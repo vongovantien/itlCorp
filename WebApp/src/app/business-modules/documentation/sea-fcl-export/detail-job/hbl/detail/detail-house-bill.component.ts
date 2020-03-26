@@ -64,6 +64,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
                 this.getDetailHbl();
 
+
             } else {
                 this.gotoList();
             }
@@ -149,7 +150,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -193,7 +193,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/sea-lcl-import/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }

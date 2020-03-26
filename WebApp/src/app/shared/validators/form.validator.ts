@@ -41,7 +41,7 @@ export class FormValidators extends Validators {
         const eta: any = controls.get('eta').value;
         const etd: any = controls.get('etd').value;
 
-        if (!eta || !etd) {
+        if (!eta || !etd || !eta.startDate || !etd.startDate) {
             return null;
         }
         const etaTime = new Date(eta.startDate).getTime();

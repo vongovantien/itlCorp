@@ -248,7 +248,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.ServiceTypeId ?? "").IndexOf(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ServiceTypeId ?? "").Contains(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase)
                                     && (x.Active == criteria.Active || criteria.Active == null);
             }
             else
@@ -257,7 +257,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.ServiceTypeId ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || (x.ServiceTypeId ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase))
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
             var list = Get(query);

@@ -173,7 +173,7 @@
                                     <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
                                         (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
                                         [disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
-                                        autoFormatCurrency numeric [decimals]="digitDecimal">
+                                        autoFormatCurrency>
                                 </div>
                             </td>
                             <td class="disabled">

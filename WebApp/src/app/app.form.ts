@@ -40,6 +40,7 @@ export abstract class AppForm extends AppPage {
 
     confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
+    errorETA: string = 'ETA must be greater than or equal ETD';
 
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();

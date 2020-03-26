@@ -175,7 +175,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl`]);
                     } else {
                         this._toastService.error(res.message);
                     }

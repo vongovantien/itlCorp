@@ -28,9 +28,15 @@ export abstract class PopupBase extends AppPage {
 
     isSubmitted: boolean = false;
     headers: CommonInterface.IHeaderTable[];
+
+    // @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    //     if (this.popup.isShown) {
+    //         this.popup.hide();
+    //     }
+    // }
+
     constructor() {
         super();
-
     }
 
     // * fn set options

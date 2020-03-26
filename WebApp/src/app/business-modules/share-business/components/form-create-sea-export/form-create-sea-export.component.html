@@ -50,8 +50,7 @@
                                 </span>
                             </div>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">ETA must
-                                greater than or equal ETD
+                                *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">{{errorETA}}
                             </div>
                         </div>
                     </div>
