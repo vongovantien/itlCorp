@@ -30,6 +30,13 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
+        readonly IContextBase<CatCharge> catChargeRepo;
+        readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
+        readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+
+
+
 
         public ShipmentService(IContextBase<CsTransaction> repository, IMapper mapper,
             IContextBase<OpsTransaction> ops,
@@ -41,7 +48,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
-            IContextBase<CatPlace> catPlace) : base(repository, mapper)
+            IContextBase<CatPlace> catPlace,
+            IContextBase<CatCharge> catCharge,
+            IContextBase<CatChargeGroup> catChargeGroup,
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysUserLevel> sysUserLevel) : base(repository, mapper)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -53,6 +64,10 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserRepo = sysUser;
             catCurrencyExchangeRepo = catCurrencyExchange;
             catPlaceRepo = catPlace;
+            catChargeRepo = catCharge;
+            catChargeGroupRepo = catChargeGroup;
+            sysOfficeRepo = sysOffice;
+            sysUserLevelRepo = sysUserLevel;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -482,6 +497,409 @@ namespace eFMS.API.Documentation.DL.Services
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
         }
+        #region -- EXPORT SHIPMENT OVERVIEW
+        public IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria)
+        {
+            List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
+            var dataShipment = QueryDataShipmentOverview(criteria);
+            foreach (var item in dataShipment)
+            {
+                GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
+                if (item.ServiceName == TermData.InlandTrucking)
+                {
+                    data.ServiceName = "Inland Trucking ";
+                }
+                if (item.ServiceName == TermData.AirExport)
+                {
+                    data.ServiceName = "Export (Air) ";
+                }
+                if (item.ServiceName == TermData.AirImport)
+                {
+                    data.ServiceName = "Import (Air) ";
+                }
+                if (item.ServiceName == TermData.SeaConsolExport)
+                {
+                    data.ServiceName = "Export (Sea Consol) ";
+                }
+                if (item.ServiceName == TermData.SeaConsolImport)
+                {
+                    data.ServiceName = "Import (Sea Consol) ";
+                }
+                if (item.ServiceName == TermData.SeaFCLExport)
+                {
+                    data.ServiceName = "Export (Sea FCL) ";
+                }
+                if (item.ServiceName == TermData.SeaFCLImport)
+                {
+                    data.ServiceName = "Import (Sea FCL) ";
+                }
+                if (item.ServiceName == TermData.SeaLCLExport)
+                {
+                    data.ServiceName = "Export (Sea LCL) ";
+                }
+                if (item.ServiceName == TermData.SeaLCLImport)
+                {
+                    data.ServiceName = "Import (Sea LCL) ";
+                }
+                data.JobNo = item.JobNo;
+                data.etd = item.etd;
+                data.eta = item.eta;
+                data.FlightNo = item.FlightNo;
+                data.MblMawb = item.MblMawb;
+                data.HblHawb = item.HblHawb;
+                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
+                data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
+                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.ShipmentType = item.ShipmentType;
+                data.Salesman = sysUserRepo.Get(x => x.Id == item.Salesman).FirstOrDefault()?.Username;
+                data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
+                data.GW = item.GW;
+                data.CW = item.CW;
+                #region -- Phí Selling trước thuế --
+                decimal _totalSellAmountFreight = 0;
+                decimal _totalSellAmountTrucking = 0;
+                decimal _totalSellAmountHandling = 0;
+                decimal _totalSellAmountOther = 0;
+                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeSell)
+                {
+
+                    var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    //SELL
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    // tinh total phi chargeGroup freight
+                    if (charGroupObj?.Name == "Freight")
+                    {
+                        _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if(charGroupObj?.Name == "Trucking")
+                    {
+                        _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Handling")
+                    {
+                        _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Other")
+                    {
+                        _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    //END SELL
+
+                }
+                data.TotalSellFreight = _totalSellAmountFreight;
+                data.TotalSellTrucking = _totalSellAmountTrucking;
+                data.TotalSellHandling = _totalSellAmountHandling;
+                data.TotalSellOthers = _totalSellAmountOther;
+                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
+                #endregion
+                #region -- Phí Buying trước thuế --
+                decimal _totalBuyAmountFreight = 0;
+                decimal _totalBuyAmountTrucking = 0;
+                decimal _totalBuyAmountHandling = 0;
+                decimal _totalBuyAmountOther = 0;
+                decimal _totalBuyAmountKB = 0;
+                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeBuy)
+                {
+                    var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    //BUY
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    // tinh total phi chargeGroup freight
+                    if (charGroupObj?.Name == "Freight")
+                    {
+                        _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Trucking")
+                    {
+                        _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Handling")
+                    {
+                        _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Other")
+                    {
+                        _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charge.KickBack == true)
+                    {
+                        _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                    }
+
+                    //END BUY
+                }
+                data.TotalBuyFreight = _totalBuyAmountFreight;
+                data.TotalBuyTrucking = _totalBuyAmountTrucking;
+                data.TotalBuyHandling = _totalBuyAmountHandling;
+                data.TotalBuyOthers = _totalBuyAmountOther;
+                data.TotalBuyKB = _totalBuyAmountKB;
+                data.TotalBuy = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + _totalBuyAmountKB;
+                data.Profit = data.TotalSell - data.TotalBuy;
+                #endregion -- Phí Buying trước thuế --
+
+                #region -- Phí OBH sau thuế --
+                decimal _obh = 0;
+                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.HblId);
+                foreach (var charge in _chargeObh)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _obh += charge.Total * _rate ?? 0; // Phí OBH sau thuế
+                }
+                data.AmountOBH = _obh;
+                #endregion -- Phí OBH sau thuế --
+                data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
+                data.CustomerId = item.CustomerId;
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                data.RalatedHblHawb = string.Empty;// tạm thời để trống
+                data.RalatedJobNo = string.Empty;// tạm thời để trống
+                data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
+                var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.Salesman).Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
+                data.Creator = sysUserRepo.Get(x=>x.Id == item.Creator).Select(t=>t.Username).FirstOrDefault();
+                data.POINV = item.POINV;
+                data.BKRefNo = item.JobNo;
+                data.Commodity = item.Commodity;
+                data.ServiceMode = item.ServiceMode;//chua co thong tin
+                data.PMTerm = item.PMTerm;
+                data.ShipmentNotes = item.ShipmentNotes;
+                data.Created = item.Created;
+                lstShipment.Add(data);
+            }
+            return lstShipment.AsQueryable();
+
+        }
+        private IQueryable<GeneralExportShipmentOverviewResult> QueryDataShipmentOverview(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans;
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = q =>
+                    q.TransactionType.Contains("E") ?
+                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                    :
+                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+            }
+            else
+            {
+                queryTrans = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                queryTranDetail = q => q.CustomerId == criteria.CustomerId;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Service))
+            {
+                queryTrans = queryTrans.And(q => criteria.Service.Contains(q.TransactionType));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.TransactionType == criteria.Service);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                queryTranDetail = queryTranDetail == null ?
+                    (q => q.Hwbno == criteria.Hawb)
+                    :
+                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                queryTrans = queryTrans.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                queryTrans = queryTrans.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                queryTrans = queryTrans.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                queryTrans = queryTrans.And(q => criteria.PersonInCharge.Contains(q.PersonIncharge));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                queryTranDetail = (queryTranDetail == null) ?
+                    (q => criteria.SalesMan.Contains(q.SaleManId))
+                    :
+                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                queryTrans = queryTrans.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CarrierId))
+            {
+                queryTrans = queryTrans.And(q => q.ColoaderId == criteria.CarrierId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.AgentId))
+            {
+                queryTrans = queryTrans.And(q => q.AgentId == criteria.AgentId);
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
+            }
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId into housebill
+                                    from house in housebill.DefaultIfEmpty()
+                                    select new GeneralExportShipmentOverviewResult
+                                    {
+                                        ServiceName = master.TransactionType,
+                                        JobNo = master.JobNo,
+                                        etd = master.Etd,
+                                        eta = master.Eta,
+                                        FlightNo = master.FlightVesselName,
+                                        MblMawb = master.Mawb,
+                                        HblHawb = house.Hwbno,
+                                        Pol = house.Pol,
+                                        Pod = house.Pod,
+                                        ShipmentType = master.ShipmentType,
+                                        Salesman = house.SaleManId,
+                                        Carrier = master.ColoaderId,
+                                        Agent = master.AgentId,
+                                        Shipper = house.ShipperId,
+                                        Consignee = house.ConsigneeId,
+                                        PackageType = house.PackageType,
+                                        QTy = house.PackageQty,
+                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
+                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
+                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
+                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        GW = master.GrossWeight,
+                                        CW = master.ChargeWeight,
+                                        CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
+                                        HblId = house.Id,
+                                        CustomerId = house.CustomerId,
+                                        OfficeId = master.OfficeId,
+                                        Creator = master.UserCreated,
+                                        POINV = master.Pono,
+                                        Commodity = master.Commodity,
+                                        PMTerm = master.PaymentTerm,
+                                        ShipmentNotes = master.Notes,
+                                        Created = master.DatetimeCreated
+
+                                        
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = detailRepository.Get().Where(queryTranDetail);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new GeneralExportShipmentOverviewResult
+                                    {
+                                        ServiceName = master.TransactionType,
+                                        JobNo = master.JobNo,
+                                        etd = master.Etd,
+                                        eta = master.Eta,
+                                        FlightNo = master.FlightVesselName,
+                                        MblMawb = master.Mawb,
+                                        HblHawb = house.Hwbno,
+                                        Pol = house.Pol,
+                                        Pod = house.Pod,
+                                        ShipmentType = master.ShipmentType,
+                                        Salesman = house.SaleManId,
+                                        Carrier = master.ColoaderId,
+                                        Agent = master.AgentId,
+                                        Shipper = house.ShipperId,
+                                        Consignee = house.ConsigneeId,
+                                        PackageType = house.PackageType,
+                                        QTy = house.PackageQty,
+                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
+                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
+                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
+                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        GW = master.GrossWeight,
+                                        CW = master.ChargeWeight,
+                                        CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
+                                        HblId = house.Id,
+                                        CustomerId = house.CustomerId,
+                                        OfficeId = master.OfficeId,
+                                        Creator = master.UserCreated,
+                                        POINV = master.Pono,
+                                        Commodity = master.Commodity,
+                                        PMTerm = master.PaymentTerm,
+                                        ShipmentNotes = master.Notes,
+                                        Created = master.DatetimeCreated
+                                    };
+                return queryShipment;
+            }
+        }
+
+        #endregion
 
         #region -- GENERAL REPORT --
 

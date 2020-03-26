@@ -23,6 +23,7 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<AcctSettlementPayment> AcctSettlementPayment { get; set; }
         public virtual DbSet<AcctSoa> AcctSoa { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
+        public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
@@ -55,7 +56,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -620,6 +621,51 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
                     .HasColumnType("decimal(18, 4)");
+            });
+
+            modelBuilder.Entity<CatCommodity>(entity =>
+            {
+                entity.ToTable("catCommodity");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
+
+                entity.Property(e => e.CommodityNameEn)
+                    .HasColumnName("CommodityName_EN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.CommodityNameVn)
+                    .HasColumnName("CommodityName_VN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCountry>(entity =>
@@ -1352,7 +1398,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.AgentId)
                     .HasColumnName("AgentID")
-                    .HasMaxLength(10);
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 

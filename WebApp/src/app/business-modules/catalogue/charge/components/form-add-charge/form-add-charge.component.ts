@@ -129,7 +129,6 @@ export class FormAddChargeComponent extends AppForm {
         let valid: boolean = true;
         this.setError(this.service);
         this.setError(this.chargeGroup);
-
         if (!this.formGroup.valid) {
             valid = false;
         }
@@ -168,7 +167,7 @@ export class FormAddChargeComponent extends AppForm {
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
 
                 if (this.isUpdate === false) {
-                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup[5].id, text: this.ngDataChargeGroup[5].text }]);
+                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup[6].id, text: this.ngDataChargeGroup[6].text }]);
 
                 }
             }
@@ -213,7 +212,7 @@ export class FormAddChargeComponent extends AppForm {
         const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
         const itemChargeGroup = this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup);
         this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
-        this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]);
+        !!res.charge.chargeGroup ? this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]) : null;
 
     }
 }
