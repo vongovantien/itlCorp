@@ -76,7 +76,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'partnerNameVn', label: 'Name ABBR' },
+        { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
