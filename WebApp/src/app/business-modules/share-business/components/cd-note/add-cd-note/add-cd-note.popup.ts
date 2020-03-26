@@ -116,7 +116,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
-            { field: 'id', label: 'Partner ID' },
+            { field: 'accountNo', label: 'Partner ID' },
             { field: 'shortName', label: 'Partner ABBR' },
             { field: 'partnerNameEn', label: 'Partner Name' },
             { field: 'taxCode', label: 'Tax Code' },
@@ -136,8 +136,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                     dataCharges.forEach(element => {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
-                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;  
-                        });                                                                                                
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
+                        });
                     });
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
@@ -147,7 +147,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             this.listCharges.push(charge);
                         }
                     }
-                    //Tính toán Amount Credit, Debit, Balance
+                    // Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount(this.listChargePartner);
                 },
             );
@@ -165,14 +165,14 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     onSubmitChangePartnerPopup() {
         this.keyword = '';
         this.isCheckAllCharge = false;
-        //Gán this.selectedPartner cho this.partnerCurrent
+        // Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
         this.changePartnerPopup.hide();
     }
 
     onCancelChangePartnerPopup() {
-        //Gán this.partnerCurrent cho this.selectedPartner
+        // Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
     }
 
@@ -211,7 +211,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                 if (charges.isSelected) charges.isDeleted = true;
             }
         }
-        //Tính toán Amount Credit, Debit, Balance
+        // Tính toán Amount Credit, Debit, Balance
         var listCharge = this.getGroupChargeNotDelete(this.listChargePartner);
         this.calculatorAmount(listCharge);
     }
@@ -234,10 +234,10 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     saveCDNote() {
-        //Lấy danh sách group charge chưa delete
+        // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
 
-        //Không được phép create khi chưa có charge
+        // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
             this.notExistsChargePopup.show();
         } else {
@@ -298,7 +298,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     calculatorAmount(listChargePartner: ChargeCdNote[]) {
-        //List currency có trong listCharges
+        // List currency có trong listCharges
         const listCurrency = [];
         const listCharge = [];
         for (const charges of listChargePartner) {
@@ -309,7 +309,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                 listCharge.push(charge);
             }
         }
-        //List currency unique      
+        // List currency unique      
         const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
@@ -357,8 +357,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                     dataCharges.forEach(element => {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && this.selectedPartner.value === ele.paymentObjectId)) ? ele.total : null;
-                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && this.selectedPartner.value === ele.payerId)) ? ele.total : null;  
-                        });                                                                                                
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && this.selectedPartner.value === ele.payerId)) ? ele.total : null;
+                        });
                     });
                     this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
                     this.addRemainChargePopup.show();
@@ -380,16 +380,16 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = [];
         this.listChargePartner = data;
         this.initGroup = data;
-        //Tính toán giá trị amount, balance
+        // Tính toán giá trị amount, balance
         this.calculatorAmount(this.listChargePartner);
     }
 
-    //Charge keyword search
+    // Charge keyword search
     onChangeKeyWord(keyword: string) {
         this.listChargePartner = this.initGroup;
         //TODO improve search.
         if (!!keyword) {
-            if(keyword.indexOf('\\') != -1) return this.listChargePartner = [];
+            if (keyword.indexOf('\\') != -1) return this.listChargePartner = [];
             keyword = keyword.toLowerCase();
             // Search group
             let dataGrp = this.listChargePartner.filter((item: any) => item.hwbno.toLowerCase().toString().search(keyword) !== -1)
@@ -410,20 +410,20 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         }
     }
 
-    cancel(){
-        if(this.isChangeCharge === false){
+    cancel() {
+        if (this.isChangeCharge === false) {
             this.closePopup();
         } else {
             this.confirmCloseAddPopup.show();
         }
     }
 
-    onSubmitConfirmCloseAdd(){
+    onSubmitConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
         this.closePopup();
     }
-    
-    onCancelConfirmCloseAdd(){
+
+    onCancelConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
-    }    
+    }
 }
