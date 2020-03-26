@@ -42,7 +42,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportAdvancePayment(AdvancePaymentCriteria advancePaymentCriteria)
         {
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(advancePaymentCriteria, aPis.HostStaging + Urls.Accounting.AdvancePaymentUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(advancePaymentCriteria, aPis.AccountingAPI + Urls.Accounting.AdvancePaymentUrl);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentModel>>();
 
@@ -67,7 +67,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportAdvancePaymentShipment(AdvancePaymentCriteria advancePaymentCriteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var advancePaymentsAPI = await HttpServiceExtension.PostAPI(advancePaymentCriteria, aPis.HostStaging + Urls.Accounting.AdvancePaymentUrl, accessToken);
+            var advancePaymentsAPI = await HttpServiceExtension.PostAPI(advancePaymentCriteria, aPis.AccountingAPI + Urls.Accounting.AdvancePaymentUrl, accessToken);
 
             var advancePayments = advancePaymentsAPI.Content.ReadAsAsync<List<AdvancePaymentModel>>();
             List<string> codes = new List<string>();
@@ -75,7 +75,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 codes.Add(item.AdvanceNo);
             }
-            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.HostStaging + Urls.Accounting.GetGroupRequestsByAdvanceNoList, accessToken);
+            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.AccountingAPI + Urls.Accounting.GetGroupRequestsByAdvanceNoList, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AdvancePaymentRequestModel>>();
 
@@ -99,7 +99,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportSettlementPayment(SettlementPaymentCriteria settlementPaymentCriteria)
         {
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(settlementPaymentCriteria, aPis.HostStaging + Urls.Accounting.SettlementPaymentUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(settlementPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.SettlementPaymentUrl);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementPaymentModel>>();
 
@@ -124,7 +124,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportSettlementPaymentShipment(SettlementPaymentCriteria settlementPaymentCriteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var settlementsAPI = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.HostStaging + Urls.Accounting.SettlementPaymentUrl, accessToken);
+            var settlementsAPI = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.SettlementPaymentUrl, accessToken);
 
             var settlementPayments = settlementsAPI.Content.ReadAsAsync<List<SettlementPaymentModel>>();
             List<string> codes = new List<string>();
@@ -132,7 +132,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 codes.Add(item.SettlementNo);
             }
-            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.HostStaging + Urls.Accounting.QueryDataSettlementExport, accessToken);
+            var responseFromApi = await HttpServiceExtension.PostAPI(codes, aPis.AccountingAPI + Urls.Accounting.QueryDataSettlementExport, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SettlementExportGroupDefault>>();
 
@@ -156,7 +156,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string language)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + language);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + language);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
 
@@ -179,7 +179,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportDetailSOA(string soaNo, string currency)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailSOAExportUrl + soaNo + "&&currencyLocal="  + currency);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSOAExportUrl + soaNo + "&&currencyLocal="  + currency);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<DetailSOAModel>();
 
@@ -202,7 +202,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportBravoSOA(string soaNo)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi( aPis.HostStaging + Urls.Accounting.GetDataBravoSOAUrl + soaNo) ;
+            var responseFromApi = await HttpServiceExtension.GetApi( aPis.AccountingAPI + Urls.Accounting.GetDataBravoSOAUrl + soaNo) ;
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportBravoSOAModel>>();
 
@@ -225,7 +225,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportSOAOPS(string soaNo)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.GetDataSOAOPSUrl + soaNo);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAOPSUrl + soaNo);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SOAOPSModel>();
 
@@ -249,7 +249,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string language)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
@@ -272,7 +272,7 @@ namespace eFMS.API.ReportData.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportSOAAirfreight(string soaNo, string officeId)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
             if(dataObjects.Result.HawbAirFrieghts == null)
