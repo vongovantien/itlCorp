@@ -227,7 +227,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="jobId"></param>
         /// <returns></returns>
         [HttpPut("UploadMultiFiles/{jobId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
         {
             string folderName = Request.Headers["Module"];
