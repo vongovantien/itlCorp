@@ -3,6 +3,7 @@ import { StyleCellDirective, AutofocusDirective, TwoDigitDecimaNumberDirective, 
 import { LoadModuleDirective } from './load-module.directive';
 import { AutoFormatCurrencyDirective } from './auto-format-currency.directive';
 import { CurrencyPipe } from '@angular/common';
+import { NoDblClickDirective } from './prevent-dbclick.directive';
 
 const APP_DIRECTIVES = [
     StyleCellDirective,
@@ -19,7 +20,8 @@ const APP_DIRECTIVES = [
     AppLoadingButtonDirective,
     AppRequiredDirective,
     NumericDirective,
-    AutoFormatCurrencyDirective
+    AutoFormatCurrencyDirective,
+    NoDblClickDirective
 ];
 @NgModule({
     declarations: [
