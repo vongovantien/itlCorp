@@ -167,7 +167,7 @@ export class FormAddChargeComponent extends AppForm {
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
 
                 if (this.isUpdate === false) {
-                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup[5].id, text: this.ngDataChargeGroup[5].text }]);
+                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup[6].id, text: this.ngDataChargeGroup[6].text }]);
 
                 }
             }
