@@ -99,7 +99,7 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     }
 
     addCharge() {
-        this.initCharges = [...this.initCharges, new CatPartnerCharge({ partnerId: this.partnerId })];
+        this.initCharges = [...this.initCharges, new CatPartnerCharge({ partnerId: this.partnerId, quantity: 1 })];
     }
 
     deleteCharge(charge: CatPartnerCharge, index: number) {

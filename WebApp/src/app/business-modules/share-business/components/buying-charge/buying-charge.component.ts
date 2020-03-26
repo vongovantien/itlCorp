@@ -181,9 +181,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getUnits() {
-        this._progressRef.start();
         this._store.select(getCatalogueUnitState)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (units: Unit[]) => {
                     this.listUnits = units;
@@ -192,9 +191,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getPartner() {
-        this._progressRef.start();
         this._catalogueRepo.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
