@@ -432,6 +432,7 @@ namespace eFMS.API.System.Controllers
                                             && x.OfficeId == model.OfficeId
                                             && x.DepartmentId == model.DepartmentId
                                             && x.UserId == model.UserId
+                                            && x.GroupId == model.GroupId
                                             && x.GroupId != SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
