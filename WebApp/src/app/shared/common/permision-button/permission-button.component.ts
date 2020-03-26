@@ -8,10 +8,11 @@ import { Observable } from 'rxjs';
 @Component({
     selector: 'app-permission-button',
     templateUrl: './permission-button.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppPermissionButtonComponent extends AppForm implements OnInit {
-    @Input() title: string = 'new';
-    @Input() type: string = 'add';
+    @Input() title: string;
+    @Input() type: string;
 
     menuPermission: Observable<SystemInterface.IUserPermission>;
 
