@@ -42,11 +42,11 @@
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
                                                         <app-permission-button type="copy"
-                                                            (click)="viewDetailTpCopy(tariff)">
+                                                            (onClick)="viewDetailTpCopy(tariff)">
                                                         </app-permission-button>
                                                         <ng-container *ngIf="!tariff.status">
                                                             <app-permission-button type="delete"
-                                                                (click)="showDeletePopup(tariff)">
+                                                                (onClick)="showDeletePopup(tariff)">
                                                             </app-permission-button>
                                                         </ng-container>
                                                     </div>

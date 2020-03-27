@@ -77,7 +77,7 @@
                                                 <div class="float-right">
                                                     <ng-container *ngIf="(isLocked  | async ) === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (click)="gotoCreate()"
+                                                            (onClick)="gotoCreate()"
                                                             *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
@@ -101,14 +101,14 @@
                                                         *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
-                                                                <app-permission-button (click)="gotoDetail(house.id)"
+                                                                <app-permission-button (onClick)="gotoDetail(house.id)"
                                                                     type="detail">
                                                                 </app-permission-button>
                                                                 <ng-container *ngIf="(isLocked | async) === false">
                                                                     <ng-container
                                                                         *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                                         <app-permission-button
-                                                                            (click)="showDeletePopup(house, $event,i)"
+                                                                            (onClick)="showDeletePopup(house, $event,i)"
                                                                             type="delete">
                                                                         </app-permission-button>
                                                                     </ng-container>

@@ -20,10 +20,10 @@
                             <div class="c-button-actions">
                                 <ng-container
                                     *ngIf="!!advancePayment && (advancePayment.statusApproval == 'Denied' || advancePayment.statusApproval === 'New')">
-                                    <app-permission-button type="save" title="Save" (click)="updateAdvPayment()">
+                                    <app-permission-button type="save" title="Save" (onClick)="updateAdvPayment()">
                                     </app-permission-button>
                                     <app-permission-button type="save-and-send" title="Save & Send Request"
-                                        (click)="sendRequest()"></app-permission-button>
+                                        (onClick)="sendRequest()"></app-permission-button>
                                 </ng-container>
                                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
                                     <app-default-button data-toggle="dropdown" aria-haspopup="true"

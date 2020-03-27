@@ -1,8 +1,9 @@
 <div class="advance-payment-page m-animate-fade-in">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-permission-button title="Add New" [routerLink]="'/home/accounting/settlement-payment/new'"></app-permission-button>            
-            <app-permission-button type="export" title="Export" (click)="export()"></app-permission-button>
+            <app-permission-button title="Add New" [routerLink]="'/home/accounting/settlement-payment/new'">
+            </app-permission-button>
+            <app-permission-button type="export" title="Export" (onClick)="export()"></app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -41,10 +42,10 @@
                                                             <i class="la la-trash text-danger"></i>
                                                         </a>
                                                     </ng-container> -->
-                                                    <button [disabled]="settlePayment.statusApproval !== 'New' && settlePayment.statusApproval !== 'Denied'"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
-                                                        title="Delete"
-                                                        (click)="prepareDeleteAdvance(settlePayment)">
+                                                    <button
+                                                        [disabled]="settlePayment.statusApproval !== 'New' && settlePayment.statusApproval !== 'Denied'"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        title="Delete" (click)="prepareDeleteAdvance(settlePayment)">
                                                         <i class="la la-trash text-danger"></i>
                                                     </button>
                                                     <span>

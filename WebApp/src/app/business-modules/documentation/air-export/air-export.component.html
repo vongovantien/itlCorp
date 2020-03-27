@@ -1,6 +1,6 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <app-permission-button title="create new job" (click)="gotoCreateJob()" type="add"></app-permission-button>
+        <app-permission-button title="create new job" (onClick)="gotoCreateJob()" type="add"></app-permission-button>
     </div>
 </app-sub-header>
 
@@ -28,7 +28,7 @@
                                                 title="Collapse" (click)="getListHouseBill(shipment.id,i)">
                                                 <i class="la la-angle-up"></i>
                                             </button>
-                                            <app-permission-button (click)="viewDetail(shipment.id)" type="detail">
+                                            <app-permission-button (onClick)="viewDetail(shipment.id)" type="detail">
                                             </app-permission-button>
 
                                             <button type="button" *ngIf="shipment.isLocked"
@@ -37,7 +37,7 @@
                                             </button>
 
                                             <ng-container *ngIf="!shipment.isLocked">
-                                                <app-permission-button (click)="prepareDeleteShipment(shipment)"
+                                                <app-permission-button (onClick)="prepareDeleteShipment(shipment)"
                                                     type="delete">
                                                 </app-permission-button>
                                             </ng-container>
