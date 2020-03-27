@@ -1,4 +1,6 @@
-﻿using eFMS.API.ReportData.Models.Documentation;
+﻿using eFMS.API.ReportData.Models;
+using eFMS.API.ReportData.Models.Criteria;
+using eFMS.API.ReportData.Models.Documentation;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -1063,5 +1065,128 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H17"].Style.Font.Color.SetColor(Color.Blue);
         }
         #endregion -- Export SCSC & TCS Air Export --
+
+        #region MONTHY REPORT
+        /// <returns></returns>
+        public Stream GenerateShipmentOverviewExcel(List<ExportShipmentOverview> overview, GeneralReportCriteria criteria, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Shipment Overview");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDataShipmentOverview(workSheet, overview, criteria);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        public void BinddingDataShipmentOverview(ExcelWorksheet workSheet, List<ExportShipmentOverview> overview, GeneralReportCriteria criteria)
+        {
+            List<string> headers = new List<string>()
+            {
+                "INDO TRANS LOGISTICS CORPORATION",
+               "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+               "MONTHLY SALES REPORT"
+            };
+
+            List<string> headersTable = new List<string>()
+            {
+                "No",
+                "SERVICE",
+                "JOB NO",
+                "ETD",
+                "ETA",
+                "VESSEL/FLIGHT",
+                "MBL/MAWB",
+                "HBL/HAWB",
+                "POL/POD",
+                "cARRIER",
+                "AGENT",
+                "SHIPPER",
+                "CONSIGNEE",
+                "SHIPMENT TYPE",
+                "SALEMAN",
+                "NOINATION PARTY",
+                "Q'TY",
+                "20'",
+                "40'",
+                "40'HC",
+                "45'",
+                "G.W",
+                "C.W",
+                "CBM",
+                "REVENUE",
+                "COSTING",
+                "PROFIT",
+                "OBH(P)",
+                "OBH(R)",
+                "DESTINATION",
+                "CUSTOMER ID",
+                "CUSTOMER NAME",
+                "RELATED HBL/HAWB",
+                "RELATED JOB NO",
+                "HANDLE OFFICE",
+                "SALES OFFICE",
+                "CREATOR",
+                "P.O/INV#",
+                "B.K/REF NO",
+                "B.K/REF NO",
+                "COMMODITY",
+                "SERVICE MODE",
+                "P/M TERM",
+                "SHIPMENT NOTES",
+                "CREATED",
+                
+            };
+
+            List<string> subheadersTable = new List<string>()
+            {
+                "FREIGHT", 
+                "TRUCKING",
+                "HANDLING FEE",
+                "OTHERS",
+                "TOTAL",
+                "COM."
+
+            };
+            //Title
+            workSheet.Cells["A7:U7"].Merge = true;
+            workSheet.Cells["A7"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
+            workSheet.Cells["A7"].Value = headers[2];
+            workSheet.Cells["A7"].Style.Font.Size = 16;
+            workSheet.Cells["A7"].Style.Font.Bold = true;
+            workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A1:E1"].Merge = true;
+            workSheet.Cells["A1"].Value = headers[0];
+            workSheet.Cells["A1"].Style.Font.Bold = true;
+
+            workSheet.Cells["A2:E6"].Merge = true;
+            workSheet.Cells["A2:E6"].Style.WrapText = true;
+            workSheet.Cells["A2"].Value = headers[1];
+            workSheet.Cells["A2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
+            workSheet.Cells["A8:U8"].Merge = true;
+            DateTime fromDate = criteria.CreatedDateFrom == null ? criteria.ServiceDateFrom.GetValueOrDefault() : criteria.CreatedDateFrom.GetValueOrDefault();
+            DateTime toDate = criteria.CreatedDateTo == null ? criteria.ServiceDateTo.GetValueOrDefault() : criteria.CreatedDateTo.GetValueOrDefault();
+
+            workSheet.Cells["A8"].Value = "From:" + fromDate.ToString("dd/MM/yyyy") + " To:" + toDate.ToString("dd/MM/yyyy");
+
+            workSheet.Cells["A8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+
+
+
+        }
+
+        #endregion
     }
 }

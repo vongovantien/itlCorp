@@ -189,13 +189,18 @@ namespace eFMS.API.System.DL.Services
             var users = DataContext.Get();
             var employees = employeeRepository.Get();
             var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
+            var datas = from u in users
+                        join e in employees on u.EmployeeId equals e.Id into em
+                        from e in em.DefaultIfEmpty()
+                        select new { u,e};
+
             if (criteria.All == null)
             {
-                data = data.Where(x => (x.x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                         && (x.y.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                         && (x.y.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                         && (x.x.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                         && (x.x.Active == criteria.Active || criteria.Active == null));
+                datas = datas.Where(x => (x.u.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                         && (x.e.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                         && (x.e.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                         && (x.u.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                         && (x.e.Active == criteria.Active || criteria.Active == null));
             }
             else
             {
@@ -207,20 +212,20 @@ namespace eFMS.API.System.DL.Services
                 {
                     criteria.Active = false;
                 }
-                data = data.Where(x => (
-                          ((x.x.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                          || (x.y.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.y.Title ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.x.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                          || (x.x.Active == criteria.Active)
+                datas = datas.Where(x => (
+                          ((x.u.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                          || (x.e.EmployeeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.e.Title ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.u.UserType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                          || (x.u.Active == criteria.Active)
                           ));
             }
             List<SysUserViewModel> results = new List<SysUserViewModel>();
-            foreach (var item in data)
+            foreach (var item in datas)
             {
-                var model = mapper.Map<SysUserViewModel>(item.x);
-                model.EmployeeNameEn = item.y.EmployeeNameEn;
-                model.EmployeeNameVn = item.y.EmployeeNameVn;
+                var model = mapper.Map<SysUserViewModel>(item.u);
+                model.EmployeeNameEn = item.e.EmployeeNameEn;
+                model.EmployeeNameVn = item.e.EmployeeNameVn;
                 results.Add(model);
             }
             return results.AsQueryable();
