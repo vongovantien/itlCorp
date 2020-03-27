@@ -241,52 +241,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatChargeModel> Query(CatChargeCriteria criteria)
         {
-            Expression<Func<CatChargeModel, bool>> query = null;
-            if (criteria.All == null)
-            {
-                query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                    && (x.ServiceTypeId ?? "").Contains(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase)
-                                    && (x.Active == criteria.Active || criteria.Active == null);
-            }
-            else
-            {
-                query = x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                   || (x.ServiceTypeId ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase))
-                                   && (x.Active == criteria.Active || criteria.Active == null);
-            }
-            var list = Get(query);
-            var currencies = currencyService.Get();
-            var units = catUnitService.Get();
-            list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
-                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel
-                        {
-                            Id = x.x.Id,
-                            Code = x.x.Code,
-                            ChargeNameVn = x.x.ChargeNameVn,
-                            ChargeNameEn = x.x.ChargeNameEn,
-                            ServiceTypeId = x.x.ServiceTypeId,
-                            Type = x.x.Type,
-                            CurrencyId = x.x.CurrencyId,
-                            UnitPrice = x.x.UnitPrice,
-                            UnitId = x.x.UnitId,
-                            Vatrate = x.x.Vatrate,
-                            IncludedVat = x.x.IncludedVat,
-                            UserCreated = x.x.UserCreated,
-                            DatetimeCreated = x.x.DatetimeCreated,
-                            UserModified = x.x.UserModified,
-                            DatetimeModified = x.x.DatetimeModified,
-                            Active = x.x.Active,
-                            InactiveOn = x.x.InactiveOn,
-                            currency = y.UnitNameEn,
-                            unit = y.UnitNameEn
-                        });
-            return list;
+            return QueryCriteria(criteria);
         }
 
         public HandleState DeleteCharge(Guid id)
@@ -546,6 +501,109 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return true;
 
+        }
+
+        private IQueryable<CatChargeModel> QueryCriteria(CatChargeCriteria criteria)
+        {
+            Expression<Func<CatChargeModel, bool>> query = null;
+            if (criteria.All == null)
+            {
+                query = x => (x.ChargeNameEn ?? "").IndexOf(criteria.ChargeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ChargeNameVn ?? "").IndexOf(criteria.ChargeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.Type ?? "").IndexOf(criteria.Type ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.ServiceTypeId ?? "").Contains(criteria.ServiceTypeId ?? "", StringComparison.OrdinalIgnoreCase)
+                                    && (x.Active == criteria.Active || criteria.Active == null);
+            }
+            else
+            {
+                query = x => ((x.ChargeNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ChargeNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.Type ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.ServiceTypeId ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase))
+                                   && (x.Active == criteria.Active || criteria.Active == null);
+            }
+            var list = Get(query);
+            var currencies = currencyService.Get();
+            var units = catUnitService.Get();
+            list = list.Join(currencies, x => x.CurrencyId, y => y.Id, (x, y) => new { x, y.CurrencyName })
+                        .Join(units, x => x.x.UnitId, y => y.Id, (x, y) => new CatChargeModel
+                        {
+                            Id = x.x.Id,
+                            Code = x.x.Code,
+                            ChargeNameVn = x.x.ChargeNameVn,
+                            ChargeNameEn = x.x.ChargeNameEn,
+                            ServiceTypeId = x.x.ServiceTypeId,
+                            Type = x.x.Type,
+                            CurrencyId = x.x.CurrencyId,
+                            UnitPrice = x.x.UnitPrice,
+                            UnitId = x.x.UnitId,
+                            Vatrate = x.x.Vatrate,
+                            IncludedVat = x.x.IncludedVat,
+                            UserCreated = x.x.UserCreated,
+                            DatetimeCreated = x.x.DatetimeCreated,
+                            UserModified = x.x.UserModified,
+                            DatetimeModified = x.x.DatetimeModified,
+                            Active = x.x.Active,
+                            InactiveOn = x.x.InactiveOn,
+                            currency = y.UnitNameEn,
+                            unit = y.UnitNameEn,
+                            OfficeId =x.x.OfficeId,
+                            GroupId = x.x.GroupId,
+                            CompanyId = x.x.CompanyId,
+                            DepartmentId = x.x.DepartmentId
+                        });
+            return list;
+
+        }
+
+        public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)
+        {
+            IQueryable<CatChargeModel> data = null;
+            var list = QueryCriteria(criteria);
+
+            switch (range)
+            {
+                case PermissionRange.All:
+                    data = list;
+                    break;
+                case PermissionRange.Owner:
+                    data = list.Where(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Group:
+                    data = list.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Department:
+                    data = list.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Office:
+                    data = list.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Company:
+                    data = list.Where(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
+                    break;
+                default:
+                    break;
+            }
+
+            return data;
+        }
+
+        public IQueryable<CatChargeModel> QueryExport(CatChargeCriteria criteria)
+        {
+            IQueryable<CatChargeModel> data = null;
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
+            {
+                return data;
+            }
+            data = QueryByPermission(criteria, rangeSearch);
+            return data;
         }
     }
 }

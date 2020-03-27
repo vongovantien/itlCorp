@@ -15,6 +15,8 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<CatChargeModel> Query(CatChargeCriteria criteria);
+        IQueryable<CatChargeModel> QueryExport(CatChargeCriteria criteria);
+
         IQueryable<CatChargeModel> GetBy(string type);
         HandleState AddCharge(CatChargeAddOrUpdateModel model);
         HandleState UpdateCharge(CatChargeAddOrUpdateModel model);

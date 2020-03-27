@@ -11,7 +11,7 @@
             public const string CatCommodityGroupUrl = "/api/v1/en-US/CatCommodityGroup/query";
             public const string CatStageUrl = "/api/v1/en-US/CatStage/query";
             public const string CatUnitUrl = "/api/v1/en-US/CatUnit/query";
-            public const string CatchargeUrl = "/api/v1/en-US/CatCharge/query";
+            public const string CatchargeUrl = "/api/v1/en-US/CatCharge/QueryExport";
             public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
         }
         public class CustomClearance

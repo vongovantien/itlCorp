@@ -98,6 +98,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = helper.CreatePartnerExcelFile(dataObjects.Result, catPartnerCriteria.PartnerType, catPartnerCriteria.Author);
             return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
         }
+
         /// <summary>
         /// export commodity list
         /// </summary>
@@ -160,6 +161,7 @@ namespace eFMS.API.ReportData.Controllers
             var stream = helper.CreateCatUnitExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.UnitList);
         }
+
         /// <summary>
         /// export province
         /// </summary>
@@ -217,14 +219,19 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportCharge")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportCharge(CatChargeCriteria catChargeCriteria)
         {
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catChargeCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatchargeUrl);
+            var accessToken = Request.Headers["Authorization"].ToString();
+
+            var responseFromApi = await HttpServiceExtension.PostAPI(catChargeCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatchargeUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatCharge>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
             var stream = helper.CreateChargeExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.ChargeName);
         }
+
         /// <summary>
         /// export currency
         /// </summary>
