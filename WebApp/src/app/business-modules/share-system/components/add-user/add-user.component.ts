@@ -15,7 +15,8 @@ import { IShareSystemState, getShareSystemUserLevelState, SystemLoadUserLevelAct
 
 @Component({
     selector: 'form-user-level',
-    templateUrl: 'add-user.component.html'
+    templateUrl: 'add-user.component.html',
+    styleUrls: ['./add-user.component.scss']
 })
 
 export class ShareSystemAddUserComponent extends AppList {
@@ -81,7 +82,6 @@ export class ShareSystemAddUserComponent extends AppList {
                     this.userLevelTemp = cloneDeep(this.usersLevels);
                 }
             );
-        // this.queryUserLevel();
     }
 
     getUsers() {
@@ -98,7 +98,6 @@ export class ShareSystemAddUserComponent extends AppList {
 
     addNewLine() {
         this.isSubmitted = true;
-        // this.usersLevels.push(new UserLevel());
         this.userLevelTemp.push(new UserLevel());
     }
 
@@ -106,16 +105,17 @@ export class ShareSystemAddUserComponent extends AppList {
         this.userLevelTemp = cloneDeep(this.usersLevels);
     }
 
-    selectedUser(userLevel: UserLevel, id: string) {
+    selectedUser(userLevel: UserLevel, currenUser: User) {
         this.isSubmitted = true;
         const object = {};
         const userId: string[] = [];
 
-        const user: User = this.users.find(u => u.id === id);
-        if (!!user) {
-            userLevel.employeeName = user.employeeNameVn;
-        }
+        if (!currenUser) { return; }
 
+        userLevel.employeeName = currenUser.employeeNameVn;
+        userLevel.userId = currenUser.id;
+
+        // * check duplicate
         this.userLevelTemp.forEach(function (item) {
             if (!object[item.userId]) {
                 object[item.userId] = 0;
@@ -128,7 +128,6 @@ export class ShareSystemAddUserComponent extends AppList {
                 userId.push(prop);
             }
         }
-        console.log(userId);
         if (userId.length > 0) {
             this.userLevelTemp = this.checkDup(this.userLevelTemp, userId);
         } else {
@@ -203,7 +202,6 @@ export class ShareSystemAddUserComponent extends AppList {
             this._toastService.warning("Please add user Level");
             return;
         }
-        console.log(this.usersLevels);
 
         this.isSubmitted = true;
         if (!this.checkValidate()) {
@@ -284,7 +282,6 @@ export class ShareSystemAddUserComponent extends AppList {
             this._router.navigate([`home/system/office/${officeId}/${id}/${this.type}`]);
         }
         if (this.type === "company") {
-            console.log(this.object);
             this._router.navigate([`home/system/company/${this.object.id}/${officeId}/${id}/${this.type}`]);
         }
         if (this.type === "department") {
