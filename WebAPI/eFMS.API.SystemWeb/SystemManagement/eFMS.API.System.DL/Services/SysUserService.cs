@@ -86,7 +86,6 @@ namespace eFMS.API.System.DL.Services
             var userLevels = userlevelRepository.Get();
             var companies = sysCompanyRepository.Get();
             var offices = sysCompanyRepository.Get();
-            //var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
             var datas = from u in users
                         join e in employees on u.EmployeeId equals e.Id into em
                         from e in em.DefaultIfEmpty()
@@ -192,7 +191,6 @@ namespace eFMS.API.System.DL.Services
         {
             var users = DataContext.Get();
             var employees = employeeRepository.Get();
-            var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
             var datas = from u in users
                         join e in employees on u.EmployeeId equals e.Id into em
                         from e in em.DefaultIfEmpty()
@@ -228,8 +226,8 @@ namespace eFMS.API.System.DL.Services
             foreach (var item in datas)
             {
                 var model = mapper.Map<SysUserViewModel>(item.u);
-                model.EmployeeNameEn = item.e.EmployeeNameEn;
-                model.EmployeeNameVn = item.e.EmployeeNameVn;
+                model.EmployeeNameEn = item.e?.EmployeeNameEn;
+                model.EmployeeNameVn = item.e?.EmployeeNameVn;
                 results.Add(model);
             }
             return results.AsQueryable();
