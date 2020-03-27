@@ -134,7 +134,7 @@
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <ng-container *ngIf="isShowUpdate">
-                    <app-permission-button type="save" (click)="onSubmit()" title="Save"></app-permission-button>
+                    <app-permission-button type="save" (onClick)="onSubmit()" title="Save"></app-permission-button>
                 </ng-container>
 
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="onCancel()"></app-default-button>

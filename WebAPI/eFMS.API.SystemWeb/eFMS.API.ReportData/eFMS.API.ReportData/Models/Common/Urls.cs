@@ -4,15 +4,15 @@
     {
         public class Catelogue
         {
-            public const string CountryUrl = "/Catalogue/api/v1/en-US/CatCountry/query";
-            public const string CatplaceUrl = "/Catalogue/api/v1/en-US/CatPlace/query";
-            public const string CatPartnerUrl = "/Catalogue/api/v1/en-US/CatPartner/query";
-            public const string CatCommodityUrl = "/Catalogue/api/v1/en-US/CatCommonity/query";
-            public const string CatCommodityGroupUrl = "/Catalogue/api/v1/en-US/CatCommodityGroup/query";
-            public const string CatStageUrl = "/Catalogue/api/v1/en-US/CatStage/query";
+            public const string CountryUrl = "/api/v1/en-US/CatCountry/query";
+            public const string CatplaceUrl = "/api/v1/en-US/CatPlace/QueryExport";
+            public const string CatPartnerUrl = "/api/v1/en-US/CatPartner/query";
+            public const string CatCommodityUrl = "/api/v1/en-US/CatCommonity/query";
+            public const string CatCommodityGroupUrl = "/api/v1/en-US/CatCommodityGroup/query";
+            public const string CatStageUrl = "/api/v1/en-US/CatStage/query";
             public const string CatUnitUrl = "/api/v1/en-US/CatUnit/query";
-            public const string CatchargeUrl = "/Catalogue/api/v1/en-US/CatCharge/query";
-            public const string CatCurrencyUrl = "/Catalogue/api/v1/en-US/CatCurrency/getAllByQuery";
+            public const string CatchargeUrl = "/api/v1/en-US/CatCharge/QueryExport";
+            public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
         }
         public class CustomClearance
         {
@@ -30,20 +30,20 @@
 
         public class Accounting
         {
-            public const string AdvancePaymentUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/QueryData";
+            public const string AdvancePaymentUrl = "/api/v1/en-US/AcctAdvancePayment/QueryData";
 
-            public const string GetDataBravoSOAUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
+            public const string GetDataBravoSOAUrl = "/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
 
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
 
-            public const string SettlementPaymentUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryData";
-            public const string DetailAdvancePaymentExportUrl = "/Accounting/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
-            public const string DetailSettlementPaymentExportUrl = "/Accounting/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
-            public const string DetailSOAExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
-            public const string GetDataSOAAirfreightExportUrl = "/Accounting/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
-            public const string GetGroupRequestsByAdvanceNoList = "/Accounting/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
-            public const string QueryDataSettlementExport = "/Accounting/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
+            public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
+            public const string DetailAdvancePaymentExportUrl = "/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
+            public const string DetailSettlementPaymentExportUrl = "/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
+            public const string DetailSOAExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
+            public const string GetDataSOAAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
+            public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
+            public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
 
         }
 

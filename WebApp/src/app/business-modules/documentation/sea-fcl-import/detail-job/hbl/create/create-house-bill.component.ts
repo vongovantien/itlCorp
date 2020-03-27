@@ -76,6 +76,11 @@ export class CreateHouseBillComponent extends AppForm {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
 
+                        if (!!this.containers) {
+                            this.containers.forEach(c => {
+                                c.mblid = SystemConstants.EMPTY_GUID;
+                            });
+                        }
                         // * Update field inword with container data.
                         this.formHouseBill.formGroup.controls["warehousenotice"].setValue(this.updateInwordField(this.containers));
                     }

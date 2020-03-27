@@ -12,6 +12,7 @@ export * from './loading-button.directive';
 export * from './required.directive';
 export * from './numeric-input.directive';
 export * from './auto-format-currency.directive';
+export * from './prevent-dbclick.directive';
 
 
 

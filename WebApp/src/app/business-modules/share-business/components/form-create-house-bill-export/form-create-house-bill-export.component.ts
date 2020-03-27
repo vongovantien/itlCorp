@@ -76,7 +76,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'partnerNameVn', label: 'Name ABBR' },
+        { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameEn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
@@ -407,6 +407,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         this.saleMan.setValue(item.id);
                     }
                 });
+                if (!this.shipper.value) {
+                    this.shipper.setValue(data.id);
+                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                }
                 break;
             case 'shipper':
                 this.shipper.setValue(data.id);

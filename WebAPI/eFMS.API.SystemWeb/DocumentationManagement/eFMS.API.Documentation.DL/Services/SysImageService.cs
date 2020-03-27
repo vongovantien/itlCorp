@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace eFMS.API.Documentation.DL.Services
 {
     public class SysImageService : RepositoryBase<SysImage, SysImageModel>, ISysImageService
@@ -40,7 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = DataContext.Delete(x => x.Id == id);
             if (result.Success)
             {
-                var hs = await ImageHelper.DeleteFile(item.Url);
+                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
             }
             return result;
         }
@@ -67,7 +68,7 @@ namespace eFMS.API.Documentation.DL.Services
                     fileName = file.FileName;
                     string objectId = model.JobId.ToString();
                     await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
-                    string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
+                    string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),

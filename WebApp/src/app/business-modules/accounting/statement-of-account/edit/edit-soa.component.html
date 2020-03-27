@@ -212,24 +212,8 @@
     <soa-summary [data]="soa"></soa-summary>
 
     <div class="form-actions m--align-center">
-        <!-- <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateSOA()">
-            <span>
-                <i class="la la-save"></i>
-                <span>
-                    Save
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span>
-        </button> -->
         <div class="c-button-actions">
-            <app-permission-button type="save" title="Save" (click)="updateSOA()">
+            <app-permission-button type="save" title="Save" (onClick)="updateSOA()">
             </app-permission-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
             </app-default-button>

@@ -120,12 +120,13 @@ namespace eFMS.API.Common.Helpers
             }
         }
 
-        public static async Task<bool> DeleteFile(string pathFile)
+        public static async Task<bool> DeleteFile(string fileName, string folderName)
         {
-            if (!System.IO.File.Exists(pathFile)) return false;
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\files\\" + folderName, fileName);
+            if (!System.IO.File.Exists(path)) return false;
             try
             {
-                System.IO.File.Delete(pathFile);
+                System.IO.File.Delete(path);
                 return true;
             }
             catch (Exception e)

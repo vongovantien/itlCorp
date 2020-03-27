@@ -278,13 +278,13 @@
                         <div class="form-group"
                             [ngClass]="{ 'm-form__group has-danger': isSubmitted && billingAddressEN.invalid }">
                             <label class="form-control-label">
-                                Address Local <span class="m--font-danger">(*)</span>
+                                Address EN <span class="m--font-danger">(*)</span>
                             </label>
                             <textarea class="form-control m-input m-input--square" id="" rows="6" maxlength="300"
                                 autocomplete="nope" name="billingAddressEN" formControlName="billingAddressEN"
                                 required></textarea>
                             <div class="form-control-feedback" *ngIf="isSubmitted && billingAddressEN.invalid">
-                                Address Local is required
+                                Address EN is required
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 <div class="sea-fcl-import-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-permission-button title="create new job" (click)="gotoCreateJob()"></app-permission-button>
+            <app-permission-button title="create new job" (onClick)="gotoCreateJob()"></app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -27,14 +27,14 @@
                                                     title="Collapse" (click)="getListHouseBill(item.id, i)">
                                                     <i class="la la-angle-up"></i>
                                                 </button>
-                                                <app-permission-button (click)="viewDetail(item.id)" type="detail">
+                                                <app-permission-button (onClick)="viewDetail(item.id)" type="detail">
                                                 </app-permission-button>
                                                 <button type="button" *ngIf="item.isLocked"
                                                     class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                     <i class="fa fa-lock"></i>
                                                 </button>
                                                 <ng-container *ngIf="!item.isLocked">
-                                                    <app-permission-button (click)="prepareDeleteShipment(item)"
+                                                    <app-permission-button (onClick)="prepareDeleteShipment(item)"
                                                         type="delete">
                                                     </app-permission-button>
                                                 </ng-container>

@@ -4,10 +4,10 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button (click)="showAdd()" type="add" title="Add New"></app-permission-button>
+            <app-permission-button (onClick)="showAdd()" type="add" title="Add New"></app-permission-button>
             <app-permission-button [routerLink]="['/home/catalogue/port-index/import']" type="import" title="Import">
             </app-permission-button>
-            <app-permission-button (click)="export()" type="export" title="Export">
+            <app-permission-button (onClick)="export()" type="export" title="Export">
             </app-permission-button>
         </div>
     </div>
@@ -39,9 +39,9 @@
                             <tr *ngFor="let port of portIndexs;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <app-permission-button type="detail" (click)="showDetail(port)">
+                                        <app-permission-button type="detail" (onClick)="showDetail(port)">
                                         </app-permission-button>
-                                        <app-permission-button type="delete" (click)="showConfirmDelete(port)">
+                                        <app-permission-button type="delete" (onClick)="showConfirmDelete(port)">
                                         </app-permission-button>
                                     </div>
                                 </td>

@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPlaceModel> GetByModeOfTran();
         IQueryable<CatPlaceModel> GetCatPlaces();
         IQueryable<sp_GetCatPlace> Query(CatPlaceCriteria criteria);
+        IQueryable<sp_GetCatPlace> QueryExport(CatPlaceCriteria criteria);
         List<CatPlaceViewModel> Paging(CatPlaceCriteria criteria, int page, int size, out int rowsCount);
         List<vw_catProvince> GetProvinces(short? countryId);
         List<vw_catDistrict> GetDistricts(Guid? provinceId);

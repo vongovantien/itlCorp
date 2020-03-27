@@ -1,5 +1,5 @@
 <div class="m-portlet">
-    <div class="m-portlet__body">
+    <div class="m-portlet__body list-userlevel">
         <div class="m-form m--margin-bottom-10">
             <div class="m--align-right c-button-actions">
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveUserLevel()">
@@ -30,13 +30,12 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.userId === null || item.isDup )}">
-                                    <select [(ngModel)]="item.userId" class="form-control" [disabled]="item.id"
-                                        (ngModelChange)="selectedUser(item,$event)">
-                                        <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let user of users" [ngValue]="user.id">
-                                            {{user.username}}
-                                        </option>
-                                    </select>
+                                    <app-combo-grid-virtual-scroll (itemSelected)="selectedUser(item,$event)"
+                                        [currentActiveItemId]="{ field: 'id', value: item.userId}"
+                                        [selectedDisplayFields]="['username']" [dataSources]="users"
+                                        [displayFields]="[{field: 'username', label: 'User Name'}]" [disabled]="item.id"
+                                        (remove)="item.userId = null" placeholder="Please select user" size="15">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </td>
                             <td class="disabled">

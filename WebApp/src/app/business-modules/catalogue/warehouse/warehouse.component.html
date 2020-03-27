@@ -4,10 +4,10 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button (click)="showAdd()" type="add" title="Add New"></app-permission-button>
+            <app-permission-button (onClick)="showAdd()" type="add" title="Add New"></app-permission-button>
             <app-permission-button [routerLink]="['/home/catalogue/ware-house/import']" type="import" title="Import">
             </app-permission-button>
-            <app-permission-button type="export" (click)="export()" title="Export">
+            <app-permission-button type="export" (onClick)="export()" title="Export">
             </app-permission-button>
         </div>
     </div>
@@ -39,9 +39,9 @@
                             <tr *ngFor="let warehouse of warehouses;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <app-permission-button type="detail" (click)="showDetail(warehouse)">
+                                        <app-permission-button type="detail" (onClick)="showDetail(warehouse)">
                                         </app-permission-button>
-                                        <app-permission-button type="delete" (click)="showConfirmDelete(warehouse)">
+                                        <app-permission-button type="delete" (onClick)="showConfirmDelete(warehouse)">
                                         </app-permission-button>
                                     </div>
                                 </td>

@@ -93,6 +93,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpPost]
+        [Route("QueryExport")]
+        public IActionResult QueryExport(CatChargeCriteria searchObject)
+        {
+            IQueryable<CatChargeModel> data = catChargeService.QueryExport(searchObject);
+            return Ok(data);
+        }
+
         [HttpPost("GetDefaultByChargeCodes")]
         public IActionResult GetDefaultByChargeCodes(List<string> chargeCodes)
         {

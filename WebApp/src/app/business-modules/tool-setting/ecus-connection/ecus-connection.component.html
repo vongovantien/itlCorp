@@ -4,7 +4,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button type="add" (click)="showFormAdd()">
+            <app-permission-button type="add" (onClick)="showFormAdd()">
             </app-permission-button>
             <app-permission-button type="export" title="Export"></app-permission-button>
         </div>
@@ -35,9 +35,9 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <app-permission-button type="detail"
-                                                (click)="getEcusConnectionDetails(item.id)"></app-permission-button>
+                                                (onClick)="getEcusConnectionDetails(item.id)"></app-permission-button>
                                             <ng-container *ngIf="!item.active">
-                                                <app-permission-button type="delete" (click)="deleteEcus(item)">
+                                                <app-permission-button type="delete" (onClick)="deleteEcus(item)">
                                                 </app-permission-button>
                                             </ng-container>
                                         </div>

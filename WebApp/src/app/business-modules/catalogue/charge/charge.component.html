@@ -20,7 +20,7 @@
                 </div>
             </div>
 
-            <app-permission-button type="export" (click)="export()" title="Export"></app-permission-button>
+            <app-permission-button type="export" (onClick)="export()" title="Export"></app-permission-button>
 
         </div>
     </div>
@@ -44,9 +44,9 @@
                             <tr *ngFor="let item of ListCharges">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <app-permission-button type="detail" (click)="viewDetail(item)">
+                                        <app-permission-button type="detail" (onClick)="viewDetail(item)">
                                         </app-permission-button>
-                                        <app-permission-button type="delete" (click)="prepareDeleteCharge(item.id)">
+                                        <app-permission-button type="delete" (onClick)="prepareDeleteCharge(item.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>

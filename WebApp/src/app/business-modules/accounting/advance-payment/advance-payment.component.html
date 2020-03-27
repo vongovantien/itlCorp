@@ -1,8 +1,9 @@
 <div class="advance-payment-page">
     <app-sub-header>
-        <div class="c-button-actions">         
-            <app-permission-button title="Add New" [routerLink]="'/home/accounting/advance-payment/new'"></app-permission-button>            
-            <app-permission-button type="export" title="Export" (click)="export()"></app-permission-button>
+        <div class="c-button-actions">
+            <app-permission-button title="Add New" [routerLink]="'/home/accounting/advance-payment/new'">
+            </app-permission-button>
+            <app-permission-button type="export" title="Export" (onClick)="export()"></app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -31,8 +32,9 @@
                                                         title="Collapse" type="button">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <button [disabled]="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied'"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"                                                       
+                                                    <button
+                                                        [disabled]="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied'"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                         title="Delete advance payment"
                                                         (click)="prepareDeleteAdvance(advancePayment)">
                                                         <i class="la la-trash text-danger"></i>

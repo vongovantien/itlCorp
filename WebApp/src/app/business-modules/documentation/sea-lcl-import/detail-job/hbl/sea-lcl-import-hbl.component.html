@@ -79,7 +79,8 @@
                                     <div class="form-group">
                                         <div class="float-right">
                                             <ng-container *ngIf="(isLocked | async) === false">
-                                                <app-permission-button title="Add New House Bill" (click)="gotoCreate()"
+                                                <app-permission-button title="Add New House Bill"
+                                                    (onClick)="gotoCreate()"
                                                     *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                 </app-permission-button>
                                             </ng-container>
@@ -103,13 +104,13 @@
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 70px">
                                                         <app-permission-button type="detail"
-                                                            (click)="gotoDetail(house.id)">
+                                                            (onClick)="gotoDetail(house.id)">
                                                         </app-permission-button>
                                                         <ng-container *ngIf="(isLocked | async) === false">
                                                             <ng-container
                                                                 *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                                 <app-permission-button
-                                                                    (click)="showDeletePopup(house, $event)"
+                                                                    (onClick)="showDeletePopup(house, $event)"
                                                                     type="delete">
                                                                 </app-permission-button>
                                                             </ng-container>
