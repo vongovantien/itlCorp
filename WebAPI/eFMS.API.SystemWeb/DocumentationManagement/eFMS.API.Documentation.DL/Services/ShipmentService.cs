@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -557,7 +558,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.MblMawb;
                 data.HblHawb = item.HblHawb;
-                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
@@ -975,8 +976,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         FlightNo = master.FlightVesselName,
                                         MblMawb = master.Mawb,
                                         HblHawb = house.Hwbno,
-                                        Pol = house.Pol,
-                                        Pod = house.Pod,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
                                         ShipmentType = master.ShipmentType,
                                         Salesman = house.SaleManId,
                                         Carrier = master.ColoaderId,
@@ -985,10 +986,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
                                         QTy = house.PackageQty,
-                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
-                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
-                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
-                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
@@ -1020,8 +1021,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         FlightNo = master.FlightVesselName,
                                         MblMawb = master.Mawb,
                                         HblHawb = house.Hwbno,
-                                        Pol = house.Pol,
-                                        Pod = house.Pod,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
                                         ShipmentType = master.ShipmentType,
                                         Salesman = house.SaleManId,
                                         Carrier = master.ColoaderId,
@@ -1030,10 +1031,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
                                         QTy = house.PackageQty,
-                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
-                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
-                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
-                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
