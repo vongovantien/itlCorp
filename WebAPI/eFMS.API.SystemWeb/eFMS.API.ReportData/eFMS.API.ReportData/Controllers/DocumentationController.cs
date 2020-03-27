@@ -8,6 +8,7 @@ using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
+using eFMS.API.ReportData.Models.Criteria;
 using eFMS.API.ReportData.Models.Documentation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -224,6 +225,33 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Air Export - Phiếu Cân TCS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Shipment Overview
+        /// </summary>
+        /// <param name="criteria">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportShipmentOverview")]
+        [HttpPost]
+        public async Task<IActionResult> ExportShipmentOverview(GeneralReportCriteria criteria )
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataShipmentOverviewUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportShipmentOverview>>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateShipmentOverviewExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview.xlsx");
 
             return fileContent;
         }

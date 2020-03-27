@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.Common.Infrastructure.Common;
+using ITL.NetCore.Common;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -154,12 +155,27 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedName });
             }
             var employeeCurrent = sysEmployeeService.Get(x => x.Id == userCurrent.EmployeeId).FirstOrDefault();
-            model.SysEmployeeModel.Id = employeeCurrent.Id;
-            model.SysEmployeeModel.UserModified = currentUser.UserID;
-            model.SysEmployeeModel.DatetimeModified = DateTime.Now;
-            model.SysEmployeeModel.Active = true;
+            var hsEmployee = new HandleState();
+            if (employeeCurrent != null)
+            {
+                model.SysEmployeeModel.Id = employeeCurrent.Id;
+                model.SysEmployeeModel.UserModified = currentUser.UserID;
+                model.SysEmployeeModel.DatetimeModified = DateTime.Now;
+                model.SysEmployeeModel.Active = true;
+                hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel);
+            }
+            else
+            {
+                model.SysEmployeeModel.Id = Guid.NewGuid().ToString();
 
-            var hsEmployee = sysEmployeeService.Update(model.SysEmployeeModel);
+                model.SysEmployeeModel.UserCreated = model.SysEmployeeModel.UserModified = currentUser.UserID;
+                model.SysEmployeeModel.DatetimeModified = DateTime.Now;
+                model.SysEmployeeModel.Active = true;
+                hsEmployee = sysEmployeeService.Insert(model.SysEmployeeModel);
+            }
+           
+
+ 
             var messageEmployee = HandleError.GetMessage(hsEmployee, Crud.Update);
             ResultHandle resultEmployee = new ResultHandle { Status = hsEmployee.Success, Message = stringLocalizer[messageEmployee].Value };
             if (hsEmployee.Success)

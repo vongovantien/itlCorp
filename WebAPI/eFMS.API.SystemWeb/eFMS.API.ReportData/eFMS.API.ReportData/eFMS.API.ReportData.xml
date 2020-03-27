@@ -236,6 +236,13 @@
             <param name="jobId">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverview(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Shipment Overview
+            </summary>
+            <param name="criteria">Id of shipment</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -351,6 +358,9 @@
             </summary>
             <param name="airwayBillExport"></param>
             <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateShipmentOverviewExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.ExportShipmentOverview},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">

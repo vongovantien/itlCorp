@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -500,6 +501,16 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- EXPORT SHIPMENT OVERVIEW
         public IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria)
         {
+            IQueryable<GeneralExportShipmentOverviewResult> list;
+            var dataShipment = GeneralExportShipmentOverview(criteria);
+            var dataOperation = GeneralExportOperationOverview(criteria);
+            list = dataShipment.Union(dataOperation);
+            return list;
+        }
+
+
+        public IQueryable<GeneralExportShipmentOverviewResult> GeneralExportShipmentOverview(GeneralReportCriteria criteria)
+        {
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = QueryDataShipmentOverview(criteria);
             foreach (var item in dataShipment)
@@ -547,7 +558,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.MblMawb;
                 data.HblHawb = item.HblHawb;
-                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Carrier = catPartnerRepo.Get(x => x.Id == item.Carrier).FirstOrDefault()?.ShortName;
                 data.Agent = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.ShortName;
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
@@ -581,7 +592,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
-                    if(charGroupObj?.Name == "Trucking")
+                    if (charGroupObj?.Name == "Trucking")
                     {
                         _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
                     }
@@ -678,7 +689,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
                 var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.Salesman).Select(t => t.OfficeId).FirstOrDefault();
                 data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
-                data.Creator = sysUserRepo.Get(x=>x.Id == item.Creator).Select(t=>t.Username).FirstOrDefault();
+                data.Creator = sysUserRepo.Get(x => x.Id == item.Creator).Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.POINV;
                 data.BKRefNo = item.JobNo;
                 data.Commodity = item.Commodity;
@@ -689,8 +700,150 @@ namespace eFMS.API.Documentation.DL.Services
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
-
         }
+
+        public IQueryable<GeneralExportShipmentOverviewResult> GeneralExportOperationOverview(GeneralReportCriteria criteria)
+        {
+            List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
+            var dataOpertation = QueryDataOperation(criteria);
+            foreach (var item in dataOpertation)
+            {
+                GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
+                data.ServiceName = item.ProductService;
+                data.JobNo = item.JobNo;
+                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                #region -- Phí Selling trước thuế --
+                decimal _totalSellAmountFreight = 0;
+                decimal _totalSellAmountTrucking = 0;
+                decimal _totalSellAmountHandling = 0;
+                decimal _totalSellAmountOther = 0;
+                var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.Hblid);
+                foreach (var charge in _chargeSell)
+                {
+
+                    var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    //SELL
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    // tinh total phi chargeGroup freight
+                    if (charGroupObj?.Name == "Freight")
+                    {
+                        _totalSellAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Trucking")
+                    {
+                        _totalSellAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Handling")
+                    {
+                        _totalSellAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Other")
+                    {
+                        _totalSellAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    //END SELL
+
+                }
+                data.TotalSellFreight = _totalSellAmountFreight;
+                data.TotalSellTrucking = _totalSellAmountTrucking;
+                data.TotalSellHandling = _totalSellAmountHandling;
+                data.TotalSellOthers = _totalSellAmountOther;
+                data.TotalSell = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers;
+                #endregion
+                #region -- Phí Buying trước thuế --
+                decimal _totalBuyAmountFreight = 0;
+                decimal _totalBuyAmountTrucking = 0;
+                decimal _totalBuyAmountHandling = 0;
+                decimal _totalBuyAmountOther = 0;
+                decimal _totalBuyAmountKB = 0;
+                var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.Hblid);
+                foreach (var charge in _chargeBuy)
+                {
+                    var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    //BUY
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    // tinh total phi chargeGroup freight
+                    if (charGroupObj?.Name == "Freight")
+                    {
+                        _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Trucking")
+                    {
+                        _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Handling")
+                    {
+                        _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charGroupObj?.Name == "Other")
+                    {
+                        _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    }
+                    if (charge.KickBack == true)
+                    {
+                        _totalBuyAmountKB += charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                    }
+
+                    //END BUY
+                }
+                data.TotalBuyFreight = _totalBuyAmountFreight;
+                data.TotalBuyTrucking = _totalBuyAmountTrucking;
+                data.TotalBuyHandling = _totalBuyAmountHandling;
+                data.TotalBuyOthers = _totalBuyAmountOther;
+                data.TotalBuyKB = _totalBuyAmountKB;
+                data.TotalBuy = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + _totalBuyAmountKB;
+                data.Profit = data.TotalSell - data.TotalBuy;
+                #endregion -- Phí Buying trước thuế --
+
+                #region -- Phí OBH sau thuế --
+                decimal _obh = 0;
+                var _chargeObh = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE && x.Hblid == item.Hblid);
+                foreach (var charge in _chargeObh)
+                {
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    var _rate = charge.FinalExchangeRate;
+                    if (_rate == null)
+                    {
+                        var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
+                        _rate = GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, criteria.Currency);
+                    }
+                    _obh += charge.Total * _rate ?? 0; // Phí OBH sau thuế
+                }
+                data.AmountOBH = _obh;
+                #endregion -- Phí OBH sau thuế --
+                data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
+                data.CustomerId = item.CustomerId;
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                data.RalatedHblHawb = string.Empty;// tạm thời để trống
+                data.RalatedJobNo = string.Empty;// tạm thời để trống
+                data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
+                var OfficeSaleman = sysUserLevelRepo.Get(x => x.UserId == item.SalemanId).Select(t => t.OfficeId).FirstOrDefault();
+                data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
+                data.BKRefNo = item.JobNo;
+                data.ServiceMode = item.ServiceMode;//chua co thong tin
+                lstShipment.Add(data);
+            }
+            return lstShipment.AsQueryable();
+        }
+
+
+
         private IQueryable<GeneralExportShipmentOverviewResult> QueryDataShipmentOverview(GeneralReportCriteria criteria)
         {
             Expression<Func<CsTransaction, bool>> queryTrans;
@@ -823,8 +976,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         FlightNo = master.FlightVesselName,
                                         MblMawb = master.Mawb,
                                         HblHawb = house.Hwbno,
-                                        Pol = house.Pol,
-                                        Pod = house.Pod,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
                                         ShipmentType = master.ShipmentType,
                                         Salesman = house.SaleManId,
                                         Carrier = master.ColoaderId,
@@ -833,10 +986,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
                                         QTy = house.PackageQty,
-                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
-                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
-                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
-                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
@@ -868,8 +1021,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         FlightNo = master.FlightVesselName,
                                         MblMawb = master.Mawb,
                                         HblHawb = house.Hwbno,
-                                        Pol = house.Pol,
-                                        Pod = house.Pod,
+                                        Pol = master.Pol,
+                                        Pod = master.Pod,
                                         ShipmentType = master.ShipmentType,
                                         Salesman = house.SaleManId,
                                         Carrier = master.ColoaderId,
@@ -878,10 +1031,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
                                         QTy = house.PackageQty,
-                                        Cont20 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont20"))),
-                                        Cont40 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40"))),
-                                        Cont40HC = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont40HC"))),
-                                        Cont45 = Convert.ToInt32(house.PackageContainer.Trim().Substring(0, house.PackageContainer.Trim().IndexOf("xCont45"))),
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,

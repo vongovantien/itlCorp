@@ -244,7 +244,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
                     BuildHeader(worksheet, headers, "SETTLEMENT PAYMENT INFORMATION");
-                    
+
                     for (int i = 0; i < listObj.Count; i++)
                     {
                         var item = listObj[i];
@@ -257,7 +257,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[addressStartContent, 10].Value = item.AdvanceTotalAmount;
                         worksheet.Cells[addressStartContent, 11].Value = item.BalanceTotalAmount;
 
-                        using (var range = worksheet.Cells[addressStartContent,1, addressStartContent,14])  
+                        using (var range = worksheet.Cells[addressStartContent, 1, addressStartContent, 14])
                         {
                             range.Style.Font.Bold = true;
                             range.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -1528,12 +1528,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     totalALLValue += TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
                 }
-       
+
             }
 
             workSheet.Cells[8, 1, addressStartContent + 2, 16].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[8, 1, addressStartContent + 2, 16].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[8, 1, addressStartContent+ 2, 16].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, addressStartContent + 2, 16].Style.Border.Top.Style = ExcelBorderStyle.Thin;
 
 
             workSheet.Cells[addressStartContent + 2, 1].Value = headers[3]; //Total
@@ -1542,9 +1542,9 @@ namespace eFMS.API.ReportData.FormatExcel
             .First(c => c.Value.ToString() == headers[3])
             .Start
             .Address;
-            string addressTotalMerge= workSheet
+            string addressTotalMerge = workSheet
              .Cells[addressStartContent + 2, 9].Start.Address;
-            string addressToMerge = addressTotal +":" + addressTotalMerge;
+            string addressToMerge = addressTotal + ":" + addressTotalMerge;
             workSheet.Cells[addressToMerge].Merge = true;
             workSheet.Cells[addressToMerge].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[addressToMerge].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -1561,7 +1561,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             foreach (var item in lstSoa.exportSOAOPs)
             {
-                foreach(var it in item.Charges)
+                foreach (var it in item.Charges)
                 {
                     if (!it.Type.Contains("OBH"))
                     {
@@ -1577,7 +1577,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     }
 
                 }
-        
+
             }
 
             totalAll = totalOBHCharge + totalNormalCharge;
@@ -1593,7 +1593,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalNormalCharge].Value = totalNormalCharge;
             workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = numberFormat;
 
-            string addressNetAmountCharge= workSheet.Cells[addressStartContent + 2, 13].Start.Address;
+            string addressNetAmountCharge = workSheet.Cells[addressStartContent + 2, 13].Start.Address;
             workSheet.Cells[addressNetAmountCharge].Value = totalNetAmountOBHCharge;
             workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = numberFormat;
 
@@ -1606,7 +1606,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = numberFormat;
 
 
-            string addressTotalAll= workSheet.Cells[addressStartContent + 2, 16].Start.Address;
+            string addressTotalAll = workSheet.Cells[addressStartContent + 2, 16].Start.Address;
             workSheet.Cells[addressTotalAll].Value = totalAll;
             workSheet.Cells[addressTotalAll].Style.Numberformat.Format = numberFormat;
 
@@ -2111,12 +2111,8 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Cells.AutoFitColumns();
 
         }
-
-
-
-
-
         #endregion
+
 
         #region --- SETTLEMENT PAYMENT ---
         /// <summary>
