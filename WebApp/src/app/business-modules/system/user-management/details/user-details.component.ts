@@ -108,13 +108,17 @@ export class UserDetailsComponent extends AppPage {
                         this.formData.username = res.data.username;
                         this.formData.userType = res.data.userType;
                         this.formData.workingStatus = res.data.workingStatus;
-                        this.formAdd.employeeNameEn.setValue(res.data.sysEmployeeModel.employeeNameEn);
-                        this.formAdd.employeeNameVn.setValue(res.data.sysEmployeeModel.employeeNameVn);
+                        if(!!res.data.sysEmployeeModel){
+                            this.formAdd.employeeNameEn.setValue(res.data.sysEmployeeModel.employeeNameEn);
+                            this.formAdd.employeeNameVn.setValue(res.data.sysEmployeeModel.employeeNameVn);
+                            this.formAdd.staffcode.setValue(res.data.sysEmployeeModel.staffCode);
+                            this.formAdd.title.setValue(res.data.sysEmployeeModel.title);
+                            this.formAdd.email.setValue(res.data.sysEmployeeModel.email);
+                            this.formAdd.phone.setValue(res.data.sysEmployeeModel.tel);
+                        }
+               
                         this.formAdd.workingg.setValue(this.formAdd.working.filter(i => i.value === res.data.workingStatus)[0]);
-                        this.formAdd.staffcode.setValue(res.data.sysEmployeeModel.staffCode);
-                        this.formAdd.title.setValue(res.data.sysEmployeeModel.title);
-                        this.formAdd.email.setValue(res.data.sysEmployeeModel.email);
-                        this.formAdd.phone.setValue(res.data.sysEmployeeModel.tel);
+                    
                         this.formAdd.ldap.setValue(res.data.isLdap);
                         this.formAdd.formGroup.patchValue(this.formData);
                         this.formAdd.active.setValue(this.formAdd.status.filter(i => i.value === res.data.active)[0]);
