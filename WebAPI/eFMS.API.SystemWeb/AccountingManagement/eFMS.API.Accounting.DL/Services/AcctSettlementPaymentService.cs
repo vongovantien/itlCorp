@@ -1623,7 +1623,7 @@ namespace eFMS.API.Accounting.DL.Services
                 parameter.CompanyAddress1 = AccountingConstants.COMPANY_ADDRESS1;
                 parameter.CompanyAddress2 = AccountingConstants.COMPANY_CONTACT;
                 parameter.Website = AccountingConstants.COMPANY_WEBSITE;
-                parameter.Contact = currentUser.UserID;//Get user login
+                parameter.Contact = currentUser.UserName;//Get user login
 
                 //Lấy ra tổng Advance Amount của các charge thuộc Settlement
                 decimal advanceAmount = 0;
