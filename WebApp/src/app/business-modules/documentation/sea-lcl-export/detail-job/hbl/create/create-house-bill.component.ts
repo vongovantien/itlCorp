@@ -65,6 +65,12 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
+
+                        if (!!this.containers) {
+                            this.containers.forEach(c => {
+                                c.mblid = SystemConstants.EMPTY_GUID;
+                            });
+                        }
                     }
                 });
     }

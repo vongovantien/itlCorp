@@ -28,7 +28,7 @@ export class AppPermissionButtonComponent extends AppForm implements OnInit {
     }
 
 
-    onClicked() {
-        this.onClick.emit();
+    onClicked(e) {
+        this.onClick.emit(e);
     }
 }

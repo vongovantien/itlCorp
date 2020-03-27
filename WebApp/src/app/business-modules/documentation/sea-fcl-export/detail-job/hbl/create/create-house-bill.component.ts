@@ -64,6 +64,14 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
 
+                        // * reset mblid in container.
+                        if (!!this.containers) {
+                            this.containers.forEach(c => {
+                                c.mblid = SystemConstants.EMPTY_GUID;
+                            });
+                        }
+
+                        console.log(this.containers);
                         // * Update field inword with container data.
                         this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
