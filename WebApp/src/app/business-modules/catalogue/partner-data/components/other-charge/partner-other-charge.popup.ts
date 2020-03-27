@@ -61,7 +61,7 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
         }, { selectedDisplayFields: ['chargeNameEn'], });
         this.headers = [
             { title: 'Charge Name', field: 'chargeId', sortable: true, width: 200 },
-            { title: 'Quantity', field: 'quantity', sortable: true },
+            { title: 'Quantity', field: 'quantity', sortable: true, width: 200 },
             { title: 'Unit', field: 'unitId', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
@@ -109,6 +109,13 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
     onSelectDataFormInfo(data: Charge, partnerCharge: CatPartnerCharge) {
         partnerCharge.chargeId = data.id;
 
+    }
+
+
+    onChangeQuantityHint(hint: string, charge: CatPartnerCharge) {
+        if (!!hint) {
+            charge.quantity = null;
+        }
     }
 
     onSavePartnerCharge() {
