@@ -67,6 +67,10 @@ export const getDataRouterState = createSelector(routerState, (state: fromRouter
 export const getCataloguePortState = createSelector(catalogueState, (state: ICatalogueState) => state && state.ports);
 export const getCataloguePortLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+export const getCatalogueWarehouseState = createSelector(catalogueState, (state: ICatalogueState) => state && state.warehouses);
+export const getCatalogueWarehouseLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+
 export const getCatalogueCarrierState = createSelector(catalogueState, (state: ICatalogueState) => state && state.carriers);
 export const getCatalogueCarrierLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
@@ -78,6 +82,9 @@ export const getCatalogueUnitLoadingState = createSelector(catalogueState, (stat
 
 export const getCatalogueCommodityState = createSelector(catalogueState, (state: ICatalogueState) => state && state.commodities);
 export const getCatalogueCommodityLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
+export const getCatalogueCommodityGroupState = createSelector(catalogueState, (state: ICatalogueState) => state && state.commodityGroups);
+export const getCatalogueCommodityGroupLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
 export const getCatalogueCustomerState = createSelector(catalogueState, (state: ICatalogueState) => state && state.customers);
 export const getCatalogueCustomerLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);

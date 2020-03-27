@@ -5,10 +5,10 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
 import {
-    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction
+    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction, GetCatalogueWarehouseSuccessAction, GetCatalogueWarehouseFailAction, GetCatalogueCommodityGroupSuccessAction, GetCatalogueCommodityGroupFailAction
 } from '../actions';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState } from '../reducers';
-import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency } from '@models';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState, getCatalogueWarehouseState, getCatalogueCommodityGroupState } from '../reducers';
+import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency, Warehouse, CommodityGroup } from '@models';
 import { CommonEnum } from '@enums';
 
 @Injectable()
@@ -35,6 +35,26 @@ export class CatalogueEffect {
                 return this._catalogueRepo.getListPort(data.action.payload).pipe(
                     map((response: any) => new GetCataloguePortSuccessAction(response)),
                     catchError(err => of(new GetCataloguePortFailAction(err)))
+                );
+            })
+        );
+
+    @Effect()
+    getWarehouses$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_WAREHOUSE),
+            withLatestFrom(
+                this._store.select(getCatalogueWarehouseState),
+                (action: CatalogueActions, warehouses: Warehouse[]) => ({ data: warehouses, action: action })),
+
+            switchMap((data: { data: any[], action: CatalogueActions }) => {
+                // * Check ports in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueWarehouseSuccessAction(data.data));
+                }
+                return this._catalogueRepo.getListPort(data.action.payload).pipe(
+                    map((response: any) => new GetCatalogueWarehouseSuccessAction(response)),
+                    catchError(err => of(new GetCatalogueWarehouseFailAction(err)))
                 );
             })
         );
@@ -119,6 +139,26 @@ export class CatalogueEffect {
                 );
             })
         );
+    @Effect()
+    getCommodityGroup$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_COMMODITYGROUP),
+            withLatestFrom(
+                this._store.select(getCatalogueCommodityGroupState),
+                (action: CatalogueActions, commodities: CommodityGroup[]) => ({ data: commodities, action: action })),
+
+            switchMap((data: { data: CommodityGroup[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueCommoditySuccessAction(data.data));
+                }
+                return this._catalogueRepo.getCommondity(data.action.payload).pipe(
+                    map((response: CommodityGroup[]) => new GetCatalogueCommodityGroupSuccessAction(response)),
+                    catchError(err => of(new GetCatalogueCommodityGroupFailAction(err)))
+                );
+            })
+        );
+
 
     @Effect()
     getCountries$: Observable<Action> = this.actions$

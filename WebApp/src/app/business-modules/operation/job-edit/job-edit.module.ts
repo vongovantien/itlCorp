@@ -16,6 +16,7 @@ import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.m
 import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 
 const routing: Routes = [
     {
@@ -68,6 +69,7 @@ const customCurrencyMaskConfig = {
     exports: [],
     declarations: [
         OpsModuleBillingJobEditComponent,
+        JobManagementFormEditComponent,
         ...COMPONENTS,
     ],
     providers: [

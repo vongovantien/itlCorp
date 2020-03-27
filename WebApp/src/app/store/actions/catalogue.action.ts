@@ -10,6 +10,11 @@ export enum CatalogueActionTypes {
     GET_PORT_SUCCESS = '[Catalogue] Get Port Success',
     GET_PORT_FAIL = '[Catalogue] Get Port Fail',
 
+    GET_WAREHOUSE = '[Catalogue] Get Warehouse',
+    GET_WAREHOUSE_SUCCESS = '[Catalogue] Get Warehouse Success',
+    GET_WAREHOUSE_FAIL = '[Catalogue] Get Warehouse Fail',
+
+
     GET_CARRIER = '[Catalogue] Get Carrier',
     GET_CARRIER_SUCCESS = '[Catalogue] Get Carrier Success',
     GET_CARRIER_FAIL = '[Catalogue] Get Carrier Fail',
@@ -29,6 +34,10 @@ export enum CatalogueActionTypes {
     GET_COMMODITY = '[Catalogue] Get Commodity',
     GET_COMMODITY_SUCCESS = '[Catalogue] Get Commodity Success',
     GET_COMMODITY_FAIL = '[Catalogue] Get Commodity Fail',
+
+    GET_COMMODITYGROUP = '[Catalogue] Get Commodity Group',
+    GET_COMMODITYGROUP_SUCCESS = '[Catalogue] Get Commodity Group Success',
+    GET_COMMODITYGROUP_FAIL = '[Catalogue] Get Commodity Group Fail',
 
     GET_COUNTRY = '[Catalogue] Get Country',
     GET_COUNTRY_SUCCESS = '[Catalogue] Get Country Success',
@@ -54,6 +63,22 @@ export class GetCataloguePortFailAction implements Action {
     constructor(public payload: any) { }
 }
 //#endregion
+
+//#region Warehouse
+export class GetCatalogueWarehouseAction implements Action {
+    readonly type = CatalogueActionTypes.GET_WAREHOUSE;
+    constructor(public payload: any = { placeType: CommonEnum.PlaceTypeEnum.Warehouse }) { }
+}
+export class GetCatalogueWarehouseSuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_WAREHOUSE_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueWarehouseFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_WAREHOUSE_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
+
 
 //#region carrier
 export class GetCatalogueCarrierAction implements Action {
@@ -118,6 +143,21 @@ export class GetCatalogueCommodityFailAction implements Action {
 }
 //#endregion
 
+//#region Commodity Group
+export class GetCatalogueCommodityGroupAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COMMODITYGROUP;
+    constructor(public payload: any = { active: true }) { }
+}
+export class GetCatalogueCommodityGroupSuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COMMODITYGROUP_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueCommodityGroupFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_COMMODITYGROUP_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
+
 //#region Cuntry
 export class GetCatalogueCountryAction implements Action {
     readonly type = CatalogueActionTypes.GET_COUNTRY;
@@ -164,6 +204,9 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueCommodityAction
     | GetCatalogueCommoditySuccessAction
     | GetCatalogueCommodityFailAction
+    | GetCatalogueCommodityGroupAction
+    | GetCatalogueCommodityGroupSuccessAction
+    | GetCatalogueCommodityGroupFailAction
     | GetCatalogueCountryAction
     | GetCatalogueCountrySuccessAction
     | GetCatalogueCountryFailAction

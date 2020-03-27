@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (serviceDate.dirty && !serviceDate.value) || (isSubmitted && !serviceDate.value)}">
+                                    [ngClass]="{'m-form__group has-danger': (serviceDate.dirty && !serviceDate.value) || (isSubmitted && !serviceDate.value) || (isSubmitted && !serviceDate.value.startDate)}">
                                     <label class="form-control-label" required>
                                         Service Date
                                     </label>
@@ -197,9 +197,9 @@
                                     <label class="form-control-label">
                                         Commonity Group
                                     </label>
-                                    <ng-select #commodity [items]="commodities | async" placeholder="Commodity group"
-                                        [allowClear]="true" (opened)="closeOtherSelects(commodity)"
-                                        formControlName="commodityGroupId">
+                                    <ng-select #commodity [items]="commodityGroups | async"
+                                        placeholder="Commodity group" [allowClear]="true"
+                                        (opened)="closeOtherSelects(commodity)" formControlName="commodityGroupId">
                                     </ng-select>
                                 </div>
                             </div>

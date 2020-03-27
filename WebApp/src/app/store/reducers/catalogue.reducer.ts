@@ -1,15 +1,17 @@
 import { CatalogueActionTypes, CatalogueActions } from "../actions/catalogue.action";
-import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency } from "@models";
+import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency, Warehouse, CommodityGroup } from "@models";
 
 
 export interface ICatalogueState {
     ports: PortIndex[];
+    warehouses: Warehouse[];
     carriers: Customer[];
     agents: Customer[];
     units: Unit[];
     customers: Customer[];
     countries: CountryModel[];
     commodities: Commodity[];
+    commodityGroups: CommodityGroup[];
     currencies: Currency[];
     isLoading: boolean;
 
@@ -17,11 +19,13 @@ export interface ICatalogueState {
 
 const initialState: ICatalogueState = {
     ports: [],
+    warehouses: [],
     carriers: [],
     agents: [],
     units: [],
     customers: [],
     commodities: [],
+    commodityGroups: [],
     countries: [],
     currencies: [],
     isLoading: false

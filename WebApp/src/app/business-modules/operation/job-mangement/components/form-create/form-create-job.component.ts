@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Customer, PortIndex, User } from '@models';
 import { IShareBussinessState } from '@share-bussiness';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, GetCatalogueCommodityAction, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueCommodityState } from '@store';
+import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
@@ -39,7 +39,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     productServices: Observable<CommonInterface.INg2Select[]>;
     serviceModes: Observable<CommonInterface.INg2Select[]>;
     shipmentModes: Observable<CommonInterface.INg2Select[]>;
-    commodities: Observable<CommonInterface.INg2Select[]>;
+    commodityGroups: Observable<CommonInterface.INg2Select[]>;
 
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -78,14 +78,14 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCarrierAction());
         this._store.dispatch(new GetCatalogueAgentAction());
-        this._store.dispatch(new GetCatalogueCommodityAction());
+        this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
         this.ports = this._store.select(getCataloguePortState);
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
-        this.commodities = <any>this._store.select(getCatalogueCommodityState)
+        this.commodityGroups = <any>this._store.select(getCatalogueCommodityGroupState)
             .pipe(
-                map((data: any) => this.utility.prepareNg2SelectData(data, 'code', 'commodityNameEn'))
+                map((data: any) => this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn'))
             );
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
@@ -172,6 +172,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         if (!!this.userLogged) {
             this.billingOpsId.setValue(this.userLogged.id);
         }
+
     }
 
 }
