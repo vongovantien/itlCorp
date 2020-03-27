@@ -1,6 +1,6 @@
 import { Component, ViewChild, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AdvancePaymentRequest, Currency } from 'src/app/shared/models';
+import { AdvancePaymentRequest } from 'src/app/shared/models';
 import { Subject, Observable } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 import { SortService } from 'src/app/shared/services';
@@ -81,7 +81,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
-        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+        this.addNewRequestPaymentPopup.show();
     }
 
     updateRequestPayment(request: AdvancePaymentRequest, index: number) {
@@ -92,7 +92,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
-        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+
+        this.addNewRequestPaymentPopup.show();
     }
 
     onRequestAdvancePaymentChange(dataRequest: AdvancePaymentRequest) {
@@ -115,7 +116,10 @@ export class AdvancePaymentListRequestComponent extends AppList {
     openPopupAdd() {
         this.addNewRequestPaymentPopup.action = 'create';
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
-        this.addNewRequestPaymentPopup.show({ backdrop: 'static' });
+
+        this.addNewRequestPaymentPopup.resetDirective();
+        this.addNewRequestPaymentPopup.show();
+
     }
 
     changeCurrency(currency: string) {
