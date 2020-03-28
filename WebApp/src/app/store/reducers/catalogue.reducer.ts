@@ -47,6 +47,16 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, };
         }
 
+        case CatalogueActionTypes.GET_WAREHOUSE: {
+            return { ...state, isLoading: true };
+        }
+        case CatalogueActionTypes.GET_WAREHOUSE_SUCCESS: {
+            return { ...state, isLoading: false, warehouses: action.payload };
+        }
+        case CatalogueActionTypes.GET_WAREHOUSE_FAIL: {
+            return { ...state, isLoading: false, };
+        }
+
         case CatalogueActionTypes.GET_CARRIER: {
             return { ...state, isLoading: true };
         }

@@ -56,7 +56,7 @@
         <div class="row">
             <div class="col-12">
                 <tabset type="tabs" class="custom-class-tab">
-                    <tab heading="Job detail" (selectTab)="selectTab($event,'job-edit')">
+                    <tab heading="Job detail" (selectTab)="selectTab('job-edit')">
                         <div *ngIf="tab === 'job-edit'">
                             <div class="m-form m-form--state">
                                 <div class="m-portlet">
@@ -98,15 +98,15 @@
                             <hbl-profit-summary></hbl-profit-summary>
                         </div>
                     </tab>
-                    <tab heading="Custom declaration" (selectTab)="selectTab($event,'custom-declaration')">
+                    <tab heading="Custom declaration" (selectTab)="selectTab('custom-declaration')">
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                         </ng-container>
                     </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab($event,'cre-debit-note')">
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')">
                         <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
                         </ng-container>
                     </tab>
-                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab($event, 'stage')">
+                    <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')">
                         <ng-container *ngIf="tab === 'stage'" loadModule="stageManagement"></ng-container>
                     </tab>
                 </tabset>

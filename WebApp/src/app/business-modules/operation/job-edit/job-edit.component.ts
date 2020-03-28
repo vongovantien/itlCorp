@@ -352,17 +352,21 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     }
 
     getShipmentCommonData() {
-        this._documentRepo.getOPSShipmentCommonData()
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (responses: any) => {
-                    this.editForm.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
-                    this.editForm.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
-                    this.editForm.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
-                },
-            );
+        this._documentRepo.getOPSShipmentCommonData().toPromise().then((response: any) => {
+            this.editForm.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');
+            this.editForm.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
+            this.editForm.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
+        });
+        // .pipe(
+        //     catchError(this.catchError),
+        //     finalize(() => this._progressRef.complete())
+        // ).subscribe(
+        //     (responses: any) => {
+        //         this.editForm.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
+        //         this.editForm.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
+        //         this.editForm.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
+        //     },
+        // );
     }
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
