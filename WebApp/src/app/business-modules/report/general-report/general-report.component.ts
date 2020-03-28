@@ -3,7 +3,7 @@ import { Component } from "@angular/core";
 import { SortService } from "@services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
-import { DocumentationRepo } from "@repositories";
+import { DocumentationRepo, ExportRepo } from "@repositories";
 import { catchError, finalize, map } from "rxjs/operators";
 
 @Component({
@@ -13,12 +13,16 @@ import { catchError, finalize, map } from "rxjs/operators";
 export class GeneralReportComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     dataList: any[] = [];
+    isClickSubMenu: boolean = false;
+
 
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _documentRepo: DocumentationRepo,
+        private _exportRepo: ExportRepo,
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -83,5 +87,27 @@ export class GeneralReportComponent extends AppList {
 
     sortGeneralReport(sort: string): void {
         this.dataList = this._sortService.sort(this.dataList, sort, this.order);
+    }
+
+    exportShipmentOverview(){
+        if(this.dataList.length == 0){
+            this._toastService.warning('Please Apply Report');
+            return;
+        }
+        else {
+            this.isClickSubMenu = false;
+            this._exportRepo.exportShipmentOverview(this.dataSearch)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                )
+                .subscribe(
+                    (response: ArrayBuffer) => {
+                        const fileName = "Export ShipmentOverview.xlsx";
+                        this.downLoadFile(response, "application/ms-excel", fileName);
+                    },
+                );
+        }
+       
     }
 }
