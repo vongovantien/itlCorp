@@ -87,6 +87,17 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, };
         }
 
+        case CatalogueActionTypes.GET_COMMODITYGROUP: {
+            return { ...state, isLoading: true };
+        }
+        case CatalogueActionTypes.GET_COMMODITYGROUP_SUCCESS: {
+            return { ...state, isLoading: false, commodityGroups: action.payload };
+        }
+        case CatalogueActionTypes.GET_COMMODITYGROUP_FAIL: {
+            return { ...state, isLoading: false, };
+        }
+
+
         case CatalogueActionTypes.GET_COUNTRY: {
             return { ...state, isLoading: true };
         }
