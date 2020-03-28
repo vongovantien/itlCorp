@@ -1171,7 +1171,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A2:E6"].Style.WrapText = true;
             workSheet.Cells["A2"].Value = headers[1];
             workSheet.Cells["A2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
-            workSheet.Cells["A8:U8"].Merge = true;
+            workSheet.Cells["A8:BA8"].Merge = true;
             DateTime fromDate = criteria.CreatedDateFrom == null ? criteria.ServiceDateFrom.GetValueOrDefault() : criteria.CreatedDateFrom.GetValueOrDefault();
             DateTime toDate = criteria.CreatedDateTo == null ? criteria.ServiceDateTo.GetValueOrDefault() : criteria.CreatedDateTo.GetValueOrDefault();
             workSheet.Cells["A8"].Value = "From:" + fromDate.ToString("dd/MM/yyyy") + " To:" + toDate.ToString("dd/MM/yyyy");
