@@ -117,8 +117,8 @@
 
   "MSG_ITEM_EXPIRATION_DATE_GREATER_OR_EQUAL_EFFECTIVE_DATE": "Expiration date must be greater than or equal to the effective date",
   "MSG_ITEM_SIMILAR_AUTHORIZATION": "A similar authorization was created on the system with this time period. Please recheck or select another time period",
-  "MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL": "Duplicate user in {0}! Please Check hightlight field!!",
-  "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check higlight field!!",
+  "MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL": "Duplicate user in {0}! Please Check highlight field!!",
+  "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check highlight field!!",
   //-- user import
   "MSG_USER_WORKINGSTATUS_EMPTY": "Working Status Not Allow Empty",
   "MSG_USER_USERNAME_EMPTY": "UserName Not Allow Empty",
