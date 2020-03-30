@@ -145,14 +145,14 @@ export class CatalogueEffect {
             ofType<CatalogueActions>(CatalogueActionTypes.GET_COMMODITYGROUP),
             withLatestFrom(
                 this._store.select(getCatalogueCommodityGroupState),
-                (action: CatalogueActions, commodities: CommodityGroup[]) => ({ data: commodities, action: action })),
-
+                (action: CatalogueActions, commodityGroups: CommodityGroup[]) => ({ data: commodityGroups, action: action })
+            ),
             switchMap((data: { data: CommodityGroup[], action: CatalogueActions }) => {
                 // * Check carriers in redux store.
                 if (!!data && data.data && data.data.length) {
-                    return of(new GetCatalogueCommoditySuccessAction(data.data));
+                    return of(new GetCatalogueCommodityGroupSuccessAction(data.data));
                 }
-                return this._catalogueRepo.getCommondity(data.action.payload).pipe(
+                return this._catalogueRepo.getCommodityGroup(data.action.payload).pipe(
                     map((response: CommodityGroup[]) => new GetCatalogueCommodityGroupSuccessAction(response)),
                     catchError(err => of(new GetCatalogueCommodityGroupFailAction(err)))
                 );
