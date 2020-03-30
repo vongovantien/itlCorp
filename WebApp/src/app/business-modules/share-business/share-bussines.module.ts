@@ -65,6 +65,7 @@ import { reducers, effects } from './store';
 import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
 import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 import { ShareBussinessHBLFCLContainerPopupComponent } from './components/hbl-fcl-container/hbl-fcl-container.popup';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -151,6 +152,7 @@ const customCurrencyMaskConfig = {
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
+        NgxSpinnerModule
     ],
     exports: [
         ...COMPONENTS
