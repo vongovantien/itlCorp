@@ -283,7 +283,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.HandlingInfo = string.Empty;
                         charge.ExecutedOn = string.Empty;
                         charge.OceanVessel = houserBill.OceanVessel?.ToUpper();
-                        charge.OSI = _arrivalHeader?.ToUpper();//Header of arrival
+                        charge.OSI = _arrivalHeader;//Header of arrival (Không UpperCase)
                         if (houserBill.Eta != null)
                         {
                             charge.FlightDate = houserBill.Eta.Value; //ETA
@@ -298,7 +298,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.PlaceDelivery = podName?.ToUpper();//POD of HBL
                         charge.ArrivalNote = houserBill.Remark?.ToUpper();//Remark of HBL
 
-                        charge.ShippingMarkImport = houserBill.ShippingMark?.ToUpper();//ShippingMark of HBL
+                        charge.ShippingMarkImport = houserBill.ShippingMark;//ShippingMark of HBL
                         
                         charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                         charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
@@ -317,7 +317,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
                         charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
-                        charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival
+                        charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival (Không UpperCase)
                         charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
                         charge.MaskNos = "MaskNos";
                         charge.DlvCustoms = "DlvCustoms";
@@ -346,7 +346,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.HandlingInfo = string.Empty;
                     charge.ExecutedOn = string.Empty;
                     charge.OceanVessel = houserBill.OceanVessel?.ToUpper();
-                    charge.OSI = _arrivalHeader?.ToUpper();//Header of arrival
+                    charge.OSI = _arrivalHeader;//Header of arrival (Không UpperCase)
                     if (houserBill.Eta != null)
                     {
                         charge.FlightDate = houserBill.Eta.Value; //ETA
@@ -380,7 +380,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Curr = string.Empty; //Currency of charge arrival
                     charge.VAT = 0; //VAT of charge arrival
                     charge.Notes = string.Empty;//Note of charge arrival
-                    charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival
+                    charge.ArrivalFooterNoitice = _arrivalFooter;//Footer of arrival (Không UpperCase)
                     charge.SeaFCL = true; //Đang gán cứng lấy hàng nguyên công
                     charge.MaskNos = "MaskNos";
                     charge.DlvCustoms = "DlvCustoms";
@@ -453,7 +453,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                         charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                         charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
-                        charge.ShippingMarkImport = _arrivalHeader?.ToUpper(); //ArrivalHeader
+                        charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                         charge.DatePackage = DateTime.Now; //Current Date
                         charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty
                         charge.Description = houseBill.DesOfGoods; //Description of Goods
@@ -468,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = frieght.CurrencyId; //Currency of charge arrival
                         charge.VAT = frieght.Vatrate ?? 0; //VAT of charge arrival
                         charge.Notes = frieght.Notes;//Note of charge arrival
-                        charge.ArrivalFooterNotice = _arrivalFooter?.ToUpper(); // Arrival Footer
+                        charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer (Không UpperCase)
                         charge.Shipper = _shipperName?.ToUpper(); //Shipper Name
                         charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                         charge.AOL = string.Empty; //NOT USE
@@ -496,7 +496,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                     charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
                     charge.LastDestination = _podName?.ToUpper(); //Destination Air Port (POD)
-                    charge.ShippingMarkImport = _arrivalHeader?.ToUpper(); //ArrivalHeader
+                    charge.ShippingMarkImport = _arrivalHeader; //ArrivalHeader (Không UpperCase)
                     charge.DatePackage = DateTime.Now; //Current Date
                     charge.NoPieces = (houseBill.PackageQty != null ? houseBill.PackageQty.ToString() : string.Empty) + " " + unitRepository.Get(x => x.Id == houseBill.PackageType).FirstOrDefault()?.UnitNameEn; //Quantity + Unit Qty; //Quantity + Unit Qty
                     charge.Description = houseBill.DesOfGoods; //Description of Goods
@@ -511,7 +511,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Curr = string.Empty;
                     charge.VAT = 0; //VAT of charge
                     charge.Notes = string.Empty;//Note of charge
-                    charge.ArrivalFooterNotice = _arrivalFooter?.ToUpper(); // Arrival Footer
+                    charge.ArrivalFooterNotice = _arrivalFooter; // Arrival Footer (Không UpperCase)
                     charge.Shipper = _shipperName?.ToUpper(); //Shipper
                     charge.CBM = houseBill.ChargeWeight ?? 0; //C.W (ChargeWeight)
                     charge.AOL = string.Empty; //NOT USE
@@ -694,7 +694,7 @@ namespace eFMS.API.Documentation.DL.Services
                 GrossWeight = detail.GrossWeight,
                 Unit = unitOfMeasures,
                 CBM = detail.Cbm ?? 0,
-                DeliveryOrderNote = ReportUltity.ReplaceHtmlBaseForPreviewReport(detail.Dofooter)?.ToUpper(),
+                DeliveryOrderNote = ReportUltity.ReplaceHtmlBaseForPreviewReport(detail.Dofooter), // (Không Upper Case)
                 FirstDestination = detail.DosentTo1?.ToUpper(),
                 SecondDestination = detail.DosentTo2?.ToUpper(),
                 ArrivalNote = detail.ArrivalNo?.ToUpper(),

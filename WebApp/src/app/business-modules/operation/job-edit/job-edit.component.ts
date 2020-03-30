@@ -8,19 +8,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { SystemRepo, CatalogueRepo } from 'src/app/shared/repositories';
-import { AppPage } from "src/app/app.base";
-import { DataService } from 'src/app/shared/services';
+import { CatalogueRepo } from 'src/app/shared/repositories';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsTransactionDetail, Container, Customer } from 'src/app/shared/models';
+import { CsTransactionDetail, Container } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
-import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, map } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../share-business/store';
 import _groupBy from 'lodash/groupBy';
@@ -29,6 +24,7 @@ import { formatDate } from '@angular/common';
 import { CommonEnum } from '@enums';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { AppForm } from 'src/app/app.form';
+import { getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -55,10 +51,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     hblid: string = '';
 
     deleteMessage: string = '';
-
-    packagesUnitActive = [];
-
-    submitted: boolean = false;
+    commodityGroups = null;
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -79,7 +72,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     ngOnInit() {
         this.getShipmentCommonData();
-        this.getCommodityGroup();
+
+        this._store.dispatch(new GetCatalogueCommodityGroupAction());
+
+        this._store.select(getCatalogueCommodityGroupState)
+            .pipe(
+                map((data: any) => {
+                    this.commodityGroups = this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn');
+                })
+            ).toPromise();
         this.getListPackageTypes();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
@@ -294,31 +295,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     }
 
     getListPackageTypes() {
-        this._catalogueRepo.getUnit({ unitType: 'package' })
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this.isLoading = false; })
-            )
-            .subscribe(
-                (res: any) => {
-                    this.editForm.packageTypes = this.utility.prepareNg2SelectData(res, 'id', 'unitNameEn');
-                },
-            );
+        this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }).toPromise().then(data => {
+            this.editForm.packageTypes = this.utility.prepareNg2SelectData(data, 'id', 'unitNameEn');
+        });
     }
-
-    getCommodityGroup() {
-        this._catalogueRepo.getCommodityGroup({})
-            .pipe()
-            .subscribe(
-                (res: any) => {
-                    this.editForm.commodityGroups = this.utility.prepareNg2SelectData(res,
-                        "id",
-                        "groupNameEn"
-                    );
-                }
-            );
-    }
-
     getShipmentDetails(id: any) {
         this._documentRepo.getDetailShipment(id)
             .pipe(
@@ -328,7 +308,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 (response: any) => {
                     this.opsTransaction = new OpsTransaction(response);
                     this.hblid = this.opsTransaction.hblid;
-
                     if (this.opsTransaction != null) {
                         this.getListContainersOfJob();
                         if (this.opsTransaction != null) {
@@ -358,10 +337,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                             if (this.editForm.shipmentModes != null) {
                                 this.editForm.formEdit.controls['shipmentMode'].setValue([this.editForm.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode)]);
                             }
-                            if (this.editForm.commodityGroupId != null) {
+                            if (!!this.opsTransaction.commodityGroupId && !!this.commodityGroups) {
+
+                                this.editForm.commodityGroups = this.commodityGroups;
                                 this.editForm.formEdit.controls['commodityGroupId'].setValue([this.editForm.commodityGroups.find(type => type.id === this.opsTransaction.commodityGroupId)]);
                             }
-                            if (this.editForm.packageTypeId != null) {
+                            if (!!this.opsTransaction.packageTypeId && this.editForm.packageTypeId != null) {
                                 this.editForm.formEdit.controls['packageTypeId'].setValue([this.editForm.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId)]);
                             }
                         }
@@ -371,17 +352,21 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     }
 
     getShipmentCommonData() {
-        this._documentRepo.getOPSShipmentCommonData()
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (responses: any) => {
-                    this.editForm.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
-                    this.editForm.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
-                    this.editForm.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
-                },
-            );
+        this._documentRepo.getOPSShipmentCommonData().toPromise().then((response: any) => {
+            this.editForm.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');
+            this.editForm.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
+            this.editForm.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
+        });
+        // .pipe(
+        //     catchError(this.catchError),
+        //     finalize(() => this._progressRef.complete())
+        // ).subscribe(
+        //     (responses: any) => {
+        //         this.editForm.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
+        //         this.editForm.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
+        //         this.editForm.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
+        //     },
+        // );
     }
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
@@ -395,7 +380,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         }
     }
 
-    selectTab($event: any, tabName: string) {
+    selectTab(tabName: string) {
         this.tab = tabName;
         if (tabName === 'job-edit') {
             this.getShipmentDetails(this.jobId);
