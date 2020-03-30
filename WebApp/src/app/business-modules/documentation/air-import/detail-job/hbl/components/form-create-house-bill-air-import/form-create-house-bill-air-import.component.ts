@@ -357,14 +357,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-                this.saleMans = this.saleMans.pipe(
-                    tap((users: User[]) => {
-                        const user: User = users.find((u: User) => u.id === data.salePersonId);
-                        if (!!user) {
-                            this.saleManId.setValue(user.id);
-                        }
-                    })
-                );
+                // this.saleMans = this.saleMans.pipe(
+                //     tap((users: User[]) => {
+                //         const user: User = users.find((u: User) => u.id === data.salePersonId);
+                //         if (!!user) {
+                //             this.saleManId.setValue(user.id);
+                //         }
+                //     })
+                // );
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {
                         this.saleManId.setValue(res);
