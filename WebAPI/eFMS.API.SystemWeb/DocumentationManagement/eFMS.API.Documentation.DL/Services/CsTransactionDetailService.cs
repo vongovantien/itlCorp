@@ -1636,13 +1636,13 @@ namespace eFMS.API.Documentation.DL.Services
                     Consignee = data.ConsigneeDescription?.ToUpper(),
                     FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
-                    DepartureAirport = data.PODName?.ToUpper(),
-                    NoPieces = data.PackageQty?.ToString(),
+                    DepartureAirport = data.Route,//data.PODName?.ToUpper(), (change: tuyến sẽ lấy Route)
+                    NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
                     Description = data.DesOfGoods?.ToUpper(),
-                    WChargeable = data.ChargeWeight,
-                    DeliveryOrderNote = data.DeliveryOrderNo?.ToUpper(),
-                    FirstDestination = data.FirstCarrierTo?.ToUpper(),
-                    SecondDestination = data.TransitPlaceTo1?.ToUpper(),
+                    WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
+                    DeliveryOrderNote = string.Empty,//data.DeliveryOrderNo?.ToUpper(),
+                    FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
+                    SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     Notify = data.NotifyPartyDescription?.ToUpper()
                 };
                 authorizeLetters.Add(authorizeLetter);
@@ -1652,10 +1652,19 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWB = data.Mawb?.ToUpper(),
                 CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
-                Website = DocumentConstants.COMPANY_WEBSITE,
-                DecimalNo = 2
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
+                Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
+                DecimalNo = 2,
+                PrintDay = string.Empty,
+                PrintMonth = string.Empty,
+                PrintYear = string.Empty
             };
+            if(data.DeliveryOrderPrintedDate != null)
+            {
+                parameter.PrintDay = data.DeliveryOrderPrintedDate.Value.Day.ToString();
+                parameter.PrintMonth = data.DeliveryOrderPrintedDate.Value.Month.ToString();
+                parameter.PrintYear = data.DeliveryOrderPrintedDate.Value.Year.ToString();
+            }
             result = new Crystal
             {
                 ReportName = "AirImptAuthorisedLetter.rpt",
@@ -1670,7 +1679,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId)
         {
-
             Crystal result = null;
             var data = GetById(housbillId);
             var authorizeLetters = new List<AirImptAuthorisedLetterReport>();
@@ -1683,13 +1691,13 @@ namespace eFMS.API.Documentation.DL.Services
                     Consignee = data.ConsigneeDescription?.ToUpper(),
                     FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
-                    NoPieces = data.PackageQty?.ToString(),
+                    NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
                     Description = data.DesOfGoods?.ToUpper(),
-                    WChargeable = data.ChargeWeight,
-                    DeliveryOrderNote = data.DeliveryOrderNo?.ToUpper(),
-                    FirstDestination = data.FirstCarrierTo?.ToUpper(),
-                    SecondDestination = data.TransitPlaceTo1?.ToUpper(),
-                    CBM = data.Cbm,
+                    WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
+                    DeliveryOrderNote = string.Empty,//data.DeliveryOrderNo?.ToUpper(),
+                    FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
+                    SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
+                    CBM = data.ChargeWeight,//data.Cbm, (change: khối lượng sẽ lấy Charge Weight)
                     Notify = data.NotifyPartyDescription?.ToUpper()
                 };
                 authorizeLetters.Add(authorizeLetter);
@@ -1699,10 +1707,19 @@ namespace eFMS.API.Documentation.DL.Services
                 MAWB = data.Mawb?.ToUpper(),
                 CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
-                Website = DocumentConstants.COMPANY_WEBSITE,
-                DecimalNo = 2
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
+                Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
+                DecimalNo = 2,
+                PrintDay = string.Empty,
+                PrintMonth = string.Empty,
+                PrintYear = string.Empty
             };
+            if (data.DeliveryOrderPrintedDate != null)
+            {
+                parameter.PrintDay = data.DeliveryOrderPrintedDate.Value.Day.ToString();
+                parameter.PrintMonth = data.DeliveryOrderPrintedDate.Value.Month.ToString();
+                parameter.PrintYear = data.DeliveryOrderPrintedDate.Value.Year.ToString();
+            }
             result = new Crystal
             {
                 ReportName = "AirImptAuthorisedLetter_Consign.rpt",

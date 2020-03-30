@@ -219,28 +219,60 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         );
     }
 
-    saveArrivalNote() {
-        this._progressRef.start();
+    validateFirst_SecondNotice(firstNote: any, secondNote: any) {
+        if (!firstNote || !secondNote) {
+            return false;
+        }
+        if (!secondNote.startDate) {
+            return false;
+        }
+        const _firstNote = new Date(firstNote.startDate).getTime();
+        const _secondNote = new Date(secondNote.startDate).getTime();
+        return (_secondNote < _firstNote) ? true : false;
+    }
 
+    validateEta_FirstNotice(eta: any, firstNote: any) {
+        if (!eta || !firstNote) {
+            return false;
+        }
+        const _eta = new Date(eta).getTime();
+        const _firstNote = new Date(firstNote.startDate).getTime();
+        return (_firstNote < _eta) ? true : false;
+    }
+
+    saveArrivalNote() {
+        this.isSubmitted = true;
         const dateNotice = {
             arrivalFirstNotice: !!this.hblArrivalNote.arrivalFirstNotice && !!this.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
             arrivalSecondNotice: !!this.hblArrivalNote.arrivalSecondNotice && <any>!!this.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
         };
-        this._documentRepo.updateArrivalInfo(Object.assign({}, this.hblArrivalNote, dateNotice))
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
+        const isCheckFN_SN = this.validateFirst_SecondNotice(this.hblArrivalNote.arrivalFirstNotice, this.hblArrivalNote.arrivalSecondNotice);
+        const isCheckETA_FN = this.validateEta_FirstNotice(this.hbl.eta, this.hblArrivalNote.arrivalFirstNotice);
+        if (!isCheckFN_SN && !isCheckETA_FN) {
+            this._progressRef.start();
+            this._documentRepo.updateArrivalInfo(Object.assign({}, this.hblArrivalNote, dateNotice))
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                )
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
 
-                        // * Dispatch for detail HBL to update HBL state.
-                        this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
+                            // * Dispatch for detail HBL to update HBL state.
+                            this._store.dispatch(new GetDetailHBLAction(this.hblArrivalNote.hblid));
+                        }
                     }
-                }
-            );
+                );
+        } else {
+            if (isCheckFN_SN) {
+                this._toastService.error('The Second Notice date must be equal to or after the First Notice date');
+            }
+            if (isCheckETA_FN) {
+                this._toastService.error('The First Notice date must be equal to or after the Eta');
+            }
+        }
     }
 
     setDefaultHeadeFooter() {
