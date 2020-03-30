@@ -35,8 +35,8 @@
             </div>
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperId.value}">
-                        <label required>Shipper</label>
+                    <div class="form-group">
+                        <label>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"

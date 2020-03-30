@@ -296,7 +296,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             documentDate: !!this.formHouseBill.documentDate.value && this.formHouseBill.documentDate.value.startDate != null ? formatDate(this.formHouseBill.documentDate.value.startDate !== undefined ? this.formHouseBill.documentDate.value.startDate : this.formHouseBill.documentDate.value, 'yyyy-MM-dd', 'en') : null,
             documentNo: this.formHouseBill.documentNo.value,
             etawarehouse: !!this.formHouseBill.etawarehouse.value && this.formHouseBill.etawarehouse.value.startDate != null ? formatDate(this.formHouseBill.etawarehouse.value.startDate !== undefined ? this.formHouseBill.etawarehouse.value.startDate : this.formHouseBill.etawarehouse.value, 'yyyy-MM-dd', 'en') : null,
-            warehouseNotice: this.formHouseBill.warehouseNotice.value,
+            inWord: this.formHouseBill.inWord.value,
             shippingMark: this.formHouseBill.shippingMark.value,
             remark: this.formHouseBill.remark.value,
             issueHBLPlace: !!this.formHouseBill.placeOfIssues.value ? this.formHouseBill.placeOfIssues.value : null,
@@ -365,7 +365,7 @@ export interface ITransactionDetail {
     documentDate: string;
     documentNo: string;
     etawarehouse: string;
-    warehouseNotice: string;
+    inWord: string;
     shippingMark: string;
     remark: string;
     issueHBLPlace: string;

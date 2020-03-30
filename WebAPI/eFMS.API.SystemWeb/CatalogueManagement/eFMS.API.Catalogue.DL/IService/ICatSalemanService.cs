@@ -20,5 +20,9 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Delete(Guid id);
         HandleState Update(CatSaleManModel model);
         List<CatSaleManModel> GetBy(string partnerId);
+        Guid? GetSalemanIdByPartnerId(string partnerId);
+
+
+
     }
 }

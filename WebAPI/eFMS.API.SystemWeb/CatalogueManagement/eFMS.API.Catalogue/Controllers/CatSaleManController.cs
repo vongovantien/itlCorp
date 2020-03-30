@@ -93,6 +93,18 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get the list of saleman by partner id
+        /// </summary>
+        /// <param name="partnerId">partnerId that want to retrieve saleman</param>
+        /// <returns></returns>
+
+        [HttpGet("GetSalemanIdByPartnerId/{partnerId}")]
+        public IActionResult GetSalemanIdByPartnerId(string partnerId)
+        {
+            Guid? id = catSaleManService.GetSalemanIdByPartnerId(partnerId);
+            return Ok(id);
+        }
 
         /// <summary>
         /// add new saleman
