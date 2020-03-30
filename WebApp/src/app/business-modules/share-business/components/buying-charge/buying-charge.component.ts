@@ -21,6 +21,7 @@ import * as fromRoot from 'src/app/store';
 
 import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'buying-charge',
@@ -67,7 +68,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedSurcharge: CsShipmentSurcharge;
 
     selectedIndexCharge: number = -1;
-
+    spinnerpartner: string = 'spinner-partner';
+    isShowLoadingPartner: boolean = false;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -75,12 +77,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
-        protected _ngProgressService: NgProgress
+        protected _ngProgressService: NgProgress,
+        protected _spinner: NgxSpinnerService
+
 
     ) {
         super();
         this.requestSort = this.sortSurcharge;
         this._progressRef = this._ngProgressService.ref();
+
 
         this.getSurcharge();
 
@@ -191,8 +196,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getPartner() {
+        this.isShowLoadingPartner = true;
+        this._spinner.show(this.spinnerpartner);
         this._catalogueRepo.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._spinner.hide(this.spinnerpartner);
+                this.isShowLoadingPartner = false;
+            }
+            ))
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
@@ -206,7 +217,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.shipmentContainers = containers;
-                    console.log("shipment container", this.shipmentContainers);
                 }
             );
     }
@@ -217,7 +227,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
-                    console.log("hbl container", this.containers);
                 }
             );
     }
