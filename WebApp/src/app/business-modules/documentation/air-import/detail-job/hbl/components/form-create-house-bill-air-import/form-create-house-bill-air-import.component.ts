@@ -294,7 +294,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [null, Validators.required],
-            shipperId: [null, Validators.required],
+            shipperId: [],
             consigneeId: [null, Validators.required],
             notifyPartyId: [],
             forwardingAgentId: [],
@@ -366,18 +366,18 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         }
                     })
                 );
-                if (!this.shipperId.value) {
-                    this.shipperId.setValue(data.id);
-                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                // if (!this.shipperId.value) {
+                //     this.shipperId.setValue(data.id);
+                //     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                // }
                 if (!this.consigneeId.value) {
                     this.consigneeId.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                if (!this.notifyPartyId.value) {
-                    this.notifyPartyId.setValue(data.id);
-                    this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                // if (!this.notifyPartyId.value) {
+                //     this.notifyPartyId.setValue(data.id);
+                //     this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                // }
                 break;
             case 'shipper':
                 this.shipperId.setValue(data.id);
