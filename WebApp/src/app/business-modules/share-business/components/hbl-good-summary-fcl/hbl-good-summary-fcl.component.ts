@@ -137,7 +137,12 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.containerDescription = '';
 
         containers.forEach((c: Container) => {
-            this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+            if(c.isPartOfContainer){
+                this.containerDescription = this.containerDescription + "A Part Of " + this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+            }
+            else {
+                this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+            }
         });
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({

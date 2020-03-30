@@ -256,7 +256,7 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
     getContainerTypeName(containerId: string | number) {
         const containers: Unit[] = this.containerUnits.filter(c => c.id === containerId);
         if (!!containers.length) {
-            return containers[0].descriptionEn;
+            return containers[0].unitNameEn;
         } else {
             return null;
         }
