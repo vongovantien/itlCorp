@@ -46,6 +46,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     users: Observable<User[]>;
+    salemansId: string = null;
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
@@ -114,6 +115,12 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 break;
             case 'customer':
                 this.customerId.setValue(data.id);
+                const customerArray = this.customers.toPromise().then(res => {
+                    const customer: Customer = res.find(x => x.id === data.id);
+                    if (!!customer) {
+                        this.salemansId = customer.salePersonId;
+                    }
+                });
                 break;
             default:
                 break;
