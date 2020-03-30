@@ -73,7 +73,9 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                         console.log(this.containers);
                         // * Update field inword with container data.
-                        this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
+                        if(!this.formCreateHBLComponent.isUpdate){
+                            this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
+                        }
                     }
                 });
     }
@@ -238,7 +240,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
         const contObject = (containers || []).map((container: Container) => ({
             contType: container.containerTypeId,
-            contName: container.containerTypeName || '',
+            contName: container.description || '',
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
