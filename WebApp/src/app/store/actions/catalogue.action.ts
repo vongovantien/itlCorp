@@ -213,4 +213,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueCurrencyAction
     | GetCatalogueCurrencySuccessAction
     | GetCatalogueCurrencyFailAction
+    | GetCatalogueWarehouseAction
+    | GetCatalogueWarehouseSuccessAction
+    | GetCatalogueWarehouseFailAction
     ;

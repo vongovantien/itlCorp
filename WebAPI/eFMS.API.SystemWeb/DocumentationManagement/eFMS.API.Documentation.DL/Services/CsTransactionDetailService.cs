@@ -1608,7 +1608,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var housebill = new AirAttachedListReport();
                 housebill.HBLNo = data.Hwbno?.ToUpper();
                 housebill.IssuedDate = data.Etd;//ETD of Housebill
-                housebill.AttachedList = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.AttachList)?.ToUpper();
+                housebill.AttachedList = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.AttachList); // (Không Upper Case)
                 housebills.Add(housebill);
             }
             result = new Crystal
