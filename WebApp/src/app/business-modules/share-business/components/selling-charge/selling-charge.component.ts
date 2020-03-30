@@ -14,6 +14,7 @@ import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 @Component({
@@ -33,10 +34,12 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
         protected _sortService: SortService,
-        protected _ngProgressService: NgProgress
+        protected _ngProgressService: NgProgress,
+        protected _spinner: NgxSpinnerService
+
 
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner);
         this._progressRef = this._ngProgressService.ref();
 
     }
