@@ -357,7 +357,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-
                 this.saleMans = this.saleMans.pipe(
                     tap((users: User[]) => {
                         const user: User = users.find((u: User) => u.id === data.salePersonId);
@@ -366,6 +365,12 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         }
                     })
                 );
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                    if (!!res) {
+                        this.saleManId.setValue(res);
+                    }
+        
+                });
                 // if (!this.shipperId.value) {
                 //     this.shipperId.setValue(data.id);
                 //     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
