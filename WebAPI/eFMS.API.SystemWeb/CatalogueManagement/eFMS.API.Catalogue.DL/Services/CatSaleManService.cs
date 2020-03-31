@@ -67,6 +67,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public Guid? GetSalemanIdByPartnerId(string partnerId)
         {
             var data = GetSaleMan().Where(x => x.PartnerId == partnerId).OrderBy(x=>x.CreateDate).Select(x=>x.SaleManId).FirstOrDefault();
+            if (data == null) return null;
             Guid? salemanId = new Guid(data);
             return salemanId;
         }
