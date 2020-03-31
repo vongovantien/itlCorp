@@ -1909,21 +1909,41 @@ namespace eFMS.API.Documentation.DL.Services
                         saleProfitIncludeVAT = cost + revenue;
                         saleProfitNonVAT = costNonVat + revenueNonVat;
 
-                        //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
-                        var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
-                        //Exchange Rate theo Currency truyền vào
-                        var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_USD && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        decimal _exchangeRateUSD;
-                        if ((exchangeRate != null && exchangeRate.Rate != 0))
+                        decimal _exchangeRateUSD = 0;
+                        decimal _exchangeRateLocal = 0;
+                        if (surcharge.FinalExchangeRate != null)
                         {
-                            _exchangeRateUSD = exchangeRate.Rate;
+                            _exchangeRateUSD = _exchangeRateLocal = (currency == surcharge.CurrencyId) ? 1 : (surcharge.FinalExchangeRate ?? 0);
                         }
                         else
                         {
-                            //Exchange Rate ngược
-                            var exchangeRateReverse = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == surcharge.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                            _exchangeRateUSD = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
-                        }
+                            //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
+                            var exchargeDateSurcharge = surcharge.ExchangeDate == null ? DateTime.Now : surcharge.ExchangeDate;
+                            //Exchange Rate theo Currency truyền vào
+                            var exchangeRateUSD = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_USD && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();                            
+                            if ((exchangeRateUSD != null && exchangeRateUSD.Rate != 0))
+                            {
+                                _exchangeRateUSD = exchangeRateUSD.Rate;
+                            }
+                            else
+                            {
+                                //Exchange Rate ngược
+                                var exchangeRateUSDReverse = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == surcharge.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                                _exchangeRateUSD = (exchangeRateUSDReverse != null && exchangeRateUSDReverse.Rate != 0) ? 1 / exchangeRateUSDReverse.Rate : 1;
+                            }
+
+                            var exchangeRateLocal = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == surcharge.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                            if ((exchangeRateLocal != null && exchangeRateLocal.Rate != 0))
+                            {
+                                _exchangeRateLocal = exchangeRateLocal.Rate;
+                            }
+                            else
+                            {
+                                //Exchange Rate ngược
+                                var exchangeRateLocalReverse = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_LOCAL && x.CurrencyToId == surcharge.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                                _exchangeRateLocal = (exchangeRateLocalReverse != null && exchangeRateLocalReverse.Rate != 0) ? 1 / exchangeRateLocalReverse.Rate : 1;
+                            }
+                        }                        
 
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
@@ -1961,7 +1981,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
                         charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = surcharge.ExchangeRate ?? 0;
+                        charge.VNDExchange = _exchangeRateLocal; //surcharge.ExchangeRate ?? 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
