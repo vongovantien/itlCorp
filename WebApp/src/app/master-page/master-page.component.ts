@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Store } from '@ngrx/store';
@@ -41,14 +40,14 @@ export class MasterPageComponent implements OnInit {
 
     constructor(
         private _jwtService: JwtService,
-        private router: Router,
         private oauthService: OAuthService,
         private http: HttpClient,
         private cookieService: CookieService,
         private _toastService: ToastrService,
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>
-    ) { }
+    ) {
+    }
 
     ngOnInit() {
         interval(900000)
@@ -72,8 +71,9 @@ export class MasterPageComponent implements OnInit {
         this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
             .then(
                 (res: any) => {
+                    this.oauthService.logoutUrl = window.location.origin + '/#/login';
                     this.oauthService.logOut(false);
-                    this.router.navigate(["login"]);
+                    // this.router.navigate(["login"]);
                 },
                 (error: any) => {
                     console.log(error + '');

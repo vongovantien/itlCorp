@@ -4,6 +4,8 @@ export class SystemConstants {
     public static readonly CURRENT_CLIENT_LANGUAGE: string = 'CURRENT_CLIENT_LANGUAGE';
     public static readonly CURRENT_LANGUAGE: string = "CURRENT_LANGUAGE";
     public static readonly CURRENT_VERSION: string = "CURRENT_VERSION";
+    public static readonly CURRENT_OFFICE = 'CURRENT_OFFICE';
+
     public static readonly LOGIN_STATUS: string = "LOGIN_STATUS";
     public static readonly LOGGED_IN: string = "LOGGED_IN";
     public static readonly LOGGED_OUT: string = "LOGGED_OUT";
@@ -12,7 +14,10 @@ export class SystemConstants {
     public static readonly SECRET_KEY = "ITL-$EFMS-&SECRET_KEY001";
     public static readonly USER_CLAIMS = 'id_token_claims_obj';
     public static readonly ACCESS_TOKEN = 'access_token';
-    //RSA 512 = 64 bytes for plain text encode
+    public static readonly ID_TOKEN = 'id_token';
+
+
+    // RSA 512 = 64 bytes for plain text encode
     public static readonly ENCRYPT_SERVER_PUBLIC_KEY: string =
         `-----BEGIN PUBLIC KEY-----
         MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJwRaef6v1122j4X4sRwF0JfUE+bD3gn
