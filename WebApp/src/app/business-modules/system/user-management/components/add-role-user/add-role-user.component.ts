@@ -197,7 +197,7 @@ export class AddRoleUserComponent extends AppList {
             return;
         }
         this.listRoles.forEach(item => {
-            item.userId = this.userId;
+            item.userId = this.id;
             if (item.id === '') {
                 item.id = null;
             }
@@ -376,7 +376,7 @@ export class AddRoleUserComponent extends AppList {
 
     gotoUserPermission(id: string) {
         const type = 'user';
-        this._router.navigate([`home/system/user-management/${this.userId}/permission/${id}/${type}`]);
+        this._router.navigate([`home/system/user-management/${this.id}/permission/${id}/${type}`]);
     }
 
 }
