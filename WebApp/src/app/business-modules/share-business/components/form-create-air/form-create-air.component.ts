@@ -340,25 +340,36 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
 
         // * Handle etdchange.
-        this.formGroup.controls['etd'].valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((value: { startDate: any, endDate: any }) => {
-                if (!!value.startDate) {
-                    // this.minDateETA = value.startDate; // * Update min date
-
-                    // this.resetFormControl(this.formGroup.controls["eta"]);
-
-                    // * serviceDate hadn't value
-                    if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
-                        this.formGroup.controls["serviceDate"].setValue(value);
+        if (this.type !== 'import') {
+            this.formGroup.controls['etd'].valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe((value: { startDate: any, endDate: any }) => {
+                    if (!!value.startDate) {
+                        // * serviceDate hadn't value
+                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
+                            this.formGroup.controls["serviceDate"].setValue(value);
+                        }
                     }
-                } else {
-                    // this.formGroup.controls["serviceDate"].setValue(null);
-                }
-            });
+                });
+        } else {
+            this.formGroup.controls['eta'].valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    takeUntil(this.ngUnsubscribe)
+                )
+                .subscribe((value: { startDate: any, endDate: any }) => {
+                    if (!!value.startDate) {
+                        // * serviceDate hadn't value
+                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
+                            this.formGroup.controls["serviceDate"].setValue(value);
+                        }
+                    }
+                });
+        }
+
     }
 
     getUserLogged() {
