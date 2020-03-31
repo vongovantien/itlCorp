@@ -163,11 +163,8 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     }
 
     cancel() {
-        if (this.previousUrl.includes('group')) {
-            this.router.navigate(['/home/system/group']);
-        } else {
-            this._location.back();
-        }
+        this.router.navigate(['/home/system/group']);
+  
     }
 
     update() {

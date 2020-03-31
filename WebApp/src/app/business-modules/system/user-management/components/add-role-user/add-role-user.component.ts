@@ -15,7 +15,6 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 
 export class AddRoleUserComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @Input() userId: string = '';
 
     companies: Company[] = [];
     listRoles: PermissionSample[] = [];
