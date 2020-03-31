@@ -3,7 +3,7 @@ import { AppList } from 'src/app/app.list';
 import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromShareBussiness from './../../../../share-business/store';
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { SeaFclExportBillInstructionComponent } from './bill-instruction/sea-fcl-export-bill-instruction.component';
 import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import { ToastrService } from 'ngx-toastr';
@@ -34,7 +34,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
         private _dataService: DataService,
-        private _router: Router) {
+        private _router: Router,
+        private _systemRepo: SystemRepo) {
         super();
     }
 
@@ -117,17 +118,25 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
     getContainerData() {
         if (this.houseBills != null) {
             let desOfGoods = '';
+            let packages = 0;
             let containerNotes = '';
+            let contSealNos = '';
+            let gw = 0;
+            let volumn = 0;
             this.houseBills.forEach(x => {
-                this.billInstructionComponent.shippingInstruction.grossWeight = this.billInstructionComponent.shippingInstruction.grossWeight + x.gw;
-                this.billInstructionComponent.shippingInstruction.volume = this.billInstructionComponent.shippingInstruction.volume + x.cbm;
-                desOfGoods = (x.desOfGoods !== null) ? (x.desOfGoods + " ") : null;
-                this.billInstructionComponent.shippingInstruction.goodsDescription = this.billInstructionComponent.shippingInstruction.goodsDescription + desOfGoods;
-                containerNotes = (x.packageContainer !== null) ? (x.packageContainer + "") : null;
-                this.billInstructionComponent.shippingInstruction.containerNote = this.billInstructionComponent.shippingInstruction.containerNote + containerNotes;
-                this.billInstructionComponent.shippingInstruction.packagesNote = this.billInstructionComponent.shippingInstruction.containerNote + containerNotes;
+                gw += x.gw;
+                volumn += x.cbm;
+                desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
+                containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
+                packages += x.package;
+                contSealNos += !!x.contSealNo ? (x.contSealNo) : '';
             });
-            this.billInstructionComponent.shippingInstruction.containerSealNo = "";
+            this.billInstructionComponent.shippingInstruction.grossWeight = gw;
+            this.billInstructionComponent.shippingInstruction.volume = volumn;
+            this.billInstructionComponent.shippingInstruction.goodsDescription = desOfGoods;
+            this.billInstructionComponent.shippingInstruction.packagesNote = packages != null ? + packages + 'PKGS' : '';
+            this.billInstructionComponent.shippingInstruction.containerNote = containerNotes;
+            this.billInstructionComponent.shippingInstruction.containerSealNo = contSealNos;
         }
     }
     initNewShippingInstruction(res: CsTransaction) {
@@ -136,12 +145,12 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.billInstructionComponent.shippingInstruction.bookingNo = res.bookingNo;
         this.billInstructionComponent.shippingInstruction.paymenType = "Prepaid";
         this.billInstructionComponent.shippingInstruction.invoiceDate = new Date();
-        this.billInstructionComponent.shippingInstruction.issuedUser = localStorage.getItem("currently_userName");
         this.billInstructionComponent.shippingInstruction.supplier = res.coloaderId;
         this.billInstructionComponent.shippingInstruction.consigneeId = res.agentId;
         this.billInstructionComponent.shippingInstruction.pol = res.pol;
         this.billInstructionComponent.shippingInstruction.pod = res.pod;
         this.billInstructionComponent.shippingInstruction.loadingDate = res.etd;
+        this.billInstructionComponent.shippingInstruction.voyNo = res.flightVesselName + " - " + res.voyNo;
     }
     save() {
         this.billInstructionComponent.isSubmitted = true;
@@ -162,7 +171,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
-                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -191,14 +199,17 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.previewPopup.frm.nativeElement.submit();
-                            this.previewPopup.show();
-                        }, 1000);
-                    } else {
-                        this._toastService.warning('This shipment does not have any house bill ');
+                    if (res != null) {
+
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('This shipment does not have any house bill ');
+                        }
                     }
                 },
             );

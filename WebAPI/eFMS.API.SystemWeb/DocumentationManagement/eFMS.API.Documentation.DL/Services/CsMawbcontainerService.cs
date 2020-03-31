@@ -394,7 +394,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if(item.NwError != null)
                 {
-                    if (Int64.TryParse(item.NwError, out long x))
+                    if (decimal.TryParse(item.NwError, out decimal x))
                     {
                         item.Nw = x;
                         item.NwError = null;
@@ -407,7 +407,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.GwError != null)
                 {
-                    if (Int64.TryParse(item.GwError, out long x))
+                    if (decimal.TryParse(item.GwError, out decimal x))
                     {
                         item.Gw = x;
                         item.GwError = null;
@@ -420,7 +420,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.CbmError != null)
                 {
-                    if (Int64.TryParse(item.CbmError, out long x))
+                    if (decimal.TryParse(item.CbmError, out decimal x))
                     {
                         item.Cbm = x;
                         item.CbmError = null;
@@ -670,7 +670,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.NwError != null)
                 {
-                    if (Int64.TryParse(item.NwError, out long x))
+                    if (decimal.TryParse(item.NwError, out decimal x))
                     {
                         item.Nw = x;
                         item.NwError = null;
@@ -683,7 +683,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.GwError != null)
                 {
-                    if (Int64.TryParse(item.GwError, out long x))
+                    if (decimal.TryParse(item.GwError, out decimal x))
                     {
                         item.Gw = x;
                         item.GwError = null;
@@ -696,7 +696,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (item.CbmError != null)
                 {
-                    if (Int64.TryParse(item.CbmError, out long x))
+                    if (decimal.TryParse(item.CbmError, out decimal x))
                     {
                         item.Cbm = x;
                         item.CbmError = null;

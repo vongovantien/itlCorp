@@ -64,6 +64,13 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        public Guid? GetSalemanIdByPartnerId(string partnerId)
+        {
+            var data = GetSaleMan().Where(x => x.PartnerId == partnerId).OrderBy(x=>x.CreateDate).Select(x=>x.SaleManId).FirstOrDefault();
+            Guid? salemanId = new Guid(data);
+            return salemanId;
+        }
+
         #region CRUD
         public override HandleState Add(CatSaleManModel entity)
         {

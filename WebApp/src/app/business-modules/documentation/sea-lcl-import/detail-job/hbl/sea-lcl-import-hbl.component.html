@@ -169,7 +169,7 @@
                                 </tab>
                                 <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
                                     <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                        <selling-charge *ngIf="selectedTabSurcharge === 'SELL'"></selling-charge>
+                                        <selling-charge></selling-charge>
                                     </ng-container>
 
                                 </tab>

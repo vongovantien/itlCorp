@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
@@ -48,7 +48,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     documentDate: AbstractControl;
     documentNo: AbstractControl;
     etawarehouse: AbstractControl;
-    warehouseNotice: AbstractControl;
+    // warehouseNotice: AbstractControl;
+    inWord: AbstractControl;
+
     shippingMark: AbstractControl;
     remark: AbstractControl;
     issueHBLDate: AbstractControl;
@@ -85,7 +87,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     saleMans: any = [];
     headersSaleman: CommonInterface.IHeaderTable[];
     saleManInCustomerFilter: any = {};
-    isDetail: boolean = false;
     serviceTypesString: string[] = [];
     hbOfladingTypesString: string[] = [];
 
@@ -105,6 +106,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     object: any = { items: [] };
     listSaleMan: any = [];
     type: string = '';
+    @Input() isDetail: boolean = false;
+
 
     constructor(
         private _fb: FormBuilder,
@@ -275,7 +278,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
             documentNo: [],
             referenceNo: [],
-            warehousenotice: [],
+            // warehousenotice: [],
+            inWord:[],
             shippingMark: [],
             documnentDate: [],
             remark: [],
@@ -319,7 +323,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.documentDate = this.formGroup.controls['documnentDate'];
         this.documentNo = this.formGroup.controls['documentNo'];
         this.etawarehouse = this.formGroup.controls['dateETA'];
-        this.warehouseNotice = this.formGroup.controls['warehousenotice'];
+        // this.warehouseNotice = this.formGroup.controls['warehousenotice'];
+        this.inWord = this.formGroup.controls["inWord"];
         this.shippingMark = this.formGroup.controls['shippingMark'];
         this.remark = this.formGroup.controls['remark'];
         this.issueHBLDate = this.formGroup.controls['dateOfIssued'];
@@ -383,7 +388,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             finalDestinationPlace: data.finalDestinationPlace,
             shippingMark: data.shippingMark,
             remark: data.remark,
-            warehouseNotice: data.inWord,
+            inWord: data.inWord,
             serviceType: [<CommonInterface.INg2Select>{ id: data.serviceType, text: data.serviceType }],
 
         });
@@ -409,7 +414,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             documnentDate: !!res.documentDate ? { startDate: new Date(res.documentDate), endDate: new Date(res.documentDate) } : null,
             documentNo: res.documentNo,
             dateETA: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
-            warehousenotice: res.warehouseNotice,
+            // warehousenotice: res.warehouseNotice,
+            inWord:res.inWord,
             shippingMark: res.shippingMark,
             remark: res.remark,
             dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;

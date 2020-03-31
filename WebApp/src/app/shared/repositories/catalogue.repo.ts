@@ -162,6 +162,14 @@ export class CatalogueRepo {
         );
     }
 
+    getSalemanIdByPartnerId(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleman/GetSalemanIdByPartnerId/${partnerId}`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     importPartner(body: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Import`, body).pipe(
             map((data: any) => data)

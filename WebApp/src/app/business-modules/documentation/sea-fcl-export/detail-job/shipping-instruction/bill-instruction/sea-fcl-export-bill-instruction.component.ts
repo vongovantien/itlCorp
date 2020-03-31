@@ -21,7 +21,7 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
     shippers: any[] = [];
     ports: any[] = [];
     termTypes: CommonInterface.INg2Select[];
-    shippingInstruction: any;
+    shippingInstruction: CsShippingInstruction;
 
     siRefNo: AbstractControl;
     issueDate: AbstractControl;
@@ -49,6 +49,21 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
     packages: AbstractControl;
     gw: AbstractControl;
     cbm: AbstractControl;
+    displayFieldIsseBy: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'username', label: 'User Name' },
+        { field: 'employeeNameEn', label: 'Full Name' }
+    ];
+    displayFieldPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'accountNo', label: 'Partner ID' },
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameEn', label: 'Name EN' },
+        { field: 'taxCode', label: 'Tax Code' }
+    ];
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Port Code' },
+        { field: 'nameEn', label: 'Port Name' },
+        { field: 'countryNameEN', label: 'Country' }
+    ];
 
     constructor(private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
@@ -66,7 +81,7 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
         this.getShippers();
         this.getPorts();
     }
-    setformValue(res) {
+    setformValue(res: CsShippingInstruction) {
         if (!!res) {
             this.formSI.setValue({
                 siRefNo: res.refNo, // * disabled
@@ -97,6 +112,13 @@ export class SeaFclExportBillInstructionComponent extends AppForm {
                 gw: res.grossWeight,
                 cbm: res.volume
             });
+            if (res.issuedUser == null && res.shipper == null) {
+                const currentUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+                this.formSI.controls['issuedUser'].setValue(currentUser.id);
+                this._systemRepo.getDetailOffice(currentUser.officeId).toPromise().then((office: any) => {
+                    this.formSI.controls['shipper'].setValue(office.data.branchNameEn);
+                });
+            }
         }
     }
     initForm() {

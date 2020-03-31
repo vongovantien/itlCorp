@@ -168,7 +168,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                 eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                                 flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
                                 flightNo: shipment.flightVesselName,
-                                forwardingAgentId: shipment.agentId
+                                forwardingAgentId: shipment.agentId,
+                                arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                             });
                         }
                     }
@@ -294,7 +295,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [null, Validators.required],
-            shipperId: [null, Validators.required],
+            shipperId: [],
             consigneeId: [null, Validators.required],
             notifyPartyId: [],
             forwardingAgentId: [],
@@ -357,27 +358,32 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-
-                this.saleMans = this.saleMans.pipe(
-                    tap((users: User[]) => {
-                        const user: User = users.find((u: User) => u.id === data.salePersonId);
-                        if (!!user) {
-                            this.saleManId.setValue(user.id);
-                        }
-                    })
-                );
-                if (!this.shipperId.value) {
-                    this.shipperId.setValue(data.id);
-                    this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                // this.saleMans = this.saleMans.pipe(
+                //     tap((users: User[]) => {
+                //         const user: User = users.find((u: User) => u.id === data.salePersonId);
+                //         if (!!user) {
+                //             this.saleManId.setValue(user.id);
+                //         }
+                //     })
+                // );
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                    if (!!res) {
+                        this.saleManId.setValue(res);
+                    }
+        
+                });
+                // if (!this.shipperId.value) {
+                //     this.shipperId.setValue(data.id);
+                //     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                // }
                 if (!this.consigneeId.value) {
                     this.consigneeId.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                if (!this.notifyPartyId.value) {
-                    this.notifyPartyId.setValue(data.id);
-                    this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
-                }
+                // if (!this.notifyPartyId.value) {
+                //     this.notifyPartyId.setValue(data.id);
+                //     this.notifyPartyDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                // }
                 break;
             case 'shipper':
                 this.shipperId.setValue(data.id);
