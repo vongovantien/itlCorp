@@ -3,16 +3,13 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store } from '@ngrx/store';
 import { NgxSpinnerService } from 'ngx-spinner';
 
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { User, CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
+import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
+import { CommonEnum } from '@enums';
+import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex } from '@models';
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
-import { DataService } from 'src/app/shared/services';
+import { DataService } from '@services';
 
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
@@ -24,6 +21,7 @@ import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction
     templateUrl: './form-create-house-bill-export.component.html'
 })
 export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm implements OnInit {
+    @Input() isUpdate: boolean = false;
 
     formCreate: FormGroup;
     customer: AbstractControl;
@@ -67,13 +65,16 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     serviceTypes: CommonInterface.INg2Select[];
     ladingTypes: CommonInterface.INg2Select[];
     termTypes: CommonInterface.INg2Select[];
-    originNumbers: CommonInterface.INg2Select[] = [{ id: 1, text: '1' }, { id: 2, text: '2' }, { id: 3, text: '3' }];
+
+    originNumbers: CommonInterface.INg2Select[] = [
+        { id: '0', text: 'Zero (0)' },
+        { id: 1, text: 'One (1)' },
+        { id: 2, text: 'Two (2)' },
+        { id: 3, text: 'Three (3)' }];
+
     typeOfMoves: CommonInterface.INg2Select[];
     listSaleMan: any = [];
     type: string = '';
-    @Input() isUpdate: boolean = false;
-
-
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -105,7 +106,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         private _spinner: NgxSpinnerService,
-        private _dataService: DataService
+        private _dataService: DataService,
     ) {
         super();
     }
@@ -124,8 +125,16 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 this.isLoadingCustomer = false;
             })
         );
-        this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
-        this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE);
+        this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]).pipe(
+            finalize(() => {
+                this.isLoadingShipper = false;
+            })
+        );
+        this.consignees = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE).pipe(
+            finalize(() => {
+                this.isLoadingConsignee = false;
+            })
+        );
 
         this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCataloguePortAction());
@@ -141,9 +150,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
                 .subscribe(
                     (res: CsTransactionDetail) => {
-                        console.log("detail hbl from store", res);
                         if (!!res) {
-                            console.log(res);
                             this.updateFormValue(res);
                         }
                     }
@@ -151,6 +158,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
 
         } else {
+
             // * get detail shipment from store.
             this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
@@ -166,8 +174,31 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                                 pod: this.shipmmentDetail.pod,
                                 pol: this.shipmmentDetail.pol,
                                 serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
-                                issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null
+                                issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
+                                sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
+                                issueHblplace: localStorage.getItem(SystemConstants.CURRENT_OFFICE) || null,
                             });
+                            this.ports.subscribe(
+                                ((ports: PortIndex[]) => {
+                                    if (!!this.shipmmentDetail.pol) {
+                                        const placeDelivery: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pod);
+                                        if (!!placeDelivery) {
+                                            this.formCreate.patchValue({
+                                                placeDelivery: placeDelivery.nameEn,
+                                            });
+                                        }
+                                    }
+                                    if (!!this.shipmmentDetail.pol) {
+                                        const placeReceipt: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pol);
+                                        if (!!placeReceipt) {
+                                            this.formCreate.patchValue({
+                                                placeReceipt: placeReceipt.nameEn,
+                                            });
+                                        }
+                                    }
+                                })
+                            );
+
                         }
                     }
                 );
@@ -444,7 +475,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             case 'agent':
                 this.forwardingAgent.setValue(data.id);
                 break;
-
             case 'freightPayment':
                 if (!!data && !!data.length || !!data.id) {
                     if (data.id === 'Collect') {
@@ -457,8 +487,5 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             default:
                 break;
         }
-
     }
-
-
 }
