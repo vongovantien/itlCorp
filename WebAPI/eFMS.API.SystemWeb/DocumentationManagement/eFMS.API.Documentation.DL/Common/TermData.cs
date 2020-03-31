@@ -101,7 +101,12 @@ namespace eFMS.API.Documentation.DL.Common
             new ServiceType { Value = "CY/CFS", DisplayName = "CY/CFS" },
             new ServiceType { Value = "CY/CY", DisplayName = "CY/CY" },
             new ServiceType { Value = "CFS/CY", DisplayName = "CFS/CY" },
-            new ServiceType { Value = "CFS/CFS", DisplayName = "CFS/CFS" }
+            new ServiceType { Value = "CFS/CFS", DisplayName = "CFS/CFS" },
+            new ServiceType { Value = "CY/DR", DisplayName = "CY/DR" },
+            new ServiceType { Value = "DR/CY", DisplayName = "DR/CY" },
+            new ServiceType { Value = "DR/DR", DisplayName = "DR/DR" },
+            new ServiceType { Value = "DR/CFS", DisplayName = "DR/CFS" },
+            new ServiceType { Value = "CFS/DR", DisplayName = "CFS/DR" },
         };
         public static readonly List<TypeOfMove> TypeOfMoves = new List<TypeOfMove>
         {
