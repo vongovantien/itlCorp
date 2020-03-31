@@ -7,14 +7,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container } from '@models';
 import { AppList } from 'src/app/app.list';
-import { SortService } from 'src/app/shared/services';
+import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, share } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -78,7 +78,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _toastService: ToastrService,
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
-        protected _spinner: NgxSpinnerService
+        protected _spinner: NgxSpinnerService,
+        protected _dataService: DataService
 
 
     ) {
@@ -198,17 +199,23 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     getPartner() {
         this.isShowLoadingPartner = true;
         this._spinner.show(this.spinnerpartner);
+
         this._catalogueRepo.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._spinner.hide(this.spinnerpartner);
-                this.isShowLoadingPartner = false;
-            }
-            ))
+            .pipe(
+                share(),
+                catchError(this.catchError), finalize(() => {
+                    this._spinner.hide(this.spinnerpartner);
+                    this.isShowLoadingPartner = false;
+                }))
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
+
+                    // * Update BehaviorSubject messageSource.
+                    this._dataService.setData(SystemConstants.CSTORAGE.PARTNER, this.listPartner);
                 }
             );
+
     }
 
     getShipmentContainer() {

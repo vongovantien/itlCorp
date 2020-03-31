@@ -5,12 +5,12 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
-import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
+import { SortService, DataService } from 'src/app/shared/services';
+import { CsShipmentSurcharge, Charge, Partner } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
@@ -35,13 +35,24 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _toastService: ToastrService,
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
-        protected _spinner: NgxSpinnerService
+        protected _spinner: NgxSpinnerService,
+        protected _dataService: DataService
+
 
 
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService);
         this._progressRef = this._ngProgressService.ref();
 
+    }
+
+    getPartner() {
+        this._dataService.currentMessage.pipe(
+            skip(1)
+        ).subscribe(
+            (data: any = []) => {
+                this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
+            });
     }
 
     getSurcharge() {
