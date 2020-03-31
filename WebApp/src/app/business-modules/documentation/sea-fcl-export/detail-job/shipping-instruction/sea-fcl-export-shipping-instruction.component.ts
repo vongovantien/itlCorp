@@ -128,13 +128,13 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 volumn += x.cbm;
                 desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
-                packages += x.package;
+                packages += !!x.packageQty ? x.packageQty : 0;
                 contSealNos += !!x.contSealNo ? (x.contSealNo) : '';
             });
             this.billInstructionComponent.shippingInstruction.grossWeight = gw;
             this.billInstructionComponent.shippingInstruction.volume = volumn;
             this.billInstructionComponent.shippingInstruction.goodsDescription = desOfGoods;
-            this.billInstructionComponent.shippingInstruction.packagesNote = packages != null ? + packages + 'PKGS' : '';
+            this.billInstructionComponent.shippingInstruction.packagesNote = packages != null ? + packages + 'xPKGS' : '';
             this.billInstructionComponent.shippingInstruction.containerNote = containerNotes;
             this.billInstructionComponent.shippingInstruction.containerSealNo = contSealNos;
         }
