@@ -67,8 +67,8 @@
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'id',value: issuedUser.value}"
                                     (itemSelected)="onSelectDataForm($event, 'issuedUser')"
-                                    [selectedDisplayFields]="['employeeNameVn']" [dataSources]="userIssues"
-                                    [displayFields]="[{'field':'username','label':'User Name'},{'field':'employeeNameVn','label':'Full Name'}]">
+                                    [selectedDisplayFields]="['employeeNameEn']" [dataSources]="userIssues"
+                                    [displayFields]="displayFieldIsseBy" (remove)="resetFormControl(issuedUser)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !issuedUser.value">
@@ -87,8 +87,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="suppliers"
                                     [currentActiveItemId]="{field:'id',value: supplier.value}"
                                     (itemSelected)="onSelectDataForm($event, 'supplier')"
-                                    [selectedDisplayFields]="['partnerNameEn']"
-                                    [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
+                                    (remove)="resetFormControl(supplier)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !supplier.value">
@@ -133,8 +133,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="consignees"
                                     [currentActiveItemId]="{field:'id',value:consignee.value}"
                                     (itemSelected)="onSelectDataForm($event, 'consignee')"
-                                    [selectedDisplayFields]="['partnerNameEn']"
-                                    [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
+                                    (remove)="resetFormControl(consignee)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
@@ -167,8 +167,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="shippers"
                                     [currentActiveItemId]="{field:'id',value: realShipper.value}"
                                     (itemSelected)="onSelectDataForm($event, 'realshipper')"
-                                    [selectedDisplayFields]="['partnerNameEn']"
-                                    [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
+                                    (remove)="resetFormControl(realShipper)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
@@ -185,8 +185,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="consignees"
                                     [currentActiveItemId]="{field:'id',value: realconsignee.value}"
                                     (itemSelected)="onSelectDataForm($event, 'realconsignee')"
-                                    [selectedDisplayFields]="['partnerNameEn']"
-                                    [displayFields]="[{'field':'accountNo','label':'Partner ID'},{'field':'shortName','label':'Name ABBR'},{'field':'partnerNameEn','label':'Name EN'},{'field':'taxCode','label':'Tax Code'}]">
+                                    [selectedDisplayFields]="['partnerNameEn']" [displayFields]="displayFieldPartner"
+                                    (remove)="resetFormControl(realconsignee)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
@@ -240,8 +240,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="ports"
                                     [currentActiveItemId]="{field:'id',value: pol.value}"
                                     (itemSelected)="onSelectDataForm($event, 'pol')"
-                                    [selectedDisplayFields]="['nameEn']"
-                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                    [selectedDisplayFields]="['nameEn']" [displayFields]="displayFieldPort"
+                                    (remove)="resetFormControl(pol)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !pol.value ">
@@ -260,8 +260,8 @@
                                 <app-combo-grid-virtual-scroll [dataSources]="ports"
                                     [currentActiveItemId]="{field:'id',value: pod.value}"
                                     (itemSelected)="onSelectDataForm($event, 'pod')"
-                                    [selectedDisplayFields]=" ['nameEn']"
-                                    [displayFields]="[{'field':'code','label':'Port Code'},{'field':'nameEn','label':'Port Name'},{'field':'countryNameEN','label':'Country'}]">
+                                    [selectedDisplayFields]=" ['nameEn']" [displayFields]="displayFieldPort"
+                                    (remove)="resetFormControl(pod)">
                                 </app-combo-grid-virtual-scroll>
 
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !pod.value">

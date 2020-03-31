@@ -298,8 +298,8 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.PlaceDelivery = podName?.ToUpper();//POD of HBL
                         charge.ArrivalNote = houserBill.Remark?.ToUpper();//Remark of HBL
 
-                        charge.ShippingMarkImport = houserBill.ShippingMark;//ShippingMark of HBL
-                        
+                        charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
+
                         charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                         charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
                         charge.NoPieces = houserBill.PackageQty != null ? houserBill.PackageQty.ToString() : string.Empty;//Package Qty
@@ -361,7 +361,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.PlaceDelivery = podName?.ToUpper();//POD of HBL
                     charge.ArrivalNote = houserBill.Remark?.ToUpper();//Remark of HBL
 
-                    charge.ShippingMarkImport = houserBill.ShippingMark?.ToUpper();//ShippingMark of HBL
+                    charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
 
                     charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                     charge.Description = houserBill.DesOfGoods;// Description of goods (Description)

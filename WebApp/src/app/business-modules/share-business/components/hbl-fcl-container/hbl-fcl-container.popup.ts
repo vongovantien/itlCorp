@@ -175,6 +175,7 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                 for (const container of this.containers) {
                     container.commodityName = this.getCommodityName(container.commodityId);
                     container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
+                    container.description = this.getDescriptionName(container.containerTypeId);
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
                     if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
                         container.quantity = 1;
@@ -266,6 +267,15 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         const packages: Unit[] = this.packageUnits.filter(c => c.id === packageId);
         if (!!packages.length) {
             return packages[0].unitNameEn;
+        } else {
+            return null;
+        }
+    }
+
+    getDescriptionName(containerId: string | number) {
+        const containers: Unit[] = this.containerUnits.filter(c => c.id === containerId);
+        if (!!containers.length) {
+            return containers[0].descriptionEn;
         } else {
             return null;
         }

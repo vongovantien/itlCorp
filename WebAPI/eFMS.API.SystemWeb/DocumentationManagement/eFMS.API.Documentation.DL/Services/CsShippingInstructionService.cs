@@ -102,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ToPartner = model.SupplierName,
                     Re = model.BookingNo,
                     DatePackage = model.InvoiceDate,
-                    ShipperDf = model.ActualShipperDescription,
+                    ShipperDf = model.Shipper,
                     GoodsDelivery = model.ConsigneeDescription,
                     NotitfyParty = model.InvoiceNoticeRecevier,
                     PortofLoading = model.PodName,

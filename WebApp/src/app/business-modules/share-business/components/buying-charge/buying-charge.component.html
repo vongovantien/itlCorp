@@ -1,3 +1,7 @@
+<ngx-spinner bdColor="rgba(242,222,223,0.3)" [name]="spinnerpartner" [fullScreen]="false" type="ball-spin-clockwise"
+    size="medium">
+</ngx-spinner>
+
 <div class="buying-charge-wrapper">
     <div class="buying-charge-content">
         <div class="row m--margin-top-20">
@@ -75,35 +79,47 @@
                                 <div class="form-group col-md-12 dropdown-partner" dropdown
                                     [tooltip]="charge.partnerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
-                                    <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                        [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                        [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
-                                    <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
-                                        <div class="d-flex justify-content-end dropdown-partner__header">
-                                            <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                *ngFor="let type of partnerType; trackBy: trackByFn"
-                                                [title]="type.displayName"
-                                                (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
+                                    <ng-container
+                                        *ngIf="!!charge.creditNo || !charge.isFromShipment;else  partnerCharge">
+                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select">
+                                    </ng-container>
+                                    <ng-template #partnerCharge>
+                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null">
+                                        <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                            <div class="d-flex justify-content-end dropdown-partner__header">
+                                                <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                    *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                    [title]="type.displayName"
+                                                    (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
+                                            </div>
+                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                                [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
+                                                (onClick)="onSelectPartner($event, charge)">
+                                            </app-combo-grid>
                                         </div>
-                                        <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                            [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
-                                            (onClick)="onSelectPartner($event, charge)">
-                                        </app-combo-grid>
-                                    </div>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
-                                    <app-combo-grid-virtual-scroll
-                                        [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                        (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
-                                        [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                        [dataSources]="listCharges"
-                                        [displayFields]="configComboGridCharge.displayFields" [height]="150"
-                                        [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
-                                        placeholder="Select charge" (remove)="charge.chargeId = null">
-                                    </app-combo-grid-virtual-scroll>
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment;else  chargeID">
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.chargeNameEn">
+                                    </ng-container>
+                                    <ng-template #chargeID>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                            (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
+                                            [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                            [dataSources]="listCharges"
+                                            [displayFields]="configComboGridCharge.displayFields" [height]="150"
+                                            placeholder="Select charge" (remove)="charge.chargeId = null">
+                                        </app-combo-grid-virtual-scroll>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>

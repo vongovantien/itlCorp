@@ -271,7 +271,7 @@
 					<app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value: salemansId.value}"
 						(itemSelected)="onSelectDataFormInfo($event, 'salesman')"
 						[selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans | async" size="15"
-						[displayFields]="displayFieldSalesman">
+						[displayFields]="displayFieldSalesman" (remove)="resetFormControl(salemansId)">
 					</app-combo-grid-virtual-scroll>
 				</div>
 			</div>
