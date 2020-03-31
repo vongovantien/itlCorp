@@ -656,7 +656,7 @@ namespace eFMS.API.ReportData
                 indexNo = indexNo + 1;
                 var item = listItems[i];
                 worksheet.Cells[i + 6, 1].Value = indexNo;
-                worksheet.Cells[i + 6, 2].Value = item.Id;
+                worksheet.Cells[i + 6, 2].Value = item.AccountNo;
                 worksheet.Cells[i + 6, 3].Value = item.FullName;
                 worksheet.Cells[i + 6, 4].Value = item.ShortName;
                 worksheet.Cells[i + 6, 5].Value = item.AddressVN;
