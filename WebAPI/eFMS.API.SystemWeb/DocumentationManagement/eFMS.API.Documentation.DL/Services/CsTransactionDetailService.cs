@@ -728,8 +728,9 @@ namespace eFMS.API.Documentation.DL.Services
             }
             results.ForEach(fe =>
             {
-                fe.Packages = string.Join(", ", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
-                                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + " x" + ' ' + GetUnitNameById(s.PackageTypeId)) : string.Empty));
+                //var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Select(s => s.PackageQuantity != null ? (s.PackageQuantity + " x " + GetUnitNameById(s.PackageTypeId)) : string.Empty);
+                var packages = fe.PackageQty != null ? (fe.PackageQty + " x " + (fe.PackageType != null? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn: "PKGS")) : string.Empty;
+                fe.Packages = string.Join(", ", packages);
             });
             return results;
         }
@@ -976,7 +977,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = string.Empty;
             var data = catUnitRepo.Get(g => g.Id == id).FirstOrDefault();
-            result = (data != null) ? data.UnitNameEn : string.Empty;
+            result = (data != null) ? data.UnitNameEn : "PKGS";
             return result;
         }
 
