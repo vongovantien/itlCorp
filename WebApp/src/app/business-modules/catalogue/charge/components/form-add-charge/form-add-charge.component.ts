@@ -207,12 +207,16 @@ export class FormAddChargeComponent extends AppForm {
             debitCharge: res.charge.debitCharge,
             chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null
         });
-        const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
-        this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);
-        const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
-        const itemChargeGroup = this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup);
-        this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
-        !!res.charge.chargeGroup ? this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]) : null;
+        setTimeout(() => {
+            const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
+            this.unit.setValue([<CommonInterface.INg2Select>{ id: res.charge.unitId, text: itemUnit.text }]);
+            const itemCurrency = this.ngDataCurrentcyUnit.find(x => x.id === res.charge.currencyId);
+            const itemChargeGroup = this.ngDataChargeGroup.find(x => x.id === res.charge.chargeGroup);
+            this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
+            !!res.charge.chargeGroup ? this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]) : null;
+        }, 200);
+      
+       
 
     }
 }

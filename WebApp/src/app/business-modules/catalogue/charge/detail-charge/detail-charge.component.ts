@@ -94,7 +94,10 @@ export class DetailChargeComponent extends AddChargeComponent {
     updateCharge() {
         this.formAddCharge.isSubmitted = true;
         this.voucherList.isSubmitted = true;
-        if (this.formAddCharge.checkValidateForm() && this.voucherList.validatateDefaultAcountLine()) {
+        if(!this.formAddCharge.checkValidateForm()){
+            return;
+        }
+        if ( this.voucherList.validatateDefaultAcountLine()) {
             const modeltoUpdate = this.onsubmitData();
             if (modeltoUpdate !== null) {
                 modeltoUpdate.charge.id = this.id;
