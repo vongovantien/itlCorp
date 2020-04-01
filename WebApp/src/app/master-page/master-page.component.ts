@@ -15,7 +15,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import crypto_js from 'crypto-js';
 import { interval, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { JwtService } from '../shared/services/jwt.service';
+import { JwtService } from '@services';
 import { HeaderComponent } from './header/header.component';
 import { ChangeOfficeClaimUserAction } from '@store';
 
@@ -71,9 +71,7 @@ export class MasterPageComponent implements OnInit {
         this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
             .then(
                 (res: any) => {
-                    this.oauthService.logoutUrl = window.location.origin + '/#/login';
                     this.oauthService.logOut(false);
-                    // this.router.navigate(["login"]);
                 },
                 (error: any) => {
                     console.log(error + '');

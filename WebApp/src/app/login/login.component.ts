@@ -56,12 +56,9 @@ export class LoginComponent {
         private _cd: ChangeDetectorRef,
         private _spinner: NgxSpinnerService
     ) {
-        this.oauthService.setStorage(localStorage);
-        this.oauthService.setupAutomaticSilentRefresh();
     }
 
     private async configureWithNewConfigApi() {
-        // this.oauthService.configure(authConfig);
         this.oauthService.tokenValidationHandler = new JwksValidationHandler();
         await this.oauthService.loadDiscoveryDocumentAndTryLogin();
     }
