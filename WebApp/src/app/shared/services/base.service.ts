@@ -8,6 +8,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { language } from 'src/languages/language.en';
 
 import { BehaviorSubject } from 'rxjs';
+import fs from 'file-saver';
 
 @Injectable({
   providedIn: 'root'
@@ -209,7 +210,7 @@ export class BaseService implements ErrorHandler {
     try {
       this.spinnerHide();
       const res = await this._http.get(url, { responseType: 'blob' }).toPromise();
-      saveAs(res, saveAsFileName);
+      fs.saveAs(res, saveAsFileName);
     } catch (error) {
       this.errorToast(this.LANG.NOTIFI_MESS.FILE_NOT_FOUND, this.LANG.NOTIFI_MESS.DOWNLOAD_ERR);
     }
