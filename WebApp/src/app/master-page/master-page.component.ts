@@ -47,6 +47,7 @@ export class MasterPageComponent implements OnInit {
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>
     ) {
+        this.oauthService.logoutUrl = window.location.origin + '/#/login';
     }
 
     ngOnInit() {
