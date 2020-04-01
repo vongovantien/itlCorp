@@ -1224,7 +1224,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeSell)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
@@ -1241,7 +1241,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeBuy)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
@@ -1260,7 +1260,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeObh)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
@@ -1486,7 +1486,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeSell)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();
@@ -1503,7 +1503,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeBuy)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         if (charge.ExchangeDate.HasValue)
@@ -1525,7 +1525,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var charge in _chargeObh)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                    var _rate = charge.FinalExchangeRate;
+                    var _rate = (criteria.Currency == charge.CurrencyId) ? 1 : charge.FinalExchangeRate;
                     if (_rate == null)
                     {
                         var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == charge.ExchangeDate.Value.Date).ToList();

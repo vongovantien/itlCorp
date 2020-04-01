@@ -63,11 +63,14 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string CompanyAddress2 { get; set; }
         public string Website { get; set; }
         public string AccountName { get; set; }
+        public string AccountNameEN { get; set; }
         public string BankName { get; set; }
+        public string BankNameEN { get; set; }
         public string SwiftAccs { get; set; }
         public string AccsUSD { get; set; }
         public string AccsVND { get; set; }
         public string BankAddress { get; set; }
+        public string BankAddressEN { get; set; }
         public decimal DecimalNo { get; set; }
         public string IssueInv { get; set; }
         public string InvoiceInfo { get; set; }
