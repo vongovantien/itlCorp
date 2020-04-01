@@ -5,14 +5,15 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
+import { SortService, DataService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner, Charge } from 'src/app/shared/models';
 
 import * as fromStore from './../../store';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'obh-charge',
@@ -29,7 +30,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _toastService: ToastrService,
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
-        protected _spinner: NgxSpinnerService
+        protected _spinner: NgxSpinnerService,
+        protected _dataService: DataService
+
 
 
     ) {
@@ -40,8 +43,18 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _toastService,
             _sortService,
             _ngProgressService,
-            _spinner);
+            _spinner,
+            _dataService);
         this._progressRef = this._ngProgressService.ref();
+    }
+
+    getPartner() {
+        this._dataService.currentMessage.pipe(
+            skip(1)
+        ).subscribe(
+            (data: any = []) => {
+                this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
+            });
     }
 
     getSurcharge() {

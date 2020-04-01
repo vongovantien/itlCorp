@@ -93,7 +93,7 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));
-                        this.highLightMenu();
+                        // this.highLightMenu();
                     }
                 );
         }

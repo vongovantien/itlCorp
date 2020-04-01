@@ -15,7 +15,7 @@ import { Store } from '@ngrx/store';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 import _merge from 'lodash/merge';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
@@ -184,7 +184,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID && hbl.id !== undefined) {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
-                            console.log(hbl);
                             this.updateFormValue(hbl);
                         }
 
@@ -264,7 +263,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             if (!!res) {
                 const units = res;
                 this.ngDataUnit = units.map(x => ({ text: x.unitNameEn, id: x.id }));
-                console.log(this.ngDataUnit);
             }
 
         });
@@ -354,17 +352,16 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log(data);
         switch (type) {
             case 'customer':
                 this.customerId.setValue(data.id);
-           
+
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {
                         this.saleManId.setValue(res);
                     }
                     else {
-                    this.saleMans = this.saleMans.pipe(
+                        this.saleMans = this.saleMans.pipe(
                             tap((users: User[]) => {
                                 const user: User = users.find((u: User) => u.id === data.salePersonId);
                                 if (!!user) {

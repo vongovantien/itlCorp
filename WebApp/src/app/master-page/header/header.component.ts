@@ -88,6 +88,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
                 } else {
                     this.selectedOffice = this.offices.find(o => o.id === currenUser.officeId);
                 }
+
+                // * SAVE USER LOGGED OFFICE'S 
+                localStorage.setItem(SystemConstants.CURRENT_OFFICE, this.selectedOffice.branchNameEn);
             }
         })).subscribe((res: any) => {
             if (!!res) {

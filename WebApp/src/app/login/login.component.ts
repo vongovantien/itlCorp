@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
 import { SystemConstants } from 'src/constants/system.const';
-import { OAuthService, JwksValidationHandler } from 'angular-oauth2-oidc';
+import { OAuthService, JwksValidationHandler, TokenResponse } from 'angular-oauth2-oidc';
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
 
@@ -91,7 +91,8 @@ export class LoginComponent {
                     companyId: this.selectedCompanyId
                 });
                 this.oauthService.fetchTokenUsingPasswordFlow(this.username, passwordEncoded, header) // * Request Access Token.
-                    .then((resp: any) => {
+                    .then(async (resp: TokenResponse) => {
+                        localStorage.setItem(SystemConstants.ID_TOKEN, 'efms');
                         return this.oauthService.loadUserProfile();
                     }).then(() => {
                         const userInfo: SystemInterface.IClaimUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
