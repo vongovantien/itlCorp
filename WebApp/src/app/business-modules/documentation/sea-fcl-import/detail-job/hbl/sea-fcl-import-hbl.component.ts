@@ -91,7 +91,7 @@ export class SeaFCLImportHBLComponent extends AppList {
             { title: 'Package', field: 'packages', sortable: true },
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true }
-        ];
+        ]; 
 
         this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
         this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
