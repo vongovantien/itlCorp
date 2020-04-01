@@ -21,6 +21,7 @@ export class FormAddPartnerComponent extends AppForm {
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: true;
     parentCustomers: any[] = [];
+    parentCustomerss: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
     shippingProvinces: any[] = [];
@@ -36,6 +37,7 @@ export class FormAddPartnerComponent extends AppForm {
     nameLocalFull: AbstractControl;
     shortName: AbstractControl;
     partnerAccountRef: AbstractControl;
+
     taxCode: AbstractControl;
     partnerGroup: AbstractControl;
     shippingCountry: AbstractControl;
@@ -194,7 +196,7 @@ export class FormAddPartnerComponent extends AppForm {
             shortName: [null, Validators.compose([
                 FormValidators.required
             ])],
-            partnerAccountRef: [null],
+            partnerAccountRef:[],
             taxCode: [null, Validators.compose([
                 FormValidators.required
             ])],
@@ -281,6 +283,10 @@ export class FormAddPartnerComponent extends AppForm {
         this.roundUp = this.partnerForm.controls['roundUp'];
     }
 
+    onSelectDataFormInfo(data: any){
+       this.partnerAccountRef.setValue(data.id);
+    }
+
     setFormData(partner: Partner) {
         console.log(partner);
         const isShowSaleMan = this.checkRequireSaleman(partner.partnerGroup);
@@ -322,7 +328,7 @@ export class FormAddPartnerComponent extends AppForm {
             nameENFull: partner.partnerNameEn,
             nameLocalFull: partner.partnerNameVn,
             shortName: partner.shortName,
-            partnerAccountRef: parentCustomerActive,
+            partnerAccountRef: partner.parentId,
             taxCode: partner.taxCode,
             partnerGroup: partnerGroupActives,
             shippingCountry: shippingCountryActive,
