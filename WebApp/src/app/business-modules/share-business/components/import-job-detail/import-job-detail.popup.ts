@@ -16,7 +16,6 @@ import { ShareBusinessFormSearchImportJobComponent } from './components/form-sea
 export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
 
     @ViewChild(ShareBusinessFormSearchImportJobComponent, { static: false }) formSearchImportJobComponent: ShareBusinessFormSearchImportJobComponent;
-
     @Output() onImport: EventEmitter<any> = new EventEmitter<any>();
 
     headers: CommonInterface.IHeaderTable[];
@@ -57,9 +56,7 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
             { title: 'Supplier(Shipping Line)', field: 'supplierName', sortable: true },
             { title: 'Shipment Date', field: 'etd', sortable: true }
         ];
-        // this.getShippments(this.dataSearch);
     }
-
 
     onCancel() {
         this.hide();
@@ -95,7 +92,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                     this.totalItems = 0;
                     this.shippments = [];
                 }
-
             },
         );
     }
@@ -114,10 +110,10 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
                     objShipment.etd = null;
                     objShipment.mawb = null;
                     objShipment.eta = null;
-                    objShipment.personIncharge = localStorage.getItem('currently_userName') || 'Admin';
+                    objShipment.personIncharge = objShipment.personIncharge;
+
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(objShipment));
                     this.isCheckShipment = true;
-                    // TODO get container list.
                     this._documentRepo.getListContainersOfJob({ mblid: this.selectedShipment.id }).pipe(
                     ).subscribe(
                         (res: any) => {
@@ -134,7 +130,6 @@ export class ShareBusinessImportJobDetailPopupComponent extends PopupBase {
 
                                     this._store.dispatch(new fromShareBussiness.GetContainerSuccessAction(this.containers));
                                 }
-
                             }
                         }
                     );

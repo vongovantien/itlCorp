@@ -128,12 +128,14 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         }
     }
     initNewShippingInstruction(res: CsTransaction) {
+        const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         this.billInstructionComponent.shippingInstruction = new CsShippingInstruction();
         this.billInstructionComponent.shippingInstruction.refNo = res.jobNo;
         this.billInstructionComponent.shippingInstruction.bookingNo = res.bookingNo;
         this.billInstructionComponent.shippingInstruction.paymenType = "Prepaid";
         this.billInstructionComponent.shippingInstruction.invoiceDate = new Date();
-        this.billInstructionComponent.shippingInstruction.issuedUser = localStorage.getItem("currently_userName");
+        this.billInstructionComponent.shippingInstruction.issuedUser = user.userName
         this.billInstructionComponent.shippingInstruction.supplier = res.coloaderId;
         this.billInstructionComponent.shippingInstruction.consigneeId = res.agentId;
         this.billInstructionComponent.shippingInstruction.pol = res.pol;

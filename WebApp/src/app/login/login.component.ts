@@ -95,7 +95,6 @@ export class LoginComponent {
                         const userInfo: SystemInterface.IClaimUser = <any>this.oauthService.getIdentityClaims(); // * Get info User.
 
                         if (!!userInfo) {
-                            localStorage.setItem("currently_userName", userInfo.preferred_username);
                             this.setupLocalInfo();
                             this.rememberMe();
 

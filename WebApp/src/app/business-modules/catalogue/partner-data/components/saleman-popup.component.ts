@@ -6,6 +6,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { formatDate } from '@angular/common';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { User } from '@models';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-saleman-popup',
@@ -64,7 +65,8 @@ export class SalemanPopupComponent extends PopupBase {
             { id: 'Collect', text: 'Collect' },
         ];
         this.getComboboxData();
-        this.currrently_user = localStorage.getItem('currently_userName');
+        const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.currrently_user = user.userName;
         this.form = this._fb.group({
             saleman: [null, Validators.required],
             office: [null, Validators.required],
