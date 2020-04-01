@@ -194,7 +194,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> QueryExport(CatPartnerCriteria criteria)
         {
-            var data = Query(criteria);
+            var data = QueryPaging(criteria);
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
