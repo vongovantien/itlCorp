@@ -7,7 +7,7 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { HouseBill, CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { ShareBussinessSellingChargeComponent } from 'src/app/business-modules/share-business';
+import { ShareBussinessSellingChargeComponent, getHBLLoadingState } from 'src/app/business-modules/share-business';
 import { getParamsRouterState } from 'src/app/store';
 import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -88,6 +88,7 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+        this.isLoading = this._store.select(getHBLLoadingState);
 
         this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
             (loading: boolean) => {

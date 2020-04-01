@@ -134,9 +134,8 @@
     [labelConfirm]="'Yes'"></confirm-popup>
 
 
-<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()"
-    body="Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse to HAWB ?<span>"
-    [labelConfirm]="'Yes'">
+<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()" [body]="confirmSyncHBLText"
+    title="Sync HAWB" [labelConfirm]="'Yes'">
 </confirm-popup>
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"

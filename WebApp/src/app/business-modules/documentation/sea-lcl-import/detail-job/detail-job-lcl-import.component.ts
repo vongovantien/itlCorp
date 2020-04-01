@@ -290,6 +290,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.isLocked = true;
+        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
 
         this.saveJob(modelAdd);
     }

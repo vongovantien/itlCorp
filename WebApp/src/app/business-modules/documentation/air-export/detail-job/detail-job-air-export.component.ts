@@ -311,6 +311,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
         modelAdd.isLocked = true;
+        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+
 
         this.saveJob(modelAdd);
     }
@@ -336,6 +338,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.jobNo = this.shipmentDetail.jobNo;
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
+        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
 
         const bodySyncData: DocumentationInterface.IDataSyncHBL = {
             flightVesselName: modelAdd.flightVesselName,

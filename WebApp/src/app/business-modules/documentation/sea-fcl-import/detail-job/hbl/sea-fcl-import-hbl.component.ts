@@ -95,6 +95,7 @@ export class SeaFCLImportHBLComponent extends AppList {
 
         this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
         this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
+        this.isLoading = this._store.select(fromShareBussiness.getHBLLoadingState);
 
         this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
             (loading: boolean) => {
@@ -143,12 +144,11 @@ export class SeaFCLImportHBLComponent extends AppList {
     }
 
     deleteHbl(id: string) {
-        this.isLoading = true;
         this._progressRef.start();
         this._documentRepo.deleteHbl(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+                finalize(() => { this._progressRef.complete(); }),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

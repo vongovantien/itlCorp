@@ -290,6 +290,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
         modelUpdate.userCreated = this.fclImportDetail.userCreated;
         modelUpdate.isLocked = true;
+        modelUpdate.currentStatus = this.fclImportDetail.currentStatus;
+
         this.updateJob(modelUpdate);
     }
 

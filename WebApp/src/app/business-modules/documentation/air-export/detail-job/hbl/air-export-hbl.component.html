@@ -94,7 +94,7 @@
                                                 </th>
                                             </thead>
                                             <tbody class="tbody-group">
-                                                <ng-container *ngIf="!!houseBills.length">
+                                                <ng-container *ngIf="!(isLoading | async) && !!houseBills.length">
                                                     <tr (click)="selectHBL(house)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
