@@ -720,6 +720,18 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             Crystal result = null;
+            //Lấy thông tin Office của User Login
+            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
+            var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
+            var _bankName = officeOfUser?.BankName ?? string.Empty;
+            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
+            var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
+            var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
+            var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
+            var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+
             var parameter = new AcctSOAReportParams
             {
                 DBTitle = "N/A",
@@ -736,18 +748,21 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyDescription = "N/A",
                 Website = DocumentConstants.COMPANY_WEBSITE,//"efms.itlvn.com",
                 IbanCode = "N/A",
-                AccountName = "N/A",
-                BankName = "N/A",
-                SwiftAccs = "N/A",
-                AccsUSD = "N/A",
-                AccsVND = "N/A",
-                BankAddress = "N/A",
+                AccountName = _accountName,
+                AccountNameEN = _accountNameEN,
+                BankName = _bankName,
+                BankNameEN = _bankNameEN,
+                SwiftAccs = _swiftAccs,
+                AccsUSD = _accsUsd,
+                AccsVND = _accsVnd,
+                BankAddress = _bankAddress,
+                BankAddressEN = _bankAddressEN,
                 Paymentterms = "N/A",
                 DecimalNo = 2,
                 CurrDecimal = 2,
                 IssueInv = "N/A",
                 InvoiceInfo = "N/A",
-                Contact = currentUser.UserID,
+                Contact = currentUser.UserName,
                 IssuedDate = model.CreatedDate,
                 OtherRef = "N/A"
             };
@@ -1010,29 +1025,27 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
             //Lấy thông tin Office của User Login
-            var _accountName = string.Empty;
-            var _bankName = string.Empty;
-            var _bankAddress = string.Empty;
-            var _swiftAccs = string.Empty;
-            var _accsUsd = string.Empty;
-            var _accsVnd = string.Empty;
-            var officeOfUser = GetInfoBankOfOfficeByUserId(currentUser.UserID);
-            if (officeOfUser != null)
-            {
-                _accountName = officeOfUser.BankAccountNameEn?.ToUpper();
-                _bankName = officeOfUser.BankName?.ToUpper();
-                _bankAddress = officeOfUser.BankAddressEn?.ToUpper();
-                _swiftAccs = officeOfUser.SwiftCode?.ToUpper();
-                _accsUsd = officeOfUser.BankAccountUsd?.ToUpper();
-                _accsVnd = officeOfUser.BankAccountVnd?.ToUpper();
-            }
+            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
+            var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
+            var _bankName = officeOfUser?.BankName ?? string.Empty;
+            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
+            var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
+            var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
+            var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
+            var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+
             //Thông tin Bank
-            parameter.AccountName = _accountName ?? string.Empty;
-            parameter.BankName = _bankName ?? string.Empty;
-            parameter.BankAddress = _bankAddress ?? string.Empty;
-            parameter.SwiftAccs = _swiftAccs ?? string.Empty;
-            parameter.AccsUSD = _accsUsd ?? string.Empty;
-            parameter.AccsVND = _accsVnd ?? string.Empty;
+            parameter.AccountName = _accountName;
+            parameter.AccountNameEN = _accountNameEN;
+            parameter.BankName = _bankName;
+            parameter.BankNameEN = _bankNameEN;
+            parameter.BankAddress = _bankAddress;
+            parameter.BankAddressEN = _bankAddressEN;
+            parameter.SwiftAccs = _swiftAccs;
+            parameter.AccsUSD = _accsUsd;
+            parameter.AccsVND = _accsVnd;
 
             parameter.Currency = criteria.Currency;
 
@@ -1187,29 +1200,27 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.OtherRef = string.Empty;//Tạm thời để trống
 
             //Lấy thông tin Office của User Login
-            var _accountName = string.Empty;
-            var _bankName = string.Empty;
-            var _bankAddress = string.Empty;
-            var _swiftAccs = string.Empty;
-            var _accsUsd = string.Empty;
-            var _accsVnd = string.Empty;
-            var officeOfUser = GetInfoBankOfOfficeByUserId(currentUser.UserID);
-            if (officeOfUser != null)
-            {
-                _accountName = officeOfUser.BankAccountNameEn?.ToUpper();
-                _bankName = officeOfUser.BankName?.ToUpper();
-                _bankAddress = officeOfUser.BankAddressEn?.ToUpper();
-                _swiftAccs = officeOfUser.SwiftCode?.ToUpper();
-                _accsUsd = officeOfUser.BankAccountUsd?.ToUpper();
-                _accsVnd = officeOfUser.BankAccountVnd?.ToUpper();
-            }
+            var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
+            var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
+            var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
+            var _bankName = officeOfUser?.BankName ?? string.Empty;
+            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
+            var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
+            var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
+            var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
+            var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+
             //Thông tin Bank
-            parameter.AccountName = _accountName ?? string.Empty;
-            parameter.BankName = _bankName != null ? _bankName : string.Empty;
-            parameter.BankAddress = _bankAddress ?? string.Empty;
-            parameter.SwiftAccs = _swiftAccs ?? string.Empty;
-            parameter.AccsUSD = _accsUsd ?? string.Empty;
-            parameter.AccsVND = _accsVnd ?? string.Empty;
+            parameter.AccountName = _accountName;
+            parameter.AccountNameEN = _accountNameEN;
+            parameter.BankName = _bankName;
+            parameter.BankNameEN = _bankNameEN;
+            parameter.BankAddress = _bankAddress;
+            parameter.BankAddressEN = _bankAddressEN;
+            parameter.SwiftAccs = _swiftAccs;
+            parameter.AccsUSD = _accsUsd;
+            parameter.AccsVND = _accsVnd;
 
             parameter.Currency = criteria.Currency;
             parameter.HBLList = _hbllist?.ToUpper();
@@ -1230,18 +1241,9 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private SysOffice GetInfoBankOfOfficeByUserId(string userId)
+        private SysOffice GetInfoOfficeOfUser(Guid officeId)
         {
-            SysOffice result = null;
-            var employeeId = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
-            if (!string.IsNullOrEmpty(employeeId))
-            {
-                var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.CompanyId;
-                if (branchOfUser != null && branchOfUser != Guid.Empty)
-                {
-                    result = sysOfficeRepo.Get(x => x.Id == branchOfUser).FirstOrDefault();
-                }
-            }
+            SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();           
             return result;
         }
         #endregion -- PREVIEW CD NOTE --

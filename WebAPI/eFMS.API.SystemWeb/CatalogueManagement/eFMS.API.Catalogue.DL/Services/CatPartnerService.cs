@@ -931,7 +931,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                                 );
             if (data == null) return null;
-            //var results = data.ProjectTo<CatPartnerViewModel>(mapper.ConfigurationProvider);
             var results = data.Select(x => new CatPartnerViewModel {
                     Id = x.Id,
                     PartnerGroup = x.PartnerGroup,

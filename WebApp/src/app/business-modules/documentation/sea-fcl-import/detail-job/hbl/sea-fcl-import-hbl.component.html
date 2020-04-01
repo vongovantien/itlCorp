@@ -111,15 +111,11 @@
                                                                 <app-permission-button type="detail"
                                                                     (onClick)="gotoDetail(house.id)">
                                                                 </app-permission-button>
-                                                                <ng-container *ngIf="(isLocked | async) === false">
-                                                                    <ng-container
-                                                                        *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
-                                                                        <app-permission-button
-                                                                            (onClick)="showDeletePopup(house, $event)"
+                                                                <ng-container *ngIf="(isLocked | async) === false"> 
+                                                                        <app-permission-button   *ngIf="shipmentDetail.permission.allowUpdate === true" (onClick)="showDeletePopup(house, $event)"
                                                                             type="delete">
                                                                         </app-permission-button>
-                                                                    </ng-container>
-                                                                </ng-container>
+                                                                 </ng-container> 
                                                             </div>
                                                         </td>
                                                         <td class=" text-primary pointer"><a

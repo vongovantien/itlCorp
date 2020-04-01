@@ -8,24 +8,24 @@
 </div>
 <!--end:: subheader-->
 <app-form-add-user>
+    <div class="row m--padding-top-10">
+        <div class="col-12">
+            <div class="m--align-right">
 
-</app-form-add-user>
-<div class="row">
-    <div class="col-12">
-        <div class="text-center">
-            <button type="button" (click)="create()" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                <span>
-                    <i class="la la-save"></i>
-                    <span> Save </span>
-                </span>
-            </button>
-            <button routerLink="/home/system/user-management" type="button"
-                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
-                <span>
-                    <i class="la la-ban"></i>
-                    <span> Cancel </span>
-                </span>
-            </button>
+                <app-default-button class="m--margin-right-10" [buttonSetting]="saveButtonSetting"
+                    (onClick)="create()">
+                </app-default-button>
+                <button routerLink="/home/system/user-management" type="button"
+                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span> Cancel </span>
+                    </span>
+                </button>
+
+            </div>
         </div>
+
     </div>
-</div>
+   
+</app-form-add-user>

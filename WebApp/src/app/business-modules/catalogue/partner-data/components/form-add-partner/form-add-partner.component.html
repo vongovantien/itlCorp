@@ -67,14 +67,26 @@
                             Partner Name Abbreviation is required
                         </div>
                     </div>
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label class="form-control-label" for="">
                             A/C Ref
                         </label>
                         <ng-select [allowClear]="true" [items]="parentCustomers" name="partnerAccountRef"
                             placeholder="Select A/C Ref" formControlName="partnerAccountRef">
                         </ng-select>
+                    </div> -->
+                    <div class="form-group">
+                        <label class="form-control-label" for="">
+                            A/C Ref
+                        </label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                        [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
+                        [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
+                        [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
+                        (remove)="partnerAccountRef.value = null"  placeholder="Select A/C Ref" >
+                    </app-combo-grid-virtual-scroll>
                     </div>
+
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && taxCode.invalid }">

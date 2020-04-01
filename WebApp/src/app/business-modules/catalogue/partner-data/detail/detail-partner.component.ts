@@ -272,7 +272,8 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
                     this.formPartnerComponent.billingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
                     this.formPartnerComponent.shippingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
-                    this.formPartnerComponent.parentCustomers = this.utility.prepareNg2SelectData(customers || [], 'id', 'partnerNameVn');
+                    // this.formPartnerComponent.parentCustomers = this.utility.prepareNg2SelectData(customers || [], 'id', 'partnerNameVn');
+                    this.formPartnerComponent.parentCustomers = customers;
                     this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
                     this.getPartnerGroupActive(this.partnerType);
                     this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
@@ -371,7 +372,6 @@ export class PartnerDetailComponent extends AppList {
         }
 
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
-        this.formPartnerComponent.partnerAccountRef.setErrors(null);
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUp.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
@@ -445,6 +445,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
         this.partner.provinceShippingId = !!formBody.shippingProvince && !!formBody.shippingProvince.length ? formBody.shippingProvince[0].id : null;
         this.partner.parentId = !!formBody.partnerAccountRef && !!formBody.partnerAccountRef.length ? formBody.partnerAccountRef[0].id : null;
+        this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
         this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
         this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
         this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
