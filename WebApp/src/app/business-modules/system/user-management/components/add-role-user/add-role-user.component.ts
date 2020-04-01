@@ -7,8 +7,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { Router } from '@angular/router';
-
+import { Router, ActivatedRoute, Params } from '@angular/router';
 @Component({
     selector: 'add-role-user',
     templateUrl: 'add-role-user.component.html'
@@ -16,7 +15,6 @@ import { Router } from '@angular/router';
 
 export class AddRoleUserComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @Input() userId: string = '';
 
     companies: Company[] = [];
     listRoles: PermissionSample[] = [];
@@ -27,17 +25,25 @@ export class AddRoleUserComponent extends AppList {
     isSubmitted: boolean = false;
     idOffice: string = '';
     listRolesTemp: PermissionSample[] = [];
+    id: string = '';
 
     constructor(
         private _systemRepo: SystemRepo,
         protected _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _router: Router
+        private _router: Router,
+        private _activedRouter: ActivatedRoute,
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
     }
     ngOnInit() {
+        this._activedRouter.params.subscribe((param: Params) => {
+            if (param.id) {
+                this.id = param.id;
+            }
+    });
         this.headers = [
             { title: 'Role Name', field: 'name', required: true },
             { title: 'Company', field: '', required: true },
@@ -61,7 +67,8 @@ export class AddRoleUserComponent extends AppList {
     }
 
     getCompanies() {
-        this._systemRepo.getListCompaniesByUserId(this.userId)
+     
+        this._systemRepo.getListCompaniesByUserId(this.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
@@ -79,11 +86,11 @@ export class AddRoleUserComponent extends AppList {
     }
 
     getPermissionsByUserId() {
-        this._systemRepo.getListPermissionsByUserId(this.userId).pipe(
+        this._systemRepo.getListPermissionsByUserId(this.id).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
             tap((roles: any) => this.listRoles = roles),
-            switchMap((listRole: any) => this._systemRepo.getListOfficesByUserId(this.userId))
+            switchMap((listRole: any) => this._systemRepo.getListOfficesByUserId(this.id))
         ).subscribe(
             (res: any) => {
                 if (!!res) {
@@ -91,13 +98,16 @@ export class AddRoleUserComponent extends AppList {
                     this.listRoles.forEach(i => {
                         i.offices = res;
                     });
-                    this.listRoles.forEach(item => {
-                        item.offices.forEach(i => {
-                            if (item.buid === i.buid) {
-                                item.offices = this.officeData.filter(x => x.buid === item.buid);
-                            }
+                    setTimeout(() => {
+                        this.listRoles.forEach(item => {
+                            item.offices.forEach(i => {
+                                if (item.buid === i.buid) {
+                                    item.offices = this.officeData.filter(x => x.buid === item.buid);
+                                }
+                            });
                         });
-                    });
+                    }, 300);
+            
                     console.log(this.listRoles);
                     this.listRolesTemp = this.listRoles;
                 }
@@ -187,7 +197,7 @@ export class AddRoleUserComponent extends AppList {
             return;
         }
         this.listRoles.forEach(item => {
-            item.userId = this.userId;
+            item.userId = this.id;
             if (item.id === '') {
                 item.id = null;
             }
@@ -366,7 +376,7 @@ export class AddRoleUserComponent extends AppList {
 
     gotoUserPermission(id: string) {
         const type = 'user';
-        this._router.navigate([`home/system/user-management/${this.userId}/permission/${id}/${type}`]);
+        this._router.navigate([`home/system/user-management/${this.id}/permission/${id}/${type}`]);
     }
 
 }
