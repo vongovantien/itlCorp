@@ -927,7 +927,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                && (x.Active == criteria.Active || criteria.Active == null));
+                                && (x.Active == criteria.Active || criteria.Active == null)
+                                && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
+                                );
             if (data == null) return null;
             //var results = data.ProjectTo<CatPartnerViewModel>(mapper.ConfigurationProvider);
             var results = data.Select(x => new CatPartnerViewModel {
