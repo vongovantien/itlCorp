@@ -83,22 +83,20 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest(string currencyToId)
         {
-            var lastRate = DataContext.Get().OrderByDescending(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
-            if (lastRate == null) return null;
-            var lvCatPlace = GetExchangeRateNewest(currencyToId);
+            var lastExchanges = GetExchangeRateNewest(currencyToId);
             var result = new CurrencyExchangeNewestViewModel
             {
-                DatetimeModified = lastRate.DatetimeModified ?? lastRate.DatetimeCreated,
-                ExchangeRates = lvCatPlace
+                DatetimeModified = lastExchanges.FirstOrDefault().DatetimeCreated,
+                ExchangeRates = lastExchanges
             };
             return result;
         }
 
         private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest(string currencyToId)
         {
-            List<vw_catCurrencyExchangeNewest> lvCatPlace = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-            if(!string.IsNullOrEmpty(currencyToId)) lvCatPlace = lvCatPlace.Where(x => x.CurrencyToID == currencyToId).ToList();
-            return lvCatPlace;
+            List<vw_catCurrencyExchangeNewest> exchangeRates = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
+            if(!string.IsNullOrEmpty(currencyToId) && exchangeRates.Count > 0) exchangeRates = exchangeRates.Where(x => x.CurrencyToID == currencyToId && x.Active == true).ToList();
+            return exchangeRates;
         }
 
         public CurrencyExchangeNewestViewModel GetExchangeRates(DateTime date, string localCurrency, string fromCurrency)
@@ -196,12 +194,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
-                var rates = DataContext.Get(x => x.CurrencyFromId == currencyFrom && x.Active == false);
+                var rates = DataContext.Get(x => x.CurrencyFromId == currencyFrom && x.Active == true);
                 foreach (var item in rates)
                 {
                     item.UserModified = currentUser;
                     item.DatetimeModified = DateTime.Now;
-                    item.Active = true;
+                    item.Active = false;
                     item.InactiveOn = DateTime.Now;
                     DataContext.Update(item, x => x.Id == item.Id, false);
                 }
