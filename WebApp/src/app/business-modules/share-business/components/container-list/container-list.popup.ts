@@ -153,7 +153,6 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
             )
             .subscribe(
                 (res: any[] = [[], [], [], []]) => {
-                    console.log(this.containerUnits);
                     this.containerUnits = res[0];
                     this.packageUnits = res[1];
                     this.weightUnits = res[2];
