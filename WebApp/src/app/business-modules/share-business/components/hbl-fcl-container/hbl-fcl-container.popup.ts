@@ -101,8 +101,9 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
     addNewContainer() {
         this.isSubmitted = false;
         this.isDuplicateContPakage = false;
-        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: this.defaultWeightUnit.id, unitOfMeasureName: this.defaultWeightUnit.unitNameEn })];
-        // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
+
+        this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: !!this.defaultWeightUnit ? this.defaultWeightUnit.id : null, unitOfMeasureName: !!this.defaultWeightUnit ? this.defaultWeightUnit.unitNameEn : null })];
+
     }
 
     duplicate(index: number) {
@@ -154,12 +155,12 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                     this.containerUnits = res[0];
                     this.packageUnits = res[1];
                     this.weightUnits = res[2];
+                    this.commodities = res[3];
 
-                    const kgs: Unit = this.weightUnits.find(w => w.code === 'kgs');
+                    const kgs: Unit = this.weightUnits.find(w => w.code === 'kgs' || w.code === 'KGS');
                     if (!!kgs) {
                         this.defaultWeightUnit = kgs;
                     }
-                    this.commodities = res[3];
                 }
             );
     }

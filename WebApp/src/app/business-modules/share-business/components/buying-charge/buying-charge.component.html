@@ -85,9 +85,17 @@
                                             [(ngModel)]="charge.partnerShortName" placeholder="Please Select">
                                     </ng-container>
                                     <ng-template #partnerCharge>
-                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null">
+                                        <ng-container *ngIf="isShowLoadingPartner">
+                                            <div class="on-loading text-center">
+                                                <div class="m-loader m-loader--brand">
+                                                </div><span>Loading</span>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngIf="!isShowLoadingPartner">
+                                            <input type="text" class="dropdown-toggle form-control" dropdownToggle
+                                                readonly [(ngModel)]="charge.partnerShortName"
+                                                placeholder="Please Select">
+                                        </ng-container>
                                         <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                             <div class="d-flex justify-content-end dropdown-partner__header">
                                                 <a class="text-primary text-underline m--margin-right-20 pointer"

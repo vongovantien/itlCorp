@@ -266,8 +266,8 @@
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                            name="daterange" placeholder="Please Select" readonly [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
                                             [(ngModel)]="charge.exchangeDate"
                                             [attr.disabled]="!!charge.debitNo || !!charge.debitNo || !charge.isFromShipment ? 'disabled': null" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
