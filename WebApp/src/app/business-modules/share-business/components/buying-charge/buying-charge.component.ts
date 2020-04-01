@@ -144,12 +144,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { displayName: 'Agent', value: CommonEnum.PartnerGroupEnum.AGENT, fieldName: 'AGENT' },
         ];
 
-        this._store.dispatch(new GetCatalogueCurrencyAction());
-        this._store.dispatch(new GetCatalogueUnitAction());
-
-        this.listCurrency = this._store.select(getCatalogueCurrencyState);
-
         this.getUnits();
+        this.getCurrency();
         this.getPartner();
         this.getCharge();
         this.getShipmentContainer();
@@ -187,13 +183,22 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getUnits() {
+        this._store.dispatch(new GetCatalogueUnitAction());
+
         this._store.select(getCatalogueUnitState)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (units: Unit[]) => {
                     this.listUnits = units;
+                    this._dataService.setData(SystemConstants.CSTORAGE.UNIT, this.listUnits);
                 }
             );
+    }
+
+    getCurrency() {
+        this._store.dispatch(new GetCatalogueCurrencyAction());
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
+        this._dataService.setData(SystemConstants.CSTORAGE.CURRENCY, this.listCurrency);
     }
 
     getPartner() {

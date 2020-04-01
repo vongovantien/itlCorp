@@ -33,8 +33,6 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService
 
-
-
     ) {
         super(
             _catalogueRepo,
@@ -50,10 +48,31 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
 
     getPartner() {
         this._dataService.currentMessage.pipe(
-            skip(1)
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (data: any = []) => {
                 this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
+            });
+    }
+
+    getCurrency() {
+        this._dataService.currentMessage.pipe(
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (data: any = []) => {
+                this.listCurrency = data[SystemConstants.CSTORAGE.CURRENCY] || [];
+            });
+    }
+
+    getUnits() {
+        this._dataService.currentMessage.pipe(
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (data: any = []) => {
+                this.listUnits = data[SystemConstants.CSTORAGE.UNIT] || [];
             });
     }
 

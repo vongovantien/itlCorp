@@ -48,10 +48,31 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     getPartner() {
         this._dataService.currentMessage.pipe(
-            skip(1)
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (data: any = []) => {
                 this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
+            });
+    }
+
+    getCurrency() {
+        this._dataService.currentMessage.pipe(
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (data: any = []) => {
+                this.listCurrency = data[SystemConstants.CSTORAGE.CURRENCY] || [];
+            });
+    }
+
+    getUnits() {
+        this._dataService.currentMessage.pipe(
+            skip(1),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (data: any = []) => {
+                this.listUnits = data[SystemConstants.CSTORAGE.UNIT] || [];
             });
     }
 
