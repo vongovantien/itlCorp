@@ -934,7 +934,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     Id = x.Id,
                     PartnerGroup = x.PartnerGroup,
                     PartnerNameVn = x.PartnerNameVn,
-                    PartnerNameEn = x.PartnerNameVn,
+                    PartnerNameEn = x.PartnerNameEn,
                     ShortName = x.ShortName,
                     TaxCode = x.TaxCode
             });

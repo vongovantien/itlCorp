@@ -104,6 +104,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETA" readonly
                                         formControlName="eta" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
+                                        *ngIf="!!eta.value && !!eta.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -121,6 +125,11 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ATA" readonly
                                         formControlName="arrivalDate" />
+                                    <span class="m-input-icon_clear"
+                                        (click)="resetFormControl(formCreate.controls['arrivalDate'])"
+                                        *ngIf="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -171,7 +180,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Warehouse</label>
-                                <input type="text" class="form-control" formControlName="warehouseNotice">
+                                <select class="form-control" formControlName="warehouseNotice" disabled>
+                                    <option *ngFor="let warehouse of (warehouses | async)" [value]="warehouse.id">
+                                        {{warehouse.nameEn}}</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -198,6 +210,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="flightDate" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(flightDate)"
+                                        *ngIf="!!flightDate.value && !!flightDate.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -224,6 +240,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="flightDateOrigin" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(flightDateOrigin)"
+                                        *ngIf="!!flightDateOrigin.value && !!flightDateOrigin.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -247,13 +267,14 @@
                 </div>
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Quantity</label>
-                                <input type="number" class="form-control" formControlName="packageQty">
+                                <input type="number" class="form-control" formControlName="packageQty" numeric
+                                    [decimals]="digitDecimal" autoFormatCurrency>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Unit</label>
                                 <ng-select #unit [items]="ngDataUnit" [allowClear]="true"
@@ -261,28 +282,30 @@
                                 </ng-select>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
-                                <input type="number" class="form-control" formControlName="grossWeight">
+                                <input type="number" class="form-control" formControlName="grossWeight" numeric
+                                    [decimals]="digitDecimal" autoFormatCurrency>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
                                     GW must be less than or equal CW
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>C.W</label>
-                                <input type="number" class="form-control" formControlName="chargeWeight">
+                                <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                    [decimals]="digitDecimal" autoFormatCurrency>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Payment Term</label>
                                 <ng-select #airFreight [items]="termTypes" [allowClear]="true"
@@ -294,13 +317,13 @@
                 </div>
                 <div class="col-md-4">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>PO/Invoice No</label>
                                 <input type="text" class="form-control" formControlName="poinvoiceNo">
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>Issued Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -308,6 +331,10 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="issueHBLDate" />
+                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHBLDate)"
+                                        *ngIf="!!issueHBLDate.value && !!issueHBLDate.value.startDate">
+                                        <i class="la la-times"></i>
+                                    </span>
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -323,14 +350,9 @@
                     <div class="form-group">
                         <label>Description of Goods</label>
                         <textarea rows="7" formControlName="desOfGoods" class="form-control">
-
                         </textarea>
                     </div>
                 </div>
-
-            </div>
-            <div class="row div-inside bg-secondary">
-
             </div>
         </form>
     </div>

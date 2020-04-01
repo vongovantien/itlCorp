@@ -131,13 +131,13 @@
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
     [labelConfirm]="'Yes'"></confirm-popup>
 
-<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()"
-    body="Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date to HAWB ?<span>"
-    [labelConfirm]="'Yes'">
+<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()" [body]="confirmSyncHBLText"
+    [labelConfirm]="'Yes'" title="Sync HAWB">
 </confirm-popup>
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="gotoList()"></confirm-popup>
 
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+
 <permission-403-popup></permission-403-popup>

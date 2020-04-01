@@ -1,24 +1,22 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, CsTransaction, HouseBill } from '@models';
+import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
+import { FormValidators } from '@validators';
+import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 
 import { AppForm } from 'src/app/app.form';
-import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
+import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
+import { SystemConstants } from 'src/constants/system.const';
 
 import { tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-
-import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
-import { SystemConstants } from 'src/constants/system.const';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
-import { FormValidators } from 'src/app/shared/validators';
 @Component({
     selector: 'air-import-hbl-form-create',
     templateUrl: './form-create-house-bill-air-import.component.html',
@@ -32,6 +30,7 @@ import { FormValidators } from 'src/app/shared/validators';
 })
 export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
+
     formCreate: FormGroup;
     customerId: AbstractControl;
     saleManId: AbstractControl;
@@ -81,12 +80,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
     currencies: Observable<any[]>;
+    warehouses: Observable<Warehouse[]>;
+
     isLoadingPort: Observable<boolean>;
     units: any[] = [];
     ngDataUnit: any = [];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'partnerNameEn', label: 'Name ABBR' },
+        { field: 'shortName', label: 'Name ABBR' },
         { field: 'partnerNameVn', label: 'Name EN' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
@@ -106,6 +107,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     termTypes: CommonInterface.INg2Select[];
     wts: CommonInterface.INg2Select[];
     numberOBLs: CommonInterface.INg2Select[];
+
     jobId: string = SystemConstants.EMPTY_GUID;
     hblId: string = SystemConstants.EMPTY_GUID;
 
@@ -141,6 +143,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             { id: '3', text: 'Three (3)' }
         ];
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
+        this._store.dispatch(new GetCatalogueWarehouseAction());
+        this.warehouses = this._store.select(getCatalogueWarehouseState);
+
         this.getCustomers();
         this.getPorts();
         // this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
@@ -170,6 +175,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                 flightNo: shipment.flightVesselName,
                                 forwardingAgentId: shipment.agentId,
                                 arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                                warehouseNotice: shipment.warehouseId,
+                                route: shipment.route
                             });
                         }
                     }
@@ -186,11 +193,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.hblId = hbl.id;
                             this.updateFormValue(hbl);
                         }
-
                     }
                 );
         }
-
     }
 
     getCustomers() {

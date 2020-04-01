@@ -96,7 +96,7 @@ export class AirImportHBLComponent extends AppList implements OnInit {
         ];
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-
+        this.isLoading = this._store.select(fromShareBussiness.getHBLLoadingState);
         this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
             (loading: boolean) => {
                 if (loading) {

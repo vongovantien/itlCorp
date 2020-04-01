@@ -15,7 +15,7 @@ import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChang
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
-import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState } from '@store';
+import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 
@@ -141,6 +141,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     ngOnInit(): void {
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
+        this._store.dispatch(new GetCatalogueWarehouseAction());
+
         this.initForm();
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
@@ -149,7 +151,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.ports = this._store.select(getCataloguePortState);
-        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
+        this.warehouses = this._store.select(getCatalogueWarehouseState);
 
         this.saleMans = this._systemRepo.getListSystemUser();
 

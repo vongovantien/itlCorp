@@ -13,7 +13,8 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public Guid? Pod;
         public string AgentId;
         public string IssuedBy;
-        public Guid? WarehouseId;
+        public string WarehouseId;
+        public string Route;
 
     }
 }

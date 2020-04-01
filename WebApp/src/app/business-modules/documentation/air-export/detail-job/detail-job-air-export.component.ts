@@ -337,7 +337,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
         modelAdd.userCreated = this.shipmentDetail.userCreated;
 
-        const bodySyncData = {
+        const bodySyncData: DocumentationInterface.IDataSyncHBL = {
             flightVesselName: modelAdd.flightVesselName,
             flightDate: modelAdd.flightDate,
             etd: modelAdd.etd,
@@ -346,7 +346,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             pod: modelAdd.pod,
             agentId: modelAdd.agentId,
             issuedBy: modelAdd.issuedBy,
-            warehouseId: modelAdd.warehouseId
+            warehouseId: modelAdd.warehouseId,
+            route: modelAdd.route
         };
 
         this._progressRef.start();
@@ -370,14 +371,3 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 }
 
-interface ISyncHBL {
-    flightVesselName: string;
-    etd: string;
-    eta: string;
-    flightDate: string;
-    pol: string;
-    pod: string;
-    agentId: string;
-    issuedBy: string;
-
-}
