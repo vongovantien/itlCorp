@@ -567,7 +567,18 @@ namespace eFMS.API.Documentation.DL.Services
             var data = detailTransactionRepository.Get(x => x.Id == hblid)?.FirstOrDefault();
             if (data != null)
             {
-                result.Doheader1 = data.DosentTo1;
+                if (string.IsNullOrEmpty(result.Doheader1) && data.Pod != null)
+                {
+                    var warehouseId = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.Id;
+                    if(warehouseId != null)
+                    {
+                        result.Doheader1 = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.NameVn;
+                    }
+                }
+                else
+                {
+                    result.Doheader1 = data.DosentTo1;
+                }
                 result.Doheader2 = data.DosentTo2;
                 result.Dofooter = data.Dofooter;
                 result.DeliveryOrderNo = data.DeliveryOrderNo;

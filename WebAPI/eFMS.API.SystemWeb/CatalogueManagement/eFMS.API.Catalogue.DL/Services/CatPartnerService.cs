@@ -21,9 +21,9 @@ using System.Linq.Expressions;
 using eFMS.API.Common;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
-using eFMS.API.Catalogue.DL.Infrastructure.Common;
 using System.Text;
 using System.Text.RegularExpressions;
+using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -194,7 +194,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = Query(criteria);
+            var data = QueryPaging(criteria);
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
@@ -299,7 +299,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CustomerPartnerViewModel> results = null;
-            var data = Query(criteria)?.GroupBy(x => x.SalePersonId);
+            var data = QueryPaging(criteria)?.GroupBy(x => x.SalePersonId);
             if (data == null)
             {
                 rowsCount = 0;
@@ -362,7 +362,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return code;
         }
 
-        public List<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
+        private List<CatPartnerViewModel> QueryPaging(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
@@ -828,6 +828,24 @@ namespace eFMS.API.Catalogue.DL.Services
                 data = data.Where(x => x.Active == criteria.Active || criteria.Active == null);
             }
             return data;
+        }
+
+        public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
+        {
+            string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
+            var data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                && (x.Active == criteria.Active || criteria.Active == null));
+            if (data == null) return null;
+            //var results = data.ProjectTo<CatPartnerViewModel>(mapper.ConfigurationProvider);
+            var results = data.Select(x => new CatPartnerViewModel {
+                    Id = x.Id,
+                    PartnerGroup = x.PartnerGroup,
+                    PartnerNameVn = x.PartnerNameVn,
+                    PartnerNameEn = x.PartnerNameVn,
+                    ShortName = x.ShortName,
+                    TaxCode = x.TaxCode
+            });
+            return results;
         }
     }
 }

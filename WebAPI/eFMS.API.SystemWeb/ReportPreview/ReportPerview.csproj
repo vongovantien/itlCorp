@@ -365,6 +365,8 @@
     <Content Include="Reports\BookingNoteAir_TCS.rpt" />
     <Content Include="Reports\Monthly Sale Report.rpt" />
     <Content Include="Reports\Monthly Sale Report.ttx" />
+    <Content Include="Reports\SalesReportByQuater.rpt" />
+    <Content Include="Reports\SaleReportByQuater.ttx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

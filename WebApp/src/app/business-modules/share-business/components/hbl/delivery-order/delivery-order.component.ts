@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
-import { DeliveryOrder, User } from 'src/app/shared/models';
+import { DeliveryOrder, User, CsTransactionDetail } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SystemConstants } from 'src/constants/system.const';
@@ -29,7 +29,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
     userLogged: User;
     hblid: string;
-    hblDetail: any = {};
+    hblDetail: CsTransactionDetail = null;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -49,7 +49,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             .pipe(
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
-                switchMap((hblDetail: any) => {
+                switchMap((hblDetail: CsTransactionDetail) => {
                     this.hblid = hblDetail.id;
                     return this._documentRepo.getDeliveryOrder(hblDetail.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
 
@@ -75,7 +75,6 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
         this.isLocked = this._store.select(fromShare.getTransactionLocked);
     }
-
     setDefaultHeadeFooter() {
         const body: IDefaultHeaderFooter = {
             transactionType: '' + CommonEnum.TransactionTypeEnum.SeaFCLImport,
