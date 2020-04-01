@@ -468,7 +468,6 @@ namespace eFMS.API.System.DL.Services
                     objEmployee.Tel = item.Tel;
                     objEmployee.Title = item.Title;
                     objEmployee.StaffCode = item.StaffCode;
-                    
                     objEmployee.Email = item.Email;
                     sysEmployees.Add(objEmployee);
                     objUser.Username = item.Username;
@@ -480,6 +479,8 @@ namespace eFMS.API.System.DL.Services
                     objUser.UserCreated = objUser.UserModified = currentUser.UserID;
                     objUser.Password = BCrypt.Net.BCrypt.HashPassword(Constants.PERMISSION_RANGE_OWNER);
                     objUser.Description = item.Description;
+                    objUser.Password = SystemConstants.Password;
+                    objUser.Password = BCrypt.Net.BCrypt.HashPassword(objUser.Password);
                     sysUsers.Add(objUser);
                 }
 
