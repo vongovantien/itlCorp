@@ -95,6 +95,7 @@ export class SeaFCLImportHBLComponent extends AppList {
 
         this.containers = this._store.select(fromShareBussiness.getHBLContainersState);
         this.selectedShipment = this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState);
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
 
         this._store.select(fromShareBussiness.getSurchargeLoadingState).subscribe(
             (loading: boolean) => {
@@ -175,6 +176,7 @@ export class SeaFCLImportHBLComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
+                        console.log(          this.shipmentDetail);
                     }
                 },
             );

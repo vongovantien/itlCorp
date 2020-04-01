@@ -51,7 +51,9 @@ export class AddRoleUserComponent extends AppList {
         ];
         this.getDataCombobox();
         this.getCompanies();
-        this.getPermissionsByUserId();
+        if(!!this.id){
+            this.getPermissionsByUserId();
+        }
     }
 
     getDataCombobox() {
