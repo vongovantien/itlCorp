@@ -17,6 +17,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerModel> GetPartners();
         IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup);
         IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria);
+        IQueryable<CatPartnerViewModel> QueryExport(CatPartnerCriteria criteria);
         IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<DepartmentPartner> GetDepartments();

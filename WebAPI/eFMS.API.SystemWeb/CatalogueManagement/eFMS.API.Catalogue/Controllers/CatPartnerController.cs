@@ -127,6 +127,18 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// get partner by id
         /// </summary>
+        /// <param name="criteria">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("QueryExport")]
+        public IActionResult QueryExport(CatPartnerCriteria criteria)
+        {
+            var results = catPartnerService.QueryExport(criteria);
+            return Ok(results);
+        }
+        /// <summary>
+        /// get partner by id
+        /// </summary>
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet("{id}")]

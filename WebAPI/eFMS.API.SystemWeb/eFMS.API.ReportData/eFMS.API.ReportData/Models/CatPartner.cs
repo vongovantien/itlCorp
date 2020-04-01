@@ -7,7 +7,7 @@ namespace eFMS.API.ReportData.Models
 {
     public class CatPartner
     {
-        public string Id { get; set; }
+        public string AccountNo { get; set; }
         public string FullName { get; set; }
         public string ShortName { get; set; }
         public string AddressVN { get; set; }
@@ -17,5 +17,6 @@ namespace eFMS.API.ReportData.Models
         public string UserCreatedName { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
+    
     }
 }
