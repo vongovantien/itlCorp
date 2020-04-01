@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 @Component({
@@ -7,11 +7,15 @@ import { PopupBase } from 'src/app/popup.base';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExchangeRateHistoryPopupComponent extends PopupBase implements OnInit {
-    exchangeRatesOfDay: any;
+    @Input() exchangeRatesOfDay: any;
 
     constructor() {
         super();
     }
 
     ngOnInit(): void { }
+    hide() {
+        this.popup.hide();
+        this.exchangeRatesOfDay = null;
+    }
 }

@@ -929,12 +929,11 @@ namespace eFMS.API.Catalogue.DL.Services
             var data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                 && (x.Active == criteria.Active || criteria.Active == null));
             if (data == null) return null;
-            //var results = data.ProjectTo<CatPartnerViewModel>(mapper.ConfigurationProvider);
             var results = data.Select(x => new CatPartnerViewModel {
                     Id = x.Id,
                     PartnerGroup = x.PartnerGroup,
                     PartnerNameVn = x.PartnerNameVn,
-                    PartnerNameEn = x.PartnerNameVn,
+                    PartnerNameEn = x.PartnerNameEn,
                     ShortName = x.ShortName,
                     TaxCode = x.TaxCode
             });

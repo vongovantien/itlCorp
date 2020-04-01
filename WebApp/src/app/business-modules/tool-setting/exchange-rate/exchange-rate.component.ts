@@ -22,6 +22,7 @@ export class ExchangeRateComponent extends AppList implements OnInit {
     exchangeRates: any[] = [];
     localCurrency = "VND";
     selectedrange: any;
+    exchangeRatesOfDay: any;
 
 
     constructor(
@@ -67,14 +68,13 @@ export class ExchangeRateComponent extends AppList implements OnInit {
         this.selectedrange = null;
         this.searchHistory();
     }
-
     showDetail(item: ExchangeRateHistory) {
         this._catalogueRepo.getExchangeRate(item.datetimeCreated)
             .pipe()
             .subscribe(
                 (response: any) => {
                     if (!!response) {
-                        this.historyPopup.exchangeRatesOfDay = { ...response };
+                        this.exchangeRatesOfDay = response;
                         this.historyPopup.show();
                     }
                 }
