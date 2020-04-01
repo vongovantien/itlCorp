@@ -83,7 +83,7 @@
                         [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
                         [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
                         [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
-                        (remove)="partnerAccountRef.value = null"  placeholder="Select A/C Ref" >
+                        (remove)="resetFormControl(partnerAccountRef)"  placeholder="Select A/C Ref" >
                     </app-combo-grid-virtual-scroll>
                     </div>
 
