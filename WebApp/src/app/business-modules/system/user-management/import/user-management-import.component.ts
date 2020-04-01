@@ -11,6 +11,8 @@ import { User } from 'src/app/shared/models';
 import { language } from 'src/languages/language.en';
 import { Employee } from 'src/app/shared/models/system/employee';
 import { AppPaginationComponent, InfoPopupComponent } from 'src/app/shared/common';
+import { SystemRepo } from '@repositories';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-user-management-import',
@@ -21,7 +23,7 @@ export class UserManagementImportComponent extends AppList {
         private pagingService: PagingService,
         private baseService: BaseService,
         private api_menu: API_MENU,
-        private sortService: SortService,
+        private _systemRepo:SystemRepo,
         private toastr: ToastrService) { super(); }
     data: any[];
     pagedItems: any[] = [];
@@ -95,8 +97,14 @@ export class UserManagementImportComponent extends AppList {
         this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
     }
 
-    async downloadSample() {
-        await this.baseService.downloadfile(this.api_menu.System.User_Management.downloadExcel, 'UserImportTemplate.xlsx');
+    downloadSample() {
+        this._systemRepo.downloadUserExcel()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "User-Import.xlsx");
+                },
+            );
     }
 
     setPage(pager: PagerSetting) {
