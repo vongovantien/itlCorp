@@ -80,11 +80,14 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Website { get; set; }
         public string IbanCode { get; set; }
         public string AccountName { get; set; }
+        public string AccountNameEN { get; set; }
         public string BankName { get; set; }
+        public string BankNameEN { get; set; }
         public string SwiftAccs { get; set; }
         public string AccsUSD { get; set; }
         public string AccsVND { get; set; }
         public string BankAddress { get; set; }
+        public string BankAddressEN { get; set; }
         public string Paymentterms { get; set; }
         public decimal? DecimalNo { get; set; }
         public decimal? CurrDecimal { get; set; }
