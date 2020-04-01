@@ -258,7 +258,8 @@ export class AddPartnerDataComponent extends AppList {
             .subscribe(
                 (res) => {
                     if (res) {
-                        this.formPartnerComponent.parentCustomers = res.map(x => ({ "text": x.partnerNameVn, "id": x.id }));
+                        // this.formPartnerComponent.parentCustomers = res.map(x => ({ "text": x.partnerNameVn, "id": x.id }));
+                        this.formPartnerComponent.parentCustomers = res;
                     } else { this.formPartnerComponent.parentCustomers = []; }
                 }
             );
@@ -332,7 +333,6 @@ export class AddPartnerDataComponent extends AppList {
         }
 
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
-        this.formPartnerComponent.partnerAccountRef.setErrors(null);
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUp.setErrors(null);
         if (this.formPartnerComponent.partnerForm.valid) {
@@ -402,7 +402,7 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
         this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
         this.partner.provinceShippingId = !!formBody.shippingProvince && !!formBody.shippingProvince.length ? formBody.shippingProvince[0].id : null;
-        this.partner.parentId = !!formBody.partnerAccountRef && !!formBody.partnerAccountRef.length ? formBody.partnerAccountRef[0].id : null;
+        this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
         this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
         this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
         this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
