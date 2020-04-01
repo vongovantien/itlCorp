@@ -1335,14 +1335,12 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.OceanVessel = data.OceanVoyNo?.ToUpper();
                 if (dataPOL != null)
                 {
-                    var polCountry = countryRepository.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.DepartureAirport = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty); //POL
+                    housebill.DepartureAirport = dataPOL?.NameEn?.ToUpper(); //POL
                     housebill.DepartureAirport = housebill.DepartureAirport?.ToUpper();
                 }
                 if (dataPOD != null)
                 {
-                    var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.PortofDischarge = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //POD
+                    housebill.PortofDischarge = dataPOD?.NameEn?.ToUpper(); //POD
                     housebill.PortofDischarge = housebill.PortofDischarge?.ToUpper();
                 }
                 housebill.TranShipmentTo = string.Empty; //NOT USE
