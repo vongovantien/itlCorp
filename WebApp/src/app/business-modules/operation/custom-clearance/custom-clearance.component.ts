@@ -224,11 +224,11 @@ export class CustomClearanceComponent extends AppList {
 
     onComfirmConvertToJobs() {
         this.confirmConvertPopup.hide();
-        const clearancesToConvert = this.mapClearancesToJobs();
-        const clearanceNulls = clearancesToConvert.filter(x => x.opsTransaction == null);
+        const clearancesToConverts = this.mapClearancesToJobs();
+        const clearanceNulls = clearancesToConverts.filter(x => x.opsTransaction == null);
         if (clearanceNulls.length === 0) {
             this._progressRef.start();
-            this._documentRepo.convertClearanceToJob(clearancesToConvert)
+            this._documentRepo.convertExistedClearanceToJob(clearancesToConverts)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => { this._progressRef.complete(); })

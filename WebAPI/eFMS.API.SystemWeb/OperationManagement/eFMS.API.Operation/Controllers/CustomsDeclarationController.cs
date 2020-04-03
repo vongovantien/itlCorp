@@ -370,10 +370,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return result;
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
         /// <summary>

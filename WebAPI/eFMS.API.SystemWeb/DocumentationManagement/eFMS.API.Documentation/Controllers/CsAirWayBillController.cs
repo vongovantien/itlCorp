@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Get(Guid jobId)
         {
             var result = airWayBillService.GetBy(jobId);
+            if (result == null) return Ok();
             return Ok(result);
         }
 

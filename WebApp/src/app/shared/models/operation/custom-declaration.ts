@@ -39,6 +39,10 @@ export class CustomDeclaration {
     importCountryName: string = '';
     exportCountryName: string = '';
     convertTime: Date = null;
+    groupId: number = null;
+    departmentId: number = null;
+    officeId: string = null;
+    companyId: string = null;
 
     constructor(object?: any) {
         const self = this;
