@@ -105,6 +105,7 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onUpdate.emit(true);
+                        this.isAllowUpdateRate = false;
                         this.getExchangeNewest();
                         return;
                     }
