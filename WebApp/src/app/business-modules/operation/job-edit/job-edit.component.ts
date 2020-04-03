@@ -221,7 +221,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
             || this.editForm.sumCbm.value === 0
             || this.editForm.sumPackages.value === 0
             || this.editForm.sumContainers.value === 0
-            || (!!this.editForm.finishDate && this.editForm.serviceDate.value.startDate > this.editForm.finishDate.value.startDate)
+            || (!!this.editForm.finishDate.value.startDate && this.editForm.serviceDate.value.startDate > this.editForm.finishDate.value.startDate)
         ) {
             valid = false;
         }

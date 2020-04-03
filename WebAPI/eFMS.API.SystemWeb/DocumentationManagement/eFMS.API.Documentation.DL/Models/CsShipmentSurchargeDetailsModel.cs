@@ -12,6 +12,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ChargeNameEn { get; set; }
         public string PayerName { get; set; }
         public string Unit { get; set; }
+        public string UnitCode { get; set; }
         public string Currency { get; set; }
         public string ChargeCode { get; set; }
         public decimal? ExchangeRate { get; set; }

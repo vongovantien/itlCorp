@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -40,7 +40,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     containers: Container[] = [];
     shipmentContainers: Container[] = [];
 
-    shipment: CsTransaction;
+    shipment: CsTransaction | OpsTransaction | any;
     hbl: HouseBill;
 
     headers: CommonInterface.IHeaderTable[] = [];
@@ -247,8 +247,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (shipment: CsTransaction) => {
+                (shipment: CsTransaction | OpsTransaction) => {
                     this.shipment = shipment;
+                    console.log(this.shipment);
                 }
             );
     }
@@ -290,7 +291,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     chargeItem.unitPrice = data.unitPrice;
                 }
                 break;
-
+            case 'unit':
+                chargeItem.unitId = data.id;
+                break;
             default:
                 break;
         }
@@ -314,7 +317,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.voucherIdredate = null;
         newSurCharge.isFromShipment = true;
         newSurCharge.hblno = this.hbl.hwbno || null;
-        newSurCharge.mblno = this.shipment.mawb || null;
+        newSurCharge.mblno = this.shipment.mawb || this.shipment.mblno || null;
         newSurCharge.jobNo = this.shipment.jobNo || null;
 
 
@@ -478,21 +481,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         switch (hintType) {
             case CommonEnum.QUANTITY_TYPE.GW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.shipment.grossWeight || 0;
+                    chargeItem.quantity = this.shipment.grossWeight || this.shipment.sumGrossWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.shipment.netWeight || 0;
+                    chargeItem.quantity = this.shipment.netWeight || this.shipment.sumNetWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.shipment.cbm || 0;
+                    chargeItem.quantity = this.shipment.cbm || this.shipment.sumCbm || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
@@ -502,7 +505,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE && this.service !== 'sea') {
-                    chargeItem.quantity = this.shipment.chargeWeight || 0;
+                    chargeItem.quantity = this.shipment.chargeWeight || this.shipment.sumChargeWeight || 0;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
                 }
