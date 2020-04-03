@@ -1447,7 +1447,6 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddSubReport("Freightcharges", freightCharges);
             result.FormatType = ExportFormatType.PortableDocFormat;
             if (reportType == DocumentConstants.HBLOFLANDING_ITL
-                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME
                 || reportType == DocumentConstants.HBLOFLANDING_ITL_SEKO)
             {
                 var parameter = new SeaHBillofLadingReportParams1()
@@ -1459,9 +1458,21 @@ namespace eFMS.API.Documentation.DL.Services
                 result.SetParameter(parameter);
             }
 
+            if (reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME)
+            {
+                var parameter = new SeaHBillofLadingReportITLFRAMEParams()
+                {
+                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    GrossWeight = data?.GrossWeight.ToString(),
+                    Measurement = data?.Cbm.ToString(),
+                    TextInfo = "RECEIVED in apparent good order and condtion except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document (duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall (without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
+                };                
+                result.SetParameter(parameter);
+            }
+
             if (reportType == DocumentConstants.HBLOFLANDING_ITL_KESCO
-                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO
-                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP)
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_SAMKIP
+                || reportType == DocumentConstants.HBLOFLANDING_ITL_FRAME_KESCO)
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
@@ -1472,6 +1483,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
+            
             return result;
         }
 

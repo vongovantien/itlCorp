@@ -70,6 +70,14 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Measurement { get; set; }
     }
 
+    public class SeaHBillofLadingReportITLFRAMEParams
+    {
+        public string Packages { get; set; }
+        public string GrossWeight { get; set; }
+        public string Measurement { get; set; }
+        public string TextInfo { get; set; }
+    }
+
     public class SeaHBillofLadingReportParams2 : SeaHBillofLadingReportParams1
     {
         public string DocumentNo { get; set; }
