@@ -137,12 +137,13 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.containerDescription = '';
 
         containers.forEach((c: Container) => {
-           this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+            this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
         });
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
             cont: container.containerTypeName || '',
-            quantity: container.quantity
+            quantity: container.quantity,
+            isPartOfContainer: container.isPartOfContainer
         }));
 
         const contData = [];
@@ -153,7 +154,10 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             });
         }
 
-        for (const item of contData) {
+        for (const item of contObject) {
+            if (item.isPartOfContainer) {
+                this.containerDetail += "A Part Of ";
+            }
             this.containerDetail += this.handleStringCont(item);
         }
         this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
