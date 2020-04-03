@@ -98,7 +98,7 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <ng-container
                                         *ngIf="!!charge.debitNo || !charge.isFromShipment ;else partnerCharge">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName" placeholder="Partner Name">
                                     </ng-container>
                                     <ng-template #partnerCharge>
@@ -124,7 +124,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
                                     <ng-container *ngIf="!!charge.debitNo || !charge.isFromShipment ;else chargeID">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.chargeNameEn">
                                     </ng-container>
                                     <ng-template #chargeID>
@@ -147,58 +147,91 @@
                                             <input type="number" class="form-control" [(ngModel)]="charge.quantity"
                                                 placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
-                                                [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
-                                                autoFormatCurrency numeric [decimals]="digitDecimal">
+                                                [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
+                                                numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
                                         <div class="col-md-6 p-l-none">
-                                            <select class="form-control border" [(ngModel)]="charge.quantityType"
-                                                (ngModelChange)="onChangeQuantityHint($event, charge)"
-                                                [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
-                                                <option value="null">-</option>
-                                                <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
-                                                    {{hint.displayName}}</option>
-                                            </select>
+                                            <ng-container
+                                                *ngIf="!!charge.creditNo || !charge.isFromShipment; else qtyHint">
+                                                <select class="form-control border" disabled>
+                                                    <option [value]="charge.quantityType">
+                                                        {{charge.quantityType}}
+                                                    </option>
+                                                </select>
+                                            </ng-container>
+                                            <ng-template #qtyHint>
+                                                <select class="form-control border" [(ngModel)]="charge.quantityType"
+                                                    (ngModelChange)="onChangeQuantityHint($event, charge)">
+                                                    <option value="null">-</option>
+                                                    <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
+                                                        {{hint.displayName}}</option>
+                                                </select>
+                                            </ng-template>
                                         </div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group ">
-                                    <select class="form-control" [(ngModel)]="charge.unitId"
-                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
-                                        <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let unit of listUnits" [ngValue]="unit.id">{{unit.code}}
-                                        </option>
-                                    </select>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && charge.unitId === null }">
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment; else unit">
+                                        <input type="text" class="dropdown-toggle form-control" disabled
+                                            [(ngModel)]="charge.unitCode">
+                                    </ng-container>
+                                    <ng-template #unit>
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{field: 'id', value: charge.unitId}"
+                                            (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
+                                            [selectedDisplayFields]="['code']" [dataSources]="listUnits"
+                                            [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
+                                            (remove)="charge.unitId = null" placeholder="Select Unit">
+                                        </app-combo-grid-virtual-scroll>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
-                                    <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
-                                        (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
-                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
-                                        autoFormatCurrency numeric [decimals]="digitDecimal">
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment; else unitPrice">
+                                        <input type="text" class="form-control" disabled [value]="charge.unitPrice">
+                                    </ng-container>
+                                    <ng-template #unitPrice>
+                                        <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
+                                            (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
+                                            autoFormatCurrency numeric [decimals]="digitDecimal">
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.currencyId)}">
-                                    <select class="form-control" [(ngModel)]="charge.currencyId"
-                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
-                                        <option *ngFor="let currency of (listCurrency | async)" [ngValue]="currency.id">
-                                            {{currency.id}}
-                                        </option>
-                                    </select>
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment; else currency">
+                                        <select class="form-control" disabled>
+                                            <option [value]="currency.id">{{charge.currencyId}}</option>
+                                        </select>
+                                    </ng-container>
+                                    <ng-template #currency>
+                                        <select class="form-control" [(ngModel)]="charge.currencyId">
+                                            <option *ngFor="let currency of (listCurrency | async)"
+                                                [ngValue]="currency.id">
+                                                {{currency.id}}
+                                            </option>
+                                        </select>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
-                                    <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
-                                        (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
-                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
-                                        autoFormatCurrency>
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment; else vatrate">
+                                        <input type="text" class="form-control" disabled [value]="charge.vatrate">
+                                    </ng-container>
+                                    <ng-template #vatrate>
+                                        <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
+                                            (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
+                                            [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
+                                            autoFormatCurrency>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td class="disabled">
@@ -234,19 +267,25 @@
                             </td>
                             <td>
                                 <div class="form-group table-date">
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            name="daterange" placeholder="Please Select" readonly [autoApply]="true"
-                                            [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.exchangeDate"
-                                            [attr.disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null" />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment;else exchangeDate">
+                                        <input type="text" class="form-control" disabled
+                                            [value]="!!charge.exchangeDate && charge.exchangeDate.startDate ? (charge.exchangeDate.startDate | date: 'dd/MM/yyyy') : null ">
+                                    </ng-container>
+                                    <ng-template #exchangeDate>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                placeholder="Please Select" readonly [autoApply]="true"
+                                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                                [(ngModel)]="charge.exchangeDate" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>
@@ -264,18 +303,25 @@
                             </td>
                             <td>
                                 <div class="form-group table-date">
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDate" name="daterange" placeholder="Please Select" readonly
-                                            [autoApply]="true" [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                            [(ngModel)]="charge.invoiceDate" disabled />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
+                                    <ng-container *ngIf="!!charge.creditNo || !charge.isFromShipment;else invoiceDate">
+                                        <input type="text" class="form-control" disabled
+                                            [value]="!!charge.invoiceDate && charge.invoiceDate.startDate ? (charge.invoiceDate.startDate | date: 'dd/MM/yyyy') : null ">
+                                    </ng-container>
+                                    <ng-template #invoiceDate>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                placeholder="Please Select" readonly [autoApply]="true"
+                                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                                [(ngModel)]="charge.invoiceDate" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td class="disabled">

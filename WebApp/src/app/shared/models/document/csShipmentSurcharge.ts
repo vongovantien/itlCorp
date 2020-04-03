@@ -81,6 +81,7 @@ export class CsShipmentSurcharge {
 
     debitCharge: string = null;
     paySoano: string = null;
+    unitCode: string = null;
 
     constructor(object?: any) {
         const self = this;
