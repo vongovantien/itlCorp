@@ -364,8 +364,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {
                         this.saleManId.setValue(res);
-                    }
-                    else {
+                    } else {
                         this.saleMans = this.saleMans.pipe(
                             tap((users: User[]) => {
                                 const user: User = users.find((u: User) => u.id === data.salePersonId);

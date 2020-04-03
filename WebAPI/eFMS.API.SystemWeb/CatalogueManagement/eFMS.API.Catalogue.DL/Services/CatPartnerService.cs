@@ -937,7 +937,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     PartnerNameVn = x.PartnerNameVn,
                     PartnerNameEn = x.PartnerNameEn,
                     ShortName = x.ShortName,
-                    TaxCode = x.TaxCode
+                    TaxCode = x.TaxCode,
+                    SalePersonId = x.SalePersonId,
+                    Tel = x.Tel,
+                    AddressEn = x.AddressEn,
+                    Fax = x.Fax
             });
             return results;
         }
