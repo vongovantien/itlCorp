@@ -73,7 +73,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                         console.log(this.containers);
                         // * Update field inword with container data.
-                        if(!this.formCreateHBLComponent.isUpdate){
+                        if (!this.formCreateHBLComponent.isUpdate) {
                             this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                         }
                     }
@@ -244,15 +244,18 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
-        const contData = [];
-        for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
-            contData.push({
-                contName: keyName,
-                quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-            });
-        }
+        // const contData = [];
+        // for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
+        //     contData.push({
+        //         contName: keyName,
+        //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+        //     });
+        // }
 
-        for (const item of contData) {
+        for (const item of contObject) {
+            if (item.isPartContainer) {
+                containerDetail += "A Part Of ";
+            }
             containerDetail += this.handleStringCont(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");

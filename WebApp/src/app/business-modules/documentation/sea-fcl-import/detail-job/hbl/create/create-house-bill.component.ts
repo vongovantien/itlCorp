@@ -66,7 +66,7 @@ export class CreateHouseBillComponent extends AppForm {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-   
+
         this._actionStoreSubject
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -80,13 +80,13 @@ export class CreateHouseBillComponent extends AppForm {
                                 c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
-                        if(!this.formHouseBill.isDetail){
+                        if (!this.formHouseBill.isDetail) {
                             // * Update field inword with container data.
                             this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
                         }
-                       
+
                     }
-                  
+
                 });
     }
 
@@ -104,7 +104,7 @@ export class CreateHouseBillComponent extends AppForm {
                 this.combackToHBLList();
             }
         });
-    
+
     }
 
     onSelectTab(tabName: HBL_TAB | string) {
@@ -122,7 +122,7 @@ export class CreateHouseBillComponent extends AppForm {
 
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this.formHouseBill.type = 'SFI';
-  
+
         this._cd.detectChanges();
 
 
@@ -329,15 +329,18 @@ export class CreateHouseBillComponent extends AppForm {
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
-        const contData = [];
-        for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
-            contData.push({
-                contName: keyName,
-                quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-            });
-        }
+        // const contData = [];
+        // for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
+        //     contData.push({
+        //         contName: keyName,
+        //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+        //     });
+        // }
 
-        for (const item of contData) {
+        for (const item of contObject) {
+            if (item.isPartContainer) {
+                containerDetail += "A Part Of ";
+            }
             containerDetail += this.handleStringCont(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");
