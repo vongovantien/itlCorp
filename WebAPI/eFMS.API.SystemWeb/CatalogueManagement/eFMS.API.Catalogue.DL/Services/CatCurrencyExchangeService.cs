@@ -115,8 +115,8 @@ namespace eFMS.API.Catalogue.DL.Services
             if (data.Count() == 0) return result;
             var lastRate = data.OrderBy(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).LastOrDefault();
             result.LocalCurrency = localCurrency;
-            result.DatetimeCreated = lastRate.DatetimeCreated;
-            result.DatetimeModified = lastRate.DatetimeModified?? lastRate.DatetimeCreated;
+            result.DatetimeCreated = date;
+            result.DatetimeModified = date;
             string userName = string.Empty;
             if(lastRate.UserModified != null)
             {
