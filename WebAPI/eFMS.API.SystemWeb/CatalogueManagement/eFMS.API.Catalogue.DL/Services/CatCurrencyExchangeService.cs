@@ -113,7 +113,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             var result = new CurrencyExchangeNewestViewModel();
             if (data.Count() == 0) return result;
-            var lastRate = data.OrderBy(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).FirstOrDefault();
+            var lastRate = data.OrderBy(x => x.DatetimeModified).ThenBy(x => x.DatetimeCreated).LastOrDefault();
             result.LocalCurrency = localCurrency;
             result.DatetimeCreated = lastRate.DatetimeCreated;
             result.DatetimeModified = lastRate.DatetimeModified?? lastRate.DatetimeCreated;
@@ -121,11 +121,6 @@ namespace eFMS.API.Catalogue.DL.Services
             if(lastRate.UserModified != null)
             {
                 var userModified = users.FirstOrDefault(x => x.Id == lastRate.UserModified);
-                userName = userModified != null ? userModified.Username : "system";
-            }
-            else
-            {
-                var userModified = users.FirstOrDefault(x => x.Id == lastRate.UserCreated);
                 userName = userModified != null ? userModified.Username : "system";
             }
             result.UserModifield = userName;
