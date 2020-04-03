@@ -1,0 +1,20 @@
+﻿.Itl_Frame_VerticalText_Particular {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    font-size: 6pt;
+    color: #000000;
+    font-family: Arial;
+    font-weight: normal;
+    text-align: -webkit-center;
+    text-align: -moz-center;
+}
+
+.Fbl_Frame_VerticalText_Vilas {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    font-size: 10pt;
+    color: #000000;
+    background: white;
+    font-family: Tahoma;
+    font-weight: normal;
+}
