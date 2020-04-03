@@ -43,7 +43,7 @@
 			</div>
 			<div class="col-lg-4">
 				<div class="form-group"
-					[ngClass]="{ 'has-danger': isSubmitted && finishDate && (serviceDate.value.startDate > finishDate.value.startDate)}">
+					[ngClass]="{ 'has-danger': isSubmitted && finishDate.value.startDate && (serviceDate.value.startDate > finishDate.value.startDate)}">
 					<label class="form-control-label" for="">
 						Finish Date
 					</label>
@@ -63,7 +63,7 @@
 						</span>
 					</div>
 					<div class="form-control-feedback"
-						*ngIf="isSubmitted && finishDate && (serviceDate.value.startDate > finishDate.value.startDate)">
+						*ngIf="isSubmitted && finishDate.value.startDate && (serviceDate.value.startDate > finishDate.value.startDate)">
 						Finish Date must more greater or equal Service Date
 					</div>
 				</div>
