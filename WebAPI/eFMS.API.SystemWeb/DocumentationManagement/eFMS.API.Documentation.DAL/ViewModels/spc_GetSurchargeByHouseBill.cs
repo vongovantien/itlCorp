@@ -47,6 +47,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ChargeNameEn { get; set; }
         public string ChargeCode { get; set; }
         public string UnitNameEn { get; set; }
+        public string UnitCode { get; set; }
         public string PartnerName { get; set; }
         public string ReceiverName { get; set; }
         public string PayerName { get; set; }

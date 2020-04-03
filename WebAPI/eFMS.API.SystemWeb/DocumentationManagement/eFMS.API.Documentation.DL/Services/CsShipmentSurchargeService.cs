@@ -262,6 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Currency = item.CurrencyCode;
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
+                charge.UnitCode = item.UnitCode;
                 charge.ExchangeRate = item.RateToLocal;
                 if(charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
