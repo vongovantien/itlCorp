@@ -79,7 +79,7 @@ namespace eFMS.API.Operation.DL.Services
                          join user in users on con.UserId equals user.Id
                          join em in employees on user.EmployeeId equals em.Id
 
-                         select new { con, user, em }
+                         select new { con, user.Username, em.EmployeeNameEn }
                 );
             if (query == null)
             {
@@ -88,8 +88,8 @@ namespace eFMS.API.Operation.DL.Services
             foreach (var item in query)
             {
                 SetEcusConnectionModel ecus = item.con;
-                ecus.Username = item.user.Username;
-                ecus.Fullname = item.em.EmployeeNameEn;
+                ecus.Username = item.Username;
+                ecus.Fullname = item.EmployeeNameEn;
                 returnList.Add(ecus);
             }
             return returnList;
@@ -133,10 +133,10 @@ namespace eFMS.API.Operation.DL.Services
             if (string.IsNullOrEmpty(criteria.All))
             {
                 results = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    && (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    && (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    && (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    //&& (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    //&& (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    //&& (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    //&& (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     )?.AsQueryable();
             }
             else
