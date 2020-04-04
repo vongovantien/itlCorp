@@ -28,6 +28,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
 
+    TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,

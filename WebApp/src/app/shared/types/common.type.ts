@@ -5,6 +5,9 @@ namespace CommonType {
 
     export type DIRECTION = 'left' | 'right';
 
+    export type SERVICE_TYPE = 'air' | 'sea';
+
+
     export const DATATYPE = {
         LINK: <DataType>'LINK',
         BOOLEAN: <DataType>'BOOLEAN',
@@ -17,6 +20,10 @@ namespace CommonType {
         COPY: <ACTION_FORM>'COPY',
     };
 
+    export const SERVICE_TYPE = {
+        AIR: <SERVICE_TYPE>'air',
+        SEA: <SERVICE_TYPE>'sea',
+    };
 
 
 }
