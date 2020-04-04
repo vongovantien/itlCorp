@@ -44,7 +44,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
     ngOnInit() {
         // * Get User logged.
-        this.userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._store.select(fromShare.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),

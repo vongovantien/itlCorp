@@ -43,8 +43,11 @@
                     </li>
                 </ul>
             </div>
-            <app-default-button (click)="onSaveHBLDetail()" *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting">
-            </app-default-button>
+            <ng-container *ngIf="(isLocked | async) === false">
+                <app-default-button (click)="onSaveHBLDetail()" *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting">
+                </app-default-button>
+            </ng-container>
+
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>

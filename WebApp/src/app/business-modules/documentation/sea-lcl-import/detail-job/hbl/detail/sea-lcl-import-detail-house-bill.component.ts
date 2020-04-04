@@ -85,7 +85,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
-
+                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 this.getDetailHbl();
 
             } else {

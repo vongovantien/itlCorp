@@ -24,28 +24,31 @@
             </span>
         </button>
     </div>
-    <div class="c-button-actions">
-        <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-            *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()">
-            <span>
-                <i class="la la la-save"></i>
+    <ng-container *ngIf="!!opsTransaction && opsTransaction.isLocked === false">
+        <div class="c-button-actions">
+            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()">
                 <span>
-                    save
+                    <i class="la la la-save"></i>
+                    <span>
+                        save
+                    </span>
                 </span>
-            </span>
-        </button>
-    </div>
-    <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
-            <span>
-                <i class="la la-trash"></i>
+            </button>
+        </div>
+        <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
+            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
                 <span>
-                    delete
+                    <i class="la la-trash"></i>
+                    <span>
+                        delete
+                    </span>
                 </span>
-            </span>
-        </button>
-    </div>
+            </button>
+        </div>
+    </ng-container>
+
 
     <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
 

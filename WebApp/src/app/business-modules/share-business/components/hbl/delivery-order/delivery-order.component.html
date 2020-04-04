@@ -35,7 +35,7 @@
                         <h3 class="alert-block__title">
                             Header
                         </h3>
-                        <div *ngIf="!(isLocked | async)">
+                        <div *ngIf="(isLocked | async) === false">
                             <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>
@@ -74,7 +74,7 @@
                         <h3 class="alert-block__title">
                             Footer
                         </h3>
-                        <div *ngIf="!(isLocked | async)">
+                        <div *ngIf="(isLocked | async) === false">
                             <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>

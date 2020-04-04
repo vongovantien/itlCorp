@@ -5,12 +5,14 @@
                 <ng-content></ng-content>
             </h3>
             <div>
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="refresh()" title="Refresh">
-                    <span><i class="la la-refresh"></i>
-                        <span> Refresh </span>
-                    </span>
-                </button>
+                <ng-container *ngIf="(isLocked | async) === false">
+                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="refresh()" title="Refresh">
+                        <span><i class="la la-refresh"></i>
+                            <span> Refresh </span>
+                        </span>
+                    </button>
+                </ng-container>
             </div>
         </div>
     </div>
@@ -69,15 +71,17 @@
                             <input type="number" class="form-control" [(ngModel)]="totalCBM" min="0" numeric
                                 [decimals]="digitDecimal" autoFormatCurrency>
                         </div>
-                        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
-                            <span>
-                                <i class="la la-list"></i>
+                        <ng-container *ngIf="(isLocked | async) === false">
+                            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="openContainerListPopup()">
                                 <span>
-                                    List of Goods
+                                    <i class="la la-list"></i>
+                                    <span>
+                                        List of Goods
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </ng-container>
                     </div>
                 </div>
             </div>

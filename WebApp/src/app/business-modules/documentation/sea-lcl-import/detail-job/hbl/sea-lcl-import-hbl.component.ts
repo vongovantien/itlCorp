@@ -130,7 +130,6 @@ export class SeaLCLImportHBLComponent extends AppList implements OnInit {
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {

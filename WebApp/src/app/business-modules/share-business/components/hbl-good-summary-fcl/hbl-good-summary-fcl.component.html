@@ -84,17 +84,18 @@
                                 </div>
                             </li>
                         </ul>
-
-                        <button type="button"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-top-10"
-                            (click)="openContainerListPopup()" [disabled]="isLocked | async">
-                            <span>
-                                <i class="la la-list"></i>
+                        <ng-container *ngIf="(isLocked | async) === false">
+                            <button type="button"
+                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-top-10"
+                                (click)="openContainerListPopup()">
                                 <span>
-                                    Container List
+                                    <i class="la la-list"></i>
+                                    <span>
+                                        Container List
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
+                            </button>
+                        </ng-container>
                     </div>
                 </div>
             </div>

@@ -49,7 +49,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
 
     spinnerSurcharge: string = 'spinnerSurcharge';
 
-
     constructor(
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -255,8 +254,6 @@ export class SeaLCLExportHBLComponent extends AppList implements OnInit {
             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: hbl.id }));
             this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-
-
             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.selectedHbl.id));
 
             switch (this.selectedTabSurcharge) {
