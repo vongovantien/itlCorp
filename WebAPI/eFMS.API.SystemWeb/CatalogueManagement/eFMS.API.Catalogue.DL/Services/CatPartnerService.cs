@@ -942,7 +942,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     Tel = x.Tel,
                     AddressEn = x.AddressEn,
                     Fax = x.Fax,
-                    CoLoaderCode = x.CoLoaderCode
+                    CoLoaderCode = x.CoLoaderCode,
+
             });
             return results;
         }
