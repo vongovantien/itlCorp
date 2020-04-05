@@ -464,7 +464,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     onBlurGetAirline(data: any) {
         const hawb: string = data.target.value.substring(0, 3);
         if (this.mawb.valid && !!hawb) {
-            this._catalogueRepo.getListPartner(null, null, { type: CommonEnum.PartnerGroupEnum.CARRIER, active: true, CoLoaderCode: hawb })
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.CARRIER, active: true, CoLoaderCode: hawb })
                 .subscribe(
                     (res: Customer[]) => {
                         if (!!res && res.length > 0) {

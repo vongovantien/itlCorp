@@ -941,7 +941,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     SalePersonId = x.SalePersonId,
                     Tel = x.Tel,
                     AddressEn = x.AddressEn,
-                    Fax = x.Fax
+                    Fax = x.Fax,
+                    CoLoaderCode = x.CoLoaderCode,
+
             });
             return results;
         }

@@ -22,7 +22,9 @@ import { SystemConstants } from 'src/constants/system.const';
 })
 
 export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingChargeComponent {
-    charges: any;
+
+    TYPE: any = CommonEnum.SurchargeTypeEnum.OBH;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
