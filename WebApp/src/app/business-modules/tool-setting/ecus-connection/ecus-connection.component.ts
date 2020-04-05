@@ -94,7 +94,7 @@ export class EcusConnectionComponent extends AppList implements OnInit {
     getEcusConnections(dataSearch: any) {
         this._progressRef.start();
         this.isLoading = true;
-        this._operationRepo.getListEcus(this.page, this.pageSize, dataSearch)
+        this._operationRepo.getListEcus(this.page, this.pageSize, Object.assign({}, dataSearch))
             .pipe(
                 finalize(() => { this._progressRef.complete(); this.isLoading = false; })
             ).subscribe(
