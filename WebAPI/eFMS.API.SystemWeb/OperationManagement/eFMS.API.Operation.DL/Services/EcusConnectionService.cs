@@ -77,9 +77,9 @@ namespace eFMS.API.Operation.DL.Services
             var employees = employeeRepository.Get();
             var query = (from con in cons
                          join user in users on con.UserId equals user.Id
-                         join em in employees on user.EmployeeId equals em.Id
-
-                         select new { con, user.Username, em.EmployeeNameEn }
+                         join em in employees on user.EmployeeId equals em.Id into grpEmployees
+                         from employee in grpEmployees.DefaultIfEmpty()
+                         select new { con, user.Username, employee?.EmployeeNameEn }
                 );
             if (query == null)
             {
@@ -133,10 +133,10 @@ namespace eFMS.API.Operation.DL.Services
             if (string.IsNullOrEmpty(criteria.All))
             {
                 results = list.Where(x => (x.Username ?? "").IndexOf(criteria.Username ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    //&& (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    //&& (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    //&& (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                    //&& (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Name ?? "").IndexOf(criteria.Name ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.ServerName ?? "").IndexOf(criteria.ServerName ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Dbname ?? "").IndexOf(criteria.Dbname ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                    && (x.Fullname ?? "").IndexOf(criteria.Fullname ?? "", StringComparison.OrdinalIgnoreCase) > -1
                     )?.AsQueryable();
             }
             else
@@ -180,8 +180,6 @@ namespace eFMS.API.Operation.DL.Services
                     break;
                 case PermissionRange.All:
                     data = list;
-                    break;
-                default:
                     break;
             }
             return data;

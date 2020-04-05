@@ -221,6 +221,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(SetEcusConnectionCriteria criteria, int pageNumber, int pageSize)
         {
             var data = ecusConnectionService.Paging(criteria, pageNumber, pageSize, out int totalItems);
