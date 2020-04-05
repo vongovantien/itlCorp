@@ -1,6 +1,6 @@
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { ShareBusinessAddHblToManifestComponent } from '../popup/add-hbl-to-manifest.popup';
 @Component({
     selector: 'housebills-in-manifest',
@@ -13,6 +13,7 @@ export class ShareBusinessHousebillsInManifestComponent extends PopupBase {
     housebills: any[] = [];
     checkAll = false;
     manifest: any = {};
+    @Input() isLocked: boolean = false;
     @Output() emitVolum = new EventEmitter<object>();
 
     constructor(

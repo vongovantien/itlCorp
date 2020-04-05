@@ -16,26 +16,30 @@
             </div>
             <div class="col-lg-8 m--align-right">
                 <div class="form-group">
-                    <div class="c-button-actions">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="onRemove()">
-                            <span>
-                                <i class="la la-trash"></i>
+                    <ng-container *ngIf="!isLocked">
+                        <div class="c-button-actions">
+                            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="onRemove()">
                                 <span>
-                                    Remove selected
+                                    <i class="la la-trash"></i>
+                                    <span>
+                                        Remove selected
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
-                        <button (click)="showPopupAddHbl()" type="button" style="float:right"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-plus"></i>
+                            </button>
+                            <button (click)="showPopupAddHbl()" type="button" style="float:right"
+                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
                                 <span>
-                                    Add HBL
+                                    <i class="la la-plus"></i>
+                                    <span>
+                                        Add HBL
+                                    </span>
                                 </span>
-                            </span>
-                        </button>
-                    </div>
+                            </button>
+                        </div>
+                    </ng-container>
+
+
 
                 </div>
 
