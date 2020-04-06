@@ -67,7 +67,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     ngOnInit() {
-
+        this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
         this._store.select(getDetailHBlPermissionState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -77,6 +77,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     }
                 }
             );
+
+
     }
 
     ngAfterViewInit() {
