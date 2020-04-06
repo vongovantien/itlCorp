@@ -1,7 +1,7 @@
 <div class="sea-fcl-import-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <span *ngIf="!!(selectedShipment | async)?.isLocked" class="m--margin-right-10 align-middle">
+            <span *ngIf="(isLocked | async)" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>
             <div class="dropdown m-dropdown m-dropdown--inline">
@@ -84,7 +84,7 @@
                                                     <ng-container
                                                         *ngIf="!!shipmentDetail && shipmentDetail.isLocked === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (onClick)="gotoCreateHouseBill()"
+                                                            (onClick)="gotoCreate()"
                                                             *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
@@ -101,21 +101,23 @@
                                                 </th>
                                             </thead>
                                             <tbody class="tbody-group">
-                                                <ng-container *ngIf="!(isLoading | async) && !!houseBill.length">
+                                                <ng-container *ngIf="!(isLoading | async) && !!houseBills.length">
                                                     <tr (click)="selectHBL(house, $event)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
-                                                        *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
+                                                        *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
                                                                 <app-permission-button type="detail"
                                                                     (onClick)="gotoDetail(house.id)">
                                                                 </app-permission-button>
-                                                                <ng-container *ngIf="(isLocked | async) === false"> 
-                                                                        <app-permission-button   *ngIf="shipmentDetail.permission.allowUpdate === true" (onClick)="showDeletePopup(house, $event)"
-                                                                            type="delete">
-                                                                        </app-permission-button>
-                                                                 </ng-container> 
+                                                                <ng-container *ngIf="(isLocked | async) === false">
+                                                                    <app-permission-button
+                                                                        *ngIf="shipmentDetail.permission.allowUpdate === true"
+                                                                        (onClick)="showDeletePopup(house, $event)"
+                                                                        type="delete">
+                                                                    </app-permission-button>
+                                                                </ng-container>
                                                             </div>
                                                         </td>
                                                         <td class=" text-primary pointer"><a
@@ -144,7 +146,7 @@
                                                         <td>{{totalCBM}}</td>
                                                     </tr>
                                                 </ng-container>
-                                                <tr *ngIf="!(isLoading | async) && !houseBill.length"
+                                                <tr *ngIf="!(isLoading | async) && !houseBills.length"
                                                     app-table-none-record [colspan]="headers.length + 1">
                                                 </tr>
                                                 <tr *ngIf="(isLoading | async)" app-table-row-loading></tr>
