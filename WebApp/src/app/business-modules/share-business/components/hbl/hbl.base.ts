@@ -23,9 +23,9 @@ export abstract class AppShareHBLBase extends AppList {
 
     houseBills: HouseBill[] = [];
 
-    private totalCBM: number;
-    private totalGW: number;
-    private totalCW: number;
+    totalCBM: number;
+    totalGW: number;
+    totalCW: number;
 
     selectedHbl: CsTransactionDetail;
     selectedTabSurcharge: string = 'BUY';
@@ -36,7 +36,7 @@ export abstract class AppShareHBLBase extends AppList {
     jobId: string = '';
     spinnerSurcharge: string = 'spinnerSurcharge';
 
-    protected serviceType: CommonType.SERVICE_TYPE = 'sea';
+    serviceType: CommonType.SERVICE_TYPE = 'sea';
 
     constructor(
         protected _sortService: SortService,

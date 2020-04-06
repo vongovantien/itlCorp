@@ -84,7 +84,7 @@
                                                     <ng-container
                                                         *ngIf="!!shipmentDetail && shipmentDetail.isLocked === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (onClick)="gotoCreateHouseBill()"
+                                                            (onClick)="gotoCreate()"
                                                             *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
