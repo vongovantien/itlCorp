@@ -593,8 +593,6 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("BankAddress_Local")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankName).HasMaxLength(4000);
-
                 entity.Property(e => e.BankNameEn)
                     .HasColumnName("BankName_EN")
                     .HasMaxLength(4000);

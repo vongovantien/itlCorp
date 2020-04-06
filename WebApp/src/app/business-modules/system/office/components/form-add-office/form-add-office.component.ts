@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemRepo } from '@repositories';
 import { Company, Department } from '@models';
@@ -25,7 +25,6 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     selectedCompany: Partial<CommonInterface.IComboGridData> = {};
 
     userHeaders: CommonInterface.IHeaderTable[];
-    SelectedOffice: any = {};
     companies: Company[] = [];
     departments: Department[] = [];
     formGroup: FormGroup;
@@ -51,16 +50,18 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     bankName: AbstractControl;
     headers: CommonInterface.IHeaderTable[];
     location: AbstractControl;
-
+    bankName_En: AbstractControl;
+    bankName_Local: AbstractControl;
+    SelectedOffice:any = {};
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
     ];
+    isReadonly: any = false;
 
     isSubmited: boolean = false;
-    isDetail: boolean = false;
+    @Input() isDetail: boolean = false;
     isCreate: boolean = false;
-    isReadonly: any = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -74,14 +75,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     ngOnInit(): void {
         this.initForm();
         this.getDataComboBox();
-        this.headers = [
-            { title: 'Department Code', field: 'code', sortable: true },
-            { title: 'Name EN', field: 'deptNameEn', sortable: true },
-            { title: 'Name Local', field: 'deptName', sortable: true },
-            { title: 'Name Abbr', field: 'deptNameAbbr', sortable: true },
-            { title: 'Office', field: 'officeName', sortable: true },
-            { title: 'Status', field: 'active', sortable: true },
-        ];
+    
         this.userHeaders = [
             { title: 'User Name', field: 'userName', sortable: true },
             { title: 'Full Name', field: 'fullName', sortable: true },
@@ -90,9 +84,9 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             { title: 'Level Permission', field: 'levelPermission', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
-
-        this.isReadonly = this._store.select(checkShareSystemUserLevel);
-
+        if(this.isDetail){
+            this.isReadonly = this._store.select(checkShareSystemUserLevel);
+        }
     }
     onSelectDataFormInfo(data: any) {
         this.company.setValue(data.id);
@@ -100,14 +94,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     }
 
 
-    getDepartment(data: any) {
-        this.departments = data;
-        console.log(this.departments);
-    }
-
     update(formdata: any, data: any) {
         this.formGroup.patchValue(formdata);
-        // this.active.setValue(this.status.filter(i => i.value === data)[0]);
     }
 
     getCompanies() {
@@ -217,6 +205,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
 
         this.bankAddress_En = this.formGroup.controls['bankAddress_En'];
         this.location = this.formGroup.controls['location'];
+        this.bankName_En = this.formGroup.controls['bankName_En'];
+        this.bankName_Local = this.formGroup.controls['bankName_Local'];
 
     }
 }
@@ -249,6 +239,7 @@ export interface IFormAddOffice {
     company: string;
     active: boolean;
     location: string;
-
+    bankName_En: string;
+    bankName_Local
 
 }

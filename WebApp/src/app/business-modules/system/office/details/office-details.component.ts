@@ -8,7 +8,7 @@ import { AppPage } from 'src/app/app.base';
 import { SystemRepo } from '@repositories';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { SystemLoadUserLevelAction, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
 import { Store } from '@ngrx/store';
 import { PreviousRouteService } from 'src/app/shared/services/previous-route';
 
@@ -46,7 +46,9 @@ export class OfficeDetailsComponent extends AppPage {
         active: true,
         company: '',
         bankAddress_En: '',
-        location: ''
+        location: '',
+        bankName_En:'',
+        bankName_Local:''
     };
     officeId: string = '';
 
@@ -54,6 +56,9 @@ export class OfficeDetailsComponent extends AppPage {
     departments: Department[] = [];
 
     headers: CommonInterface.IHeaderTable[];
+    isDetail: boolean = false;
+    isReadonly: any = false;
+    selectedOffice: any = {};
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -70,6 +75,7 @@ export class OfficeDetailsComponent extends AppPage {
     }
 
     ngOnInit() {
+      
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.officeId = param.id;
@@ -79,7 +85,14 @@ export class OfficeDetailsComponent extends AppPage {
                 this._router.navigate(["home/system/office"]);
             }
         });
-
+        this.headers = [
+            { title: 'Department Code', field: 'code', sortable: true },
+            { title: 'Name EN', field: 'deptNameEn', sortable: true },
+            { title: 'Name Local', field: 'deptName', sortable: true },
+            { title: 'Name Abbr', field: 'deptNameAbbr', sortable: true },
+            { title: 'Office', field: 'officeName', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+        ];
     }
 
     updateOffice() {
@@ -107,8 +120,9 @@ export class OfficeDetailsComponent extends AppPage {
                 bankAddressEn: this.formAdd.bankAddress_En.value,
                 active: this.formAdd.active.value,
                 swiftCode: this.formAdd.swiftCode.value,
-                location: this.formAdd.location.value
-
+                location: this.formAdd.location.value,
+                bankNameEn: this.formAdd.bankName_En.value,
+                bankNameLocal: this.formAdd.bankName_Local.value,
             };
             this._systemRepo.updateOffice(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -126,8 +140,10 @@ export class OfficeDetailsComponent extends AppPage {
         }
     }
 
+
     getDetailOffice(id: string) {
         this._progressRef.start();
+        this.isDetail = true;
         this._systemRepo.getDetailOffice(id)
             .pipe(
                 catchError(this.catchError),
@@ -136,7 +152,6 @@ export class OfficeDetailsComponent extends AppPage {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.office = new Office(res.data);
-                            this.formAdd.isDetail = true;
                             this.formData.id = res.data.id;
                             this.formData.code = res.data.code;
                             this.formData.branchNameEn = res.data.branchNameEn;
@@ -157,12 +172,14 @@ export class OfficeDetailsComponent extends AppPage {
                             this.formData.bankAccountName_VN = res.data.bankAccountNameVn;
                             this.formData.bankAccountName_EN = res.data.bankAccountNameEn;
                             this.formData.location = res.data.location;
+                            this.selectedOffice = new Office(res.data);
                             this.formAdd.SelectedOffice = new Office(res.data);
+
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;
-
+                            this.formData.bankName_En= res.data.bankNameEn;
+                            this.formData.bankName_Local= res.data.bankNameLocal;
                             this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.formData.company, officeId: this.office.id, type: 'office' }));
-
                             setTimeout(() => {
                                 this.formAdd.update(this.formData, res.data.active);
                             }, 300);
@@ -174,16 +191,11 @@ export class OfficeDetailsComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.departments = res;
-                    this.formAdd.getDepartment(this.departments);
                     console.log(this.departments);
                 },
             );
     }
     cancel() {
-        if (this.previousUrl.includes('office')) {
-            this._router.navigate(['/home/system/office']);
-        } else {
-            this.back();
-        }
+        this._router.navigate(['/home/system/office']);
     }
 }
