@@ -29,7 +29,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.id}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
-                            <ng-select [allowClear]="false" [items]="users" (selected)="selectedUser = $event">
+                            <ng-select [allowClear]="false" [items]="users" [active]="activeUser"
+                                (selected)="selectedUser = $event">
                             </ng-select>
                             <div class="form-control-feedback" *ngIf="isSubmitted && !selectedUser.id">
                                 Assign To is required!

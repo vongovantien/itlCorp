@@ -37,8 +37,8 @@
                                 <label class="form-control-label">
                                     Process time (h)
                                 </label>
-                                <input appTwoDigitDecimaNumber type="text" class="form-control m-input m-input--square"
-                                    [formControl]="processTime" formControlName="processTime">
+                                <input type="number" numeric [decimals]="5" class="form-control m-input m-input--square"
+                                    [formControl]="processTime" formControlName="processTime" min="1">
                                 <div class="form-control-feedback" *ngIf="isSummited && processTime.value === 0">
                                     Process time must greater than 0 !
                                 </div>
@@ -66,18 +66,18 @@
                     <div class="row ">
                         <div class="col-lg-6 ">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSummited && !selectedMainPersonInCharge.value}">
+                                [ngClass]="{'m-form__group has-danger': isSummited && !mainPersonInCharge.value}">
                                 <label class="form-control-label ">
                                     Main person incharge <span class="m--font-danger">(*)</span>
                                 </label>
-                                <app-combo-grid-virtual-scroll *ngIf="!!data"
-                                    [currentActiveItemId]="selectedMainPersonInCharge"
-                                    (itemSelected)="onSelectMainPersonIncharge($event) "
-                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
-                                        " [displayFields]="configComboGrid.displayFields ">
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id', value: mainPersonInCharge.value}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'mainPersonInCharge')"
+                                    [selectedDisplayFields]="['username']" [dataSources]="systemUsers"
+                                    [displayFields]="displayFields" placeholder="Please select"
+                                    (remove)="resetFormControl(mainPersonInCharge)">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback"
-                                    *ngIf="isSummited && !selectedMainPersonInCharge.value">
+                                <div class="form-control-feedback" *ngIf="isSummited && !mainPersonInCharge.value">
                                     Main person in charge is required!
                                 </div>
                             </div>
@@ -87,11 +87,12 @@
                                 <label class="form-control-label ">
                                     Real person incharge
                                 </label>
-                                <app-combo-grid-virtual-scroll *ngIf="!!data"
-                                    (itemSelected)="onSelectRealPersonIncharge($event) "
-                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
-                                        " [displayFields]="configComboGrid.displayFields"
-                                    [currentActiveItemId]="selectedRealPersonInCharge">
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'id', value: realPersonInCharge.value}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'realPersonInCharge')"
+                                    [selectedDisplayFields]="['username']" [dataSources]="systemUsers"
+                                    [displayFields]="displayFields" placeholder="Please select"
+                                    (remove)="resetFormControl(realPersonInCharge)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

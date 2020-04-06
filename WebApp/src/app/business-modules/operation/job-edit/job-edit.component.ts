@@ -332,7 +332,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                                 this.editForm.formEdit.controls['productService'].setValue([this.editForm.productServices.find(type => type.id === this.opsTransaction.productService)]);
                             }
                             if (this.editForm.serviceModes != null) {
-                                this.editForm.formEdit.controls['serviceMode'].setValue([this.editForm.serviceModes.find(type => type.id === this.opsTransaction.serviceMode)]);
+                                const serviceMode = this.editForm.serviceModes.find(type => type.id === this.opsTransaction.serviceMode);
+                                if (!!serviceMode) { this.editForm.formEdit.controls['serviceMode'].setValue([serviceMode]); }
                             }
                             if (this.editForm.shipmentModes != null) {
                                 this.editForm.formEdit.controls['shipmentMode'].setValue([this.editForm.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode)]);

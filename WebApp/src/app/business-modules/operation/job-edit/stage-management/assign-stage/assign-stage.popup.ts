@@ -2,10 +2,11 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CatalogueRepo, SystemRepo, OperationRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
-import { User } from 'src/app/shared/models';
+import { User, OpsTransaction } from 'src/app/shared/models';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'asign-stage-popup',
@@ -29,11 +30,12 @@ export class AssignStagePopupComponent extends PopupBase {
 
     users: User[] = [];
     selectedUser: any = null;
+    activeUser: any[] = [];
 
     description: string = '';
 
     isSubmitted: boolean = false;
-    jobId: string = '';
+    job: OpsTransaction;
     isAsignment: boolean = false;
 
     constructor(
@@ -91,7 +93,7 @@ export class AssignStagePopupComponent extends PopupBase {
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
-            jobId: this.jobId,
+            jobId: this.job.id,
             stageId: this.selectedStageData.id,
             mainPersonInCharge: !!this.selectedUser ? this.selectedUser.id : null,
             description: this.description

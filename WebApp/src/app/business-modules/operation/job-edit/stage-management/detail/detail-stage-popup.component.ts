@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnChanges } from "@angular/core";
-import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, AbstractControl, Validators, FormControl } from "@angular/forms";
 
 import { PopupBase } from "src/app/popup.base";
 import { SystemRepo, OperationRepo } from "src/app/shared/repositories";
@@ -8,6 +8,7 @@ import { User, Stage } from "src/app/shared/models";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { formatDate } from "@angular/common";
+import { Observable, BehaviorSubject } from "rxjs";
 
 @Component({
     selector: "detail-stage-popup",
@@ -25,6 +26,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     description: AbstractControl;
     comment: AbstractControl;
     departmentName: AbstractControl;
+    mainPersonInCharge: AbstractControl;
+    realPersonInCharge: AbstractControl;
 
     deadLineDate: AbstractControl;
 
@@ -56,21 +59,12 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     ];
     statusStageActive: any[] = [this.statusStage[0]];
 
-    systemUsers: User[] = [];
-    selectedMainPersonInCharge: IPersonInCharge = null;
-    selectedRealPersonInCharge: IPersonInCharge = null;
-
-
+    systemUsers: User[];
+    displayFields: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'username', label: 'UserName' },
+        { field: 'employeeNameEn', label: 'FullName' },
+    ]
     // config for combo gird
-    configComboGrid: any = {
-        placeholder: 'Please select',
-        displayFields: [
-            { field: 'username', label: 'UserName' },
-            { field: 'employeeNameEn', label: 'FullName' },
-        ],
-        source: this.systemUsers,
-        selectedDisplayFields: ['username'],
-    };
 
     isSummited: boolean = false;
 
@@ -139,6 +133,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
                 startDate: null,
                 endDate: null
             }],
+            mainPersonInCharge: [null, Validators.required],
+            realPersonInCharge: [null]
         });
         this.stageName = this.form.controls['stageName'];
         this.processTime = this.form.controls['processTime'];
@@ -146,7 +142,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.comment = this.form.controls['comment'];
         this.departmentName = this.form.controls['departmentName'];
         this.deadLineDate = this.form.controls['deadLineDate'];
-
+        this.mainPersonInCharge = this.form.controls['mainPersonInCharge'];
+        this.realPersonInCharge = this.form.controls['realPersonInCharge'];
     }
 
     initFormUpdate() {
@@ -156,12 +153,10 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             departmentName: this.data.departmentName,
             description: this.data.description || '',
             processTime: this.data.processTime,
-            deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null
+            deadLineDate: !!this.data.deadline ? { startDate: new Date(this.data.deadline), endDate: new Date(this.data.deadline) } : null,
+            mainPersonInCharge: this.data.mainPersonInCharge,
+            realPersonInCharge: this.data.realPersonInCharge
         });
-
-        this.selectedMainPersonInCharge = Object.assign({}, { field: 'id', value: this.data.mainPersonInCharge });
-        this.selectedRealPersonInCharge = Object.assign({}, { field: 'id', value: this.data.realPersonInCharge });
-
         if (!!this.data.status) {
             this.statusStageActive = this.statusStage.filter((item: any) => item.id.trim() === this.data.status.trim());
         } else {
@@ -174,15 +169,20 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
         this.statusStageActive[0].text = $event.text;
     }
 
-    onSelectMainPersonIncharge($event: User) {
-        this.selectedMainPersonInCharge.value = $event.username;
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'mainPersonInCharge':
+                this.mainPersonInCharge.setValue(data.id);
+                break;
+            case 'realPersonInCharge':
+                this.realPersonInCharge.setValue(data.id);
+                break;
+            default:
+                break;
+        }
     }
-
-    onSelectRealPersonIncharge($event: User) {
-        this.selectedRealPersonInCharge.value = $event.username;
-    }
-
     onSubmit(form: FormGroup) {
+        console.log(this.statusStageActive);
         this.isSummited = true;
         if (form.invalid) {
             return;
@@ -197,8 +197,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             stageId: this.data.stageId,
             name: this.data.name,
             orderNumberProcessed: this.data.orderNumberProcessed,
-            mainPersonInCharge: this.selectedMainPersonInCharge.value || "admin",
-            realPersonInCharge: this.selectedRealPersonInCharge.value,
+            mainPersonInCharge: this.mainPersonInCharge.value || "admin",
+            realPersonInCharge: this.realPersonInCharge.value,
             processTime: form.value.processTime,
             comment: form.value.comment,
             description: form.value.description,
@@ -238,8 +238,8 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
             (res: any[]) => {
                 if (!res) {
                 } else {
-                    this.systemUsers = res.map((item: any) => new User(item));
-                    Object.assign(this.configComboGrid, { source: this.systemUsers });
+                    this.systemUsers = res;
+                    console.log(this.systemUsers);
                 }
             },
             // error
@@ -253,6 +253,13 @@ export class OpsModuleStageManagementDetailComponent extends PopupBase implement
     onCancel() {
         this.isSummited = false;
         this.hide();
+    }
+    resetFormControl(control: FormControl | AbstractControl) {
+        if (!!control && control instanceof FormControl) {
+            control.setValue(null);
+            control.markAsUntouched({ onlySelf: true });
+            control.markAsPristine({ onlySelf: true });
+        }
     }
 }
 
