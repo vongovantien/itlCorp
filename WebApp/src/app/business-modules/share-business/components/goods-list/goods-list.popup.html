@@ -72,13 +72,13 @@
                                     <td>
                                         <div class="form-group "
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage}">
-                                            <select class="form-control" [(ngModel)]="container.containerTypeId"
-                                                (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
-                                                <option [ngValue]="null">Please select</option>
-                                                <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
-                                                    {{unit.unitNameEn}}
-                                                </option>
-                                            </select>
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: container.containerTypeId}"
+                                                (itemSelected)="onChangeDataFormTable();container.containerTypeId = $event.id"
+                                                [selectedDisplayFields]="['unitNameEn']" [dataSources]="containerUnits"
+                                                [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'descriptionEn','label':'Descriptiton'}]"
+                                                placeholder="Please select">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </td>
                                     <td>
