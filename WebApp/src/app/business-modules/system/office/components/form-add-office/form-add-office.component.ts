@@ -51,6 +51,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     bankName: AbstractControl;
     headers: CommonInterface.IHeaderTable[];
     location: AbstractControl;
+
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -189,7 +190,9 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             bankAddress_Local: [],
             bankAddress_En: [],
             active: [this.status[0]],
-            location: []
+            location: [],
+            bankName_En:[],
+            bankName_Local:[]
         });
 
         this.code = this.formGroup.controls['code'];
