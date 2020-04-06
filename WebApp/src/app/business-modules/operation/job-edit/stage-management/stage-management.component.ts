@@ -41,8 +41,8 @@ export class OpsModuleStageManagementComponent extends AppList {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.headers = [
-            { title: 'Action', field: 'status' },
-            { title: 'No', field: 'status' },
+            { title: 'Action', field: 'status', width: 10 },
+            { title: 'No', field: 'status', sortable: true, width: 20 },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Code', field: 'stageCode', sortable: true },
             { title: 'Name', field: 'stageNameEN', sortable: true },

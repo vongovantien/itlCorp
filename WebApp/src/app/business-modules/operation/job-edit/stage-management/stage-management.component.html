@@ -71,15 +71,22 @@
                 </thead>
                 <tbody class="tbody-group">
                     <tr *ngFor="let stage of stages; let i = index">
-                        <td class="table-actions-col no-sorting">
+                        <!-- <td class="table-actions-col no-sorting">
+                            <button (click)="getDetail(stage.id)" type="button" appLoadingButton
+                                [state]="!!data && data.isLocked"
+                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                                <i class="la la-edit"></i>
+                            </button>
+                        </td> -->
+                        <td class="table-actions-col no-sorting" style="min-width: 0">
                             <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                 [state]="!!data && data.isLocked"
                                 class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>
-                        <td class="sorting">
-                            <span>{{((i + 1) < 10) ? ('0' + (i + 1)) : (i + 1)}}</span>
+                        <td class="sorting" style="min-width: 10px">
+                            <span>{{((stage.orderNumberProcessed + 1) < 10) ? ('0' + (stage.orderNumberProcessed )) : (stage.orderNumberProcessed)}}</span>
                         </td>
                         <td class="sorting">
                             <div [ngSwitch]="stage.status">
