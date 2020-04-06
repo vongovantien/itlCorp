@@ -12,7 +12,7 @@ namespace eFMS.API.Operation.DL.Common
     {
         public static readonly List<CommonData> Types = new List<CommonData>
         {
-            new CommonData { Value = "All", DisplayName = "All" },
+            // new CommonData { Value = "All", DisplayName = "All" },
             new CommonData { Value = "Export", DisplayName = "Export" },
             new CommonData { Value = "Import", DisplayName = "Import" }
         };
