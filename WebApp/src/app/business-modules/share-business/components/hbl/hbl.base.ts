@@ -21,11 +21,11 @@ export abstract class AppShareHBLBase extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
-    private houseBills: HouseBill[] = [];
+    houseBills: HouseBill[] = [];
 
-    private totalCBM: number;
-    private totalGW: number;
-    private totalCW: number;
+    totalCBM: number;
+    totalGW: number;
+    totalCW: number;
 
     selectedHbl: CsTransactionDetail;
     selectedTabSurcharge: string = 'BUY';
@@ -34,9 +34,9 @@ export abstract class AppShareHBLBase extends AppList {
     shipmentDetail: CsTransaction;
 
     jobId: string = '';
-    private spinnerSurcharge: string = 'spinnerSurcharge';
+    spinnerSurcharge: string = 'spinnerSurcharge';
 
-    protected serviceType: CommonType.SERVICE_TYPE = 'sea';
+    serviceType: CommonType.SERVICE_TYPE = 'sea';
 
     constructor(
         protected _sortService: SortService,

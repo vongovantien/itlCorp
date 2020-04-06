@@ -1,7 +1,7 @@
 <div class="sea-fcl-import-hbl-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <span *ngIf="(isLoced | async)" class="m--margin-right-10 align-middle">
+            <span *ngIf="(isLocked | async)" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>
             <div class="dropdown m-dropdown m-dropdown--inline">
@@ -84,7 +84,7 @@
                                                     <ng-container
                                                         *ngIf="!!shipmentDetail && shipmentDetail.isLocked === false">
                                                         <app-permission-button title="Add New House Bill"
-                                                            (onClick)="gotoCreateHouseBill()"
+                                                            (onClick)="gotoCreate()"
                                                             *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                         </app-permission-button>
                                                     </ng-container>
