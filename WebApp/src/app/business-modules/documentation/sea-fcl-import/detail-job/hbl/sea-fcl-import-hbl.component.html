@@ -101,23 +101,21 @@
                                                 </th>
                                             </thead>
                                             <tbody class="tbody-group">
-                                                <ng-container *ngIf="!(isLoading | async) && !!houseBills.length">
+                                                <ng-container *ngIf="!(isLoading | async) && !!houseBill.length">
                                                     <tr (click)="selectHBL(house, $event)" class="pointer"
                                                         title="Select House Bill"
                                                         [class.selected-row]="selectedHbl.id === house.id"
-                                                        *ngFor="let house of houseBills | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
+                                                        *ngFor="let house of houseBill | filter : keyword : ['hwbno','customerName','saleManName','notifyParty','finalDestinationPlace','containers','packages','gw','cbm']; let i = index; trackBy: trackByFn">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 70px">
                                                                 <app-permission-button type="detail"
                                                                     (onClick)="gotoDetail(house.id)">
                                                                 </app-permission-button>
-                                                                <ng-container *ngIf="(isLocked | async) === false">
-                                                                    <app-permission-button
-                                                                        *ngIf="shipmentDetail.permission.allowUpdate === true"
-                                                                        (onClick)="showDeletePopup(house, $event)"
-                                                                        type="delete">
-                                                                    </app-permission-button>
-                                                                </ng-container>
+                                                                <ng-container *ngIf="(isLocked | async) === false"> 
+                                                                        <app-permission-button   *ngIf="shipmentDetail.permission.allowUpdate === true" (onClick)="showDeletePopup(house, $event)"
+                                                                            type="delete">
+                                                                        </app-permission-button>
+                                                                 </ng-container> 
                                                             </div>
                                                         </td>
                                                         <td class=" text-primary pointer"><a
@@ -146,7 +144,7 @@
                                                         <td>{{totalCBM}}</td>
                                                     </tr>
                                                 </ng-container>
-                                                <tr *ngIf="!(isLoading | async) && !houseBills.length"
+                                                <tr *ngIf="!(isLoading | async) && !houseBill.length"
                                                     app-table-none-record [colspan]="headers.length + 1">
                                                 </tr>
                                                 <tr *ngIf="(isLoading | async)" app-table-row-loading></tr>

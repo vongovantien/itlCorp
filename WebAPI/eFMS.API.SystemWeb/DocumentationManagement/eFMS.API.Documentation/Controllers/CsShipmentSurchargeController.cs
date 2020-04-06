@@ -161,7 +161,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var query = list.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+            var query = list.Where(x => string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
                                       .Where(g => g.Count() > 1)
                                       .Select(y => y.Key);
             if (query.Any())
