@@ -1347,30 +1347,31 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
                 housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
-                var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
-                if (conts != null && conts.Count() > 0)
-                {
-                    string hbConstainers = string.Empty;
-                    var contLast = conts.Last();
-                    foreach (var cont in conts)
-                    {
-                        var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
-                        if (contUnit != null)
-                        {
-                            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
-                        }
-                    }
-                    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
-                    housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
-                    housebill.MaskNos = housebill.MaskNos?.ToUpper();
-                }
+                //var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
+                //if (conts != null && conts.Count() > 0)
+                //{
+                //    string hbConstainers = string.Empty;
+                //    var contLast = conts.Last();
+                //    foreach (var cont in conts)
+                //    {
+                //        var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                //        if (contUnit != null)
+                //        {
+                //            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
+                //        }
+                //    }
+                //    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
+                //    housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
+                //    housebill.MaskNos = housebill.MaskNos?.ToUpper();
+                //}         
+                housebill.MaskNos = data.ContSealNo?.ToUpper(); //Update lại MarkNo: lấy theo field ]Container No/ Cont Type/ Seal No]
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 housebill.GrossWeight = data.GrossWeight ?? 0;
                 housebill.GrwDecimal = 2;
-                housebill.Unit = "PKS"; //Đang gán cứng
+                housebill.Unit = "KGS"; //Đang gán cứng (PKS update thành KGS)
                 housebill.CBM = data.Cbm != null ? data.Cbm.Value : 0;
                 housebill.CBMDecimal = 2;
-                housebill.SpecialNote = string.Empty; //Để trống
+                housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.TotalPackages = string.Empty; //NOT USE
                 housebill.OriginCode = string.Empty; //NOT USE
                 housebill.ICASNC = string.Empty; //NOT USE
@@ -1390,13 +1391,13 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.FreightPayAt = data.PlaceFreightPay?.ToUpper(); //Freight Payable at
                 housebill.ExecutedAt = data.IssueHblplace?.ToUpper(); //Place of Issue HBL
                 housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Created Date
-                housebill.NoofOriginBL = data.OriginBlnumber.ToString(); //Number of Origin B/L
+                housebill.NoofOriginBL = data.OriginBlnumber != null ? API.Common.Globals.CustomData.NumberOfOriginBls.Where(x => x.Key == data.OriginBlnumber).Select(s => s.Value).FirstOrDefault() : string.Empty; //Number of Origin B/L
                 housebill.ForCarrier = string.Empty; //Để trống
                 housebill.SeaLCL = false; //NOT USE
                 housebill.SeaFCL = false; //NOT USE
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
-                housebill.Signature = string.Empty; //Để trống
+                housebill.Signature = data.Hbltype ?? string.Empty; //HBL Type
                 if (data.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
