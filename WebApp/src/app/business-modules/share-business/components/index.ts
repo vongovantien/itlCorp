@@ -43,6 +43,7 @@ export * from './hbl/arrival-note/arrival-note.component';
 export * from './hbl/delivery-order/delivery-order.component';
 export * from './hbl/import-detail/import-house-bill-detail.component';
 export * from './hbl/form-search-house-bill/form-search-house-bill.component';
+export * from './hbl/hbl.base';
 
 export * from './dim-volume/dim-volume.popup';
 
