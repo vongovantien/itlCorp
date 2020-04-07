@@ -86,7 +86,6 @@ export class OpsModuleStageManagementComponent extends AppList {
     }
 
     openPopUpAssignStage() {
-        console.log('open');
         this.assignStagePopup.job = this.data;
         this.assignStagePopup.isAsignment = false;
 
@@ -94,7 +93,7 @@ export class OpsModuleStageManagementComponent extends AppList {
             const defaultAssign = this.assignStagePopup.users.find(x => x.id === this.data.fieldOpsId);
             if (!!defaultAssign) {
                 this.assignStagePopup.activeUser = [defaultAssign];
-                this.assignStagePopup.selectedUser = defaultAssign.id;
+                this.assignStagePopup.selectedUser = defaultAssign;
             } else {
                 this.assignStagePopup.activeUser = [];
             }
