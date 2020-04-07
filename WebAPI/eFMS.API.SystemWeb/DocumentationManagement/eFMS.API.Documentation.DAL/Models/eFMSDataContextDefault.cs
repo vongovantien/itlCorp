@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysNotification> SysNotification { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
+        public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
         public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -2954,6 +2955,49 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.WorkingStatus)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysUserLevel>(entity =>
+            {
+                entity.ToTable("sysUserLevel");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Position)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasColumnName("UserID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
