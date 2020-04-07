@@ -11,7 +11,7 @@ namespace eFMS.API.System.DL.IService
 {
     public interface ISysUserService : IRepositoryBase<SysUser, SysUserModel>
     {
-        List<SysUserViewModel> GetAll();
+        IQueryable<SysUserViewModel> GetAll();
         SysUserViewModel GetUserById(string Id);
         IQueryable<SysUserViewModel> QueryPermission(SysUserCriteria criteria);
         HandleState Insert(SysUserModel sysUserModel);
