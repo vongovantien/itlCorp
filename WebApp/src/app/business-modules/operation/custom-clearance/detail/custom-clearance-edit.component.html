@@ -86,9 +86,8 @@
                                         *ngIf="updateForm.submitted && (customDeclaration.hblid == null || customDeclaration.hblid == '') && isConvertJob">(*)</span>
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
-                                    onpaste="return false;" [(ngModel)]="customDeclaration.hblid" name="hblid"
-                                    #hblib="ngModel" (change)="customDeclaration.hblid=customDeclaration.hblid.trim()"
-                                    maxlength="50"
+                                    [(ngModel)]="customDeclaration.hblid" name="hblid" #hblib="ngModel"
+                                    (change)="customDeclaration.hblid=customDeclaration.hblid.trim()" maxlength="50"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)"
                                     placeholder="Enter text">
                                 <div class="form-control-feedback"
@@ -106,7 +105,7 @@
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                     autocomplete="nope" [(ngModel)]="customDeclaration.mblid" name="mblid"
-                                    onpaste="return false;" #mblib="ngModel" maxlength="50"
+                                    #mblib="ngModel" maxlength="50"
                                     (change)="customDeclaration.mblid=customDeclaration.mblid.trim()"
                                     onkeypress="return event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                                 <div class="form-control-feedback"
