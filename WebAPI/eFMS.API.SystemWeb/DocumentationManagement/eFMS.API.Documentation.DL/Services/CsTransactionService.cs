@@ -1987,13 +1987,13 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
                         charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = _exchangeRateLocal; //surcharge.ExchangeRate ?? 0;
+                        charge.VNDExchange = _exchangeRateLocal;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
-                        charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : (surcharge.ExchangeRate ?? 0) * saleProfitNonVAT; //Non VAT
+                        charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = surcharge.UnitPrice ?? 0;
                         charge.Unit = unitCode;
