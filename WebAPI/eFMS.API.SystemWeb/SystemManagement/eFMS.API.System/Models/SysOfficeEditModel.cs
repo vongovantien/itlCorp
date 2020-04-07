@@ -37,5 +37,7 @@ namespace eFMS.API.System.Models
  
         public bool? Active { get; set; }
         public string Location { get; set; }
+        public string BankNameEn { get; set; }
+        public string BankNameLocal { get; set; }
     }
 }

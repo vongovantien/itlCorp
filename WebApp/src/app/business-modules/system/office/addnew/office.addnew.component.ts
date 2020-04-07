@@ -52,7 +52,9 @@ export class OfficeAddNewComponent extends AppPage {
                 swiftCode: this.formAdd.swiftCode.value,
                 shortName: this.formAdd.shortName.value,
                 active: this.formAdd.active.value.value,
-                location: this.formAdd.location.value
+                location: this.formAdd.location.value,
+                bankNameEn: this.formAdd.bankName_En.value,
+                bankNameLocal: this.formAdd.bankName_Local.value,
 
             };
             this._systemRepo.addNewOffice(body)
@@ -97,4 +99,6 @@ interface IOfficeAdd {
     shortName: string;
     active: boolean;
     location: string;
+    bankNameEn:string;
+    bankNameLocal:string;
 }

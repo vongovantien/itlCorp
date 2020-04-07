@@ -46,7 +46,7 @@ namespace eFMS.API.System.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -76,14 +76,13 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.DeptName).HasMaxLength(1600);
 
+                entity.Property(e => e.DeptType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.DeptType)
-                    .HasColumnName("DeptType")
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -92,7 +91,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
             });
 
             modelBuilder.Entity<CatPlace>(entity =>
@@ -183,6 +181,7 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>
@@ -552,7 +551,6 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Route)
                     .HasMaxLength(150)
                     .IsUnicode(false);
-
             });
 
             modelBuilder.Entity<SysOffice>(entity =>
@@ -595,7 +593,13 @@ namespace eFMS.API.System.Service.Models
                     .HasColumnName("BankAddress_Local")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankName).HasMaxLength(4000);
+                entity.Property(e => e.BankNameEn)
+                    .HasColumnName("BankName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BankNameLocal)
+                    .HasColumnName("BankName_Local")
+                    .HasMaxLength(4000);
 
                 entity.Property(e => e.BranchNameEn)
                     .HasColumnName("BranchName_EN")
@@ -655,6 +659,7 @@ namespace eFMS.API.System.Service.Models
                 entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
             });
 
             modelBuilder.Entity<SysPermissionSample>(entity =>
