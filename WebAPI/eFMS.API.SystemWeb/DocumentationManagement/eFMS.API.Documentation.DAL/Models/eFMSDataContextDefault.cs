@@ -61,7 +61,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -2329,7 +2329,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Name).HasMaxLength(200);
 
-                entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 3)");
+                entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.RealPersonInCharge)
                     .HasMaxLength(50)
@@ -2827,7 +2827,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("BankAddress_Local")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankName).HasMaxLength(4000);
+                entity.Property(e => e.BankNameEn)
+                    .HasColumnName("BankName_EN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankNameLocal)
+                    .HasColumnName("BankName_Local")
+                    .HasMaxLength(1000);
 
                 entity.Property(e => e.BranchNameEn)
                     .HasColumnName("BranchName_EN")

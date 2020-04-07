@@ -724,8 +724,8 @@ namespace eFMS.API.Documentation.DL.Services
             var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
-            var _bankName = officeOfUser?.BankName ?? string.Empty;
-            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
+            var _bankNameEN = officeOfUser?.BankNameEn ?? string.Empty;
             var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
             var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
@@ -1028,8 +1028,8 @@ namespace eFMS.API.Documentation.DL.Services
             var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
-            var _bankName = officeOfUser?.BankName ?? string.Empty;
-            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
+            var _bankNameEN = officeOfUser?.BankNameEn ?? string.Empty;
             var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
             var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
@@ -1203,8 +1203,8 @@ namespace eFMS.API.Documentation.DL.Services
             var officeOfUser = GetInfoOfficeOfUser(currentUser.OfficeID);
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
-            var _bankName = officeOfUser?.BankName ?? string.Empty;
-            var _bankNameEN = string.Empty; //Chờ update sau
+            var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
+            var _bankNameEN = officeOfUser?.BankNameEn ?? string.Empty;
             var _bankAddress = officeOfUser?.BankAddressLocal ?? string.Empty;
             var _bankAddressEN = officeOfUser?.BankAddressEn ?? string.Empty;
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
