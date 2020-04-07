@@ -40,6 +40,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     jobId: string;
     selectedHbl: any = {}; // TODO model.
     allowAdd: boolean = false;
+    isImport: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -113,7 +114,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             attachList: this.attachListComponent.attachList,
             dimensionDetails: form.dimensionDetails,
             hwConstant: this.formCreateHBLComponent.hwconstant,
-            min: form.min
+            min: form.min,
         };
 
         const houseBill = new HouseBill(_merge(form, formData));
@@ -123,23 +124,29 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     saveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-
-        if (!this.checkValidateForm()) {
-            this.infoPopup.show();
-            return;
+        if(this.isImport){
+            if(this.formCreateHBLComponent.hwbno.value === null){
+                this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
+            }
         }
-
-        const houseBill: HouseBill = this.getDataForm();
-        houseBill.jobId = this.jobId;
-
-        houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
-
-        houseBill.otherCharges.forEach(c => {
-            c.jobId = this.jobId;
-            c.hblId = SystemConstants.EMPTY_GUID;
-        });
-
-        this.createHbl(houseBill);
+        setTimeout(() => {
+            if (!this.checkValidateForm()) {
+                this.infoPopup.show();
+                return;
+            }
+    
+            const houseBill: HouseBill = this.getDataForm();
+            houseBill.jobId = this.jobId;
+    
+            houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
+    
+            houseBill.otherCharges.forEach(c => {
+                c.jobId = this.jobId;
+                c.hblId = SystemConstants.EMPTY_GUID;
+            });
+    
+            this.createHbl(houseBill);
+        }, 200);
     }
 
     checkValidateForm() {
@@ -171,10 +178,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        if (!hbId) {
+                        if (!res.data) {
                             this.gotoList();
                         } else {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}`]);
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
                         }
                     }
                 }
@@ -193,34 +200,40 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
-        if (!!this.selectedHbl) {
-            this._store.select(getDimensionVolumesState)
-                .pipe(
-                    takeUntil(this.ngUnsubscribe),
-                    map((dims: DIM[]) => dims.map(d => new DIM(d))),
-                    tap(
-                        (dims: DIM[]) => {
-                            this.formCreateHBLComponent.dims = dims;
-                        }
-                    ),
-                    mergeMap(
-                        () => this._store.select(getDetailHBlState)
+        this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.selectedHbl.id));
+        setTimeout(() => {
+            if (!!this.selectedHbl) {
+                this._store.select(getDimensionVolumesState)
+                    .pipe(
+                        takeUntil(this.ngUnsubscribe),
+                        map((dims: DIM[]) => dims.map(d => new DIM(d))),
+                        tap(
+                            (dims: DIM[]) => {
+                                this.formCreateHBLComponent.dims = dims;
+                            }
+                        ),
+                        mergeMap(
+                            () => this._store.select(getDetailHBlState)
+                        )
                     )
-                )
-                .subscribe(
-                    (hbl: HouseBill) => {
-                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
-                            this.formCreateHBLComponent.totalCBM = hbl.cbm;
-                            this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
-                            this.formCreateHBLComponent.jobId = hbl.jobId;
-                            this.formCreateHBLComponent.hblId = hbl.id;
-                            this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
-                            this.formCreateHBLComponent.updateFormValue(hbl);
+                    .subscribe(
+                        (hbl: HouseBill) => {
+                            if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                                this.isImport = true;
+                                this.formCreateHBLComponent.totalCBM = hbl.cbm;
+                                this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
+                                this.formCreateHBLComponent.jobId = hbl.jobId;
+                                this.formCreateHBLComponent.hblId = hbl.id;
+                                this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
+                                this.formCreateHBLComponent.updateFormValue(hbl);
+                                this.formCreateHBLComponent.hwbno.setValue(null);
+                            }
+    
                         }
-
-                    }
-                );
-        }
+                    );
+            }
+        }, 300);
+       
     }
 
 

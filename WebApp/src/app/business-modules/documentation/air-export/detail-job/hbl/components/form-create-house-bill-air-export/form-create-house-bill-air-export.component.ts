@@ -18,6 +18,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
+import { NINE } from '@angular/cdk/keycodes';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -178,6 +179,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
+                            console.log('update here',hbl);
 
                             this.updateFormValue(hbl);
                         }
@@ -367,7 +369,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
             etd: !!data.etd ? { startDate: new Date(data.etd), endDate: new Date(data.etd) } : null,
-            flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
+            flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : new Date(),
 
             hbltype: !!data.hbltype ? [(this.billTypes || []).find(type => type.id === data.hbltype)] : null,
             freightPayment: !!data.freightPayment ? [(this.termTypes || []).find(type => type.id === data.freightPayment)] : null,
@@ -375,6 +377,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             wtorValpayment: !!data.wtorValpayment ? [(this.wts || []).find(type => type.id === data.wtorValpayment)] : null,
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
+            flightNo: !!data.flightNo ? data.flightNo : null,
             dimensionDetails: []
 
         };
