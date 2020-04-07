@@ -103,7 +103,7 @@
     </div>
 </div>
 
-<hbl-fcl-container-popup [type]="type"></hbl-fcl-container-popup>
+<hbl-fcl-container-popup [type]="type" (onChange)="onChangeContainer($event)"></hbl-fcl-container-popup>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"

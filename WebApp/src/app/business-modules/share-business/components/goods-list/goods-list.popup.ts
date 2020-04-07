@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, Input, EventEmitter, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
@@ -9,6 +9,8 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 import * as fromStore from '../../store';
 import { ShareGoodsImportComponent } from '../goods-import/goods-import.component';
+import { Container } from '@models';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'goods-list-popup',
@@ -19,6 +21,7 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
 
     @ViewChild(ShareGoodsImportComponent, { static: false }) goodsImportPopup: ShareGoodsImportComponent;
     @ViewChild('confirmCancel', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @Output() onChange: EventEmitter<Container[]> = new EventEmitter<Container[]>();
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -91,4 +94,30 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
     sortHBLGoods() {
         this.initContainers = this._sortService.sort(this.initContainers, this.sortField, this.order)
     }
+
+    onSaveContainerList() {
+        this.isSubmitted = true;
+        if (this.checkValidateContainer()) {
+            // * DISPATCH SAVE ACTION
+            if (this.checkDuplicate()) {
+
+                this.containers = cloneDeep(this.initContainers);
+
+                for (const container of this.containers) {
+                    container.commodityName = this.getCommodityName(container.commodityId);
+                    container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
+                    container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                    if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
+                        container.quantity = 1;
+                    }
+                }
+                this._store.dispatch(new fromStore.SaveContainerAction(this.containers));
+                this.onChange.emit(this.containers);
+
+                this.isSubmitted = false;
+                this.hide();
+            }
+        }
+    }
+
 }
