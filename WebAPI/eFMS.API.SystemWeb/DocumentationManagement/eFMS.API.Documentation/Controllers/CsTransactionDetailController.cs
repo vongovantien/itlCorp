@@ -177,7 +177,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if(hblId == null)
                 {
-                    if (csTransactionDetailService.Any(x => x.Hwbno == hwbno))
+                    if (csTransactionDetailService.Any(x => x.Hwbno == hwbno && x.Hwbno != null))
                     {
                         existedHwbNo = true;
                     }

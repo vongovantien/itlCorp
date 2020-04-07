@@ -203,6 +203,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 return;
             }
         }, 200);
+
         this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
             .pipe(
                 catchError(this.catchError),
@@ -219,6 +220,8 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 }
             );
+
+
 
     }
 

@@ -136,13 +136,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 return;
             }
         }, 200);
+
         this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
             .pipe(
                 catchError(this.catchError),
             )
             .subscribe(
                 (res: any) => {
-
+                    setTimeout(() => {
+                        if (!this.checkValidateForm()) {
+                            this.infoPopup.show();
+                            return;
+                        }
+                    }, 200);
                     if (res) {
                         this.confirmExistedHbl.show();
                     } else {
@@ -152,6 +158,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 }
             );
+
+
+
     }
 
     setData(houseBill: HouseBill) {
