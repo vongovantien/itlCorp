@@ -5,7 +5,7 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { PopupBase } from 'src/app/popup.base';
 import { formatDate } from '@angular/common';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { User } from '@models';
+import { User, Office, Company } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
@@ -47,7 +47,7 @@ export class SalemanPopupComponent extends PopupBase {
     termTypes: CommonInterface.INg2Select[];
     allowDelete: boolean = false;
     userLogged: User;
-
+    company: Company[] = [];
     @Input() popupData: Saleman;
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -126,6 +126,7 @@ export class SalemanPopupComponent extends PopupBase {
         this.getSalemans();
         this.getService();
         this.getOffice();
+
         this.statuss = this.getStatus();
 
     }
@@ -149,13 +150,29 @@ export class SalemanPopupComponent extends PopupBase {
     }
 
     getOffice() {
-        this._catalogueRepo.getListBranch()
+        this._systemRepo.getListOffices()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.offices = res;
-                        console.log(this.offices);
+                        this.getCompany();
+                    }
+                },
+            );
+    }
+
+    getCompany() {
+        this._systemRepo.getListCompany()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.company = res;
+                        this.offices.forEach(item => {
+                            const objCompany = this.company.find(x => x.id === item.buid);
+                            item.abbrCompany = objCompany.bunameAbbr;
+                        });
                     }
                 },
             );
