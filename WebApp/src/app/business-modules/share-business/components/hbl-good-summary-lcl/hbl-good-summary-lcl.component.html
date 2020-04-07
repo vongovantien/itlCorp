@@ -89,7 +89,7 @@
     </div>
 </div>
 
-<goods-list-popup></goods-list-popup>>
+<goods-list-popup (onChange)="onChangeContainer($event)"></goods-list-popup>>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"

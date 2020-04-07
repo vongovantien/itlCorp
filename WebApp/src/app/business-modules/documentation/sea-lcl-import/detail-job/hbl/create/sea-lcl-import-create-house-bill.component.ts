@@ -309,6 +309,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             commodity: this.hblGoodsSummaryComponent.commodities,
             packageContainer: this.hblGoodsSummaryComponent.containerDetail,
             desOfGoods: this.hblGoodsSummaryComponent.description,
+            contSealNo: this.hblGoodsSummaryComponent.containerDescription,
             cbm: this.hblGoodsSummaryComponent.totalCBM,
             grossWeight: this.hblGoodsSummaryComponent.grossWeight,
             netWeight: this.hblGoodsSummaryComponent.netWeight,
@@ -392,4 +393,5 @@ export interface ITransactionDetail {
     dosentTo2: string;
     packageQty: number;
     packageType: any;
+    contSealNo: string;
 }

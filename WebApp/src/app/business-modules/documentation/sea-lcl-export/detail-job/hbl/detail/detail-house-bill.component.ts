@@ -98,7 +98,8 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                     if (!!res) {
                         this.hblDetail = res;
                         // * Dispatch to save containers.
-                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+                        // this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+                        this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(this.hblDetail.csMawbcontainers));
 
                         // * Get container to update model
                         this.getListContainer();
@@ -108,7 +109,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     }
 
     getListContainer() {
-        this._store.select<any>(fromShareBussiness.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getHBLContainersState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )

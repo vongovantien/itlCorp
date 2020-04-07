@@ -77,8 +77,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                     }
                 }
             );
-
-
     }
 
     ngAfterViewInit() {
@@ -97,7 +95,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     getListContainer() {
-        this._store.select<any>(fromShareBussiness.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getHBLContainersState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -174,7 +172,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.userCreated = this.hblDetail.userCreated;
-
         // Update field container
         modelUpdate.csMawbcontainers.forEach(c => {
             c.hblid = this.hblId;
@@ -219,7 +216,8 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
-                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                        // this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                        this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(this.hblDetail.csMawbcontainers));
                         // this._store.dispatch(new fromShareBussiness.GetContainerAction({ hblid: this.hblId }));
 
                         // * Get container to update model
