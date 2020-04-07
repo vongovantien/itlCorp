@@ -210,7 +210,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (res: any) => {
-
                     if (res) {
                         this.confirmExistedHbl.show();
                     } else {

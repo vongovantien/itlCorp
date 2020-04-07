@@ -143,12 +143,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (res: any) => {
-                    setTimeout(() => {
-                        if (!this.checkValidateForm()) {
-                            this.infoPopup.show();
-                            return;
-                        }
-                    }, 200);
+
+                    if (!this.checkValidateForm()) {
+                        this.infoPopup.show();
+                        return;
+                    }
+
                     if (res) {
                         this.confirmExistedHbl.show();
                     } else {
