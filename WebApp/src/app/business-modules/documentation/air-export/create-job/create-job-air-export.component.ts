@@ -134,6 +134,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
         this.isImport = true;
         this.formCreateComponent.isUpdate = true;
         this.formCreateComponent.formGroup.controls['jobNo'].setValue(null);
+        this.formCreateComponent.formGroup.controls['personIncharge'].setValue(this.formCreateComponent.userLogged.id);
         this._store.dispatch(new fromShareBusiness.GetDimensionAction(selectedData.id));
     }
 

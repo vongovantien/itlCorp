@@ -172,6 +172,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
         this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
         this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
+
+        this.formCreateComponent.formGroup.controls['personIncharge'].setValue(this.formCreateComponent.userLogged.id);
     }
 
     showImportPopup() {
