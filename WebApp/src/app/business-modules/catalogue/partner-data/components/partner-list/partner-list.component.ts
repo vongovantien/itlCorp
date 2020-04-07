@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
-import { Partner } from '@models';
+import { Partner, Company } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 
 
@@ -23,10 +23,12 @@ export class PartnerListComponent extends AppList implements OnInit {
     saleMans: any[] = [];
     services: any[] = [];
     offices: any[] = [];
+    company: Company[] = [];
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
-        private _sortService: SortService) {
+        private _sortService: SortService,
+        private _systemRepo: SystemRepo) {
         super();
 
         this._progressRef = this._ngProgressService.ref();
@@ -38,6 +40,7 @@ export class PartnerListComponent extends AppList implements OnInit {
     ngOnInit() {
         this.getService();
         this.getOffice();
+        this.getCompany();
         this.headerSalemans = [
             { title: 'No', field: '', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
@@ -85,7 +88,8 @@ export class PartnerListComponent extends AppList implements OnInit {
                     it.office = item.branchNameEn;
                 }
                 if (it.company === item.buid) {
-                    it.company = item.abbrCompany;
+                    const objCompany = this.company.find(x => x.id === item.buid);
+                    it.company = objCompany.bunameAbbr;
                 }
             });
         }
@@ -94,12 +98,24 @@ export class PartnerListComponent extends AppList implements OnInit {
 
 
     getOffice() {
-        this._catalogueRepo.getListBranch()
+        this._systemRepo.getListOffices()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.offices = res;
+                    }
+                },
+            );
+    }
+
+    getCompany() {
+        this._systemRepo.getListCompany()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.company = res;
                     }
                 },
             );

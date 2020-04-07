@@ -18,6 +18,7 @@ import { FormAddPartnerComponent } from '../components/form-add-partner/form-add
 import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { Company } from '@models';
 
 
 @Component({
@@ -55,6 +56,7 @@ export class PartnerDetailComponent extends AppList {
     index: number = 0;
     isExistedTaxcode: boolean = false;
     currenctUser: any = '';
+    company: Company[] = [];
 
     list: any[] = [];
 
@@ -155,7 +157,8 @@ export class PartnerDetailComponent extends AppList {
                                         it.officeName = item.branchNameEn;
                                     }
                                     if (it.company === item.buid) {
-                                        it.companyName = item.abbrCompany;
+                                        const objCompany = this.company.find(x => x.id === item.buid);
+                                        it.companyName = objCompany.bunameAbbr;
                                     }
                                 });
                             }
@@ -217,7 +220,8 @@ export class PartnerDetailComponent extends AppList {
                                             it.officeName = item.branchNameEn;
                                         }
                                         if (it.company === item.buid) {
-                                            it.companyName = item.abbrCompany;
+                                            const objCompany = this.company.find(x => x.id === item.buid);
+                                            it.companyName = objCompany.bunameAbbr;
                                         }
                                     });
                                 }
@@ -291,6 +295,7 @@ export class PartnerDetailComponent extends AppList {
     getComboboxDataSaleman(): any {
         this.getService();
         this.getOffice();
+        this.getCompany();
         this.getStatus();
     }
 
@@ -308,12 +313,24 @@ export class PartnerDetailComponent extends AppList {
     }
 
     getOffice() {
-        this._catalogueRepo.getListBranch()
+        this._systemRepo.getListOffices()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.offices = res;
+                    }
+                },
+            );
+    }
+
+    getCompany() {
+        this._systemRepo.getListCompany()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.company = res;
                     }
                 },
             );

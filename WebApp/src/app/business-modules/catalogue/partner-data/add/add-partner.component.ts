@@ -15,6 +15,7 @@ import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { formatDate } from '@angular/common';
+import { Company } from '@models';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -48,7 +49,7 @@ export class AddPartnerDataComponent extends AppList {
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
     index: number = 0;
-
+    company: Company[] = [];
 
     list: any[] = [];
 
@@ -144,7 +145,8 @@ export class AddPartnerDataComponent extends AppList {
                                             it.officeName = item.branchNameEn;
                                         }
                                         if (it.company === item.buid) {
-                                            it.companyName = item.abbrCompany;
+                                            const objCompany = this.company.find(x => x.id === item.buid);
+                                            it.companyName = objCompany.bunameAbbr;
                                         }
                                     });
                                 }
@@ -206,6 +208,7 @@ export class AddPartnerDataComponent extends AppList {
         this.getparentCustomers();
         this.getService();
         this.getOffice();
+        this.getCompany();
         this.getStatus();
     }
 
@@ -223,7 +226,7 @@ export class AddPartnerDataComponent extends AppList {
     }
 
     getOffice() {
-        this._catalogueRepo.getListBranch()
+        this._systemRepo.getListOffices()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -233,6 +236,19 @@ export class AddPartnerDataComponent extends AppList {
                 },
             );
     }
+
+    getCompany() {
+        this._systemRepo.getListCompany()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.company = res;
+                    }
+                },
+            );
+    }
+
 
     getStatus(): CommonInterface.ICommonTitleValue[] {
         return [

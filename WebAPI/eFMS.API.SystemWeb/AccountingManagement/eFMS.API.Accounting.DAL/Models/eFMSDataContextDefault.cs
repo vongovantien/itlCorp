@@ -23,7 +23,6 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<AcctSettlementPayment> AcctSettlementPayment { get; set; }
         public virtual DbSet<AcctSoa> AcctSoa { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
-        public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
@@ -621,51 +620,6 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
                     .HasColumnType("decimal(18, 4)");
-            });
-
-            modelBuilder.Entity<CatCommodity>(entity =>
-            {
-                entity.ToTable("catCommodity");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.Code)
-                    .HasMaxLength(25)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
-
-                entity.Property(e => e.CommodityNameEn)
-                    .HasColumnName("CommodityName_EN")
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.CommodityNameVn)
-                    .HasColumnName("CommodityName_VN")
-                    .HasMaxLength(250);
-
-                entity.Property(e => e.DatetimeCreated)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.DatetimeModified)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
-                entity.Property(e => e.Note)
-                    .HasMaxLength(250)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserCreated)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.UserModified)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCountry>(entity =>
@@ -1676,9 +1630,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("ETD")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.ExportReferenceNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.ExportReferenceNo).HasMaxLength(200);
 
                 entity.Property(e => e.FinalDestinationPlace).HasMaxLength(500);
 
@@ -1826,9 +1778,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("RClass")
                     .HasMaxLength(250);
 
-                entity.Property(e => e.ReferenceNo)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.ReferenceNo).HasMaxLength(200);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
 
@@ -2079,7 +2029,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Name).HasMaxLength(200);
 
-                entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 3)");
+                entity.Property(e => e.ProcessTime).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.RealPersonInCharge)
                     .HasMaxLength(50)
@@ -2526,7 +2476,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("BankAddress_Local")
                     .HasMaxLength(4000);
 
-                entity.Property(e => e.BankName).HasMaxLength(4000);
+                entity.Property(e => e.BankNameEn)
+                    .HasColumnName("BankName_EN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankNameLocal)
+                    .HasColumnName("BankName_Local")
+                    .HasMaxLength(1000);
 
                 entity.Property(e => e.BranchNameEn)
                     .HasColumnName("BranchName_EN")

@@ -1844,7 +1844,7 @@ namespace eFMS.API.Accounting.DL.Services
             var officeData = officeRepo.Get(x => x.Id == new Guid(officeId)).FirstOrDefault();
             result.OfficeEn = officeData.BranchNameEn;
             result.BankAccountVND = officeData.BankAccountVnd;
-            result.BankNameEn = officeData.BankName;
+            result.BankNameEn = officeData.BankNameEn;
             result.AddressEn = officeData.AddressEn;
             result.SwiftCode = officeData.SwiftCode;
             return result;

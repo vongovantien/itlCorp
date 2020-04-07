@@ -72,7 +72,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     ngOnInit() {
         this.getShipmentCommonData();
-
         this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
         this._store.select(getCatalogueCommodityGroupState)
@@ -100,7 +99,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.lstMasterContainers = action.payload;
-                        console.log(this.lstMasterContainers);
                         this.updateData(this.lstMasterContainers);
                     }
                 }
@@ -294,9 +292,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.containerPopup.show();
     }
 
+    packageTypes: any[];
     getListPackageTypes() {
         this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }).toPromise().then(data => {
-            this.editForm.packageTypes = this.utility.prepareNg2SelectData(data, 'id', 'unitNameEn');
+            this.packageTypes = this.utility.prepareNg2SelectData(data, 'id', 'unitNameEn');
         });
     }
     getShipmentDetails(id: any) {
@@ -311,6 +310,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                     if (this.opsTransaction != null) {
                         this.getListContainersOfJob();
                         if (this.opsTransaction != null) {
+
+                            this.editForm.shipmentModes = this.shipmentModes;
+                            this.editForm.serviceModes = this.serviceModes;
+                            this.editForm.productServices = this.productServices;
+                            this.editForm.packageTypes = this.packageTypes;
                             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
                             this.editForm.opsTransaction = this.opsTransaction;
                             const hbl = new CsTransactionDetail(this.opsTransaction);
@@ -351,12 +355,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 },
             );
     }
-
+    productServices: CommonInterface.INg2Select[];
+    serviceModes: CommonInterface.INg2Select[];
+    shipmentModes: CommonInterface.INg2Select[];
     getShipmentCommonData() {
         this._documentRepo.getOPSShipmentCommonData().toPromise().then((response: any) => {
-            this.editForm.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');
-            this.editForm.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
-            this.editForm.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
+            this.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');
+            this.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
+            this.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
         });
         // .pipe(
         //     catchError(this.catchError),
