@@ -76,7 +76,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                 this.getDetailHbl();
-
             } else {
                 this.combackToHBLList();
             }
@@ -84,7 +83,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
     }
 
     getListContainer() {
-        this._store.select<any>(fromShareBussiness.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getHBLContainersState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -202,7 +201,9 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent {
                         this.formHouseBill.updateDataToForm(this.hblDetail);
 
                         // * Dispatch to save containers.
-                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                        // this._store.dispatch(new fromShareBussiness.SaveContainerAction(this.hblDetail.csMawbcontainers || []));
+                        this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(this.hblDetail.csMawbcontainers || []));
+
 
                         // * Get container to update model
                         this.getListContainer();

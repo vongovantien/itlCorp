@@ -99,7 +99,9 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                     if (!!res) {
                         this.hblDetail = res;
                         // * Dispatch to save containers.
-                        this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+                        // this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
+                        this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(res.csMawbcontainers || []));
+
 
                         // * Get container to update model
                         this.getListContainer();
@@ -109,7 +111,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
     }
 
     getListContainer() {
-        this._store.select<any>(fromShareBussiness.getContainerSaveState)
+        this._store.select<any>(fromShareBussiness.getHBLContainersState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
             )

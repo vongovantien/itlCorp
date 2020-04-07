@@ -305,6 +305,7 @@ export class CreateHouseBillComponent extends AppForm {
             netWeight: this.hblGoodSummaryComponent.netWeight,
             packageQty: this.hblGoodSummaryComponent.packageQty,
             packageType: +this.hblGoodSummaryComponent.selectedPackage,
+            contSealNo: this.hblGoodSummaryComponent.containerDescription,
 
             arrivalSecondNotice: null,
             arrivalNo: null,
@@ -416,5 +417,6 @@ export interface ITransactionDetail {
     dosentTo2: string;
     packageQty: number;
     packageType: number;
+    contSealNo: string;
 
 }

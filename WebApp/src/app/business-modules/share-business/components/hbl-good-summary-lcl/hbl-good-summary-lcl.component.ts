@@ -11,7 +11,7 @@ import { getParamsRouterState } from 'src/app/store';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, takeUntil, skip } from 'rxjs/operators';
+import { catchError, skip } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
 
@@ -54,17 +54,12 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         );
 
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+        this._store.select(fromStore.getHBLContainersState)
+            .pipe(skip(1))
             .subscribe(
-                (action: fromStore.ContainerAction) => {
-                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.isSave = true;
-                        this.containers = action.payload;
-                        this.updateData(action.payload);
-                    }
+                (containers: Container[]) => {
+                    console.log("list container hbl", containers);
+                    this.containers = containers;
                 }
             );
 
@@ -75,7 +70,6 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             .subscribe(
                 (res: HouseBill) => {
                     if (!!res) {
-                        console.log("detail hbl from store", res);
                         this.totalCBM = res.cbm;
                         this.netWeight = res.netWeight;
                         this.totalChargeWeight = res.chargeWeight;
@@ -105,9 +99,13 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     }
 
-    updateData(containers: Container[] | any) {
-        console.log(containers);
+    onChangeContainer(containers: Container[]) {
+        this.isSave = true;
+        this.containers = containers;
+        this.updateData(containers);
+    }
 
+    updateData(containers: Container[] | any) {
         // * Description, Commondity.
         if (!this.description) {
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
@@ -131,7 +129,6 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         if (!!containers.length && !this.selectedPackage || containers.length === 1 && !this.selectedPackage) {
             if (!!containers[0].packageTypeId) {
                 const data: any = this.packages.find((unit: Unit) => unit.id === containers[0].packageTypeId);
-                console.log(data);
                 if (!!data) {
                     this.selectedPackage = data.id;
                 }
