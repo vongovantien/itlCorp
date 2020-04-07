@@ -635,6 +635,19 @@ export class DocumentationRepo {
         );
     }
 
+    checkExistedHawbNo(hwbno: string, jobId: string, hblId: string = null) {
+        if (hblId === null) {
+            return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/CheckHwbNoExisted`, { hwbno: hwbno, jobId: jobId }).pipe(
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/CheckHwbNoExisted`, { hwbno: hwbno, jobId: jobId, hblId: hblId }).pipe(
+                map((data: any) => data)
+            );
+        }
+
+    }
+
     getSeparate(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GetSeparateByHblid`, { hbId: id });
     }

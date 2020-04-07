@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { CsTransactionDetail } from '@models';
+import { CsTransactionDetail, HouseBill } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -152,11 +152,39 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         }
+        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+                        this.arrivalNoteComponent.isSubmitted = true;
+                        this.deliveryComponent.isSubmitted = true;
+                        this.infoPopup.show();
+                        return;
+                    }
+                    if (res) {
+                        this.confirmExistedHbl.show();
+                    } else {
+                        const modelUpdate = this.getDataForm();
+                        this.setDataToUpdate(modelUpdate);
+                        this.updateHbl(modelUpdate);
+                    }
+                }
+            );
+    }
 
+    confirmUpdateData() {
+        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
+        this.setDataToUpdate(modelUpdate);
+        this.updateHbl(modelUpdate);
+    }
+
+    setDataToUpdate(modelUpdate: HouseBill) {
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-
         modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
         modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
         modelUpdate.arrivalHeader = this.hblDetail.arrivalHeader;
@@ -169,10 +197,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.subAbbr = this.hblDetail.subAbbr;
         modelUpdate.transactionType = ChargeConstants.AI_CODE;
-
         modelUpdate.userCreated = this.hblDetail.userCreated;
-
-        this.updateHbl(modelUpdate);
     }
 
     updateHbl(body: any) {

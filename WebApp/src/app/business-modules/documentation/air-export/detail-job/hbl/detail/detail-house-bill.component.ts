@@ -6,7 +6,7 @@ import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
-import { Crystal, CsTransactionDetail } from '@models';
+import { Crystal, CsTransactionDetail, HouseBill } from '@models';
 import { ReportPreviewComponent } from '@common';
 import * as fromShareBussiness from '@share-bussiness';
 
@@ -25,6 +25,7 @@ import { InputBookingNotePopupComponent } from '../components/input-booking-note
 export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(InputBookingNotePopupComponent, { static: false }) inputBookingNotePopupComponent: InputBookingNotePopupComponent;
+
 
     hblId: string;
     hblDetail: CsTransactionDetail;
@@ -109,8 +110,36 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         }
+        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!this.checkValidateForm()) {
+                        this.infoPopup.show();
+                        return;
+                    }
+                    if (res) {
+                        this.confirmExistedHbl.show();
+                    } else {
+                        const modelUpdate = this.getDataForm();
+                        this.setDataToUpdate(modelUpdate);
+                        this.updateHbl(modelUpdate);
+                    }
+                }
+            );
+    }
 
+    confirmUpdateData() {
+        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
+        this.setDataToUpdate(modelUpdate);
+        this.updateHbl(modelUpdate);
+    }
+
+
+    setDataToUpdate(modelUpdate: HouseBill) {
         modelUpdate.otherCharges = this.formCreateHBLComponent.otherCharges;
 
         modelUpdate.otherCharges.forEach(c => {
@@ -127,7 +156,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             dim.hblId = this.hblId;
             // dim.mblId = this.jobId;
         }
-        this.updateHbl(modelUpdate);
     }
 
     updateHbl(body: any, isSeparate?: boolean) {
