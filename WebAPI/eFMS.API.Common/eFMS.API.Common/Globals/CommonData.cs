@@ -10,6 +10,12 @@ namespace eFMS.API.Common.Globals
         public string DisplayName { get; set; }
     }
 
+    public class CommonDataEx
+    {
+        public int Key { get; set; }
+        public string Value { get; set; }
+    }
+
     public static class CustomData
     {
         //Define list services
@@ -38,6 +44,14 @@ namespace eFMS.API.Common.Globals
             "CREDIT",
             "DEBIT",
             "OBH"
+        };
+
+        public static readonly List<CommonDataEx> NumberOfOriginBls = new List<CommonDataEx>
+        {
+            new CommonDataEx { Key = 0, Value = "ZERO" },
+            new CommonDataEx { Key = 1, Value = "ONE (1)" },
+            new CommonDataEx { Key = 2, Value = "TWO (2)" },
+            new CommonDataEx { Key = 3, Value = "THREE (3)" },
         };
     }
 }
