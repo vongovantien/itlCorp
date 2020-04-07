@@ -220,7 +220,8 @@ export class PartnerDetailComponent extends AppList {
                                             it.officeName = item.branchNameEn;
                                         }
                                         if (it.company === item.buid) {
-                                            it.companyName = item.abbrCompany;
+                                            const objCompany = this.company.find(x => x.id === item.buid);
+                                            it.companyName = objCompany.bunameAbbr;
                                         }
                                     });
                                 }
