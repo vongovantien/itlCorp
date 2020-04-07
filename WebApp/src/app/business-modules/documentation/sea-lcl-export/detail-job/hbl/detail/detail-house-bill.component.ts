@@ -4,7 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import { CsTransactionDetail } from 'src/app/shared/models';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -34,7 +34,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     allowUpdate: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -46,7 +45,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     ) {
         super(
-            _progressService,
             _activedRoute,
             _store,
             _documentationRepo,
@@ -140,14 +138,12 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = 'SLE';
         body.transactionType = body.transactionType = ChargeConstants.SLE_CODE;
 
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

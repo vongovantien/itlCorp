@@ -16,7 +16,7 @@ import {
     ShareBussinessHBLGoodSummaryLCLComponent
 } from 'src/app/business-modules/share-business';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
@@ -44,7 +44,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     allowAdd: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -55,7 +54,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         private _systemRepo?: SystemRepo
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
             .pipe(
@@ -224,11 +222,9 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     createHbl(body: any) {
-        this._progressRef.start();
         this._documentationRepo.createHousebill(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {

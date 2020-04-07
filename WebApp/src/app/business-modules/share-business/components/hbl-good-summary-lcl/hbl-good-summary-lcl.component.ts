@@ -86,6 +86,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.selectedPackage = !!this.packages.length ? [this.packages.find(p => p.id === res.packageType)] : null;
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
+                        this.containerDescription = res.contSealNo;
                     }
                 }
             );
