@@ -144,7 +144,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                         if (!isSeparate) {
                             this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
                         } else {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
                         }
                     } else {
                         this._toastService.error(res.message);
@@ -207,7 +207,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             .subscribe(
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
-                    this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
+                        this.downLoadFile(response, "application/ms-excel", 'Air Export - NEUTRAL HAWB.xlsx');
                     } else {
                         this._toastService.warning('There is no neutral hawb data to print', '');
                     }

@@ -56,15 +56,15 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             if (param.hblId) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
-                this.getSeparate();
+                this.getSeparate(this.hblId);
             }
         });
 
     }
 
 
-    getSeparate() {
-        this._documentationRepo.getSeparate(this.hblId)
+    getSeparate(hblId: string) {
+        this._documentationRepo.getSeparate(hblId)
             .pipe(catchError(this.catchError))
             .subscribe((res: any) => {
                 console.log(res);

@@ -50,9 +50,9 @@ namespace eFMS.API.System.DL.Services
             sysOfficeRepository = sysOfficeRepo;
         }
 
-        public List<SysUserViewModel> GetAll()
+        public IQueryable<SysUserViewModel> GetAll()
         {
-            var users = DataContext.Get();
+            var users = DataContext.Get(x=>x.Active == true);
             var employees = employeeRepository.Get();
             var data = users.Join(employees, x => x.EmployeeId, y => y.Id, (x, y) => new { x, y });
             List<SysUserViewModel> results = new List<SysUserViewModel>();
@@ -63,7 +63,7 @@ namespace eFMS.API.System.DL.Services
                 model.EmployeeNameVn = item.y.EmployeeNameVn;
                 results.Add(model);
             }
-            return results;
+            return results?.OrderBy(x=>x.Username).AsQueryable();
         }
 
         public SysUserViewModel GetUserById(string Id)

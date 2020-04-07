@@ -47,8 +47,8 @@ export class OfficeDetailsComponent extends AppPage {
         company: '',
         bankAddress_En: '',
         location: '',
-        bankName_En:'',
-        bankName_Local:''
+        bankName_En: '',
+        bankName_Local: ''
     };
     officeId: string = '';
 
@@ -75,7 +75,7 @@ export class OfficeDetailsComponent extends AppPage {
     }
 
     ngOnInit() {
-      
+
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.officeId = param.id;
@@ -177,8 +177,8 @@ export class OfficeDetailsComponent extends AppPage {
 
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;
-                            this.formData.bankName_En= res.data.bankNameEn;
-                            this.formData.bankName_Local= res.data.bankNameLocal;
+                            this.formData.bankName_En = res.data.bankNameEn;
+                            this.formData.bankName_Local = res.data.bankNameLocal;
                             this._store.dispatch(new SystemLoadUserLevelAction({ companyId: this.formData.company, officeId: this.office.id, type: 'office' }));
                             setTimeout(() => {
                                 this.formAdd.update(this.formData, res.data.active);
@@ -197,5 +197,8 @@ export class OfficeDetailsComponent extends AppPage {
     }
     cancel() {
         this._router.navigate(['/home/system/office']);
+    }
+    gotoDetailDepartment(id: string) {
+        this._router.navigate([`home/system/department/${id}`]);
     }
 }
