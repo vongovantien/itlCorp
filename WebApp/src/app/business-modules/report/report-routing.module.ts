@@ -29,6 +29,10 @@ const routes: Routes = [
     path: 'sale-report', loadChildren: () => import('./sale-report/sale-report.module').then(m => m.SaleReportModule),
     data: { name: 'Sale Report' }
   },
+  {
+    path: 'sheet-debit-report', loadChildren: () => import('./sheet-debit-report/sheet-debit-report.module').then(m => m.SheetDebitReportModule),
+    data: { name: 'Sheet Debit Report' }
+  },
 ];
 
 @NgModule({
