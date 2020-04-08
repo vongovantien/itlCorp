@@ -110,16 +110,13 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         }
-        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+        else {
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
             .pipe(
                 catchError(this.catchError),
             )
             .subscribe(
                 (res: any) => {
-                    if (!this.checkValidateForm()) {
-                        this.infoPopup.show();
-                        return;
-                    }
                     if (res) {
                         this.confirmExistedHbl.show();
                     } else {
@@ -129,6 +126,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                     }
                 }
             );
+        }
     }
 
     confirmUpdateData() {

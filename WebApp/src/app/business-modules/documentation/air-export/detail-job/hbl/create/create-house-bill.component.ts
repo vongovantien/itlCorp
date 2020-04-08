@@ -17,13 +17,14 @@ import { AbstractControl } from '@angular/forms';
 import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
 
 import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
-import { getDimensionVolumesState, getDetailHBlState } from './../../../../../share-business/store';
+import { getDimensionVolumesState, getDetailHBlState, GetDetailHBLSuccessAction } from './../../../../../share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import _merge from 'lodash/merge';
 
 import isUUID from 'validator/lib/isUUID';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -126,40 +127,50 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         if (this.isImport) {
-            if (this.formCreateHBLComponent.hwbno.value === null) {
-                this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
+            this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+            .pipe(
+                mergeMap((res: any) => {
+                    if(this.formCreateHBLComponent.hwbno.value == null || this.formCreateHBLComponent.hwbno.value == ""){
+                        this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
+                    }
+                    if (!this.checkValidateForm()) {
+                        this.infoPopup.show();
+                        return null;
+                    }
+                    return forkJoin([this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
+                }
+            )).subscribe(result => {
+                if (result[0]) {
+                    this.confirmExistedHbl.show();
+                } else {
+                    const houseBill: HouseBill = this.getDataForm();
+                    this.setData(houseBill);
+                    this.createHbl(houseBill);
+                }
             }
+            );
         }
-        setTimeout(() => {
+        else {
             if (!this.checkValidateForm()) {
                 this.infoPopup.show();
                 return;
             }
-        }, 200);
-
-        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-
-                    if (!this.checkValidateForm()) {
-                        this.infoPopup.show();
-                        return;
-                    }
-
-                    if (res) {
-                        this.confirmExistedHbl.show();
-                    } else {
-                        const houseBill: HouseBill = this.getDataForm();
-                        this.setData(houseBill);
-                        this.createHbl(houseBill);
-                    }
-                }
-            );
-
-
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+                .pipe(
+                    catchError(this.catchError),
+                    )
+                    .subscribe(
+                        (res: any) => {
+                            if (res) {
+                                this.confirmExistedHbl.show();
+                            } else {
+                                const houseBill: HouseBill = this.getDataForm();
+                                this.setData(houseBill);
+                                this.createHbl(houseBill);
+                            }
+                        }
+                    );
+        }
 
     }
 
@@ -230,8 +241,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     onImport(selectedData: any) {
         this.selectedHbl = selectedData;
+        this._store.dispatch(new GetDetailHBLSuccessAction(this.selectedHbl));
         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.selectedHbl.id));
-        setTimeout(() => {
             if (!!this.selectedHbl) {
                 this._store.select(getDimensionVolumesState)
                     .pipe(
@@ -262,7 +273,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         }
                     );
             }
-        }, 300);
 
     }
 

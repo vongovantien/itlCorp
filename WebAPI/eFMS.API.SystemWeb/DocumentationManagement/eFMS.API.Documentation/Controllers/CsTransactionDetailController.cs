@@ -173,11 +173,13 @@ namespace eFMS.API.Documentation.Controllers
         {
             bool existedHwbNo = false;
             var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
-            if(transaction.TransactionType == TermData.AirExport || transaction.TransactionType == TermData.AirImport)
+            var data = csTransactionDetailService.GetDataHawbToCheckExisted();
+            data = data.Where(x => x.TransactionType == transaction.TransactionType);
+            if (transaction.TransactionType == TermData.AirExport || transaction.TransactionType == TermData.AirImport)
             {
                 if(hblId == null)
                 {
-                    if (csTransactionDetailService.Any(x => x.Hwbno == hwbno && x.Hwbno != null))
+                    if (data.Any(x => x.Hwbno == hwbno && x.Hwbno != null))
                     {
                         existedHwbNo = true;
                     }
@@ -193,7 +195,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         return Ok(false);
                     }
-                    if (csTransactionDetailService.Any(x => x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
+                    if (data.Any(x => x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
                     {
                         existedHwbNo = true;
                     }

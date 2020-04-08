@@ -628,7 +628,7 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-
+    
     generateHBLNo(transactionTypeEnum: number) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
             map((data: any) => data)

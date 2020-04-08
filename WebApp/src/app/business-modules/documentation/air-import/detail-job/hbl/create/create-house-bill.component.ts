@@ -190,38 +190,29 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     saveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-        if (this.isImport) {
-            if (this.formCreateHBLComponent.hwbno.value === null) {
-                this.generateHblNo(CommonEnum.TransactionTypeEnum.AirImport);
-            }
-        }
-        setTimeout(() => {
-            if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
+        if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
                 this.arrivalNoteComponent.isSubmitted = true;
                 this.deliveryComponent.isSubmitted = true;
                 this.infoPopup.show();
                 return;
             }
-        }, 200);
-
-        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+        else {
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
             .pipe(
-                catchError(this.catchError),
-            )
+            catchError(this.catchError),
+             )
             .subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmExistedHbl.show();
-                    } else {
-                        const houseBill: HouseBill = this.getDataForm();
-                        houseBill.jobId = this.jobId;
-                        this.createHbl(houseBill);
+            (res: any) => {
+                        if (res) {
+                            this.confirmExistedHbl.show();
+                        } else {
+                            const houseBill: HouseBill = this.getDataForm();
+                            houseBill.jobId = this.jobId;
+                            this.createHbl(houseBill);
+                        }
                     }
-                }
-            );
-
-
-
+                );
+            }
     }
 
     confirmSaveData() {

@@ -70,9 +70,17 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
-
+                this._store.select(getDetailHBlPermissionState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.allowUpdate = res.allowUpdate;
+                        }
+                    }
+                );
                 this.getDetailHbl();
 
             } else {
@@ -81,15 +89,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-        this._store.select(getDetailHBlPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowUpdate = res.allowUpdate;
-                    }
-                }
-            );
+      
     }
 
     getDetailHbl() {
@@ -152,18 +152,13 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         }
-        this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+        else {
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
             .pipe(
                 catchError(this.catchError),
             )
             .subscribe(
                 (res: any) => {
-                    if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
-                        this.arrivalNoteComponent.isSubmitted = true;
-                        this.deliveryComponent.isSubmitted = true;
-                        this.infoPopup.show();
-                        return;
-                    }
                     if (res) {
                         this.confirmExistedHbl.show();
                     } else {
@@ -173,6 +168,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     }
                 }
             );
+        }
     }
 
     confirmUpdateData() {
