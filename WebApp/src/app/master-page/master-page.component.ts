@@ -51,15 +51,17 @@ export class MasterPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        interval(900000)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                () => {
-                    const remainingMinutes: number = this._jwtService.remainingExpireTimeToken();
-                    if (remainingMinutes <= 3 && remainingMinutes > 0) {
-                        this._toastService.warning("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
-                    }
-                });
+        // interval(3000000)
+        //     .pipe(takeUntil(this.ngUnsubscribe))
+        //     .subscribe(
+        //         () => {
+        //             console.log("checking token expired...");
+        //             const remainingMinutes: number = this._jwtService.remainingExpireTimeToken();
+        //             console.log(remainingMinutes)
+        //             if (remainingMinutes <= 3 && remainingMinutes >= 0) {
+        //                 this._toastService.warning("Phiên đăng nhập sẽ hết hạn sau " + remainingMinutes + " phút nữa, hãy lưu công việc hiện tại hoặc đăng nhập lại để tiếp tục công việc.", "Cảnh Báo !")
+        //             }
+        //         });
 
     }
 

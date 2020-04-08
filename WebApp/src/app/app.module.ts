@@ -42,6 +42,7 @@ import { CustomRouteReuseStrategy } from "./router-reuse";
 
 const authConfig: AuthConfig = {
     issuer: environment.HOST.INDENTITY_SERVER_URL,
+    tokenEndpoint: environment.HOST.INDENTITY_SERVER_URL + '/connect/token',
     redirectUri: window.location.origin + '/#/home',
     clientId: 'eFMS',
     requireHttps: false,
