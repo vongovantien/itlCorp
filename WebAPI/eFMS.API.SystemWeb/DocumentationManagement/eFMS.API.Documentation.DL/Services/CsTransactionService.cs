@@ -1644,6 +1644,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var oldHouseId = item.Id;
                     item.Id = Guid.NewGuid();
                     item.JobId = transaction.Id;
+                    item.ManifestRefNo = null;
                     item.DeliveryOrderNo = null;
                     item.DeliveryOrderPrintedDate = null;
                     item.DosentTo1 = null;
