@@ -27,13 +27,13 @@ export class CatalogueEffect {
                 this._store.select(getCataloguePortState),
                 (action: CatalogueActions, ports: PortIndex[]) => ({ data: ports, action: action })),
 
-            switchMap((data: { data: any[], action: CatalogueActions }) => {
+            switchMap((data: { data: PortIndex[], action: CatalogueActions }) => {
                 // * Check ports in redux store.
                 if (!!data && data.data && data.data.length) {
                     return of(new GetCataloguePortSuccessAction(data.data));
                 }
                 return this._catalogueRepo.getListPort(data.action.payload).pipe(
-                    map((response: any) => new GetCataloguePortSuccessAction(response)),
+                    map((response: PortIndex) => new GetCataloguePortSuccessAction(response)),
                     catchError(err => of(new GetCataloguePortFailAction(err)))
                 );
             })

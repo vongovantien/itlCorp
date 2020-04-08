@@ -91,6 +91,8 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
     delete(item: CsOtherCharge, index: number) {
         this.isSubmitted = false;
         this.csOtherChargesTemp.splice(index, 1);
+        this.updateDescription();
+
     }
 
     addOtherCharge() {

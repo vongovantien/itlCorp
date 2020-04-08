@@ -141,11 +141,11 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        if (!isSeparate) {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
-                        } else {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}/separate`]);
-                        }
+                        // if (!isSeparate) {
+                        //     // this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
+                        // } else {
+                        //     // this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                        // }
                     } else {
                         this._toastService.error(res.message);
                     }

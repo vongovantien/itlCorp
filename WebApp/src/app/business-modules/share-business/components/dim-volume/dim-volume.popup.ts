@@ -166,6 +166,7 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
             ).subscribe(
                 (res: DIM[]) => {
                     if (!!res && !!res.length) {
+                        this.dimsTemp.length = 0;
                         this.dimsTemp = cloneDeep(res);
 
                         this.calculateHWDimension();
