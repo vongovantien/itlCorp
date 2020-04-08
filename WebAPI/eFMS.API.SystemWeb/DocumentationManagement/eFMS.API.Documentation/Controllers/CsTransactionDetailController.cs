@@ -168,6 +168,47 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("CheckHwbNoExisted")]
+        public IActionResult CheckHwbNoExisted(string hwbno,string jobId, string hblId )
+        {
+            bool existedHwbNo = false;
+            var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
+            var data = csTransactionDetailService.GetDataHawbToCheckExisted();
+            data = data.Where(x => x.TransactionType == transaction.TransactionType);
+            if (transaction.TransactionType == TermData.AirExport || transaction.TransactionType == TermData.AirImport)
+            {
+                if(hblId == null)
+                {
+                    if (data.Any(x => x.Hwbno == hwbno && x.Hwbno != null))
+                    {
+                        existedHwbNo = true;
+                    }
+                    else
+                    {
+                        existedHwbNo = false;
+                    }
+                }
+                else
+                {
+                    var transactionDetail = csTransactionDetailService.Get(x => x.Id.ToString() == hblId ).FirstOrDefault();
+                    if (transactionDetail.Hwbno == hwbno)
+                    {
+                        return Ok(false);
+                    }
+                    if (data.Any(x => x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
+                    {
+                        existedHwbNo = true;
+                    }
+                    else
+                    {
+                        existedHwbNo = false;
+                    }
+                }
+              
+            }
+            return Ok(existedHwbNo);
+        }
+
         [HttpGet("GenerateHBLNo")]
         public IActionResult GenerateHBLNo(TransactionTypeEnum transactionTypeEnum)
         {

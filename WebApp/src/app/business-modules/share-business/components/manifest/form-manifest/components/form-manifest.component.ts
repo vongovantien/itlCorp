@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { AppList } from 'src/app/app.list';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -63,7 +63,9 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         private _dataService: DataService,
         private _spinner: NgxSpinnerService,
         private _documentRepo: DocumentationRepo,
-        private _store: Store<fromShare.IShareBussinessState>
+        private _store: Store<fromShare.IShareBussinessState>,
+        private _cd: ChangeDetectorRef
+
 
     ) {
         super();
@@ -156,8 +158,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     initForm() {
         this.formGroup = this._fb.group({
             referenceNo: [],
-            supplier: [null
-                , Validators.required],
+            supplier: [null, Validators.required],
             attention: [],
             marksOfNationality: [null, Validators.required],
             vesselNo: [null, Validators.required],
@@ -167,8 +168,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             deconsolidator: [],
             weight: [],
             volume: [],
-            agent: [null
-                , Validators.required],
+            agent: [null, Validators.required],
             pol: [null, Validators.required],
             pod: [null, Validators.required]
 
