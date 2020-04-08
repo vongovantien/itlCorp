@@ -69,15 +69,21 @@ export class MasterPageComponent implements OnInit {
     }
 
     logout() {
-        this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
-            .then(
-                (res: any) => {
-                    this.oauthService.logOut(false);
-                },
-                (error: any) => {
-                    console.log(error + '');
-                }
-            );
+        if (this.oauthService.hasValidAccessToken()) {
+            this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
+                .then(
+                    (res: any) => {
+                        this.oauthService.logOut(false);
+                    },
+                    (error: any) => {
+                        console.log(error + '');
+                    }
+                );
+        } else { window.location.href = this.oauthService.logoutUrl; }
+    }
+
+    reLogout() {
+
     }
 
     officeChange(office: Office) {
