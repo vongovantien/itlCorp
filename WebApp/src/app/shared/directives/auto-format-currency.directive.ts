@@ -32,7 +32,7 @@ export class AutoFormatCurrencyDirective {
         setTimeout(() => {
             this.currentValue = this.el.value;
             this.el.value = this.currencyPipe.transform(this.el.value, this.currencyCode, '', this.digitNumber);
-        }, 100);
+        }, 300);
     }
 
     @HostListener("focus", ["$event.target.value"])

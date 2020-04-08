@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, ViewChild, Input, forwardRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, Input, forwardRef, EventEmitter, Output } from '@angular/core';
 import { CatalogueRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { SortService } from '@services';
@@ -27,6 +27,7 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
     @ViewChild('confirmDeleteContainerPopup', { static: false }) confirmDeleteContainerPopup: ConfirmPopupComponent;
 
     @Input() type: string = 'import';
+    @Output() onChange: EventEmitter<Container[]> = new EventEmitter<Container[]>();
 
     mblid: string = null;
     hblid: string = null;
@@ -183,6 +184,7 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                     }
                 }
                 this._store.dispatch(new SaveContainerAction(this.containers));
+                this.onChange.emit(this.containers);
 
                 this.isSubmitted = false;
                 this.hide();

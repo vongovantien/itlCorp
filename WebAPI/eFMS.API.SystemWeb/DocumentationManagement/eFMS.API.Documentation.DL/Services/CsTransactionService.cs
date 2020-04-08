@@ -1600,16 +1600,11 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
-            var transaction = mapper.Map<CsTransaction>(model);
-            transaction.Id = Guid.NewGuid();
             IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id);
             if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0)
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
-            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
-            transaction.UserCreated = currentUser.UserID;
-            transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
-            transaction.UserModified = model.UserCreated;
-            transaction.Active = true;
+
+            var transaction = GetDefaultJob(model);
             List<CsMawbcontainer> containers = null;
             List<CsDimensionDetail> dimensionDetails = null;
             List<CsShipmentSurcharge> surcharges = null;
@@ -1649,11 +1644,26 @@ namespace eFMS.API.Documentation.DL.Services
                     var oldHouseId = item.Id;
                     item.Id = Guid.NewGuid();
                     item.JobId = transaction.Id;
+                    item.ManifestRefNo = null;
+                    item.DeliveryOrderNo = null;
+                    item.DeliveryOrderPrintedDate = null;
+                    item.DosentTo1 = null;
+                    item.DosentTo2 = null;
+                    item.Dofooter = null;
+                    item.ArrivalNo = null;
+                    item.ArrivalFirstNotice = null;
+                    item.ArrivalSecondNotice = null;
+                    item.ArrivalHeader = null;
+                    item.ArrivalFooter = null;
+                    item.ArrivalDate = null;
                     item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
-                    countDetail = countDetail + 1;
                     item.Active = true;
-                    item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
+                    item.UserCreated = transaction.UserCreated;
                     item.DatetimeCreated = DateTime.Now;
+                    item.GroupId = currentUser.GroupId;
+                    item.DepartmentId = currentUser.DepartmentId;
+                    item.OfficeId = currentUser.OfficeID;
+                    item.CompanyId = currentUser.CompanyID;
                     var housebillcontainers = GetHouseBillContainers(oldHouseId, item.Id);
                     if (housebillcontainers != null) containers.AddRange(housebillcontainers);
                     var housebillDimensions = GetHouseBillDimensions(oldHouseId, item.Id);
@@ -1667,8 +1677,9 @@ namespace eFMS.API.Documentation.DL.Services
                     if (houseFreigcharges != null)
                     {
                         freightCharges.AddRange(houseFreigcharges);
+                    }
+                    countDetail = countDetail + 1;
                 }
-            }
             }
             try
             {
@@ -1688,15 +1699,28 @@ namespace eFMS.API.Documentation.DL.Services
                     freighchargesRepository.SubmitChanges();
                     return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
-                else
-                {
-                    return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString() };
-                }
+                return new ResultHandle { Status = hsTrans.Success, Message = hsTrans.Message.ToString() };
             }
             catch (Exception ex)
             {
                 return new ResultHandle { Status = false, Message = ex.Message };
             }
+        }
+
+        private CsTransaction GetDefaultJob(CsTransactionEditModel model)
+        {
+            var transaction = mapper.Map<CsTransaction>(model);
+            transaction.Id = Guid.NewGuid();
+            transaction.JobNo = CreateJobNoByTransactionType(model.TransactionTypeEnum, model.TransactionType);
+            transaction.UserCreated = transaction.UserModified = currentUser.UserID;
+            transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
+            transaction.GroupId = currentUser.GroupId;
+            transaction.DepartmentId = currentUser.DepartmentId;
+            transaction.OfficeId = currentUser.OfficeID;
+            transaction.CompanyId = currentUser.CompanyID;
+            transaction.CurrentStatus = TermData.Processing;
+            transaction.Active = true;
+            return transaction;
         }
 
         private List<CsArrivalFrieghtCharge> GetFreightCharges(Guid oldHouseId, Guid newHouseId)
@@ -1710,6 +1734,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     item.Id = Guid.NewGuid();
                     item.UserCreated = currentUser.UserID;
+                    item.DatetimeCreated = DateTime.Now;
                     item.Hblid = newHouseId;
                     charges.Add(item);
                 }
@@ -1987,13 +2012,13 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Cost = cost; //Phí chi của charge
                         charge.Revenue = revenue; //Phí thu của charge
                         charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = _exchangeRateLocal; //surcharge.ExchangeRate ?? 0;
+                        charge.VNDExchange = _exchangeRateLocal;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
-                        charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : (surcharge.ExchangeRate ?? 0) * saleProfitNonVAT; //Non VAT
+                        charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = surcharge.UnitPrice ?? 0;
                         charge.Unit = unitCode;

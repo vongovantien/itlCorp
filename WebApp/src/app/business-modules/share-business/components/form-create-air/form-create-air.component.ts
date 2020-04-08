@@ -8,7 +8,7 @@ import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehou
 import { FormValidators } from '@validators';
 import { AppForm } from 'src/app/app.form';
 import {
-    getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction, GetCatalogueUnitAction, getCatalogueUnitState, GetCatalogueCommodityAction, getCatalogueCommodityState
+    getCataloguePortLoadingState, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction, GetCatalogueUnitAction, getCatalogueUnitState, GetCatalogueCommodityAction, getCatalogueCommodityState
 } from '@store';
 
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
@@ -131,7 +131,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
 
     ngOnInit() {
-        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
+        // this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new GetCatalogueCarrierAction());
         this._store.dispatch(new GetCatalogueAgentAction({ active: true }));
 
@@ -151,6 +151,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
 
         this.listUsers = this._systemRepo.getSystemUsers();
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
         this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
             (res: Warehouse[]) => {
                 if (!!res) {
@@ -164,7 +165,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.initForm();
         this.getCarriers();
         this.getAgents();
-        this.getPorts();
         this.getUnits();
         this.getCommodities();
 
@@ -384,12 +384,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 this.carries = result;
                 this.initCarriers = cloneDeep(result);
             });
-    }
-
-    getPorts() {
-        this.ports = this._store.select(getCataloguePortState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        );
     }
 
     getAgents() {

@@ -182,7 +182,7 @@
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                                     [currentActiveItemId]="{ field: 'id', value: pol.value}"
                                     [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                    [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)">
+                                    [displayFields]="displayFieldPort" [height]="150" (remove)="resetFormControl(pol)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -194,7 +194,7 @@
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                                     [currentActiveItemId]="{ field: 'id', value: pod.value}"
                                     [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                                    [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)">
+                                    [displayFields]="displayFieldPort" [height]="150" (remove)="resetFormControl(pod)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

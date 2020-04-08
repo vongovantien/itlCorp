@@ -433,7 +433,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     ReportName = "Monthly Sale Report.rpt",
                     AllowPrint = true,
-                    AllowExport = true
+                    AllowExport = true,
+                    IsLandscape = true
                 };
                 result.AddDataSource(list);
                 result.FormatType = ExportFormatType.PortableDocFormat;

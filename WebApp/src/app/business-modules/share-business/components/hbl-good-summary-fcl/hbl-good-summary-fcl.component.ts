@@ -73,15 +73,11 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             }
         );
 
-        this._actionStoreSubject
-            .pipe(takeUntil(this.ngUnsubscribe))
+        this._store.select(fromStore.getHBLContainersState)
+            .pipe(skip(1))
             .subscribe(
-                (action: fromStore.ContainerAction) => {
-                    if (action.type === fromStore.ContainerActionTypes.SAVE_CONTAINER) {
-                        this.isSave = true;
-                        this.containers = action.payload;
-                        this.updateData(action.payload);
-                    }
+                (containers: Container[]) => {
+                    this.containers = containers;
                 }
             );
 
@@ -100,6 +96,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;
                         this.selectedPackage = res.packageType;
+                        this.containerDescription = res.contSealNo;
                     }
                 }
             );
@@ -205,5 +202,11 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.description = '';
         this.commodities = '';
         this.updateData(this.containers);
+    }
+
+    onChangeContainer(container: Container[]) {
+        this.isSave = true;
+        this.containers = container;
+        this.updateData(container);
     }
 }

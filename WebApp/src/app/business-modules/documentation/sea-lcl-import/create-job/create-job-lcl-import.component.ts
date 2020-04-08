@@ -52,6 +52,8 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         this.selectedJob = selectedData;
         this.isImport = true;
         this.shipmentGoodSummaryComponent.commodities = this.selectedJob.commodity;
+        this.formCreateComponent.formCreate.controls['personIncharge'].setValue(this.formCreateComponent.userLogged.id);
+
     }
 
     onSubmitData() {

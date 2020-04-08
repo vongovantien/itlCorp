@@ -121,6 +121,8 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         this.shipmentGoodSummaryComponent.netWeight = this.selectedJob.netWeight;
         this.shipmentGoodSummaryComponent.totalChargeWeight = this.selectedJob.chargeWeight;
         this.shipmentGoodSummaryComponent.totalCBM = this.selectedJob.cbm;
+        this.formCreateComponent.formCreate.controls['personIncharge'].setValue(this.formCreateComponent.userLogged.id);
+
     }
 
     checkValidateForm() {

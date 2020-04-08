@@ -141,7 +141,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
-        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
+        // this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
         this._store.dispatch(new GetCatalogueWarehouseAction());
 
         this.initForm();
@@ -151,7 +151,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
 
-        this.ports = this._store.select(getCataloguePortState);
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
         this.warehouses = this._store.select(getCatalogueWarehouseState);
 
         this.saleMans = this._systemRepo.getListSystemUser();
@@ -179,7 +179,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
-                            console.log('update here',hbl);
 
                             this.updateFormValue(hbl);
                         }
