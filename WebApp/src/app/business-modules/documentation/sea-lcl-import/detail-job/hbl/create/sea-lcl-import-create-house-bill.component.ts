@@ -102,7 +102,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     showImportPopup() {
         const dataSearch = { jobId: this.jobId };
         dataSearch.jobId = this.jobId;
-        this.importHouseBillPopup.typeFCL = '';
+        this.importHouseBillPopup.typeFCL = 'Import';
         this.importHouseBillPopup.selected = - 1;
         this.importHouseBillPopup.typeTransaction = 9;
         this.importHouseBillPopup.getHourseBill(dataSearch);
