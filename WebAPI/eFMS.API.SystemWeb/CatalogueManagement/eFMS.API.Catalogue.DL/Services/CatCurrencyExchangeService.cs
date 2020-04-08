@@ -241,21 +241,22 @@ namespace eFMS.API.Catalogue.DL.Services
                             rate.DatetimeModified = DateTime.Now;
                             rate.Active = false;
                             DataContext.Update(rate, x => x.Id == rate.Id, false);
-
-
-                            var newrate = new CatCurrencyExchange
-                            {
-                                CurrencyFromId = item.CurrencyFromId,
-                                CurrencyToId = model.CurrencyToId,
-                                Rate = item.Rate,
-                                Active = true,
-                                UserCreated = model.UserModified,
-                                DatetimeCreated = DateTime.Now,
-                                UserModified = model.UserModified,
-                                DatetimeModified = DateTime.Now
-                            };
-                            DataContext.Add(newrate, false);
                         }
+                        else { continue; }
+
+
+                        var newrate = new CatCurrencyExchange
+                        {
+                            CurrencyFromId = item.CurrencyFromId,
+                            CurrencyToId = model.CurrencyToId,
+                            Rate = item.Rate,
+                            Active = true,
+                            UserCreated = model.UserModified,
+                            DatetimeCreated = DateTime.Now,
+                            UserModified = model.UserModified,
+                            DatetimeModified = DateTime.Now
+                        };
+                        DataContext.Add(newrate, false);
                     }
                     else
                     {
