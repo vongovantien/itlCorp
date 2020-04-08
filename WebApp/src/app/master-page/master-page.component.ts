@@ -82,10 +82,6 @@ export class MasterPageComponent implements OnInit {
         } else { window.location.href = this.oauthService.logoutUrl; }
     }
 
-    reLogout() {
-
-    }
-
     officeChange(office: Office) {
         if (!!office) {
             this.selectedOffice = office;
