@@ -600,7 +600,7 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
                  && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
-                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                  );
                 }
@@ -611,7 +611,7 @@ namespace eFMS.API.Documentation.DL.Services
                   && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                   && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
                   && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
-                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                  && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                   && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                   );
                 }
