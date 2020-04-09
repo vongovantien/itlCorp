@@ -82,8 +82,8 @@ export class TariffCharge {
     warehouseId: any = null;
     type: string = null;
     rangeType: string = null;
-    rangeFrom: string = '';
-    rangeTo: string = '';
+    rangeFrom: number = 0;
+    rangeTo: number = 0;
     unitPrice: number = 0;
     min: number = 0;
     max: number = 0;

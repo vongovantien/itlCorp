@@ -551,7 +551,7 @@ namespace eFMS.API.Setting.DL.Services
                                 PortName = port.NameEn,
                                 WarehouseName = warehouse.NameEn
                             };
-            return queryData.OrderByDescending(x => x.DatetimeModified);
+            return queryData;
         }
 
         public bool CheckAllowPermissionAction(Guid id, PermissionRange range)

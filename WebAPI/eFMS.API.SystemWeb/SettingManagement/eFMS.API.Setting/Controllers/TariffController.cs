@@ -253,7 +253,7 @@ namespace eFMS.API.Setting.Controllers
 
             var result = new TariffModel();
             result.setTariff = tariffService.GetTariffById(tariffId);
-            result.setTariffDetails = tariffService.GetListTariffDetailByTariffId(tariffId).ToList();
+            result.setTariffDetails = tariffService.GetListTariffDetailByTariffId(tariffId)?.OrderBy(x => x.DatetimeCreated).ToList();
             if (result == null)
             {
                 return Ok(new ResultHandle { Status = false, Message = "Không tìm thấy Tariff", Data = result });
