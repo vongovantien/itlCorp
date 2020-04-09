@@ -31,7 +31,7 @@ export class AutoFormatCurrencyDirective {
 
         this.timeOut = setTimeout(() => {
             this.currentValue = this.el.value;
-            this.el.value = this.currencyPipe.transform(this.el.value || '', this.currencyCode, '', this.digitNumber);
+            this.el.value = this.currencyPipe.transform(this.el.value, this.currencyCode, '', this.digitNumber);
         }, 1000);
     }
 
