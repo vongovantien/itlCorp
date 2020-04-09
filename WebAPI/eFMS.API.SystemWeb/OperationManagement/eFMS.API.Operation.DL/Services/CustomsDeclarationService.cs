@@ -592,7 +592,7 @@ namespace eFMS.API.Operation.DL.Services
                     result = deleteMultipleModel(customs);
                     break;
                 default:
-                    return new HandleState(403);
+                    return new HandleState(403,"");
             }
 
             return result;

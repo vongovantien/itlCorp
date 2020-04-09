@@ -13,7 +13,7 @@ export class TariffListChargeComponent extends AppList {
     @Input() charges: any[] = [];
     @Input() permission: {
         allowUpdate: true, // * Default.
-    };
+    } = { allowUpdate: true };
 
     @Output() chargesChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 

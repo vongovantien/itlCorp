@@ -3,6 +3,11 @@ import { Injectable } from '@angular/core';
 enum STORAGE_KEY {
     ACCESS_TOKEN = 'access_token',
     EXPIRE_TOKEN = 'expires_at',
+    REFRESH_TOKEN = 'refresh_token',
+    EXPIRES_AT = 'expires_at',
+    ACCESS_TOKEN_STORED_AT = 'access_token_stored_at',
+    ID_TOKEN = 'id_token',
+    CLAIMS = 'id_token_claims_obj',
 }
 
 @Injectable({ providedIn: 'root' })
@@ -16,8 +21,32 @@ export class JwtService {
         window.localStorage[STORAGE_KEY.ACCESS_TOKEN] = token;
     }
 
-    private destroyToken() {
+    saveTokenID(tokenId: string) {
+        window.localStorage[STORAGE_KEY.ID_TOKEN] = tokenId;
+    }
+
+    destroyToken() {
         window.localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN);
+    }
+
+    destroyRefreshToken() {
+        window.localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN);
+    }
+
+    destroyClaim() {
+        window.localStorage.removeItem(STORAGE_KEY.CLAIMS);
+    }
+
+    destroyExpiresAt() {
+        window.localStorage.removeItem(STORAGE_KEY.EXPIRES_AT);
+    }
+
+    destroyIdToken() {
+        window.localStorage.removeItem(STORAGE_KEY.ID_TOKEN);
+    }
+
+    destroyAccessTokenStoredAt() {
+        window.localStorage.removeItem(STORAGE_KEY.ACCESS_TOKEN_STORED_AT);
     }
 
     private getExpiresToken() {
@@ -29,12 +58,12 @@ export class JwtService {
             const expiresAt = this.getExpiresToken();
             const now = new Date();
             if (expiresAt && parseInt(expiresAt, 10) < now.getTime()) {
-                localStorage.clear();
+                // localStorage.clear();
                 return false;
             }
             return true;
         }
-        localStorage.clear();
+        // localStorage.clear();
         return false;
     }
 

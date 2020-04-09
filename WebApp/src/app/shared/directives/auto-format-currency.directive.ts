@@ -12,7 +12,7 @@ export class AutoFormatCurrencyDirective {
     private el: HTMLInputElement;
 
     // private ngControl: NgControl;
-
+    timeOut: any;
     constructor(
         private currencyPipe: CurrencyPipe,
         private _elementRef: ElementRef,
@@ -29,20 +29,24 @@ export class AutoFormatCurrencyDirective {
             this.renderer.setAttribute(this._elementRef.nativeElement, 'type', 'text');
         }
 
-        setTimeout(() => {
+        this.timeOut = setTimeout(() => {
             this.currentValue = this.el.value;
-            this.el.value = this.currencyPipe.transform(this.el.value, this.currencyCode, '', this.digitNumber);
-        }, 300);
+            this.el.value = this.currencyPipe.transform(this.el.value || '', this.currencyCode, '', this.digitNumber);
+        }, 1000);
     }
 
     @HostListener("focus", ["$event.target.value"])
     onFocus(value) {
-        this.el.value = this.currentValue.toString(); // opossite of transform
+        this.el.value = this.currentValue + ''.toString(); // opossite of transform
     }
 
     @HostListener("blur", ["$event.target.value"])
     onBlur(value) {
         this.currentValue = value;
         this.el.value = this.currencyPipe.transform(value, this.currencyCode, '', this.digitNumber);
+    }
+
+    ngOnDestroy(): void {
+        clearTimeout(this.timeOut);
     }
 }

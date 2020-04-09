@@ -90,7 +90,7 @@ namespace eFMS.API.Documentation.DL.Services
             var job = csTransactionRepo.Get(x => x.Id == model.JobId).FirstOrDefault();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403);
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
 
             if (model.CsMawbcontainers?.Count > 0)
             {
@@ -197,7 +197,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
-                    if (code == 403) return new HandleState(403);
+                    if (code == 403) return new HandleState(403,"");
                     
                     // TODO validate follow service
                     //if (model.CsMawbcontainers?.Count > 0)
@@ -600,7 +600,7 @@ namespace eFMS.API.Documentation.DL.Services
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
                  && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
-                 && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                  );
                 }
@@ -611,7 +611,7 @@ namespace eFMS.API.Documentation.DL.Services
                   && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                   && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
                   && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
-                  && (x.sale.Id.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                  && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                   && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
                   );
                 }
@@ -1077,7 +1077,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
 
                     int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
-                    if (code == 403) return new HandleState(403);
+                    if (code == 403) return new HandleState(403,"");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
                     var isSOA = false;
@@ -1466,7 +1466,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
                     GrossWeight = data?.GrossWeight.ToString(),
                     Measurement = data?.Cbm.ToString(),
-                    TextInfo = "RECEIVED in apparent good order and condtion except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document (duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall (without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
+                    TextInfo = "RECEIVED in apparent good order and condition except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document( duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall( without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
                 };                
                 result.SetParameter(parameter);
             }

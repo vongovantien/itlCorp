@@ -208,6 +208,7 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
                         );
                 }
             }
+            this._toastService.success('Data has been updated');
         } else {
             this.inValid = true;
             this._toastService.warning("Please select currency to add new Rate");

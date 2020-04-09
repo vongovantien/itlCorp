@@ -10,7 +10,7 @@ export class AuthGuardService implements CanActivate {
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
         if (!this.checkLoginSession()) {
-            this._router.navigate(['/login', { url: state.url }]);
+            this._router.navigate(['/login', { url: state.url, isEndSession: true }]);
             return false;
         } else {
             return true;
@@ -24,13 +24,17 @@ export class AuthGuardService implements CanActivate {
 
     checkLoginSession(): boolean {
         if (this._jwt.hasValidAccessToken() === false) {
-            localStorage.clear();
+            this._jwt.destroyToken();
+            this._jwt.destroyRefreshToken();
+            this._jwt.destroyExpiresAt();
+            this._jwt.destroyIdToken();
+            this._jwt.destroyAccessTokenStoredAt();
+            this._jwt.destroyClaim();
             return false;
         } else {
             return true;
         }
     }
-
 }
 
 
