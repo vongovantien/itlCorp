@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
                 CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
                 Website = DocumentConstants.COMPANY_WEBSITE,
-                Contact = currentUser.UserID
+                Contact = currentUser.UserName
             };
             var manifests = new List<SeaFCLExportCargoManifest>();
             var freightManifests = new List<FreightManifest>();
@@ -289,7 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
                 CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
                 Website = DocumentConstants.COMPANY_WEBSITE,
-                Contact = currentUser.UserID
+                Contact = currentUser.UserName,
             };
             result = new Crystal
             {

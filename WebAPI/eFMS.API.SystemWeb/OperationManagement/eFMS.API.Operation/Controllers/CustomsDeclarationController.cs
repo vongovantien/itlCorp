@@ -315,14 +315,7 @@ namespace eFMS.API.Operation.Controllers
         public IActionResult CheckDeletePermission(List<CustomsDeclarationModel> clearances)
         {
             var hs = customsDeclarationService.CheckAllowDelete(clearances);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result;
-            if (hs.Success)
-            {
-                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            }
-            result = new ResultHandle { Status = hs.Success, Message = hs.Exception.Message.ToString() };
-            return Ok(result);
+            return Ok(hs);
         }
 
         /// <summary>

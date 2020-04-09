@@ -1,4 +1,4 @@
-<div class="m-content form-manifest m-form m-form--state">
+<div class="m-content m-form m-form--state">
     <form [formGroup]="formGroup">
         <div class="m-portlet">
             <div class="m-portlet__body">
@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (supplier.dirty && !supplier.valid) || (isSubmitted && !supplier.valid)}">
+                            [ngClass]="{'m-form__group has-danger':  (supplier.dirty && !supplier.valid) || (isSubmitted && !supplier.valid)}">
                             <label class="form-control-label" for="">
                                 Supplier <span class="m--font-danger">(*)</span>
                             </label>
@@ -46,7 +46,7 @@
                             <input type="text" class="form-control m-input m-input--square"
                                 formControlName="marksOfNationality">
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (marksOfNationality.errors | equalError: 'required') || (marksOfNationality.errors | equalError: 'required') && marksOfNationality.dirty">
+                                *ngIf="isSubmitted && (marksOfNationality.errors | equalError: 'required') && marksOfNationality.dirty">
                                 Marks of Nationality & Registration is required!
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                             </label>
                             <input type="text" class="form-control m-input m-input--square" formControlName="vesselNo">
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (vesselNo.errors | equalError: 'required') || (vesselNo.errors | equalError: 'required') && vesselNo.dirty">
+                                *ngIf="isSubmitted && (vesselNo.errors | equalError: 'required') && vesselNo.dirty">
                                 Vessel No is required!
                             </div>
                         </div>
@@ -153,7 +153,7 @@
                             <ng-select [items]="freightCharges" placeholder="select" formControlName="freightCharge">
                             </ng-select>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') || (freightCharge.errors | equalError: 'required') && freightCharge.dirty">
+                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') && freightCharge.dirty">
                                 Freight Charge is required!
                             </div>
                         </div>

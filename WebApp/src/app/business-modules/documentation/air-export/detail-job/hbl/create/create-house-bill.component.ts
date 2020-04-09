@@ -128,27 +128,27 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.formCreateHBLComponent.isSubmitted = true;
         if (this.isImport) {
             this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
-            .pipe(
-                mergeMap((res: any) => {
-                    if(this.formCreateHBLComponent.hwbno.value == null || this.formCreateHBLComponent.hwbno.value == ""){
-                        this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
-                    }
-                    if (!this.checkValidateForm()) {
-                        this.infoPopup.show();
-                        return null;
-                    }
-                    return forkJoin([this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
-                }
-            )).subscribe(result => {
-                if (result[0]) {
-                    this.confirmExistedHbl.show();
-                } else {
-                    const houseBill: HouseBill = this.getDataForm();
-                    this.setData(houseBill);
-                    this.createHbl(houseBill);
-                }
+                .pipe(
+                    mergeMap((res: any) => {
+                        if (this.formCreateHBLComponent.hwbno.value == null || this.formCreateHBLComponent.hwbno.value == "") {
+                            this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
             }
-            );
+                        if (!this.checkValidateForm()) {
+                            this.infoPopup.show();
+                            return null;
+        }
+                        return forkJoin([this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
+                    }
+                    )).subscribe(result => {
+                        if (result[0]) {
+                            this.confirmExistedHbl.show();
+                        } else {
+                            const houseBill: HouseBill = this.getDataForm();
+                            this.setData(houseBill);
+                            this.createHbl(houseBill);
+                        }
+                    }
+                    );
         }
         else {
             if (!this.checkValidateForm()) {
@@ -158,36 +158,36 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
                 .pipe(
                     catchError(this.catchError),
-                    )
-                    .subscribe(
-                        (res: any) => {
-                            if (res) {
-                                this.confirmExistedHbl.show();
-                            } else {
-                                const houseBill: HouseBill = this.getDataForm();
-                                this.setData(houseBill);
-                                this.createHbl(houseBill);
-                            }
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (res) {
+                            this.confirmExistedHbl.show();
+                        } else {
+            const houseBill: HouseBill = this.getDataForm();
+                            this.setData(houseBill);
+                            this.createHbl(houseBill);
                         }
-                    );
+                    }
+                );
         }
 
     }
 
     setData(houseBill: HouseBill) {
-        houseBill.jobId = this.jobId;
-        houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
-        houseBill.otherCharges.forEach(c => {
-            c.jobId = this.jobId;
-            c.hblId = SystemConstants.EMPTY_GUID;
-        });
+            houseBill.jobId = this.jobId;
+            houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
+            houseBill.otherCharges.forEach(c => {
+                c.jobId = this.jobId;
+                c.hblId = SystemConstants.EMPTY_GUID;
+            });
     }
 
     confirmSaveData() {
         this.confirmExistedHbl.hide();
         const houseBill: HouseBill = this.getDataForm();
         this.setData(houseBill);
-        this.createHbl(houseBill);
+            this.createHbl(houseBill);
     }
 
     checkValidateForm() {
@@ -222,7 +222,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         if (!res.data) {
                             this.gotoList();
                         } else {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                            if (!!hbId) {
+                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}/separate`]);
+                            }
+                            else {
+                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                            }
                         }
                     }
                 }

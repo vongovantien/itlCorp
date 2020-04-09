@@ -1,19 +1,12 @@
 import { Component, Input, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { AppList } from 'src/app/app.list';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
-import { forkJoin, Observable } from 'rxjs';
-import { finalize, catchError } from 'rxjs/operators';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { NgxSpinnerService } from 'ngx-spinner';
+import { Observable } from 'rxjs';
 import { CsManifest } from 'src/app/shared/models/document/manifest.model';
 import { FormValidators } from '@validators';
 import { Store } from '@ngrx/store';
 import * as fromShare from './../../../../../share-business/store';
 import { GetCataloguePortAction, getCataloguePortState } from '@store';
-import { CommonEnum, TransactionTypeEnum } from '@enums';
+import { CommonEnum } from '@enums';
 import { PortIndex } from '@models';
 import { AppForm } from 'src/app/app.form';
 
@@ -46,7 +39,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     shipmentDetail: any = {}; // TODO model.
     manifest: CsManifest;
     jobId: string = '';
-    isAir: boolean = false;
+    @Input() isAir: boolean = false;
     isImport: boolean = false;
     defaultMarksOfNationality: string = '';
     defaultVoyNo: string = '';
@@ -59,10 +52,6 @@ export class ShareBusinessFormManifestComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo,
-        private _dataService: DataService,
-        private _spinner: NgxSpinnerService,
-        private _documentRepo: DocumentationRepo,
         private _store: Store<fromShare.IShareBussinessState>,
         private _cd: ChangeDetectorRef
 
@@ -82,6 +71,10 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         }
         this.ports = this._store.select(getCataloguePortState);
         this.initForm();
+    }
+
+    ngAfterViewInit() {
+        this._cd.detectChanges;
     }
 
     getShipmentDetail(id: any) {
