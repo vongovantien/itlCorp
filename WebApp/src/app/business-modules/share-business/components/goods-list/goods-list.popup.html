@@ -197,8 +197,9 @@
 
 <goods-import-popup></goods-import-popup>
 
-<confirm-popup #confirmCancel [body]="'Do you want to save your changes to List of Goods ?'" [title]="'Alert'"
-    [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)="onSubmitCancel()" (onCancel)="onCancel()"></confirm-popup>
+<confirm-popup #confirmCancel body="All entered data will be discarded, <br>Are you sure you want to leave?"
+    [title]="'Alert'" [labelConfirm]="'Yes'" [labelCancel]="'No'" (onSubmit)="onSubmitCancel()" (onCancel)="onCancel()">
+</confirm-popup>
 
 <confirm-popup #confirmDeleteContainerPopup [body]="'Are you sure you want to delete ?'" [title]="'Alert'"
     [labelConfirm]="'Yes'" (onSubmit)="onDeleteContainer()"></confirm-popup>
