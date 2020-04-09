@@ -31,11 +31,13 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
 
     jobId: string;
     hblDetail: any = {};
     selectedHbl: any = {};
     allowAdd: boolean = false;
+    isImport: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -116,7 +118,9 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     onImport(selectedData: any) {
+        this.isImport = true;
         this.selectedHbl = selectedData;
+        this.selectedHbl.hwbno = null;
         this.formCreateHBLComponent.updateFormValue(this.selectedHbl);
     }
 
@@ -187,15 +191,37 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
-            this.arrivalNoteComponent.isSubmitted = true;
-            this.deliveryComponent.isSubmitted = true;
-            this.infoPopup.show();
-        } else {
-            const houseBill: HouseBill = this.getDataForm();
-            houseBill.jobId = this.jobId;
-            this.createHbl(houseBill);
-        }
+                this.arrivalNoteComponent.isSubmitted = true;
+                this.deliveryComponent.isSubmitted = true;
+                this.infoPopup.show();
+                return;
+            }
+        else {
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+            .pipe(
+            catchError(this.catchError),
+             )
+            .subscribe(
+            (res: any) => {
+                        if (res) {
+                            this.confirmExistedHbl.show();
+                        } else {
+                            const houseBill: HouseBill = this.getDataForm();
+                            houseBill.jobId = this.jobId;
+                            this.createHbl(houseBill);
+                        }
+                    }
+                );
+            }
     }
+
+    confirmSaveData() {
+        this.confirmExistedHbl.hide();
+        const houseBill: HouseBill = this.getDataForm();
+        houseBill.jobId = this.jobId;
+        this.createHbl(houseBill);
+    }
+
 
     checkValidateForm() {
         let valid: boolean = true;

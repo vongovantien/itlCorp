@@ -40,7 +40,7 @@ export class TariffChargePopupComponent extends PopupBase {
     charges: any[] = [];
 
     configPayer: CommonInterface.IComboGirdConfig | any = {};
-    configComondity: CommonInterface.IComboGirdConfig | any = {};
+    configComodity: CommonInterface.IComboGirdConfig | any = {};
     configWareHouse: CommonInterface.IComboGirdConfig | any = {};
     configPort: CommonInterface.IComboGirdConfig | any = {};
 
@@ -73,7 +73,6 @@ export class TariffChargePopupComponent extends PopupBase {
     }
 
     ngOnChanges() {
-        // console.log(this.tariffCharge);
     }
 
     ngOnInit(): void {
@@ -166,9 +165,8 @@ export class TariffChargePopupComponent extends PopupBase {
             ]
         }, { selectedDisplayFields: ['shortName'], });
 
-        this.configComondity = Object.assign({}, this.configComoBoGrid, {
+        this.configComodity = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'ID' },
                 { field: 'groupNameEn', label: 'Name EN' },
                 { field: 'groupNameVn', label: 'Name Local' },
             ]
@@ -264,13 +262,13 @@ export class TariffChargePopupComponent extends PopupBase {
 
     getCommondityGroup() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.COMMODITY)) {
-            this.configComondity.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.COMMODITY);
+            this.configComodity.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.COMMODITY);
         } else {
             this._catalogueRepo.getCommodityGroup({ active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (commondityGroup: any = []) => {
-                        this.configComondity.dataSource = commondityGroup;
+                        this.configComodity.dataSource = commondityGroup;
                         this._dataService.setDataService(SystemConstants.CSTORAGE.COMMODITY, commondityGroup);
                     },
                 );
@@ -457,7 +455,6 @@ export class TariffChargePopupComponent extends PopupBase {
         // * Reset form
         this.formChargeTariff.reset();
         this.formChargeTariff.reset({ tariffChargeDetail: new TariffCharge() });
-
     }
 
     submitData() {
@@ -505,7 +502,7 @@ export class TariffChargePopupComponent extends PopupBase {
             !this.selectedCharge
             || !this.formChargeTariff.value.tariffChargeDetail.useFor
             || !this.formChargeTariff.value.tariffChargeDetail.route
-            || this.formChargeTariff.value.tariffChargeDetail.rangeFrom < this.formChargeTariff.value.tariffChargeDetail.rangeTo
+            || this.formChargeTariff.value.tariffChargeDetail.rangeFrom > this.formChargeTariff.value.tariffChargeDetail.rangeTo
         ) {
             valid = false;
         }

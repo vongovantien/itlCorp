@@ -57,5 +57,7 @@ namespace eFMS.API.Documentation.DL.IService
         CsTransactionDetailModel GetDetails(Guid id);
         AirwayBillExportResult NeutralHawbExport(Guid housebillId, Guid officeId);
         Crystal PreviewBookingNote(BookingNoteCriteria criteria);
+
+        IQueryable<CsTransactionDetailModel> GetDataHawbToCheckExisted();
     }
 }

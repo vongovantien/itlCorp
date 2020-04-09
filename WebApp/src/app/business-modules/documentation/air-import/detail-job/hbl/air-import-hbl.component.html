@@ -106,7 +106,7 @@
                                                                     <ng-container
                                                                         *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                                                                         <app-permission-button type="delete"
-                                                                            (onClick)="showDeletePopup(house, $event)">
+                                                                            (onClick)="showDeletePopup(house, $event,i)">
                                                                         </app-permission-button>
                                                                     </ng-container>
                                                                 </ng-container>

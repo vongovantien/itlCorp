@@ -191,8 +191,8 @@ export class CustomClearanceComponent extends AppList {
                         if (res.success) {
                             this.confirmDeletePopup.show();
                         } else {
-                            this._toastrService.error(res.message);
-                            // this.canNotAllowActionPopup.show();
+                            // this._toastrService.error(res.message);
+                            this.canNotAllowActionPopup.show();
                         }
                     },
                 );
@@ -216,8 +216,11 @@ export class CustomClearanceComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     // this._toastrService.success(res.message, '');
-                    this.getListCustomsDeclaration();
-                    this.canNotAllowActionPopup.show();
+                    if (res.status) {
+                        this.getListCustomsDeclaration();
+                    } else {
+                        this.canNotAllowActionPopup.show();
+                    }
                 },
             );
     }
@@ -254,6 +257,7 @@ export class CustomClearanceComponent extends AppList {
         this.isCheckAll = this.listCustomDeclaration.every((item: CustomDeclaration) => item.isSelected);
     }
 
+    messageConvertError: string = '';
     mapClearancesToJobs() {
         const clearancesToConvert = [];
         const customCheckedArray: any[] = this.listCustomDeclaration.filter((item: CustomDeclaration) => item.isSelected && !item.jobNo);
@@ -302,23 +306,24 @@ export class CustomClearanceComponent extends AppList {
                     shipment.packageTypeId = this.listUnit[index].id;
                 }
             } else {
-                this._toastrService.error(clearance.clearanceNo + ` Không có customer để tạo job mới`);
+                this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có customer để tạo job mới <br />`;
                 shipment = null;
             }
             if (clearance.mblid == null) {
-                this._toastrService.error(clearance.clearanceNo + ` Không có MBL/MAWB để tạo job mới`);
+                this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có MBL/MAWB để tạo job mới <br />`;
                 shipment = null;
             }
             if (clearance.hblid == null) {
-                this._toastrService.error(clearance.clearanceNo + ` Không có HBL/HAWB để tạo job mới`);
+                this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có HBL/HAWB để tạo job mới <br />`;
                 shipment = null;
             }
             if (clearance.clearanceDate == null) {
-                this._toastrService.error(clearance.clearanceNo + ` Không có clearance date để tạo job mới`);
+                this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có clearance date để tạo job mới <br />`;
                 shipment = null;
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
         }
+        this._toastrService.error(this.messageConvertError, '', { enableHtml: true });
         return clearancesToConvert;
     }
 

@@ -82,8 +82,6 @@ export class AirExportManifestComponent extends AppList {
     }
 
     ngAfterViewInit() {
-        this.formManifest.isAir = true;
-        this.cdRef.detectChanges();
         this._store.select(getParamsRouterState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
@@ -98,6 +96,7 @@ export class AirExportManifestComponent extends AppList {
 
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
+                    this.cdRef.detectChanges();
 
                 }
             });

@@ -27,12 +27,17 @@
 <confirm-popup #confirmSave body="You are about to create a new HAWB.
 Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Create HBL"></confirm-popup>
 
+<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
+    (onSubmit)="confirmSaveData()" title="HAWB Existed"></confirm-popup>
+
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
 
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="confirmCancelPopup.hide();gotoList()"></confirm-popup>
+
+
 
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="2">
 </import-house-bill-detail>

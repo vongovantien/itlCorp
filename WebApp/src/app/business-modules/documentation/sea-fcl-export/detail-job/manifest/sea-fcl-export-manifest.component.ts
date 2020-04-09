@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -57,7 +57,9 @@ export class SeaFclExportManifestComponent extends AppList {
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
-        protected _router: Router
+        protected _router: Router,
+        private cdRef: ChangeDetectorRef
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -93,6 +95,7 @@ export class SeaFclExportManifestComponent extends AppList {
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
+                    this.cdRef.detectChanges();
 
                 }
             });

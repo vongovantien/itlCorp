@@ -162,46 +162,40 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         }, { selectedDisplayFields: ['name_EN'], });
         this.initForm();
         this.getPorts();
-        this._store.select(fromShare.getDetailHBlState)
-            .subscribe(
-                (res: any) => {
-                    if (!!res.id) {
+        if (!this.isDetail) {
+            this._store.select(fromShare.getTransactionDetailCsTransactionState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: any) => {
                         this.shipmentDetail = res;
+
+                        this.mtBill.setValue(this.shipmentDetail.mawb);
                         this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
                         this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                    }
-                }
-            );
-        this._store.select(fromShare.getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    this.shipmentDetail = res;
+                        this.supplier.setValue(this.shipmentDetail.coloaderId);
+                        this.issueHBLDate.setValue(new Date());
+                        this.pol.setValue(this.shipmentDetail.pol);
+                        this.pod.setValue(this.shipmentDetail.pod);
+                        this.localVessel.setValue(this.shipmentDetail.flightVesselName);
+                        this.localVoyNo.setValue(this.shipmentDetail.voyNo);
 
-                    this.mtBill.setValue(this.shipmentDetail.mawb);
-                    this.servicetype.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.typeOfService, text: this.shipmentDetail.typeOfService }]);
-                    this.documentDate.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                    this.supplier.setValue(this.shipmentDetail.coloaderId);
-                    this.issueHBLDate.setValue(new Date());
-                    this.pol.setValue(this.shipmentDetail.pol);
-                    this.pod.setValue(this.shipmentDetail.pod);
-                    this.localVessel.setValue(this.shipmentDetail.flightVesselName);
-                    this.localVoyNo.setValue(this.shipmentDetail.voyNo);
+                        if (this.shipmentDetail.eta != null) {
 
-                    if (this.shipmentDetail.eta != null) {
+                            this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                            if (this.shipmentDetail.etd != null) {
+                                this.etd.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
+                                this.mindateEta = this.createMoment(new Date(this.shipmentDetail.etd));
 
-                        this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                        if (this.shipmentDetail.etd != null) {
-                            this.etd.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
-                            this.mindateEta = this.createMoment(new Date(this.shipmentDetail.etd));
+                            }
+                            this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
+                            this.mindateEtaWareHouse = this.createMoment(new Date(this.shipmentDetail.eta));
 
                         }
-                        this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
-                        this.mindateEtaWareHouse = this.createMoment(new Date(this.shipmentDetail.eta));
-
                     }
-                }
-            );
+                );
+        }
+
+
 
     }
 
@@ -279,7 +273,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             documentNo: [],
             referenceNo: [],
             // warehousenotice: [],
-            inWord:[],
+            inWord: [],
             shippingMark: [],
             documnentDate: [],
             remark: [],
@@ -415,7 +409,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             documentNo: res.documentNo,
             dateETA: !!res.etawarehouse ? { startDate: new Date(res.etawarehouse), endDate: new Date(res.etawarehouse) } : null, // * Date;
             // warehousenotice: res.warehouseNotice,
-            inWord:res.inWord,
+            inWord: res.inWord,
             shippingMark: res.shippingMark,
             remark: res.remark,
             dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
