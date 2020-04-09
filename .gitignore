@@ -364,3 +364,4 @@ WebAPI/ITL.NetCore.Connection.pdb
 /WebAPI/eFMS.API.Common/eFMS.API.Infrastructure/obj
 /WebAPI/eFMS.API.Common/eFMS.API.Infrastructure/bin
 /WebAPI/eFMS.API.SystemWeb/ReportPreview/obj
+WebApp/.vscode/settings.json
