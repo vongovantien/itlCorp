@@ -124,8 +124,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     saveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
-        if(this.isImport){
-            if(this.formCreateHBLComponent.hwbno.value === null){
+        if (this.isImport) {
+            if (this.formCreateHBLComponent.hwbno.value === null) {
                 this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
             }
         }
@@ -134,17 +134,17 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 this.infoPopup.show();
                 return;
             }
-    
+
             const houseBill: HouseBill = this.getDataForm();
             houseBill.jobId = this.jobId;
-    
+
             houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
-    
+
             houseBill.otherCharges.forEach(c => {
                 c.jobId = this.jobId;
                 c.hblId = SystemConstants.EMPTY_GUID;
             });
-    
+
             this.createHbl(houseBill);
         }, 200);
     }
@@ -181,7 +181,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         if (!res.data) {
                             this.gotoList();
                         } else {
-                            this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                            if (!!hbId) {
+                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}/separate`]);
+                            }
+                            else {
+                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                            }
                         }
                     }
                 }
@@ -228,12 +233,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                                 this.formCreateHBLComponent.updateFormValue(hbl);
                                 this.formCreateHBLComponent.hwbno.setValue(null);
                             }
-    
+
                         }
                     );
             }
         }, 300);
-       
+
     }
 
 
