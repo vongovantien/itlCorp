@@ -63,5 +63,8 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Upd
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="confirmCancelPopup.hide();gotoList()"></confirm-popup>
+<confirm-popup #confirmSaveExistedHbl body="HAWB No has existed, do you want to continue saving?"
+    (onSubmit)="confirmUpdateData()" title="HAWB Existed"></confirm-popup>
+
 
 <input-booking-note-popup></input-booking-note-popup>

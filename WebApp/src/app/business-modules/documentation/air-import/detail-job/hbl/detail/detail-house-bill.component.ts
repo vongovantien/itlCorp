@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { CsTransactionDetail } from '@models';
+import { CsTransactionDetail, HouseBill } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -70,9 +70,17 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+                this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
-
+                this._store.select(getDetailHBlPermissionState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this.allowUpdate = res.allowUpdate;
+                        }
+                    }
+                );
                 this.getDetailHbl();
 
             } else {
@@ -81,15 +89,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-        this._store.select(getDetailHBlPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowUpdate = res.allowUpdate;
-                    }
-                }
-            );
+      
     }
 
     getDetailHbl() {
@@ -152,11 +152,35 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         }
+        else {
+            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.confirmExistedHbl.show();
+                    } else {
+                        const modelUpdate = this.getDataForm();
+                        this.setDataToUpdate(modelUpdate);
+                        this.updateHbl(modelUpdate);
+                    }
+                }
+            );
+        }
+    }
 
+    confirmUpdateData() {
+        this.confirmExistedHbl.hide();
         const modelUpdate = this.getDataForm();
+        this.setDataToUpdate(modelUpdate);
+        this.updateHbl(modelUpdate);
+    }
+
+    setDataToUpdate(modelUpdate: HouseBill) {
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
-
         modelUpdate.arrivalFirstNotice = this.hblDetail.arrivalFirstNotice;
         modelUpdate.arrivalFooter = this.hblDetail.arrivalFooter;
         modelUpdate.arrivalHeader = this.hblDetail.arrivalHeader;
@@ -169,10 +193,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.subAbbr = this.hblDetail.subAbbr;
         modelUpdate.transactionType = ChargeConstants.AI_CODE;
-
         modelUpdate.userCreated = this.hblDetail.userCreated;
-
-        this.updateHbl(modelUpdate);
     }
 
     updateHbl(body: any) {

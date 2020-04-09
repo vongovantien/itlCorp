@@ -53,7 +53,8 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _store: Store<fromShare.IShareBussinessState>,
-        private cdRef: ChangeDetectorRef
+        private _cd: ChangeDetectorRef
+
 
     ) {
         super();
@@ -73,7 +74,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     }
 
     ngAfterViewInit() {
-        this.cdRef.detectChanges;
+        this._cd.detectChanges;
     }
 
     getShipmentDetail(id: any) {
@@ -150,8 +151,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     initForm() {
         this.formGroup = this._fb.group({
             referenceNo: [],
-            supplier: [null
-                , Validators.required],
+            supplier: [null, Validators.required],
             attention: [],
             marksOfNationality: [null, Validators.required],
             vesselNo: [null, Validators.required],
@@ -161,8 +161,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             deconsolidator: [],
             weight: [],
             volume: [],
-            agent: [null
-                , Validators.required],
+            agent: [null, Validators.required],
             pol: [null, Validators.required],
             pod: [null, Validators.required]
 
