@@ -5,7 +5,7 @@ namespace CommonType {
 
     export type DIRECTION = 'left' | 'right';
 
-    export type SERVICE_TYPE = 'air' | 'sea';
+    export type SERVICE_TYPE = 'air' | 'sea' | 'logistic';
 
 
     export const DATATYPE = {
@@ -23,6 +23,7 @@ namespace CommonType {
     export const SERVICE_TYPE = {
         AIR: <SERVICE_TYPE>'air',
         SEA: <SERVICE_TYPE>'sea',
+        LOGISTIC: <SERVICE_TYPE>'logistic',
     };
 
 

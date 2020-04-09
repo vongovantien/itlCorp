@@ -139,7 +139,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setDisplayFields(data: { field: string, label: string }[]) {
-        console.log(data);
         if (!!data && data.length > 0) {
             this.DisplayFields = data;
             this.searchKeys = this.DisplayFields.map(d => d.field);

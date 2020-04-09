@@ -249,6 +249,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (shipment: CsTransaction | OpsTransaction) => {
                     this.shipment = shipment;
+
                 }
             );
     }
@@ -259,8 +260,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (hbl: any) => {
                     this.hbl = hbl;
-                    console.log(this.hbl);
-
                 }
             );
     }
@@ -481,34 +480,40 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
         switch (hintType) {
             case CommonEnum.QUANTITY_TYPE.GW:
-                if (this.service !== 'sea') {
+                if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        chargeItem.quantity = this.shipment.grossWeight || this.shipment.sumGrossWeight || 0;
+                        chargeItem.quantity = this.shipment.grossWeight;
                     } else {
                         chargeItem.quantity = this.hbl.gw;
                     }
+                } else if (this.service === 'logistic') {
+                    chargeItem.quantity = this.shipment.grossWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.GW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
-                if (this.service !== 'sea') {
+                if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        chargeItem.quantity = this.shipment.netWeight || this.shipment.sumNetWeight || 0;
+                        chargeItem.quantity = this.shipment.netWeight;
                     } else {
                         chargeItem.quantity = this.hbl.netWeight;
                     }
+                } else if (this.service === 'logistic') {
+                    chargeItem.quantity = this.shipment.grossWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
-                if (this.service !== 'sea') {
+                if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        chargeItem.quantity = this.shipment.cbm || this.shipment.sumCbm || 0;
+                        chargeItem.quantity = this.shipment.cbm;
                     } else {
                         chargeItem.quantity = this.hbl.cbm;
                     }
+                } else if (this.service === 'logistic') {
+                    chargeItem.quantity = this.shipment.grossWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
@@ -517,23 +522,27 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
-                if (this.service !== 'sea') {
+                if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        chargeItem.quantity = this.shipment.chargeWeight || this.shipment.sumChargeWeight || 0;
+                        chargeItem.quantity = this.shipment.chargeWeight;
                     } else {
                         chargeItem.quantity = this.hbl.cw;
                     }
+                } else if (this.service === 'logistic') {
+                    chargeItem.quantity = this.shipment.grossWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
                 }
                 break;
             case CommonEnum.QUANTITY_TYPE.PACKAGE:
-                if (this.service !== 'sea') {
+                if (this.service === 'sea') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        chargeItem.quantity = this.shipment.packageQty || this.shipment.sumChargeWeight || 0;
+                        chargeItem.quantity = this.shipment.packageQty;
                     } else {
                         chargeItem.quantity = this.hbl.packageQty;
                     }
+                } else if (this.service === 'logistic') {
+                    chargeItem.quantity = this.shipment.grossWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 }
