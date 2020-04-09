@@ -1,0 +1,41 @@
+﻿{
+  "MSG_DATA_NOT_FOUND": "Data not found",
+  "MSG_OBJECT_NOT_EXISTS": "Object does not exist",
+  "MSG_OBJECT_DUPLICATED": "Object is duplicated",
+  "MSG_OBJECT_RELATION_NOT_VALID": "Do not have parent object", //204
+  "MSG_INSERT_SUCCESS": "New data added",
+  "MSG_UPDATE_SUCCESS": "Data update success",
+  "MSG_DELETE_SUCCESS": "Data delete success",
+  "MSG_NAME_EXISTED": "Name has existed",
+  "MSG_CODE_EXISTED": "Code has existed",
+  "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data has been used. Delete denied",
+  "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
+  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
+  "FILE_NOT_FOUND": "File not found!",
+  "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
+  "MSG_NAME_EN_EXISTED": "Name EN has been existed",
+  "MSG_NAME_LOCAL_EXISTED": "Name VN has been existed",
+
+  //------------start: Custom Clearance
+  "MSG_CLEARANCENO_EXISTED": "Custom No [{0}] existed ! Please recheck it?",
+  "MSG_INVALID_DATE": "Invalid date format",
+  "MSG_INVALID_NUMBER": "Invalid number format",
+  "MSG_CUSTOM_CLEARANCE_NO_EMPTY": "Clearance No is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_DATE_EMPTY": "Clearance Date is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_CUSTOMER_CODE_EMPTY": "Customer Code is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_MBL_EMPTY": "MBL is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_HBL_EMPTY": "HBL is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_GATEWAY_EMPTY": "Gateway is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_CARGO_TYPE_EMPTY": "Cargo Type is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_SERVICE_TYPE_EMPTY": "Service Type is not allow empty",
+  "MSG_CUSTOM_CLEARANCE_ROUTE_EMPTY": "Route is not allow empty",
+  "MSG_DUPLICATE_DATA": "{0} duplacate data",
+  "MSG_INVALID_MAX_LENGTH": "Should be at most {0} symbols",
+  "MSG_INVALID_NEGATIVE": "Not allow negative numbers",
+  "MSG_CUSTOM_INVALID_CHARACTER_SPECIAL": "Not allowed to enter special characters. Except for characters ./_- and space",
+  "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS": " have been convert from ecus system",
+  "MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA": "There is no data converted from ecus system",
+  //------------end: Custom Clearance,
+  "MSG_STAGE_ASSIGNED_EXISTED": "There is no data converted from ecus system"
+
+}

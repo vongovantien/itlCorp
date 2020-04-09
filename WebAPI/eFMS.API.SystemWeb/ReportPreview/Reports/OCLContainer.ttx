@@ -1,0 +1,8 @@
+STT	Number		
+ContainerNo	String	100	
+SealNo	String	100	
+CELLLOG	String	100
+ST	String	100	
+SZTY	String	100	
+GW	Number		
+CBM	Number		

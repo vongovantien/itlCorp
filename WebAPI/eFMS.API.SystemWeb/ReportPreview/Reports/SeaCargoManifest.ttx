@@ -1,0 +1,17 @@
+TransID	String	255	TRANID
+HBL	String	255	VNHCM01190241152
+Marks	String	255	Remarks
+Nofpiece	String	255	100 Pcs
+GrossWeight	Number	1000
+SeaCBM	Number	4
+NoOfAWB	Number	1	
+Destination	String	255	MainDescription
+Shipper	String	255	ShipmetnName
+Consignee	String	255	ConsigneeName
+Descriptions	Memo	So long
+FreightCharge	String	255	FreightFee
+Notify	String	255	Notification
+OnboardNote	String	255	Nothing
+MaskNos	Memo	LongText
+TranShipmentTo	String	255	PlaceTo
+BillType	String	255	Sea

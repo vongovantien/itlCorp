@@ -1,5 +1,7 @@
 
-import * as lodash from 'lodash';
+
+import _uniq from 'lodash/uniq';
+import _filter from 'lodash/filter';
 
 /**
  * Author: Thor The
@@ -14,15 +16,15 @@ import * as lodash from 'lodash';
  * @param key_search 
  * @param condition 
  */
-export async function PrepareListFieldSearch(current_list_fields_search = null, list_fields, key_search, condition) {
+export function PrepareListFieldSearch(current_list_fields_search = null, list_fields, key_search, condition) {
 
     var list_fields_search: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_fields_search = await PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
+        list_fields_search = PrepareListFieldsSearchWithAndCondition(current_list_fields_search, list_fields, key_search);
     }
 
     if (condition == 'or' || condition == 'OR') {
-        list_fields_search = await PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
+        list_fields_search = PrepareListFieldsSearchWithOrCondition(list_fields, key_search);
     }
 
     return list_fields_search;
@@ -35,13 +37,13 @@ export async function PrepareListFieldSearch(current_list_fields_search = null, 
  * @param reference_source 
  * @param condition 
  */
-export async function SearchEngine(list_keys_search: any[], reference_source: any[], condition) {
+export function SearchEngine(list_keys_search: any[], reference_source: any[], condition) {
     var list_result: any[] = [];
     if (condition == 'and' || condition == 'AND') {
-        list_result = await SearchWithAndCondition(list_keys_search, reference_source);
+        list_result = SearchWithAndCondition(list_keys_search, reference_source);
     }
     if (condition == 'or' || condition == 'OR') {
-        list_result = await SearchWithOrCondition(list_keys_search, reference_source);
+        list_result = SearchWithOrCondition(list_keys_search, reference_source);
     }
 
     return list_result;
@@ -58,7 +60,7 @@ function SearchWithAndCondition(list_keys_search: any[], reference_source: any[]
         if (list_keys_search.length == 0) {
             ReturnList = reference_source;
         } else {
-            ReturnList = lodash.filter(reference_source, function (o) {
+            ReturnList = _filter(reference_source, function (o) {
 
                 var result = false;
                 var list_result: any[] = []
@@ -88,7 +90,7 @@ function SearchWithAndCondition(list_keys_search: any[], reference_source: any[]
 
 
                 }
-                if (lodash.uniq(list_result).length == 1 && list_result[0] == true) {
+                if (_uniq(list_result).length == 1 && list_result[0] == true) {
                     result = true;
                 } else {
                     result = false;
@@ -112,7 +114,7 @@ function SearchWithOrCondition(list_keys_search: any[], reference_source: any[])
         if (list_keys_search.length == 0) {
             ReturnList = reference_source;
         } else {
-            ReturnList = lodash.filter(reference_source, function (o) {
+            ReturnList = _filter(reference_source, function (o) {
                 var result = false;
                 for (var k = 0; k < list_keys_search.length; k++) {
                     var key = Object.keys(list_keys_search[k])[0];
@@ -159,13 +161,11 @@ function PrepareListFieldsSearchWithAndCondition(current_list_fields_search, lis
             for (var i = 0; i < current_list_fields_search.length; i++) {
                 var obj_comp = Object.keys(current_list_fields_search[i])[0] === key;
                 if (obj_comp) {
-                    console.log(obj_comp);
                     index_existed = i;
                 }
             }
 
             if (index_existed != -1 && value != "") {
-                console.log(index_existed);
                 current_list_fields_search.splice(index_existed, 1, search_obj);
             }
             if (index_existed != -1 && value == "") {

@@ -1,0 +1,26 @@
+for %%d in (
+	..\eFMS.API.SystemWeb\IdentityServer\eFMS.IdentityServer.DAL,
+	..\eFMS.API.SystemWeb\IdentityServer\eFMS.IdentityServer.DL,
+	..\eFMS.API.SystemWeb\IdentityServer\eFMS.IdentityServer,
+	..\eFMS.API.SystemWeb\AccountingManagement\eFMS.API.Accounting.DAL,
+	..\eFMS.API.SystemWeb\AccountingManagement\eFMS.API.Accounting.DL,
+	..\eFMS.API.SystemWeb\AccountingManagement\eFMS.API.Accounting,
+	..\eFMS.API.SystemWeb\CatalogueManagement\eFMS.API.Catalogue.DAL,
+	..\eFMS.API.SystemWeb\CatalogueManagement\eFMS.API.Catalogue.DL,
+	..\eFMS.API.SystemWeb\CatalogueManagement\eFMS.API.Catalogue,
+	..\eFMS.API.SystemWeb\DocumentationManagement\eFMS.API.Documentation.DAL,
+	..\eFMS.API.SystemWeb\DocumentationManagement\eFMS.API.Documentation.DL,
+	..\eFMS.API.SystemWeb\DocumentationManagement\eFMS.API.Documentation,
+	..\eFMS.API.SystemWeb\OperationManagement\eFMS.API.Operation.DAL,
+	..\eFMS.API.SystemWeb\OperationManagement\eFMS.API.Operation.DL,
+	..\eFMS.API.SystemWeb\OperationManagement\eFMS.API.Operation,
+	..\eFMS.API.SystemWeb\SettingManagement\eFMS.API.Setting.DAL,
+	..\eFMS.API.SystemWeb\SettingManagement\eFMS.API.Setting.DL,
+	..\eFMS.API.SystemWeb\SettingManagement\eFMS.API.Setting,
+	..\eFMS.API.SystemWeb\SystemManagement\eFMS.API.System.DAL,
+	..\eFMS.API.SystemWeb\SystemManagement\eFMS.API.System.DL,
+	..\eFMS.API.SystemWeb\SystemManagement\eFMS.API.System,
+	..\eFMS.API.SystemWeb\eFMS.API.ReportData,
+	..\eFMS.API.SystemWeb\ReportPreview
+) do dotnet build "%%d"
+pause

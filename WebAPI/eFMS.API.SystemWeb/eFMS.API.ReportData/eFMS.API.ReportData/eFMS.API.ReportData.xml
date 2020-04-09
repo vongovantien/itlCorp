@@ -1,0 +1,375 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.ReportData</name>
+    </assembly>
+    <members>
+        <member name="T:eFMS.API.ReportData.Consts.ResourceConsts">
+            <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
+        </member>
+        <member name="T:eFMS.API.ReportData.Controllers.AccountingReportController">
+            <summary>
+            Accounting Report Controller
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Accounting Report
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAdvancePayment(eFMS.API.ReportData.Models.Criteria.AdvancePaymentCriteria)">
+            <summary>
+            Export Advance Payment
+            </summary>
+            <param name="advancePaymentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAdvancePaymentShipment(eFMS.API.ReportData.Models.Criteria.AdvancePaymentCriteria)">
+            <summary>
+            Export Advance Payment with each Request.
+            </summary>
+            <param name="advancePaymentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPayment(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
+            <summary>
+            Export Settlement Payment
+            </summary>
+            <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPaymentShipment(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
+            <summary>
+            Export Settlement Payment
+            </summary>
+            <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailAdvancePayment(System.Guid,System.String)">
+            <summary>
+            Export detail advance payment
+            </summary>
+            <param name="advanceId">Id of advance payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSOA(System.String,System.String)" -->
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportBravoSOA(System.String)">
+            <summary>
+            Export Bravo SOA
+            </summary>
+            <param name="soaNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAOPS(System.String)">
+            <summary>
+            Export SOA OPS
+            </summary>
+            <param name="soaNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPayment(System.Guid,System.String)">
+            <summary>
+            Export detail settlement payment
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
+        <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            constructor
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCountry(eFMS.API.ReportData.Models.CatCountryCriteria)">
+            <summary>
+            export country
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportWareHouse(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export warehouse
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportPortIndex(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export portindex
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportPartner(eFMS.API.ReportData.Models.CatPartnerCriteria)">
+            <summary>
+            export partnerdata
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCommodityList(eFMS.API.ReportData.Models.CatCommodityCriteria)">
+            <summary>
+            export commodity list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCommodityGroup(eFMS.API.ReportData.Models.CatCommodityGroupCriteria)">
+            <summary>
+            export commodity group
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportStage(eFMS.API.ReportData.Models.CatStageCriteria)">
+            <summary>
+            export stage
+            </summary>
+            <returns></returns>
+            
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportUnit(eFMS.API.ReportData.Models.CatUnitCriteria)">
+            <summary>
+            export unit
+            </summary> 
+            <returns></returns>
+             
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportProvince(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportDistrict(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export district
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportTownWard(eFMS.API.ReportData.Models.CatPlaceCriteria)">
+            <summary>
+            export town-ward
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCharge(eFMS.API.ReportData.Models.CatChargeCriteria)">
+            <summary>
+            export charge
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCurrency(eFMS.API.ReportData.Models.CatCurrrencyCriteria)">
+            <summary>
+            export currency
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
+            <summary>
+            export Custom Clearance
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Accounting Report
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportEManifest(System.Guid)">
+            <summary>
+            Export E-Manifest of a housebill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportGoodsDeclare(System.String)">
+            <summary>
+            Export goods declare by house bill id
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportDangerousGoods(System.String)">
+            <summary>
+            export dangerous goods
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportMAWBAirExport(System.String)">
+            <summary>
+            Export MAWB Air Export
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportHAWBAirExport(System.String,System.String)">
+            <summary>
+            Export HAWB Air Export
+            </summary>
+            <param name="hblid"></param>
+            <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSCSCAirExport(System.String)">
+            <summary>
+            Export SCSC of MAWB Air Export
+            </summary>
+            <param name="jobId">Id of shipment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportTCSAirExport(System.String)">
+            <summary>
+            Export TCS of MAWB Air Export
+            </summary>
+            <param name="jobId">Id of shipment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverview(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Shipment Overview
+            </summary>
+            <param name="criteria">Id of shipment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            
+            </summary>
+            <param name="appSettings"></param>
+            <param name="fileHelper"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportOffice(eFMS.API.ReportData.Models.SysOfficeCriteria)">
+            <summary>
+            Export Office
+            </summary>
+            <param name="sysOfficeCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportDepartment(eFMS.API.ReportData.Models.CatDepartmentCriteria)">
+            <summary>
+            Export Department
+            </summary>
+            <param name="catDepartmentCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportGroup(eFMS.API.ReportData.Models.Criteria.SysGroupCriteria)">
+            <summary>
+            export list group to excel file
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.ExportUser(eFMS.API.ReportData.Models.SysUserCriteria)">
+            <summary>
+            Export User
+            </summary>
+            <param name="sysUserCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.FormatExcel.AccountingHelper">
+            <summary>
+            Accountant
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
+            <summary>
+            Generate advance payment excel
+            </summary>
+            <param name="listObj"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSettlementPaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.SettlementPaymentModel},System.IO.Stream)">
+            <summary>
+            Generate settlement payment excel
+            </summary>
+            <param name="listObj"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.BuildHeader(OfficeOpenXml.ExcelWorksheet,System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Build header
+            </summary>
+            <param name="worksheet"></param>
+            <param name="headers"></param>
+            <param name="title"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailAdvancePaymentExcel(eFMS.API.ReportData.Models.Accounting.AdvanceExport,System.String,System.IO.Stream)">
+            <summary>
+            Generate detail advance payment excel
+            </summary>
+            <param name="advanceExport"></param>
+            <param name="language"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSOAAirfreightExcel(eFMS.API.ReportData.Models.ExportSOAAirfreightModel,System.IO.Stream)">
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.IO.Stream)">
+            <summary>
+            Generate detail settlement payment excel
+            </summary>
+            <param name="settlementExport"></param>
+            <param name="language"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateMAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate MAWB Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateHAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate HAWBW Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateSCSCAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate SCSC Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateTCSAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">
+            <summary>
+            Generate TCS Air Export Excel
+            </summary>
+            <param name="airwayBillExport"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateShipmentOverviewExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.ExportShipmentOverview},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="T:eFMS.API.ReportData.Models.FilesNames">
+            <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
+        </member>
+    </members>
+</doc>

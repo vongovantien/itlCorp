@@ -1,15 +1,28 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build ---prod` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+        production: false,
+        local: false,
+        HOST: {
+                WEB_URL: "test.api-efms.itlvn.com",
+                ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
+                // ACCOUNTING: "localhost:44368",
+                DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
+                // DOCUMENTATION: "localhost:44366",
+                CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
+                // CATALOGUE: "localhost:44361",
+                // OPERATION: "test.api-efms.itlvn.com/Operation",
+                OPERATION: "localhost:44365",
+                SYSTEM: "test.api-efms.itlvn.com/System",
+                // SYSTEM: "localhost:44360",
+                // SETTING: "test.api-efms.itlvn.com/Setting",
+                SETTING: "localhost:44363",
+                REPORT: "test.api-efms.itlvn.com/ReportPreview/Default.aspx",
+                // REPORT: "localhost:53717",
+                EXPORT: "test.api-efms.itlvn.com/Export",
+                // EXPORT: "localhost:63492",
+                INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
+                // INDENTITY_SERVER_URL: "https://localhost:44369",
+                EXPORT_CRYSTAL: "localhost:53717/ExportCrystal.aspx",
+                // EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
+        },
 };
-
-/*
- * In development mode, to ignore zone related error stack frames such as
- * `zone.run`, `zoneDelegate.invokeTask` for easier debugging, you can
- * import the following file, but please comment it out in production mode
- * because it will have performance impact when throw error
- */
-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

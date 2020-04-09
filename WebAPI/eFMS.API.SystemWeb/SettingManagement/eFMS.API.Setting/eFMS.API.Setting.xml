@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.Setting</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.ITariffService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="currUser"></param>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.Paging(eFMS.API.Setting.DL.Models.Criteria.TariffCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of tariff
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.AddTariff(eFMS.API.Setting.DL.Models.TariffModel)">
+            <summary>
+            Add tariff and list tariff details
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.UpdateTariff(eFMS.API.Setting.DL.Models.TariffModel)">
+            <summary>
+            Update tariff and list tariff details
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckAllowDelete(System.Guid)">
+            <summary>
+            Check permission view detail ecus
+            </summary>
+            <param name="id">id of item want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.Delete(System.Guid)">
+            <summary>
+            Delete tariff and list tariff details
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check permission view detail ecus
+            </summary>
+            <param name="id">id of item want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.GetTariff(System.Guid)">
+            <summary>
+            Get tariff and list tariff detail by tariff id
+            </summary>
+            <param name="tariffId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.TariffController.CheckDuplicateTariff(eFMS.API.Setting.DL.Models.SetTariffModel)">
+            <summary>
+            Check duplicate tariff
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

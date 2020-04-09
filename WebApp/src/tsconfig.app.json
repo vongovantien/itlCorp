@@ -2,11 +2,15 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/app",
-    "module": "es2015",
     "types": []
   },
+  "compileOnSave": true,
   "exclude": [
-    "src/test.ts",
+    "test.ts",
     "**/*.spec.ts"
-  ]
+  ],
+    "angularCompilerOptions": {
+      "allowEmptyCodegenFiles": true,
+      "enableIvy": false    // do not enable Ivymode, it may cause to fail to build in product mode because Ivymode now just beta version
+    }
 }
