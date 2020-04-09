@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ButtonModalSetting } from '../../../shared/models/layout/button-modal-setting.model';
 import { ButtonType } from '../../../shared/enums/type-button.enum';
@@ -187,7 +187,7 @@ export class UserManagementComponent extends AppList {
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'User.xlsx');
                 },
-                (errors: any) => {
+                () => {
                 },
                 () => { }
             );
