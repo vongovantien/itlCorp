@@ -40,32 +40,28 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.length === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.length"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.width === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.width"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.height === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.height"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.package === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.package"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal">
                                 </div>
 
                             </div>
@@ -97,7 +93,7 @@
                             <div class="font-12">HW Constant</div>
                             <input type="number" style="max-width: 100px"
                                 class="form-control mw-100 m--margin-left-10 m--margin-right-10 flex-grow-1"
-                                [(ngModel)]="hwConstant" (ngModelChange)="calculateHWDimension()" autoFormatCurrency>
+                                [(ngModel)]="hwConstant" (ngModelChange)="calculateHWDimension()">
                         </div>
                     </div>
                     <div class="col-md-2 text-right">

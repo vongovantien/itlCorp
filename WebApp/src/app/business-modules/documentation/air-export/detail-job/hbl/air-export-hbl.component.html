@@ -177,7 +177,7 @@
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <obh-charge></obh-charge>
+                                                <obh-charge service="air"></obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>

@@ -73,14 +73,16 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
 
     onSubmitCancel() {
         this.confirmCancelPopup.hide();
-        this.onSaveContainerList();
+        // this.onSaveContainerList();
+        this.closePopup();
+
     }
 
     onCancel() {
         this.isSubmitted = false;
 
         this.confirmCancelPopup.hide();
-        this.closePopup();
+        // this.closePopup();
     }
 
     showImportPopup() {

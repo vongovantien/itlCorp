@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsTransactionDetail, Container } from 'src/app/shared/models';
+import { CsTransactionDetail, Container, CsTransaction } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
@@ -52,6 +52,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     deleteMessage: string = '';
     commodityGroups = null;
+
+    packageTypes: any[];
+    productServices: CommonInterface.INg2Select[];
+    serviceModes: CommonInterface.INg2Select[];
+    shipmentModes: CommonInterface.INg2Select[];
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -104,6 +109,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 }
             );
     }
+
     updateData(lstMasterContainers: any[]) {
         let sumCbm = 0;
         let sumPackages = 0;
@@ -292,7 +298,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.containerPopup.show();
     }
 
-    packageTypes: any[];
     getListPackageTypes() {
         this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }).toPromise().then(data => {
             this.packageTypes = this.utility.prepareNg2SelectData(data, 'id', 'unitNameEn');
@@ -319,11 +324,24 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                             this.editForm.opsTransaction = this.opsTransaction;
                             const hbl = new CsTransactionDetail(this.opsTransaction);
                             hbl.id = this.opsTransaction.hblid;
-
                             this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(hbl));
 
+                            const csTransation: CsTransaction = new CsTransaction(Object.assign({}, response, {
+                                grossWeight: this.opsTransaction.sumGrossWeight,
+                                netWeight: this.opsTransaction.sumNetWeight,
+                                cbm: this.opsTransaction.sumCbm,
+                                chargeWeight: this.opsTransaction.sumChargeWeight,
+                                packageQty: this.opsTransaction.sumPackages,
+                                isLocked: this.opsTransaction.isLocked,
+                                customerId: this.opsTransaction.customerId,
+                                customerName: this.opsTransaction.customerName,
+                                agentName: this.opsTransaction.agentName,
+                                supplierName: this.opsTransaction.supplierName,
+                            }));
+
+                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
+
                             // Tricking Update Transation Apply for isLocked..
-                            this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(this.opsTransaction));
 
                             this._store.dispatch(new OPSTransactionGetDetailSuccessAction(this.opsTransaction));
                             this._store.dispatch(new fromShareBussiness.GetProfitHBLAction(this.opsTransaction.hblid));
@@ -355,9 +373,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 },
             );
     }
-    productServices: CommonInterface.INg2Select[];
-    serviceModes: CommonInterface.INg2Select[];
-    shipmentModes: CommonInterface.INg2Select[];
+
     getShipmentCommonData() {
         this._documentRepo.getOPSShipmentCommonData().toPromise().then((response: any) => {
             this.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');

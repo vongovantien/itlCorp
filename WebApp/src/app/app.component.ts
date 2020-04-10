@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 import { Router, Event, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { NgProgress, NgProgressRef } from '@ngx-progressbar/core';
-import { OAuthService, OAuthEvent, OAuthErrorEvent, OAuthInfoEvent, TokenResponse } from 'angular-oauth2-oidc';
+import { OAuthService, OAuthEvent, OAuthInfoEvent, TokenResponse } from 'angular-oauth2-oidc';
 import { ToastrService } from 'ngx-toastr';
 import { JwtService } from './shared/services/jwt.service';
 
@@ -52,9 +52,6 @@ export class AppComponent {
         this.oauthService.events.subscribe(
             (e: OAuthEvent) => {
                 console.log(e);
-                if (e instanceof OAuthErrorEvent) {
-                    this._toast.error(e.reason + '', e.type);
-                }
                 if (e instanceof OAuthInfoEvent) {
                     if (e.type === 'token_expires') {
                         this.oauthService.refreshToken().then(

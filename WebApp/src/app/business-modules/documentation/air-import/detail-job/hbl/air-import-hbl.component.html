@@ -166,13 +166,14 @@
                                         </tab>
                                         <tab heading="Selling" (selectTab)="onSelectTabSurcharge('SELL')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <selling-charge [showSyncFreight]="false" [showGetCharge]="false">
+                                                <selling-charge service="air" [showSyncFreight]="false"
+                                                    [showGetCharge]="false">
                                                 </selling-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="onSelectTabSurcharge('OBH')">
                                             <ng-container *ngIf="!!selectedHbl && selectedHbl.id; else placeholder">
-                                                <obh-charge></obh-charge>
+                                                <obh-charge service="air"></obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>
