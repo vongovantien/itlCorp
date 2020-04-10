@@ -117,7 +117,6 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.addNewRequestPaymentPopup.action = 'create';
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
-        this.addNewRequestPaymentPopup.resetDirective();
         this.addNewRequestPaymentPopup.show();
 
     }

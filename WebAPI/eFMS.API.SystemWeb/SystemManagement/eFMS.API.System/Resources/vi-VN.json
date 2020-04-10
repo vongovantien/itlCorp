@@ -124,5 +124,8 @@
   "MSG_ITEM_SIMILAR_AUTHORIZATION": "Một ủy quyền tương tự đã được tạo trên hệ thống với khoảng thời gian này. Vui lòng kiểm tra lại hoặc chọn khoảng thời gian khác",
   "MSG_ITEM_DUPLICATE_USER_ON_USER_LEVEL": "Duplicate user in {0}! Please Check highlight field!!",
   "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check highlight field!!",
-  "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE": "Phòng kế toán đã tồn tại trong Office. Vui lòng kiểm tra lại"
+  "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE": "Phòng kế toán đã tồn tại trong Office. Vui lòng kiểm tra lại",
+  //----------start: User Permission
+  "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "Duplicate role on user {0}!Please Check hight field!!"
+  //-- end
 }
