@@ -70,7 +70,11 @@ namespace eFMS.API.System.DL.Services
                 office.CompanyName = item.companyName;
                 resultData.Add(office);
             }
-            return resultData.AsQueryable();
+            if(resultData.Count > 0)
+            {
+                resultData = resultData.GroupBy(x => x.ShortName).Select(g => g.First()).ToList();
+            }
+            return resultData?.OrderBy(x=>x.ShortName).AsQueryable();
         }
 
         public IQueryable<SysOffice> GetByUserId(string id)
