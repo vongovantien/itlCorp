@@ -153,8 +153,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !!formChargeTariff.value.tariffChargeDetail.rangeTo && formChargeTariff.value.tariffChargeDetail.rangeFrom > formChargeTariff.value.tariffChargeDetail.rangeTo}">
                                 <label>Range To</label>
-                                <input numeric [decimals]="digitDecimal" type="text" class="form-control"
-                                    formControlName="rangeTo">
+                                <input numeric [decimals]="digitDecimal" autoFormatCurrency type="text"
+                                    class="form-control" formControlName="rangeTo">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && !!formChargeTariff.value.tariffChargeDetail.rangeTo && formChargeTariff.value.tariffChargeDetail.rangeFrom > formChargeTariff.value.tariffChargeDetail.rangeTo">
                                     Range From must be greater than or equal to Range To!

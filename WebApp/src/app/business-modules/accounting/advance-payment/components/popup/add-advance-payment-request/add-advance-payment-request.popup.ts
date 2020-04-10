@@ -5,7 +5,6 @@ import { AccountingRepo, OperationRepo } from 'src/app/shared/repositories';
 import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { AutoFormatCurrencyDirective } from '@directives';
 
 @Component({
     selector: 'adv-payment-add-popup',
@@ -20,8 +19,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @ViewChild('exitPopup', { static: false }) exitPopup: ConfirmPopupComponent;
     @ViewChild('confirmDuplicatePopup', { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild('existedPopup', { static: false }) existedShipmentPopup: ConfirmPopupComponent;
-
-    @ViewChild(AutoFormatCurrencyDirective, { static: false }) autoFormatCurrencyDirective: AutoFormatCurrencyDirective;
 
     action: string = 'create';
 
@@ -130,9 +127,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         if (this.customDeclarations.length === 1) {
             this.customNo.setValue(this.customDeclarations[0]);
         }
-
-        // * Update Directive
-        this.autoFormatCurrencyDirective.currentValue = data.amount;
     }
 
     onSubmit(form: FormGroup) {
@@ -327,9 +321,5 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             && requestInit.advanceType === data.advanceType
             && requestInit.customNo === data.customNo
         );
-    }
-
-    resetDirective() {
-        this.autoFormatCurrencyDirective.currentValue = null;
     }
 }
