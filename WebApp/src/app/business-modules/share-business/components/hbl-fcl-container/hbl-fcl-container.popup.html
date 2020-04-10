@@ -95,15 +95,14 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.quantity || container.quantity && type === 'export' && isDuplicateContPakage)}">
                                             <input type="number" class="form-control" [(ngModel)]="container.quantity"
                                                 (ngModelChange)="onChangeDataFormTable()" name="quantity" integer
-                                                min="1" step="1" autoFormatCurrency>
+                                                min="1" step="1">
                                         </div>
                                     </td>
                                     <td>
                                         <div class=" form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.gw && container.gw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.gw"
-                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal"
-                                                autoFormatCurrency>
+                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
@@ -111,15 +110,14 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.chargeAbleWeight && container.chargeAbleWeight < 0}">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.chargeAbleWeight" name="chargeAbleWeight" min="0"
-                                                step=".10" numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                                step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.cbm && container.cbm < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.cbm"
-                                                name="cbm" min="0" step=".10" numeric [decimals]="digitDecimal"
-                                                autoFormatCurrency>
+                                                name="cbm" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
                                     <td>
@@ -127,8 +125,7 @@
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && type === 'import' && isDuplicateContPakage }">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()" min="0" integer step="1"
-                                                autoFormatCurrency>
+                                                (ngModelChange)="onChangeDataFormTable()" min="0" integer step="1">
                                         </div>
                                     </td>
                                     <td>
@@ -194,8 +191,7 @@
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !!container.nw && container.nw < 0}">
                                             <input type="number" class="form-control" [(ngModel)]="container.nw"
-                                                name="nw" min="0" step=".10" numeric [decimals]="digitDecimal"
-                                                autoFormatCurrency>
+                                                name="nw" min="0" step=".10" numeric [decimals]="digitDecimal">
                                         </div>
                                     </td>
 

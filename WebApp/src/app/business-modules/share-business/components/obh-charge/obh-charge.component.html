@@ -149,7 +149,7 @@
                                                 placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
                                                 [disabled]="!!charge.debitNo || !!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true ? 'disabled': null"
-                                                autoFormatCurrency numeric [decimals]="digitDecimal">
+                                                numeric [decimals]="digitDecimal">
                                         </div>
                                         <div class="col-md-6 p-l-none">
                                             <select class="form-control border" [(ngModel)]="charge.quantityType"

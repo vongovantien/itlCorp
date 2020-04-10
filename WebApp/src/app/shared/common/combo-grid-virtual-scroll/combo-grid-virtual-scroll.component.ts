@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -44,14 +44,21 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     keyboardEventsManager: ListKeyManager<any>;
 
     constructor(
-        private cdr: ChangeDetectorRef,
     ) {
         super();
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (!!changes.dataSources && !!changes.dataSources.currentValue) {
-            this.setDataSource(changes.dataSources.currentValue);
+        if (!!changes.dataSources) {
+            this.loading = changes.dataSources.firstChange;
+            if (!!changes.dataSources.currentValue) {
+                if (!!changes.dataSources.currentValue.length) {
+                    if (changes.dataSources.firstChange) {
+                        this.loading = false;
+                    }
+                }
+                this.setDataSource(changes.dataSources.currentValue);
+            }
         }
         if (!!changes.displayFields && !!changes.displayFields.currentValue) {
             this.setDisplayFields(changes.displayFields.currentValue);
@@ -59,7 +66,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (!!changes.selectedDisplayFields && !!changes.selectedDisplayFields.currentValue) {
             this.setSelectedDisplayFields(changes.selectedDisplayFields.currentValue);
         }
-        if (!!changes.currentActiveItemId && (changes.currentActiveItemId.previousValue !== changes.currentActiveItemId.currentValue)) {
+        if (!!changes.currentActiveItemId && (!!changes.currentActiveItemId.currentValue)) {
             this.setCurrentActiveItemId(changes.currentActiveItemId.currentValue);
         }
         if (changes.disabled !== undefined && changes.disabled !== null) {
@@ -70,13 +77,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         }
     }
 
-    ngAfterViewInit(): void {
-        this.cdr.markForCheck();
-    }
-
-    ngOnInit() {
-
-    }
     // tslint:disable: deprecation
     handleKeyUp(event: KeyboardEvent) {
         let currenIndex: number;
@@ -126,7 +126,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             if (this.CurrentActiveItemIdObj !== null) {
                 const activeItemData = this.CurrentActiveItemIdObj;
 
-                this.loading = true;
                 const itemIndex = this.ConstDataSources.findIndex(o => o[activeItemData.field] === activeItemData.value);
 
                 if (itemIndex !== -1) {
@@ -134,16 +133,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
                 } else if (!!activeItemData.hardValue) {
                     this.displaySelectedStr = activeItemData.hardValue;
-                } else {
-                    if (this.loading) {
-                        this.loading = false;
-                    }
                 }
             }
         }
-        //  else {
-        //     this.DataSources = [];
-        // }
     }
 
     setDisplayFields(data: { field: string, label: string }[]) {
@@ -167,22 +159,16 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     setCurrentActiveItemId(data: any) {
         if (data.value != null) {
             this.CurrentActiveItemIdObj = data;
-
-            const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
-
-            if (itemIndex !== -1) {
-                this.indexSelected = itemIndex;
-                this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
-
-            } else if (!!data.hardValue) {
-                this.displaySelectedStr = data.hardValue;
-            } else {
-                setTimeout(() => {
-                    if (this.loading) {
-                        this.loading = false;
-                    }
-                }, 500);
+            if (!!this.ConstDataSources.length) {
+                const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
+                if (itemIndex !== -1) {
+                    this.indexSelected = itemIndex;
+                    this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
+                } else if (!!data.hardValue) {
+                    this.displaySelectedStr = data.hardValue;
+                }
             }
+
         } else {
             this.indexSelected = -1;
             if (!!data.hardValue) {
@@ -190,11 +176,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             } else {
                 this.displaySelectedStr = null;
             }
-            setTimeout(() => {
-                if (this.loading) {
-                    this.loading = false;
-                }
-            }, 500);
         }
     }
 
@@ -232,10 +213,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                 }
             });
         }
-    }
-
-    getValue(item: any, field: string) {
-        return item[field] || null;
     }
 
     clickSearch() {
