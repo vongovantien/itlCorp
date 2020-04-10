@@ -63,7 +63,7 @@
     "minimatch": "^3.0.4",
     "moment": "^2.22.2",
     "ng2-select": "^2.0.0",
-    "ngx-bootstrap": "^5.0.0",
+    "ngx-bootstrap": "^5.2.0",
     "ngx-cookie-service": "^2.1.0",
     "ngx-currency": "^2.0.0",
     "ngx-daterangepicker-material": "^2.1.8",

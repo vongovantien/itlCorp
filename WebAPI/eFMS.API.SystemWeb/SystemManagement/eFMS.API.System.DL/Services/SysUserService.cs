@@ -251,9 +251,11 @@ namespace eFMS.API.System.DL.Services
                 model.EmployeeNameVn = item.e.EmployeeNameVn;
                 results.Add(model);
             }
-            if(results.Count > 0) {
+            if (results.Count > 0)
+            {
+                results = results.GroupBy(x => x.Username).Select(g => g.First()).ToList();
             }
-            return results.AsQueryable();
+            return results?.OrderBy(x => x.Username).AsQueryable();
         }
 
         public List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list)

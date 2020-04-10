@@ -56,6 +56,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     if (changes.dataSources.firstChange) {
                         this.loading = false;
                     }
+                } else {
+                    this.loading = false;
                 }
                 this.setDataSource(changes.dataSources.currentValue);
             }

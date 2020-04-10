@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { CatalogueRepo, AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, catchError, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { takeUntil, distinctUntilChanged, catchError, map } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 import { CustomDeclaration, Surcharge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { DataService } from 'src/app/shared/services';
@@ -424,7 +424,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             unitId: this.form.value.unit.id,
             unitName: this.form.value.unit.unitNameEn,
             unitPrice: this.form.value.price,
-            currencyId: 'VND',
+            currencyId: this.form.value.currency,
             vatrate: this.form.value.vat,
             total: this.form.value.amount,
             notes: this.form.value.note,

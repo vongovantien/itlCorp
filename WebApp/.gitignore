@@ -34,8 +34,10 @@ yarn-error.log
 testem.log
 /typings
 package-lock.json
-environment.ts
 
 # System Files
 .DS_Store
 Thumbs.db
+
+#Files
+src/environments/environment.ts

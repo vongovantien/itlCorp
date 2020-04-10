@@ -142,7 +142,7 @@
                                                 placeholder="Quantity"
                                                 (ngModelChange)="onChangeQuantity($event, charge)"
                                                 [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
-                                                numeric [decimals]="digitDecimal">
+                                                numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
                                         <div class="col-md-6 p-l-none">
                                             <ng-container

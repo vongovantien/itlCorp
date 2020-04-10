@@ -94,7 +94,8 @@
                                         <div class=" form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && !container.gw}">
                                             <input type="number" class="form-control" [(ngModel)]="container.gw"
-                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal">
+                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal"
+                                                autoFormatCurrency>
                                         </div>
                                     </td>
                                     <td>
@@ -102,7 +103,7 @@
                                             isSubmitted && !container.cbm}">
                                             <input type="number" class="form-control" [(ngModel)]="container.cbm"
                                                 name="cbm" min="0" step=".10" (ngModelChange)="onChangeDataFormTable()"
-                                                numeric [decimals]="digitDecimal">
+                                                numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
                                     </td>
                                     <td>
