@@ -1213,6 +1213,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
+                                    item.ExchangeDate = DateTime.Now;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }
@@ -1351,6 +1352,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
+                                    item.ExchangeDate = DateTime.Now;
                                     csShipmentSurchargeRepo.Add(item);
                                 }
                             }

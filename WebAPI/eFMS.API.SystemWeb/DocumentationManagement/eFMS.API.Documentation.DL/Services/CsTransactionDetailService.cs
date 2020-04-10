@@ -1762,13 +1762,13 @@ namespace eFMS.API.Documentation.DL.Services
                 var _pol = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var _pod = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var _airportOfDischarge = !string.IsNullOrEmpty(data.FirstCarrierTo) ? data.FirstCarrierTo : _pod?.Code;
-                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + data.Etd.Value.ToString("dd MMM");
-                bookingNote.FlightNo1 = _flightNo.ToUpper();
+                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + (data.Etd != null ? data.Etd.Value.ToString("dd MMM") : string.Empty);
+                bookingNote.FlightNo1 = _flightNo?.ToUpper();
                 bookingNote.FlightNo2 = criteria.FlightNo2?.ToUpper();
-                bookingNote.DepartureAirport = _pol?.Code.ToUpper(); //Lấy Code
+                bookingNote.DepartureAirport = _pol?.Code?.ToUpper(); //Lấy Code
                 bookingNote.PlaceOfReceipt = data.PickupPlace?.ToUpper();
-                bookingNote.AirportOfDischarge = _airportOfDischarge.ToUpper();
-                bookingNote.DestinationAirport = (_pod?.NameEn + "-" + _pod?.Code)?.ToUpper(); //Lấy Name - Code
+                bookingNote.AirportOfDischarge = _airportOfDischarge?.ToUpper();
+                bookingNote.DestinationAirport = _pod != null ? (_pod?.NameEn + " - " + _pod?.Code)?.ToUpper() : string.Empty; //Lấy Name - Code
                 bookingNote.TotalCollect = data.TotalCll?.ToUpper();
                 bookingNote.TotalPrepaid = data.TotalPp?.ToUpper();
                 bookingNote.ShippingMark = data.ShippingMark?.ToUpper();
