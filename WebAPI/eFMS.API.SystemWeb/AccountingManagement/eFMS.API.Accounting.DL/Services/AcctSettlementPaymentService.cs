@@ -959,13 +959,14 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- GET EXISITS CHARGE --
         public List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
         {
-            //Chỉ lấy ra những phí chứng từ (thuộc credit + partner)
+            //Chỉ lấy ra những phí chứng từ (thuộc phí credit + partner hay những phí thuộc đối tượng payer + partner)
             var surcharge = csShipmentSurchargeRepo
                 .Get(x =>
                         x.IsFromShipment == true
                      //&& (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId != null && x.CreditNo != null))
                      //&& (x.Type == AccountingConstants.TYPE_CHARGE_BUY || (x.PayerId == criteria.partnerId && x.CreditNo != null))
-                     && x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PayerId == criteria.partnerId
+                     && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId) 
+                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
                 );
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
