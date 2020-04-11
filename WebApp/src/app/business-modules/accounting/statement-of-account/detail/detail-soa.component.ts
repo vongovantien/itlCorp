@@ -89,8 +89,13 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    const fileName = "Export SOA " + this.soaNO + ".xlsx";
-                    this.downLoadFile(response, "application/ms-excel", fileName);
+                    if (response.byteLength > 0) {
+                        const fileName = "Export SOA " + this.soaNO + ".xlsx";
+                        this.downLoadFile(response, "application/ms-excel", fileName);
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+
                 },
             );
 
