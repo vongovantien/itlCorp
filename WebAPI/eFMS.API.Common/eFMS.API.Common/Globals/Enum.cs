@@ -150,6 +150,7 @@
         reportShipmentOverview,
         reportGeneral,
         reportSale,
+        reportSheetDebit,
         setting,
         settingCatalogLogViewer,
         settingEcusConnection,

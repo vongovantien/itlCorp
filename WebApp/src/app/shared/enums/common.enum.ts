@@ -118,6 +118,10 @@ export namespace CommonEnum {
         SR_QUARTER = 'SR_QUARTER',
         SR_SUMMARY = 'SR_SUMMARY'
     }
+
+    export enum SHEET_DEBIT_REPORT_TYPE {
+        ACCNT_PL_SHEET = 'ACCNT_PL_SHEET'
+    }
 }
 
 
