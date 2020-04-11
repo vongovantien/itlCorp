@@ -626,7 +626,9 @@ namespace eFMS.API.Accounting.DL.Services
                                             CommodityGroupID = ops.CommodityGroupId,
 
                                             Service = "CL",
-                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo
+                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
+                                            TypeCharge = chg.Type
+
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -746,6 +748,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             Service = "CL",
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                             TaxCodeOBH = pat.TaxCode,
+                                            TypeCharge = chg.Type
 
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
