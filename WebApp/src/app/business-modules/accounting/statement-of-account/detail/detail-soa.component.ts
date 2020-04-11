@@ -89,13 +89,8 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    if (response.byteLength > 0) {
-                        const fileName = "Export SOA " + this.soaNO + ".xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
-                    } else {
-                        this._toastService.warning('No data found');
-                    }
-
+                    const fileName = "Export SOA " + this.soaNO + ".xlsx";
+                    this.downLoadFile(response, "application/ms-excel", fileName);
                 },
             );
 
@@ -148,7 +143,11 @@ export class StatementOfAccountDetailComponent extends AppList {
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Bravo SOA.xlsx');
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Bravo SOA.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
                 },
             );
     }
