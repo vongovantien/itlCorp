@@ -7,9 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { NgxCurrencyModule } from 'ngx-currency';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';

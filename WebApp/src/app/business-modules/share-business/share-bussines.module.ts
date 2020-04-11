@@ -5,11 +5,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { NgxCurrencyModule } from 'ngx-currency';
-import { ModalModule, } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule, CollapseModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';

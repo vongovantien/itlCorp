@@ -9,7 +9,7 @@ import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ToastrService } from 'ngx-toastr';
 import { DomSanitizer } from '@angular/platform-browser';
 import { API_MENU } from 'src/constants/api-menu.const';
-import { ModalDirective } from 'ngx-bootstrap/modal';
+import { ModalDirective } from 'ngx-bootstrap';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 

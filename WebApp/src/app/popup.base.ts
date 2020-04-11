@@ -1,4 +1,4 @@
-import { ModalOptions, ModalDirective } from "ngx-bootstrap/modal";
+import { ModalOptions, ModalDirective } from "ngx-bootstrap";
 import { AppPage } from "src/app/app.base";
 import { ViewChild, QueryList, ViewChildren } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";

@@ -1,9 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BillingCustomDeclarationComponent } from './billing-custom-declaration.component';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
-
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';

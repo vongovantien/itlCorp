@@ -4,9 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SelectModule } from 'ng2-select';
 import { NgProgressModule } from '@ngx-progressbar/core';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 
 import { UnitComponent } from './unit.component';
 import { Routes, RouterModule } from '@angular/router';

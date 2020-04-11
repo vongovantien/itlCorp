@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { PaginationModule } from "ngx-bootstrap/pagination";
-import { ModalModule } from "ngx-bootstrap/modal";
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { GroupComponent } from './group.component';
 import { AddGroupComponent } from './add/add-group/add-group.component';
@@ -14,7 +12,6 @@ import { FormSearchGroupComponent } from './components/form-search-group/form-se
 import { FormUserGroupComponent } from './components/form-user-group/form-user-group.component';
 import { ShareSystemModule } from '../../share-system/share-system.module';
 import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
-import { importType } from '@angular/compiler/src/output/output_ast';
 
 
 const routing: Routes = [

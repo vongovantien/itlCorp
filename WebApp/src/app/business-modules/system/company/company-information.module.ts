@@ -14,8 +14,7 @@ import { CompanyInformationDetailComponent } from './detail/detail-company-infor
 import { CompanyInformationFormSearchComponent } from './components/form-search-company/form-search-company.component';
 import { CompanyInformationFormAddComponent } from './components/form-add-company/form-add-company.component';
 
-import { PaginationModule } from "ngx-bootstrap/pagination";
-import { TabsModule } from "ngx-bootstrap/tabs";
+import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 import { ShareSystemModule } from '../../share-system/share-system.module';

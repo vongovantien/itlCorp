@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
-
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { NgProgressModule } from '@ngx-progressbar/core';
 
 import { CurrencyComponent } from './currency.component';

@@ -4,11 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { AccordionModule } from 'ngx-bootstrap/accordion';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { PaginationModule, AccordionModule, ModalModule, BsDropdownModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';

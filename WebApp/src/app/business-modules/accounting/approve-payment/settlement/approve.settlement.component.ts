@@ -12,7 +12,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
 import { switchMap, tap } from 'rxjs/operators';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 
 @Component({
     selector: 'app-approve-settlement',

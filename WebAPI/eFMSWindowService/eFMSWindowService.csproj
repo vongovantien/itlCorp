@@ -126,8 +126,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="serviceinstaller.bat" />
-    <None Include="UnistallService.bat" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\eFMSModel.Context.tt">

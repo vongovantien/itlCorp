@@ -5,9 +5,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
 import { SaleReportComponent } from './sale-report.component';
 import { SaleReportFormSearchComponent } from './components/form-search-sale-report/form-search-sale-report.component';
 const routing: Routes = [

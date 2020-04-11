@@ -4,10 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { SelectModule } from 'ng2-select';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
-
+import { ModalModule, PaginationModule } from 'ngx-bootstrap';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 

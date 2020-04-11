@@ -7,13 +7,7 @@ import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.compone
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TabsModule, ModalModule, CollapseModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';
@@ -23,7 +17,6 @@ import { StatementOfAccountSummaryComponent } from './components/summary/summary
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { StatementOfAccountFormCreateComponent } from './components/form-create-soa/form-create-soa.component';
 import { ShareAccountingModule } from '../share-accouting.module';
-import { from } from 'rxjs';
 
 const routing: Routes = [
     {

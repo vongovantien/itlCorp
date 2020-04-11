@@ -3,9 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportComponent } from './sea-lcl-import.component';
 import { SharedModule } from 'src/app/shared/shared.module';

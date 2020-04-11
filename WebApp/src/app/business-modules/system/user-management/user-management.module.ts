@@ -6,9 +6,7 @@ import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { UserFormSearchComponent } from './components/form-search-user/form-search-user.component';
 import { UserAddNewComponent } from './addnew/user.addnew.component';
 import { FormAddUserComponent } from './components/form-add-user/form-add-user.component';

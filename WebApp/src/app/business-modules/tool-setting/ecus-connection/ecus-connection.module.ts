@@ -5,9 +5,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { EcusConnectionComponent } from './ecus-connection.component';
 import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { EcusConnectionFormPopupComponent } from './form-ecus/form-ecus.component';
 
 

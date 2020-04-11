@@ -4,11 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
-import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';

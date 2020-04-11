@@ -5,11 +5,7 @@ import { CommonModule } from '@angular/common';
 
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { PaginationModule, ModalModule, TabsModule, BsDropdownModule } from 'ngx-bootstrap';
 
 import { SeaLCLImportHBLComponent } from './sea-lcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';

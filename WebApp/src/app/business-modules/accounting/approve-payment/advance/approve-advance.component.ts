@@ -6,10 +6,10 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment } from 'src/app/shared/models';
+import { AdvancePayment, Currency } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({

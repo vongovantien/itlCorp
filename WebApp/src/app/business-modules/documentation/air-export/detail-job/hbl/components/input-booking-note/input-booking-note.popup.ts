@@ -7,7 +7,7 @@ import { Crystal } from "@models";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { ModalDirective } from 'ngx-bootstrap/modal';
+import { ModalDirective } from "ngx-bootstrap";
 import { environment } from "src/environments/environment";
 
 @Component({

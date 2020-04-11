@@ -1,11 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent } from '.';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from './popup';
 import { SelectModule } from 'ng2-select';
 import { ScrollingModule } from '@angular/cdk/scrolling';

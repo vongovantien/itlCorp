@@ -9,8 +9,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { ChargeImportComponent } from './charge-import/charge-import.component';
 import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-
+import { PaginationModule } from 'ngx-bootstrap';
 import { FormSearchChargeComponent } from './components/form-search-charge/form-search-charge.component';
 import { AddChargeComponent } from './add-charge/add-charge.component';
 import { DetailChargeComponent } from './detail-charge/detail-charge.component';
