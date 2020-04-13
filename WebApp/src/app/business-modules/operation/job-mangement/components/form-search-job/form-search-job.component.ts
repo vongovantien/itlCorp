@@ -182,6 +182,15 @@ export class JobManagementFormSearchComponent extends AppForm {
         //     this.onSearch.emit(<any>{});
         // }
     }
+
+    collapsed() {
+        this.resetFormControl(this.productService);
+        this.resetFormControl(this.serviceMode);
+        this.resetFormControl(this.shipmentMode);
+        this.resetFormControl(this.user);
+        this.resetFormControl(this.serviceDate);
+        this.selectedPartner = { field: 'id', value: null };
+    }
 }
 
 

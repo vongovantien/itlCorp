@@ -7,14 +7,17 @@ using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 
 namespace eFMS.API.Catalogue.DL.Services
-{ 
-    public class CatChargeGroupService : RepositoryBaseCache<CatChargeGroup, CatChargeGroupModel>, ICatChargeGroupService
+{
+    public class CatChargeGroupService : RepositoryBase<CatChargeGroup, CatChargeGroupModel>, ICatChargeGroupService
     {
-        private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
-        public CatChargeGroupService(IContextBase<CatChargeGroup> repository,
-            ICacheServiceBase<CatChargeGroup> cacheService, IMapper mapper) : base(repository, cacheService, mapper)
+        //private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
+        //public CatChargeGroupService(IContextBase<CatChargeGroup> repository,
+        //    ICacheServiceBase<CatChargeGroup> cacheService, IMapper mapper) : base(repository, cacheService, mapper)
+        //{
+        //    chargeGroupRepository = repository;
+        //}
+        public CatChargeGroupService(IContextBase<CatChargeGroup> repository, IMapper mapper) : base(repository, mapper)
         {
-            chargeGroupRepository = repository;
         }
     }
 }

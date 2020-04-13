@@ -350,35 +350,39 @@ namespace eFMS.API.System.DL.Services
                 //check empty and valid working status
                 string workingStatus = item.WorkingStatus;
                 item.WorkingStatusValid = true;
-                if (string.IsNullOrEmpty(workingStatus))
+                //if (string.IsNullOrEmpty(workingStatus))
+                //{
+                //    item.WorkingStatus = stringLocalizer[SystemLanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
+                //    item.IsValid = false;
+                //    item.WorkingStatusValid = false;
+                //}
+                if(workingStatus != null)
                 {
-                    item.WorkingStatus = stringLocalizer[SystemLanguageSub.MSG_USER_WORKINGSTATUS_EMPTY];
-                    item.IsValid = false;
-                    item.WorkingStatusValid = false;
+                    if (!workingStatus.Equals("Working") && !workingStatus.Equals("Maternity leave") && !workingStatus.Equals("Off"))
+                    {
+                        item.WorkingStatus = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
+                        item.IsValid = false;
+                        item.WorkingStatusValid = false;
+                    }
                 }
-                else if (!workingStatus.Equals("Working") && !workingStatus.Equals("Maternity leave") && !workingStatus.Equals("Off"))
-                {
-                    item.WorkingStatus = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
-                    item.IsValid = false;
-                    item.WorkingStatusValid = false;
-                }
-
                 //check empty and valid status 
                 string status = item.Status;
                 item.StatusValid = true;
-                if (string.IsNullOrEmpty(status))
+                //if (string.IsNullOrEmpty(status))
+                //{
+                //    item.Status = stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_EMPTY];
+                //    item.IsValid = false;
+                //    item.StatusValid = false;
+                //}
+                if(status != null)
                 {
-                    item.Status = stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_EMPTY];
-                    item.IsValid = false;
-                    item.StatusValid = false;
+                    if (!status.Equals("Active") && !status.Equals("Inactive"))
+                    {
+                        item.Status = string.Format(stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_NOTFOUND], item.Status);
+                        item.IsValid = false;
+                        item.StatusValid = false;
+                    }
                 }
-                else if (!status.Equals("Active") && !status.Equals("Inactive"))
-                {
-                    item.Status = string.Format( stringLocalizer[SystemLanguageSub.MSG_USER_STATUS_NOTFOUND], item.Status);
-                    item.IsValid = false;
-                    item.StatusValid = false;
-                }
-
                 //check empty and valid email
                 string email = item.Email;
                 item.EmailValid = true;
@@ -474,8 +478,8 @@ namespace eFMS.API.System.DL.Services
                     sysEmployees.Add(objEmployee);
                     objUser.Username = item.Username;
                     objUser.UserType = item.UserType;
-                    objUser.WorkingStatus = item.WorkingStatus;
-                    objUser.Active = item.Active;
+                    objUser.WorkingStatus = !string.IsNullOrEmpty(item.WorkingStatus)? item.WorkingStatus : "Working";
+                    objUser.Active = item.Status?.ToLower() == "active" ? true : (item.Status?.ToLower() == "inactive" ? false : false);
                     objUser.EmployeeId = objEmployee.Id;
                     objUser.Id = Guid.NewGuid().ToString();
                     objUser.UserCreated = objUser.UserModified = currentUser.UserID;

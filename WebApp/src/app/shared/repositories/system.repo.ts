@@ -446,6 +446,10 @@ export class SystemRepo {
             );
     }
 
+    upLoadUserFile(files: any) {
+        return this._api.postFile(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/uploadFile`, files, "uploadedFile");
+    }
+
     downloadUserExcel() {
         return this._api.downloadfile(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/DownloadExcel`).pipe(
             catchError((error) => throwError(error)),
@@ -453,6 +457,11 @@ export class SystemRepo {
         );
     }
 
+    importUser(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUser/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 
     deleteUserLevel(id: number) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/${id}`)
