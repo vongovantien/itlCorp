@@ -112,10 +112,11 @@
                                 <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.userType }}</span>
                             </td>
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.status }}</span>
+                                <span [ngClass]="{'m--font-danger' : !item.status}">{{ item.status }}</span>
                             </td>
                             <td>
-                                <span [ngClass]="{'m--font-danger' : !item.userType}">{{ item.workingStatus }}</span>
+                                <span
+                                    [ngClass]="{'m--font-danger' : !item.workingStatus}">{{ item.workingStatus }}</span>
                             </td>
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.email}">{{ item.email }}</span>

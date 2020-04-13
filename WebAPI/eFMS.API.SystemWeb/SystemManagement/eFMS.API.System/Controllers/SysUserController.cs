@@ -344,19 +344,16 @@ namespace eFMS.API.System.Controllers
 
         [HttpPost]
         [Route("Import")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Import([FromBody]List<SysUserViewModel> data)
         {
-            var result = sysUserService.Import(data);
-            if (result != null)
+            var hs = sysUserService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
             {
-                
-                return Ok(result);
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
             }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
+            return Ok(result);
         }
 
 
