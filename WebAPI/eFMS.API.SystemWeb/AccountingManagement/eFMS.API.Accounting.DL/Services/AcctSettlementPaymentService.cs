@@ -1379,10 +1379,26 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                                 foreach (var item in listChargeSceneUpdate)
                                 {
-                                    item.UserCreated = listChargeExists.Where(x => x.Id == item.Id).First().UserCreated;
-                                    item.DatetimeCreated = listChargeExists.Where(x => x.Id == item.Id).First().DatetimeCreated;
+                                    var sceneCharge = listChargeExists.Where(x => x.Id == item.Id).FirstOrDefault();
+                                    item.UserCreated = sceneCharge?.UserCreated;
+                                    item.DatetimeCreated = sceneCharge?.DatetimeCreated;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
+                                    item.ExchangeDate = sceneCharge?.ExchangeDate;
+                                    item.FinalExchangeRate = sceneCharge?.FinalExchangeRate;
+                                    item.CreditNo = sceneCharge?.CreditNo;
+                                    item.DebitNo = sceneCharge?.DebitNo;
+                                    item.PaySoano = sceneCharge?.PaySoano;
+                                    item.Soano = sceneCharge?.Soano;
+                                    item.KickBack = sceneCharge?.KickBack;
+                                    item.QuantityType = sceneCharge?.QuantityType;
+                                    item.IncludedVat = sceneCharge?.IncludedVat;
+                                    item.PaymentRefNo = sceneCharge?.PaymentRefNo;
+                                    item.Status = sceneCharge?.Status;
+                                    item.VoucherId = sceneCharge?.VoucherId;
+                                    item.VoucherIddate = sceneCharge?.VoucherIddate;
+                                    item.VoucherIdre = sceneCharge?.VoucherIdre;
+                                    item.VoucherIdredate = sceneCharge?.VoucherIdredate;
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
