@@ -14,4 +14,8 @@ export const environment = {
     INDENTITY_SERVER_URL: "http://api-efms.itlvn.com/identityserver",
     EXPORT_CRYSTAL: "api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx"
   },
+  AUTHORIZATION:
+  {
+    requireHttps: true
+  }
 };

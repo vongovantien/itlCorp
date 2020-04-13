@@ -44,8 +44,15 @@ namespace eFMS.API.System.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var data = catDepartmentService.Get();
-            return Ok(data);
+            try
+            {
+                var data = catDepartmentService.Get();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>

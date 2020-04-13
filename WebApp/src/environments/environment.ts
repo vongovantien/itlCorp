@@ -25,4 +25,8 @@ export const environment = {
                 EXPORT_CRYSTAL: "localhost:53717/ExportCrystal.aspx",
                 // EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         },
+        AUTHORIZATION:
+        {
+                requireHttps: false
+        }
 };
