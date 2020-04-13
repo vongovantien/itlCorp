@@ -36,6 +36,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysOffice> officeRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
+        readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
+
 
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
@@ -55,7 +57,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPlace> catplace,
             IContextBase<CatChargeDefaultAccount> chargeDefault,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<CatCommodity> catCommodity) : base(repository, mapper)
+            IContextBase<CatCommodity> catCommodity,
+            IContextBase<CatCommodityGroup> catCommodityGroup) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -73,6 +76,7 @@ namespace eFMS.API.Accounting.DL.Services
             catPlaceRepo = catplace;
             officeRepo = sysOffice;
             catCommodityRepo = catCommodity;
+            catCommodityGroupRepo = catCommodityGroup;
         }
 
         #region -- Insert & Update SOA
@@ -1885,8 +1889,9 @@ namespace eFMS.API.Accounting.DL.Services
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
                 exportSOAOPS.Charges = new List<ChargeSOAResult>();
                 var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.Commodity).FirstOrDefault();
+                var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.CommodityGroupId).FirstOrDefault();
                 string commodityName = string.Empty;
-                if(commodity.Length >= 1)
+                if(commodity != null)
                 {
                     string[] commodityArr = commodity.Split(',');
                     foreach(var item in commodityArr)
@@ -1894,6 +1899,10 @@ namespace eFMS.API.Accounting.DL.Services
                         commodityName = commodityName + "," + catCommodityRepo.Get(x=>x.Code == item).Select(t=>t.CommodityNameVn).FirstOrDefault() ;
                     }
                     commodityName =  commodityName.Substring(1);
+                }
+                if(commodityGroup != null)
+                {
+                    commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
                 }
                 exportSOAOPS.CommodityName = commodityName;
 
