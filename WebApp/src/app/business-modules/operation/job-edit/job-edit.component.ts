@@ -79,12 +79,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.getShipmentCommonData();
         this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
-        this._store.select(getCatalogueCommodityGroupState)
-            .pipe(
-                map((data: any) => {
-                    this.commodityGroups = this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn');
-                })
-            ).toPromise();
+
         this.getListPackageTypes();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
@@ -360,11 +355,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                             if (this.editForm.shipmentModes != null) {
                                 this.editForm.formEdit.controls['shipmentMode'].setValue([this.editForm.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode)]);
                             }
-                            if (!!this.opsTransaction.commodityGroupId && !!this.commodityGroups) {
 
-                                this.editForm.commodityGroups = this.commodityGroups;
-                                this.editForm.formEdit.controls['commodityGroupId'].setValue([this.editForm.commodityGroups.find(type => type.id === this.opsTransaction.commodityGroupId)]);
-                            }
+                            setTimeout(() => {
+                                if (!!this.opsTransaction.commodityGroupId) {
+                                    // this.editForm.commodityGroups = this.commodityGroups;
+                                    this.editForm.formEdit.controls['commodityGroupId'].setValue([this.editForm.commodityGroups.find(type => type.id === this.opsTransaction.commodityGroupId)]);
+                                }
+                            }, 500);
+
                             if (!!this.opsTransaction.packageTypeId && this.editForm.packageTypeId != null) {
                                 this.editForm.formEdit.controls['packageTypeId'].setValue([this.editForm.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId)]);
                             }
