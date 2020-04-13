@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { ShareBussinessContainerListPopupComponent, IShareBussinessState } from '@share-bussiness';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User } from '@models';
+import { OpsTransaction, Customer, PortIndex, Warehouse, User, Commodity } from '@models';
 import { Observable } from 'rxjs';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
-import { catchError, finalize } from 'rxjs/operators';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction } from '@store';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 
@@ -62,7 +62,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     agents: Observable<Customer[]>;
     warehouses: Observable<Warehouse[]>;
     salesmans: Observable<User[]>;
-    commodityGroups: CommonInterface.INg2Select[];
+    commodityGroups: CommonInterface.INg2Select[] = [];
     packageTypes: any[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
@@ -105,7 +105,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.agents = this._store.select(getCatalogueAgentState);
         this.warehouses = this._store.select(getCatalogueWarehouseState);
         this.getListPackageTypes();
-
+        this.getCommodityGroup();
         this.initForm();
     }
     setFormValue() {
@@ -135,9 +135,22 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             sumContainers: this.opsTransaction.sumContainers,
             sumPackages: this.opsTransaction.sumPackages,
             sumCbm: this.opsTransaction.sumCbm,
-            containerDescription: this.opsTransaction.containerDescription
+            containerDescription: this.opsTransaction.containerDescription,
         });
     }
+
+    getCommodityGroup() {
+        this._catalogueRepo.getCommondity({ active: true })
+            .pipe(
+                map((data: any) => this.utility.prepareNg2SelectData(data, 'id', 'commodityNameEn'))
+            ).subscribe(
+                (res) => {
+                    this.commodityGroups = res;
+                }
+            );
+
+    }
+
     getListPackageTypes() {
         this._catalogueRepo.getUnit({ unitType: 'package' })
             .pipe(

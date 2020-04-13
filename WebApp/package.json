@@ -11,6 +11,8 @@
     "build:stag": "ng build --prod --c=staging-vi && ng build --prod --c=staging-en",
     "build:stag:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=staging-vi",
     "build:stag:en": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=staging-en",
+    "build:uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=uat",
+    "build:prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=production",
     "build:stats": "ng build --stats-json",
     "local": "ng serve --c=local",
     "test": "ng serve --c=test",
