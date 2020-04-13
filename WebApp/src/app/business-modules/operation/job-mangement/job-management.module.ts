@@ -6,7 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, CollapseModule } from 'ngx-bootstrap';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';
@@ -40,7 +40,8 @@ const LIB = [
     SelectModule,
     NgProgressModule,
     PaginationModule.forRoot(),
-    TabsModule.forRoot()
+    TabsModule.forRoot(),
+    CollapseModule.forRoot(),
 ];
 
 @NgModule({

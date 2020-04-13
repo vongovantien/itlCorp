@@ -1,12 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PagingService } from 'src/app/shared/services/paging-service';
-import { BaseService } from 'src/app/shared/services/base.service';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
-import { AppPaginationComponent } from 'src/app/shared/common/pagination/pagination.component';
-import { NgProgressComponent, NgProgress } from '@ngx-progressbar/core';
+import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { language } from 'src/languages/language.en';
 import { ToastrService } from 'ngx-toastr';

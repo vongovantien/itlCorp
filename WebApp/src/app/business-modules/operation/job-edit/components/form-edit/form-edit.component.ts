@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState } from '@store';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, getCatalogueCommodityState } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 
@@ -62,7 +62,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     agents: Observable<Customer[]>;
     warehouses: Observable<Warehouse[]>;
     salesmans: Observable<User[]>;
-    commodityGroups: CommonInterface.INg2Select[] = [];
+    commodityGroups: CommonInterface.INg2Select[];
     packageTypes: any[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
@@ -104,6 +104,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
         this.warehouses = this._store.select(getCatalogueWarehouseState);
+
+
         this.getListPackageTypes();
         this.getCommodityGroup();
         this.initForm();
@@ -140,15 +142,12 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getCommodityGroup() {
-        this._catalogueRepo.getCommondity({ active: true })
-            .pipe(
-                map((data: any) => this.utility.prepareNg2SelectData(data, 'id', 'commodityNameEn'))
-            ).subscribe(
-                (res) => {
-                    this.commodityGroups = res;
-                }
+        this._store.select(getCatalogueCommodityGroupState)
+            .subscribe(
+                ((data: any) => {
+                    this.commodityGroups = this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn');
+                })
             );
-
     }
 
     getListPackageTypes() {
