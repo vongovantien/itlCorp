@@ -114,6 +114,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
 
         public IActionResult Get(CatPlaceCriteria criteria, int page, int size)
         {

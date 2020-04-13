@@ -12,7 +12,7 @@ export const authConfig: AuthConfig = {
 
   // The SPA's id. The SPA is registerd with this id at the auth-server
   clientId: 'eFMS',
-  requireHttps: false,
+  requireHttps: environment.AUTHORIZATION.requireHttps,
   oidc: false,
   logoutUrl: '#/login',
 

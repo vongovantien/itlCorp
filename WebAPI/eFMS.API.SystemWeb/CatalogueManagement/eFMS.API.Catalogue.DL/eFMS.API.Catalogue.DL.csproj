@@ -24,6 +24,8 @@
   <ItemGroup>
     <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Helpers\RedisCacheHelper.cs" />
+    <Compile Remove="IService\ICatBranchService.cs" />
+    <Compile Remove="Services\CatBranchService.cs" />
   </ItemGroup>
 
   <ItemGroup>
