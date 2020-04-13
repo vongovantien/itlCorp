@@ -24,5 +24,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string CurrencyCharge { get; set; }
         public Nullable<decimal> DebitExchange { get; set; }
         public Nullable<decimal> CreditExchange { get; set; }
+        public decimal? FinalExchangeRate { get; set; }
+        public DateTime? ExchangeDate { get; set; }
     }
 }

@@ -70,10 +70,6 @@ namespace eFMS.API.System.DL.Services
                 office.CompanyName = item.companyName;
                 resultData.Add(office);
             }
-            if(resultData.Count > 0)
-            {
-                resultData = resultData.GroupBy(x => x.ShortName).Select(g => g.First()).ToList();
-            }
             return resultData?.OrderBy(x=>x.ShortName).AsQueryable();
         }
 
@@ -111,7 +107,7 @@ namespace eFMS.API.System.DL.Services
             var SysOffices = GetOffices();
             var sysBu = sysBuRepository.Get();
             var query = (from branch in SysOffices
-                         join bu in sysBu on branch.Buid equals bu.Id
+                         join bu in sysBu on branch.Buid equals bu.Id 
                          select new { branch, companyName = bu.BunameEn });
 
             if (criteria.All == null)
