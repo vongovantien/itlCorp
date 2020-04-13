@@ -227,8 +227,7 @@
                                     <ng-template #vatrate>
                                         <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
                                             (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
-                                            [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
-                                            autoFormatCurrency>
+                                            [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                     </ng-template>
                                 </div>
                             </td>
