@@ -1296,7 +1296,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = "AirImpDocumentRelease.rpt",
+                ReportName = "AirImptDocumentRelease.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
