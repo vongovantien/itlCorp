@@ -1,30 +1,32 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagingService, BaseService, SortService } from 'src/app/shared/services';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { ToastrService } from 'ngx-toastr';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { NgProgressComponent } from '@ngx-progressbar/core';
+import { NgProgressComponent, NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
 import { AppList } from 'src/app/app.list';
 import { User } from 'src/app/shared/models';
-import { language } from 'src/languages/language.en';
 import { Employee } from 'src/app/shared/models/system/employee';
 import { AppPaginationComponent, InfoPopupComponent } from 'src/app/shared/common';
 import { SystemRepo } from '@repositories';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-user-management-import',
     templateUrl: './user-management-import.component.html',
 })
 export class UserManagementImportComponent extends AppList {
+    @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
     constructor(
         private pagingService: PagingService,
-        private baseService: BaseService,
-        private api_menu: API_MENU,
-        private _systemRepo:SystemRepo,
-        private toastr: ToastrService) { super(); }
+        private _systemRepo: SystemRepo,
+        private _progressService: NgProgress,
+        private _toastService: ToastrService) {
+        super();
+        this._progressRef = this._progressService.ref();
+
+    }
     data: any[];
     pagedItems: any[] = [];
     inValidItems: any[] = [];
@@ -69,24 +71,23 @@ export class UserManagementImportComponent extends AppList {
     }
 
     chooseFile(file: Event) {
-        if (file.target['files'] == null) return;
-        this.progressBar.start();
-        /**/
-        this.resetBeforeSelecedFile();
-        /**/
-        this.baseService.uploadfile(this.api_menu.System.User_Management.uploadExel, file.target['files'], "uploadedFile")
+        this.pager.totalItems = 0;
+        if (file.target['files'] == null) { return; }
+        this._progressRef.start();
+        this._systemRepo.upLoadUserFile(file.target['files'])
+            .pipe(
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
             .subscribe((response: any) => {
-                console.log(response);
                 this.data = response.data;
                 this.pager.totalItems = this.data.length;
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
+                this.pager.currentPage = 1;
                 this.pagingData(this.data);
-                this.progressBar.complete();
-                console.log(this.data);
-            }, err => {
-                this.progressBar.complete();
-                this.baseService.handleError(err);
+            }, () => {
             });
     }
 
@@ -139,40 +140,38 @@ export class UserManagementImportComponent extends AppList {
         }
     }
 
-    async import() {
-        if (this.data == null || this.data == undefined) {
-            this.toastr.warning('Not selected import file', '', { positionClass: 'toast-bottom-right', closeButton: true, timeOut: 5000 });
-            return;
-        }
+    async import(element) {
+        if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
-            this.infoPopup.show();
+            this.importAlert.show();
         } else {
-            this.progressBar.start();
-            console.log(this.data);
-            this.data.forEach(element => {
-                if (element.status === 'Active') {
-                    element.active = true;
-                } else {
-                    element.active = false;
-                }
-            });
-            const response = await this.baseService.postAsync(this.api_menu.System.User_Management.import, this.data, true, false);
-            if (response.success) {
-                this.baseService.successToast(language.NOTIFI_MESS.IMPORT_SUCCESS);
-                this.reset();
-                this.progressBar.complete();
-            } else {
-                this.progressBar.complete();
-                this.baseService.handleError(response);
-            }
-            console.log(response);
+            const data = this.data.filter(x => x.isValid);
+            this._progressRef.start();
+            this._systemRepo.importUser(data)
+                .pipe(
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                )
+                .subscribe(
+                    (res) => {
+                        if (res) {
+                            this._toastService.success(res.message);
+                            this.pager.totalItems = 0;
+                            this.reset(element);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
         }
     }
 
-    reset() {
+    reset(element) {
         this.data = null;
         this.pagedItems = null;
         this.pager.totalItems = 0;
+        element.value = "";
         this.totalRows = this.totalValidRows = 0;
     }
 }

@@ -11,6 +11,8 @@
     "build:stag": "ng build --prod --c=staging-vi && ng build --prod --c=staging-en",
     "build:stag:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=staging-vi",
     "build:stag:en": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=staging-en",
+    "build:uat": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=uat",
+    "build:prod": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=production",
     "build:stats": "ng build --stats-json",
     "local": "ng serve --c=local",
     "test": "ng serve --c=test",
@@ -78,7 +80,7 @@
     "zone.js": "^0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.800.1",
+    "@angular-devkit/build-angular": "^0.803.24",
     "@angular/cli": "^8.0.1",
     "@angular/compiler-cli": "^8.1.0-next.1",
     "@angular/language-service": "^8.2.1",

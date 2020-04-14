@@ -17,7 +17,6 @@
         public class CustomClearance
         {
             public const string CustomClearanceUrl = "/Operation/api/v1/en-US/CustomsDeclaration/Query";
-
         }
         public class System
         {

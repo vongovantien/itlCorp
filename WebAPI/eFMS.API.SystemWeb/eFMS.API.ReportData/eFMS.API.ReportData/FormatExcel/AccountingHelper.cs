@@ -1416,8 +1416,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             int addressStartContent = 10;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
-
-            if(lstSoa.exportSOAOPs != null)
+            if(lstSoa.exportSOAOPs != null && lstSoa.exportSOAOPs.Count() > 0)
             {
                 for (int i = 0; i < lstSoa.exportSOAOPs.Count; i++)
                 {
@@ -1478,7 +1477,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
-
 
                     for (int j = 0; j < item.Charges.Count; j++)
                     {

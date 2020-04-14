@@ -185,6 +185,42 @@
                                 }
                             ]
                         },
+                        "uat-debug": {
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.uat.ts"
+                                }
+                            ]
+                        },
+                        "uat": {
+                            "optimization": true,
+                            "outputHashing": "none",
+                            "sourceMap": false,
+                            "extractCss": true,
+                            "baseHref": "/en/",
+                            "namedChunks": true,
+                            "aot": true,
+                            "extractLicenses": true,
+                            "vendorChunk": true,
+                            "buildOptimizer": true,
+                            "outputPath": "dist/uat/eFMS-en/",
+                            "fileReplacements": [
+                                {
+                                    "replace": "src/environments/environment.ts",
+                                    "with": "src/environments/environment.uat.ts"
+                                }
+                            ],
+                            "serviceWorker": false,
+                            "budgets": [
+                                {
+                                    "type": "bundle",
+                                    "name": "vendor",
+                                    "maximumWarning": "2mb",
+                                    "maximumError": "5mb"
+                                }
+                            ]
+                        },
                         "production": {
                             "fileReplacements": [
                                 {
@@ -238,6 +274,9 @@
                         },
                         "local": {
                             "browserTarget": "eFMS-Web:build:local"
+                        },
+                        "uat": {
+                            "browserTarget": "eFMS-Web:build:uat-debug"
                         }
                     }
                 },

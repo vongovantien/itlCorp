@@ -113,6 +113,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
                         }
                     );
             } else {
+                body.id = '00000000-0000-0000-0000-000000000000';
                 this._catalogueRepo.addPlace(body)
                     .pipe(
                         catchError(this.catchError),

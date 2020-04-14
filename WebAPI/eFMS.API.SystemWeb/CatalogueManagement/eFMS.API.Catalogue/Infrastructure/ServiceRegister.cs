@@ -86,7 +86,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatChargeGroup)));
 
             services.AddTransient<ICurrentUser, CurrentUser>();
-            services.AddTransient<ICatBranchService, CatBranchService>();
+            //services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
             services.AddTransient<ICatCountryService, CatCountryService>();
             services.AddTransient<ICatStageService, CatStageService>();

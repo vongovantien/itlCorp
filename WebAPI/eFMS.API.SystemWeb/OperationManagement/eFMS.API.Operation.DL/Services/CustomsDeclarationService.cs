@@ -335,7 +335,7 @@ namespace eFMS.API.Operation.DL.Services
             return returnList;
         }
 
-        private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<CustomsDeclaration> list)
+        private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<Object> list)
         {
             List<CustomsDeclarationModel> results = new List<CustomsDeclarationModel>();
             var countryCache = countryApi.Getcountries().Result;
@@ -344,7 +344,7 @@ namespace eFMS.API.Operation.DL.Services
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
             var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
             var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
-            foreach (var item in list)
+            foreach (CustomsDeclaration item in list)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);
                 var imCountryCode = item.ImportCountryCode;
@@ -424,6 +424,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 results = results.Where(x => x.JobNo == null);
             }
+            results = MapClearancesToClearanceModels(results?.AsQueryable());
             return results?.AsQueryable();
         }
 
