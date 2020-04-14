@@ -75,6 +75,8 @@ export class MasterPageComponent implements OnInit {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
                 .then(
                     (res: any) => {
+
+                        this.oauthService.logoutUrl = window.location.origin + '/#/login';
                         this.oauthService.logOut(false);
                     },
                     (error: any) => {
@@ -120,7 +122,6 @@ export class MasterPageComponent implements OnInit {
 
     loginAgain(companyId: string, officeId: string, departmentId: number, groupId: number) {
         this._spinner.show();
-
         this.oauthService.loadDiscoveryDocument().then((a) => {
             this.oauthService.tryLogin().then((b) => {
                 const header: HttpHeaders = new HttpHeaders({
@@ -139,6 +140,7 @@ export class MasterPageComponent implements OnInit {
                             return this.oauthService.loadUserProfile();
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
+
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
                             if (userInfo) {
                                 this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
