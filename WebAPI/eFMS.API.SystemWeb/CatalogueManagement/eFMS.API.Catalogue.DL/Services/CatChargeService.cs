@@ -428,8 +428,12 @@ namespace eFMS.API.Catalogue.DL.Services
                         Active = item.Status.Trim().ToLower() == "active",
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
-                        UserModified = currentUser.UserID
-                    };
+                        UserModified = currentUser.UserID,
+                        CompanyId = currentUser.CompanyID,
+                        OfficeId = currentUser.OfficeID,
+                        GroupId = currentUser.GroupId,
+                        DepartmentId = currentUser.DepartmentId
+                };
                     DataContext.Add(charge, false);
                 }
                 DataContext.SubmitChanges();
