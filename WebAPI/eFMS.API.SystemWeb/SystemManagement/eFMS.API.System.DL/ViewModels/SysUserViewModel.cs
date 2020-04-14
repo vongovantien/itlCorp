@@ -18,7 +18,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public string Status { get; set; }
-        public string Active { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string StaffCode { get; set; }
         public string EmployeeNameVn { get; set; }
