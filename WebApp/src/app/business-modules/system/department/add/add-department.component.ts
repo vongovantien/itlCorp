@@ -143,7 +143,7 @@ export class DepartmentAddNewComponent extends AppForm {
             )
             .subscribe(
                 (data: any) => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.shortName }));
                 },
             );
     }

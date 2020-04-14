@@ -75,6 +75,7 @@ export class AddGroupComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: any) => {
                     this.departments = res;
+                    console.log(this.departments);
                 },
             );
     }
