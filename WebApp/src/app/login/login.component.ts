@@ -35,11 +35,11 @@ export class LoginComponent {
     selectedCompanyId: any;
 
     ngAfterViewInit(): void {
-        if (this.route.snapshot.paramMap.get("isEndSession")) {
-            setTimeout(() => {
-                this.toastr.warning("Login again to continue, please !", "Expired Session");
-            }, 50);
-        }
+        // if (this.route.snapshot.paramMap.get("isEndSession")) {
+        //     setTimeout(() => {
+        //         this.toastr.warning("Login again to continue, please !", "Expired Session");
+        //     }, 50);
+        // }
 
         this.getLoginData();
         this._cd.detectChanges();

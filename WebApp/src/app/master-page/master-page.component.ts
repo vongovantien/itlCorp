@@ -47,7 +47,7 @@ export class MasterPageComponent implements OnInit {
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>
     ) {
-        this.oauthService.logoutUrl = window.location.origin + '/#/login';
+
     }
 
     ngOnInit() {
@@ -71,6 +71,7 @@ export class MasterPageComponent implements OnInit {
     }
 
     logout() {
+        this.oauthService.logoutUrl = window.location.origin + '/#/login';
         if (this.oauthService.hasValidAccessToken()) {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
                 .then(
