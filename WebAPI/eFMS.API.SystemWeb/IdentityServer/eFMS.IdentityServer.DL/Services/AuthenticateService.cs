@@ -161,13 +161,38 @@ namespace eFMS.IdentityServer.DL.Services
                         modelReturn = null;
                         return -4;
                     }
-                    var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
-                    modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
+                    if (permissionInfo == null)
+                    {
+                        var userLevel = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
+                        modelReturn = SetLoginReturnModel(sysUser, userLevel, null);
 
-                    modelReturn.companyId = companyId;
-                    // Update Log
-                    LogUserLogin(sysUser, companyId);
-                    return 1;
+                        modelReturn.companyId = companyId;
+                        // Update Log
+                        LogUserLogin(sysUser, companyId);
+                        return 1;
+                    }
+                    else
+                    {
+                        var userLevel = userLevelRepository.Get(lv => lv.UserId == sysUser.Id 
+                        && lv.OfficeId == permissionInfo.OfficeID 
+                        && lv.CompanyId == companyId
+                        )?.FirstOrDefault();
+                        PermissionInfo info = new PermissionInfo
+                        {
+                            OfficeID = userLevel.OfficeId,
+                            DepartmentID = (Int16)userLevel.DepartmentId,
+                            GroupID = userLevel.GroupId,
+                            CompanyID = userLevel.CompanyId
+                        };
+                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
+
+                        modelReturn.companyId = companyId;
+                        // Update Log
+                        LogUserLogin(sysUser, companyId);
+                        return 1;
+                    }
+
+
                 }
                 else
                 {

@@ -68,6 +68,7 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
+            { title: 'creator', field: 'userCreatedName', sortable: true },
             { title: 'Status', field: 'jobNo', sortable: true },
         ];
         this.getListCustomsDeclaration();
