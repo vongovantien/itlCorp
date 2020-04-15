@@ -510,6 +510,11 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OpsTransaction.DepartmentId = currentUser.DepartmentId;
                     model.OpsTransaction.OfficeId = currentUser.OfficeID;
                     model.OpsTransaction.CompanyId = currentUser.CompanyID;
+                    var customer = partnerRepository.Get(x => x.Id == model.OpsTransaction.CustomerId).FirstOrDefault();
+                    if(customer != null)
+                    {
+                        model.OpsTransaction.SalemanId = customer.SalePersonId;
+                    }
                     int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                     model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
                     var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
@@ -605,6 +610,12 @@ namespace eFMS.API.Documentation.DL.Services
                         item.OpsTransaction.DepartmentId = currentUser.DepartmentId;
                         item.OpsTransaction.OfficeId = currentUser.OfficeID;
                         item.OpsTransaction.CompanyId = currentUser.CompanyID;
+
+                        var customer = partnerRepository.Get(x => x.Id == item.OpsTransaction.CustomerId).FirstOrDefault();
+                        if (customer != null)
+                        {
+                            item.OpsTransaction.SalemanId = customer.SalePersonId;
+                        }
                         int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                         item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, (countNumberJob + i));
                         var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
