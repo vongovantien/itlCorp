@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { Charge, SOASearchCharge } from 'src/app/shared/models';
+import { Charge, SOASearchCharge, User } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -137,9 +137,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getCurrencyUser(data: any) {
-        this.users = (data || []).map((item: any) => ({ id: item.id, text: item.username }));
+        this.users = (data || []).map((item: User) => ({ id: item.id, text: item.username }));
 
-        this.selectedUser = [this.users.filter((i: any) => i.text === 'admin')[0]];
+        const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.selectedUser = [this.users.filter((i: CommonInterface.INg2Select) => i.text.toLowerCase() === userLogged.userName.toLowerCase())[0]];
 
         this.updateDataSearch('strCreators', this.selectedUser.map((item: any) => item.id).toString());
     }
