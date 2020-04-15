@@ -193,7 +193,7 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
                         .subscribe(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
-                                    this._toastService.success(res.message);
+                                    // this._toastService.success(res.message);
                                     this.ngSelectCurrencyRate.active = [];
                                     this.exchangeRateToAdd = {
                                         currencyToId: this.localCurrency,
@@ -201,6 +201,7 @@ export class ExchangeRateFormComponent extends AppForm implements OnInit {
                                         userModified: ''
                                     };
                                     this.getExchangeNewest();
+                                    this.onUpdate.emit(true);
                                     return;
                                 }
                                 this._toastService.error(res.message);
