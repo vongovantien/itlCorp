@@ -31,17 +31,30 @@ namespace eFMS.IdentityServer
             string password = cryption.Decrypt(context.Password);
 
             string officeId = _contextAccessor.HttpContext.Request.Headers["officeId"];
+            string deptId = _contextAccessor.HttpContext.Request.Headers["departmentId"];
+            string grpId = _contextAccessor.HttpContext.Request.Headers["groupId"];
 
             if (!string.IsNullOrEmpty(officeId))
             {
-                short departmentId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["departmentId"]);
-                int groupId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["groupId"]);
-                userPermissionInfo = new PermissionInfo
+                if(string.IsNullOrEmpty(deptId)){
+                    userPermissionInfo = new PermissionInfo
+                    {
+                        OfficeID = new Guid(officeId),
+                        DepartmentID = null,
+                        GroupID = null
+                    };
+                }
+                else
                 {
-                    OfficeID = new Guid(officeId),
-                    DepartmentID = departmentId,
-                    GroupID = groupId
-                };
+                    short departmentId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["departmentId"]);
+                    int groupId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["groupId"]);
+                    userPermissionInfo = new PermissionInfo
+                    {
+                        OfficeID = new Guid(officeId),
+                        DepartmentID = departmentId,
+                        GroupID = groupId
+                    };
+                }
             }
             else
             {
