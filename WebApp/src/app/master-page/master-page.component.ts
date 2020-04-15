@@ -47,7 +47,7 @@ export class MasterPageComponent implements OnInit {
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>
     ) {
-        this.oauthService.logoutUrl = window.location.origin + '/#/login';
+
     }
 
     ngOnInit() {
@@ -71,10 +71,13 @@ export class MasterPageComponent implements OnInit {
     }
 
     logout() {
+        this.oauthService.logoutUrl = window.location.origin + '/#/login';
         if (this.oauthService.hasValidAccessToken()) {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
                 .then(
                     (res: any) => {
+
+                        this.oauthService.logoutUrl = window.location.origin + '/#/login';
                         this.oauthService.logOut(false);
                     },
                     (error: any) => {
@@ -112,15 +115,18 @@ export class MasterPageComponent implements OnInit {
             const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
             if (!!userInfoCurrent) {
-                this.isChangeDepartgroup = true;
-                this.loginAgain(userInfoCurrent.companyId, userInfoCurrent.officeId, this.selectedDepartGroup.departmentId, this.selectedDepartGroup.groupId);
+                this._toastService.info(userInfoCurrent.userName.toUpperCase(), "Change Department - Group Success");
+                userInfoCurrent.departmentId = this.selectedDepartGroup.departmentId;
+                userInfoCurrent.groupId = this.selectedDepartGroup.groupId;
+                localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfoCurrent));
+                this.headerComponent.selectedDepartmentGroup = this.headerComponent.departmentGroups.find(d => d.departmentId === +userInfoCurrent.departmentId && d.groupId === +userInfoCurrent.groupId);
+                // this.loginAgain(userInfoCurrent.companyId, userInfoCurrent.officeId, this.selectedDepartGroup.departmentId, this.selectedDepartGroup.groupId);
             }
         }
     }
 
     loginAgain(companyId: string, officeId: string, departmentId: number, groupId: number) {
         this._spinner.show();
-
         this.oauthService.loadDiscoveryDocument().then((a) => {
             this.oauthService.tryLogin().then((b) => {
                 const header: HttpHeaders = new HttpHeaders({
@@ -139,16 +145,12 @@ export class MasterPageComponent implements OnInit {
                             return this.oauthService.loadUserProfile();
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
+
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
                             if (userInfo) {
                                 this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
-                                if (this.isChangeDepartgroup) {
-                                    // this._store.dispatch(new ChangeDepartGroupClaimUserAction({ departmentId: this.selectedDepartGroup.departmentId, groupId: this.selectedDepartGroup.groupId }));
-                                    this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
-                                } else {
-                                    this._store.dispatch(new ChangeOfficeClaimUserAction(this.selectedOffice.id));
-                                    this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
-                                }
+                                this._store.dispatch(new ChangeOfficeClaimUserAction(userInfo.officeId));
+                                this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                             }
                         });
                 } else {

@@ -353,6 +353,9 @@ namespace eFMS.API.Operation.DL.Services
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
                 clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.PartnerNameEn;
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
+                clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
+                clearance.UserModifieddName = userRepository.Get(x => x.Id == item.UserModified).FirstOrDefault()?.Username;
+
                 results.Add(clearance);
             }
             return results;
@@ -1092,6 +1095,18 @@ namespace eFMS.API.Operation.DL.Services
         {
             try
             {
+                foreach (var item in data)
+                {
+                    item.DatetimeCreated = DateTime.Now;
+                    item.DatetimeModified = DateTime.Now;
+                    item.UserCreated = item.UserModified = currentUser.UserID;
+                    item.Source = OperationConstants.FromEFMS;
+                    item.GroupId = currentUser.GroupId;
+                    item.DepartmentId = currentUser.DepartmentId;
+                    item.OfficeId = currentUser.OfficeID;
+                    item.CompanyId = currentUser.CompanyID;
+                }
+               
                 var hs = Add(data);
                 if (hs.Success)
                 {
