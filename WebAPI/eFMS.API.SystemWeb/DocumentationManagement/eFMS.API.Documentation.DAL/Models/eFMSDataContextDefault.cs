@@ -17,6 +17,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         public virtual DbSet<AcctCdnote> AcctCdnote { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
+        public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
@@ -62,7 +63,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -245,6 +246,19 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
                     .HasColumnType("decimal(18, 4)");
+            });
+
+            modelBuilder.Entity<CatChargeGroup>(entity =>
+            {
+                entity.ToTable("catChargeGroup");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatCommodity>(entity =>

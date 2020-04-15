@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" *ngIf="!isDetail">Add sale man</h5>
+                <h5 class="modal-title" *ngIf="!isDetail">Add Salesman</h5>
                 <h5 class="modal-title" *ngIf="isDetail">Detail</h5>
 
                 <button type="button" class="close" aria-label="Close" (click)=closePoup()>
@@ -15,7 +15,7 @@
                         <div class="col-lg-6">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger':  isSave &&  !saleman.value }">
-                                <label>Sale Man <span class="m--font-danger">(*)</span></label>
+                                <label>Salesman <span class="m--font-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll [disabled]="isDetail ? true : false"
                                     [selectedDisplayFields]="['username']"
                                     [currentActiveItemId]="{ field: 'id', value: saleman.value}"
@@ -23,7 +23,7 @@
                                     [displayFields]="[{'field':'username','label':'Username'},{'field':'employeeNameEn','label':'Name EN'}]">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSave && !saleman.value">
-                                    Sale Man is required
+                                    Salesman is required
                                 </div>
                             </div>
                         </div>

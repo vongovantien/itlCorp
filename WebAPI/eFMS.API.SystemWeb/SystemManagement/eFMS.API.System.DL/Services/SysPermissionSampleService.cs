@@ -165,7 +165,7 @@ namespace eFMS.API.System.DL.Services
                                 peritem.IsAllow = s.IsAllow;
                                 peritem.MenuId = s.MenuId;
                                 peritem.ModuleId = s.ModuleId;
-                                peritem.ActionName = s.NameEn;
+                                peritem.ActionName = s.ActionName;
                                 peritem.PermissionId = entity.Id;
                                 peritem.UserModified = currentUser.UserID;
                                 peritem.DatetimeModified = DateTime.Now;

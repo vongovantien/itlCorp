@@ -96,7 +96,7 @@
                                 <label for="">Department <span class="text-danger">(*)</span></label>
                                 <select formControlName="department" class="form-control" [disabled]="isReadonly">
                                     <option *ngFor="let department of departments" [ngValue]="department">
-                                        {{department.deptNameEn}}
+                                        {{department.deptNameAbbr}}
                                     </option>
                                 </select>
                                 <!-- <div class="form-control-feedback" *ngIf="isSubmitted && !department.valid">

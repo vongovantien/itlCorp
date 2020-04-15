@@ -32,20 +32,6 @@
                                 <tr *ngFor="let office of offices; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
-
-
-
-
-                                            <!-- <ng-container>
-                                                        <a title="Delete" class="pointer" (click)="showDeletePopup(office)">
-                                                            <i class="la la-trash text-danger"></i>
-                                                        </a>
-                                                    </ng-container> -->
-                                            <!-- <span [class.m--margin-left-20]="!office.status">
-                                                        <a title="Detail" class="pointer" [routerLink]="office.id">
-                                                            <i class="la la-file-text-o"></i>
-                                                        </a>
-                                                    </span> -->
                                             <button type="button"
                                                 class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                                 [routerLink]="office.id" title="Detail">

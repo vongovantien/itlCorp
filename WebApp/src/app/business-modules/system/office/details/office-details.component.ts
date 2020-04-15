@@ -11,12 +11,14 @@ import { ToastrService } from 'ngx-toastr';
 import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
 import { Store } from '@ngrx/store';
 import { PreviousRouteService } from 'src/app/shared/services/previous-route';
+import { SortService } from '@services';
+import { AppList } from 'src/app/app.list';
 
 @Component({
     selector: 'app-office-details',
     templateUrl: './office-details.component.html'
 })
-export class OfficeDetailsComponent extends AppPage {
+export class OfficeDetailsComponent extends AppList {
     @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
     previousUrl: string;
     formData: IFormAddOffice = {
@@ -67,11 +69,13 @@ export class OfficeDetailsComponent extends AppPage {
         private _toastService: ToastrService,
         private _store: Store<IShareSystemState>,
         private _previousRouteService: PreviousRouteService,
+        private _sortService: SortService,
         private _router: Router
     ) {
         super();
         this._progressRef = this._progressService.ref();
         this.previousUrl = this._previousRouteService.getPreviousUrl();
+        this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {
@@ -200,5 +204,9 @@ export class OfficeDetailsComponent extends AppPage {
     }
     gotoDetailDepartment(id: string) {
         this._router.navigate([`home/system/department/${id}`]);
+    }
+
+    sortLocal(sort: string): void {
+        this.departments = this._sortService.sort(this.departments, sort, this.order);
     }
 }

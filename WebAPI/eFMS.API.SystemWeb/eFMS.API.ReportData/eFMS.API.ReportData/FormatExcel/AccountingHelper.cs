@@ -1478,7 +1478,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
                     workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
 
-
                     for (int j = 0; j < item.Charges.Count; j++)
                     {
                         addressStartContent++;

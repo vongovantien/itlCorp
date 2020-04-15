@@ -229,6 +229,8 @@ namespace eFMS.API.System.DL.Services
                                 peritem.ModuleId = s.ModuleId;
                                 peritem.ActionName = s.ActionName;
                                 peritem.UserPermissionId = entity.Id;
+                                peritem.UserModified = currentUser.UserID;
+                                peritem.DatetimeModified = DateTime.Now;
                                 var hs = userPermissionSpecialRepository.Add(peritem, false);
                             }
                             else

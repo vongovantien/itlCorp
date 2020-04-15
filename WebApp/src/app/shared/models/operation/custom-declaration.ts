@@ -43,7 +43,8 @@ export class CustomDeclaration {
     departmentId: number = null;
     officeId: string = null;
     companyId: string = null;
-
+    userCreatedName: string = null;
+    userModifieddName: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -93,6 +93,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
 
                         this.setValueFormGroup(res);
                     } else {
+                        this.router.navigate(['/home/system/group']);
                         this.formGroup.reset();
                     }
                 });
@@ -164,7 +165,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
 
     cancel() {
         this.router.navigate(['/home/system/group']);
-  
+
     }
 
     update() {

@@ -199,7 +199,7 @@ export class DepartmentDetailComponent extends AppList {
             .pipe(
                 catchError(this.catchError),
                 tap(data => {
-                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.branchNameEn }));
+                    this.officeList = data.map((item: any) => ({ "id": item.id, "text": item.shortName }));
                     this.getDeptTypes();
                 }),
                 switchMap(() => this._systemRepo.getDetailDepartment(this.departmentId).pipe(
