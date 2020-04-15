@@ -105,6 +105,7 @@ export class MasterPageComponent implements OnInit {
 
             if (!!userInfoCurrent) {
                 this.isChangeOffice = true;
+                this.isChangeDepartgroup = false;
                 this.loginAgain(userInfoCurrent.companyId, this.selectedOffice.id, userInfoCurrent.departmentId, userInfoCurrent.groupId);
             }
         }
@@ -115,26 +116,32 @@ export class MasterPageComponent implements OnInit {
             const userInfoCurrent: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
             if (!!userInfoCurrent) {
-                this._toastService.info(userInfoCurrent.userName.toUpperCase(), "Change Department - Group Success");
-                userInfoCurrent.departmentId = this.selectedDepartGroup.departmentId;
-                userInfoCurrent.groupId = this.selectedDepartGroup.groupId;
-                localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfoCurrent));
-                this.headerComponent.selectedDepartmentGroup = this.headerComponent.departmentGroups.find(d => d.departmentId === +userInfoCurrent.departmentId && d.groupId === +userInfoCurrent.groupId);
-                // this.loginAgain(userInfoCurrent.companyId, userInfoCurrent.officeId, this.selectedDepartGroup.departmentId, this.selectedDepartGroup.groupId);
+                this.isChangeDepartgroup = true;
+                this.isChangeOffice = false;
+                this.loginAgain(userInfoCurrent.companyId, userInfoCurrent.officeId, this.selectedDepartGroup.departmentId, this.selectedDepartGroup.groupId);
             }
         }
     }
 
     loginAgain(companyId: string, officeId: string, departmentId: number, groupId: number) {
         this._spinner.show();
+
         this.oauthService.loadDiscoveryDocument().then((a) => {
             this.oauthService.tryLogin().then((b) => {
-                const header: HttpHeaders = new HttpHeaders({
-                    companyId: companyId,
-                    officeId: officeId,
-                    groupId: '' + groupId,
-                    departmentId: '' + departmentId
-                });
+                let header: HttpHeaders;
+                if (this.isChangeDepartgroup) {
+                    header = new HttpHeaders({
+                        companyId: companyId,
+                        officeId: officeId,
+                        groupId: '' + groupId,
+                        departmentId: '' + departmentId
+                    });
+                } else {
+                    header = new HttpHeaders({
+                        companyId: companyId,
+                        officeId: officeId,
+                    });
+                }
                 this.password = this.getUserPassword();
                 this.username = this.getUserName();
 
@@ -145,11 +152,14 @@ export class MasterPageComponent implements OnInit {
                             return this.oauthService.loadUserProfile();
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
-
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
-                            if (userInfo) {
+
+                            if (this.isChangeDepartgroup) {
                                 this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
-                                this._store.dispatch(new ChangeOfficeClaimUserAction(userInfo.officeId));
+                                this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
+                            } else {
+                                this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
+                                this._store.dispatch(new ChangeOfficeClaimUserAction(this.selectedOffice.id));
                                 this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                             }
                         });
