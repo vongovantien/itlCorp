@@ -439,6 +439,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         for (const charge of listChargesToSave) {
 
             if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
+                // swap để map field cho chage obh
+                charge.payerId = charge.paymentObjectId;
                 charge.paymentObjectId = charge.obhId;
             }
             const date = charge.invoiceDate;

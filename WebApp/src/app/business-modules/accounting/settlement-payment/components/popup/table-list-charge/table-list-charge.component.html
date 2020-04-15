@@ -81,15 +81,26 @@
                                                     [selectedDisplayFields]="['chargeNameEn']"
                                                     [dataSources]="listCharges"
                                                     [displayFields]="configChargeDisplayFields" [height]="150"
-                                                    placeholder="Please Select">
+                                                    placeholder="Please Select" (remove)="charge.chargeId = null">
                                                 </app-combo-grid-virtual-scroll>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group col-md-12 dropdown-partner" dropdown
+                                            <div class="form-group col-md-12 dropdown-partner e--combogrid " dropdown
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.paymentObjectId}">
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Please Select" [(ngModel)]="charge.payer">
+                                                <ng-container>
+                                                    <div class="e--combogrid_icon">
+                                                        <span class="e--combogrid_icon__dropdown">
+                                                            <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                                        </span>
+                                                        <span class="e--combogrid_icon__clear"
+                                                            (click)="charge.paymentObjectId = null; charge.payer = null">
+                                                            <i class="la la-times" aria-hidden="true"></i>
+                                                        </span>
+                                                    </div>
+                                                </ng-container>
                                                 <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                                     <div class="d-flex justify-content-end dropdown-partner__header">
                                                         <a class="text-primary text-underline m--margin-right-20 pointer"
@@ -154,12 +165,24 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group col-md-12 dropdown-partner" dropdown
+                                            <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.type === 'OBH' && !charge.obhId) }">
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Please Select"
                                                     [(ngModel)]="charge.obhPartnerName"
-                                                    [disabled]="!charge.chargeId || charge.type !== 'OBH' ? 'disabled': null">
+                                                    [disabled]="!charge.chargeId || charge.type !== 'OBH' ? 'disabled': null"
+                                                    #c>
+                                                <ng-container *ngIf="!c.disabled">
+                                                    <div class="e--combogrid_icon">
+                                                        <span class="e--combogrid_icon__dropdown">
+                                                            <i class="fa fa-angle-down" aria-hidden="true"></i>
+                                                        </span>
+                                                        <span class="e--combogrid_icon__clear"
+                                                            (click)="charge.obhId = null; charge.obhPartnerName = null">
+                                                            <i class="la la-times" aria-hidden="true"></i>
+                                                        </span>
+                                                    </div>
+                                                </ng-container>
                                                 <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                                     <div class="d-flex justify-content-end dropdown-partner__header">
                                                         <a class="text-primary text-underline m--margin-right-20 pointer"
