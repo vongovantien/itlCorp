@@ -618,6 +618,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.AccountNo = partner.TaxCode;
                     partner.Active = active;
                     partner.InactiveOn = inactiveDate;
+                    partner.CompanyId = currentUser.CompanyID;
+                    partner.OfficeId = currentUser.OfficeID;
+                    partner.GroupId = currentUser.GroupId;
+                    partner.DepartmentId = currentUser.DepartmentId;
                     var saleman = new CatSaleman
                     {
                         Id = Guid.NewGuid(),

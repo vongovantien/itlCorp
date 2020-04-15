@@ -850,7 +850,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         Active = active,
                         InactiveOn = inactiveDate,
                         ModeOfTransport = item.ModeOfTransport,
-                        AreaId = item.AreaId
+                        AreaId = item.AreaId,
+                        CompanyId = currentUser.CompanyID,
+                        OfficeId = currentUser.OfficeID,
+                        GroupId = currentUser.GroupId,
+                        DepartmentId = currentUser.DepartmentId
                     };
                     DataContext.Add(catPlace, false);
                 }

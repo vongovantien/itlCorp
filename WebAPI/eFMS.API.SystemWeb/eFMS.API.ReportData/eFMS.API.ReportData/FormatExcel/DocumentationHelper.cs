@@ -1279,7 +1279,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["Y10:AI10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["Y10:AI10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             int addressStartContent = 11;
-
+            int positionStart = 1;
             for (int i = 0; i < overview.Count; i++)
             {
                 var item = overview[i];
@@ -1351,10 +1351,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i + addressStartContent, 52].Value = item.ShipmentNotes;
                 workSheet.Cells[i + addressStartContent, 53].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
                 workSheet.Cells.AutoFitColumns();
+                positionStart++;
             }
-            workSheet.Cells[9, 1, addressStartContent + 6, 53].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + 6, 53].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + 6, 53].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            positionStart = positionStart - 2;
+            workSheet.Cells[9, 1, addressStartContent + positionStart, 53].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart, 53].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart, 53].Style.Border.Top.Style = ExcelBorderStyle.Thin;
         }
 
         #endregion

@@ -52,7 +52,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     location: AbstractControl;
     bankName_En: AbstractControl;
     bankName_Local: AbstractControl;
-    SelectedOffice:any = {};
+    SelectedOffice: any = {};
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -75,7 +75,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     ngOnInit(): void {
         this.initForm();
         this.getDataComboBox();
-    
+
         this.userHeaders = [
             { title: 'User Name', field: 'userName', sortable: true },
             { title: 'Full Name', field: 'fullName', sortable: true },
@@ -84,7 +84,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             { title: 'Level Permission', field: 'levelPermission', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
-        if(this.isDetail){
+        if (this.isDetail) {
             this.isReadonly = this._store.select(checkShareSystemUserLevel);
         }
     }
@@ -128,7 +128,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.configOffice.dataSource = data;
         this.configOffice.displayFields = [
             { field: 'code', label: 'Company Code' },
-            { field: 'bunameEn', label: 'Name EN' },
+            { field: 'bunameAbbr', label: 'Name Abbr' },
             { field: 'bunameVn', label: 'Name Local' },
         ];
         this.configOffice.selectedDisplayFields = ['bunameEn'];
@@ -179,8 +179,8 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             bankAddress_En: [],
             active: [this.status[0]],
             location: [],
-            bankName_En:[],
-            bankName_Local:[]
+            bankName_En: [],
+            bankName_Local: []
         });
 
         this.code = this.formGroup.controls['code'];

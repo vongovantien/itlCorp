@@ -14,6 +14,7 @@ import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
+import { SortService } from '@services';
 
 @Component({
     selector: 'app-detail-company-info',
@@ -43,10 +44,12 @@ export class CompanyInformationDetailComponent extends AppList {
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
+        private _sortService: SortService,
         private _store: Store<IShareSystemState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortLocal;
 
         this.headersOffice = [
             { title: 'Office Code', field: 'code', sortable: true },
@@ -155,6 +158,10 @@ export class CompanyInformationDetailComponent extends AppList {
 
     gotoDetailOffice(office: Office) {
         this._router.navigate([`home/system/office/${office.id}`]);
+    }
+
+    sortLocal(sort: string): void {
+        this.offices = this._sortService.sort(this.offices, sort, this.order);
     }
 }
 
