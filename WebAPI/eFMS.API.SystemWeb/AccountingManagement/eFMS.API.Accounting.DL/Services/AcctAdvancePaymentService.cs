@@ -1377,6 +1377,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == "ACCOUNTANT").Select(s => s.Id).ToList();
             var accountants = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
+                                                    && x.Position == "Manager-Leader"
                                                     && x.OfficeId == officeId
                                                     && x.DepartmentId != null
                                                     && x.CompanyId == companyId)
