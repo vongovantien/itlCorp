@@ -131,7 +131,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             { field: 'bunameAbbr', label: 'Name Abbr' },
             { field: 'bunameVn', label: 'Name Local' },
         ];
-        this.configOffice.selectedDisplayFields = ['bunameEn'];
+        this.configOffice.selectedDisplayFields = ['bunameAbbr'];
 
     }
 

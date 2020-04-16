@@ -9,6 +9,7 @@ import { ExchangeRateHistoryPopupComponent } from './components/detail-history/e
 
 import { finalize } from 'rxjs/operators';
 import { ExchangeRateHistory } from '@models';
+import { ExchangeRateConvertComponent } from './components/convert/exchange-rate-convert.component';
 
 
 @Component({
@@ -18,6 +19,7 @@ import { ExchangeRateHistory } from '@models';
 export class ExchangeRateComponent extends AppList implements OnInit {
 
     @ViewChild(ExchangeRateHistoryPopupComponent, { static: false }) historyPopup: ExchangeRateHistoryPopupComponent;
+    @ViewChild(ExchangeRateConvertComponent, { static: false }) convertPopup: ExchangeRateConvertComponent;
 
     exchangeRates: any[] = [];
     localCurrency = "VND";
@@ -53,7 +55,12 @@ export class ExchangeRateComponent extends AppList implements OnInit {
     onSortChange() {
         this.exchangeRates = this.sortService.sort(this.exchangeRates, this.sort, this.order);
     }
-
+    reloadHistory(event) {
+        if (event) {
+            this.searchHistory();
+            this.convertPopup.getcurrencies();
+        }
+    }
     searchHistory() {
         this.dataSearch = { localCurrencyId: this.localCurrency };
         if (this.selectedrange != null) {
@@ -63,7 +70,6 @@ export class ExchangeRateComponent extends AppList implements OnInit {
         this.page = 1;
         this.getExchangeRates(this.dataSearch);
     }
-
     resetSearch() {
         this.selectedrange = null;
         this.searchHistory();

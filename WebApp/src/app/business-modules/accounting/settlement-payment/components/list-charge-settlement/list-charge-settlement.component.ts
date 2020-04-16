@@ -301,8 +301,10 @@ export class SettlementListChargeComponent extends AppList {
                         // get partner theo payerId.
                         const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);
                         if (!!partner) {
+                            // swap để map field cho chage obh
                             item.payer = partner.shortName;
                             item.obhId = item.paymentObjectId;
+                            item.paymentObjectId = item.payerId;
                         }
                     } else {
                         // get partner theo paymentObjectId.

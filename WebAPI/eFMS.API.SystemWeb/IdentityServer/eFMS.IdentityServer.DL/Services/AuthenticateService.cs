@@ -73,7 +73,8 @@ namespace eFMS.IdentityServer.DL.Services
         {
             SearchResult ldapInfo = null;
             bool isAuthenticated = false;
-
+            SysUserLevel userLevel = null;
+            PermissionInfo info = null;
             var sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
             if (sysUser == null)
             {
@@ -100,12 +101,19 @@ namespace eFMS.IdentityServer.DL.Services
                             return -4;
                         }
 
-                        // Get danh sách level office của user.
-                        var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.CompanyId == companyId && lv.OfficeId != null)?.FirstOrDefault();
-                        modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
-                        modelReturn.companyId = companyId;
+                        userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
+                        info = new PermissionInfo
+                        {
+                            OfficeID = userLevel.OfficeId,
+                            DepartmentID = (Int16)userLevel.DepartmentId,
+                            GroupID = userLevel.GroupId,
+                            CompanyID = userLevel.CompanyId
+                        };
+                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
 
+                        modelReturn.companyId = companyId;
                         LogUserLogin(sysUser, companyId);
+
                         return 1;
                     }
                     else
@@ -133,10 +141,20 @@ namespace eFMS.IdentityServer.DL.Services
                         }
                         var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
                         var hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
-                        modelReturn = SetLoginReturnModel(sysUser, levelOffice, permissionInfo);
+
+                        userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
+                        info = new PermissionInfo
+                        {
+                            OfficeID = userLevel.OfficeId,
+                            DepartmentID = (Int16)userLevel.DepartmentId,
+                            GroupID = userLevel.GroupId,
+                            CompanyID = userLevel.CompanyId
+                        };
+                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
+
                         modelReturn.companyId = companyId;
-                        // Update Log
                         LogUserLogin(sysUser, companyId);
+
                         return 1;
                     }
 
@@ -161,37 +179,21 @@ namespace eFMS.IdentityServer.DL.Services
                         modelReturn = null;
                         return -4;
                     }
-                    if (permissionInfo == null)
+                    
+                    userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
+                    info = new PermissionInfo
                     {
-                        var userLevel = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
-                        modelReturn = SetLoginReturnModel(sysUser, userLevel, null);
+                        OfficeID = userLevel.OfficeId,
+                        DepartmentID = (Int16)userLevel.DepartmentId,
+                        GroupID = userLevel.GroupId,
+                        CompanyID = userLevel.CompanyId
+                    };
+                    modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
 
-                        modelReturn.companyId = companyId;
-                        // Update Log
-                        LogUserLogin(sysUser, companyId);
-                        return 1;
-                    }
-                    else
-                    {
-                        var userLevel = userLevelRepository.Get(lv => lv.UserId == sysUser.Id 
-                        && lv.OfficeId == permissionInfo.OfficeID 
-                        && lv.CompanyId == companyId
-                        )?.FirstOrDefault();
-                        PermissionInfo info = new PermissionInfo
-                        {
-                            OfficeID = userLevel.OfficeId,
-                            DepartmentID = (Int16)userLevel.DepartmentId,
-                            GroupID = userLevel.GroupId,
-                            CompanyID = userLevel.CompanyId
-                        };
-                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
+                    modelReturn.companyId = companyId;
+                    LogUserLogin(sysUser, companyId);
 
-                        modelReturn.companyId = companyId;
-                        // Update Log
-                        LogUserLogin(sysUser, companyId);
-                        return 1;
-                    }
-
+                    return 1;
 
                 }
                 else
@@ -203,6 +205,38 @@ namespace eFMS.IdentityServer.DL.Services
 
             modelReturn = null;
             return -2;
+        }
+
+        private SysUserLevel detectSwitchOfficeDeptGroup(string userId, Guid companyId, PermissionInfo permissionInfo)
+        {
+            SysUserLevel userLevel = null;
+            PermissionInfo info = null;
+
+            // switch company
+            if (permissionInfo == null)
+            {
+                userLevel = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
+            }
+            // switch office
+            else if (permissionInfo.OfficeID != null && (permissionInfo.DepartmentID == null || permissionInfo.GroupID == null))
+            {
+                userLevel = userLevelRepository.Get(lv => lv.UserId == userId
+                && lv.OfficeId == permissionInfo.OfficeID
+                && lv.CompanyId == companyId
+                )?.FirstOrDefault();
+            }
+            //switch group-dept
+            else
+            {
+                userLevel = userLevelRepository.Get(lv => lv.UserId == userId
+                && lv.OfficeId == permissionInfo.OfficeID
+                && lv.CompanyId == companyId
+                && lv.DepartmentId == permissionInfo.DepartmentID
+                && lv.GroupId == permissionInfo.GroupID
+                )?.FirstOrDefault();
+            }
+
+            return userLevel;
         }
 
         private bool CheckLdapInfo(string username, string password, out SearchResult ldapInfo)
