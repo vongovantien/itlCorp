@@ -630,7 +630,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _exchangeRate = 1 / finalExchangeRate.Value;
+                    _exchangeRate = (finalExchangeRate.Value != 0) ? (1 / finalExchangeRate.Value) : 0;
                 }
                 else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -638,7 +638,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    _exchangeRate = finalExchangeRate.Value / _exchangeRateCurrencyTo;
+                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
                 }
             }
             else
@@ -649,7 +649,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _exchangeRate = 1 / _exchangeRateCurrencyTo;
+                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
                 else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -657,7 +657,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    _exchangeRate = _exchangeRateCurrencyFrom / _exchangeRateCurrencyTo;
+                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? _exchangeRateCurrencyFrom / _exchangeRateCurrencyTo : 0;
                 }
             }
             return _exchangeRate;
