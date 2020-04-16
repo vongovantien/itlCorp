@@ -18,9 +18,9 @@ import { SystemConstants } from 'src/constants/system.const';
 
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/clone';
+import { Observable, throwError } from 'rxjs';
+import { map, tap, takeUntil, catchError, finalize, skip, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { Observable } from 'rxjs';
-import { map, tap, takeUntil, catchError, finalize, skip } from 'rxjs/operators';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -165,36 +165,41 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             }
         );
 
-        this._activedRoute.params.subscribe(
-            (params: Params) => {
-                if (isUUID(params.jobId)) {
-                    this.jobId = params.jobId;
-                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-                    this._documentationRepo.getAirwayBill(this.jobId)
-                        .subscribe(
-                            (res: AirwayBill) => {
-                                if (!!res) {
-                                    console.log("Update airwaybill");
-                                    this.airwaybillId = res.id;
-                                    this.isUpdate = true;
-                                    this.otherCharges = res.otherCharges;
-                                    this.dimensionDetails = res.dimensionDetails;
+        this._activedRoute.params
+            .pipe(
+                switchMap((params) => {
+                    if (params.jobId && isUUID(params.jobId)) {
+                        this.jobId = params.jobId;
+                        return this._documentationRepo.getAirwayBill(this.jobId);
+                    } else {
+                        return throwError("Not found jobId");
+                    }
+                })
+            )
+            .subscribe(
+                (res: AirwayBill) => {
+                    console.log(res);
+                    if (!!res) {
+                        console.log("Update airwaybill");
+                        this.airwaybillId = res.id;
+                        this.isUpdate = true;
+                        this.otherCharges = res.otherCharges;
+                        this.dimensionDetails = res.dimensionDetails;
 
-                                    this._store.dispatch(new GetShipmentOtherChargeSuccessAction(this.otherCharges));
-                                    this._store.dispatch(new GetDimensionSuccessAction(this.dimensionDetails));
-                                    this.updateFormValue(res);
+                        this._store.dispatch(new GetShipmentOtherChargeSuccessAction(this.otherCharges));
+                        this._store.dispatch(new GetDimensionSuccessAction(this.dimensionDetails));
+                        this.updateFormValue(res);
 
-                                } else {
-                                    console.log("create airwaybill");
-                                    this.isUpdate = false;
-                                    this.updateDefaultValue();
-                                }
-                            }
-                        );
-                }
-            }
-        );
-
+                    } else {
+                        this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                        console.log("create airwaybill");
+                        this.isUpdate = false;
+                        this.updateDefaultValue();
+                    }
+                },
+                (err) => {
+                    this._router.navigate([`home/documentation/air-export`]);
+                });
     }
 
     updateDefaultValue() {
@@ -217,7 +222,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             warehouseId: shipment.warehouseId,
                             issuedBy: shipment.issuedBy,
                             mblno1: shipment.coloaderCode,
-                            mblno2: shipment.polCode
+                            mblno2: shipment.polCode,
+                            mblno3: !!shipment.mawb ? shipment.mawb.slice(-7) : null
                         });
                     }
                 });
