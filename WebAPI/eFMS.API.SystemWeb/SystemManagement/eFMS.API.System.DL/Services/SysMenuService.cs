@@ -7,7 +7,9 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -23,7 +25,7 @@ namespace eFMS.API.System.DL.Services
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
         }
-
+        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
         List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
             var permissionId = userpermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
@@ -35,6 +37,7 @@ namespace eFMS.API.System.DL.Services
             var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
             userMenus.AddRange(parentMenus);
             var data = mapper.Map<List<MenuUserModel>>(userMenus);
+
             var results = FlatToHierarchy(data, null);
             if (results.Count > 0)
                 return results.Where(x => x.SubMenus.Count > 0).ToList();
@@ -48,8 +51,7 @@ namespace eFMS.API.System.DL.Services
                     {
                         Id = x.Id,
                         ParentId = x.ParentId,
-                        NameVn = x.NameVn,
-                        NameEn = x.NameEn,
+                        Name = currentCulture.IetfLanguageTag == "en-US" ? x.NameEn: x.NameVn,
                         Description = x.Description,
                         AssemplyName = x.AssemplyName,
                         Icon = x.Icon,
