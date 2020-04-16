@@ -143,7 +143,6 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
     updateDataSearch(key: string, data: any) {
         this.dataSearch[key] = data;
-        console.log(this.dataSearch);
     }
 
     searchChargeWithDataSearch(dataSearch: any) {

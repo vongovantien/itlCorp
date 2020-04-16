@@ -22,5 +22,9 @@ namespace eFMS.API.Documentation.DL.Models
         public PermissionAllowBase Permission { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
+        public string POLCode { get; set; }
+        public string PODCode { get; set; }
+        public string ColoaderCode { get; set; }
+
     }
 }

@@ -87,6 +87,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public CurrencyExchangeNewestViewModel GetCurrencyExchangeNewest(string currencyToId)
         {
             var lastExchanges = GetExchangeRateNewest(currencyToId);
+            if (lastExchanges == null) return null;
             var result = new CurrencyExchangeNewestViewModel
             {
                 DatetimeModified = lastExchanges.FirstOrDefault().DatetimeCreated,
@@ -98,7 +99,11 @@ namespace eFMS.API.Catalogue.DL.Services
         private List<vw_catCurrencyExchangeNewest> GetExchangeRateNewest(string currencyToId)
         {
             List<vw_catCurrencyExchangeNewest> exchangeRates = ((eFMSDataContext)DataContext.DC).GetViewData<vw_catCurrencyExchangeNewest>();
-            if(!string.IsNullOrEmpty(currencyToId) && exchangeRates.Count > 0) exchangeRates = exchangeRates.Where(x => x.CurrencyToID == currencyToId && (x.Active == true || x.Active == null)).ToList();
+            if (exchangeRates.Count == 0) return null;
+
+            if (!string.IsNullOrEmpty(currencyToId) && exchangeRates.Count > 0) exchangeRates = exchangeRates.Where(x => x.CurrencyToID == currencyToId && (x.Active == true || false)).ToList();
+
+            if (exchangeRates.Count == 0) return null;
             return exchangeRates;
         }
 
