@@ -10,7 +10,7 @@ export const environment = {
         CATALOGUE: "staging.api-efms.itlvn.com/Catalogue",
         OPERATION: "staging.api-efms.itlvn.com/Operation",
         SYSTEM: "staging.api-efms.itlvn.com/System",
-        REPORT: "staging.api-efms.itlvn.com/ReportPreview/Default.aspx",
+        REPORT: "http://staging.api-efms.itlvn.com/ReportPreview/Default.aspx",
         EXPORT: "staging.api-efms.itlvn.com/Export",
         SETTING: "staging.api-efms.itlvn.com/Setting",
         INDENTITY_SERVER_URL: "http://staging.api-efms.itlvn.com/identityserver",

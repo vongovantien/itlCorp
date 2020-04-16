@@ -204,6 +204,7 @@ namespace eFMS.API.System.DL.Services
                     foreach (var general in list)
                     {
                         general.UserModified = currentUser.UserID;
+                        general.DatetimeModified = DateTime.Now;
                         if(general.Id != Guid.Empty)
                         {
                             var hs =userPermissionGeneralService.Update(general, x => x.Id == general.Id, false);
