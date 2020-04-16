@@ -508,8 +508,8 @@ export class SystemRepo {
         );
     }
 
-    getMenu(userId: string, officeId: string) {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/Menu/GetMenus`, { userId: userId, officeId: officeId }).pipe(
+    getMenu(userId: string, language: string, officeId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/` + language + `/Menu/GetMenus`, { userId: userId, officeId: officeId }).pipe(
             map((data: any) => data)
         );
     }

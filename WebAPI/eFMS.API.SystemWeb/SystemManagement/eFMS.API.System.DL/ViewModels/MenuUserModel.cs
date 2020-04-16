@@ -12,6 +12,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string ParentId { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public string AssemplyName { get; set; }
         public string Icon { get; set; }
