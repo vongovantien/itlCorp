@@ -51,8 +51,6 @@ namespace eFMS.API.System.DL.Services
                     {
                         Id = x.Id,
                         ParentId = x.ParentId,
-                        NameVn = x.NameVn,
-                        NameEn = x.NameEn,
                         Name = currentCulture.IetfLanguageTag == "en-US" ? x.NameEn: x.NameVn,
                         Description = x.Description,
                         AssemplyName = x.AssemplyName,
