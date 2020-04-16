@@ -40,6 +40,6 @@ export class ReportPreviewComponent extends PopupBase {
     get scr() {
         //return this.sanitizer.bypassSecurityTrustResourceUrl('http://localhost:53717');
         // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
-        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.REPORT}`);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 }
