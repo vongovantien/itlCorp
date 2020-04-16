@@ -144,6 +144,10 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 entity.InactiveOn = DateTime.Now;
             }
+            if(model.SaleMans.Count > 0)
+            {
+                entity.SalePersonId = model.SaleMans.FirstOrDefault().SaleManId.ToString();
+            }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
