@@ -201,7 +201,7 @@ export class PartnerDetailComponent extends AppList {
                 .subscribe(
                     (res: any) => {
                         if (!!res) {
-                            if (this.isDup && res === true) {
+                            if (this.isDup) {
                                 console.log("dup");
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
