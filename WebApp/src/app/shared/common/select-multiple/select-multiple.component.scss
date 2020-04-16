@@ -2,6 +2,10 @@
     position: relative;
 
     .select-multiple-content {
+        &::-webkit-scrollbar {
+            width: 9px;
+            height: 6px;
+        }
         position: absolute;
         width: 100%;
         top: 100%;
@@ -11,6 +15,7 @@
         overflow-x: hidden;
         overflow-y: scroll;
         max-height: 300px;
+        box-shadow: 0 1px #ffffff inset, 0 1px 3px rgba(34, 25, 25, 0.4);
 
         li {
             transition: all 0.12s;

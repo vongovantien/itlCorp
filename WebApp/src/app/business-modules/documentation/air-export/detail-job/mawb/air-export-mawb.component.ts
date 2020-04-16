@@ -174,6 +174,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         .subscribe(
                             (res: AirwayBill) => {
                                 if (!!res) {
+                                    console.log("Update airwaybill");
                                     this.airwaybillId = res.id;
                                     this.isUpdate = true;
                                     this.otherCharges = res.otherCharges;
@@ -184,6 +185,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                                     this.updateFormValue(res);
 
                                 } else {
+                                    console.log("create airwaybill");
                                     this.isUpdate = false;
                                     this.updateDefaultValue();
                                 }
@@ -200,7 +202,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
             .subscribe(
                 (shipment: CsTransaction) => {
+                    console.log(shipment);
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+
                         this.formMAWB.patchValue({
                             pod: shipment.pod,
                             pol: shipment.pol,
@@ -211,8 +215,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             freightPayment: !!shipment.paymentTerm ? [{ id: shipment.paymentTerm, text: shipment.paymentTerm }] : null,
                             route: shipment.route,
                             warehouseId: shipment.warehouseId,
-                            issuedBy: shipment.issuedBy
-
+                            issuedBy: shipment.issuedBy,
+                            mblno1: shipment.coloaderCode,
+                            mblno2: shipment.polCode
                         });
                     }
                 });

@@ -431,10 +431,22 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 var result = mapper.Map<CsTransactionModel>(data);
-                if (result.ColoaderId != null) result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
+                if (result.ColoaderId != null)
+                {
+                    result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
+                    result.ColoaderCode = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.CoLoaderCode;
+                }
                 if (result.AgentId != null) result.AgentName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId)?.PartnerNameEn;
-                if (result.Pod != null) result.PODName = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().NameEn;
-                if (result.Pol != null) result.POLName = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().NameEn;
+                if (result.Pod != null)
+                {
+                    result.PODName = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().NameEn;
+                    result.PODCode = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().Code;
+                }
+                if (result.Pol != null)
+                {
+                    result.POLName = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().NameEn;
+                    result.POLCode = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().Code;
+                }
                 if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
