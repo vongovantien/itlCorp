@@ -1181,9 +1181,9 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 4].Value = item.Service;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.PartnerCode;
                         worksheet.Cells[i + addressStartContent, 6].Value = item.Debit;
-                        worksheet.Cells[i + addressStartContent, 6].Style.Numberformat.Format = numberFormat;
+                        //worksheet.Cells[i + addressStartContent, 6].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[i + addressStartContent, 7].Value = item.Credit;
-                        worksheet.Cells[i + addressStartContent, 7].Style.Numberformat.Format = numberFormat;
+                        //worksheet.Cells[i + addressStartContent, 7].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[i + addressStartContent, 8].Value = item.ChargeCode;
                         worksheet.Cells[i + addressStartContent, 9].Value = item.OriginalCurrency;
                         worksheet.Cells[i + addressStartContent, 10].Value = amountStr;

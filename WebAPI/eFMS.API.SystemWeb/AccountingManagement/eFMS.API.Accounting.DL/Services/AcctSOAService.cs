@@ -2158,10 +2158,10 @@ namespace eFMS.API.Accounting.DL.Services
                              {
                                  ServiceDate = chg.ServiceDate,
                                  SOANo = s.Soano,
-                                 Service = GetServiceNameOfSoa(s.ServiceTypeId).ToString(),
+                                 Service =  GetServiceNameOfSoa(chg.Service).ToString(),
                                  PartnerCode = pat.TaxCode,
-                                 Debit = chg.Debit,
-                                 Credit = chg.Credit,
+                                 Debit = cd.DebitAccountNo,
+                                 Credit = cd.CreditAccountNo,
                                  ChargeCode = chg.ChargeCode,
                                  OriginalCurrency = chg.Currency,
                                  OriginalAmount = chg.Debit - chg.Credit,
