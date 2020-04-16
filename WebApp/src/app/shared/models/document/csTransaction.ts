@@ -85,7 +85,9 @@ export class CsTransaction extends BaseModel {
     userNameCreated: string = '';
     userNameModified: string = '';
     currentStatus: string = 'Processing';
-
+    coloaderCode: string = null;
+    polCode: string = null;
+    podCode: string = null;
     constructor(object?: any) {
         super();
         const self = this;

@@ -145,13 +145,13 @@ namespace eFMS.API.Catalogue.Controllers
         {
       
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office && x.PartnerId == model.PartnerId);
+            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office && x.PartnerId == model.PartnerId && x.SaleManId == model.SaleManId);
             if (checkExist)
             {
-                messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
-                return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
+                //messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                return BadRequest(new ResultHandle { Status = false, Message = "Duplicate service, office with sale man!" });
             }
-            ResultHandle result = new ResultHandle { Data = false };
+            ResultHandle result = new ResultHandle { Data = checkExist };
             return Ok(result);
         }
 

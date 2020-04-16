@@ -219,9 +219,13 @@ namespace eFMS.API.System.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_IS_ACTIVE_NOT_ALLOW_DELETED].Value });
             }
             var user = sysUserService.Get(x => x.Id == id).FirstOrDefault();
+            var employee = sysEmployeeService.Get(x => x.Id == user.EmployeeId).FirstOrDefault();
+            if(employee != null)
+            {
+                var hsEmployee = sysEmployeeService.Delete(x => x.Id == employee.Id, true);
+            }
             var hs = sysUserService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
-
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
@@ -302,7 +306,7 @@ namespace eFMS.API.System.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("uploadFile")]
-        //[Authorize]
+        [Authorize]
         public IActionResult UploadFile(IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);

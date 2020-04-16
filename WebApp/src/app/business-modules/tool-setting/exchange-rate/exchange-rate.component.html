@@ -9,7 +9,7 @@
 <div class="m-content">
     <div class="row">
         <div class="col-xl-8">
-            <exchange-rate-form (onUpdate)="searchHistory()"></exchange-rate-form>
+            <exchange-rate-form (onUpdate)="reloadHistory($event)"></exchange-rate-form>
         </div>
         <div class="col-xl-4">
             <exchange-rate-convert></exchange-rate-convert>
@@ -64,7 +64,7 @@
                         <th class="m--w-90 first table-actions-col "></th>
                     </thead>
                     <tbody class="tbody-group">
-                        <ng-container *ngIf="!!exchangeRates.length">
+                        <ng-container *ngIf="!!exchangeRates">
                             <ng-container *ngFor="let item of exchangeRates;let i = index; trackBy: trackByFn">
                                 <tr>
                                     <td class="table-actions-col">
@@ -88,7 +88,7 @@
                                 </tr>
                             </ng-container>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!isLoading && !exchangeRates.length"></tr>
+                        <tr app-table-none-record *ngIf="!isLoading && !exchangeRates"></tr>
                         <tr app-table-row-loading *ngIf="isLoading"></tr>
 
                     </tbody>
@@ -96,7 +96,7 @@
             </div>
             <div class="pagination-nav ">
                 <div class="row">
-                    <div *ngIf="!!exchangeRates.length" class="col-sm-6">
+                    <div *ngIf="!!exchangeRates" class="col-sm-6">
                         <div class="tatable__pager-size">
                             <div class="select-box">
                                 <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
