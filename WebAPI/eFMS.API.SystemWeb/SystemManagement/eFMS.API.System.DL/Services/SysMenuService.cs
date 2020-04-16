@@ -17,6 +17,7 @@ namespace eFMS.API.System.DL.Services
     {
         private IContextBase<SysUserPermission> userpermissionRepository;
         private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
+        private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
         public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
             IContextBase<SysUserPermission> userpermissionRepo,
@@ -25,7 +26,6 @@ namespace eFMS.API.System.DL.Services
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
         }
-        CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
         List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
             var permissionId = userpermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
