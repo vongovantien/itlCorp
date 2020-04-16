@@ -184,7 +184,7 @@ export class PartnerDetailComponent extends AppList {
         this.salemanToAdd = param;
         this.salemanToAdd.partnerId = this.partner.id;
         this.poupSaleman.isDetail = false;
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
+        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office && saleMane.saleManId === this.salemanToAdd.saleManId));
         if (this.isDup) {
             for (const it of this.saleMandetail) {
                 const index = this.services.findIndex(x => x.id === it.service);
@@ -201,7 +201,7 @@ export class PartnerDetailComponent extends AppList {
                 .subscribe(
                     (res: any) => {
                         if (!!res) {
-                            if (this.isDup) {
+                            if (this.isDup && res === true) {
                                 console.log("dup");
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {

@@ -151,7 +151,7 @@ namespace eFMS.API.Catalogue.Controllers
                 //messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 return BadRequest(new ResultHandle { Status = false, Message = "Duplicate service, office with sale man!" });
             }
-            ResultHandle result = new ResultHandle { Data = false };
+            ResultHandle result = new ResultHandle { Data = checkExist };
             return Ok(result);
         }
 
