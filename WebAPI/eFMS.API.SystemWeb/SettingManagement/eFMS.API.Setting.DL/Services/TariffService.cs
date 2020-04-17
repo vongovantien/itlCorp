@@ -392,6 +392,10 @@ namespace eFMS.API.Setting.DL.Services
         private IQueryable<TariffViewModel> QueryPermission(TariffCriteria criteria, PermissionRange range)
         {
             var list = Query(criteria);
+            if(list == null)
+            {
+                return null;
+            }
             IQueryable<TariffViewModel> data = null;
 
             switch (range)

@@ -102,13 +102,13 @@
                                 <span>{{custom.clearanceDate | date: 'dd/MM/yyyy'}}</span>
                             </td>
                             <td>
+                                <span class="text-success">{{custom.userCreatedName}}</span>
+                            </td>
+                            <td>
                                 <span *ngIf="custom.jobNo; else nojobno" class="m--font-success">Imported</span>
                                 <ng-template #nojobno>
                                     <span class="m--font-danger">Not Imported</span>
                                 </ng-template>
-                            </td>
-                            <td>
-                                <span class="text-success">{{custom.userCreatedName}}</span>
                             </td>
                         </tr>
                         <tr class="loading-wrapper" *ngIf="isLoading">

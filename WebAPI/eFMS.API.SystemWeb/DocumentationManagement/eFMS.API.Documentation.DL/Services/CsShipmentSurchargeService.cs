@@ -34,6 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         //private readonly IOpsTransactionService opsTransactionService;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -43,8 +44,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCharge> catChargeRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             ICurrentUser currUser,
-            ICsTransactionDetailService transDetailService
-            //IOpsTransactionService opsTransService
+            ICsTransactionDetailService transDetailService,
+            //IOpsTransactionService opsTransService,
+            ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -57,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
             catChargeRepository = catChargeRepo;
             transactionDetailService = transDetailService;
             //opsTransactionService = opsTransService;
+            currencyExchangeService = currencyExchange;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -263,7 +266,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Unit = item.UnitNameEn;
                 charge.NameEn = item.ChargeNameEn;
                 charge.UnitCode = item.UnitCode;
-                charge.ExchangeRate = item.RateToLocal;
+                charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//item.RateToLocal;
                 if(charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     charge.DebitCharge = catChargeRepository.Get(c => c.Id == charge.ChargeId).FirstOrDefault()?.DebitCharge;
@@ -311,7 +314,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 charge.Unit = item.UnitNameEn;
                 charge.Currency = item.CurrencyCode;
-                charge.ExchangeRate = item.RateToLocal;
+                charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL); //item.RateToLocal;
                 results.Add(charge);
             }
             return results;
@@ -328,8 +331,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (!surcharges.Any()) return result;
             foreach (var item in surcharges)
             {
-                decimal totalLocal = item.Total * item.RateToLocal;
-                decimal totalUSD = item.Total * item.RateToUSD;
+                decimal _rateToLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                decimal _rateToUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                decimal totalLocal = item.Total * _rateToLocal; //item.RateToLocal;
+                decimal totalUSD = item.Total * _rateToUSD; //item.RateToUSD;
                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     result.HouseBillTotalCharge.TotalBuyingLocal = result.HouseBillTotalCharge.TotalBuyingLocal + totalLocal;
@@ -458,5 +463,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
+        
     }
 }

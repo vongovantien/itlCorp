@@ -98,7 +98,7 @@ export class InputBookingNotePopupComponent extends PopupBase {
     }
 
     get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.REPORT}`);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 
     ngAfterViewInit() {

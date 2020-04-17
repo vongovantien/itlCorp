@@ -233,8 +233,8 @@ export class CatalogueRepo {
             );
     }
 
-    deleteSaleman(id: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}`).pipe(
+    deleteSaleman(id: string, partnerId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}/${partnerId}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

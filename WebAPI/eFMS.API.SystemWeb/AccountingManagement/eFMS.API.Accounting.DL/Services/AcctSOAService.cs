@@ -37,7 +37,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysOffice> officeRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
-
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
@@ -58,7 +58,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatChargeDefaultAccount> chargeDefault,
             IContextBase<SysOffice> sysOffice,
             IContextBase<CatCommodity> catCommodity,
-            IContextBase<CatCommodityGroup> catCommodityGroup) : base(repository, mapper)
+            IContextBase<CatCommodityGroup> catCommodityGroup,
+            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -77,6 +78,7 @@ namespace eFMS.API.Accounting.DL.Services
             officeRepo = sysOffice;
             catCommodityRepo = catCommodity;
             catCommodityGroupRepo = catCommodityGroup;
+            currencyExchangeService = currencyExchange;
         }
 
         #region -- Insert & Update SOA
@@ -427,7 +429,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var chg in charge)
             {
                 var _exchangeDate = model.Id == 0 ? DateTime.Now : model.DatetimeCreated;
-                var _exchangeRate = CurrencyExchangeRateConvert(chg.FinalExchangeRate, _exchangeDate, chg.Currency, model.Currency);
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(chg.FinalExchangeRate, _exchangeDate, chg.Currency, model.Currency);
                 //Debit Amount
                 debitAmount += _exchangeRate * (chg.Debit ?? 0);
                 //Credit Amount
@@ -568,100 +570,6 @@ namespace eFMS.API.Accounting.DL.Services
             return 1;
         }
 
-        private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
-        {
-            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
-
-            currencyFrom = currencyFrom.Trim();
-            currencyTo = currencyTo.Trim();
-
-            if (currencyFrom != currencyTo)
-            {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
-                if (get1 != null)
-                {
-                    return get1.Rate;
-                }
-                else
-                {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
-                    if (get2 != null)
-                    {
-                        return 1 / get2.Rate;
-                    }
-                    else
-                    {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
-                        if (get3.Count > 1)
-                        {
-                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
-                            {
-                                return get3[0].Rate / get3[1].Rate;
-                            }
-                            else
-                            {
-                                return get3[1].Rate / get3[0].Rate;
-                            }
-                        }
-                        else
-                        {
-                            //Nến không tồn tại Currency trong Exchange thì return về 0
-                            return 0;
-                        }
-                    }
-                }
-            }
-            return 1;
-        }
-
-        private decimal CurrencyExchangeRateConvert(decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo)
-        {
-            var exchargeDateSurcharge = exchangeDate == null ? DateTime.Now.Date : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-            decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-
-            decimal _exchangeRate = 0;
-            if (finalExchangeRate != null)
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = (finalExchangeRate.Value != 0) ? (1 / finalExchangeRate.Value) : 0;
-                }
-                else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
-                else
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
-                }
-            }
-            else
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
-                }
-                else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = GetRateCurrencyExchange(currencyExchange, currencyFrom, AccountingConstants.CURRENCY_LOCAL);
-                }
-                else
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? _exchangeRateCurrencyFrom / _exchangeRateCurrencyTo : 0;
-                }
-            }
-            return _exchangeRate;
-        }
         #endregion -- Get Rate Exchange --
 
         #region -- Get Data Charge Master --
@@ -1257,10 +1165,10 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.Currency = item.Currency;
                 chg.CurrencyToLocal = criteria.CurrencyLocal;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, criteria.CurrencyLocal);
+                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, criteria.CurrencyLocal);
                 chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
                 chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
+                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
                 chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
                 chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
                 chg.SOANo = item.SOANo;
@@ -1446,10 +1354,10 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.Currency = item.Currency;
                 chg.CurrencyToLocal = criteria.CurrencyLocal;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, criteria.CurrencyLocal);
+                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, criteria.CurrencyLocal);
                 chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
                 chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
+                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
                 chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
                 chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
                 chg.SOANo = item.SOANo;
@@ -1798,10 +1706,10 @@ namespace eFMS.API.Accounting.DL.Services
                 chg.Note = item.Note;
                 chg.CurrencyToLocal = currencyLocal;
                 chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                var _exchangeRateLocal = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, currencyLocal);
+                var _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, currencyLocal);
                 chg.AmountDebitLocal = _exchangeRateLocal * (chg.Debit ?? 0);
                 chg.AmountCreditLocal = _exchangeRateLocal * (chg.Credit ?? 0);
-                var _exchangeRateUSD = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
+                var _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.Currency, AccountingConstants.CURRENCY_USD);
                 chg.AmountDebitUSD = _exchangeRateUSD * (chg.Debit ?? 0);
                 chg.AmountCreditUSD = _exchangeRateUSD * (chg.Credit ?? 0);
                 chg.DatetimeModifiedSurcharge = item.DatetimeModified;
@@ -1909,7 +1817,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<ExportSOAModel> _result = dataResult.ToList();
             _result.ForEach(fe =>
             {
-                var _exchangeRate = CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.CurrencyCharge, fe.CurrencySOA);
+                var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.CurrencyCharge, fe.CurrencySOA);
                 fe.CreditExchange = _exchangeRate * (fe.Credit ?? 0);
                 fe.DebitExchange = _exchangeRate * (fe.Debit ?? 0);
             });

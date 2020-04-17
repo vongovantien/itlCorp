@@ -12,5 +12,6 @@ namespace eFMS.API.Documentation.DL.Models
         public List<CsShipmentSurcharge> listShipmentSurcharge { get; set; }
         public int total_charge { get; set; }
         public string soaNo { get; set; }
+        public object balanceCdNote { get; set; }
     }
 }
