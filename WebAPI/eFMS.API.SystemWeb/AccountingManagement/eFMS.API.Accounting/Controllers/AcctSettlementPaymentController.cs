@@ -346,7 +346,7 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctSettlementPaymentService.CheckUpdatePermissionBySettlementId(model.Settlement.Id);
-            if(isAllowUpdate == false)
+            if (isAllowUpdate == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -601,7 +601,6 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet]
         [Route("GetListSceneChargeSettlementBySettlementNo")]
         [Authorize]
-
         public IActionResult GetListSceneChargeSettlementBySettlementNo(string settlementNo)
         {
             //Start change request Modified 14/10/2019 by Andy.Hoa
@@ -672,7 +671,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         ///Settlement export List within Shipment.
         /// </summary>
-        /// <param name="settlement List"></param>
+        /// <param name="settlementNoList"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("QueryDataSettlementExport")]

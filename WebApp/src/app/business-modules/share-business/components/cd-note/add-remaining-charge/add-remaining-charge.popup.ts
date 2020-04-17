@@ -16,7 +16,7 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
     listChargePartnerAddMore: ChargeCdNote[] = [];
     listChargePartner: ChargeCdNote[] = [];
     partner: string = "";
-    
+
     transactionType: TransactionTypeEnum = 0;
     constructor(private _sortService: SortService) {
         super();
@@ -44,7 +44,7 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
 
     addCharge() {
         let chargesSelected = [];
-        let grpChargeSelected = [];
+        const grpChargeSelected = [];
         if (this.listChargePartnerAddMore.length > 0) {
             for (const charges of this.listChargePartnerAddMore) {
                 chargesSelected = charges.listCharges.filter(group => group.isSelected);
@@ -53,12 +53,12 @@ export class ShareBussinessCdNoteAddRemainingChargePopupComponent extends PopupB
                 }
             }
         }
-        let result = [];
+        const result = [];
         for (const group of grpChargeSelected) {
             if (this.listChargePartner.length > 0) {
                 for (const item of this.listChargePartner) {
                     item.isDeleted = false;
-                    if (item.hwbno == group.hwbno && item.id == group.id) {
+                    if (item.hwbno === group.hwbno && item.id == group.id) {
                         for (const charge of group.listCharges) {
                             item.listCharges.push(charge)
                         }

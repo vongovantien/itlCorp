@@ -173,23 +173,23 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.getListCdNote(this.idMasterBill);
     }
 
-    //Charge keyword search
+    // Charge keyword search
     onChangeKeyWord(keyword: string) {
         this.cdNoteGroups = this.initGroup;
-        //TODO improve search.
+        // TODO improve search.
         if (!!keyword) {
-            if(keyword.indexOf('\\') != -1) return this.cdNoteGroups = [];
+            if (keyword.indexOf('\\') !== -1) { return this.cdNoteGroups = []; }
             keyword = keyword.toLowerCase();
             // Search group
-            let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1)
+            let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1);
             // Không tìm thấy group thì search tiếp list con của group
-            if (dataGrp.length == 0) {
-                let arrayCharge = [];
+            if (dataGrp.length === 0) {
+                const arrayCharge = [];
                 for (const group of this.cdNoteGroups) {
-                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 
-                                                                     || item.code.toLowerCase().toString().search(keyword) !== -1 
-                                                                     || item.userCreated.toLowerCase().toString().search(keyword) !== -1
-                                                                     || item.soaNo.toLowerCase().toString().search(keyword) !== -1)
+                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1
+                        || item.code.toLowerCase().toString().search(keyword) !== -1
+                        || item.userCreated.toLowerCase().toString().search(keyword) !== -1
+                        || item.soaNo.toLowerCase().toString().search(keyword) !== -1);
                     if (data.length > 0) {
                         arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
                     }

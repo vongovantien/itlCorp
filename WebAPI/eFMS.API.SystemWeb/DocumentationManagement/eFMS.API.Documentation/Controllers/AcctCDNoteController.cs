@@ -98,14 +98,14 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet]
         [Route("Get")]
         [Authorize]
-        public List<object> Get(Guid Id,bool IsShipmentOperation)
+        public List<object> Get(Guid Id, bool IsShipmentOperation)
         {
-             return cdNoteServices.GroupCDNoteByPartner(Id, IsShipmentOperation);
+            return cdNoteServices.GroupCDNoteByPartner(Id, IsShipmentOperation);
         }
 
         [HttpGet]
         [Route("GetDetails")]
-        public AcctCDNoteDetailsModel Get(Guid jobId,string cdNo)
+        public AcctCDNoteDetailsModel Get(Guid jobId, string cdNo)
         {
             return cdNoteServices.GetCDNoteDetails(jobId, cdNo);
         }

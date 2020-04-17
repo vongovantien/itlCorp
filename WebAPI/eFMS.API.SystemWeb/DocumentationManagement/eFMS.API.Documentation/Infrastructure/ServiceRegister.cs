@@ -44,6 +44,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsAirWayBillService, CsAirWayBillService>();
             services.AddTransient<ICsShipmentOtherChargeService, CsShipmentOtherChargeService>();
             services.AddTransient<ISaleReportService, SaleReportService>();
+            services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
