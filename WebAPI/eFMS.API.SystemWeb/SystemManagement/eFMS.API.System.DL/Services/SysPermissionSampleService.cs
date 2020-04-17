@@ -149,7 +149,14 @@ namespace eFMS.API.System.DL.Services
                     {
                         general.UserModified = currentUser.UserID;
                         general.DatetimeModified = DateTime.Now;
-                        permissioSampleGeneralRepository.Update(general, x => x.Id == general.Id, false);
+                        if (general.Id == 0)
+                        {
+                            permissioSampleGeneralRepository.Add(general, false);
+                        }
+                        else
+                        {
+                            permissioSampleGeneralRepository.Update(general, x => x.Id == general.Id, false);
+                        }
                     }
                 }
                 foreach(var item in entity.SysPermissionSampleSpecials)

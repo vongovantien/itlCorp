@@ -16,7 +16,7 @@ export const environment = {
                 // SYSTEM: "localhost:44360",
                 SETTING: "test.api-efms.itlvn.com/Setting",
                 // SETTING: "localhost:44363",
-                REPORT: "test.api-efms.itlvn.com/ReportPreview/Default.aspx",
+                REPORT: "http://test.api-efms.itlvn.com/ReportPreview/Default.aspx",
                 // REPORT: "localhost:53717",
                 EXPORT: "test.api-efms.itlvn.com/Export",
                 // EXPORT: "localhost:63492",

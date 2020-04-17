@@ -2151,17 +2151,17 @@ namespace eFMS.API.Accounting.DL.Services
                              from chg in chg2.DefaultIfEmpty()
                              join pat in partner on s.Customer equals pat.Id into pat2
                              from pat in pat2.DefaultIfEmpty()
-                             join cd in chargeDefaults on chg.ID equals cd.ChargeId into defaults
+                             join cd in chargeDefaults on chg.ChargeID equals cd.ChargeId into defaults
                              from cd in defaults.DefaultIfEmpty()
 
                              select new ExportImportBravoFromSOAResult
                              {
                                  ServiceDate = chg.ServiceDate,
                                  SOANo = s.Soano,
-                                 Service = GetServiceNameOfSoa(s.ServiceTypeId).ToString(),
+                                 Service =  GetServiceNameOfSoa(chg.Service).ToString(),
                                  PartnerCode = pat.TaxCode,
-                                 Debit = chg.Debit,
-                                 Credit = chg.Credit,
+                                 Debit = cd.DebitAccountNo,
+                                 Credit = cd.CreditAccountNo,
                                  ChargeCode = chg.ChargeCode,
                                  OriginalCurrency = chg.Currency,
                                  OriginalAmount = chg.Debit - chg.Credit,
