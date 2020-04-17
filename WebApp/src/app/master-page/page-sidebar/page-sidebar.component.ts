@@ -35,7 +35,8 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
 
     getMenu(officeId: string) {
         if (!!this.userLogged) {
-            this._systemRepo.getMenu(this.userLogged.id, officeId)
+            const language = localStorage.getItem(SystemConstants.CURRENT_LANGUAGE);
+            this._systemRepo.getMenu(this.userLogged.id, language, officeId)
                 .subscribe(
                     (res: Menu[]) => {
                         this.Menu = res.map((m: Menu) => new Menu(m));

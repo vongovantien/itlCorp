@@ -9,11 +9,11 @@ export const environment = {
         CATALOGUE: "localhost:44361",
         OPERATION: "localhost:44365",
         SYSTEM: "localhost:44360",
-        REPORT: "localhost:53717/Default.aspx",
+        REPORT: "http://localhost:53717/Default.aspx",
         EXPORT: "localhost:63492",
         SETTING: "localhost:44363",
         INDENTITY_SERVER_URL: "https://localhost:44369",
-        EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
+        EXPORT_CRYSTAL: "localhost:53717/ExportCrystal.aspx",
     },
     AUTHORIZATION:
     {

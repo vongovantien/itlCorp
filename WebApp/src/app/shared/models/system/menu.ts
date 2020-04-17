@@ -2,8 +2,7 @@ import { BaseModel } from "../base.model";
 
 export class Menu extends BaseModel {
     parentId: string = null;
-    nameVn: string = null;
-    nameEn: string = null;
+    name: string = null;
     description: string = null;
     assemplyName: string = null;
     icon: string = null;
