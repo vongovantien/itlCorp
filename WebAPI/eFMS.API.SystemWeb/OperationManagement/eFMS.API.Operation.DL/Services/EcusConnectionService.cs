@@ -155,7 +155,10 @@ namespace eFMS.API.Operation.DL.Services
         {
             var list = Query(criteria);
             IQueryable<SetEcusConnectionModel> data = null;
-
+            if (list == null)
+            {
+                return list;
+            }
             switch (range)
             {
                 case PermissionRange.Owner:

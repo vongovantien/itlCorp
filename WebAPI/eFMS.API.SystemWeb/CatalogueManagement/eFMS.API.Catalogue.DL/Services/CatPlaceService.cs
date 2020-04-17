@@ -308,7 +308,10 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             IQueryable<sp_GetCatPlace> data = null;
             var list = QueryCriteria(criteria);
-
+            if(list == null)
+            {
+                return list;
+            }
             switch (range)
             {
                 case PermissionRange.Owner:
@@ -929,7 +932,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.FlightVesselNo ?? "").Contains(criteria.FlightVesselNo ?? "", StringComparison.OrdinalIgnoreCase) == true
                                     && (x.Active == criteria.Active || criteria.Active == null)
-                    ).AsQueryable();
+                    )?.AsQueryable();
             }
             else
             {
