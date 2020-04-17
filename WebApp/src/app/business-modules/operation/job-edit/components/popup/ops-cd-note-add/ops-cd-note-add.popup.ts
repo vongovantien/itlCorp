@@ -87,9 +87,9 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
 
     closePopup() {
         this.hide();
-        //Reset popup về default
+        // Reset popup về default
         this.selectedNoteType = "DEBIT";
-        this.selectedPartner = {};;
+        this.selectedPartner = {};
         this.partnerCurrent = {};
         this.listChargePartner = [];
         this.initGroup = [];
@@ -132,8 +132,8 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                     dataCharges.forEach(element => {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
-                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;  
-                        });                                                                                                
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
+                        });
                     });
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
@@ -143,7 +143,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                             this.listCharges.push(charge);
                         }
                     }
-                    //Tính toán Amount Credit, Debit, Balance
+                    // Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount(this.listChargePartner);
                 },
             );
@@ -161,14 +161,14 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     onSubmitChangePartnerPopup() {
         this.keyword = '';
         this.isCheckAllCharge = false;
-        //Gán this.selectedPartner cho this.partnerCurrent
+        // Gán this.selectedPartner cho this.partnerCurrent
         this.partnerCurrent = Object.assign({}, this.selectedPartner);
         this.getListCharges(this.currentMBLId, this.selectedPartner.value, this.isHouseBillID, "");
         this.changePartnerPopup.hide();
     }
 
     onCancelChangePartnerPopup() {
-        //Gán this.partnerCurrent cho this.selectedPartner
+        // Gán this.partnerCurrent cho this.selectedPartner
         this.selectedPartner = Object.assign({}, this.partnerCurrent);
     }
 
@@ -204,17 +204,17 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                 for (const charge of charges.listCharges.filter(group => group.isSelected)) {
                     charge.isDeleted = true;
                 }
-                if (charges.isSelected) charges.isDeleted = true;
+                if (charges.isSelected) { charges.isDeleted = true; }
             }
         }
-        //Tính toán Amount Credit, Debit, Balance
-        var listCharge = this.getGroupChargeNotDelete(this.listChargePartner);
+        // Tính toán Amount Credit, Debit, Balance
+        const listCharge = this.getGroupChargeNotDelete(this.listChargePartner);
         this.calculatorAmount(listCharge);
     }
 
     getGroupChargeNotDelete(listCharge: ChargeCdNote[]) {
         let chargesNotDeleted = [];
-        let grpChargesNotDeleted = [];
+        const grpChargesNotDeleted = [];
 
         if (listCharge.length > 0) {
             for (const charges of listCharge) {
@@ -230,19 +230,19 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     }
 
     saveCDNote() {
-        //Lấy danh sách group charge chưa delete
-        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner)
+        // Lấy danh sách group charge chưa delete
+        this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
 
-        //Không được phép create khi chưa có charge
+        // Không được phép create khi chưa có charge
         if (this.listChargePartner.length === 0) {
             this.notExistsChargePopup.show();
         } else {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "VND" // in the future , this id must be local currency of each country
+            this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
-            var arrayCharges = [];
+            const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {
                     arrayCharges.push(charge);
@@ -254,13 +254,13 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             }
             this.CDNote.listShipmentSurcharge = arrayCharges;
             const _totalCredit = arrayCharges.reduce((credit, charge) => credit + charge.credit * charge.exchangeRate, 0);
-            const _totalDebit = arrayCharges.reduce((debit, charge) => debit + charge.debit * charge.exchangeRate, 0);;
+            const _totalDebit = arrayCharges.reduce((debit, charge) => debit + charge.debit * charge.exchangeRate, 0);
             const _balance = _totalDebit - _totalCredit;
             this.CDNote.total = _balance;
             if (Math.abs(_balance) > 99999999999999) {
                 this._toastService.error('Balance amount field exceeds numeric storage size');
             } else {
-                if (this.action == "create") {
+                if (this.action === "create") {
                     this._documentationRepo.addCdNote(this.CDNote)
                         .pipe(catchError(this.catchError))
                         .subscribe(
@@ -294,19 +294,19 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     }
 
     calculatorAmount(listChargePartner: ChargeCdNote[]) {
-        //List currency có trong listCharges
+        // List currency có trong listCharges
         const listCurrency = [];
         const listCharge = [];
         for (const charges of listChargePartner) {
             for (const currenct of charges.listCharges.map(m => m.currencyId)) {
-                listCurrency.push(currenct)
+                listCurrency.push(currenct);
             }
             for (const charge of charges.listCharges) {
                 listCharge.push(charge);
             }
         }
-        //List currency unique      
-        const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
+        // List currency unique      
+        const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
@@ -348,8 +348,8 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                     dataCharges.forEach(element => {
                         element.listCharges.forEach(ele => {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && this.selectedPartner.value === ele.paymentObjectId)) ? ele.total : null;
-                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && this.selectedPartner.value === ele.payerId)) ? ele.total : null;  
-                        });                                                                                                
+                            ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && this.selectedPartner.value === ele.payerId)) ? ele.total : null;
+                        });
                     });
                     this.addRemainChargePopup.listChargePartnerAddMore = dataCharges;
                     this.addRemainChargePopup.show();
@@ -371,24 +371,24 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         this.listChargePartner = [];
         this.listChargePartner = data;
         this.initGroup = data;
-        //Tính toán giá trị amount, balance
+        // Tính toán giá trị amount, balance
         this.calculatorAmount(this.listChargePartner);
     }
 
-    //Charge keyword search
+    // Charge keyword search
     onChangeKeyWord(keyword: string) {
         this.listChargePartner = this.initGroup;
-        //TODO improve search.
+        // TODO improve search.
         if (!!keyword) {
-            if(keyword.indexOf('\\') != -1) return this.listChargePartner = [];
+            if (keyword.indexOf('\\') !== -1) { return this.listChargePartner = []; }
             keyword = keyword.toLowerCase();
             // Search group
-            let dataGrp = this.listChargePartner.filter((item: any) => item.hwbno.toLowerCase().toString().search(keyword) !== -1)
+            let dataGrp = this.listChargePartner.filter((item: any) => item.hwbno.toLowerCase().toString().search(keyword) !== -1);
             // Không tìm thấy group thì search tiếp list con của group
-            if (dataGrp.length == 0) {
-                let arrayCharge = [];
+            if (dataGrp.length === 0) {
+                const arrayCharge = [];
                 for (const group of this.listChargePartner) {
-                    const data = group.listCharges.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1 || item.nameEn.toLowerCase().toString().search(keyword) !== -1)
+                    const data = group.listCharges.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1 || item.nameEn.toLowerCase().toString().search(keyword) !== -1);
                     if (data.length > 0) {
                         arrayCharge.push({ id: group.id, hwbno: group.hwbno, isSelected: group.isSelected, isDeleted: group.isDeleted, listCharges: data });
                     }
@@ -401,20 +401,20 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
         }
     }
 
-    cancel(){
-        if(this.isChangeCharge === false){
+    cancel() {
+        if (this.isChangeCharge === false) {
             this.closePopup();
         } else {
             this.confirmCloseAddPopup.show();
         }
     }
 
-    onSubmitConfirmCloseAdd(){
+    onSubmitConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
         this.closePopup();
     }
-    
-    onCancelConfirmCloseAdd(){
+
+    onCancelConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
-    } 
+    }
 }

@@ -48,6 +48,8 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<AcctCdnote, AcctCdnoteModel>();
 
             CreateMap<CsDimensionDetailModel, CsDimensionDetail>();
+            
+            CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
         }
     }
 }

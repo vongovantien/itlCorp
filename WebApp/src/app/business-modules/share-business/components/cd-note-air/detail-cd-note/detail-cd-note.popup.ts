@@ -102,14 +102,14 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
                         element.credit = (element.type === 'BUY' || (element.type === 'OBH' && dataCdNote.partnerId === element.payerId)) ? element.total : null;
                     });
                     this.CdNoteDetail = dataCdNote;
-                    //Tính toán Amount Credit, Debit, Balance
+                    // Tính toán Amount Credit, Debit, Balance
                     this.calculatorAmount();
                 },
             );
     }
 
     calculatorAmount() {
-        //List currency có trong listCharges
+        // List currency có trong listCharges
         const listCurrency = [];
         const listCharge = [];
         for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
@@ -118,8 +118,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         for (const charge of this.CdNoteDetail.listSurcharges) {
             listCharge.push(charge);
         }
-        //List currency unique      
-        const uniqueCurrency = [...new Set(listCurrency)] // Remove duplicate
+        // List currency unique      
+        const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
         this.balanceAmount = '';
@@ -137,10 +137,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
         this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
         this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
-        
-        // this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
-        // this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
-        // this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
     }
 
     formatNumberCurrency(input: number) {
