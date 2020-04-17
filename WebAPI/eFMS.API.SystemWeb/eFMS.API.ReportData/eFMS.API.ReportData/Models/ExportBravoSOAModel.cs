@@ -23,8 +23,8 @@ namespace eFMS.API.ReportData.Models
         public string ChargeName { get; set; }
         public string CreditDebitNo { get; set; }
         public string TransationType { get; set; }
-        public Nullable<decimal> Debit { get; set; }
-        public Nullable<decimal> Credit { get; set; }
+        public string Debit { get; set; }
+        public string Credit { get; set; }
         public string OriginalCurrency { get; set; }
         public decimal? OriginalAmount { get; set; }
         public decimal? AmountVND { get; set; }

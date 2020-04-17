@@ -196,7 +196,7 @@ export class FormAddPartnerComponent extends AppForm {
             shortName: [null, Validators.compose([
                 FormValidators.required
             ])],
-            partnerAccountRef:[],
+            partnerAccountRef: [],
             taxCode: [null, Validators.compose([
                 FormValidators.required
             ])],
@@ -283,8 +283,8 @@ export class FormAddPartnerComponent extends AppForm {
         this.roundUp = this.partnerForm.controls['roundUp'];
     }
 
-    onSelectDataFormInfo(data: any){
-       this.partnerAccountRef.setValue(data.id);
+    onSelectDataFormInfo(data: any) {
+        this.partnerAccountRef.setValue(data.id);
     }
 
     setFormData(partner: Partner) {
