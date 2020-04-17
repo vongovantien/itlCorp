@@ -29,13 +29,16 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatSaleManService catSaleManService;
+        private readonly ICatPartnerService partnerService;
+
 
         private readonly IMapper mapper;
-        public CatSaleManController(IStringLocalizer<LanguageSub> localizer, ICatSaleManService service, IMapper iMapper)
+        public CatSaleManController(IStringLocalizer<LanguageSub> localizer, ICatSaleManService service, ICatPartnerService partnerSv, IMapper iMapper)
         {
             stringLocalizer = localizer;
             catSaleManService = service;
             mapper = iMapper;
+            partnerService = partnerSv;
         }
 
         /// <summary>
@@ -183,14 +186,25 @@ namespace eFMS.API.Catalogue.Controllers
         /// delete an existed item
         /// </summary>
         /// <param name="id">id of data that need to delete</param>
+        /// <param name="partnerId">id of data that need to delete</param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
-
-        public IActionResult Delete(Guid id)
+        [HttpDelete("{id}/{partnerId}")]
+        [Authorize]
+        public IActionResult Delete(Guid id, string partnerId)
         {
             var hs = catSaleManService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (hs.Success)
+            {
+                var objPartner = partnerService.Get(x => x.Id == partnerId).FirstOrDefault();
+                objPartner.SalePersonId = catSaleManService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.CreateDate).FirstOrDefault().SaleManId.ToString();
+                var hsPartner = partnerService.Update(objPartner, x=>x.Id == partnerId);
+                if (!hsPartner.Success)
+                {
+                    return BadRequest();
+                }
+            }
             if (!hs.Success)
             {
                 return BadRequest(result);

@@ -57,6 +57,7 @@ export class PartnerDetailComponent extends AppList {
     isExistedTaxcode: boolean = false;
     currenctUser: any = '';
     company: Company[] = [];
+    salemansId: string = null;
 
     list: any[] = [];
 
@@ -185,6 +186,7 @@ export class PartnerDetailComponent extends AppList {
         this.salemanToAdd.partnerId = this.partner.id;
         this.poupSaleman.isDetail = false;
         this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
+
         if (this.isDup) {
             for (const it of this.saleMandetail) {
                 const index = this.services.findIndex(x => x.id === it.service);
@@ -238,7 +240,8 @@ export class PartnerDetailComponent extends AppList {
     }
     closeppAndDeleteSaleman(index: any) {
         this.index = index;
-        this.deleteSaleman(this.index);
+        const id = this.saleMandetail[index].id;
+        this.deleteSaleman(this.index, id);
     }
 
     showPopupSaleman() {
@@ -249,15 +252,38 @@ export class PartnerDetailComponent extends AppList {
     }
 
     onDeleteSaleman() {
-        if (this.saleMandetail.length > 0) {
-            this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
+        if (this.saleMandetail.length === 1) {
+            this._toastService.error('Salesman must have one row!');
             this.confirmDeleteSalemanPopup.hide();
-            this.toastr.success('Delete Success !');
+            return;
         }
-
+        this.confirmDeleteSalemanPopup.hide();
+        if (!!this.salemansId) {
+            this._catalogueRepo.deleteSaleman(this.salemansId, this.partner.id)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
+                            this.confirmDeleteSalemanPopup.hide();
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        } else {
+            if (this.saleMandetail.length > 0) {
+                this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
+                if (!this.salemansId) {
+                    this._toastService.success('Data delete success!');
+                }
+            }
+        }
     }
-    deleteSaleman(index: any) {
+    deleteSaleman(index: any, id: string) {
         this.index = index;
+        this.salemansId = id;
         this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
         this.confirmDeleteSalemanPopup.show();
     }

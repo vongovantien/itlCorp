@@ -14,7 +14,7 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatSaleManService : IRepositoryBase<CatSaleman, CatSaleManModel>
     {
         IQueryable<CatSaleman> GetSaleMan();
-        List<CatSaleManViewModel> Query(CatSalemanCriteria criteria);
+        IQueryable<CatSaleManViewModel> Query(CatSalemanCriteria criteria);
 
         List<CatSaleManViewModel> Paging(CatSalemanCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(Guid id);

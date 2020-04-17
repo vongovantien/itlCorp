@@ -98,11 +98,9 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
-        public List<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
+        public IQueryable<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
             var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
-            var salesManData = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
-
             var sysUser = sysUserRepository.Get();
             //var partner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
             //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
@@ -165,7 +163,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 saleman.Username = item.users.Username;
                 results.Add(saleman);
             }
-            return results;
+            return results?.OrderBy(x=>x.CreateDate).AsQueryable();
         }
 
         public List<CatSaleManViewModel> Paging(CatSalemanCriteria criteria, int page, int size, out int rowsCount)
