@@ -137,7 +137,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         this.totalCredit = this.totalCredit.replace("| ]", "").replace("]", "");
         this.totalDebit = this.totalDebit.replace("| ]", "").replace("]", "");
         this.balanceAmount = this.balanceAmount.replace("| ]", "").replace("]", "");
-        
+
         // this.totalCredit = this.totalCredit === ' | ' ? '' : this.totalCredit.replace("| ", "");
         // this.totalDebit = this.totalDebit === ' | ' ? '' : this.totalDebit.replace("| ", "");
         // this.balanceAmount = this.balanceAmount === ' | ' ? '' : this.balanceAmount.replace("| ", "");
@@ -263,9 +263,9 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     get scr() {
-        //return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
-        //return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:53717");
-        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.REPORT}`);
+        // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        // return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:53717");
+        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 
     ngAfterViewInit() {

@@ -36,6 +36,6 @@ export class ExportCrystalComponent extends PopupBase {
         }
     }
     get scr() {
-        return this.sanitizer.bypassSecurityTrustResourceUrl('http://' + `${environment.HOST.EXPORT_CRYSTAL}`);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.EXPORT_CRYSTAL}`);
     }
 }
