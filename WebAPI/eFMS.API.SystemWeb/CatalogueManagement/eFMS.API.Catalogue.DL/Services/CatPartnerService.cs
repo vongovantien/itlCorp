@@ -292,6 +292,12 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = QueryPaging(criteria);
+
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
