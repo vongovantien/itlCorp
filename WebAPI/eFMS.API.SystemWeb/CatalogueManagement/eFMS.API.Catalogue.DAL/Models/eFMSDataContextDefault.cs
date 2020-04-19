@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatChargeDefaultAccount> CatChargeDefaultAccount { get; set; }
         public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
+        public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
         public virtual DbSet<CatContainerType> CatContainerType { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
@@ -225,6 +226,51 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCommodity>(entity =>
+            {
+                entity.ToTable("catCommodity");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
+
+                entity.Property(e => e.CommodityNameEn)
+                    .HasColumnName("CommodityName_EN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.CommodityNameVn)
+                    .HasColumnName("CommodityName_VN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 

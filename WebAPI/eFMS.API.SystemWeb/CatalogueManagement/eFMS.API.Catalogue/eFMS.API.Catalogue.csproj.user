@@ -10,6 +10,6 @@
     <WebStackScaffolding_LayoutPageFile />
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <ShowAllFiles>false</ShowAllFiles>
-    <NameOfLastUsedPublishProfile>TestPublish</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>Pre-Prod</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

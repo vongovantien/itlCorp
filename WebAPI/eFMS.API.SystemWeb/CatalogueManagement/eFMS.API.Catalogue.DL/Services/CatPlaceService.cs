@@ -270,10 +270,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var list = QueryCriteria(criteria);
             if (list == null) return null;
             IQueryable<sp_GetCatPlace> data = null;
-            var list = QueryCriteria(criteria);
             if(list == null)
             {
-                return list;
+                return null;
             }
             switch (range)
             {

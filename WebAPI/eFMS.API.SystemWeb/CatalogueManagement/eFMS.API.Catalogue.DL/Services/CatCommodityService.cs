@@ -48,13 +48,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<CatCommodityModel> results = null;
             var data = Query(criteria);
             if (data == null)
             {
                 rowsCount = 0;
-                return results;
+                return null;
             }
+            List<CatCommodityModel> results = null;
             rowsCount = data.Count();
             data = data.OrderByDescending(x => x.DatetimeModified);
             if (size > 1)
@@ -72,6 +72,7 @@ namespace eFMS.API.Catalogue.DL.Services
             Expression<Func<CatCommodityModel, bool>> query = null;
 
             var commodities = Get();
+            if (commodities == null) return null;
             var catCommonityGroups = catCommodityGroupService.Get();
             IQueryable<CatCommodityModel> results = from com in commodities
                       join grCom in catCommonityGroups on com.CommodityGroupId equals grCom.Id into grpComs
@@ -111,7 +112,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                             && (x.Active == criteria.Active || criteria.Active == null);
             }
-            if (results == null) return results;
+            if (results == null) return null;
             results = results.Where(query);
             return results;
         }
