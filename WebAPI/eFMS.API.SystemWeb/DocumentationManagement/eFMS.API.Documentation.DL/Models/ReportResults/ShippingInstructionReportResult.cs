@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Documentation.DL.Models.ReportResults
+﻿namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
     public class ShippingInstructionReportResult
     {
-        //public decimal SumVolume { get; set; }
-        //public decimal SumGrossWeight { get; set; }
-        //public string SumPackagesNote { get; set; }
-        //public string SumContainerSealNo { get; set; }
         public string VesselNo { get; set; }
         public string PoDelivery { get; set; }
         public string PodName { get; set; }

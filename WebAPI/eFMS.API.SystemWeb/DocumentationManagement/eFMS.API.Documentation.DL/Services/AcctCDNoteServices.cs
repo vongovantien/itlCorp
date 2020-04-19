@@ -406,42 +406,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         private List<CsShipmentSurchargeDetailsModel> Query(Guid hbId)
         {
-            //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            //var charges = surchargeRepository.Get(x => x.Hblid == hbId);
-            //var partners = partnerRepositoty.Get();
-            //var catcharges = catchargeRepository.Get();
-            //var currencies = currencyRepository.Get();
-            //var units = unitRepository.Get();
-
-            //var query = (from charge in charges
-            //             //where charge.Hblid == hbId
-            //             join chargeDetail in catcharges on charge.ChargeId equals chargeDetail.Id
-
-            //             join partner in partners on charge.PaymentObjectId equals partner.Id into partnerGroup
-            //             from p in partnerGroup.DefaultIfEmpty()
-
-            //             join payer in partners on charge.PayerId equals payer.Id into payerGroup
-            //             from pay in payerGroup.DefaultIfEmpty()
-
-            //             join unit in units on charge.UnitId equals unit.Id
-            //             join currency in currencies on charge.CurrencyId equals currency.Id
-            //             select new { charge, p, pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, chargeDetail.Code }
-            //            ).ToList();
-            //foreach (var item in query)
-            //{
-            //    var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
-            //    charge.PartnerName = item.p?.PartnerNameEn;
-            //    charge.NameEn = item?.ChargeNameEn;
-            //    if(charge.Type == "OBH")
-            //    {
-            //        charge.ReceiverName = item.p?.PartnerNameEn;
-            //    }
-            //    charge.PayerName = item.pay?.PartnerNameEn;
-            //    charge.Unit = item.UnitNameEn;
-            //    charge.Currency = item.CurrencyName;
-            //    charge.ChargeCode = item.Code;
-            //    listCharges.Add(charge);
-            //}
             var surcharges = surchargeService.GetByHB(hbId);
             return surcharges;
         }

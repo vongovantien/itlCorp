@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -33,7 +32,6 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
-        //private readonly IOpsTransactionService opsTransactionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
@@ -45,7 +43,6 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> csTransactionRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
-            //IOpsTransactionService opsTransService,
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
@@ -58,7 +55,6 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = currUser;
             catChargeRepository = catChargeRepo;
             transactionDetailService = transDetailService;
-            //opsTransactionService = opsTransService;
             currencyExchangeService = currencyExchange;
         }
 

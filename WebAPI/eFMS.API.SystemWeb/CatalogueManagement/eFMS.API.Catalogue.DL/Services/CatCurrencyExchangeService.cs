@@ -12,7 +12,6 @@ using eFMS.API.Catalogue.Service.ViewModels;
 using ITL.NetCore.Connection;
 using System.Linq;
 using ITL.NetCore.Common;
-using System.Globalization;
 using eFMS.API.Catalogue.Service.Contexts;
 
 namespace eFMS.API.Catalogue.DL.Services

@@ -11,11 +11,8 @@ using System.Linq;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using Microsoft.Extensions.Caching.Distributed;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
 using System.Linq.Expressions;
 
@@ -169,6 +166,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
+                var list = new List<CatCommodity>();
                 foreach (var item in data)
                 {
                     bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
@@ -185,12 +183,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID
                     };
-                    DataContext.Add(commodity, false);
+                    list.Add(commodity);
                 }
+                var hs = DataContext.Add(list);
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch(Exception ex)
             {

@@ -15,7 +15,6 @@
             </summary>
             <param name="localizer">inject interface IStringLocalizer</param>
             <param name="service">inject interface ICustomsDeclarationService</param>
-            <param name="distributedCache"></param>
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.Get">
             <summary>

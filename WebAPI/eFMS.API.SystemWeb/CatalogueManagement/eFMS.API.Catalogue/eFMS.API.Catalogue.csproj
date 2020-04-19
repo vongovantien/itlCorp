@@ -23,6 +23,7 @@
     <Compile Remove="Controllers\SysEmployeesController.cs" />
     <Compile Remove="Infrastructure\Common\HandleError.cs" />
     <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
+    <Compile Remove="Models\SysUserGroupEditModel.cs" />
     <Compile Remove="Resources\LanguageSub.cs" />
   </ItemGroup>
 

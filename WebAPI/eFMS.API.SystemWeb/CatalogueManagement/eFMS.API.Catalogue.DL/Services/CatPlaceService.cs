@@ -17,12 +17,10 @@ using System.Threading;
 using System.Globalization;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Caching.Distributed;
 using System.Data.SqlClient;
 using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
@@ -63,8 +61,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "WarehouseId");
             SetChildren<CsManifest>("Id", "Pol");
             SetChildren<CsManifest>("Id", "Pod");
-            SetChildren<CsShippingInstruction>("Id", "Pod");
-            SetChildren<CsShippingInstruction>("Id", "Pol");
+            //SetChildren<CsShippingInstruction>("Id", "Pod");
+            //SetChildren<CsShippingInstruction>("Id", "Pol");
         }
 
         #region CRUD
@@ -164,7 +162,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             }
 
-            rowsCount = data.Count();
+            rowsCount = data.Select(x => x.ID).Count();
             if (rowsCount == 0) return results;
             if (size > 1)
             {
@@ -235,73 +233,36 @@ namespace eFMS.API.Catalogue.DL.Services
         private IQueryable<CatPlaceViewModel> GetCulturalData(IQueryable<sp_GetCatPlace> list)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            if (currentCulture.Name == "vi-VN")
+            return list.Select(x => new CatPlaceViewModel
             {
-                return list.Select(x => new CatPlaceViewModel
-                {
-                    ID = x.ID,
-                    Code = x.Code,
-                    NameEn = x.NameEn,
-                    NameVn = x.NameVn,
-                    DisplayName = x.DisplayName,
-                    Address = x.Address,
-                    DistrictID = x.DistrictID,
-                    DistrictName = x.DistrictNameVN,
-                    ProvinceID = x.ProvinceID,
-                    ProvinceName = x.ProvinceNameVN,
-                    CountryID = x.CountryID,
-                    AreaID = x.AreaID,
-                    LocalAreaID = x.LocalAreaID,
-                    ModeOfTransport = x.ModeOfTransport,
-                    GeoCode = x.GeoCode,
-                    PlaceTypeID = x.PlaceTypeID,
-                    Note = x.Note,
-                    UserCreated = x.UserCreated,
-                    DatetimeCreated = x.DatetimeCreated,
-                    UserModified = x.UserModified,
-                    DatetimeModified = x.DatetimeModified,
-                    Active = x.Active,
-                    InActiveOn = x.InActiveOn,
-                    CountryName = x.CountryNameVN,
-                    AreaName = x.AreaNameVN,
-                    LocalAreaName = x.LocalAreaNameVN,
-                    FlightVesselNo = x.FlightVesselNo,
-                });
-            }
-            else
-            {
-                return list.Select(x => new CatPlaceViewModel
-                {
-                    ID = x.ID,
-                    Code = x.Code,
-                    NameEn = x.NameEn,
-                    NameVn = x.NameVn,
-                    DisplayName = x.DisplayName,
-                    Address = x.Address,
-                    DistrictID = x.DistrictID,
-                    DistrictName = x.DistrictNameEN,
-                    ProvinceID = x.ProvinceID,
-                    ProvinceName = x.ProvinceNameEN,
-                    CountryID = x.CountryID,
-                    AreaID = x.AreaID,
-                    LocalAreaID = x.LocalAreaID,
-                    ModeOfTransport = x.ModeOfTransport,
-                    GeoCode = x.GeoCode,
-                    PlaceTypeID = x.PlaceTypeID,
-                    Note = x.Note,
-                    UserCreated = x.UserCreated,
-                    DatetimeCreated = x.DatetimeCreated,
-                    UserModified = x.UserModified,
-                    DatetimeModified = x.DatetimeModified,
-                    Active = x.Active,
-                    InActiveOn = x.InActiveOn,
-                    CountryName = x.CountryNameEN,
-                    AreaName = x.AreaNameEN,
-                    LocalAreaName = x.LocalAreaNameEN,
-                    FlightVesselNo = x.FlightVesselNo,
-
-                });
-            }
+                ID = x.ID,
+                Code = x.Code,
+                NameEn = x.NameEn,
+                NameVn = x.NameVn,
+                DisplayName = x.DisplayName,
+                Address = x.Address,
+                DistrictID = x.DistrictID,
+                DistrictName = currentCulture.IetfLanguageTag == "en-US" ? x.DistrictNameEN : x.DistrictNameVN,
+                ProvinceID = x.ProvinceID,
+                ProvinceName = currentCulture.IetfLanguageTag == "en-US" ? x.ProvinceNameEN : x.ProvinceNameVN,
+                CountryID = x.CountryID,
+                AreaID = x.AreaID,
+                LocalAreaID = x.LocalAreaID,
+                ModeOfTransport = x.ModeOfTransport,
+                GeoCode = x.GeoCode,
+                PlaceTypeID = x.PlaceTypeID,
+                Note = x.Note,
+                UserCreated = x.UserCreated,
+                DatetimeCreated = x.DatetimeCreated,
+                UserModified = x.UserModified,
+                DatetimeModified = x.DatetimeModified,
+                Active = x.Active,
+                InActiveOn = x.InActiveOn,
+                CountryName = currentCulture.IetfLanguageTag == "en-US" ? x.CountryNameEN : x.CountryNameVN,
+                AreaName = x.AreaNameVN,
+                LocalAreaName = x.LocalAreaNameVN,
+                FlightVesselNo = x.FlightVesselNo,
+            });
         }
 
         public IQueryable<sp_GetCatPlace> QueryByPermission(CatPlaceCriteria criteria, PermissionRange range)
@@ -955,15 +916,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                    && (x.Active == criteria.Active || criteria.Active == null)
                                    ).AsQueryable();
             }
-
-            //foreach (var item in list)
-            //{
-            //    if(item.WarehouseId != null)
-            //    {
-            //        var place = DataContext.First(x => x.Id == item.WarehouseId);
-            //        item.WarehouseName = place.NameEn;
-            //    }
-            //}
             return list;
         }
 

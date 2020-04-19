@@ -22,10 +22,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\CommonData.cs" />
     <Compile Remove="Common\WebUrl.cs" />
-    <Compile Remove="Helpers\RedisCacheHelper.cs" />
+    <Compile Remove="Infrastructure\ExpressionExtension.cs" />
+    <Compile Remove="Infrastructure\StringExtensions.cs" />
     <Compile Remove="IService\ICatBranchService.cs" />
+    <Compile Remove="Models\CatBranchModel.cs" />
+    <Compile Remove="Models\Criteria\CatChargeDefaultAccountCriteria.cs" />
     <Compile Remove="Services\CatBranchService.cs" />
+    <Compile Remove="ViewModels\CustomerPartnerViewModel.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,7 +68,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
     <Folder Include="Models\Views\" />
   </ItemGroup>
 </Project>

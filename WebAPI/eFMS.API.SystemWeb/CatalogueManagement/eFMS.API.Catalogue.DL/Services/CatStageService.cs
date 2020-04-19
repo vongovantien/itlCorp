@@ -9,12 +9,9 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Common.Globals;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.NoSql;
-using Microsoft.Extensions.Caching.Distributed;
-using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
 using AutoMapper.QueryableExtensions;
 
@@ -37,8 +34,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatStageModel> GetAll()
         {
-            //var data = Get();
-            //return data;
             var data = DataContext.Get();
             if (data == null) return null;
             var results = data.ProjectTo<CatStageModel>(mapper.ConfigurationProvider);
@@ -210,6 +205,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
+                var list = new List<CatStage>();
                 foreach(var item in data)
                 {
                     bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
@@ -227,12 +223,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         Active = active,
                         InactiveOn = inactiveDate
                     };
-                    DataContext.Add(stage, false);
+                    list.Add(stage);
                 }
+                var hs = DataContext.Add(list);
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch(Exception ex)
             {

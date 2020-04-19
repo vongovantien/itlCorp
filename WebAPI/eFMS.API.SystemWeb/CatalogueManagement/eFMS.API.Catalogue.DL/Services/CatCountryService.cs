@@ -1,28 +1,23 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
@@ -43,6 +38,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CatPlace>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryShippingId");
+            SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
             SetChildren<CsTransactionDetail>("Id", "OriginCountryId");
         }
 
@@ -78,6 +74,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatCountryViewModel> GetByLanguage()
         {
             var data = Get();
+            if (data == null) return null;
             return GetDataByLanguage(data);
         }
         
@@ -119,15 +116,21 @@ namespace eFMS.API.Catalogue.DL.Services
                         NameVn = item.NameVn,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
+                        DatetimeModified = DateTime.Now,
                         Active = active,
                         InactiveOn = inactiveDate
                     };
-                    DataContext.Add(country, false);
+                    newList.Add(country);
                 }
+                var hs = DataContext.Add(newList);
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch (Exception ex)
             {
@@ -205,43 +208,21 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             var results = new List<CatCountryViewModel>();
-            if (currentCulture.Name == "vi-VN")
+            foreach (var item in data)
             {
-                foreach (var item in data)
+                var country = new CatCountryViewModel
                 {
-                    var country = new CatCountryViewModel
-                    {
-                        Id = item.Id,
-                        Code = item.Code,
-                        Name = item.NameVn,
-                        UserCreated = item.UserCreated,
-                        DatetimeCreated = item.DatetimeCreated,
-                        UserModified = item.UserModified,
-                        DatetimeModified = item.DatetimeModified,
-                        Active = item.Active,
-                        InActiveOn = item.InactiveOn
-                    };
-                    results.Add(country);
-                }
-            }
-            else
-            {
-                foreach (var item in data)
-                {
-                    var country = new CatCountryViewModel
-                    {
-                        Id = item.Id,
-                        Code = item.Code,
-                        Name = item.NameEn,
-                        UserCreated = item.UserCreated,
-                        DatetimeCreated = item.DatetimeCreated,
-                        UserModified = item.UserModified,
-                        DatetimeModified = item.DatetimeModified,
-                        Active = item.Active,
-                        InActiveOn = item.InactiveOn
-                    };
-                    results.Add(country);
-                }
+                    Id = item.Id,
+                    Code = item.Code,
+                    Name = currentCulture.IetfLanguageTag == "en-US" ? item.NameEn : item.NameVn,
+                    UserCreated = item.UserCreated,
+                    DatetimeCreated = item.DatetimeCreated,
+                    UserModified = item.UserModified,
+                    DatetimeModified = item.DatetimeModified,
+                    Active = item.Active,
+                    InActiveOn = item.InactiveOn
+                };
+                results.Add(country);
             }
             return results;
         }

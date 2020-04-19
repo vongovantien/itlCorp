@@ -29,7 +29,6 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
-        private readonly ICatChargeGroupService charegeGroupService;
 
 
         public CatChargeService(IContextBase<CatCharge> repository,
@@ -47,6 +46,7 @@ namespace eFMS.API.Catalogue.DL.Services
             currentUser = user;
             catUnitService = unitService;
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
+            SetChildren<CatPartnerCharge>("Id", "ChargeId");
         }
 
         public HandleState AddCharge(CatChargeAddOrUpdateModel model)
@@ -176,9 +176,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return returnCharge;
         }
-
-
-
+        
         public IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
@@ -473,7 +471,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public object GetListService()
         {
-            return API.Common.Globals.CustomData.Services;
+            return CustomData.Services;
         }
 
         public IQueryable<CatChargeModel> GetBy(string type)

@@ -14,8 +14,6 @@ using System.Threading;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.Caching;
 using System.Linq.Expressions;

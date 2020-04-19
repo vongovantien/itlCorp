@@ -14,6 +14,10 @@ namespace eFMS.API.Catalogue.Controllers
     public class CatChargeGroupController : ControllerBase
     {
         private readonly ICatChargeGroupService catChargeGroupService;
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="service"></param>
         public CatChargeGroupController(ICatChargeGroupService service)
         {
             catChargeGroupService = service;

@@ -50,9 +50,10 @@ namespace eFMS.API.Catalogue.DL.Services
             CatPartner partner = catPartnerRepository.Get(x => x.Id == partnerId)?.FirstOrDefault();
 
             data = DataContext.Get(x => x.PartnerId == partnerId);
-            IQueryable<CatPartnerChargeModel> catPartnerChargeModel = data?.Select(x => mapper.Map<CatPartnerChargeModel>(x));
+            if (data == null) return null;
+            IQueryable<CatPartnerChargeModel> catPartnerChargeModel = data.Select(x => mapper.Map<CatPartnerChargeModel>(x));
 
-            IQueryable<CatPartnerChargeModel> result = catPartnerChargeModel.Select(x => new CatPartnerChargeModel
+            IQueryable<CatPartnerChargeModel> results = catPartnerChargeModel.Select(x => new CatPartnerChargeModel
             {
                 partnerName = partner.PartnerNameEn,
                 partnerShortName = partner.ShortName,
@@ -68,9 +69,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 UserModified = x.UserModified,
                 DatetimeModified = x.DatetimeModified,
             });
-
-
-            return result;
+            return results;
         }
     }
 }

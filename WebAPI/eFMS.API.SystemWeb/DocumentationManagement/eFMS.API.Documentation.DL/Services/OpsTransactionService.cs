@@ -116,46 +116,6 @@ namespace eFMS.API.Documentation.DL.Services
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
-        public HandleState Delete(Guid id)
-        {
-            var detail = DataContext.First(x => x.Id == id);
-            var result = Delete(x => x.Id == id, false);
-            if (result.Success)
-            {
-                var assigneds = opsStageAssignedRepository.Get(x => x.JobId == id);
-                if (assigneds != null)
-                {
-                    RemoveStageAssigned(assigneds);
-                }
-                if(detail != null)
-                {
-                    var surcharges = surchargeRepository.Get(x => x.Hblid == detail.Hblid && x.Soano == null);
-                    if (surcharges != null)
-                    {
-                        RemoveSurcharge(surcharges);
-                    }
-                }
-            }
-            SubmitChanges();
-            opsStageAssignedRepository.SubmitChanges();
-            surchargeRepository.SubmitChanges();
-            return result;
-        }
-        private void RemoveSurcharge(IQueryable<CsShipmentSurcharge> list)
-        {
-            foreach(var item in list)
-            {
-                surchargeRepository.Delete(x => x.Id == item.Id, false);
-            }
-        }
-        private void RemoveStageAssigned(IQueryable<OpsStageAssigned> list)
-        {
-            foreach(var item in list)
-            {
-                opsStageAssignedRepository.Delete(x => x.Id == item.Id, false);
-            }
-        }
-
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);

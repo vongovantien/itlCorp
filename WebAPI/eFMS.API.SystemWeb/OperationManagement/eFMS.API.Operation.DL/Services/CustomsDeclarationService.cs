@@ -431,35 +431,7 @@ namespace eFMS.API.Operation.DL.Services
             return results?.AsQueryable();
         }
 
-        public List<CustomsDeclarationModel> GetCustomDeclaration(string customNo, string taxCode, bool? ImPorted, int pageNumber, int pageSize, out int rowsCount)
-        {
-            Func<CustomsDeclarationModel, bool> query = x => x.PartnerTaxCode == taxCode && (x.ClearanceNo == customNo || string.IsNullOrEmpty(customNo));
-
-            Expression<Func<CustomsDeclarationModel, object>> orderByProperty = x => x.DatetimeModified;
-            List<CustomsDeclarationModel> returnList = null;
-            var results = Get().Where(query);
-            rowsCount = results.Count();
-            if (rowsCount == 0) return returnList;
-            else results = results.OrderByDescending(x => x.DatetimeModified);
-            if (ImPorted == true)
-            {
-                results = results.Where(x => x.JobNo != null);
-            }
-            else if (ImPorted == false)
-            {
-                results = results.Where(x => x.JobNo == null);
-            }
-            if (pageSize > 1)
-            {
-                if (pageNumber < 1)
-                {
-                    pageNumber = 1;
-                }
-                returnList = results.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            }
-            return returnList;
-        }
-        private List<sp_GetCustomDeclaration> GetCustomClearanceViewList(string jobNo)
+       private List<sp_GetCustomDeclaration> GetCustomClearanceViewList(string jobNo)
         {
             DbParameter[] parameters =
             {

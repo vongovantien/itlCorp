@@ -1,7 +1,4 @@
-﻿using eFMS.API.Catalogue.Service.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace eFMS.API.Catalogue.DL.Models
 {

@@ -14,19 +14,20 @@
 
   <ItemGroup>
     <Compile Remove="Dtos\**" />
+    <Compile Remove="Infrastructure\**" />
     <Compile Remove="Models\Views\**" />
     <Compile Remove="Repositories\**" />
     <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Infrastructure\**" />
     <EmbeddedResource Remove="Models\Views\**" />
     <EmbeddedResource Remove="Repositories\**" />
     <None Remove="Dtos\**" />
+    <None Remove="Infrastructure\**" />
     <None Remove="Models\Views\**" />
     <None Remove="Repositories\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Infrastructure\ErrorHandler\ErrorMessages.cs" />
-    <Compile Remove="Infrastructure\ErrorHandler\IErrorHandler.cs" />
     <Compile Remove="IService\IOpsTransactionService.cs" />
     <Compile Remove="Services\OpsTransactionSevice.cs" />
   </ItemGroup>
@@ -74,7 +75,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infrastructure\ErrorHandler\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>

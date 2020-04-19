@@ -1,7 +1,4 @@
-﻿using eFMS.API.Documentation.DL.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace eFMS.API.Documentation.DL.Models
 {

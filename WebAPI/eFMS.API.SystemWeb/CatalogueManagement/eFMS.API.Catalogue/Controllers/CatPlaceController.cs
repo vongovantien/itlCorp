@@ -6,7 +6,6 @@ using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
-using eFMS.API.Catalogue.Infrastructure.Common;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -21,7 +20,6 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Hosting;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Infrastructure.Extensions;
-using ITL.NetCore.Common;
 using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.Controllers
@@ -48,6 +46,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatPlaceService</param>
         /// <param name="iMapper">inject interface IMapper</param>
+        /// <param name="curUser"></param>
         /// <param name="hostingEnvironment"></param>
         public CatPlaceController(IStringLocalizer<LanguageSub> localizer,
             ICatPlaceService service,

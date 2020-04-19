@@ -1,23 +1,23 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.Exports;
+using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Documentation.DL.Common;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.API.Common.Models;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Documentation.DL.Models.Exports;
 
 namespace eFMS.API.Documentation.DL.Services
 {

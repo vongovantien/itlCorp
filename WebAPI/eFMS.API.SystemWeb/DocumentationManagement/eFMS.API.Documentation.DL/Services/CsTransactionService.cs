@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Common.NoSql;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Common;
-using eFMS.API.Common.NoSql;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common;
-using Microsoft.Extensions.Localization;
-using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -587,6 +587,7 @@ namespace eFMS.API.Documentation.DL.Services
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
+            if (masterBills == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             switch (rangeSearch)
             {
@@ -645,54 +646,32 @@ namespace eFMS.API.Documentation.DL.Services
                     select new CsTransactionModel
                     {
                         Id = masterBill.Id,
-                        //BranchId = masterBill.BranchId,
                         JobNo = masterBill.JobNo,
                         Mawb = masterBill.Mawb,
-                        //TypeOfService = masterBill.TypeOfService,
                         Etd = masterBill.Etd,
                         Eta = masterBill.Eta,
                         ServiceDate = masterBill.ServiceDate,
-                        //Mbltype = masterBill.Mbltype,
                         ColoaderId = masterBill.ColoaderId,
-                        //SubColoader = masterBill.SubColoader,
-                        //BookingNo = masterBill.BookingNo,
                         AgentId = masterBill.AgentId,
                         Pol = masterBill.Pol,
                         Pod = masterBill.Pod,
-                        //DeliveryPlace = masterBill.DeliveryPlace,
-                        //PaymentTerm = masterBill.PaymentTerm,
-                        //FlightVesselName = masterBill.FlightVesselName,
-                        //VoyNo = masterBill.VoyNo,
-                        //ShipmentType = masterBill.ShipmentType,
-                        //Commodity = masterBill.Commodity,
-                        //DesOfGoods = masterBill.DesOfGoods,
                         PackageContainer = masterBill.PackageContainer,
-                        //Pono = masterBill.Pono,
-                        //PersonIncharge = masterBill.PersonIncharge,
                         NetWeight = masterBill.NetWeight,
                         GrossWeight = masterBill.GrossWeight,
                         ChargeWeight = masterBill.ChargeWeight,
                         Cbm = masterBill.Cbm,
-                        //Notes = masterBill.Notes,
                         TransactionType = masterBill.TransactionType,
                         UserCreated = masterBill.UserCreated,
                         IsLocked = masterBill.IsLocked,
-                        //LockedDate = masterBill.LockedDate,
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
                         DatetimeModified = masterBill.DatetimeModified,
-                        //Active = masterBill.Active,
-                        //InactiveOn = masterBill.InactiveOn,
                         SupplierName = coloader.ShortName,
                         AgentName = agent.ShortName,
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        PackageQty = masterBill.PackageQty,
-                        //PackageType = masterBill.PackageType,
-                        //FlightDate = masterBill.FlightDate,
-                        //Hw = masterBill.Hw,
-                        //Hwconstant = masterBill.Hwconstant
+                        PackageQty = masterBill.PackageQty
                     };
 
             return query;
