@@ -267,6 +267,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<sp_GetCatPlace> QueryByPermission(CatPlaceCriteria criteria, PermissionRange range)
         {
+            var list = QueryCriteria(criteria);
+            if (list == null) return null;
             IQueryable<sp_GetCatPlace> data = null;
             var list = QueryCriteria(criteria);
             if(list == null)
@@ -740,49 +742,6 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                     }
                 }
-                //if (string.IsNullOrEmpty(item.ProvinceName))
-                //{
-                //    result.ProvinceName = stringLocalizer[CatalogueLanguageSub.MSG_PLACE_PROVINCE_NAME_EMPTY];
-                //    result.IsValid = false;
-                //}
-                //if (string.IsNullOrEmpty(item.DistrictName))
-                //{
-                //    result.DistrictName = stringLocalizer[CatalogueLanguageSub.MSG_PLACE_DISTRICT_NAME_EMPTY];
-                //    result.IsValid = false;
-                //}
-                //else
-                //{
-                //    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == item.CountryName.ToLower());
-                //    if (country == null)
-                //    {
-                //        result.CountryName = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_COUNTRY_NOT_FOUND], item.CountryName);
-                //        result.IsValid = false;
-                //    }
-                //    else
-                //    {
-                //        result.CountryId = country.Id;
-                //        var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == item.ProvinceName.ToLower() && (i.CountryId == country.Id || country == null));
-                //        if (province == null)
-                //        {
-                //            result.ProvinceName = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_PROVINCE_NOT_FOUND], item.ProvinceName, item.CountryName);
-                //            result.IsValid = false;
-                //        }
-                //        else
-                //        {
-                //            result.ProvinceId = province.Id;
-                //            var district = districts.FirstOrDefault(i => i.NameEn.ToLower() == item.DistrictName.ToLower() && (i.ProvinceId == province.Id || province == null));
-                //            if (district == null)
-                //            {
-                //                result.DistrictName = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PLACE_DISTRICT_NOT_FOUND], item.DistrictName, item.ProvinceName);
-                //                result.IsValid = false;
-                //            }
-                //            else
-                //            {
-                //                result.DistrictId = district.Id;
-                //            }
-                //        }
-                //    }
-                //}
                 result.PlaceTypeId = placeTypeName;
                 results.Add(result);
             }
@@ -914,7 +873,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.FlightVesselNo ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) == true
                                    )
                                    && (x.Active == criteria.Active || criteria.Active == null)
-                                   ).AsQueryable();
+                                   )?.AsQueryable();
             }
             return list;
         }
