@@ -22,7 +22,7 @@ import * as fromShare from './../../../store';
 export class ShareBusinessDeliveryOrderComponent extends AppForm {
     @Input() isAir: boolean = false;
 
-    deliveryOrder: DeliveryOrder = new DeliveryOrder();
+    deliveryOrder: DeliveryOrder = null;
 
     header: string = '';
     footer: string = '';
@@ -58,16 +58,16 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        if (res.deliveryOrderNo !== null) {
-                            this.deliveryOrder = new DeliveryOrder(res);
-                            this.deliveryOrder.deliveryOrderPrintedDate = {
-                                startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
-                                endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
-                            };
+                        this.deliveryOrder = new DeliveryOrder(res);
 
-                            this.deliveryOrder.userDefault = this.userLogged.id;
-                            this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
-                        }
+                        console.log(this.deliveryOrder);
+                        this.deliveryOrder.deliveryOrderPrintedDate = {
+                            startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                            endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                        };
+
+                        this.deliveryOrder.userDefault = this.userLogged.id;
+                        this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
                     }
                 }
             );
