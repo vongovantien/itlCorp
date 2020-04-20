@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
 
@@ -44,7 +43,6 @@ namespace eFMS.API.Operation.Controllers
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICustomsDeclarationService</param>
-        /// <param name="distributedCache"></param>
         public CustomsDeclarationController(IStringLocalizer<LanguageSub> localizer, ICustomsDeclarationService service, IHostingEnvironment hostingEnvironment, ICurrentUser user)
         {
             stringLocalizer = localizer;

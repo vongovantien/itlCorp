@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using eFMS.API.Catalogue.Authorize;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -104,22 +103,6 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get(CatPartnerCriteria criteria, int page, int size)
         {
             var data = catPartnerService.Paging(criteria, page, size, out int rowCount);
-            var result = new { data, totalItems = rowCount, page, size };
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// et and paging the list of partners by conditions
-        /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <param name="page">page to retrieve data</param>
-        /// <param name="size">number items per page</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("PagingCustomer")]
-        public IActionResult GetCustomer(CatPartnerCriteria criteria, int page, int size)
-        {
-            var data = catPartnerService.PagingCustomer(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }

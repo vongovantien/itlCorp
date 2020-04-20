@@ -23,7 +23,7 @@ export class OpsCDNoteComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(OpsCdNoteDetailPopupComponent, { static: false }) cdNoteDetailPopupComponent: OpsCdNoteDetailPopupComponent;
     @ViewChild(OpsCdNoteAddPopupComponent, { static: false }) cdNoteAddPopupComponent: OpsCdNoteAddPopupComponent;
-    
+
     headers: CommonInterface.IHeaderTable[];
     idMasterBill: string = '';
     cdNoteGroups: any[] = [];
@@ -79,7 +79,7 @@ export class OpsCDNoteComponent extends AppList {
                 },
             );
     }
-    
+
     ngAfterViewInit() {
         this.cdNoteAddPopupComponent.getListSubjectPartner(this.idMasterBill);
         this.cdNoteDetailPopupComponent.cdNoteEditPopupComponent.getListSubjectPartner(this.idMasterBill);
@@ -91,7 +91,7 @@ export class OpsCDNoteComponent extends AppList {
         this.cdNoteAddPopupComponent.show();
     }
 
-    openPopupDetail(jobId: string, cdNote: string){
+    openPopupDetail(jobId: string, cdNote: string) {
         this.cdNoteDetailPopupComponent.jobId = jobId;
         this.cdNoteDetailPopupComponent.cdNote = cdNote;
         this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
@@ -151,21 +151,21 @@ export class OpsCDNoteComponent extends AppList {
     onDeletedCdNote() {
         this.getListCdNote(this.idMasterBill);
     }
-    
-    //Charge keyword search
+
+    // Charge keyword search
     onChangeKeyWord(keyword: string) {
         this.cdNoteGroups = this.initGroup;
-        //TODO improve search.
+        // TODO improve search.
         if (!!keyword) {
-            if(keyword.indexOf('\\') != -1) return this.cdNoteGroups = [];
+            if (keyword.indexOf('\\') !== -1) { return this.cdNoteGroups = []; }
             keyword = keyword.toLowerCase();
             // Search group
-            let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1)
+            let dataGrp = this.cdNoteGroups.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1);
             // Không tìm thấy group thì search tiếp list con của group
-            if (dataGrp.length == 0) {
-                let arrayCharge = [];
+            if (dataGrp.length === 0) {
+                const arrayCharge = [];
                 for (const group of this.cdNoteGroups) {
-                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1)
+                    const data = group.listCDNote.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1);
                     if (data.length > 0) {
                         arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
                     }

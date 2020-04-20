@@ -11,11 +11,8 @@ using System.Linq;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using Microsoft.Extensions.Caching.Distributed;
-using eFMS.API.Catalogue.Service.Contexts;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common.Helpers;
 using ITL.NetCore.Connection.Caching;
 using System.Linq.Expressions;
 
@@ -51,13 +48,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatCommodityModel> Paging(CatCommodityCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<CatCommodityModel> results = null;
             var data = Query(criteria);
             if (data == null)
             {
                 rowsCount = 0;
-                return results;
+                return null;
             }
+            List<CatCommodityModel> results = null;
             rowsCount = data.Count();
             data = data.OrderByDescending(x => x.DatetimeModified);
             if (size > 1)
@@ -75,6 +72,7 @@ namespace eFMS.API.Catalogue.DL.Services
             Expression<Func<CatCommodityModel, bool>> query = null;
 
             var commodities = Get();
+            if (commodities == null) return null;
             var catCommonityGroups = catCommodityGroupService.Get();
             IQueryable<CatCommodityModel> results = from com in commodities
                       join grCom in catCommonityGroups on com.CommodityGroupId equals grCom.Id into grpComs
@@ -114,7 +112,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             || (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                             && (x.Active == criteria.Active || criteria.Active == null);
             }
-            if (results == null) return results;
+            if (results == null) return null;
             results = results.Where(query);
             return results;
         }
@@ -169,6 +167,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
+                var list = new List<CatCommodity>();
                 foreach (var item in data)
                 {
                     bool active = !string.IsNullOrEmpty(item.Status) && (item.Status.ToLower() == "active");
@@ -185,12 +184,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID
                     };
-                    DataContext.Add(commodity, false);
+                    list.Add(commodity);
                 }
+                var hs = DataContext.Add(list);
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch(Exception ex)
             {

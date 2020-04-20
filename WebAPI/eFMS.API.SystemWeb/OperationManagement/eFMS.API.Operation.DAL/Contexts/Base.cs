@@ -1,6 +1,4 @@
-﻿//using eFMS.API.Operation.Service.Models;
-using eFMS.API.Operation.Service.Contexts;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
 

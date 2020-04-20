@@ -158,7 +158,7 @@
                                                 *ngIf="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
-                                                        {{charge.quantityType}}
+                                                        {{!!charge.quantityType ? charge.quantityType : '-'}}
                                                     </option>
                                                 </select>
                                             </ng-container>

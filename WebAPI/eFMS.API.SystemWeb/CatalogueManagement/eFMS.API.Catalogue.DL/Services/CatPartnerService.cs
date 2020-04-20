@@ -23,7 +23,6 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using System.Text;
 using System.Text.RegularExpressions;
-using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -63,12 +62,14 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "CustomerId");
             SetChildren<OpsTransaction>("Id", "SupplierId");
             SetChildren<OpsTransaction>("Id", "AgentId");
-            SetChildren<CsShippingInstruction>("Id", "Shipper");
-            SetChildren<CsShippingInstruction>("Id", "Supplier");
-            SetChildren<CsShippingInstruction>("Id", "ConsigneeId");
-            SetChildren<CsShippingInstruction>("Id", "ActualShipperId");
-            SetChildren<CsShippingInstruction>("Id", "ActualConsigneeId");
+            SetChildren<CatPartnerCharge>("Id", "PartnerId");
+            //SetChildren<CsShippingInstruction>("Id", "Shipper");
+            //SetChildren<CsShippingInstruction>("Id", "Supplier");
+            //SetChildren<CsShippingInstruction>("Id", "ConsigneeId");
+            //SetChildren<CsShippingInstruction>("Id", "ActualShipperId");
+            //SetChildren<CsShippingInstruction>("Id", "ActualConsigneeId");
             SetChildren<CsManifest>("Id", "Supplier");
+            SetChildren<CatSaleman>("Id", "PartnerId");
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -199,6 +200,10 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> QueryExport(CatPartnerCriteria criteria)
         {
             var data = QueryPaging(criteria);
+           if(data == null)
+            {
+                return null;
+            }
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
@@ -292,6 +297,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = QueryPaging(criteria);
+            if(data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
             var salemans = salemanRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
@@ -380,7 +390,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            rowsCount = data.Count();
+            rowsCount = data.Select(x => x.Id).Count();
             IQueryable<CatPartnerViewModel> results = null;
             if (size > 1)
             {
@@ -392,40 +402,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return results;
         }
-
-        public List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
-        {
-            List<CustomerPartnerViewModel> results = null;
-            var data = QueryPaging(criteria)?.GroupBy(x => x.SalePersonId);
-            if (data == null)
-            {
-                rowsCount = 0;
-                return results;
-            }
-            rowsCount = data.ToList().Count;
-            if (size > 1)
-            {
-                if (page < 1)
-                {
-                    page = 1;
-                }
-                data = data.Skip((page - 1) * size).Take(size);
-            }
-            results = new List<CustomerPartnerViewModel>();
-            foreach (var item in data)
-            {
-                var partner = new CustomerPartnerViewModel
-                {
-                    SalePersonId = item.Key,
-                    SalePersonName = item.Key != null ? sysUserRepository.First(x => x.Id == item.Key).Username : null,
-                    CatPartnerModels = item.ToList(),
-                    SumNumberPartner = item.Count()
-                };
-                results.Add(partner);
-            }
-            return results;
-        }
-
         public int CheckDetailPermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
@@ -490,7 +466,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
-                           ));
+                           ))?.AsQueryable();
             }
             else
             {
@@ -508,9 +484,9 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
-                           && (x.partner.Active == criteria.Active || criteria.Active == null));
+                           && (x.partner.Active == criteria.Active || criteria.Active == null))?.AsQueryable();
             }
-            if (query.Count() == 0) return null;
+            if (query == null) return null;
             List<CatPartnerViewModel> results = new List<CatPartnerViewModel>();
             foreach (var item in query)
             {
@@ -934,7 +910,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            var data = DataContext.Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            var data = DataContext.Get(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                                 );
@@ -951,7 +927,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     AddressEn = x.AddressEn,
                     Fax = x.Fax,
                     CoLoaderCode = x.CoLoaderCode,
-
             });
             return results;
         }

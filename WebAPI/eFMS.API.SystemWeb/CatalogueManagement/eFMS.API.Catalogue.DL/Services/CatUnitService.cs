@@ -1,18 +1,15 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,7 +120,6 @@ namespace eFMS.API.Catalogue.DL.Services
                                         && (x.UnitNameEn ?? "").IndexOf(criteria.UnitNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.UnitType ?? "").IndexOf(criteria.UnitType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                         && (x.Active == criteria.Active || criteria.Active == null);
-                //);
             }
             else
             {
@@ -135,10 +131,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             var data = Get().Where(query);
             return data;
-        }
-        public IQueryable<CatUnitModel> GetAll()
-        {
-            return Get();
         }
 
         public CatUnitModel GetDetail(short id)

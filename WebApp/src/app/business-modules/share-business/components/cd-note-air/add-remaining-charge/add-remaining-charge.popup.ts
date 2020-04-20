@@ -16,7 +16,7 @@ export class ShareBussinessCdNoteAddRemainingChargeAirPopupComponent extends Pop
     listChargePartnerAddMore: ChargeCdNote[] = [];
     listChargePartner: ChargeCdNote[] = [];
     partner: string = "";
-    
+
     transactionType: TransactionTypeEnum = 0;
     constructor(private _sortService: SortService) {
         super();
@@ -44,7 +44,7 @@ export class ShareBussinessCdNoteAddRemainingChargeAirPopupComponent extends Pop
 
     addCharge() {
         let chargesSelected = [];
-        let grpChargeSelected = [];
+        const grpChargeSelected = [];
         if (this.listChargePartnerAddMore.length > 0) {
             for (const charges of this.listChargePartnerAddMore) {
                 chargesSelected = charges.listCharges.filter(group => group.isSelected);
@@ -53,7 +53,7 @@ export class ShareBussinessCdNoteAddRemainingChargeAirPopupComponent extends Pop
                 }
             }
         }
-        let result = [];
+        const result = [];
         for (const group of grpChargeSelected) {
             if (this.listChargePartner.length > 0) {
                 for (const item of this.listChargePartner) {

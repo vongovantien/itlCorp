@@ -5,11 +5,6 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatDepartment
     {
-        public CatDepartment()
-        {
-            SysGroup = new HashSet<SysGroup>();
-        }
-
         public int Id { get; set; }
         public string Code { get; set; }
         public string DeptName { get; set; }
@@ -26,6 +21,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? InactiveOn { get; set; }
 
         public virtual SysOffice Branch { get; set; }
-        public virtual ICollection<SysGroup> SysGroup { get; set; }
     }
 }

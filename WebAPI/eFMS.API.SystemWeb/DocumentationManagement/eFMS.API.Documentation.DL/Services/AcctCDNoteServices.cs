@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
         //IOpsTransactionService opsTransactionService;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public AcctCDNoteServices(IStringLocalizer<LanguageSub> localizer,
             IContextBase<AcctCdnote> repository, IMapper mapper, ICurrentUser user,
@@ -57,8 +58,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysOffice> sysOffice,
             ICsShipmentSurchargeService surcharge,
-            ICsTransactionDetailService transDetailService
+            ICsTransactionDetailService transDetailService,
             //IOpsTransactionService opsTransService
+            ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +83,7 @@ namespace eFMS.API.Documentation.DL.Services
             surchargeService = surcharge;
             transactionDetailService = transDetailService;
             //opsTransactionService = opsTransService;
+            currencyExchangeService = currencyExchange;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -135,7 +138,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             int count = 0;
             var cdCode = DataContext.Get(x => x.Code.StartsWith(code) && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
-                .OrderByDescending(x => x.DatetimeModified).FirstOrDefault()?.Code;
+                .OrderByDescending(x => x.DatetimeCreated).FirstOrDefault()?.Code;
             if (cdCode != null)
             {
                 cdCode = cdCode.Substring(code.Length + 4, 5);
@@ -357,11 +360,11 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         // -to continue
                         var chargesOfCDNote = listCharges.Where(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                        decimal totalDebit = 0;
-                        decimal totalCredit = 0;
+                        //decimal totalDebit = 0;
+                        //decimal totalCredit = 0;
                         foreach (var charge in chargesOfCDNote)
                         {
-                            if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE || (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
+                            /*if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE || (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == charge.PayerId))
                             {
                                 // calculate total credit
                                 totalCredit += (decimal)(charge.Total * charge.ExchangeRate);
@@ -370,12 +373,19 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 // calculate total debit 
                                 totalDebit += (decimal)(charge.Total * charge.ExchangeRate);
-                            }
+                            }*/
                         }
-                        cdNote.Total = Math.Abs(totalDebit - totalCredit);
+                        // cdNote.Total = Math.Abs(totalDebit - totalCredit);
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
+                        var _cdCurrency = chargesOfCDNote.Select(s => new {
+                            Currency = s.CurrencyId,
+                            Debit = (s.Type == DocumentConstants.CHARGE_SELL_TYPE || (s.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == s.PaymentObjectId)) ? s.Total : 0,
+                            Credit = (s.Type == DocumentConstants.CHARGE_BUY_TYPE || (s.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == s.PayerId)) ? s.Total : 0
+                        });
+                        var _balanceByCurrency = _cdCurrency.GroupBy(g => new { g.Currency }).Select(s => new { currency = s.Key.Currency, balance = s.Sum(su => su.Debit) - s.Sum(su => su.Credit), balancePositive = Math.Abs(s.Sum(su => su.Debit) - s.Sum(su => su.Credit)) });
+                        cdNote.balanceCdNote = _balanceByCurrency;
                         listCDNote.Add(cdNote);
                     }
 
@@ -396,42 +406,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         private List<CsShipmentSurchargeDetailsModel> Query(Guid hbId)
         {
-            //List<CsShipmentSurchargeDetailsModel> listCharges = new List<CsShipmentSurchargeDetailsModel>();
-            //var charges = surchargeRepository.Get(x => x.Hblid == hbId);
-            //var partners = partnerRepositoty.Get();
-            //var catcharges = catchargeRepository.Get();
-            //var currencies = currencyRepository.Get();
-            //var units = unitRepository.Get();
-
-            //var query = (from charge in charges
-            //             //where charge.Hblid == hbId
-            //             join chargeDetail in catcharges on charge.ChargeId equals chargeDetail.Id
-
-            //             join partner in partners on charge.PaymentObjectId equals partner.Id into partnerGroup
-            //             from p in partnerGroup.DefaultIfEmpty()
-
-            //             join payer in partners on charge.PayerId equals payer.Id into payerGroup
-            //             from pay in payerGroup.DefaultIfEmpty()
-
-            //             join unit in units on charge.UnitId equals unit.Id
-            //             join currency in currencies on charge.CurrencyId equals currency.Id
-            //             select new { charge, p, pay, unit.UnitNameEn, currency.CurrencyName, chargeDetail.ChargeNameEn, chargeDetail.Code }
-            //            ).ToList();
-            //foreach (var item in query)
-            //{
-            //    var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item.charge);
-            //    charge.PartnerName = item.p?.PartnerNameEn;
-            //    charge.NameEn = item?.ChargeNameEn;
-            //    if(charge.Type == "OBH")
-            //    {
-            //        charge.ReceiverName = item.p?.PartnerNameEn;
-            //    }
-            //    charge.PayerName = item.pay?.PartnerNameEn;
-            //    charge.Unit = item.UnitNameEn;
-            //    charge.Currency = item.CurrencyName;
-            //    charge.ChargeCode = item.Code;
-            //    listCharges.Add(charge);
-            //}
             var surcharges = surchargeService.GetByHB(hbId);
             return surcharges;
         }
@@ -481,13 +455,14 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 var hb = trandetailRepositoty.Get(x => x.Id == item.Hblid).FirstOrDefault();
                 var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-
+                
+                //Quy đổi theo Final Exchange Rate. Nếu Final Exchange Rate is null thì
                 //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
-                var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
-                var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-
+                //var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
+                //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                 charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
-                charge.ExchangeRate = (exchangeRate != null && exchangeRate.Rate != 0) ? exchangeRate.Rate : 1;
+                charge.ExchangeRate = _exchangeRate;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
                 charge.Unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault()?.UnitNameEn;
                 charge.ChargeCode = catCharge?.Code;
@@ -914,18 +889,18 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    decimal? _exchangeRate;
-                    if ((exchangeRate != null && exchangeRate.Rate != 0))
+                    //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
+                    /*if ((exchangeRate != null && exchangeRate.Rate != 0))
                     {
                         _exchangeRate = exchangeRate.Rate;
                     }
                     else
                     {
                         //Exchange Rate ngược
-                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                         _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
-                    }
+                    }*/
 
                     var charge = new SeaDebitAgentsNewReport();
                     //Thông tin Partner
@@ -970,9 +945,9 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
                     charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
-                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit.Value) : Math.Round(_credit.Value, 3);
+                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3);
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
-                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit.Value) : Math.Round(_debit.Value, 3);
+                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3);
                     listCharge.Add(charge);
                 }
             }
@@ -1077,18 +1052,18 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    decimal? _exchangeRate;
-                    if ((exchangeRate != null && exchangeRate.Rate != 0))
+                    //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
+                    /*if ((exchangeRate != null && exchangeRate.Rate != 0))
                     {
                         _exchangeRate = exchangeRate.Rate;
                     }
                     else
                     {
                         //Exchange Rate ngược
-                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                         _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
-                    }
+                    }*/
 
                     var charge = new AirShipperDebitNewReport();
                     charge.IndexSort = i++;
@@ -1131,9 +1106,9 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
                     charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
                     var _credit = (item.Type == DocumentConstants.CHARGE_BUY_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PayerId)) ? item.Total * _exchangeRate : 0;
-                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit.Value) : Math.Round(_credit.Value, 3);
+                    charge.Credit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_credit) : Math.Round(_credit, 3);
                     var _debit = (item.Type == DocumentConstants.CHARGE_SELL_TYPE || (item.Type == DocumentConstants.CHARGE_OBH_TYPE && data.PartnerId == item.PaymentObjectId)) ? item.Total * _exchangeRate : 0;
-                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit.Value) : Math.Round(_debit.Value, 3);
+                    charge.Debit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(_debit) : Math.Round(_debit, 3);
                     charge.ExtVND = 0; //NOT USE
                     charge.Notes = item.Notes;
 
@@ -1226,7 +1201,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.HBLList = _hbllist?.ToUpper();
             parameter.DecimalNo = 2;
             //Exchange Rate USD to VND
-            var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+            var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
 
             result = new Crystal
@@ -1246,6 +1221,6 @@ namespace eFMS.API.Documentation.DL.Services
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();           
             return result;
         }
-        #endregion -- PREVIEW CD NOTE --
+        #endregion -- PREVIEW CD NOTE --        
     }
 }

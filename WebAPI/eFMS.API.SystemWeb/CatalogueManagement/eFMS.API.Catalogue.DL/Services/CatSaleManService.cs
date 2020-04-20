@@ -5,14 +5,10 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
-using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -42,8 +38,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatSaleManModel> GetBy(string partnerId)
         {
-            //List<CatSaleManModel> results = null;
-            //var data = DataContext.Get(x => x.JobNo == jobNo);
             var data = GetSaleMan().Where(x => x.PartnerId.Trim() == partnerId);
             var sysUser = sysUserRepository.Get();
             var query = from sale in data
@@ -102,43 +96,13 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
             var sysUser = sysUserRepository.Get();
-            //var partner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
-            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            //switch (rangeSearch)
-            //{
-            //    case PermissionRange.None:
-            //        salesMan = null;
-            //        break;
-            //    case PermissionRange.All:
-            //        break;
-            //    case PermissionRange.Owner:
-            //        salesMan = salesMan.Where(x=> x.SaleManId == currentUser.UserID);
-            //        break;
-            //    case PermissionRange.Group:
-            //        salesMan = salesMan.Where(x => partner.GroupId == currentUser.GroupId && x.SaleManId == currentUser.UserID);
-
-            //        break;
-            //    case PermissionRange.Department:
-            //        break;
-            //    case PermissionRange.Office:
-            //        break;
-            //    case PermissionRange.Company:
-            //        break;
-            //}
-            //if (salesMan == null)
-            //{
-            //    return null;
-            //}
             var query = from saleman in salesMan
                         join users in sysUser on saleman.SaleManId equals users.Id
                         select new { saleman, users };
             if (criteria.All == null)
             {
                 query = query.Where(x =>
-                           //(x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty)
-                           //&& (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.saleman.Office == criteria.Office || criteria.Office == Guid.Empty)
                            && (x.saleman.Status == criteria.Status || criteria.Status == null)
                            );
@@ -146,9 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 query = query.Where(x =>
-                            //(x.saleman.Company ?? "").IndexOf(criteria.Company ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             (x.saleman.Company == criteria.Company || criteria.Company == Guid.Empty)
-                            //|| (x.saleman.Office ?? "").IndexOf(criteria.Office ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                             || (x.saleman.Office == criteria.Office || criteria.Office == Guid.Empty)
                             || (x.saleman.Status == criteria.Status || criteria.Status == null)
                             || (x.saleman.PartnerId == criteria.PartnerId)

@@ -1,5 +1,4 @@
-﻿using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
 

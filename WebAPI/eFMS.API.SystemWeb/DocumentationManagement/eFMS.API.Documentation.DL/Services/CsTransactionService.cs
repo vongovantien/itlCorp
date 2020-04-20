@@ -1,24 +1,24 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Common.NoSql;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Common;
-using eFMS.API.Common.NoSql;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common;
-using Microsoft.Extensions.Localization;
-using eFMS.API.Common.Globals;
-using eFMS.API.Documentation.DL.Models.ReportResults;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsDimensionDetail> dimensionDetailRepository;
         readonly IStringLocalizer stringLocalizer;
         readonly IUserPermissionService permissionService;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
@@ -68,7 +69,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
             IUserPermissionService perService,
-            IContextBase<CsArrivalFrieghtCharge> freighchargesRepo) : base(repository, mapper)
+            IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
+            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -91,6 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
             dimensionDetailRepository = dimensionDetailRepo;
             permissionService = perService;
             freighchargesRepository = freighchargesRepo;
+            currencyExchangeService = currencyExchange;
         }
 
         #region -- INSERT & UPDATE --
@@ -584,6 +587,7 @@ namespace eFMS.API.Documentation.DL.Services
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
             var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
+            if (masterBills == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             switch (rangeSearch)
             {
@@ -642,54 +646,32 @@ namespace eFMS.API.Documentation.DL.Services
                     select new CsTransactionModel
                     {
                         Id = masterBill.Id,
-                        //BranchId = masterBill.BranchId,
                         JobNo = masterBill.JobNo,
                         Mawb = masterBill.Mawb,
-                        //TypeOfService = masterBill.TypeOfService,
                         Etd = masterBill.Etd,
                         Eta = masterBill.Eta,
                         ServiceDate = masterBill.ServiceDate,
-                        //Mbltype = masterBill.Mbltype,
                         ColoaderId = masterBill.ColoaderId,
-                        //SubColoader = masterBill.SubColoader,
-                        //BookingNo = masterBill.BookingNo,
                         AgentId = masterBill.AgentId,
                         Pol = masterBill.Pol,
                         Pod = masterBill.Pod,
-                        //DeliveryPlace = masterBill.DeliveryPlace,
-                        //PaymentTerm = masterBill.PaymentTerm,
-                        //FlightVesselName = masterBill.FlightVesselName,
-                        //VoyNo = masterBill.VoyNo,
-                        //ShipmentType = masterBill.ShipmentType,
-                        //Commodity = masterBill.Commodity,
-                        //DesOfGoods = masterBill.DesOfGoods,
                         PackageContainer = masterBill.PackageContainer,
-                        //Pono = masterBill.Pono,
-                        //PersonIncharge = masterBill.PersonIncharge,
                         NetWeight = masterBill.NetWeight,
                         GrossWeight = masterBill.GrossWeight,
                         ChargeWeight = masterBill.ChargeWeight,
                         Cbm = masterBill.Cbm,
-                        //Notes = masterBill.Notes,
                         TransactionType = masterBill.TransactionType,
                         UserCreated = masterBill.UserCreated,
                         IsLocked = masterBill.IsLocked,
-                        //LockedDate = masterBill.LockedDate,
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
                         DatetimeModified = masterBill.DatetimeModified,
-                        //Active = masterBill.Active,
-                        //InactiveOn = masterBill.InactiveOn,
                         SupplierName = coloader.ShortName,
                         AgentName = agent.ShortName,
                         PODName = pod.NameEn,
                         POLName = pol.NameEn,
                         CreatorName = creator.Username,
-                        PackageQty = masterBill.PackageQty,
-                        //PackageType = masterBill.PackageType,
-                        //FlightDate = masterBill.FlightDate,
-                        //Hw = masterBill.Hw,
-                        //Hwconstant = masterBill.Hwconstant
+                        PackageQty = masterBill.PackageQty
                     };
 
             return query;
@@ -1441,10 +1423,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                 foreach (var c in charges)
                 {
-                    var exchangeRate = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var UsdToVnd = currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND" && x.Active == true)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                    var rate = exchangeRate == null ? 1 : exchangeRate.Rate;
-                    var usdToVndRate = UsdToVnd == null ? 1 : UsdToVnd.Rate;
+                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, c.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == c.CurrencyId && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var UsdToVnd = currencyExchangeService.CurrencyExchangeRateConvert(c.FinalExchangeRate, c.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);//currencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == c.ExchangeDate.Value.Date && x.CurrencyFromId == "USD" && x.CurrencyToId == "VND")).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
+                    var rate = exchangeRate;
+                    var usdToVndRate = UsdToVnd;
                     if (c.Type.ToLower() == DocumentConstants.CHARGE_BUY_TYPE.ToLower())
                     {
                         totalBuying += c.Total * rate;
@@ -1853,101 +1835,7 @@ namespace eFMS.API.Documentation.DL.Services
             return containers;
         }
 
-        #region -- PREVIEW --
-        private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
-        {
-            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
-
-            currencyFrom = currencyFrom.Trim();
-            currencyTo = currencyTo.Trim();
-
-            if (currencyFrom != currencyTo)
-            {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
-                if (get1 != null)
-                {
-                    return get1.Rate;
-                }
-                else
-                {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
-                    if (get2 != null)
-                    {
-                        return 1 / get2.Rate;
-                    }
-                    else
-                    {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
-                        if (get3.Count > 1)
-                        {
-                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
-                            {
-                                return get3[0].Rate / get3[1].Rate;
-                            }
-                            else
-                            {
-                                return get3[1].Rate / get3[0].Rate;
-                            }
-                        }
-                        else
-                        {
-                            //Nến không tồn tại Currency trong Exchange thì return về 0
-                            return 0;
-                        }
-                    }
-                }
-            }
-            return 1;
-        }
-
-        private decimal CurrencyExchangeRateConvert(decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo)
-        {
-            var exchargeDateSurcharge = exchangeDate == null ? DateTime.Now.Date : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = currencyExchangeRepository.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-            decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-
-            decimal _exchangeRate = 0;
-            if(finalExchangeRate != null)
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = (finalExchangeRate.Value != 0) ? (1 / finalExchangeRate.Value) : 0;
-                }
-                else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
-                else
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (finalExchangeRate.Value / _exchangeRateCurrencyTo) : 0;
-                }
-            }
-            else
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
-                }
-                else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = GetRateCurrencyExchange(currencyExchange, currencyFrom, DocumentConstants.CURRENCY_LOCAL);
-                }
-                else
-                {
-                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (_exchangeRateCurrencyFrom / _exchangeRateCurrencyTo) : 0;
-                }
-            }
-            return _exchangeRate;
-        }
+        #region -- PREVIEW --       
 
         public Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency)
         {
@@ -2047,8 +1935,8 @@ namespace eFMS.API.Documentation.DL.Services
                         saleProfitIncludeVAT = cost + revenue;
                         saleProfitNonVAT = costNonVat + revenueNonVat;
 
-                        decimal _exchangeRateUSD = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
-                        decimal _exchangeRateLocal = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                        decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
+                        decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                                               
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
@@ -2310,8 +2198,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
     }
-
-
 }
 
 

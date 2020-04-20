@@ -20,9 +20,72 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\Settings.cs" />
     <Compile Remove="Helpers\ChangeTrackerHelper.cs" />
     <Compile Remove="Helpers\MongoDbHelper.cs" />
+    <Compile Remove="Models\AcctAdvancePayment.cs" />
+    <Compile Remove="Models\AcctAdvanceRequest.cs" />
+    <Compile Remove="Models\AcctApproveAdvance.cs" />
+    <Compile Remove="Models\AcctApproveSettlement.cs" />
+    <Compile Remove="Models\AcctCdnote.cs" />
+    <Compile Remove="Models\AcctSettlementPayment.cs" />
+    <Compile Remove="Models\AcctSoa.cs" />
+    <Compile Remove="Models\CatBranch.cs" />
+    <Compile Remove="Models\CatCustomerPlace.cs" />
+    <Compile Remove="Models\CatPartnerContact.cs" />
+    <Compile Remove="Models\CatPartnerContract.cs" />
+    <Compile Remove="Models\CatSaleResource.cs" />
+    <Compile Remove="Models\CsAirWayBill.cs" />
+    <Compile Remove="Models\CsArrivalAndDeliveryDefault.cs" />
+    <Compile Remove="Models\CsArrivalFrieghtCharge.cs" />
+    <Compile Remove="Models\CsArrivalFrieghtChargeDefault.cs" />
+    <Compile Remove="Models\CsDimensionDetail.cs" />
+    <Compile Remove="Models\CsFcltransactionDetailContainer.cs" />
+    <Compile Remove="Models\CsShipmentHawbdetail.cs" />
+    <Compile Remove="Models\CsShipmentOtherCharge.cs" />
+    <Compile Remove="Models\CsShipmentProfitShares.cs" />
+    <Compile Remove="Models\CsShipmentSellingRate.cs" />
+    <Compile Remove="Models\CsShippingInstruction.cs" />
+    <Compile Remove="Models\CustomsDeclaration.cs" />
     <Compile Remove="Models\eFMSDataContext.cs" />
+    <Compile Remove="Models\SetEcusconnection.cs" />
+    <Compile Remove="Models\SetTariff.cs" />
+    <Compile Remove="Models\SetTariffDetail.cs" />
+    <Compile Remove="Models\SysAuthorization.cs" />
+    <Compile Remove="Models\SysAuthorizationDetail.cs" />
+    <Compile Remove="Models\SysBranch.cs" />
+    <Compile Remove="Models\SysBu.cs" />
+    <Compile Remove="Models\SysCompany.cs" />
+    <Compile Remove="Models\SysDepartment.cs" />
+    <Compile Remove="Models\SysEmployee.cs" />
+    <Compile Remove="Models\SysGroup.cs" />
+    <Compile Remove="Models\SysGroupRole.cs" />
+    <Compile Remove="Models\SysImage.cs" />
+    <Compile Remove="Models\SysMenu.cs" />
+    <Compile Remove="Models\SysMenuPermissionInstruction.cs" />
+    <Compile Remove="Models\SysNotification.cs" />
+    <Compile Remove="Models\SysPermission.cs" />
+    <Compile Remove="Models\SysPermissionSample.cs" />
+    <Compile Remove="Models\SysPermissionSampleGeneral.cs" />
+    <Compile Remove="Models\SysPermissionSampleSpecial.cs" />
+    <Compile Remove="Models\SysPermissionSpecialAction.cs" />
+    <Compile Remove="Models\SysRole.cs" />
+    <Compile Remove="Models\SysRoleMenu.cs" />
+    <Compile Remove="Models\SysRolePermission.cs" />
+    <Compile Remove="Models\SysSentEmailHistory.cs" />
+    <Compile Remove="Models\SysUserGroup.cs" />
+    <Compile Remove="Models\SysUserLevel.cs" />
+    <Compile Remove="Models\SysUserLog.cs" />
+    <Compile Remove="Models\SysUserNotification.cs" />
+    <Compile Remove="Models\SysUserOtherWorkPlace.cs" />
+    <Compile Remove="Models\SysUserPermission.cs" />
+    <Compile Remove="Models\SysUserPermissionGeneral.cs" />
+    <Compile Remove="Models\SysUserPermissionSpecial.cs" />
+    <Compile Remove="Models\SysUserRole.cs" />
+    <Compile Remove="ViewModels\ChangeLog.cs" />
+    <Compile Remove="ViewModels\vw_catPlace.cs" />
+    <Compile Remove="ViewModels\vw_sysUser.cs" />
+    <Compile Remove="ViewModels\vw_WorkPlace.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +114,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
 

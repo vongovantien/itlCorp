@@ -1,6 +1,4 @@
-﻿using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Catalogue.DL.IService;
-using eFMS.API.Catalogue.DL.Models.Criteria;
+﻿using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -23,15 +21,6 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Get()
         {
             return Ok(catPlaceTypeService.Get());
-        }
-
-        [HttpGet]
-        [Route("Query")]
-        public IActionResult Get(CatPlaceTypeCriteria criteria, string orderByProperty, bool isAscendingOrder)
-        {
-            //var results = catPlaceTypeService.Query(criteria, orderByProperty, isAscendingOrder);
-            //return Ok(results);
-            return Ok();
         }
     }
 }

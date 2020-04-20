@@ -10,8 +10,6 @@ using System.Linq;
 using eFMS.API.Catalogue.DL.Common;
 using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
-using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Common.Globals;
@@ -135,11 +133,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     };
                     listCharge.Add(defaultAccount);
                 }
-                DataContext.Add(listCharge);
-                ClearCache();
-                Get();
-                
-                return new HandleState();
+                var hs = DataContext.Add(listCharge);
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch(Exception ex)
             {

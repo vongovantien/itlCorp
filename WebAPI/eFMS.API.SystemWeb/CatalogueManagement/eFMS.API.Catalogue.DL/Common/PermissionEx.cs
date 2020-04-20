@@ -1,9 +1,6 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Common
 {

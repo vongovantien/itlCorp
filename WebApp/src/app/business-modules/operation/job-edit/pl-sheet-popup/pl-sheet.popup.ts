@@ -12,6 +12,7 @@ import { API_MENU } from 'src/constants/api-menu.const';
 import { ModalDirective } from 'ngx-bootstrap';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'pl-sheet-popup',
@@ -91,8 +92,9 @@ export class PlSheetPopupComponent extends PopupBase {
     }
 
     get scr() {
-        // http://localhost:51830/Default.aspx
-        return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        // http://localhost:51830/Default.aspx       
+        // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
+        return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 
     ngAfterViewInit() {

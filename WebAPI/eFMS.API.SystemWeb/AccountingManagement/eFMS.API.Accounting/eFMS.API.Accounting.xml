@@ -356,7 +356,7 @@
              <summary>
             Settlement export List within Shipment.
              </summary>
-             <param name="settlement ListList"></param>
+             <param name="settlementNoList"></param>
              <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">

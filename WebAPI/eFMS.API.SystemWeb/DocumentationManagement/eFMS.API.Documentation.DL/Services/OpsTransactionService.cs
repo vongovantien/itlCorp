@@ -41,6 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsMawbcontainerService mawbcontainerService;
         readonly IUserPermissionService permissionService;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -58,7 +59,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsMawbcontainer> csMawbcontainerRepo,
             ICsMawbcontainerService containerService, 
             IUserPermissionService perService,
-            IContextBase<CatCurrencyExchange> currencyExchangeRepo) : base(repository, mapper)
+            IContextBase<CatCurrencyExchange> currencyExchangeRepo,
+            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -79,6 +81,7 @@ namespace eFMS.API.Documentation.DL.Services
             mawbcontainerService = containerService;
             permissionService = perService;
             currencyExchangeRepository = currencyExchangeRepo;
+            currencyExchangeService = currencyExchange;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -113,46 +116,6 @@ namespace eFMS.API.Documentation.DL.Services
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
-        public HandleState Delete(Guid id)
-        {
-            var detail = DataContext.First(x => x.Id == id);
-            var result = Delete(x => x.Id == id, false);
-            if (result.Success)
-            {
-                var assigneds = opsStageAssignedRepository.Get(x => x.JobId == id);
-                if (assigneds != null)
-                {
-                    RemoveStageAssigned(assigneds);
-                }
-                if(detail != null)
-                {
-                    var surcharges = surchargeRepository.Get(x => x.Hblid == detail.Hblid && x.Soano == null);
-                    if (surcharges != null)
-                    {
-                        RemoveSurcharge(surcharges);
-                    }
-                }
-            }
-            SubmitChanges();
-            opsStageAssignedRepository.SubmitChanges();
-            surchargeRepository.SubmitChanges();
-            return result;
-        }
-        private void RemoveSurcharge(IQueryable<CsShipmentSurcharge> list)
-        {
-            foreach(var item in list)
-            {
-                surchargeRepository.Delete(x => x.Id == item.Id, false);
-            }
-        }
-        private void RemoveStageAssigned(IQueryable<OpsStageAssigned> list)
-        {
-            foreach(var item in list)
-            {
-                opsStageAssignedRepository.Delete(x => x.Id == item.Id, false);
-            }
-        }
-
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);
@@ -774,8 +737,8 @@ namespace eFMS.API.Documentation.DL.Services
                     saleProfitIncludeVAT = cost + revenue;
                     saleProfitNonVAT = costNonVat + revenueNonVat;
 
-                    decimal _exchangeRateUSD = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                    decimal _exchangeRateLocal = CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                    decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
 
                     var surchargeRpt = new FormPLsheetReport
                     {
@@ -942,101 +905,6 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             return result;
-        }
-
-        private decimal GetRateCurrencyExchange(List<CatCurrencyExchange> currencyExchange, string currencyFrom, string currencyTo)
-        {
-            if (currencyExchange.Count == 0 || string.IsNullOrEmpty(currencyFrom)) return 0;
-
-            currencyFrom = currencyFrom.Trim();
-            currencyTo = currencyTo.Trim();
-
-            if (currencyFrom != currencyTo)
-            {
-                var get1 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom && x.CurrencyToId.Trim() == currencyTo).OrderByDescending(x => x.Rate).FirstOrDefault();
-                if (get1 != null)
-                {
-                    return get1.Rate;
-                }
-                else
-                {
-                    var get2 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyTo && x.CurrencyToId.Trim() == currencyFrom).OrderByDescending(x => x.Rate).FirstOrDefault();
-                    if (get2 != null)
-                    {
-                        return 1 / get2.Rate;
-                    }
-                    else
-                    {
-                        var get3 = currencyExchange.Where(x => x.CurrencyFromId.Trim() == currencyFrom || x.CurrencyFromId.Trim() == currencyTo).OrderByDescending(x => x.Rate).ToList();
-                        if (get3.Count > 1)
-                        {
-                            if (get3[0].CurrencyFromId.Trim() == currencyFrom && get3[1].CurrencyFromId.Trim() == currencyTo)
-                            {
-                                return get3[0].Rate / get3[1].Rate;
-                            }
-                            else
-                            {
-                                return get3[1].Rate / get3[0].Rate;
-                            }
-                        }
-                        else
-                        {
-                            //Nến không tồn tại Currency trong Exchange thì return về 0
-                            return 0;
-                        }
-                    }
-                }
-            }
-            return 1;
-        }
-
-        private decimal CurrencyExchangeRateConvert(decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo)
-        {
-            var exchargeDateSurcharge = exchangeDate == null ? DateTime.Now.Date : exchangeDate.Value.Date;
-            List<CatCurrencyExchange> currencyExchange = currencyExchangeRepository.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
-            decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-            decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, DocumentConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
-
-            decimal _exchangeRate = 0;
-            if (finalExchangeRate != null)
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = 1 / finalExchangeRate.Value;
-                }
-                else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = finalExchangeRate.Value;
-                }
-                else
-                {
-                    _exchangeRate = finalExchangeRate.Value / _exchangeRateCurrencyTo;
-                }
-            }
-            else
-            {
-                if (currencyFrom == currencyTo)
-                {
-                    _exchangeRate = 1;
-                }
-                else if (currencyFrom == DocumentConstants.CURRENCY_LOCAL && currencyTo != DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = 1 / _exchangeRateCurrencyTo;
-                }
-                else if (currencyFrom != DocumentConstants.CURRENCY_LOCAL && currencyTo == DocumentConstants.CURRENCY_LOCAL)
-                {
-                    _exchangeRate = GetRateCurrencyExchange(currencyExchange, currencyFrom, DocumentConstants.CURRENCY_LOCAL);
-                }
-                else
-                {
-                    _exchangeRate = _exchangeRateCurrencyFrom / _exchangeRateCurrencyTo;
-                }
-            }
-            return _exchangeRate;
-        }
+        }        
     }
 }

@@ -17,7 +17,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -251,11 +250,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new HandleState(ex.Message);
             }
         }
-
-        private List<vw_csMAWBContainer> GetView(){
-            List<vw_csMAWBContainer> results = ((eFMSDataContext)DataContext.DC).GetViewData<vw_csMAWBContainer>();
-            return results;
-        }
+        
         public HandleState Importcontainer(List<CsMawbcontainerImportModel> data)
         {
             try

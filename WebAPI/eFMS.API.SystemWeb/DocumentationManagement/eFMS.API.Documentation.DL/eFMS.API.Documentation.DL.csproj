@@ -14,11 +14,17 @@
 
   <ItemGroup>
     <Compile Remove="Dtos\**" />
+    <Compile Remove="Models\Views\**" />
     <Compile Remove="Repositories\**" />
+    <Compile Remove="ViewModels\**" />
     <EmbeddedResource Remove="Dtos\**" />
+    <EmbeddedResource Remove="Models\Views\**" />
     <EmbeddedResource Remove="Repositories\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
     <None Remove="Dtos\**" />
+    <None Remove="Models\Views\**" />
     <None Remove="Repositories\**" />
+    <None Remove="ViewModels\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,7 +75,5 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
-    <Folder Include="Models\Views\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>

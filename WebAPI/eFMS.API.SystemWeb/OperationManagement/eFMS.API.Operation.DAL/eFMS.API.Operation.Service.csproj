@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\Settings.cs" />
     <Compile Remove="Models\CatStage.cs" />
     <Compile Remove="Models\CatTransportationMode.cs" />
     <Compile Remove="Models\CatUnit.cs" />
@@ -60,6 +61,10 @@
     <Reference Include="ITL.NetCore.Connection">
       <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Common\" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Documentation.DL.Models.ReportResults
+﻿namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
     public class SeaFCLExportCargoManifest
     {

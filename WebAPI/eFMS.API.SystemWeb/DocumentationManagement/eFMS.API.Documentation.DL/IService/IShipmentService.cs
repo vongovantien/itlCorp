@@ -1,15 +1,10 @@
-﻿using eFMS.API.Documentation.DL.Common;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using ITL.NetCore.Common;
-using eFMS.API.Common;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
-using eFMS.API.Documentation.DL.Models.ReportResults.Sales;
 
 namespace eFMS.API.Documentation.DL.IService
 {

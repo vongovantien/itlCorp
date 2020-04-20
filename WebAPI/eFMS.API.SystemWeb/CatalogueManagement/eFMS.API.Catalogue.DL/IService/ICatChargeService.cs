@@ -7,7 +7,6 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -16,7 +15,6 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatChargeModel> Paging(CatChargeCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<CatChargeModel> Query(CatChargeCriteria criteria);
         IQueryable<CatChargeModel> QueryExport(CatChargeCriteria criteria);
-
         IQueryable<CatChargeModel> GetBy(string type);
         HandleState AddCharge(CatChargeAddOrUpdateModel model);
         HandleState UpdateCharge(CatChargeAddOrUpdateModel model);

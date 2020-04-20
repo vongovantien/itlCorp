@@ -5,10 +5,8 @@ using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -19,7 +17,6 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria);
         IQueryable<CatPartnerViewModel> QueryExport(CatPartnerCriteria criteria);
         IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
-        List<CustomerPartnerViewModel> PagingCustomer(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<DepartmentPartner> GetDepartments();
         List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list);
         HandleState Import(List<CatPartnerImportModel> data);
