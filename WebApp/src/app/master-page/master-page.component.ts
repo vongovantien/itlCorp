@@ -51,6 +51,22 @@ export class MasterPageComponent implements OnInit {
     }
 
     ngOnInit() {
+        const userInfo: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        const isChangeOffice = JSON.parse(localStorage.getItem(SystemConstants.ISCHANGE_OFFICE));
+        const isChangeGroupDept = JSON.parse(localStorage.getItem(SystemConstants.ISCHANGE_DEPT_GROUP));
+        if (isChangeOffice !== null) {
+            if (isChangeOffice) {
+                this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
+                localStorage.removeItem(SystemConstants.ISCHANGE_OFFICE);
+            }
+        }
+
+        if (isChangeGroupDept !== null) {
+            if (isChangeGroupDept) {
+                this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
+                localStorage.removeItem(SystemConstants.ISCHANGE_DEPT_GROUP);
+            }
+        }
         // interval(3000000)
         //     .pipe(takeUntil(this.ngUnsubscribe))
         //     .subscribe(
@@ -153,15 +169,17 @@ export class MasterPageComponent implements OnInit {
                         }).then((userInfo: SystemInterface.IClaimUser) => {
                             this._spinner.hide();
                             localStorage.setItem(SystemConstants.USER_CLAIMS, JSON.stringify(userInfo));
+                            window.location.reload();
 
                             if (this.isChangeDepartgroup) {
-                                this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
-                                this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
+                                localStorage.setItem(SystemConstants.ISCHANGE_DEPT_GROUP, JSON.stringify(true));
+                                // this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
                             } else {
-                                this.headerComponent.getOfficeDepartGroupCurrentUser(userInfo);
-                                this._store.dispatch(new ChangeOfficeClaimUserAction(this.selectedOffice.id));
-                                this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
+                                localStorage.setItem(SystemConstants.ISCHANGE_OFFICE, JSON.stringify(true));
+                                // this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                             }
+
+
                         });
                 } else {
                     throw new Error("Not found login information");

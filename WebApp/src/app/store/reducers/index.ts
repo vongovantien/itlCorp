@@ -18,7 +18,7 @@ export interface IAppState {
     routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
     // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
-    claimReducer: IClaimUserState;
+    // claimReducer: IClaimUserState;
     menuReducer: IMenuState;
 }
 
@@ -26,7 +26,7 @@ export const reducers: ActionReducerMap<IAppState> = {
     routerReducer: fromRouter.routerReducer,
     // spinnerReducer: spinnerReducer,
     catalogueReducer: catalogueReducer,
-    claimReducer: claimUserReducer,
+    // claimReducer: claimUserReducer,
     menuReducer: menuReducer
 };
 
