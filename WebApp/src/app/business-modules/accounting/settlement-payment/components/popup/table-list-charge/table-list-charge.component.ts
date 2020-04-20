@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef, QueryList, ViewChildren } from '@angular/core';
 
 import { CustomDeclaration, Surcharge, Partner, Unit } from '@models';
 import { CatalogueRepo, DocumentationRepo, OperationRepo, AccountingRepo } from '@repositories';
@@ -15,6 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
 import { Store } from '@ngrx/store';
 import { IAppState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { ComboGridVirtualScrollComponent } from '@common';
 
 
 @Component({
@@ -27,6 +28,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     @Output() onChange: EventEmitter<Surcharge[]> = new EventEmitter<Surcharge[]>();
     @Output() onUpdate: EventEmitter<Surcharge[]> = new EventEmitter<Surcharge[]>();
+    @ViewChildren('comboGridCharge') comboGridCharges: QueryList<ComboGridVirtualScrollComponent>;
+
 
     headers: CommonInterface.IHeaderTable[];
     headerPartner: CommonInterface.IHeaderTable[] = [];
@@ -242,7 +245,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.charges.forEach((charge: Surcharge) => {
                     if (!this.checkExistCharge(charge.chargeId, this.listCharges)) {
                         charge.chargeId = null;
+                        charge.chargeName = null;
                     }
+                });
+                // * Reset charge name.
+                this.comboGridCharges.forEach(c => {
+                    c.displaySelectedStr = '';
                 });
                 break;
             case 'cd':

@@ -75,7 +75,7 @@
                                         <td>
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode) }">
-                                                <app-combo-grid-virtual-scroll
+                                                <app-combo-grid-virtual-scroll #comboGridCharge
                                                     [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                     (itemSelected)="onSelectDataTableInfo($event, charge, 'charge')"
                                                     [selectedDisplayFields]="['chargeNameEn']"

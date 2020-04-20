@@ -318,11 +318,12 @@ export class SettlementListChargeComponent extends AppList {
                         item.invoiceDate = { startDate: new Date(item.invoiceDate), endDate: new Date(item.invoiceDate) };
                     }
                 });
-
+                this.tableListChargePopup.getAdvances(shipment.jobId);
                 // * Update value form.
                 this.tableListChargePopup.formGroup.patchValue({
                     shipment: shipment.hblid,
-                    advanceNo: surcharges[0].advanceNo
+                    advanceNo: surcharges[0].advanceNo,
+                    customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
                 });
 
                 this.tableListChargePopup.isUpdate = true;
