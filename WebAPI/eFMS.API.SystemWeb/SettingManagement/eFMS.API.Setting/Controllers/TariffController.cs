@@ -54,7 +54,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        //[Authorize]
+        [Authorize]
         public IActionResult Paging(TariffCriteria criteria, int page, int size)
         {
             var data = tariffService.Paging(criteria, page, size, out int rowCount);

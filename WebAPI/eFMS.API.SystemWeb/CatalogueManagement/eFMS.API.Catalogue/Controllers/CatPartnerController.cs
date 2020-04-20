@@ -114,6 +114,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("QueryExport")]
+        [Authorize]
         public IActionResult QueryExport(CatPartnerCriteria criteria)
         {
             var results = catPartnerService.QueryExport(criteria);
