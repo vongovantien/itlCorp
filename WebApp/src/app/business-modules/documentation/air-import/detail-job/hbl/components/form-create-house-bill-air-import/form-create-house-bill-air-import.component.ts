@@ -301,7 +301,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             shipperId: [],
             consigneeId: [null, Validators.required],
             notifyPartyId: [],
-            forwardingAgentId: [],
+            forwardingAgentId: [null, Validators.required],
             pol: [],
             pod: [null, Validators.required],
             finalPod: [],

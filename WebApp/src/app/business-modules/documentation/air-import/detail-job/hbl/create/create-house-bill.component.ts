@@ -191,18 +191,18 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
         if (!this.checkValidateForm() || !this.arrivalNoteComponent.checkValidate() || !this.deliveryComponent.deliveryOrder.deliveryOrderNo) {
-                this.arrivalNoteComponent.isSubmitted = true;
-                this.deliveryComponent.isSubmitted = true;
-                this.infoPopup.show();
-                return;
-            }
+            this.arrivalNoteComponent.isSubmitted = true;
+            this.deliveryComponent.isSubmitted = true;
+            this.infoPopup.show();
+            return;
+        }
         else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
-            .pipe(
-            catchError(this.catchError),
-             )
-            .subscribe(
-            (res: any) => {
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any) => {
                         if (res) {
                             this.confirmExistedHbl.show();
                         } else {
@@ -212,7 +212,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         }
                     }
                 );
-            }
+        }
     }
 
     confirmSaveData() {
@@ -256,9 +256,12 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
-                ).subscribe(result => {
-                    this._toastService.success(result[0].message, '');
-                    this.gotoList();
+                ).subscribe((res: CommonInterface.IResult) => {
+                    if (!!res) {
+                        this._toastService.success(res[1].message, '');
+                        this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
+                    }
+                    // this.gotoList();
                 });
         }
     }
