@@ -93,10 +93,13 @@ export class FormAddPartnerComponent extends AppForm {
     onChange(event: any, type: string) {
         switch (type) {
             case 'shippingCountry':
-                this.getShippingProvinces(event.id);
+                this.getShippingProvinces(event.id, !!this.shippingProvince.value && this.shippingProvince.value.length > 0 ? this.shippingProvince.value[0].id : null);
+                console.log(event.id);
+                console.log(this.shippingCountry.value)
+                console.log(this.shippingProvince.value);
                 break;
             case 'billingCountry':
-                this.getBillingProvinces(event.id);
+                this.getBillingProvinces(event.id, !!this.billingProvince.value && this.shippingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
                 break;
             case 'category':
                 const isShowSaleMan = this.checkRequireSaleman(event.id);
@@ -145,13 +148,19 @@ export class FormAddPartnerComponent extends AppForm {
             }
         }
     }
-    getBillingProvinces(countryId?: number) {
+    getBillingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
                         this.billingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        if (!!provinceId) {
+                            const obj = this.billingProvinces.find(x => x.id === provinceId);
+                            if (obj === undefined) {
+                                this.billingProvince.setValue(null);
+                            }
+                        }
                     }
                 );
         } else {
@@ -164,16 +173,24 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
-    getShippingProvinces(countryId?: number) {
+    getShippingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
                         this.shippingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        if (!!provinceId) {
+                            const obj = this.shippingProvinces.find(x => x.id === provinceId);
+                            if (obj === undefined) {
+                                this.shippingProvince.setValue(null);
+                            }
+                        }
+
                     }
                 );
-        } else {
+        }
+        else {
             this._catalogueRepo.getProvinces()
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
@@ -182,6 +199,7 @@ export class FormAddPartnerComponent extends AppForm {
                     }
                 );
         }
+
     }
     initForm() {
         this.partnerForm = this._fb.group({
@@ -385,6 +403,7 @@ export class FormAddPartnerComponent extends AppForm {
     copyShippingAddress() {
         this.billingCountry.setValue(this.shippingCountry.value);
         this.billingProvince.setValue(this.shippingProvince.value);
+        this.getBillingProvinces(!!this.shippingCountry.value && this.shippingCountry.value.length > 0 ? this.shippingCountry.value[0].id : null, !!this.billingProvince.value && this.shippingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
         this.billingZipcode.setValue(this.zipCodeShipping.value);
         this.billingAddressEN.setValue(this.shippingAddressEN.value);
         this.billingAddressLocal.setValue(this.shippingAddressVN.value);
