@@ -153,6 +153,7 @@ export class CustomClearanceComponent extends AppList {
     }
 
     confirmConvert() {
+        this._toastrService.clear();
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
             const clearancesToConvert = this.mapClearancesToJobs();
             if (clearancesToConvert.filter(x => x.opsTransaction === null).length > 0) {
@@ -324,7 +325,10 @@ export class CustomClearanceComponent extends AppList {
             }
             clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
         }
-        this._toastrService.error(this.messageConvertError, '', { enableHtml: true });
+        if (this.messageConvertError.length > 0) {
+            this._toastrService.error(this.messageConvertError, '', { enableHtml: true });
+        }
+        this.messageConvertError = '';
         return clearancesToConvert;
     }
 
