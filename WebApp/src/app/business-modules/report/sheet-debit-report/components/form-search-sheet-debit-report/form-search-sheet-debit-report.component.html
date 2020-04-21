@@ -27,7 +27,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label">
-                            Customer
+                            Partner
                         </label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'id', value: customer.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
@@ -147,36 +147,6 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Carrier/Supplier/Vendor
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{ field: 'id', value: carrier.value}"
-                                    (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="carriers | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150"
-                                    (remove)="resetFormControl(carrier)">
-                                </app-combo-grid-virtual-scroll>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
-                                    Agent
-                                </label>
-                                <app-combo-grid-virtual-scroll
-                                    [currentActiveItemId]="{ field: 'id', value: agent.value}"
-                                    (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150"
-                                    (remove)="resetFormControl(agent)">
-                                </app-combo-grid-virtual-scroll>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label class="form-control-label" for="">
                                     P.O.L/A.O.L
                                 </label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
@@ -186,6 +156,8 @@
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label class="form-control-label" for="">

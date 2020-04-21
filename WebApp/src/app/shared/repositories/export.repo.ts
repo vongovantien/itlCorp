@@ -190,7 +190,7 @@ export class ExportRepo {
         );
     }
 
-    
+
     exportShipmentOverview(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverview`, searchObject).pipe(
             catchError((error) => throwError(error)),
@@ -242,6 +242,13 @@ export class ExportRepo {
 
     exportTCSAirwayBill(jobId: string) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportTCSAirExport?jobId=${jobId}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportAccountingPLSheet(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingPlSheet`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

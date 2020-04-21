@@ -1000,7 +1000,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated
 
-                                        
+
                                     };
                 return queryShipment;
             }
@@ -1519,6 +1519,499 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return dataList.AsQueryable();
         }
-        #endregion -- GENERAL REPORT --      
+        #endregion -- GENERAL REPORT --     
+
+        #region -- Export Accounting PL Sheet --
+        public List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria)
+        {
+            var dataDocumentation = AcctPLSheetDocumentation(criteria);
+            IQueryable<AccountingPlSheetExportResult> list;
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = AcctPLSheetOperation(criteria);
+                list = dataDocumentation.Union(dataOperation);
+            }
+            else
+            {
+                list = dataDocumentation;
+            }
+            return list.ToList();
+        }
+
+        private IQueryable<OpsTransaction> QueryDataOperationAcctPLSheet(GeneralReportCriteria criteria)
+        {
+            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            Expression<Func<OpsTransaction, bool>> query = q => true;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                query = q =>
+                    q.ServiceDate.HasValue ? q.ServiceDate.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date : false;
+            }
+            else
+            {
+                query = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            query = query.And(q => criteria.Service.Contains("CL"));
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                query = query.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                query = query.And(q => q.Mblno == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                query = query.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                query = query.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                query = query.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                query = query.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                query = query.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                query = query.And(q => criteria.PersonInCharge.Contains(q.BillingOpsId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                query = query.And(q => criteria.SalesMan.Contains(q.SalemanId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                query = query.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                query = query.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                query = query.And(q => q.Pod == criteria.Pod);
+            }
+            var queryShipment = shipments.Where(query);
+            return queryShipment;
+        }
+
+        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetOperation(GeneralReportCriteria criteria)
+        {
+            List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
+            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            foreach (var item in dataShipment)
+            {                
+                var _charges = surCharge.Get(x => x.Hblid == item.Hblid);
+                if (!string.IsNullOrEmpty(criteria.CustomerId))
+                {
+                    _charges = _charges.Where(x => criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId);
+                }
+                foreach (var charge in _charges)
+                {
+                    AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
+
+                    data.ServiceDate = item.ServiceDate;
+                    data.JobId = item.JobNo;
+                    var _partnerId = (charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
+                    data.PartnerCode = _partner?.AccountNo;
+                    data.PartnerName = _partner?.PartnerNameEn;
+                    data.PartnerTaxCode = _partner?.TaxCode;
+                    data.Mbl = item.Mblno;
+                    data.Hbl = item.Hwbno;
+                    data.CustomNo = charge.ClearanceNo;
+                    data.PaymentMethodTerm = string.Empty;
+                    var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    data.ChargeCode = _charge?.Code;
+                    data.ChargeName = _charge?.ChargeNameEn;
+
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+
+                    decimal? _amount = charge.Quantity * charge.UnitPrice;
+                    var _taxInvNoRevenue = string.Empty;
+                    decimal? _usdRevenue = 0;
+                    decimal? _vndRevenue = 0;
+                    decimal? _taxOut = 0;
+                    decimal? _totalRevenue = 0;
+                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                    {
+                        _taxInvNoRevenue = charge.InvoiceNo ?? charge.DebitNo;
+                        _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
+
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                            _vndRevenue = _amount * _exchangeRateToVnd;
+                        }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _vndRevenue = _amount;
+                        }
+
+                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                        {
+                            _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                        }
+                        else
+                        {
+                            _taxOut = Math.Abs(charge.Vatrate ?? 0);
+                        }
+
+                        _totalRevenue = (_amount * _exchangeRate) + _taxOut;
+                    }
+                    data.TaxInvNoRevenue = _taxInvNoRevenue;
+                    data.UsdRevenue = _usdRevenue;
+                    data.VndRevenue = _vndRevenue;
+                    data.TaxOut = _taxOut;
+                    data.TotalRevenue = _totalRevenue;
+
+                    var _taxInvNoCost = string.Empty;
+                    decimal? _usdCost = 0;
+                    decimal? _vndCost = 0;
+                    decimal? _taxIn = 0;
+                    decimal? _totalCost = 0;
+                    if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                    {
+                        _taxInvNoCost = charge.InvoiceNo ?? charge.DebitNo;
+                        _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
+
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                            _vndCost = _amount * _exchangeRateToVnd;
+                        }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _vndCost = _amount;
+                        }
+
+                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                        {
+                            _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                        }
+                        else
+                        {
+                            _taxIn = Math.Abs(charge.Vatrate ?? 0);
+                        }
+
+                        _totalCost = (_amount * _exchangeRate) + _taxIn;
+                    }
+                    data.TaxInvNoCost = _taxInvNoCost;
+                    data.VoucherId = charge.VoucherId;
+                    data.UsdCost = _usdCost;
+                    data.VndCost = _vndCost;
+                    data.TaxIn = _taxIn;
+                    data.TotalCost = _totalCost;
+
+                    data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
+                    data.ExchangeRate = _exchangeRate;
+                    data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                    data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
+                    data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
+                    data.PaidDate = null;
+                    data.AcVoucherNo = string.Empty;
+                    data.PmVoucherNo = string.Empty;
+                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                    data.UserExport = currentUser.UserName;
+
+                    dataList.Add(data);
+                }
+            }
+            return dataList.AsQueryable();
+        }
+
+        private IQueryable<AccountingPlSheetExportResult> QueryDataDocumentationAcctPLSheet(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans;
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = q =>
+                    q.TransactionType.Contains("E") ?
+                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                    :
+                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+            }
+            else
+            {
+                queryTrans = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Service))
+            {
+                queryTrans = queryTrans.And(q => criteria.Service.Contains(q.TransactionType));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.TransactionType == criteria.Service);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                queryTranDetail = queryTranDetail == null ?
+                    (q => q.Hwbno == criteria.Hawb)
+                    :
+                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                queryTrans = queryTrans.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                queryTrans = queryTrans.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                queryTrans = queryTrans.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                queryTrans = queryTrans.And(q => criteria.PersonInCharge.Contains(q.PersonIncharge));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                queryTranDetail = (queryTranDetail == null) ?
+                    (q => criteria.SalesMan.Contains(q.SaleManId))
+                    :
+                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                queryTrans = queryTrans.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
+            }
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId into housebill
+                                    from house in housebill.DefaultIfEmpty()
+                                    select new AccountingPlSheetExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hblid = house.Id,
+                                        Hbl = house.Hwbno,
+                                        PaymentMethodTerm = master.PaymentTerm,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = detailRepository.Get().Where(queryTranDetail);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new AccountingPlSheetExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        Mbl = master.Mawb,
+                                        Hblid = house.Id,
+                                        Hbl = house.Hwbno,
+                                        PaymentMethodTerm = master.PaymentTerm,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType
+                                    };
+                return queryShipment;
+            }
+        }
+
+        private IQueryable<AccountingPlSheetExportResult> AcctPLSheetDocumentation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataDocumentationAcctPLSheet(criteria);
+            List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
+            foreach (var item in dataShipment)
+            {                
+                var _charges = surCharge.Get(x => x.Hblid == item.Hblid);
+                if (!string.IsNullOrEmpty(criteria.CustomerId))
+                {
+                    _charges = _charges.Where(x => criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId);
+                }
+                foreach (var charge in _charges)
+                {
+                    AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
+
+                    data.ServiceDate = item.ServiceDate;
+                    data.JobId = item.JobId;
+                    var _partnerId = (charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
+                    data.PartnerCode = _partner?.AccountNo;
+                    data.PartnerName = _partner?.PartnerNameEn;
+                    data.PartnerTaxCode = _partner?.TaxCode;
+                    data.Mbl = item.Mbl;
+                    data.Hbl = item.Hbl;
+                    data.CustomNo = charge.ClearanceNo;
+                    data.PaymentMethodTerm = item.PaymentMethodTerm;
+                    var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    data.ChargeCode = _charge?.Code;
+                    data.ChargeName = _charge?.ChargeNameEn;
+
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+
+                    decimal? _amount = charge.Quantity * charge.UnitPrice;
+                    var _taxInvNoRevenue = string.Empty;
+                    decimal? _usdRevenue = 0;
+                    decimal? _vndRevenue = 0;
+                    decimal? _taxOut = 0;
+                    decimal? _totalRevenue = 0;
+                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                    {
+                        _taxInvNoRevenue = charge.InvoiceNo ?? charge.DebitNo;
+                        _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
+
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                            _vndRevenue = _amount * _exchangeRateToVnd;
+                        }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _vndRevenue = _amount;
+                        }
+
+                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                        {
+                            _taxOut = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                        }
+                        else
+                        {
+                            _taxOut = Math.Abs(charge.Vatrate ?? 0);
+                        }
+
+                        _totalRevenue = (_amount * _exchangeRate) + _taxOut;
+                    }
+                    data.TaxInvNoRevenue = _taxInvNoRevenue;
+                    data.UsdRevenue = _usdRevenue;
+                    data.VndRevenue = _vndRevenue;
+                    data.TaxOut = _taxOut;
+                    data.TotalRevenue = _totalRevenue;
+
+                    var _taxInvNoCost = string.Empty;
+                    decimal? _usdCost = 0;
+                    decimal? _vndCost = 0;
+                    decimal? _taxIn = 0;
+                    decimal? _totalCost = 0;
+                    if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                    {
+                        _taxInvNoCost = charge.InvoiceNo ?? charge.DebitNo;
+                        _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
+
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            var _exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, DocumentConstants.CURRENCY_USD, DocumentConstants.CURRENCY_LOCAL);
+                            _vndCost = _amount * _exchangeRateToVnd;
+                        }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _vndCost = _amount;
+                        }
+
+                        if (charge.Vatrate > 0 && charge.Vatrate < 101)
+                        {
+                            _taxIn = (_amount * _exchangeRate * charge.Vatrate) / 100;
+                        }
+                        else
+                        {
+                            _taxIn = Math.Abs(charge.Vatrate ?? 0);
+                        }
+
+                        _totalCost = (_amount * _exchangeRate) + _taxIn;
+                    }
+                    data.TaxInvNoCost = _taxInvNoCost;
+                    data.VoucherId = charge.VoucherId;
+                    data.UsdCost = _usdCost;
+                    data.VndCost = _vndCost;
+                    data.TaxIn = _taxIn;
+                    data.TotalCost = _totalCost;
+
+                    data.TotalKickBack = (charge.KickBack == true) ? _amount * _exchangeRate : 0;
+                    data.ExchangeRate = _exchangeRate;
+                    data.Balance = _totalRevenue - _totalCost - data.TotalKickBack;
+                    data.InvNoObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.InvoiceNo : string.Empty;
+                    data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
+                    data.PaidDate = null;
+                    data.AcVoucherNo = string.Empty;
+                    data.PmVoucherNo = string.Empty;
+                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                    data.UserExport = currentUser.UserName;
+
+                    dataList.Add(data);
+                }
+            }
+            return dataList.AsQueryable();
+        }
+        #endregion -- Export Accounting PL Sheet --
     }
 }

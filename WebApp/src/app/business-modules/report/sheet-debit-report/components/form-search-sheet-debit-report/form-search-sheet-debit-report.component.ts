@@ -25,8 +25,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     serviceDate: AbstractControl;
     dateType: AbstractControl;
     customer: AbstractControl;
-    carrier: AbstractControl;
-    agent: AbstractControl;
     service: AbstractControl;
     currency: AbstractControl;
     refNo: AbstractControl;
@@ -51,8 +49,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     ];
 
     customers: Observable<Customer[]>;
-    carriers: Observable<Customer[]>;
-    agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
 
     dateTypeList: any[] = [];
@@ -89,9 +85,20 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     ngOnInit() {
         this.initDataInform();
         this.initFormSearch();
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
-        this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
-        this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
+        const partnerGroup = [
+            CommonEnum.PartnerGroupEnum.CUSTOMER,
+            CommonEnum.PartnerGroupEnum.AGENT,
+            CommonEnum.PartnerGroupEnum.CARRIER,
+            CommonEnum.PartnerGroupEnum.CONSIGNEE,
+            CommonEnum.PartnerGroupEnum.SHIPPER,
+            CommonEnum.PartnerGroupEnum.SUPPLIER,
+            CommonEnum.PartnerGroupEnum.PAYMENTOBJECT,
+            CommonEnum.PartnerGroupEnum.SHIPPINGLINE,
+            CommonEnum.PartnerGroupEnum.SUPPLIERMATERIAL,
+            CommonEnum.PartnerGroupEnum.AIRSHIPSUP,
+            CommonEnum.PartnerGroupEnum.PETROLSTATION
+        ];
+        this.customers = this._catalogueRepo.getPartnerByGroups(partnerGroup, null);
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
@@ -116,8 +123,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             }],
             dateType: [this.dateTypeActive],
             customer: [],
-            carrier: [],
-            agent: [],
             service: [this.serviceActive],
             currency: [this.currencyActive],
             refNo: [],
@@ -135,8 +140,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         this.serviceDate = this.formSearch.controls['serviceDate'];
         this.dateType = this.formSearch.controls['dateType'];
         this.customer = this.formSearch.controls['customer'];
-        this.carrier = this.formSearch.controls['carrier'];
-        this.agent = this.formSearch.controls['agent'];
         this.service = this.formSearch.controls['service'];
         this.currency = this.formSearch.controls['currency'];
         this.refNo = this.formSearch.controls['refNo'];
@@ -164,12 +167,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
-                break;
-            case 'carrier':
-                this.carrier.setValue(data.id);
-                break;
-            case 'agent':
-                this.agent.setValue(data.id);
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
@@ -502,8 +499,8 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             personInCharge: this.staffType.value[0].id === "PIC" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
             salesMan: this.staffType.value[0].id === "SALESMAN" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
             creator: this.staffType.value[0].id === "CREATOR" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            carrierId: this.carrier.value,
-            agentId: this.agent.value,
+            carrierId: null,
+            agentId: null,
             pol: this.pol.value,
             pod: this.pod.value,
             typeReport: this.typeReportActive[0].id
@@ -527,8 +524,6 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     resetSearch() {
         this.formSearch.reset();
         this.resetFormControl(this.customer);
-        this.resetFormControl(this.carrier);
-        this.resetFormControl(this.agent);
         this.resetFormControl(this.pol);
         this.resetFormControl(this.pod);
         this.onSearch.emit(<any>{});
