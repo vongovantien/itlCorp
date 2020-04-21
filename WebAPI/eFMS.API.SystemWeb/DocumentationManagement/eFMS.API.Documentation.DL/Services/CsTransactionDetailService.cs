@@ -651,8 +651,10 @@ namespace eFMS.API.Documentation.DL.Services
                       from sale in salemans.DefaultIfEmpty()
                       join notify in catPartnerRepo.Get() on detail.NotifyPartyId equals notify.Id into notifys
                       from notify in notifys.DefaultIfEmpty()
-                      join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portDetail
-                      from pod in portDetail.DefaultIfEmpty()
+                      join port in catPlaceRepo.Get() on detail.Pod equals port.Id into portPODDetail
+                      from pod in portPODDetail.DefaultIfEmpty()
+                      join port in catPlaceRepo.Get() on detail.Pol equals port.Id into portPOLDetail
+                      from pol in portPOLDetail.DefaultIfEmpty()
                       select new CsTransactionDetailModel
                       {
                           Id = detail.Id,
@@ -689,6 +691,7 @@ namespace eFMS.API.Documentation.DL.Services
                           ConsigneeName = consignee.ShortName,
                           DesOfGoods = detail.DesOfGoods,
                           PODName = pod.NameEn,
+                          POLName = pol.NameEn,
                           ManifestRefNo = detail.ManifestRefNo,
                           ServiceType = detail.ServiceType,
                           ContSealNo = detail.ContSealNo,
