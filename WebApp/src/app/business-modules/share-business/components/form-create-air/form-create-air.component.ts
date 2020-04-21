@@ -105,6 +105,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     isLoadingPort: Observable<boolean>;
     isUpdateDIM: boolean = false;
 
+    applyDIM: string = 'None';
+    roundUp: string = 'None';
 
     constructor(
         private _fb: FormBuilder,
@@ -392,9 +394,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
     }
 
-    onSelectDataFormInfo(data: any, type: string) {
+    onSelectDataFormInfo(data: Customer | PortIndex | any, type: string) {
         switch (type) {
             case 'supplier':
+                console.log(data);
+                // this.dimVolumePopup.$roundUp.next(data.roundUpMethod);
+                // this.dimVolumePopup.$applyDIM.next(data.applyDim);
+                this.applyDIM = data.applyDim;
+                this.roundUp = data.roundUpMethod;
                 this.coloaderId.setValue(data.id);
                 break;
             case 'pol':
@@ -426,7 +433,24 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.isUpdateDIM = true;
         this.dimensionDetails = dims;
         if (!!this.dimensionDetails.length) {
-            const hw: number = this.dimensionDetails.reduce((acc: number, item: DIM) => acc += item.hw, 0);
+            let hw: number = this.dimensionDetails.reduce((acc: number, item: DIM) => acc += item.hw, 0);
+
+            // calculate roundUp.
+            if (!!this.applyDIM && !!this.roundUp) {
+                if (this.applyDIM === CommonEnum.APPLY_DIM.TOTAL) {
+                    if (this.roundUp === CommonEnum.ROUND_DIM.HALF) {
+                        hw = Math.round(hw);
+                    } else if (this.roundUp === CommonEnum.ROUND_DIM.ONE) {
+                        hw = Math.ceil(hw);
+                    } else { // * Standard
+
+                    }
+                } else {
+                    if (this.roundUp === CommonEnum.ROUND_DIM.HALF) {
+                    } else {
+                    }
+                }
+            }
             this.formGroup.patchValue({ hw });
 
             if (this.dimVolumePopup.isCBMChecked) {

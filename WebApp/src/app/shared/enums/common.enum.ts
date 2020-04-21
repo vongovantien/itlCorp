@@ -122,6 +122,15 @@ export namespace CommonEnum {
     export enum SHEET_DEBIT_REPORT_TYPE {
         ACCNT_PL_SHEET = 'ACCNT_PL_SHEET'
     }
+
+    export enum ROUND_DIM {
+        "HALF" = '0.5',
+        'ONE' = '1',
+    }
+    export enum APPLY_DIM {
+        TOTAL = 'Total',
+        SINGLE = 'Single'
+    }
 }
 
 
