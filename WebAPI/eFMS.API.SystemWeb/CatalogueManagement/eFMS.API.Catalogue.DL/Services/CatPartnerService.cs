@@ -121,7 +121,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
-                SendMail.Send("Confirm Add Partner", webUrl.Value.Url.ToString() + "/en/#/home/catalogue/partner-data/detail/" + entity.Id, "samuel.an@logtechub.com", null, null);
+                SendMail.Send("Confirm Add Partner", webUrl.Value.Url.ToString() + "/en/#/home/catalogue/partner-data/detail/" + entity.Id, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com" }, null,null);
             }
             return hs;
         }
