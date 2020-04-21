@@ -162,6 +162,7 @@ namespace eFMS.API.Operation.DL.Services
                 GrossWeight = clearance.TR_LUONG,
                 Route = route,
                 Type = type,
+                CargoType = cargoType,
                 ServiceType = serviceType,
                 UserCreated = currentUser.UserID,
                 DatetimeCreated = DateTime.Now,

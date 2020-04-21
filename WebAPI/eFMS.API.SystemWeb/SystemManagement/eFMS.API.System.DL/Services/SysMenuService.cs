@@ -4,6 +4,7 @@ using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
@@ -13,27 +14,35 @@ using System.Threading;
 
 namespace eFMS.API.System.DL.Services
 {
-    public class SysMenuService : RepositoryBase<SysMenu, SysMenuModel>, ISysMenuService
+    public class SysMenuService : RepositoryBaseCache<SysMenu, SysMenuModel>, ISysMenuService
     {
         private IContextBase<SysUserPermission> userpermissionRepository;
         private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
+        public SysMenuService(IContextBase<SysMenu> repository, ICacheServiceBase<SysMenu> cacheService, IMapper mapper,
             IContextBase<SysUserPermission> userpermissionRepo,
-            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, mapper)
+            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, cacheService, mapper)
         {
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
         }
+
+        //public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
+        //    IContextBase<SysUserPermission> userpermissionRepo,
+        //    IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, mapper)
+        //{
+        //    userpermissionRepository = userpermissionRepo;
+        //    permissionGeneralRepository = permissionGeneralRepo;
+        //}
         List<MenuUserModel> ISysMenuService.GetMenus(string userId, Guid officeId)
         {
             var permissionId = userpermissionRepository.Get(x => x.UserId == userId && x.OfficeId == officeId)?.FirstOrDefault()?.Id;
             if (permissionId == null) return new List<MenuUserModel>();
             var permissionMenus = permissionGeneralRepository.Get(x => x.UserPermissionId == permissionId && x.Access == true);
 
-            var menus = DataContext.Get(x => x.Id != null);
-            var parentMenus = DataContext.Get(x => x.ParentId == null).ToList();
+            var menus = Get(x => x.Id != null);
+            var parentMenus = Get(x => x.ParentId == null).ToList();
             var userMenus = menus.Join(permissionMenus, x => x.Id, y => y.MenuId, (x, y) => x).ToList();
             userMenus.AddRange(parentMenus);
             var data = mapper.Map<List<MenuUserModel>>(userMenus);

@@ -15,6 +15,10 @@ using System;
 using eFMS.API.System.DL.Services;
 using eFMS.API.System.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
+using eFMS.API.System.Service.Models;
+using ITL.NetCore.Connection.Caching;
+using eFMS.API.System.Infrastructure.Common;
+using StackExchange.Redis;
 
 namespace eFMS.API.System.Infrastructure
 {
@@ -48,6 +52,10 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysUserPermissionService, SysUserPermissionService>();
             services.AddTransient<ISysUserPermissionGeneralService, SysUserPermissionGeneralService>();
             services.AddTransient<ISysUserPermissionSpecialService, SysUserPermissionSpecialService>();
+
+            services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
+            new CacheServiceBase<SysMenu>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.SysMenu)));
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

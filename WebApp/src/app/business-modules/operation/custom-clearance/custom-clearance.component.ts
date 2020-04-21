@@ -144,7 +144,9 @@ export class CustomClearanceComponent extends AppList {
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._toastrService.success(res.message, '');
+                    if (!!res.message) {
+                        this._toastrService.success(res.message, '');
+                    }
                     this.getListCustomsDeclaration();
                 },
                 (errors: any) => { },

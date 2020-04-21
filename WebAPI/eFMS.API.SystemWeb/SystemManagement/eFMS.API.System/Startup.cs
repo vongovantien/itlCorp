@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using eFMS.API.Infrastructure;
 using eFMS.API.Common.Globals;
+using StackExchange.Redis;
 
 namespace eFMS.API.System
 {
@@ -44,6 +45,8 @@ namespace eFMS.API.System
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
+
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")));
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
         }
