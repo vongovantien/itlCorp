@@ -15,7 +15,7 @@ import { distinctUntilChanged, takeUntil, catchError } from 'rxjs/operators';
 import * as fromShare from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { User, CsTransactionDetail, PortIndex } from 'src/app/shared/models';
+import { User, CsTransactionDetail, PortIndex, CsTransaction } from 'src/app/shared/models';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
 
 @Component({
@@ -166,7 +166,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             this._store.select(fromShare.getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
-                    (res: any) => {
+                    (res: CsTransaction) => {
                         this.shipmentDetail = res;
 
                         this.mtBill.setValue(this.shipmentDetail.mawb);
@@ -191,6 +191,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                             this.mindateEtaWareHouse = this.createMoment(new Date(this.shipmentDetail.eta));
 
                         }
+
+                        this._dataService.setDataService("podName", this.shipmentDetail.warehousePodNameVn || "");
+
                     }
                 );
         }
@@ -471,15 +474,14 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 break;
             case 'PortOfLoading':
                 this.pol.setValue(data.id);
-
-                // * Update default value for sentTo delivery order.
-                this._dataService.setDataService("polName", data.warehouseName || "");
                 break;
             case 'PortOfDischarge':
                 this.pod.setValue(data.id);
                 if (this.countChangePort === 0) {
                     this.finalDestinationPlace.setValue(data.nameEn);
                 }
+
+                // * Validate duplicate port.
                 if (this.pol.value !== undefined && this.pod.value !== undefined) {
                     if (this.pol.value === this.pod.value) {
                         this.PortChargeLikePortLoading = true;
@@ -488,6 +490,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     }
                 }
                 this.countChangePort++;
+
+                // * Update default value for sentTo delivery order.
+                this._dataService.setDataService("podName", data.warehouseNameVn || "");
+
                 break;
             case 'Supplier':
                 this.supplier.setValue(data.id);

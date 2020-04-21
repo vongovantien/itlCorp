@@ -355,7 +355,7 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     onSelectTabDO() {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey('polName') || "";
+        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey('podName') || "";
     }
 }
 

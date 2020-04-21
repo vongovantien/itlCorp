@@ -16,6 +16,7 @@ import { tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
+import { DataService } from '@services';
 
 @Component({
     selector: 'air-import-hbl-form-create',
@@ -115,7 +116,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
-        private _store: Store<IShareBussinessState>
+        private _store: Store<IShareBussinessState>,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -178,6 +180,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                 warehouseNotice: shipment.warehouseId,
                                 route: shipment.route
                             });
+
+                            this._dataService.setDataService("podName", shipment.warehousePodNameVn || "");
                         }
                     }
                 );
@@ -413,6 +417,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
+
+                // * Update default value for sentTo delivery order.
+                this._dataService.setDataService("podName", data.warehouseNameVn || "");
                 break;
             case 'final':
                 this.finalPod.setValue(data.id);
