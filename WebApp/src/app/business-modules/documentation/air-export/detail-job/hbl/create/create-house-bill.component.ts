@@ -132,11 +132,11 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     mergeMap((res: any) => {
                         if (this.formCreateHBLComponent.hwbno.value == null || this.formCreateHBLComponent.hwbno.value == "") {
                             this.formCreateHBLComponent.hwbno.setValue(res.hblNo);
-            }
+                        }
                         if (!this.checkValidateForm()) {
                             this.infoPopup.show();
                             return null;
-        }
+                        }
                         return forkJoin([this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
                     }
                     )).subscribe(result => {
@@ -164,7 +164,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         if (res) {
                             this.confirmExistedHbl.show();
                         } else {
-            const houseBill: HouseBill = this.getDataForm();
+                            const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);
                             this.createHbl(houseBill);
                         }
@@ -175,19 +175,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     setData(houseBill: HouseBill) {
-            houseBill.jobId = this.jobId;
-            houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
-            houseBill.otherCharges.forEach(c => {
-                c.jobId = this.jobId;
-                c.hblId = SystemConstants.EMPTY_GUID;
-            });
+        houseBill.jobId = this.jobId;
+        houseBill.otherCharges = this.formCreateHBLComponent.otherCharges;
+        houseBill.otherCharges.forEach(c => {
+            c.jobId = this.jobId;
+            c.hblId = SystemConstants.EMPTY_GUID;
+        });
     }
 
     confirmSaveData() {
         this.confirmExistedHbl.hide();
         const houseBill: HouseBill = this.getDataForm();
         this.setData(houseBill);
-            this.createHbl(houseBill);
+        this.createHbl(houseBill);
     }
 
     checkValidateForm() {
@@ -248,36 +248,36 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.selectedHbl = selectedData;
         this._store.dispatch(new GetDetailHBLSuccessAction(this.selectedHbl));
         this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.selectedHbl.id));
-            if (!!this.selectedHbl) {
-                this._store.select(getDimensionVolumesState)
-                    .pipe(
-                        takeUntil(this.ngUnsubscribe),
-                        map((dims: DIM[]) => dims.map(d => new DIM(d))),
-                        tap(
-                            (dims: DIM[]) => {
-                                this.formCreateHBLComponent.dims = dims;
-                            }
-                        ),
-                        mergeMap(
-                            () => this._store.select(getDetailHBlState)
-                        )
-                    )
-                    .subscribe(
-                        (hbl: HouseBill) => {
-                            if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
-                                this.isImport = true;
-                                this.formCreateHBLComponent.totalCBM = hbl.cbm;
-                                this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
-                                this.formCreateHBLComponent.jobId = hbl.jobId;
-                                this.formCreateHBLComponent.hblId = hbl.id;
-                                this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
-                                this.formCreateHBLComponent.updateFormValue(hbl);
-                                this.formCreateHBLComponent.hwbno.setValue(null);
-                            }
-
+        if (!!this.selectedHbl) {
+            this._store.select(getDimensionVolumesState)
+                .pipe(
+                    takeUntil(this.ngUnsubscribe),
+                    map((dims: DIM[]) => dims.map(d => new DIM(d))),
+                    tap(
+                        (dims: DIM[]) => {
+                            this.formCreateHBLComponent.dims = dims;
                         }
-                    );
-            }
+                    ),
+                    mergeMap(
+                        () => this._store.select(getDetailHBlState)
+                    )
+                )
+                .subscribe(
+                    (hbl: HouseBill) => {
+                        if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
+                            this.isImport = true;
+                            this.formCreateHBLComponent.totalCBM = hbl.cbm;
+                            this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
+                            this.formCreateHBLComponent.jobId = hbl.jobId;
+                            this.formCreateHBLComponent.hblId = hbl.id;
+                            this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
+                            this.formCreateHBLComponent.updateFormValue(hbl);
+                            this.formCreateHBLComponent.hwbno.setValue(null);
+                        }
+
+                    }
+                );
+        }
 
     }
 

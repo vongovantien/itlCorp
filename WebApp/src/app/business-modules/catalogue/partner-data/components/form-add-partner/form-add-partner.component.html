@@ -80,11 +80,11 @@
                             A/C Ref
                         </label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
-                        [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
-                        [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
-                        [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
-                        (remove)="resetFormControl(partnerAccountRef)"  placeholder="Select A/C Ref" >
-                    </app-combo-grid-virtual-scroll>
+                            [currentActiveItemId]="{ field: 'id', value: partnerAccountRef.value}"
+                            [selectedDisplayFields]="['partnerNameVn']" [dataSources]="parentCustomers"
+                            [displayFields]="[{field: 'partnerNameVn', label: 'Name'}]"
+                            (remove)="resetFormControl(partnerAccountRef)" placeholder="Select A/C Ref">
+                        </app-combo-grid-virtual-scroll>
                     </div>
 
                 </div>
@@ -161,7 +161,8 @@
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select #chooseShippingCountry [allowClear]="true" [items]="countries"
+                                    <ng-select (opened)="closeOtherSelects(chooseShippingCountry)"
+                                        #chooseShippingCountry [allowClear]="true" [items]="countries"
                                         formControlName="shippingCountry"
                                         (selected)="onChange($event, 'shippingCountry')"
                                         (removed)="removed($event, 'shippingCountry')" placeholder="Select country">
@@ -177,7 +178,8 @@
                                     <label class="form-control-label">
                                         City <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="shippingProvinces"
+                                    <ng-select (opened)="closeOtherSelects(chooseShippingProvince)"
+                                        #chooseShippingProvince [allowClear]="true" [items]="shippingProvinces"
                                         formControlName="shippingProvince" placeholder="Select province/ city">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && shippingProvince.invalid">
@@ -249,7 +251,8 @@
                                     <label class="form-control-label">
                                         Country <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="countries" formControlName="billingCountry"
+                                    <ng-select (opened)="closeOtherSelects(chooseBillingCountry)" #chooseBillingCountry
+                                        [allowClear]="true" [items]="countries" formControlName="billingCountry"
                                         (selected)="onChange($event, 'billingCountry')"
                                         (removed)="removed($event, 'billingCountry')" placeholder="Select country">
                                     </ng-select>
@@ -264,8 +267,9 @@
                                     <label class="form-control-label">
                                         City <span class="m--font-danger">(*)</span>
                                     </label>
-                                    <ng-select [allowClear]="true" [items]="billingProvinces"
-                                        formControlName="billingProvince" placeholder="Select city/ province">
+                                    <ng-select (opened)="closeOtherSelects(chooseBillingProvice)" #chooseBillingProvice
+                                        [allowClear]="true" [items]="billingProvinces" formControlName="billingProvince"
+                                        placeholder="Select city/ province">
                                     </ng-select>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && billingProvince.invalid">
                                         City is required
