@@ -216,7 +216,7 @@ namespace eFMS.API.Catalogue.Controllers
                         Type = worksheet.Cells[row, 2].Value == null ? string.Empty : worksheet.Cells[row, 2].Value.ToString().Trim(),
                         DebitAccountNo = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString().Trim(),
                         CreditAccountNo = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString(),
-                        DebitVat = worksheet.Cells[row, 5].Value != null ? (decimal?)null:Convert.ToDecimal(worksheet.Cells[row, 5].Value),
+                        DebitVat = worksheet.Cells[row, 5].Value == null ? (decimal?)null:Convert.ToDecimal(worksheet.Cells[row, 5].Value),
                         CreditVat = worksheet.Cells[row, 6].Value == null ? (decimal?)null: Convert.ToDecimal(worksheet.Cells[row, 6].Value),
                         Status = worksheet.Cells[row, 7].Value == null? string.Empty: worksheet.Cells[row, 7].Value.ToString(),
                         Active = active,
