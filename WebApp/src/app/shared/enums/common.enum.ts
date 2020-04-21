@@ -124,8 +124,9 @@ export namespace CommonEnum {
     }
 
     export enum ROUND_DIM {
-        "HALF" = '0.5',
-        'ONE' = '1',
+        HALF = '0.5',
+        ONE = '1.0',
+        STANDARD = 'Standard'
     }
     export enum APPLY_DIM {
         TOTAL = 'Total',
