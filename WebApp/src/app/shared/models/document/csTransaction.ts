@@ -88,6 +88,11 @@ export class CsTransaction extends BaseModel {
     coloaderCode: string = null;
     polCode: string = null;
     podCode: string = null;
+    warehousePodNameEn: string = null;
+    warehousePodNameVn: string = null;
+    warehousePolNameEn: string = null;
+    warehousePolNameVn: string = null;
+
     constructor(object?: any) {
         super();
         const self = this;
