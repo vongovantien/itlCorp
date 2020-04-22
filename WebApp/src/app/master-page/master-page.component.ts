@@ -13,11 +13,9 @@ import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import crypto_js from 'crypto-js';
-import { interval, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { JwtService } from '@services';
 import { HeaderComponent } from './header/header.component';
-import { ChangeOfficeClaimUserAction } from '@store';
 
 @Component({
     selector: 'app-master-page',
