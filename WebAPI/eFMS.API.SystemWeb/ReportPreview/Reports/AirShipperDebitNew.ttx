@@ -40,4 +40,5 @@ DecimalSymbol	String	255
 DigitSymbol	String	255	
 DecimalNo	Number		
 CurrDecimalNo	Number		
+ETA	DateTime		
 FlexID	String	255	

@@ -1086,7 +1086,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.LastDestination = charge.LastDestination?.ToUpper();
 
                     charge.LoadingDate = data.Etd;//ETD
-                                       
+                    charge.ETA = data?.Eta; //ETA
+
                     charge.ATTN = string.Empty; //NOT USE
                     charge.FlightNo = data.Vessel?.ToUpper();//Flight No
                     charge.FlightDate = data.VesselDate; //Flight Date
@@ -1201,9 +1202,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.DecimalNo = 2;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-            parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
-
-            parameter.ETA = data?.Eta;
+            parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;            
 
             result = new Crystal
             {

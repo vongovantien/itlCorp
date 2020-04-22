@@ -47,6 +47,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
         public string FlexID { get; set; }
+        public DateTime? ETA { get; set; }
     }
 
     public class AirShipperDebitNewReportParams
@@ -80,7 +81,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string InwordVND { get; set; }
         public string Currency { get; set; }              
         public decimal RateUSDToVND { get; set; }
-        public string BalanceAmount { get; set; }
-        public DateTime? ETA { get; set; }
+        public string BalanceAmount { get; set; }     
     }
 }
