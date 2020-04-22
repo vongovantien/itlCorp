@@ -89,10 +89,10 @@ export class UtilityHelper {
             for (let i = 0; i < n_length; i++) {
                 received_n_array[i] = number.substr(i, 1);
             }
-            for (let i = 9 - n_length, j = 0; i < 9; i++ , j++) {
+            for (let i = 9 - n_length, j = 0; i < 9; i++, j++) {
                 n_array[i] = received_n_array[j];
             }
-            for (let i = 0, j = 1; i < 9; i++ , j++) {
+            for (let i = 0, j = 1; i < 9; i++, j++) {
                 if (i == 0 || i == 2 || i == 4 || i == 7) {
                     if (n_array[i] == 1) {
                         // tslint:disable-next-line: radix
@@ -129,5 +129,20 @@ export class UtilityHelper {
             words_string = words_string.split("  ").join(" ");
         }
         return words_string;
+    }
+
+    calculateRoundStandard(num: number) {
+        if (isNaN(num)) {
+            return 0;
+        } else {
+            const d = +(num % 1).toFixed(2);
+            if (d < 0.5) {
+                return Math.round(num);
+            } else if (d > 0.5) {
+                return Math.ceil(num);
+            } else {
+                return num;
+            }
+        }
     }
 }

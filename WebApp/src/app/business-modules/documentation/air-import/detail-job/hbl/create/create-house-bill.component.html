@@ -19,7 +19,7 @@
             <tab heading="Arrival Notice">
                 <arrival-note-air></arrival-note-air>
             </tab>
-            <tab heading="Authorize Letter">
+            <tab heading="Authorize Letter" (selectTab)="onSelectTabAL()">
                 <ng-container>
                     <hbl-delivery-order [isAir]="true">
                     </hbl-delivery-order>

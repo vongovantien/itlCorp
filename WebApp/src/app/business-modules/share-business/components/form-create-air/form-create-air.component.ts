@@ -105,6 +105,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     isLoadingPort: Observable<boolean>;
     isUpdateDIM: boolean = false;
 
+    applyDIM: string;
+    roundUp: string;
 
     constructor(
         private _fb: FormBuilder,
@@ -392,10 +394,21 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         );
     }
 
-    onSelectDataFormInfo(data: any, type: string) {
+    onSelectDataFormInfo(data: Customer | PortIndex | any, type: string) {
         switch (type) {
             case 'supplier':
+
+                this.dimVolumePopup.$roundUp.next(data.roundUpMethod);
+                this.dimVolumePopup.$applyDIM.next(data.applyDim);
+
+                this.applyDIM = data.applyDim;
+                this.roundUp = data.roundUpMethod;
+
                 this.coloaderId.setValue(data.id);
+
+                // * if DIM had been saved
+                this.updateFormHW(this.dimensionDetails);
+
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
@@ -425,17 +438,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     onUpdateDIM(dims: DIM[]) {
         this.isUpdateDIM = true;
         this.dimensionDetails = dims;
-        if (!!this.dimensionDetails.length) {
-            const hw: number = this.dimensionDetails.reduce((acc: number, item: DIM) => acc += item.hw, 0);
-            this.formGroup.patchValue({ hw });
-
-            if (this.dimVolumePopup.isCBMChecked) {
-                this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
-            }
-        } else {
-            this.formGroup.patchValue({ hw: null });
-
-        }
+        this.updateFormHW(this.dimensionDetails);
     }
 
     onBlurGetWarehouseFlightNo(data: any) {
@@ -451,7 +454,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                         }
                     );
             }
-
         }
     }
 
@@ -462,12 +464,57 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 .subscribe(
                     (res: Customer[]) => {
                         if (!!res && res.length > 0) {
-
                             this.coloaderId.setValue(res[0].id);
                         }
                     }
                 );
         }
+    }
 
+    calculateDataDIMWithRound(round: string, num: number): number {
+        if (isNaN(num)) {
+            return 0;
+        }
+        if (!!round) {
+            if (round === CommonEnum.ROUND_DIM.HALF) {
+                return Math.round(num);
+            } else if (round === CommonEnum.ROUND_DIM.ONE) {
+                return Math.ceil(num);
+            } else { // * Standard
+                return this.utility.calculateRoundStandard(num);
+            }
+        } else {
+            return num;
+        }
+    }
+
+    updateFormHW(dimensionDetails: DIM[]) {
+        const dim = cloneDeep(dimensionDetails);
+        if (!!dim.length) {
+            let totalHw: number = null;
+            // calculate roundUp.
+            if (!!this.applyDIM && !!this.roundUp) {
+                if (this.applyDIM === CommonEnum.APPLY_DIM.TOTAL) {
+                    totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
+                    // * Round
+                    totalHw = this.calculateDataDIMWithRound(this.roundUp, totalHw);
+
+                } else {
+                    dim.forEach(d => {
+                        d.hw = this.calculateDataDIMWithRound(this.roundUp, d.hw);
+                    });
+                    totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
+                }
+            } else {
+                totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
+            }
+            this.formGroup.patchValue({ hw: totalHw });
+
+            if (this.dimVolumePopup.isCBMChecked) {
+                this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
+            }
+        } else {
+            this.formGroup.patchValue({ hw: null });
+        }
     }
 }

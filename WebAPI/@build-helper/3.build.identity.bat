@@ -1,4 +1,4 @@
 for %%d in (
-	..\eFMS.API.SystemWeb\IdentityServer\eFMS.IdentityServer.DAL,
-	..\eFMS.API.SystemWeb\IdentityServer\eFMS.IdentityServer.DL
+	..\eFMS.API.SystemWeb\eFMS.IdentityServer\eFMS.IdentityServer.DAL,
+	..\eFMS.API.SystemWeb\eFMS.IdentityServer\eFMS.IdentityServer.DL
 ) do dotnet build "%%d"

@@ -19,6 +19,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { forkJoin } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
+import { DataService } from '@services';
 
 @Component({
     selector: 'app-create-hbl-air-import',
@@ -47,12 +48,11 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
-
+        protected _cd: ChangeDetectorRef,
+        protected _dataService: DataService
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit() {
@@ -195,8 +195,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             this.deliveryComponent.isSubmitted = true;
             this.infoPopup.show();
             return;
-        }
-        else {
+        } else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
                 .pipe(
                     catchError(this.catchError),
@@ -266,6 +265,9 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         }
     }
 
+    onSelectTabAL() {
+        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey("podName") || "";
+    }
 
     gotoList() {
         this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);

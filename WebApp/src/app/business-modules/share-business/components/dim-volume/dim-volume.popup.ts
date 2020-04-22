@@ -12,6 +12,8 @@ import * as fromStore from './../../store';
 import { DocumentationRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
 import cloneDeep from 'lodash/cloneDeep';
+import { BehaviorSubject } from 'rxjs';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'dim-volume-popup',
@@ -40,6 +42,12 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     selectedIndexDIMItem: number;
 
+    applyDIM: string;
+    roundUp: string;
+
+    $applyDIM: BehaviorSubject<string> = new BehaviorSubject(this.applyDIM);
+    $roundUp: BehaviorSubject<string> = new BehaviorSubject(this.roundUp);
+
     constructor(
         private _toastService: ToastrService,
         private _store: Store<fromStore.IShareBussinessState>,
@@ -60,6 +68,20 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
                     this.dimsTemp = cloneDeep(dims);
 
                     this.calculateHWDimension();
+                }
+            );
+
+        this.$applyDIM
+            .pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+                (apply) => {
+                    this.applyDIM = apply;
+                }
+            );
+
+        this.$roundUp
+            .pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+                (round: string) => {
+                    this.roundUp = round;
                 }
             );
     }
@@ -116,9 +138,12 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
     }
 
     updateHeightWeight(dimItem: DIM) {
-        // dimItem.hw = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant) * dimItem.package).toFixed(3);
-        // dimItem.cbm = +((dimItem.length * dimItem.height * dimItem.width / this.hwContstant / this.cbmConstant) * dimItem.package).toFixed(3);
         dimItem.hw = this.utility.calculateHeightWeight(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwConstant);
+
+        // * Round
+        if (this.applyDIM === CommonEnum.APPLY_DIM.SINGLE) {
+            dimItem.hw = this.calculateDataDIMWithRound(this.applyDIM, this.roundUp, dimItem.hw);
+        }
         dimItem.cbm = this.utility.calculateCBM(dimItem.width, dimItem.height, dimItem.length, dimItem.package, this.hwConstant);
 
         this.updateTotalHeightWeight();
@@ -137,6 +162,28 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
 
     updateTotalHeightWeight() {
         this.totalHW = +this.dimsTemp.reduce((acc: number, curr: DIM) => acc += curr.hw, 0).toFixed(3);
+
+        // * Round
+        if (this.applyDIM === CommonEnum.APPLY_DIM.TOTAL) {
+            this.totalHW = this.calculateDataDIMWithRound(this.applyDIM, this.roundUp, this.totalHW);
+        }
+    }
+
+    calculateDataDIMWithRound(apply: string, round: string, num: number): number {
+        if (isNaN(num)) {
+            return 0;
+        }
+        if (!!apply && !!round) {
+            if (round === CommonEnum.ROUND_DIM.HALF) {
+                return Math.round(num);
+            } else if (round === CommonEnum.ROUND_DIM.ONE) {
+                return Math.ceil(num);
+            } else { // * Standard
+                return this.utility.calculateRoundStandard(num);
+            }
+        } else {
+            return num;
+        }
     }
 
     updateCBM() {

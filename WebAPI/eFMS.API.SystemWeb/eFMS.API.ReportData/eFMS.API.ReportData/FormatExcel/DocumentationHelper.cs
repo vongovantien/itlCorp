@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace eFMS.API.ReportData.FormatExcel
 {
@@ -1360,5 +1361,355 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateAccountingPLSheetExcel(List<AccountingPlSheetExport> listData, GeneralReportCriteria criteria, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Accounting PL Sheet (" + criteria.Currency + ")");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataAccountingPLSheetExportExcel(workSheet, listData, criteria);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelAccountingPLSheetExport(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 12; //Cột A
+            workSheet.Column(2).Width = 16; //Cột B
+            workSheet.Column(3).Width = 16; //Cột C
+            workSheet.Column(4).Width = 16; //Cột D
+            workSheet.Column(5).Width = 32; //Cột E
+            workSheet.Column(6).Width = 16; //Cột F
+            workSheet.Column(7).Width = 16; //Cột G
+            workSheet.Column(8).Width = 16; //Cột H
+            workSheet.Column(9).Width = 15; //Cột I
+            workSheet.Column(10).Width = 16; //Cột J
+            workSheet.Column(11).Width = 30; //Cột K
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 14; //Cột M
+            workSheet.Column(14).Width = 17; //Cột N
+            workSheet.Column(15).Width = 15; //Cột O
+            workSheet.Column(16).Width = 20; //Cột P
+            workSheet.Column(17).Width = 17; //Cột Q
+            workSheet.Column(18).Width = 17; //Cột R
+            workSheet.Column(19).Width = 14; //Cột S
+            workSheet.Column(20).Width = 18; //Cột T
+            workSheet.Column(21).Width = 17; //Cột U
+            workSheet.Column(22).Width = 20; //Cột V
+            workSheet.Column(23).Width = 17; //Cột W
+            workSheet.Column(24).Width = 15; //Cột X
+            workSheet.Column(25).Width = 22; //Cột Y
+            workSheet.Column(26).Width = 17; //Cột Z
+            workSheet.Column(27).Width = 18; //Cột AA
+            workSheet.Column(28).Width = 17; //Cột AB
+            workSheet.Column(29).Width = 19; //Cột AC
+            workSheet.Column(30).Width = 19; //Cột AD
+            workSheet.Column(31).Width = 24; //Cột AE
+        }
+
+        private void BindingDataAccountingPLSheetExportExcel(ExcelWorksheet workSheet, List<AccountingPlSheetExport> listData, GeneralReportCriteria criteria)
+        {
+            SetWidthColumnExcelAccountingPLSheetExport(workSheet);
+            List<string> headers = new List<string> {
+               "INDO TRANS LOGISTICS CORPORATION", //0
+               "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+               "JOB COSTING SUMMARY REPORT", //2
+               "Date", //3
+               "Job No.", //4
+               "Code Cus", //5
+               "Taxcode", //6
+               "Customer", //7
+               "M-B/L", //8
+               "H-B/L", //9
+               "Customs No.", //10
+               "P/M Term", //11
+               "Charge Code", //12
+               "Description", //13
+               "REVENUE", //14
+               "TAX Inv.No",//15
+               "USD", //16
+               "VND", //17
+               "Tax Out", //18
+               "Total", //19
+               "COST", //20
+               "Voucher No.", //21
+               "TAX In", //22
+               "Com.", //23
+               "Ex. Rate", //24
+               "Balance", //25
+               "Payment on behalf", //26
+               "Inv.No", //27
+               "Amount", //28
+               "Paid Date", //29
+               "A/C Voucher No.", //30
+               "P/M Voucher No.", //31
+               "Service" //32
+            };
+
+            workSheet.Cells["Z1:AE1"].Merge = true;
+            workSheet.Cells["Z1"].Value = headers[0];
+            workSheet.Cells["Z1"].Style.Font.Bold = true;
+            workSheet.Cells["Z1"].Style.Font.Italic = true;
+
+            workSheet.Row(2).Height = 64.5;
+            workSheet.Cells["Z2:AE2"].Merge = true;
+            workSheet.Cells["Z2:AE2"].Style.WrapText = true;
+            workSheet.Cells["Z2"].Value = headers[1];
+            workSheet.Cells["Z2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            
+            workSheet.Cells["A4:AE4"].Merge = true;
+            workSheet.Cells["A4"].Value = headers[2];
+            workSheet.Cells["A4"].Style.Font.Bold = true;
+            workSheet.Cells["A4"].Style.Font.Size = 13;
+            workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            DateTime? _fromDate = criteria.CreatedDateFrom != null ? criteria.CreatedDateFrom : criteria.ServiceDateFrom;
+            DateTime? _toDate = criteria.CreatedDateTo != null ? criteria.CreatedDateTo : criteria.ServiceDateTo;
+
+            workSheet.Cells["A5:AE5"].Merge = true;
+            workSheet.Cells["A5"].Value = "From: " + _fromDate.Value.ToString("dd MMM, yyyy") + " to: " + _toDate.Value.ToString("dd MMM, yyyy");
+            workSheet.Cells["A5"].Style.Font.Bold = true;
+            workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            //Header table
+            workSheet.Cells["A7:AE8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AE8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AE8"].Style.Font.Bold = true;
+
+            workSheet.Cells["A7:A8"].Merge = true;
+            workSheet.Cells["A7"].Value = headers[3]; // Date
+
+            workSheet.Cells["B7:B8"].Merge = true;
+            workSheet.Cells["B7"].Value = headers[4]; // Job No.
+
+            workSheet.Cells["C7:C8"].Merge = true;
+            workSheet.Cells["C7"].Value = headers[5]; //Code Cus
+
+            workSheet.Cells["D7:D8"].Merge = true;
+            workSheet.Cells["D7"].Value = headers[6]; //Taxcode
+
+            workSheet.Cells["E7:E8"].Merge = true;
+            workSheet.Cells["E7"].Value = headers[7]; //Customer
+
+            workSheet.Cells["F7:F8"].Merge = true;
+            workSheet.Cells["F7"].Value = headers[8]; //MBL
+
+            workSheet.Cells["G7:G8"].Merge = true;
+            workSheet.Cells["G7"].Value = headers[9]; //HBL
+
+            workSheet.Cells["H7:H8"].Merge = true;
+            workSheet.Cells["H7"].Value = headers[10]; //Customs No.
+
+            workSheet.Cells["I7:I8"].Merge = true;
+            workSheet.Cells["I7"].Value = headers[11]; //P/M Term
+
+            workSheet.Cells["J7:J8"].Merge = true;
+            workSheet.Cells["J7"].Value = headers[12]; //Charge Code
+
+            workSheet.Cells["K7:K8"].Merge = true;
+            workSheet.Cells["K7"].Value = headers[13]; //Description
+
+            workSheet.Cells["L7:P7"].Merge = true;
+            workSheet.Cells["L7"].Value = headers[14]; //REVENUE
+            workSheet.Cells["L8"].Value = headers[15]; //TAX Inv.No (Revenue)
+            workSheet.Cells["M8"].Value = headers[16]; //USD (Revenue)
+            workSheet.Cells["N8"].Value = headers[17]; //VND (Revenue)
+            workSheet.Cells["O8"].Value = headers[18]; //TAX Out
+            workSheet.Cells["P8"].Value = headers[19]; //Total (Revenue)
+
+            workSheet.Cells["Q7:V7"].Merge = true;
+            workSheet.Cells["Q7"].Value = headers[20]; //COST
+            workSheet.Cells["Q8"].Value = headers[15]; //TAX Inv.No (Cost)
+            workSheet.Cells["R8"].Value = headers[21]; //Voucher No.
+            workSheet.Cells["S8"].Value = headers[16]; //USD (Cost)
+            workSheet.Cells["T8"].Value = headers[17]; //VND (Cost)
+            workSheet.Cells["U8"].Value = headers[22]; //TAX In
+            workSheet.Cells["V8"].Value = headers[19]; //Total (Cost)
+
+            workSheet.Cells["W7:W8"].Merge = true;
+            workSheet.Cells["W7"].Value = headers[23]; //Com.
+
+            workSheet.Cells["X7:X8"].Merge = true;
+            workSheet.Cells["X7"].Value = headers[24]; //Ex Rate
+
+            workSheet.Cells["Y7:Y8"].Merge = true;
+            workSheet.Cells["Y7"].Value = headers[25]; //Balance
+
+            workSheet.Cells["Z7:AA7"].Merge = true;
+            workSheet.Cells["Z7"].Value = headers[26]; //Payment on Behalf
+            workSheet.Cells["Z8"].Value = headers[27]; //Inv.No
+            workSheet.Cells["AA8"].Value = headers[28]; //Amount
+
+            workSheet.Cells["AB7:AB8"].Merge = true;
+            workSheet.Cells["AB7"].Value = headers[29]; //Paid Date
+
+            workSheet.Cells["AC7:AC8"].Merge = true;
+            workSheet.Cells["AC7"].Value = headers[30]; //A/C Voucher No.
+
+            workSheet.Cells["AD7:AD8"].Merge = true;
+            workSheet.Cells["AD7"].Value = headers[31]; //P/M Voucher No.
+
+            workSheet.Cells["AE7:AE8"].Merge = true;
+            workSheet.Cells["AE7"].Value = headers[32]; //Service
+            //Header table
+
+            int rowStart = 9;
+            for(int i = 0; i < listData.Count; i++)
+            {
+                workSheet.Cells[rowStart, 1].Value = listData[i].ServiceDate;
+                workSheet.Cells[rowStart, 1].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[rowStart, 2].Value = listData[i].JobId;
+                workSheet.Cells[rowStart, 3].Value = listData[i].PartnerCode;
+                workSheet.Cells[rowStart, 4].Value = listData[i].PartnerTaxCode;
+                workSheet.Cells[rowStart, 5].Value = listData[i].PartnerName;
+                workSheet.Cells[rowStart, 6].Value = listData[i].Mbl;
+                workSheet.Cells[rowStart, 7].Value = listData[i].Hbl;
+                workSheet.Cells[rowStart, 8].Value = listData[i].CustomNo;
+                workSheet.Cells[rowStart, 9].Value = listData[i].PaymentMethodTerm;
+                workSheet.Cells[rowStart, 10].Value = listData[i].ChargeCode;
+                workSheet.Cells[rowStart, 11].Value = listData[i].ChargeName;
+                workSheet.Cells[rowStart, 12].Value = listData[i].TaxInvNoRevenue;
+
+                if (listData[i].UsdRevenue != null && listData[i].UsdRevenue != 0)
+                {
+                    workSheet.Cells[rowStart, 13].Value = listData[i].UsdRevenue;
+                    workSheet.Cells[rowStart, 13].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].VndRevenue != null && listData[i].VndRevenue != 0)
+                {
+                    workSheet.Cells[rowStart, 14].Value = listData[i].VndRevenue;
+                    workSheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].TaxOut != null && listData[i].TaxOut != 0)
+                {
+                    workSheet.Cells[rowStart, 15].Value = listData[i].TaxOut;
+                    workSheet.Cells[rowStart, 15].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].TotalRevenue != null && listData[i].TotalRevenue != 0)
+                {
+                    workSheet.Cells[rowStart, 16].Value = listData[i].TotalRevenue;
+                    workSheet.Cells[rowStart, 16].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[rowStart, 17].Value = listData[i].TaxInvNoCost;
+                workSheet.Cells[rowStart, 18].Value = listData[i].VoucherId;
+
+                if (listData[i].UsdCost != null && listData[i].UsdCost != 0)
+                {
+                    workSheet.Cells[rowStart, 19].Value = listData[i].UsdCost;
+                    workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].VndCost != null && listData[i].VndCost != 0)
+                {
+                    workSheet.Cells[rowStart, 20].Value = listData[i].VndCost;
+                    workSheet.Cells[rowStart, 20].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].TaxIn != null && listData[i].TaxIn != 0)
+                {
+                    workSheet.Cells[rowStart, 21].Value = listData[i].TaxIn;
+                    workSheet.Cells[rowStart, 21].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].TotalCost != null && listData[i].TotalCost != 0)
+                {
+                    workSheet.Cells[rowStart, 22].Value = listData[i].TotalCost;
+                    workSheet.Cells[rowStart, 22].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].TotalKickBack != null && listData[i].TotalKickBack != 0)
+                {
+                    workSheet.Cells[rowStart, 23].Value = listData[i].TotalKickBack;
+                    workSheet.Cells[rowStart, 23].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].ExchangeRate != 0)
+                {
+                    workSheet.Cells[rowStart, 24].Value = listData[i].ExchangeRate;
+                    workSheet.Cells[rowStart, 24].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].Balance != null && listData[i].Balance != 0)
+                {
+                    workSheet.Cells[rowStart, 25].Value = listData[i].Balance;
+                    workSheet.Cells[rowStart, 25].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[rowStart, 26].Value = listData[i].InvNoObh;
+
+                if (listData[i].AmountObh != null && listData[i].AmountObh != 0)
+                {
+                    workSheet.Cells[rowStart, 27].Value = listData[i].AmountObh;
+                    workSheet.Cells[rowStart, 27].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[rowStart, 28].Value = listData[i].PaidDate;
+                workSheet.Cells[rowStart, 29].Value = listData[i].AcVoucherNo;
+                workSheet.Cells[rowStart, 30].Value = listData[i].PmVoucherNo;
+                workSheet.Cells[rowStart, 31].Value = listData[i].Service;
+
+                rowStart += 1;
+
+            }
+
+            workSheet.Cells[rowStart, 1, rowStart, 31].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart, 11].Merge = true;
+            workSheet.Cells[rowStart, 1, rowStart, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[rowStart, 1].Value = headers[19];
+
+            workSheet.Cells[rowStart, 13].Value = listData.Select(s => s.UsdRevenue).Sum(); // Total USD Revenue           
+            workSheet.Cells[rowStart, 14].Value = listData.Select(s => s.VndRevenue).Sum(); // Total VND Revenue
+            workSheet.Cells[rowStart, 15].Value = listData.Select(s => s.TaxOut).Sum(); // Total TaxOut
+            workSheet.Cells[rowStart, 16].Value = listData.Select(s => s.TotalRevenue).Sum(); // Sum Total Revenue            
+            for(int i = 13; i < 17; i++)
+            {
+                workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+            }
+
+            workSheet.Cells[rowStart, 19].Value = listData.Select(s => s.UsdCost).Sum(); // Total USD Cost
+            workSheet.Cells[rowStart, 20].Value = listData.Select(s => s.VndCost).Sum(); // Total VND Cost
+            workSheet.Cells[rowStart, 21].Value = listData.Select(s => s.TaxIn).Sum(); // Total TaxIn
+            workSheet.Cells[rowStart, 22].Value = listData.Select(s => s.TotalCost).Sum(); // Sum Total Cost
+            for (int i = 19; i < 23; i++)
+            {
+                workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+            }
+
+            workSheet.Cells[rowStart, 25].Value = listData.Select(s => s.Balance).Sum(); // Sum Total Balance
+            workSheet.Cells[rowStart, 25].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 27].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
+            workSheet.Cells[rowStart, 27].Style.Numberformat.Format = numberFormat;
+
+            workSheet.Cells[6, 1, 6, 31].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 31].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 31].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            workSheet.Cells[rowStart + 2, 1, rowStart + 2, 31].Merge = true;
+            workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+            workSheet.Cells[rowStart + 2, 1].Style.Font.Italic = true;
+            workSheet.Cells[rowStart + 2, 1].Value = "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData[0].UserExport;
+        }
     }
 }
