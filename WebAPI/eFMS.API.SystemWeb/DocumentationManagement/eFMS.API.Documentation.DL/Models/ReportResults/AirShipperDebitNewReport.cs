@@ -81,5 +81,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Currency { get; set; }              
         public decimal RateUSDToVND { get; set; }
         public string BalanceAmount { get; set; }
+        public DateTime? ETA { get; set; }
     }
 }
