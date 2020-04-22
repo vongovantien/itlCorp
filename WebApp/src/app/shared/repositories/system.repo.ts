@@ -229,6 +229,12 @@ export class SystemRepo {
         );
     }
 
+    getListGroup() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getGroup(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/paging`, body, {
             page: '' + page,

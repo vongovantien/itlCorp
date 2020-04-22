@@ -6,7 +6,7 @@ import { SelectModule } from 'ng2-select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
 import { UserFormSearchComponent } from './components/form-search-user/form-search-user.component';
 import { UserAddNewComponent } from './addnew/user.addnew.component';
 import { FormAddUserComponent } from './components/form-add-user/form-add-user.component';
@@ -15,6 +15,7 @@ import { UserManagementImportComponent } from './import/user-management-import.c
 import { AddRoleUserComponent } from './components/add-role-user/add-role-user.component';
 import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 import { ShareSystemModule } from '../../share-system/share-system.module';
+import { UserManagementAddGroupPopupComponent } from './components/popup/add-group/user-management-add-group.popup';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -49,10 +50,20 @@ const routing: Routes = [
         TabsModule.forRoot(),
         ReactiveFormsModule,
         RouterModule.forChild(routing),
-        ShareSystemModule
+        ShareSystemModule,
+        ModalModule
     ],
     exports: [],
-    declarations: [UserManagementComponent, UserFormSearchComponent, FormAddUserComponent, UserAddNewComponent, UserDetailsComponent, UserManagementImportComponent, AddRoleUserComponent],
+    declarations: [
+        UserManagementComponent,
+        UserFormSearchComponent,
+        FormAddUserComponent,
+        UserAddNewComponent,
+        UserDetailsComponent,
+        UserManagementImportComponent,
+        AddRoleUserComponent,
+        UserManagementAddGroupPopupComponent
+    ],
     providers: [],
 })
 export class UserManagementModule { }

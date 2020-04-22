@@ -7,7 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { IAddUser } from '../addnew/user.addnew.component';
-import { User } from 'src/app/shared/models';
+import { User, UserLevel } from 'src/app/shared/models';
 
 @Component({
     selector: 'app-user-details',
@@ -25,6 +25,15 @@ export class UserDetailsComponent extends AppPage {
         description: ''
     };
     userId: string = '';
+
+    headersuslv: CommonInterface.IHeaderTable[] = [
+        { title: 'Group Name', field: 'groupName' },
+        { title: 'Company', field: 'companyName' },
+        { title: 'Office', field: 'officeName' },
+        { title: 'Department', field: 'departmentName' },
+        { title: 'Position', field: 'position' },
+    ];
+    userLevels: UserLevel[] = [];
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -108,7 +117,7 @@ export class UserDetailsComponent extends AppPage {
                         this.formData.username = res.data.username;
                         this.formData.userType = res.data.userType;
                         this.formData.workingStatus = res.data.workingStatus;
-                        if(!!res.data.sysEmployeeModel){
+                        if (!!res.data.sysEmployeeModel) {
                             this.formAdd.employeeNameEn.setValue(res.data.sysEmployeeModel.employeeNameEn);
                             this.formAdd.employeeNameVn.setValue(res.data.sysEmployeeModel.employeeNameVn);
                             this.formAdd.staffcode.setValue(res.data.sysEmployeeModel.staffCode);
@@ -116,9 +125,9 @@ export class UserDetailsComponent extends AppPage {
                             this.formAdd.email.setValue(res.data.sysEmployeeModel.email);
                             this.formAdd.phone.setValue(res.data.sysEmployeeModel.tel);
                         }
-               
+
                         this.formAdd.workingg.setValue(this.formAdd.working.filter(i => i.value === res.data.workingStatus)[0]);
-                    
+
                         this.formAdd.ldap.setValue(res.data.isLdap);
                         this.formAdd.formGroup.patchValue(this.formData);
                         this.formAdd.active.setValue(this.formAdd.status.filter(i => i.value === res.data.active)[0]);
@@ -140,8 +149,8 @@ export class UserDetailsComponent extends AppPage {
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.formAdd.userLevels = res;
-                        console.log('group', this.formAdd.userLevels);
+                        this.userLevels = res;
+                        console.log('group', this.userLevels);
                     }
                 },
             );
