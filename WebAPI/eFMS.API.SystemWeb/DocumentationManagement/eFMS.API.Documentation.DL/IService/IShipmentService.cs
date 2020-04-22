@@ -20,5 +20,6 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<Shipments> GetShipmentNotDelete();
         List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria,int page,int size, out int rowCount);
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
+        List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
     }
 }

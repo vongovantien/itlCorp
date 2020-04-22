@@ -150,5 +150,18 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get data for export accounting P/L
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportAccountingPlSheet")]
+        [Authorize]
+        public IActionResult GetDataExportAccountingPlSheet(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataAccountingPLSheet(criteria);
+            return Ok(data);
+        }
+
     }
 }
