@@ -58,7 +58,7 @@
                     name="keyword">
             </div>
         </div>
-        <div class="col-8" [ngClass]="TYPE === 'LIST' ? 'col-8' : 'col-12'">
+        <div [ngClass]="!!STATE && STATE === 'WRITE' && TYPE === 'LIST' ? 'col-lg-8' : 'col-lg-12'">
             <div class="m--align-right foat-right">
                 <a class="pointer icon-switch" (click)="switchToGroup()">
                     <i class="la la-list" *ngIf="TYPE === 'GROUP' else list"></i>
