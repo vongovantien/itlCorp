@@ -1,5 +1,5 @@
 
-call 7.build-service.bat
+call build-all.bat
 set year=%date:~-4%
 set month=%date:~3,2%
 if "%month:~0,1%" == " " set month=0%month:~1,1%
