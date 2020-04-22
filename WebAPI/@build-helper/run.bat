@@ -1,5 +1,5 @@
 
-call build-service.bat
+call 7.build-service.bat
 set year=%date:~-4%
 set month=%date:~3,2%
 if "%month:~0,1%" == " " set month=0%month:~1,1%
@@ -15,12 +15,12 @@ if "%secs:~0,1%" == " " set secs=0%secs:~1,1%
 set datetimef=%year%%month%%day%%hour%%min%
 
 for %%a in (
-	AccountingManagementAPI,
-CatalogueManagementAPI,
-DocumentationManagementAPI,
-ExportFileAPI,
-IdentityServerAPI,
-OperationManagementAPI,
-SettingManagementAPI,
-SystemManagementAPI,
+	eFMS.API.Accounting,
+eFMS.API.Catalogue,
+eFMS.API.Documentation,
+eFMS.API.ReportData,
+eFMS.IdentityServer,
+eFMS.API.Operation,
+eFMS.API.Setting,
+eFMS.API.System,
 ) do call publish-service.bat %%a %1 %2 %datetimef%
