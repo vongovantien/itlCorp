@@ -15,6 +15,9 @@ export class PortIndex {
     warehouseId: string;
     permission?: PermissionShipment;
 
+    warehouseNameEn: string = null;
+    warehouseNameVn: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

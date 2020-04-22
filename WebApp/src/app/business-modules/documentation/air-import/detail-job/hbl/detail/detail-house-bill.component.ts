@@ -16,6 +16,7 @@ import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
 
 import isUUID from 'validator/lib/isUUID';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { DataService } from '@services';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -49,7 +50,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
+        protected _cd: ChangeDetectorRef,
+        protected _datService: DataService
 
     ) {
         super(
@@ -60,7 +62,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             _toastService,
             _actionStoreSubject,
             _router,
-            _cd
+            _cd,
+            _datService
         );
     }
 
@@ -73,14 +76,14 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 this._store.select(getDetailHBlPermissionState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        if (!!res) {
-                            this.allowUpdate = res.allowUpdate;
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: any) => {
+                            if (!!res) {
+                                this.allowUpdate = res.allowUpdate;
+                            }
                         }
-                    }
-                );
+                    );
                 this.getDetailHbl();
 
             } else {
@@ -89,7 +92,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         });
 
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-      
+
     }
 
     getDetailHbl() {
@@ -154,20 +157,20 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         }
         else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmExistedHbl.show();
-                    } else {
-                        const modelUpdate = this.getDataForm();
-                        this.setDataToUpdate(modelUpdate);
-                        this.updateHbl(modelUpdate);
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (res) {
+                            this.confirmExistedHbl.show();
+                        } else {
+                            const modelUpdate = this.getDataForm();
+                            this.setDataToUpdate(modelUpdate);
+                            this.updateHbl(modelUpdate);
+                        }
                     }
-                }
-            );
+                );
         }
     }
 

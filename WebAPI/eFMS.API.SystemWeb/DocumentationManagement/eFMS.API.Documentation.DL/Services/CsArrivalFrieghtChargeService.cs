@@ -565,12 +565,12 @@ namespace eFMS.API.Documentation.DL.Services
             var data = detailTransactionRepository.Get(x => x.Id == hblid)?.FirstOrDefault();
             if (data != null)
             {
-                if (string.IsNullOrEmpty(result.Doheader1) && data.Pod != null)
+                if (string.IsNullOrEmpty(data.DosentTo1) && data.Pod != null)
                 {
                     var warehouseId = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.Id;
                     if(warehouseId != null)
                     {
-                        result.Doheader1 = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.NameVn;
+                        result.Doheader1 = placeRepository.Get(x => x.Id == warehouseId).FirstOrDefault()?.NameVn;
                     }
                 }
                 else
