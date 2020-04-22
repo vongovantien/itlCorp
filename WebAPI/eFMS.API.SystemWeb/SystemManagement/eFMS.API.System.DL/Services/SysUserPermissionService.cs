@@ -58,6 +58,8 @@ namespace eFMS.API.System.DL.Services
             permissionSampleSpecialRepository = permissionSampleSpecialRepo;
             sysMenuRepository = sysMenuRepo;
 
+            SetChildren<SysUserPermissionSpecial>("Id", "UserPermissionId");
+            SetChildren<SysUserPermissionGeneral>("Id", "UserPermissionId");
         }
 
         public IQueryable<SysUserPermissionModel> GetByUserId(string id)
@@ -67,13 +69,14 @@ namespace eFMS.API.System.DL.Services
             var data = DataContext.Get(x => x.UserId == id.ToString());
             var permissionSample = permissionSampleRepository.Get();
             var results = from d in data
-                          join p in permissionSample on d.PermissionSampleId equals p.Id
+                          join p in permissionSample on d.PermissionSampleId equals p.Id into grpSample
+                          from sample in grpSample.DefaultIfEmpty()
                           join o in dataOffice on d.OfficeId equals o.Id
                           join c in dataCompany on o.Buid equals c.Id
                           select new SysUserPermissionModel
                           {
                               Id = d.Id,
-                              Name = p.Name,
+                              Name = sample.Name,
                               OfficeId = d.OfficeId,
                               PermissionSampleId = d.PermissionSampleId,
                               Buid = c.Id,

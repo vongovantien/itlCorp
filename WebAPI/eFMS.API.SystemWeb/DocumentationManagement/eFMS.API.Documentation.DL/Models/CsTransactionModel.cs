@@ -25,6 +25,10 @@ namespace eFMS.API.Documentation.DL.Models
         public string POLCode { get; set; }
         public string PODCode { get; set; }
         public string ColoaderCode { get; set; }
+        public string WarehousePodNameEn { get; set; }
+        public string WarehousePodNameVn { get; set; }
+        public string WarehousePolNameEn { get; set; }
+        public string WarehousePolNameVn { get; set; }
 
     }
 }

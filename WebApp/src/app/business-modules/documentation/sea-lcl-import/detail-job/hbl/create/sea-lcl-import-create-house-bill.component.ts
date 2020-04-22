@@ -330,8 +330,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     onSelectTabDO(event) {
-        const warehouseName = this._dataService.getDataByKey("polName");
-        this.deliveryComponent.deliveryOrder.doheader1 = warehouseName || "";
+        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey("podName") || "";
     }
 }
 

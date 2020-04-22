@@ -243,6 +243,13 @@
             <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingPlSheet(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Accounting PL Sheet
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -361,6 +368,15 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateShipmentOverviewExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.ExportShipmentOverview},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateAccountingPLSheetExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AccountingPlSheetExport},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
+            <summary>
+            
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">

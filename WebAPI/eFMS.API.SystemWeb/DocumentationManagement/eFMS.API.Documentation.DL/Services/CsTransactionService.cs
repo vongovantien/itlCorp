@@ -440,16 +440,35 @@ namespace eFMS.API.Documentation.DL.Services
                     result.ColoaderCode = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.CoLoaderCode;
                 }
                 if (result.AgentId != null) result.AgentName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId)?.PartnerNameEn;
+
                 if (result.Pod != null)
                 {
-                    result.PODName = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().NameEn;
-                    result.PODCode = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault().Code;
+                    var portIndexPod = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault();
+                    result.PODName = portIndexPod.NameEn;
+                    result.PODCode = portIndexPod.Code;
+
+                    if(portIndexPod.WarehouseId != null)
+                    {
+                        var warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
+                        result.WarehousePodNameEn = warehouse.NameEn;
+                        result.WarehousePodNameVn = warehouse.NameVn;
+                    }
                 }
+
                 if (result.Pol != null)
                 {
-                    result.POLName = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().NameEn;
-                    result.POLCode = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault().Code;
+                    var portIndexPol = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault();
+                    result.POLCode = portIndexPol.NameEn;
+                    result.POLName = portIndexPol.Code;
+
+                    if (portIndexPol.WarehouseId != null)
+                    {
+                        var warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
+                        result.WarehousePolNameEn = warehouse.NameEn;
+                        result.WarehousePolNameVn = warehouse.NameVn;
+                    }
                 }
+
                 if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
@@ -1881,7 +1900,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var listHousebill = transactionDetailService.GetByJob(criteria);
-            if(hblId != Guid.Empty)
+            if (hblId != Guid.Empty)
             {
                 listHousebill = listHousebill.Where(x => x.Id == hblId).ToList();
             }
@@ -1937,7 +1956,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
                         decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                                              
+
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo?.ToUpper(); //JobNo of shipment
