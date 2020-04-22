@@ -70,13 +70,13 @@ export class FormAddPartnerComponent extends AppForm {
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
-        { id: 'Round 0.5', text: 'Round 0.5' },
-        { id: 'Round 1.0', text: 'Round 1.0' },
+        { id: '0.5', text: 'Round 0.5' },
+        { id: '1.0', text: 'Round 1.0' },
     ];
 
     applyDims: CommonInterface.INg2Select[] = [
-        { id: 'Single Dim', text: 'Single Dim' },
-        { id: 'Total Dim', text: 'Total Dim' }
+        { id: 'Single', text: 'Single Dim' },
+        { id: 'Total', text: 'Total Dim' }
     ];
 
 

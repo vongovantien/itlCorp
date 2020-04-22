@@ -927,6 +927,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     AddressEn = x.AddressEn,
                     Fax = x.Fax,
                     CoLoaderCode = x.CoLoaderCode,
+                    RoundUpMethod = x.RoundUpMethod,
+                    ApplyDim = x.ApplyDim
             });
             return results;
         }
