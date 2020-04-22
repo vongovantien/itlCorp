@@ -49,6 +49,10 @@ namespace eFMS.API.System.DL.Services
             currentUser = currUser;
             userPermissionRepository =  userPermissionRepo;
             userRepository = userRepo;
+
+            SetChildren<SysUserPermission>("Id", "PermissionSampleId");
+            SetChildren<SysPermissionSampleGeneral>("Id", "PermissionId");
+            SetChildren<SysPermissionSampleSpecial>("Id", "PermissionId");
         }
 
         public SysPermissionSampleModel GetBy(Guid? id)
