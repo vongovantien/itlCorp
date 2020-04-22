@@ -45,6 +45,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsShipmentOtherChargeService, CsShipmentOtherChargeService>();
             services.AddTransient<ISaleReportService, SaleReportService>();
             services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
+            services.AddTransient<IDocSendMailService, DocSendMailService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
