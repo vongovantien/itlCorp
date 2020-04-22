@@ -291,6 +291,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PreviewProofOfDelivery")]
+        [Authorize]
         public IActionResult ReviewProofOfDelivery(Guid id)
         {
             var result = csTransactionDetailService.PreviewProofOfDelivery(id);
@@ -303,6 +304,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PreviewAirProofOfDelivery")]
+        [Authorize]
         public IActionResult ReviewAirProofOfDelivery(Guid id)
         {
             var result = csTransactionDetailService.PreviewAirProofOfDelivery(id);

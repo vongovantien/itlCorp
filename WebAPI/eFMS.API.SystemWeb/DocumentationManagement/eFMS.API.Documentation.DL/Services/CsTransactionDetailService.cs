@@ -1230,7 +1230,7 @@ namespace eFMS.API.Documentation.DL.Services
                 proofOfDelivery.Consignee = dataConsignee.PartnerNameEn?.ToUpper();
                 proofOfDelivery.ATTN = dataATTN?.PartnerNameEn?.ToUpper();
                 proofOfDelivery.TotalValue = 0;
-                proofOfDelivery.Shipper = dataShipper.PartnerNameEn?.ToUpper();
+                proofOfDelivery.Shipper = dataShipper?.PartnerNameEn?.ToUpper();
                 proofOfDelivery.WChargeable = data.ChargeWeight ?? 0;
                 proofOfDelivery.Description = data.DesOfGoods?.ToUpper();
                 proofOfDelivery.NoPieces = data.PackageQty ?? 0;
