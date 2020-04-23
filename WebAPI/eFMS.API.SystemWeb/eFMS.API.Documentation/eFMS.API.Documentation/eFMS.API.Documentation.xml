@@ -1,0 +1,835 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.Documentation</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.AddNew(eFMS.API.Documentation.DL.Models.AcctCdnoteModel)">
+            <summary>
+            Add New CD Note
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Update(eFMS.API.Documentation.DL.Models.AcctCdnoteModel)">
+            <summary>
+            Update CD Note
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Delete(System.Guid)">
+            <summary>
+            Delete CD Note
+            </summary>
+            <param name="cdNoteId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewOpsCdNote(eFMS.API.Documentation.DL.Models.AcctCDNoteDetailsModel)">
+            <summary>
+            Preview CD Note (OPS)
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check allow delete an existed item
+            </summary>
+            <param name="cdNoteId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewSIFCdNote(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note (Sea)
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewAirCdNote(eFMS.API.Documentation.DL.Models.PreviewCdNoteCriteria)">
+            <summary>
+            Preview CD Note (AIR)
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.#ctor(eFMS.API.Documentation.DL.IService.ICsAirWayBillService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            constructor
+            </summary>
+            <param name="wayBillService"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Get(System.Guid)">
+            <summary>
+            get
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Add(eFMS.API.Documentation.DL.Models.CsAirWayBillModel)">
+            <summary>
+            add an air way bill
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.Update(eFMS.API.Documentation.DL.Models.CsAirWayBillModel)">
+            <summary>
+            update an air way bill
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.AirwayBillExport(System.Guid)">
+            <summary>
+            Export airway bill
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsArrivalFrieghtChargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="freightChargeService"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetArrival(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get arrival by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetDeliveryOrder(System.Guid,eFMS.API.Documentation.DL.Common.TransactionTypeEnum)">
+            <summary>
+            get delivery order by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateArrival(eFMS.API.Documentation.DL.Models.CsArrivalViewModel)">
+            <summary>
+            update arrival info
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateDeliveryOrder(eFMS.API.Documentation.DL.Models.DeliveryOrderViewModel)">
+            <summary>
+            update delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalChargeDefault(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeDefaultEditModel)">
+            <summary>
+            set freight charge default of an user in a shipment type
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsArrivalDefaultModel)">
+            <summary>
+            set header - footer default of arrival
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetDeliveryOrderHeaderFooterDefault(eFMS.API.Documentation.DL.Models.CsDeliveryOrderDefaultModel)">
+            <summary>
+            set header - footer default of delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.DeleteCharge(System.Guid)">
+            <summary>
+            delete an existed charge
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewDeliveryOrder(System.Guid)">
+            <summary>
+            return data source of deliver order report
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewArrivalNotice(eFMS.API.Documentation.DL.Models.Criteria.PreviewArrivalNoticeCriteria)">
+            <summary>
+            return data source of arrival notice report (Sea)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewArrivalNoticeAir(eFMS.API.Documentation.DL.Models.Criteria.PreviewArrivalNoticeCriteria)">
+            <summary>
+            return data source of arrival notice report (Air)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsDimensionDetailController.GetDIMFromHouseBillsByJob(System.Guid)">
+            <summary>
+            get dimension from all house bills by a job
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsManifestController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsManifestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.Get(System.Guid)">
+            <summary>
+            get manifest by jobId
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.AddOrUpdateManifest(eFMS.API.Documentation.DL.Models.CsManifestEditModel)">
+            <summary>
+            add/ update manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewSeaExportManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+            <summary>
+            preview manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewSeaImportManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+            <summary>
+            preview FCL Import Manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewAirExportManifest(eFMS.API.Documentation.DL.Models.ManifestReportModel)">
+            <summary>
+            preview air export manifest
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsMawbcontainerService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+            <param name="hostingEnvironment"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Query(eFMS.API.Documentation.DL.Models.Criteria.CsMawbcontainerCriteria)">
+            <summary>
+            get container by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Update(eFMS.API.Documentation.DL.Models.CsMawbcontainerEdit)">
+            <summary>
+            update container
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.GetHBContainers(System.Guid)">
+            <summary>
+            get list containers by jobId
+            </summary>
+            <param name="JobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.DownloadExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.DownloadGoodsExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.Importcontainer(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsMawbcontainerImportModel})">
+            <summary>
+            import list container
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadFileContainer(Microsoft.AspNetCore.Http.IFormFile,System.Guid,System.Boolean)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <param name="id"></param>
+            <param name="isHouseBill"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsMawbcontainerController.UploadGoodsFile(Microsoft.AspNetCore.Http.IFormFile,System.Guid,System.Boolean)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
+            <param name="id"></param>
+            <param name="isHouseBill"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="user"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByHouseBill(System.Guid,System.String)">
+            <summary>
+            get list of surcharge by house bill and type
+            </summary>
+            <param name="hbId"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetByListHouseBill(System.Guid,System.String,System.Boolean,System.String)">
+            <summary>
+            get list of surcharge by house bill anf partner id
+            </summary>
+            <param name="Id"></param>
+            <param name="partnerID"></param>
+            <param name="IsHouseBillID"></param>
+            <param name="cdNoteCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetBy(System.Guid)">
+            <summary>
+            get surcharge by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetPartners(System.Guid,System.Boolean)">
+            <summary>
+            get partners have surcharge
+            </summary>
+            <param name="Id"></param>
+            <param name="IsHouseBillID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetHouseBillProfit(System.Guid)">
+            <summary>
+            get profit of a house bill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetshipmentProfit(System.Guid)">
+            <summary>
+            get profit of a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.AddNew(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
+            <summary>
+            add new surcharge
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Add(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel})">
+            <summary>
+            add list surcharge
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Update(eFMS.API.Documentation.DL.Models.CsShipmentSurchargeModel)">
+            <summary>
+            update an existed surcharge
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.Delete(System.Guid)">
+            <summary>
+            delete an existed surcharge
+            </summary>
+            <param name="chargId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.ListChargeShipment(eFMS.API.Documentation.DL.Models.Criteria.ChargeShipmentCriteria)">
+            <summary>
+            Get list charge shipment by conditions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetHouseBillTotalProfit(System.Guid)">
+            <summary>
+            get total profit of a house bill
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetShipmentTotalProfit(System.Guid)">
+            <summary>
+            get total profit of a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GroupByListHBNotExists(eFMS.API.Documentation.DL.Models.Criteria.GroupByListHBCriteria)">
+            <summary>
+            get list of surcharge not exists in cd note by house bill and partner id
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CsTransactionController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ISysImageService)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer">inject IStringLocalizer</param>
+            <param name="service">inject ICsTransactionService</param>
+            <param name="user">inject ICurrentUser</param>
+            <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
+            <param name="imageService"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CountJob(System.DateTime)">
+            <summary>
+            count job by date
+            </summary>
+            <param name="date"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetTotalProfit(System.Guid)">
+            <summary>
+            get total profit by job
+            </summary>
+            <param name="JobId">job id that want to get total profit</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Query(eFMS.API.Documentation.DL.Models.Criteria.CsTransactionCriteria)">
+            <summary>
+            get list transactions by search condition
+            </summary>
+            <param name="criteria">search condition</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Paging(eFMS.API.Documentation.DL.Models.Criteria.CsTransactionCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging list transaction by search condition
+            </summary>
+            <param name="criteria">search condition</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a shipment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Get(System.Guid)">
+            <summary>
+            get transaction by id
+            </summary>
+            <param name="id">id that want to retrieve transaction</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Post(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
+            <summary>
+            add new transaction
+            </summary>
+            <param name="model">model to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Put(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model">model to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.UploadMultiFiles(System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile},System.Guid)">
+            <summary>
+            attach multi files to shipment
+            </summary>
+            <param name="files"></param>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetAttachedFiles(System.Guid)">
+            <summary>
+            get all attached files in a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check allow delete an existed item
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckDeletePermission(System.Guid)">
+            <summary>
+            Check delete permission
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of existed data that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.Import(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
+            <summary>
+            import transaction
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.PreviewSIFPLsheet(System.Guid,System.Guid,System.String)">
+            <summary>
+            Preview PLsheet of Sea FCL Import
+            </summary>
+            <param name="jobId"></param>
+            <param name="hblId"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.SyncHBL(System.Guid,eFMS.API.Documentation.DL.Models.Criteria.CsTransactionSyncHBLCriteria)">
+            <summary>
+            Sync HBL with id
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
+            <summary>
+            preview proof
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewAirProofOfDelivery(System.Guid)">
+            <summary>
+            preview air proof
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewAirDocumentRelease(System.Guid)">
+            <summary>
+            preview air document release
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewSeaHBLofLading(System.Guid,System.String)">
+            <summary>
+            preview sea house bill of lading
+            </summary>
+            <param name="hblId">Id of Housebill</param>
+            <param name="reportType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewHouseAirwayBillLastest(System.Guid,System.String)">
+            <summary>
+            preview house airway bill lastest
+            </summary>
+            <param name="hblId">Id of Housebill</param>
+            <param name="reportType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewAirAttachList(System.Guid)">
+            <summary>
+            preview attach list (Air)
+            </summary>
+            <param name="hblId">Id of Housebill</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.NeutralHawbExport(System.Guid,System.Guid)">
+            <summary>
+            Get data neutral hawb export
+            </summary>
+            <param name="housebillId"></param>
+            <param name="officeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.PreviewBookingNote(eFMS.API.Documentation.DL.Models.Criteria.BookingNoteCriteria)">
+            <summary>
+            Preview Booking Note
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CustomAuthcontroller.#ctor(eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+            <summary>
+            constructor
+            </summary>
+            <param name="curUser"></param>
+            <param name="menu"></param>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.DocSendMailController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.#ctor(eFMS.API.Documentation.DL.IService.IDocSendMailService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.SendMailDocument(eFMS.API.Documentation.DL.Models.EmailContentModel)">
+            <summary>
+            Send mail
+            </summary>
+            <param name="emailContent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirImport(System.Guid)">
+            <summary>
+            Get info mail housebill of Air Import
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+            <summary>
+            
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+            <param name="hostingEnvironment"></param>
+            <param name="curUser"></param>
+            <param name="menu"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Query(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">
+            <summary>
+            get the list of countries by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a shipment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Get(System.Guid)">
+            <summary>
+            get data detail by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Paging(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of countries by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="page">page to retrieve data</param>
+            <param name="size">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Add(eFMS.API.Documentation.DL.Models.OpsTransactionModel)">
+            <summary>
+            add new job
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Update(eFMS.API.Documentation.DL.Models.OpsTransactionModel)">
+            <summary>
+            update an existed item
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Delete(System.Guid)">
+            <summary>
+            delete an existed item
+            </summary>
+            <param name="id">id of item that want to delete</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.CheckAllowDelete(System.Guid)">
+            <summary>
+            check an item that is allowed delete
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertClearanceToJob(eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel)">
+            <summary>
+            convert a custom clearance to a job
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertExistedClearancesToJobs(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel})">
+            <summary>
+            convert multi clearances to multi jobs
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.PreviewFormPLsheet(System.Guid,System.String)">
+            <summary>
+            preview Form PL sheet
+            </summary>
+            <param name="jobId"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.SaleReportController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.#ctor(eFMS.API.Documentation.DL.IService.ISaleReportService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            
+            </summary>
+            <param name="service"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.QuaterSaleReport(eFMS.API.Documentation.DL.Models.ReportResults.Sales.SaleReportCriteria)">
+            <summary>
+            Get data sale report by quater
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.SaleReportController.DepartSaleReport(eFMS.API.Documentation.DL.Models.ReportResults.Sales.SaleReportCriteria)">
+            <summary>
+            Get data sale report by department
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.ShipmentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentNotLocked">
+            <summary>
+            get list of shipment available
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentsCreditPayer(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            get list shipment credit payer
+            </summary>
+            <param name="partner"></param>
+            <param name="productServices"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentsCopyListBySearchOption(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Get list shipment copy by search option and keywords
+            </summary>
+            <param name="searchOption"></param>
+            <param name="keywords"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataGeneralReport(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria,System.Int32,System.Int32)">
+            <summary>
+            Get data for general report
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportShipmentOverview(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Get data for export shipment overview
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportAccountingPlSheet(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Get data for export accounting P/L
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

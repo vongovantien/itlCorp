@@ -14,7 +14,7 @@
             <div class="modal-body">
                 <form class="m-form m-form--state bg-secondary m--padding-15 m--margin-bottom-15" [formGroup]="form">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': description.dirty && !description.valid }">
                                 <label for="">Description
@@ -29,7 +29,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label for="">Shipment
                                     <span class="text-danger">*</span>
@@ -42,7 +42,7 @@
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Custom No
                                 </label>
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Amount
                                     <span class="text-danger">*</span>
@@ -65,14 +65,14 @@
                                     numeric autoFormatCurrency [decimals]="digitDecimal">
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Currency
                                 </label>
                                 <input type="text" class="form-control" formControlName="currency" readonly disabled>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Type</label>
                                 <select class="form-control" name="type" formControlName="type">

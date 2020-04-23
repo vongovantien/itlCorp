@@ -3,7 +3,8 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
     selector: 'app-sub-header',
-    templateUrl: './sub-header.component.html'
+    templateUrl: './sub-header.component.html',
+    styleUrls: ['./sub-header.component.scss']
 })
 
 export class SubHeaderComponent {

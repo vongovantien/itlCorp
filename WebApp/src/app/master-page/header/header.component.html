@@ -10,10 +10,10 @@
                 <div class="m-stack__item m-stack__item--middle m-brand__tools">
                     <a href="javascript:;" id="m_aside_left_minimize_toggle"
                         class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-desktop-inline-block"
-                        (click)="minimize_page_sidebar()">
+                        (click)="minimize_page_sidebar_desktop()">
                         <span></span>
                     </a>
-                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle"
+                    <a href="javascript:;" id="m_aside_left_offcanvas_toggle" (click)="minimize_page_sidebar_mobile()"
                         class="m-brand__icon m-brand__toggler m-brand__toggler--left m--visible-tablet-and-mobile-inline-block">
                         <span></span>
                     </a>
@@ -21,10 +21,10 @@
             </div>
         </div>
         <div class="m-stack__item m-stack__item--fluid m-header-head" id="m_header_nav">
-            <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark "
+            <!-- <button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark "
                 id="m_aside_header_menu_mobile_close_btn">
                 <i class="la la-close"></i>
-            </button>
+            </button> -->
             <div class="m-header-menu">
                 <h3 class="m-subheader__title">{{pageTitle}}</h3>
             </div>
@@ -159,19 +159,20 @@
                                 </div>
                             </div>
                         </li> -->
-                        <li class="m-nav__item topbar__lang">
+                        <li class="m-nav__item m-office">
                             <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-building-o"></i>
                                 </span>
-                                <span class="m-nav__link-text" *ngIf="!!selectedOffice">
+                                <span class="m-nav__link-text m-name" *ngIf="!!selectedOffice">
                                     {{selectedOffice.branchNameEn}}
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let office of offices; let i = index"
-                                        (click)="changeOffice(office)">
+                                        (click)="changeOffice(office)"
+                                        [class.m-nav__item--active]="!!selectedOffice && selectedOffice.branchNameEn == office.branchNameEn">
                                         <a class="m-nav__link" data-toggle="modal" data-target="#change-office-modal">
                                             <span class="m-nav__link-text">
                                                 {{office.branchNameEn}}
@@ -181,19 +182,20 @@
                                 </ul>
                             </div>
                         </li>
-                        <li class="m-nav__item topbar__lang">
+                        <li class="m-nav__item m-group-dept">
                             <a class="m-nav__link m-dropdown__toggle pointer" data-toggle="dropdown">
                                 <span class="m-nav__link-icon">
                                     <i class="la la-users"></i>
                                 </span>
-                                <span class="m-nav__link-text" *ngIf="!!selectedDepartmentGroup">
+                                <span class="m-nav__link-text m-name" *ngIf="!!selectedDepartmentGroup">
                                     {{selectedDepartmentGroup.departmentName}} - {{selectedDepartmentGroup.groupName}}
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
-                                        (click)="changeDepartmentGroup(item)">
+                                        (click)="changeDepartmentGroup(item)"
+                                        [class.m-nav__item--active]="!!selectedDepartmentGroup &&  selectedDepartmentGroup.departmentName + selectedDepartmentGroup.groupName == item.departmentName+item.groupName">
                                         <a class="m-nav__link active" data-toggle="modal"
                                             data-target="#change-group-modal">
                                             <span class="m-nav__link-text">
@@ -251,7 +253,7 @@
                                 </span>
                             </a>
                         </li>
-                        <li class="m-nav__item">
+                        <li class="m-nav__item m-topbar-logout">
                             <a class="m-nav__link" href="javascript:void(0)" data-toggle="modal"
                                 data-target="#logout-modal">
                                 <span class="m-nav__link-icon">
