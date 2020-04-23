@@ -90,22 +90,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.DebitVatError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY];
                     item.IsValid = false;
                 }
-                if (item.DebitVat != null)
-                {
-                    if(item.DebitVat> 99)
-                    {
-                        item.DebitVatError = "Must be lower 100";
-                        item.IsValid = false;
-                    }
-                }
-                if(item.CreditVat != null)
-                {
-                    if(item.CreditVat > 99)
-                    {
-                        item.CreditVatError = "Must be lower 100";
-                        item.IsValid = false;
-                    }
-                }
             });
             return list;
         }
