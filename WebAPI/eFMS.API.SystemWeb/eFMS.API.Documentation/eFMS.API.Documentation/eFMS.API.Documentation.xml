@@ -624,6 +624,32 @@
             <param name="curUser"></param>
             <param name="menu"></param>
         </member>
+        <member name="T:eFMS.API.Documentation.Controllers.DocSendMailController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.#ctor(eFMS.API.Documentation.DL.IService.IDocSendMailService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+            <param name="localizer"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.SendMailDocument(eFMS.API.Documentation.DL.Models.EmailContentModel)">
+            <summary>
+            Send mail
+            </summary>
+            <param name="emailContent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailHBLAirImport(System.Guid)">
+            <summary>
+            Get info mail housebill of Air Import
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
             <summary>
             A base class for an MVC controller without view support.
