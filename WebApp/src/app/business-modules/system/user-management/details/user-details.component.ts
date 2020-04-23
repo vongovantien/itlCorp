@@ -44,7 +44,6 @@ export class UserDetailsComponent extends AppPage {
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit() {
@@ -54,7 +53,7 @@ export class UserDetailsComponent extends AppPage {
                 this.getDetailUser(this.userId);
                 this.getListUserLevelByUserId();
             } else {
-                this._router.navigate(["home/system/office"]);
+                this._router.navigate(["home/system/user-management"]);
             }
         });
     }
@@ -79,7 +78,6 @@ export class UserDetailsComponent extends AppPage {
                 workingStatus: this.formAdd.workingg.value.value,
                 isLdap: this.formAdd.ldap.value,
                 description: this.formAdd.description.value
-
             };
             this._systemRepo.updateUser(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -91,14 +89,11 @@ export class UserDetailsComponent extends AppPage {
 
                         } else {
                             this._toastService.warning(res.message);
-
                         }
                     }
                 );
         }
-
     }
-
 
     getDetailUser(id: string) {
         this._progressRef.start();
@@ -110,7 +105,6 @@ export class UserDetailsComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     if (res.status) {
-                        console.log(res.data);
                         this.formAdd.SelectedUser = new User(res.data);
                         this.formAdd.isDetail = true;
                         this.formData.isLdap = res.data.isLdap;
@@ -133,8 +127,6 @@ export class UserDetailsComponent extends AppPage {
                         this.formAdd.active.setValue(this.formAdd.status.filter(i => i.value === res.data.active)[0]);
                         this.formAdd.usertype.setValue(this.formAdd.usertypes.filter(i => i.value === res.data.userType)[0]);
                         this.formAdd.description.setValue(res.data.description);
-
-
                     }
                 },
             );
@@ -150,7 +142,6 @@ export class UserDetailsComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.userLevels = res;
-                        console.log('group', this.userLevels);
                     }
                 },
             );

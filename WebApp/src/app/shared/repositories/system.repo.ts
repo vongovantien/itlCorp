@@ -229,8 +229,8 @@ export class SystemRepo {
         );
     }
 
-    getListGroup() {
-        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup`).pipe(
+    getListGroup(body = { active: true }) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysGroup/Query`, body).pipe(
             map((data: any) => data)
         );
     }

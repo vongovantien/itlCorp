@@ -1,8 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
 import { Group } from '@models';
+import { NgProgress } from '@ngx-progressbar/core';
+import { finalize } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'usermanagement-add-group-popup',
@@ -11,6 +14,7 @@ import { Group } from '@models';
 
 export class UserManagementAddGroupPopupComponent extends PopupBase implements OnInit {
     @Input() userId: string;
+    @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
     groups: Observable<Group[]>;
     selectedGroup: Group;
@@ -24,9 +28,14 @@ export class UserManagementAddGroupPopupComponent extends PopupBase implements O
     ];
 
     constructor(
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _progressService: NgProgress,
+        private _toastService: ToastrService
+
     ) {
         super();
+        this._progressRef = this._progressService.ref();
+
     }
 
     ngOnInit() {
@@ -42,8 +51,6 @@ export class UserManagementAddGroupPopupComponent extends PopupBase implements O
         if (!this.selectedPosition || !this.selectedGroup) {
             return;
         }
-        console.log(this.selectedGroup, this.selectedPosition);
-
         const body = {
             userId: this.userId,
             groupId: this.selectedGroup.id,
@@ -53,11 +60,29 @@ export class UserManagementAddGroupPopupComponent extends PopupBase implements O
             position: this.selectedPosition,
             active: true
         };
-        console.log(body);
-        // this._systemRepo.addUserToGroupLevel(body).subscribe(
-        //     (res) => {
-        //         console.log(res);
-        //     }
-        // );
+        this._progressRef.start();
+        this._systemRepo.addUserToGroupLevel([body])
+            .pipe(finalize(() => {
+                this._progressRef.complete();
+            }))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.onUpdate.emit();
+                        this.hide();
+                        this.resetForm();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                    console.log(res);
+                }
+            );
+    }
+
+    resetForm() {
+        this.isSubmitted = false;
+        this.selectedGroup = null;
+        this.selectedPosition = null;
     }
 }

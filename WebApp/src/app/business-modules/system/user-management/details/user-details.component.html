@@ -29,14 +29,15 @@
 
 <div class="m-content">
     <div class="m-portlet__body">
-        <div class="float-right">
-            <button class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                (click)="formAddGroup.show()" type="button">
-                <i class="la la-plus"></i>
-            </button>
-        </div>
+
         <tabset class="custom-class-tab">
             <tab heading="Group">
+                <div class="float-right m-3">
+                    <button class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                        (click)="formAddGroup.show()" type="button">
+                        <i class="la la-plus"></i>
+                    </button>
+                </div>
                 <div class="p-3 bg-white">
                     <div class="table-wrapper table-scrollabler" id="department-list-table">
                         <table class="table table-striped table-brand table-hover dataTable">
@@ -66,4 +67,5 @@
     </div>
 </div>
 
-<usermanagement-add-group-popup #formAddGroup userId="userId"></usermanagement-add-group-popup>
+<usermanagement-add-group-popup #formAddGroup [userId]="userId" (onUpdate)="getListUserLevelByUserId()">
+</usermanagement-add-group-popup>
