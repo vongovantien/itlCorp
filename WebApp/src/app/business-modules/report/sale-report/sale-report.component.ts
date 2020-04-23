@@ -34,6 +34,7 @@ export class SaleReportComponent extends AppList {
                 this.previewMonthlyReport(data);
                 break;
             case CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT:
+                this.previewDepartmentReport(data);
                 break;
             case CommonEnum.SALE_REPORT_TYPE.SR_QUARTER:
                 this.previewQuaterReport(data);
@@ -88,5 +89,29 @@ export class SaleReportComponent extends AppList {
                 },
             );
     }
+
+    previewDepartmentReport(data: ReportInterface.ISaleReportCriteria) {
+        this._documentationRepo.previewSaleDepartmentReport(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        }
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
 
 }

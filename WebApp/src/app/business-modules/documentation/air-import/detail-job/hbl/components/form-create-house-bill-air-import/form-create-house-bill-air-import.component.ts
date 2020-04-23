@@ -38,7 +38,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     shipperId: AbstractControl;
     consigneeId: AbstractControl;
     notifyPartyId: AbstractControl;
-    warehouseNotice: AbstractControl;
+    warehouseId: AbstractControl;
     forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
     arrivaldate: AbstractControl;
@@ -177,7 +177,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                 flightNo: shipment.flightVesselName,
                                 forwardingAgentId: shipment.agentId,
                                 arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                                warehouseNotice: shipment.warehouseId,
+                                warehouseId: shipment.warehouseId,
                                 route: shipment.route
                             });
 
@@ -293,7 +293,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             handingInformation: [],
 
             issueHblplace: [],
-            warehouseNotice: [],
+            warehouseId: [],
             route: [],
             packageQty: [],
             desOfGoods: [],

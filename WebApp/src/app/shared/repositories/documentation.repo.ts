@@ -628,7 +628,7 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    
+
     generateHBLNo(transactionTypeEnum: number) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLNo`, { transactionTypeEnum: transactionTypeEnum }).pipe(
             map((data: any) => data)
@@ -736,6 +736,12 @@ export class DocumentationRepo {
             page: '' + page,
             size: '' + size
         }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewSaleDepartmentReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/DepartSaleReport`, body).pipe(
             map((data: any) => data)
         );
     }
