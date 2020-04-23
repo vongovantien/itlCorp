@@ -567,7 +567,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (string.IsNullOrEmpty(data.DosentTo1) && data.Pod != null)
                 {
-                    var warehouseId = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.Id;
+                    var warehouseId = placeRepository.Get(x => x.Id == data.Pod).FirstOrDefault()?.WarehouseId;
                     if(warehouseId != null)
                     {
                         result.Doheader1 = placeRepository.Get(x => x.Id == warehouseId).FirstOrDefault()?.NameVn;

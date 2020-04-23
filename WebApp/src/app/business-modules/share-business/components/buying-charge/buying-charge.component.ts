@@ -513,7 +513,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         chargeItem.quantity = this.hbl.cbm;
                     }
                 } else if (this.service === 'logistic') {
-                    chargeItem.quantity = this.shipment.grossWeight;
+                    chargeItem.quantity = this.shipment.cbm;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
