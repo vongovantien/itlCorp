@@ -8,9 +8,9 @@
 }
 .m-login-wrap {
     width: 100%;
-    max-width: 820px;
-    min-height: 645px;
-    padding: 0 30px;
+    max-width: 764px;
+    // min-height: 645px;
+    // padding: 0 30px;
     margin: auto;
 }
 .lang-nav {
@@ -19,7 +19,7 @@
     font-size: 16px;
     font-weight: inherit;
     text-align: right;
-    margin-bottom: 20px;
+    margin: 10px 0px;
     .lang-item {
         margin-left: 5px;
         -webkit-filter: grayscale(80%); /* Safari 6.0 - 9.0 */
@@ -32,35 +32,35 @@
         }
     }
 }
-.m-login { 
+.m-login {
     width: 100%;
-    max-width: 760px;
-    min-height: 645px;
+    // max-width: 760px;
+    // min-height: 645px;
     display: table;
-    overflow:hidden;
+    // overflow:hidden;
     background-color: rgba(32, 42, 63, 0.83);
     font-family: inherit;
 
-    .m-login__wrapper-1 { 
+    .m-login__wrapper-1 {
         width: 50%;
-        display: table-cell; 
+        display: table-cell;
         background-color: #fff;
         color: #202a3f;
-         
+
         .m-login__wrapper-1-1 {
-            width: 100%;  
-            min-height: 645px;  
+            width: 100%;
+            min-height: 645px;
             display: table;
             margin: 0 auto;
-            .m-login__contanier {                 
+            .m-login__contanier {
                 margin: 0 auto;
-                display: table-cell;   
+                display: table-cell;
                 text-align: center;
                 vertical-align: middle;
 
-                .m-login__content {                                             
+                .m-login__content {
                     width: 100%;
-                    margin: 0 auto;                 
+                    margin: 0 auto;
                     padding: 1rem 1.5rem;
 
                     .m-login__logo {
@@ -70,7 +70,7 @@
                             max-width: 190px;
                         }
                     }
-                    
+
                     .m-login__title {
                         margin-bottom: 15px;
                         h3 {
@@ -81,20 +81,20 @@
 
                     .m-login__desc {
                         font-size: 16px;
-                    }                   
-                }                 
-            }            
-        } 
-    }    
+                    }
+                }
+            }
+        }
+    }
 
     //== Login Area
     .m-login__wrapper-2 {
         width: 50%;
-        padding: 50px 30px;
-        display: table-cell;  
+        padding: 0px 30px;
+        display: table-cell;
         vertical-align: middle;
         font-size: 14px;
-         
+
         .m-login__contanier {
             // width: 430px;
             margin: 0 auto;
@@ -106,7 +106,7 @@
 
             .m-login__form,
             .m-setting__form {
-                .form-control {     
+                .form-control {
                     height: 42px;
                     padding: 12px 20px;
                     color: #fff;
@@ -114,7 +114,7 @@
                     font-weight: 300;
                     border: 0;
                     background-color: #3d4963;
-                            
+
                     &.m-login__form-input--last {
                         border: 0;
                     }
@@ -134,17 +134,17 @@
                         height: 44px;
                         font-size: 16px;
                         line-height: 25px;
-                    }                      
+                    }
                 }
             }
             .m-login__account {
                 text-align: center;
-            }       
-        } 
+            }
+        }
         .form-control-label {
             color: #c0c6d5;
             font-weight: 300;
-        }   
+        }
         .m-checkbox {
             color: #c0c6d5;
             font-weight: 300;
@@ -171,9 +171,9 @@
                 font-weight: 300;
             }
         }
-    } 
+    }
     .nav {
-        &.nav-pills {  
+        &.nav-pills {
             width: 100%;
             .nav-item {
                 width: 50%;
@@ -204,8 +204,8 @@
                         margin-left: -3px;
                     }
                 }
-                .nav-link { 
-                    &.active { 
+                .nav-link {
+                    &.active {
                         background-color: #3966b7;
                         color: #fff;
                         &:after {
@@ -215,75 +215,89 @@
                 }
             }
         }
-    }      
+    }
 }
 @media only screen and (max-width: 600px) {
+    .m-login-wrap {
+        overflow-y: scroll;
+    }
     .m-login {
-        .m-login__wrapper-1 { 
+        .m-login__wrapper-1 {
             display: none;
         }
         .m-login__wrapper-2 {
             .m-login__content {
                 display: block;
-            } 
+                margin-bottom: 20px;
+                .m-login__logo {
+                    margin-bottom: 0;
+                }
+            }
             .m-login__form-sub {
                 .col {
                     text-align: center;
                 }
-            } 
+            }
         }
     }
 }
-:host /deep/ { 
-    .ui-select-container {
-        .ui-select-match {
-            .form-control {
-                &,
-                &:focus {
-                    background-color: #3d4963;
-                    border-color: #3d4963;
-                    color: #77829d;
-                    font-size: 16px;
-                    line-height: 1;
-                }
-            }
-        }
-        .form-control {
-            &,
-            &:focus {
-                height: 42px;
-                padding: 12px 20px;
-                background-color: #3d4963;
-                border-color: #3d4963;
-                color: #77829d;
-                font-size: 16px;
-                line-height: 1;
-            }
-            &::placeholder {
-                color: #77829d;
-            }
-        }
-        .ui-select-placeholder {
-            height: 42px;
-            padding: 12px 20px;
-            color: #77829d !important;
-            font-size: 16px;
-            line-height: 1;
-        }
-        .dropdown-menu {
-            border-radius: 0;
-            background-color: #4a5d87;
-        }
-        .ui-select-choices .ui-select-choices-row .dropdown-item {
-            padding: 6px 15px;
-            color: #fff;
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 300;
-        }
-        .ui-select-choices .ui-select-choices-row.active > a {
-            color: #fff;
-            background-color: #3966b6;
-        }
+
+@media only screen and (min-width: 600px) and (max-width: 812px) {
+    .m-login-wrap {
+        overflow-x: scroll;
     }
 }
+
+// :host /deep/ {
+//     .ui-select-container {
+//         .ui-select-match {
+//             .form-control {
+//                 &,
+//                 &:focus {
+//                     background-color: #3d4963;
+//                     border-color: #3d4963;
+//                     color: #77829d;
+//                     font-size: 16px;
+//                     line-height: 1;
+//                 }
+//             }
+//         }
+//         .form-control {
+//             &,
+//             &:focus {
+//                 height: 42px;
+//                 padding: 12px 20px;
+//                 background-color: #3d4963;
+//                 border-color: #3d4963;
+//                 color: #77829d;
+//                 font-size: 16px;
+//                 line-height: 1;
+//             }
+//             &::placeholder {
+//                 color: #77829d;
+//             }
+//         }
+//         .ui-select-placeholder {
+//             height: 42px;
+//             padding: 12px 20px;
+//             color: #77829d !important;
+//             font-size: 16px;
+//             line-height: 1;
+//         }
+//         .dropdown-menu {
+//             border-radius: 0;
+//             background-color: #4a5d87;
+//         }
+//         .ui-select-choices .ui-select-choices-row .dropdown-item {
+//             padding: 6px 15px;
+//             color: #fff;
+//             font-family: inherit;
+//             font-size: 14px;
+//             font-weight: 300;
+//         }
+//         .ui-select-choices .ui-select-choices-row.active > a {
+//             color: #fff;
+//             background-color: #3966b6;
+//         }
+//     }
+// }

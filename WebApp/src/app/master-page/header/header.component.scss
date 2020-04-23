@@ -1,0 +1,32 @@
+@media only screen and (max-width: 1180px) {
+    .m-group-dept,
+    .m-office {
+        .m-nav__link-text {
+            &.m-name {
+                display: none;
+            }
+        }
+    }
+    .m-topbar__user-profile {
+        .m-topbar__userpic {
+            display: none !important;
+        }
+        a.m-nav__link {
+            padding: 0;
+        }
+    }
+    .m-topbar-logout {
+        a.m-nav__link {
+            padding: 0;
+        }
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .m-nav {
+        margin: 0 !important;
+    }
+    #m_header_topbar {
+        top: 0 !important;
+    }
+}

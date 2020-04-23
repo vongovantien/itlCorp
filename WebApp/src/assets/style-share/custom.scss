@@ -251,6 +251,9 @@ a {
 }
 
 //sidebar
+.m-aside-mobile--active {
+    left: 0;
+}
 .m-aside-left--minimize .m-aside-menu.m-aside-menu--skin-dark,
 .m-aside-menu.m-aside-menu--skin-dark {
     .m-menu__nav--dropdown-submenu-arrow {
