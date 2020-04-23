@@ -163,7 +163,7 @@ namespace eFMS.API.System.DL.Services
             //    OfficeId =  y.BranchId,
 
             //}).OrderByDescending(x => x.DatetimeModified);
-            return results;
+            // return results;
         }
 
         public IQueryable<SysGroupModel> GetGroupByDepartment(int id)
