@@ -1,4 +1,5 @@
 ﻿using System;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -40,14 +41,15 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost("SendMailDocument")]
         public IActionResult SendMailDocument(EmailContentModel emailContent)
         {
-            var result = sendMailService.SendMailDocument(emailContent);
-            return Ok(new { status = result, message = result ? "Send mail successful" : "Send mail failed" });
+            var status = sendMailService.SendMailDocument(emailContent);
+            var result = new ResultHandle { Status = status, Message = status ? "Send mail successful" : "Send mail failed" };
+            return Ok(result);
         }
 
         /// <summary>
         /// Get info mail housebill of Air Import
         /// </summary>
-        /// <param name="hblId"></param>
+        /// <param name="hblId">Housebill ID</param>
         /// <returns></returns>
         [HttpGet("GetInfoMailHBLAirImport")]
         [Authorize]
@@ -56,6 +58,32 @@ namespace eFMS.API.Documentation.Controllers
             var data = sendMailService.GetInfoMailHBLAirImport(hblId);
             return Ok(data);
         }
-        
+
+        /// <summary>
+        /// Get info mail housebill of Air Export
+        /// </summary>
+        /// <param name="hblId">Housebill ID</param>
+        /// <returns></returns>
+        [HttpGet("GetInfoMailHBLAirExport")]
+        [Authorize]
+        public IActionResult GetInfoMailHBLAirExport(Guid hblId)
+        {
+            var data = sendMailService.GetInfoMailHBLAirExport(hblId);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get info mail shipping instruction of Sea Export
+        /// </summary>
+        /// <param name="jobId">Job ID</param>
+        /// <returns></returns>
+        [HttpGet("GetInfoMailSISeaExport")]
+        [Authorize]
+        public IActionResult GetInfoMailSISeaExport(Guid jobId)
+        {
+            var data = sendMailService.GetInfoMailSISeaExport(jobId);
+            return Ok(data);
+        }
+
     }
 }

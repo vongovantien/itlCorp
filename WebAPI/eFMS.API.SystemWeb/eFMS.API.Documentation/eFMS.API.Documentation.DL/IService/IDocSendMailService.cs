@@ -8,6 +8,8 @@ namespace eFMS.API.Documentation.DL.IService
     public interface IDocSendMailService : IRepositoryBase<CsTransaction, CsTransactionModel>
     {
         bool SendMailDocument(EmailContentModel emailContent);
-        EmailContentModel GetInfoMailHBLAirImport(Guid hblId);        
+        EmailContentModel GetInfoMailHBLAirImport(Guid hblId);
+        EmailContentModel GetInfoMailHBLAirExport(Guid hblId);
+        EmailContentModel GetInfoMailSISeaExport(Guid jobId);
     }
 }
