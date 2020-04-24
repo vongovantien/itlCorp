@@ -252,21 +252,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         }
     }
 
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
-    }
-
-
     onsubmitData() {
         const body: ITransactionDetail = {
             id: SystemConstants.EMPTY_GUID,
