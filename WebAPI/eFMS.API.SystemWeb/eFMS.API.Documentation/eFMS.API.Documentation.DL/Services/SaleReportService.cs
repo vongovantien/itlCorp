@@ -712,6 +712,65 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
 
+        public Crystal PreviewGetDepartSaleReport(SaleReportCriteria criteria)
+        {
+            var data = GetQuaterSaleReport(criteria);
+            Crystal result = null;
+
+            DateTime _fromDate, _toDate = DateTime.Now;
+            if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
+            {
+                _fromDate = criteria.CreatedDateFrom.Value;
+                _toDate = criteria.CreatedDateTo.Value;
+            }
+            else
+            {
+                var list = data.ToList();
+                _fromDate = criteria.ServiceDateFrom.Value;
+                _toDate = criteria.ServiceDateTo.Value;
+
+                var _officeCurrentUser = officeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+                string _officeNameEn = _officeCurrentUser?.BranchNameEn ?? string.Empty;
+                string _addressOffice = _officeCurrentUser?.AddressEn ?? string.Empty;
+
+                string _userIdAccountant = GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault();
+                var _employeeIdAcountant = userRepository.Get(x => x.Id == _userIdAccountant).FirstOrDefault()?.EmployeeId;
+                string _accountantName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+
+                string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
+                var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
+                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+
+                var parameter = new DepartSaleReportParameter
+                {
+                    FromDate = _fromDate, //
+                    ToDate = _toDate, //
+                    Contact = currentUser.UserName, // Current User Name
+                    CompanyName = _officeNameEn, // Office Name En của Current User
+                    CompanyDescription = string.Empty,
+                    CompanyAddress1 = _addressOffice, // Address En của Current User
+                    CompanyAddress2 = string.Empty,
+                    Website = string.Empty,
+                    CurrDecimalNo = 2, //
+                    ReportBy = string.Empty,
+                    SalesManager = string.Empty,
+                    Director = _comManagerName, // Company Manager
+                    ChiefAccountant = _accountantName // Accountant Manager của Current User
+                };
+                result = new Crystal
+                {
+                    ReportName = "SalesReportByDepartment.rpt",
+                    AllowPrint = true,
+                    AllowExport = true
+                };
+                result.AddDataSource(list);
+                result.FormatType = ExportFormatType.PortableDocFormat;
+                result.SetParameter(parameter);
+            }
+            
+            return result;
+        }
+
         private IQueryable<QuaterSaleReportResult> GetQuaterSaleReport(SaleReportCriteria criteria)
         {
             IQueryable<QuaterSaleReportResult> opsShipments = null;

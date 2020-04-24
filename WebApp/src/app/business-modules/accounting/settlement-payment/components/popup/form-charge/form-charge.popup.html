@@ -9,9 +9,9 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <form class="col-12" [formGroup]="form">
+                    <form class="col-lg-12" [formGroup]="form">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Charge Name
                                         <span class="text-danger">(*)</span>
@@ -66,7 +66,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Shipment <span class="text-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
@@ -77,7 +77,7 @@
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Payer <span class="text-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPayer"
@@ -90,7 +90,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
@@ -111,14 +111,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Unit Price <span class="text-danger">(*)</span></label>
                                     <input class="form-control" formControlName="price" placeholder="Unit Price"
                                         (ngModelChange)="calculateTotalAmount()">
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
@@ -138,14 +138,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Amount</label>
                                     <input currencyMask [options]="configAmountCurrency" type="text"
                                         class="form-control" formControlName="amount" placeholder="Amount" disabled>
                                 </div>
                             </div>
-                            <div class="col-4 d-flex justify-content-center align-items-end">
+                            <div class="col-lg-4 d-flex justify-content-center align-items-end">
                                 <div class="d-flex">
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
@@ -156,7 +156,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">OBH Partner
                                         <span class="text-danger"
@@ -173,7 +173,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
@@ -193,7 +193,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="form-group">
@@ -222,7 +222,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Custom No</label>
                                     <select class="form-control" name="type" formControlName="customNo">
@@ -235,7 +235,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Cont No</label>
                                     <input type="text" class="form-control" formControlName="contNo"
@@ -254,7 +254,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-lg-12">
                         <div class="m--align-center m--margin-top-20">
                             <button
                                 class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"

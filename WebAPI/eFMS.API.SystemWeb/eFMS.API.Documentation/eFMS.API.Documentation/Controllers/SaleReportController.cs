@@ -53,5 +53,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = saleReportService.PreviewGetQuaterSaleReport(criteria);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get data sale report by department
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("DepartSaleReport")]
+        [Authorize]
+        public IActionResult DepartSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewGetDepartSaleReport(criteria);
+            return Ok(result);
+        }
     }
 }

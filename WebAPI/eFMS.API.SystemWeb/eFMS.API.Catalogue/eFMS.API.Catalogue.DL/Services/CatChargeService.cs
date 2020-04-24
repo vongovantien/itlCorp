@@ -129,6 +129,14 @@ namespace eFMS.API.Catalogue.DL.Services
                             chargeDefaultRepository.Add(item, false);
                         }
                     }
+                    if(model.ListChargeDefaultAccount.Count() ==0)
+                    {
+                        var objChargeDefaultCurrent = chargeDefaultRepository.Get(x => x.ChargeId == model.Charge.Id).FirstOrDefault();
+                        if(objChargeDefaultCurrent != null)
+                        {
+                            chargeDefaultRepository.Delete(x => x.ChargeId == objChargeDefaultCurrent.ChargeId);
+                        }
+                    }
                     chargeDefaultRepository.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();

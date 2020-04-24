@@ -187,7 +187,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CreditVat)
                     .HasColumnName("CreditVAT")
-                    .HasColumnType("decimal(18, 4)");
+                    .HasMaxLength(800);
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -201,7 +201,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.DebitVat)
                     .HasColumnName("DebitVAT")
-                    .HasColumnType("decimal(18, 4)");
+                    .HasMaxLength(800);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -803,8 +803,6 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.DisplayName).HasMaxLength(4000);
 
                 entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
-
-                entity.Property(e => e.FlightVesselNo).HasMaxLength(50);
 
                 entity.Property(e => e.GeoCode)
                     .HasMaxLength(50)

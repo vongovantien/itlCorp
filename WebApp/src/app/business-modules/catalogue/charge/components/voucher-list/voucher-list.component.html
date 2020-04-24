@@ -50,12 +50,12 @@
                                     type="number" [(ngModel)]="item.creditAccountNo" [name]="'creditAccountNo'+index" />
                             </td>
                             <td>
-                                <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
-                                    type="number" [(ngModel)]="item.debitVat" [name]="'debitVat'+index" />
+                                <input class="form-control m-input m-input--square" [(ngModel)]="item.debitVat"
+                                    [name]="'debitVat'+index" />
                             </td>
                             <td>
-                                <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
-                                    type="number" [(ngModel)]="item.creditVat" [name]="'creditVat'+index" />
+                                <input class="form-control m-input m-input--square" [(ngModel)]="item.creditVat"
+                                    [name]="'creditVat'+index" />
                             </td>
 
                         </tr>
@@ -67,10 +67,10 @@
                     style="color: #f4516c">
                     Required voucher type and at least one of other fields
                 </div>
-                <div class="form-control-feedback" *ngIf="isSubmitted && ChargeToAdd.listChargeDefaultAccount.length==0"
+                <!-- <div class="form-control-feedback" *ngIf="isSubmitted && ChargeToAdd.listChargeDefaultAccount.length==0"
                     style="color: #f4516c">
                     Required at least 1 row of account info
-                </div>
+                </div> -->
                 <div class="form-control-feedback" *ngIf="isMaximumAccountRow" style="color: #f4516c">
                     You can add maximum 3 account row for 3 voucher type
                 </div>

@@ -170,7 +170,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             forwardingAgentId: form.forwardingAgentId,
             pol: form.pol,
             pod: form.pod,
-            warehouseNotice: form.warehouseNotice,
+            warehouseId: form.warehouseId,
             route: form.route,
             flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,

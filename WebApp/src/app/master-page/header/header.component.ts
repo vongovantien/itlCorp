@@ -9,7 +9,8 @@ import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-header',
-    templateUrl: './header.component.html'
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit, AfterViewInit {
 
@@ -188,7 +189,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
 
     // minimize sidebar
-    minimize_page_sidebar() {
+    minimize_page_sidebar_desktop() {
         const bodyElement = document.getElementById('bodyElement');
         const leftMinimizeToggle = document.getElementById('m_aside_left_minimize_toggle');
         if (leftMinimizeToggle.classList.contains('m-brand__toggler--active')) {
@@ -199,6 +200,18 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             leftMinimizeToggle.classList.add('m-brand__toggler--active');
         }
     }
+
+    minimize_page_sidebar_mobile() {
+        const leftMinimizeToggle = document.getElementById('m_aside_left');
+
+        if (leftMinimizeToggle.classList.contains('m-aside-mobile--active')) {
+            leftMinimizeToggle.classList.remove('m-aside-mobile--active');
+        } else {
+            leftMinimizeToggle.classList.add('m-aside-mobile--active');
+
+        }
+    }
+
 }
 
 

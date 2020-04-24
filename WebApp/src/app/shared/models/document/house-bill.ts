@@ -100,7 +100,7 @@ export class HouseBill extends BaseModel {
     subAbbr: string = null;
     warehouseNotice: string = null;
     packageQty: number = null;
-
+    warehouseId: string = null;
     // * AIR 
     flightNo: string = null;
     issuranceAmount: string = null;
