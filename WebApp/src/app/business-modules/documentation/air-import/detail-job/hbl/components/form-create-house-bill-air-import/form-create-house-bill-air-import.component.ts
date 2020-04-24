@@ -12,7 +12,7 @@ import { AppForm } from 'src/app/app.form';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { tap, takeUntil, catchError, skip, finalize } from 'rxjs/operators';
+import { tap, takeUntil, catchError, skip } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
@@ -69,7 +69,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     packageType: AbstractControl;
     issueHBLDate: AbstractControl;
     desOfGoods: AbstractControl;
-    isLoading: boolean = false;
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
@@ -203,30 +202,15 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getCustomers() {
-        this.isLoading = true;
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        );
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
     }
 
     getSalesman() {
-        this.isLoading = true;
-        this.saleMans = this._systemRepo.getListSystemUser().pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        );
+        this.saleMans = this._systemRepo.getListSystemUser();
     }
 
     getShipper() {
-        this.isLoading = true;
-        this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        );
+        this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
     }
 
     getPorts() {
@@ -240,32 +224,16 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getConsignee() {
-        this.isLoading = true;
-        this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        );
+        this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
     }
 
     getNotify() {
-        this.isLoading = true;
-        this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        );
+        this.notifies = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
     }
 
     getAgent() {
-        this.isLoading = true;
-        this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]).pipe(
-            finalize(() => {
-                this.isLoading = false;
-            })
-        )
+        this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
     }
-
 
     getUnit() {
         this._catalogueRepo.getUnit({ active: true }).subscribe((res: any) => {
