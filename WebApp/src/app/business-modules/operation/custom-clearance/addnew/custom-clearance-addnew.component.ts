@@ -146,9 +146,9 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
             this.customDeclaration.commodityCode = this.strCommodityCurrent;
             this.customDeclaration.unitCode = this.strUnitCurrent;
 
-            const shipment = this.mapClearanceToShipment();
+            // const shipment = this.mapClearanceToShipment();
             this.customDeclaration.clearanceDate = formatDate(this.customDeclaration.clearanceDate.startDate, 'yyyy-MM-dd', 'en');
-            this._documentation.convertClearanceToJob({ opsTransaction: shipment, customsDeclaration: this.customDeclaration }).subscribe(
+            this._documentation.convertClearanceToJob(this.customDeclaration).subscribe(
                 (response: any) => {
                     if (response.status) {
                         this.isConvertJob = false;

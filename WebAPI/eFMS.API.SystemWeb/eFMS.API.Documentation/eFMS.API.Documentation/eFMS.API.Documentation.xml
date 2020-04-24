@@ -697,14 +697,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertClearanceToJob(eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel)">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertClearanceToJob(eFMS.API.Documentation.DL.Models.CustomsDeclarationModel)">
             <summary>
             convert a custom clearance to a job
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertExistedClearancesToJobs(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.OpsTransactionClearanceModel})">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.ConvertExistedClearancesToJobs(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.CustomsDeclarationModel})">
             <summary>
             convert multi clearances to multi jobs
             </summary>

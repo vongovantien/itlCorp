@@ -17,9 +17,11 @@ namespace eFMS.API.Documentation.DL.IService
         //OpsTransactionModel GetBy(Guid id);
         int CheckDetailPermission(Guid id);
         OpsTransactionModel GetDetails(Guid id);
-        bool CheckAllowDelete(Guid jobId);        
-        HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
-        HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
+        bool CheckAllowDelete(Guid jobId);
+        //HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model);
+        HandleState ConvertClearanceToJob(CustomsDeclarationModel model);
+        //HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list);
+        HandleState ConvertExistedClearancesToJobs(List<CustomsDeclarationModel> list);
         HandleState SoftDeleteJob(Guid id);
         string CheckExist(OpsTransactionModel model);
         Crystal PreviewFormPLsheet(Guid id, string currency);

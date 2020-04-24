@@ -213,6 +213,28 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        ///// <summary>
+        ///// convert a custom clearance to a job
+        ///// </summary>
+        ///// <param name="model"></param>
+        ///// <returns></returns>
+        //[HttpPost("ConvertClearanceToJob")]
+        //[Authorize]
+        //public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        //{
+        //    currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+        //    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+        //    if (permissionRange == PermissionRange.None) return Forbid();
+        //    var hs = transactionService.ConvertClearanceToJob(model);
+        //    var message = HandleError.GetMessage(hs, Crud.Insert);
+        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+        //    if (!hs.Success)
+        //    {
+        //        return BadRequest(result);
+        //    }
+        //    return Ok(result);
+        //}
+
         /// <summary>
         /// convert a custom clearance to a job
         /// </summary>
@@ -220,7 +242,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("ConvertClearanceToJob")]
         [Authorize]
-        public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        public IActionResult ConvertClearanceToJob(CustomsDeclarationModel model)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
@@ -235,6 +257,28 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        ///// <summary>
+        ///// convert multi clearances to multi jobs
+        ///// </summary>
+        ///// <param name="list"></param>
+        ///// <returns></returns>
+        //[HttpPost("ConvertExistedClearancesToJobs")]
+        //[Authorize]
+        //public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
+        //{
+        //    currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+        //    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+        //    if (permissionRange == PermissionRange.None) return Forbid();
+        //    HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
+        //    var message = HandleError.GetMessage(hs, Crud.Insert);
+        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+        //    if (!hs.Success)
+        //    {
+        //        return BadRequest(result);
+        //    }
+        //    return Ok(result);
+        //}
+
         /// <summary>
         /// convert multi clearances to multi jobs
         /// </summary>
@@ -242,7 +286,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("ConvertExistedClearancesToJobs")]
         [Authorize]
-        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
+        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
