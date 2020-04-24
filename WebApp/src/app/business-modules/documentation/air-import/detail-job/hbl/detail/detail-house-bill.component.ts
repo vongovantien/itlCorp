@@ -75,6 +75,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                // TODO: PERMISSION: USE ASYNC PIPE NOT SUBSCRIBE.
                 this._store.select(getDetailHBlPermissionState)
                     .pipe(takeUntil(this.ngUnsubscribe))
                     .subscribe(
@@ -84,6 +86,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                             }
                         }
                     );
+
                 this.getDetailHbl();
 
             } else {

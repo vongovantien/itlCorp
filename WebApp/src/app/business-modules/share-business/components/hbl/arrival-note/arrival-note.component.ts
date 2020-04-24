@@ -196,6 +196,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     syncSellingCharge() {
+        // TODO Call API get selling charge by hblID
         this._store.select(getSellingSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -208,6 +209,13 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
                         this.hblArrivalNote.csArrivalFrieghtCharges.length = 0;
                         this.hblArrivalNote.csArrivalFrieghtCharges = [...sellingCharges];
+
+                        // * Update show,full,tick.
+                        this.hblArrivalNote.csArrivalFrieghtCharges.forEach(c => {
+                            c.isShow = true;
+                            c.isFull = true;
+                            c.isTick = true;
+                        });
                     } else {
                         this._toastService.warning("Not found selling charge!");
                     }

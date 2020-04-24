@@ -17,7 +17,7 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryLCLComponent
 } from 'src/app/business-modules/share-business';
-import { DeliveryOrder } from 'src/app/shared/models';
+import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
 import { finalize } from 'rxjs/internal/operators/finalize';
@@ -51,11 +51,10 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string = '';
-    shipmentDetail: any = {}; // TODO model.
+    shipmentDetail: CsTransaction; // TODO model.
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
-    hblDetail: any = {};
     allowAdd: boolean = false;
 
     constructor(
@@ -92,6 +91,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                // TODO use asyn pipe not subscribe
                 this.getDetailShipmentPermission();
             } else {
                 this.combackToHBLList();
@@ -194,11 +194,11 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: CsTransaction) => {
                     if (!!res) {
-                        this.hblDetail = res;
+                        this.shipmentDetail = res;
                         const objArrival = {
-                            arrivalNo: this.hblDetail.jobNo + "-A01",
+                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
                             arrivalFirstNotice: new Date()
                         };
 
@@ -206,11 +206,12 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                             objArrival
                         );
                         const objDelivery = {
-                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
+                            deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
                             deliveryOrderPrintedDate: {
                                 startDate: new Date(),
                                 endDate: new Date()
-                            }
+                            },
+                            doheader1: this.shipmentDetail.warehousePodNameVn
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
