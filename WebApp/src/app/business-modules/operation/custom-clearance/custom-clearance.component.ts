@@ -30,6 +30,8 @@ export class CustomClearanceComponent extends AppList {
     listPort: any = [];
     listUnit: any = [];
     menuPermission: SystemInterface.IUserPermission;
+    messageConvertError: string = '';
+    clearancesToConvert: CustomDeclaration[] = [];
 
     headers: CommonInterface.IHeaderTable[];
     constructor(
@@ -157,27 +159,29 @@ export class CustomClearanceComponent extends AppList {
     confirmConvert() {
         this._toastrService.clear();
         if (this.listCustomDeclaration.filter(i => i.isSelected && !i.jobNo).length > 0) {
-            const clearancesToConvert = this.mapClearancesToJobs();
-            // if (clearancesToConvert.filter(x => x.opsTransaction === null).length > 0) {
-            //     return;
-            // } else {
-            //     this._documentRepo.checkAllowConvertJob(clearancesToConvert)
-            //         .pipe(
-            //             catchError(this.catchError),
-            //             finalize(() => this._progressRef.complete())
-            //         ).subscribe(
-            //             (res: any) => {
-            //                 if (res.status) {
-            //                     this.confirmConvertPopup.show();
-            //                 } else {
-            //                     this.canNotAllowActionPopup.show();
-            //                 }
-            //             },
-            //         );
+            this.clearancesToConvert = this.checkValidClearancesToJobs();
+            if (this.clearancesToConvert === null) { return; }
 
-            // }
+            if (this.messageConvertError.length > 0) {
+                this._toastrService.error(this.messageConvertError, '', { enableHtml: true });
+                this.messageConvertError = '';
+                return;
+            } else {
+                this._documentRepo.checkAllowConvertJob(this.clearancesToConvert)
+                    .pipe(
+                        catchError(this.catchError),
+                        finalize(() => this._progressRef.complete())
+                    ).subscribe(
+                        (res: any) => {
+                            if (res.status) {
+                                this.confirmConvertPopup.show();
+                            } else {
+                                this.canNotAllowActionPopup.show();
+                            }
+                        },
+                    );
+            }
         } else {
-            // this._toastrService.warning('Custom clearance was not selected');
 
             this.canNotAllowActionPopup.show();
         }
@@ -231,24 +235,20 @@ export class CustomClearanceComponent extends AppList {
 
     onComfirmConvertToJobs() {
         this.confirmConvertPopup.hide();
-        const clearancesToConverts = this.mapClearancesToJobs();
-        const clearanceNulls = clearancesToConverts.filter(x => x.opsTransaction == null);
-        if (clearanceNulls.length === 0) {
-            this._progressRef.start();
-            this._documentRepo.convertExistedClearanceToJob(clearancesToConverts)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); })
-                )
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastrService.success('Convert Success');
-                            this.getListCustomsDeclaration();
-                        }
-                    },
-                );
-        }
+        this._progressRef.start();
+        this._documentRepo.convertExistedClearanceToJob(this.clearancesToConvert)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastrService.success('Convert Success');
+                        this.getListCustomsDeclaration();
+                    }
+                },
+            );
     }
 
     checkUncheckAll() {
@@ -260,82 +260,36 @@ export class CustomClearanceComponent extends AppList {
     onChangeAction() {
         this.isCheckAll = this.listCustomDeclaration.every((item: CustomDeclaration) => item.isSelected);
     }
-
-    messageConvertError: string = '';
-    mapClearancesToJobs() {
-        const clearancesToConvert = [];
-        const customCheckedArray: any[] = this.listCustomDeclaration.filter((item: CustomDeclaration) => item.isSelected && !item.jobNo);
-        for (let i = 0; i < customCheckedArray.length; i++) {
-            const clearance: CustomDeclaration = customCheckedArray[i];
-            let shipment = new OpsTransaction();
+    checkValidClearancesToJobs() {
+        const customCheckedArray: CustomDeclaration[] = this.listCustomDeclaration.filter((item: CustomDeclaration) => item.isSelected && !item.jobNo);
+        if (customCheckedArray === null) {
+            return customCheckedArray;
+        }
+        for (const row of customCheckedArray) {
+            const clearance: CustomDeclaration = row;
 
             if (clearance.mblid === null || clearance.mblid.length === 0) {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có MBL/MAWB để tạo job mới <br />`;
-                shipment = null;
             }
             if (clearance.hblid === null || clearance.hblid.length === 0) {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có HBL/HAWB để tạo job mới <br />`;
-                shipment = null;
             }
             if (clearance.clearanceDate === null) {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có clearance date để tạo job mới <br />`;
-                shipment = null;
             }
             if (clearance.partnerTaxCode === null || clearance.partnerTaxCode.length === 0) {
                 this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có customer để tạo job mới <br />`;
-                shipment = null;
-            } else {
-                shipment = new OpsTransaction();
-                let index = this.listCustomer.findIndex(x => x.taxCode.trim() === clearance.partnerTaxCode.trim());
-                if (index !== -1) {
-                    const customer = this.listCustomer[index];
-                    shipment.customerId = customer.id;
-                    shipment.salemanId = customer.salePersonId;
-                }
-                shipment.serviceMode = clearance.type;
-                index = this.listPort.findIndex(x => x.code === clearance.gateway);
-                if (index > -1) {
-                    if (clearance.type === "Export") {
-                        shipment.pol = this.listPort[index].id;
-                        shipment.clearanceLocation = shipment.pol;
-                    }
-                    if (clearance.type === "Import") {
-                        shipment.pod = this.listPort[index].id;
-                        shipment.clearanceLocation = shipment.pod;
-                    }
-                }
-                if (clearance.serviceType === "Sea") {
-                    if (clearance.cargoType === "FCL") {
-                        shipment.productService = "SeaFCL";
-                    }
-                    if (clearance.cargoType === "LCL") {
-                        shipment.productService = "SeaLCL";
-                    }
-                } else {
-                    shipment.productService = clearance.serviceType;
-                }
-                shipment.shipmentMode = "External";
-                shipment.mblno = clearance.mblid;
-                shipment.hwbno = clearance.hblid;
-                shipment.serviceDate = clearance.clearanceDate;
-                shipment.sumGrossWeight = clearance.grossWeight;
-                shipment.sumNetWeight = clearance.netWeight;
-                shipment.sumCbm = clearance.cbm;
-                const claim = localStorage.getItem('id_token_claims_obj');
-                const currenctUser = JSON.parse(claim)["id"];
-                shipment.billingOpsId = currenctUser;
-                index = this.listUnit.findIndex(x => x.code === clearance.unitCode);
-                if (index > -1) {
-                    shipment.packageTypeId = this.listUnit[index].id;
+            }
+            if (clearance.serviceType !== "Air" && clearance.serviceType !== "Express") {
+                if (clearance.cargoType === null) {
+                    this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có cargo type để tạo mới <br />`;
                 }
             }
-            clearancesToConvert.push({ opsTransaction: shipment, customsDeclaration: clearance });
+            if (clearance.type === null) {
+                this.messageConvertError = this.messageConvertError + clearance.clearanceNo + ` Không có Type để tạo job mới <br />`;
+            }
         }
-        if (this.messageConvertError.length > 0) {
-            this._toastrService.error(this.messageConvertError, '', { enableHtml: true });
-        }
-        this.messageConvertError = '';
-        return clearancesToConvert;
+        return customCheckedArray;
     }
 
     export() {

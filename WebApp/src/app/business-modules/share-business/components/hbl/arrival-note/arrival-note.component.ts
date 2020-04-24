@@ -15,7 +15,7 @@ import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl'
 import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../store';
-import { getSellingSurChargeState } from './../../../store';
+import { getSellingSurChargeState, GetSellingSurchargeAction } from './../../../store';
 
 
 @Component({
@@ -196,7 +196,8 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     syncSellingCharge() {
-        // TODO Call API get selling charge by hblID
+        this._store.dispatch(new fromShareBussiness.GetSellingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE, hblId: this.hblArrivalNote.hblid }));
+
         this._store.select(getSellingSurChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

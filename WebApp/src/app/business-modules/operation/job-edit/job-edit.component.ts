@@ -345,27 +345,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                             this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ hblid: this.opsTransaction.hblid }));
 
                             this.editForm.setFormValue();
-                            if (this.editForm.productServices != null) {
-                                this.editForm.formEdit.controls['productService'].setValue([this.editForm.productServices.find(type => type.id === this.opsTransaction.productService)]);
-                            }
-                            if (this.editForm.serviceModes != null) {
-                                const serviceMode = this.editForm.serviceModes.find(type => type.id === this.opsTransaction.serviceMode);
-                                if (!!serviceMode) { this.editForm.formEdit.controls['serviceMode'].setValue([serviceMode]); }
-                            }
-                            if (this.editForm.shipmentModes != null) {
-                                this.editForm.formEdit.controls['shipmentMode'].setValue([this.editForm.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode)]);
-                            }
-
-                            setTimeout(() => {
-                                if (!!this.opsTransaction.commodityGroupId) {
-                                    // this.editForm.commodityGroups = this.commodityGroups;
-                                    this.editForm.formEdit.controls['commodityGroupId'].setValue([this.editForm.commodityGroups.find(type => type.id === this.opsTransaction.commodityGroupId)]);
-                                }
-                            }, 500);
-
-                            if (!!this.opsTransaction.packageTypeId && this.editForm.packageTypeId != null) {
-                                this.editForm.formEdit.controls['packageTypeId'].setValue([this.editForm.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId)]);
-                            }
                         }
                     }
                 },
@@ -378,16 +357,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
             this.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
             this.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
         });
-        // .pipe(
-        //     catchError(this.catchError),
-        //     finalize(() => this._progressRef.complete())
-        // ).subscribe(
-        //     (responses: any) => {
-        //         this.editForm.productServices = this.utility.prepareNg2SelectData(responses.productServices, 'value', 'displayName');
-        //         this.editForm.serviceModes = this.utility.prepareNg2SelectData(responses.serviceModes, 'value', 'displayName');
-        //         this.editForm.shipmentModes = this.utility.prepareNg2SelectData(responses.shipmentModes, 'value', 'displayName');
-        //     },
-        // );
     }
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {

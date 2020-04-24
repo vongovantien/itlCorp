@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepository;
+        private readonly IContextBase<CatCommodity> commodityRepository;
         private readonly ICsMawbcontainerService mawbcontainerService;
         readonly IUserPermissionService permissionService;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsMawbcontainerService containerService, 
             IUserPermissionService perService,
             IContextBase<CatCurrencyExchange> currencyExchangeRepo,
+            IContextBase<CatCommodity> commodityRepo,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -82,6 +84,7 @@ namespace eFMS.API.Documentation.DL.Services
             permissionService = perService;
             currencyExchangeRepository = currencyExchangeRepo;
             currencyExchangeService = currencyExchange;
+            commodityRepository = commodityRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -413,44 +416,149 @@ namespace eFMS.API.Documentation.DL.Services
             return results.AsQueryable();
         }
         
-        private string SetProductServiceShipment(OpsTransactionClearanceModel model)
+        private string SetProductServiceShipment(CustomsDeclarationModel model)
         {
             string productService = string.Empty;
-            if (model.CustomsDeclaration.ServiceType == "Sea")
+            if (model.ServiceType == "Sea")
             {
-                if (model.CustomsDeclaration.CargoType == "FCL")
+                if (model.CargoType == "FCL")
                 {
-                    model.CustomsDeclaration.CargoType = "SeaFCL";
+                    productService = "SeaFCL";
                 }
-                if (model.CustomsDeclaration.CargoType == "LCL")
+                else
                 {
-                    model.CustomsDeclaration.CargoType = "SeaLCL";
+                    productService = "SeaLCL";
                 }
-                productService = model.CustomsDeclaration.CargoType;
             }
             else
             {
-                productService = model.CustomsDeclaration.ServiceType;
+                if(model.CargoType != null && model.ServiceType == null)
+                {
+                    model.ServiceType = "Sea";
+                    if (model.CargoType == "FCL")
+                    {
+                        productService = "SeaFCL";
+                    }
+                    else
+                    {
+                        productService = "SeaLCL";
+                    }
+                }
+                else
+                {
+                    productService = model.ServiceType;
+                }
             }
             return productService;
         }
-        public HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        //public HandleState ConvertClearanceToJob(OpsTransactionClearanceModel model)
+        //{
+        //    var result = new HandleState();
+        //    try
+        //    {
+        //        var existedMessage = CheckExist(model.OpsTransaction);
+        //        if (existedMessage != null)
+        //        {
+        //            return new HandleState(existedMessage);
+        //        }
+        //        if (CheckExistClearance(model.CustomsDeclaration, model.CustomsDeclaration.Id))
+        //        {
+        //            result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
+        //            return result;
+        //        }
+        //        string productService = SetProductServiceShipment(model);
+        //        if (model.CustomsDeclaration.CargoType == null && model.CustomsDeclaration.ServiceType == "Sea")
+        //        {
+        //            result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
+        //            return result;
+        //        }
+        //        if (productService == null)
+        //        {
+        //            result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
+        //            return result;
+        //        }
+        //        if (model.CustomsDeclaration.JobNo == null)
+        //        {
+        //            model.OpsTransaction.Id = Guid.NewGuid();
+        //            model.OpsTransaction.Hblid = Guid.NewGuid();
+        //            model.OpsTransaction.DatetimeCreated = DateTime.Now;
+        //            model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
+        //            model.OpsTransaction.DatetimeModified = DateTime.Now;
+        //            model.OpsTransaction.UserModified = currentUser.UserID;
+        //            model.OpsTransaction.ProductService = productService;
+        //            model.OpsTransaction.GroupId = currentUser.GroupId;
+        //            model.OpsTransaction.DepartmentId = currentUser.DepartmentId;
+        //            model.OpsTransaction.OfficeId = currentUser.OfficeID;
+        //            model.OpsTransaction.CompanyId = currentUser.CompanyID;
+        //            var customer = partnerRepository.Get(x => x.Id == model.OpsTransaction.CustomerId).FirstOrDefault();
+        //            if(customer != null)
+        //            {
+        //                model.OpsTransaction.SalemanId = customer.SalePersonId;
+        //            }
+        //            int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
+        //            model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+        //            var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+        //            if (dayStatus > 0)
+        //            {
+        //                model.OpsTransaction.CurrentStatus = TermData.InSchedule;
+        //            }
+        //            else
+        //            {
+        //                model.OpsTransaction.CurrentStatus = TermData.Processing;
+        //            }
+        //            var transaction = mapper.Map<OpsTransaction>(model.OpsTransaction);
+        //            DataContext.Add(transaction, false);
+        //        }
+
+        //        var clearance = mapper.Map<CustomsDeclaration>(model.CustomsDeclaration);
+        //        clearance.ConvertTime = DateTime.Now;
+        //        if (clearance.Id > 0)
+        //        {
+        //            clearance.DatetimeModified = DateTime.Now;
+        //            clearance.UserModified = currentUser.UserID;
+        //            clearance.JobNo = model.OpsTransaction.JobNo;
+        //            customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+        //        }
+        //        else
+        //        {
+        //            clearance.DatetimeCreated = DateTime.Now;
+        //            clearance.DatetimeModified = DateTime.Now;
+        //            clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
+        //            clearance.Source = DocumentConstants.CLEARANCE_FROM_EFMS;
+        //            clearance.JobNo = model.OpsTransaction.JobNo;
+        //            clearance.GroupId = currentUser.GroupId;
+        //            clearance.DepartmentId = currentUser.DepartmentId;
+        //            clearance.OfficeId = currentUser.OfficeID;
+        //            clearance.CompanyId = currentUser.CompanyID;
+        //            customDeclarationRepository.Add(clearance, false);
+        //        }
+        //        DataContext.SubmitChanges();
+        //        customDeclarationRepository.SubmitChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        result = new HandleState(ex.Message);
+        //    }
+        //    return result;
+        //}
+
+        public HandleState ConvertClearanceToJob(CustomsDeclarationModel model)
         {
             var result = new HandleState();
             try
             {
-                var existedMessage = CheckExist(model.OpsTransaction);
+                var existedMessage = CheckExist(model.Mblid, model.Hblid);
                 if (existedMessage != null)
                 {
                     return new HandleState(existedMessage);
                 }
-                if (CheckExistClearance(model.CustomsDeclaration, model.CustomsDeclaration.Id))
+                if (CheckExistClearance(model, model.Id))
                 {
-                    result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCENO_EXISTED, model.CustomsDeclaration.ClearanceNo].Value);
+                    result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCENO_EXISTED, model.ClearanceNo].Value);
                     return result;
                 }
                 string productService = SetProductServiceShipment(model);
-                if (model.CustomsDeclaration.CargoType == null && model.CustomsDeclaration.ServiceType == "Sea")
+                if (model.CargoType == null && model.ServiceType == "Sea")
                 {
                     result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
                     return result;
@@ -460,55 +568,92 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                     return result;
                 }
-                if (model.CustomsDeclaration.JobNo == null)
+                var opsTransaction = new OpsTransaction
                 {
-                    model.OpsTransaction.Id = Guid.NewGuid();
-                    model.OpsTransaction.Hblid = Guid.NewGuid();
-                    model.OpsTransaction.DatetimeCreated = DateTime.Now;
-                    model.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
-                    model.OpsTransaction.DatetimeModified = DateTime.Now;
-                    model.OpsTransaction.UserModified = currentUser.UserID;
-                    model.OpsTransaction.ProductService = productService;
-                    model.OpsTransaction.GroupId = currentUser.GroupId;
-                    model.OpsTransaction.DepartmentId = currentUser.DepartmentId;
-                    model.OpsTransaction.OfficeId = currentUser.OfficeID;
-                    model.OpsTransaction.CompanyId = currentUser.CompanyID;
-                    var customer = partnerRepository.Get(x => x.Id == model.OpsTransaction.CustomerId).FirstOrDefault();
-                    if(customer != null)
+                    Id = Guid.NewGuid(),
+                    Hblid = Guid.NewGuid(),
+                    ProductService = productService,
+                    ServiceMode = model.Type,
+                    ShipmentMode = "External",
+                    Mblno = model.Mblid,
+                    Hwbno = model.Hblid,
+                    ServiceDate = model.ClearanceDate,
+                    SumGrossWeight = model.GrossWeight,
+                    SumNetWeight = model.NetWeight,
+                    SumCbm = model.Cbm,
+                    Shipper = model.Shipper,
+                    Consignee = model.Consignee,
+                    BillingOpsId = currentUser.UserID,
+                    GroupId = currentUser.GroupId,
+                    DepartmentId = currentUser.DepartmentId,
+                    OfficeId = currentUser.OfficeID,
+                    CompanyId = currentUser.CompanyID,
+                    DatetimeCreated = DateTime.Now,
+                    UserCreated = currentUser.UserID, //currentUser.UserID;
+                    DatetimeModified = DateTime.Now,
+                    UserModified = currentUser.UserID
+                };
+                var customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
+                if (customer != null)
+                {
+                    opsTransaction.CustomerId = customer.Id;
+                    opsTransaction.SalemanId = customer.SalePersonId;
+                }
+                var port = placeRepository.Get(x => x.Code == model.Gateway).FirstOrDefault();
+                if(port != null) {
+                    if (model.Type == "Export")
                     {
-                        model.OpsTransaction.SalemanId = customer.SalePersonId;
+                        opsTransaction.Pol = port.Id;
+                        opsTransaction.ClearanceLocation = port.Id;
                     }
-                    int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                    model.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
-                    var dayStatus = (int)(model.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
-                    if (dayStatus > 0)
+                    if (model.Type == "Import")
                     {
-                        model.OpsTransaction.CurrentStatus = TermData.InSchedule;
+                        opsTransaction.Pod = port.Id;
+                        opsTransaction.ClearanceLocation = port.Id;
                     }
-                    else
-                    {
-                        model.OpsTransaction.CurrentStatus = TermData.Processing;
-                    }
-                    var transaction = mapper.Map<OpsTransaction>(model.OpsTransaction);
-                    DataContext.Add(transaction, false);
                 }
 
-                var clearance = mapper.Map<CustomsDeclaration>(model.CustomsDeclaration);
+                var unit = unitRepository.Get(x => x.Code == model.UnitCode).FirstOrDefault();
+                if (unit != null)
+                {
+                    opsTransaction.SumPackages = model.Pcs;
+                    opsTransaction.PackageTypeId = unit.Id;
+                }
+                var commodity = commodityRepository.Get(x => x.Code == model.CommodityCode).FirstOrDefault();
+                if(commodity != null)
+                {
+                    opsTransaction.CommodityGroupId = commodity.CommodityGroupId;
+                }
+                int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
+                opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+                var dayStatus = (int)(opsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                if (dayStatus > 0)
+                {
+                    opsTransaction.CurrentStatus = TermData.InSchedule;
+                }
+                else
+                {
+                    opsTransaction.CurrentStatus = TermData.Processing;
+                }
+                var transaction = mapper.Map<OpsTransaction>(opsTransaction);
+                DataContext.Add(transaction, false);
+
+                var clearance = mapper.Map<CustomsDeclaration>(model);
                 clearance.ConvertTime = DateTime.Now;
                 if (clearance.Id > 0)
                 {
                     clearance.DatetimeModified = DateTime.Now;
                     clearance.UserModified = currentUser.UserID;
-                    clearance.JobNo = model.OpsTransaction.JobNo;
+                    clearance.JobNo = opsTransaction.JobNo;
                     customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
                 }
                 else
                 {
                     clearance.DatetimeCreated = DateTime.Now;
                     clearance.DatetimeModified = DateTime.Now;
-                    clearance.UserCreated = model.CustomsDeclaration.UserModified = currentUser.UserID;
+                    clearance.UserCreated = model.UserModified = currentUser.UserID;
                     clearance.Source = DocumentConstants.CLEARANCE_FROM_EFMS;
-                    clearance.JobNo = model.OpsTransaction.JobNo;
+                    clearance.JobNo = opsTransaction.JobNo;
                     clearance.GroupId = currentUser.GroupId;
                     clearance.DepartmentId = currentUser.DepartmentId;
                     clearance.OfficeId = currentUser.OfficeID;
@@ -524,6 +669,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return result;
         }
+
         private bool CheckExistClearance(CustomsDeclarationModel model, decimal id)
         {
             if (id == 0)
@@ -543,7 +689,7 @@ namespace eFMS.API.Documentation.DL.Services
             return false;
         }
 
-        public HandleState ConvertExistedClearancesToJobs(List<OpsTransactionClearanceModel> list)
+        public HandleState ConvertExistedClearancesToJobs(List<CustomsDeclarationModel> list)
         {
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403);
@@ -553,45 +699,24 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
-                    var existedMessage = CheckExist(item.OpsTransaction);
+                    var existedMessage = CheckExist(item.Mblid, item.Hblid);
                     if (existedMessage != null)
                     {
                         return new HandleState(existedMessage);
                     }
-                    if (item.CustomsDeclaration.JobNo == null)
+
+                    if (CheckExistClearance(item, item.Id))
                     {
-                        var model = new BaseUpdateModel { UserCreated = item.CustomsDeclaration.UserCreated, GroupId = item.CustomsDeclaration.GroupId, DepartmentId = item.CustomsDeclaration.DepartmentId, OfficeId = item.CustomsDeclaration.OfficeId, CompanyId = item.CustomsDeclaration.CompanyId };
+                        result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCENO_EXISTED, item.ClearanceNo].Value);
+                        return result;
+                    }
+                    if (item.JobNo == null)
+                    {
+                        var model = new BaseUpdateModel { UserCreated = item.UserCreated, GroupId = item.GroupId, DepartmentId = item.DepartmentId, OfficeId = item.OfficeId, CompanyId = item.CompanyId };
                         var code = PermissionExtention.GetPermissionCommonItem(model, permissionRange, currentUser);
                         if (code == 403) return new HandleState(403);
-                        item.OpsTransaction.Id = Guid.NewGuid();
-                        item.OpsTransaction.Hblid = Guid.NewGuid();
-                        item.OpsTransaction.DatetimeCreated = DateTime.Now;
-                        item.OpsTransaction.UserCreated = currentUser.UserID; //currentUser.UserID;
-                        item.OpsTransaction.DatetimeModified = DateTime.Now;
-                        item.OpsTransaction.UserModified = currentUser.UserID;
-                        item.OpsTransaction.GroupId = currentUser.GroupId;
-                        item.OpsTransaction.DepartmentId = currentUser.DepartmentId;
-                        item.OpsTransaction.OfficeId = currentUser.OfficeID;
-                        item.OpsTransaction.CompanyId = currentUser.CompanyID;
-
-                        var customer = partnerRepository.Get(x => x.Id == item.OpsTransaction.CustomerId).FirstOrDefault();
-                        if (customer != null)
-                        {
-                            item.OpsTransaction.SalemanId = customer.SalePersonId;
-                        }
-                        int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                        item.OpsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, (countNumberJob + i));
-                        var dayStatus = (int)(item.OpsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
-                        if (dayStatus > 0)
-                        {
-                            item.OpsTransaction.CurrentStatus = TermData.InSchedule;
-                        }
-                        else
-                        {
-                            item.OpsTransaction.CurrentStatus = TermData.Processing;
-                        }
                         string productService = SetProductServiceShipment(item);
-                        if (item.CustomsDeclaration.CargoType == null && item.CustomsDeclaration.ServiceType == "Sea")
+                        if (item.CargoType == null && item.ServiceType == "Sea")
                         {
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_NOT_ALLOW_EMPTY].Value);
                             return result;
@@ -601,14 +726,81 @@ namespace eFMS.API.Documentation.DL.Services
                             result = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CARGOTYPE_MUST_HAVE_SERVICE_TYPE].Value);
                             return result;
                         }
-                        item.OpsTransaction.ProductService = productService;
-                        var transaction = mapper.Map<OpsTransaction>(item.OpsTransaction);
+                        var opsTransaction = new OpsTransaction
+                        {
+                            Id = Guid.NewGuid(),
+                            Hblid = Guid.NewGuid(),
+                            ProductService = productService,
+                            ServiceMode = item.Type,
+                            ShipmentMode = "External",
+                            Mblno = item.Mblid,
+                            Hwbno = item.Hblid,
+                            ServiceDate = item.ClearanceDate,
+                            SumGrossWeight = item.GrossWeight,
+                            SumNetWeight = item.NetWeight,
+                            SumCbm = item.Cbm,
+                            Shipper = item.Shipper,
+                            Consignee = item.Consignee,
+                            BillingOpsId = currentUser.UserID,
+                            GroupId = currentUser.GroupId,
+                            DepartmentId = currentUser.DepartmentId,
+                            OfficeId = currentUser.OfficeID,
+                            CompanyId = currentUser.CompanyID,
+                            DatetimeCreated = DateTime.Now,
+                            UserCreated = currentUser.UserID, //currentUser.UserID;
+                            DatetimeModified = DateTime.Now,
+                            UserModified = currentUser.UserID
+                        };
+                        var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode).FirstOrDefault();
+                        if (customer != null)
+                        {
+                            opsTransaction.CustomerId = customer.Id;
+                            opsTransaction.SalemanId = customer.SalePersonId;
+                        }
+                        var port = placeRepository.Get(x => x.Code == item.Gateway).FirstOrDefault();
+                        if (port != null)
+                        {
+                            if (item.Type == "Export")
+                            {
+                                opsTransaction.Pol = port.Id;
+                                opsTransaction.ClearanceLocation = port.Id;
+                            }
+                            if (item.Type == "Import")
+                            {
+                                opsTransaction.Pod = port.Id;
+                                opsTransaction.ClearanceLocation = port.Id;
+                            }
+                        }
+                        var unit = unitRepository.Get(x => x.Code == item.UnitCode).FirstOrDefault();
+                        if(unit!= null)
+                        {
+                            opsTransaction.SumPackages = item.Pcs;
+                            opsTransaction.PackageTypeId = unit.Id;
+                        }
+
+                        var commodity = commodityRepository.Get(x => x.Code == item.CommodityCode).FirstOrDefault();
+                        if (commodity != null)
+                        {
+                            opsTransaction.CommodityGroupId = commodity.CommodityGroupId;
+                        }
+                        int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
+                        opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+                        var dayStatus = (int)(opsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
+                        if (dayStatus > 0)
+                        {
+                            opsTransaction.CurrentStatus = TermData.InSchedule;
+                        }
+                        else
+                        {
+                            opsTransaction.CurrentStatus = TermData.Processing;
+                        }
+                        var transaction = mapper.Map<OpsTransaction>(opsTransaction);
                         DataContext.Add(transaction, false);
-                        item.CustomsDeclaration.JobNo = item.OpsTransaction.JobNo;
-                        item.CustomsDeclaration.UserModified = currentUser.UserID;
-                        item.CustomsDeclaration.DatetimeModified = DateTime.Now;
-                        item.CustomsDeclaration.ConvertTime = DateTime.Now;
-                        var clearance = mapper.Map<CustomsDeclaration>(item.CustomsDeclaration);
+                        item.JobNo = opsTransaction.JobNo;
+                        item.UserModified = currentUser.UserID;
+                        item.DatetimeModified = DateTime.Now;
+                        item.ConvertTime = DateTime.Now;
+                        var clearance = mapper.Map<CustomsDeclaration>(item);
                         customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                         i = i + 1;
                     }
@@ -671,6 +863,21 @@ namespace eFMS.API.Documentation.DL.Services
             if (existedMBL)
             {
                 return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mblno].Value;
+            }
+            return null;
+        }
+
+        public string CheckExist(string mblNo, string hblNo)
+        {
+            var existedHBL = DataContext.Any(x => x.Hwbno == hblNo && x.CurrentStatus != TermData.Canceled);
+            var existedMBL = DataContext.Any(x => x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
+            if (existedHBL)
+            {
+                return stringLocalizer[DocumentationLanguageSub.MSG_HBNO_EXISTED, hblNo].Value;
+            }
+            if (existedMBL)
+            {
+                return stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, mblNo].Value;
             }
             return null;
         }

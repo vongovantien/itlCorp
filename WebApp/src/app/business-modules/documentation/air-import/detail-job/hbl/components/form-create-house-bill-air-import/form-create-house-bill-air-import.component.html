@@ -14,7 +14,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [currentActiveItemId]="{ field: 'id', value: customerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                            placeholder="Select Customer" [loading]="isLoading" [displayFields]="displayFieldsCustomer"
+                            placeholder="Select Customer" [displayFields]="displayFieldsCustomer"
                             (remove)="resetFormControl(customerId)" [height]="200">
                         </app-combo-grid-virtual-scroll>
 
@@ -26,9 +26,9 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
                             [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
-                            [loading]="isLoading" [displayFields]="[{field: 'username', label: 'User Name'}]"
-                            placeholder="Select Salesman" [height]="200" [disabled]="!customerId.value"
-                            (remove)="resetFormControl(saleManId)" size="15">
+                            [displayFields]="[{field: 'username', label: 'User Name'}]" placeholder="Select Salesman"
+                            [height]="200" [disabled]="!customerId.value" (remove)="resetFormControl(saleManId)"
+                            size="15">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
-                            [loading]="isLoading" placeholder="Select Shipper" (remove)="resetFormControl(shipperId)"
+                            placeholder="Select Shipper" (remove)="resetFormControl(shipperId)"
                             [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
@@ -51,7 +51,7 @@
                     <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !consigneeId.value}">
                         <label required>Consignee</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
-                            [currentActiveItemId]="{ field: 'id', value: consigneeId.value}" [loading]="isLoading"
+                            [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
                             placeholder="Select Consignee" (remove)="resetFormControl(consigneeId)"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
                             [displayFields]="displayFieldsCustomer" [height]="200">
@@ -66,9 +66,8 @@
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'notify')"
                             [currentActiveItemId]="{ field: 'id', value: notifyPartyId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="notifies | async"
-                            [loading]="isLoading" placeholder="Select Notify Party"
-                            (remove)="resetFormControl(notifyPartyId)" [displayFields]="displayFieldsCustomer"
-                            [height]="200">
+                            placeholder="Select Notify Party" (remove)="resetFormControl(notifyPartyId)"
+                            [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="notifyPartyDescription"></textarea>
@@ -146,7 +145,7 @@
                         <label required>Agent</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                             [currentActiveItemId]="{ field: 'id', value: forwardingAgentId.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async" [loading]="isLoading"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                             placeholder="Select Agent" (remove)="resetFormControl(forwardingAgentId)"
                             [displayFields]="displayFieldsCustomer" [height]="200">
                         </app-combo-grid-virtual-scroll>
