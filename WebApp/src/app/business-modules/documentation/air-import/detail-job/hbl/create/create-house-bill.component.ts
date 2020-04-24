@@ -7,7 +7,7 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { HouseBill, DeliveryOrder } from '@models';
+import { HouseBill, DeliveryOrder, CsTransaction } from '@models';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
 
     jobId: string;
-    hblDetail: any = {};
+    shipmentDetail: CsTransaction;
     selectedHbl: any = {};
     allowAdd: boolean = false;
     isImport: boolean = false;
@@ -63,6 +63,8 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirImport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
+
+                    // TODO: PERMISSION: USE ASYNC PIPE NOT SUBSCRIBE.
                     this.getDetailShipmentPermission();
                 } else {
                     this.gotoList();
@@ -95,19 +97,22 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: CsTransaction) => {
                     if (!!res) {
-                        this.hblDetail = res;
+                        this.shipmentDetail = res;
+                        // TODO why setTimeOut in subscribe? ??? .
                         setTimeout(() => {
                             const objArrival = {
-                                arrivalNo: this.hblDetail.jobNo + "-A01",
+                                arrivalNo: this.shipmentDetail.jobNo + "-A01",
                                 arrivalFirstNotice: new Date()
                             };
                             this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
 
                             const objDelivery = {
-                                deliveryOrderNo: this.hblDetail.jobNo + "-A01",
-                                deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
+                                deliveryOrderNo: this.shipmentDetail.jobNo + "-A01",
+                                deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
+                                // *  AUTO GENERATE SENT TO (1) WITH WAREHOUSENAME FROM POD
+                                doheader1: this.shipmentDetail.warehousePodNameVn,
                             };
                             this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                         }, 500);
@@ -165,7 +170,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             forwardingAgentId: form.forwardingAgentId,
             pol: form.pol,
             pod: form.pod,
-            warehouseNotice: form.warehouseNotice,
+            warehouseId: form.warehouseId,
             route: form.route,
             flightNo: form.flightNo,
             flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,

@@ -94,10 +94,10 @@ export class DetailChargeComponent extends AddChargeComponent {
     updateCharge() {
         this.formAddCharge.isSubmitted = true;
         this.voucherList.isSubmitted = true;
-        if(!this.formAddCharge.checkValidateForm()){
+        if (!this.formAddCharge.checkValidateForm()) {
             return;
         }
-        if ( this.voucherList.validatateDefaultAcountLine()) {
+        if (this.voucherList.validatateDefaultAcountLine()) {
             const modeltoUpdate = this.onsubmitData();
             if (modeltoUpdate !== null) {
                 modeltoUpdate.charge.id = this.id;
@@ -118,9 +118,10 @@ export class DetailChargeComponent extends AddChargeComponent {
                         }
                     );
             }
-        } else {
-            this._toastService.error("Please add voucher charge");
         }
+        //  else {
+        //     this._toastService.error("Please add voucher charge");
+        // }
     }
 
     ngOnDestroy() {

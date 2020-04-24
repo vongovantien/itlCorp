@@ -92,6 +92,9 @@ export class VoucherListComponent extends AppList implements OnInit {
                 return true;
             }
         }
+        if (this.ChargeToAdd.listChargeDefaultAccount.length === 0) {
+            return true;
+        }
 
     }
 

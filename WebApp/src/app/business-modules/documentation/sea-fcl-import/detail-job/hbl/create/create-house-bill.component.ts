@@ -17,7 +17,7 @@ import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
-import { DeliveryOrder } from 'src/app/shared/models';
+import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
@@ -45,11 +45,10 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 
     jobId: string = '';
-    shipmentDetail: any = {}; // TODO model.
+    shipmentDetail: CsTransaction;
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
-    hblDetail: any = {};
     allowAdd: boolean = false;
 
     constructor(
@@ -95,6 +94,8 @@ export class CreateHouseBillComponent extends AppForm {
             if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+
+                // TODO use async pipe not subscribe;
                 this.getDetailShipmentPermission();
                 // * Get default containers from masterbill.
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
@@ -137,19 +138,20 @@ export class CreateHouseBillComponent extends AppForm {
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: CsTransaction) => {
                     if (!!res) {
-                        this.hblDetail = res;
+                        this.shipmentDetail = res;
 
                         const objArrival = {
-                            arrivalNo: this.hblDetail.jobNo + "-A01",
+                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
                             arrivalFirstNotice: new Date()
                         };
                         this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
 
                         const objDelivery = {
-                            deliveryOrderNo: this.hblDetail.jobNo + "-D01",
-                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() }
+                            deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
+                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
+                            doheader1: this.shipmentDetail.warehousePodNameVn
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
