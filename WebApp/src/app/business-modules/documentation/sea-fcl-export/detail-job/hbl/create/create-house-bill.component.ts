@@ -13,7 +13,8 @@ import { SystemConstants } from 'src/constants/system.const';
 import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
-    ShareBusinessFormCreateHouseBillExportComponent
+    ShareBusinessFormCreateHouseBillExportComponent,
+    getTransactionPermission
 } from 'src/app/business-modules/share-business';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -89,7 +90,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                     // * Get default containers from masterbill.
                     this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-                    this.getDetailShipmentPermission();
+                    this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();
                 }

@@ -62,25 +62,14 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-
+                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
                 this.getDetailHbl();
 
             } else {
                 this.gotoList();
             }
         });
-
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-
-        this._store.select(getDetailHBlPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowUpdate = res.allowUpdate;
-                    }
-                }
-            );
     }
 
     ngAfterViewInit() {

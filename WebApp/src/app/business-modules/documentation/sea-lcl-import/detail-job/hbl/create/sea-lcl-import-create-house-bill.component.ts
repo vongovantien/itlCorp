@@ -15,7 +15,8 @@ import {
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessImportHouseBillDetailComponent,
-    ShareBussinessHBLGoodSummaryLCLComponent
+    ShareBussinessHBLGoodSummaryLCLComponent,
+    getTransactionPermission
 } from 'src/app/business-modules/share-business';
 import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
@@ -91,8 +92,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             if (param.jobId && isUUID(param.jobId)) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                // TODO use asyn pipe not subscribe
-                this.getDetailShipmentPermission();
+                this.permissionShipments = this._store.select(getTransactionPermission);
             } else {
                 this.combackToHBLList();
             }
@@ -251,21 +251,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 );
         }
     }
-
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
-    }
-
 
     onsubmitData() {
         const body: ITransactionDetail = {

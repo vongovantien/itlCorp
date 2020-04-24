@@ -21,7 +21,7 @@ import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent } from 'src/app/business-modules/share-business';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission } from 'src/app/business-modules/share-business';
 import groupBy from 'lodash/groupBy';
 import { DataService } from '@services';
 enum HBL_TAB {
@@ -99,7 +99,7 @@ export class CreateHouseBillComponent extends AppForm {
                 this.getDetailShipmentPermission();
                 // * Get default containers from masterbill.
                 this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-
+                this.permissionShipments = this._store.select(getTransactionPermission);
                 this.getDetailShipment();
             } else {
                 this.combackToHBLList();

@@ -39,8 +39,8 @@
                 </ul>
             </div>
             <ng-container *ngIf="(isLocked | async) === false">
-                <app-default-button *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting"
-                    (onClick)="confirmSave.show()">
+                <app-default-button *ngIf="(permissionHblDetail | async)?.allowUpdate"
+                    [buttonSetting]="saveButtonSetting" (onClick)="confirmSave.show()">
                 </app-default-button>
             </ng-container>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()"></app-default-button>

@@ -44,7 +44,8 @@
                 </ul>
             </div>
             <ng-container *ngIf="(isLocked | async) === false">
-                <app-default-button (click)="onSaveHBLDetail()" *ngIf="allowUpdate" [buttonSetting]="saveButtonSetting">
+                <app-default-button (click)="onSaveHBLDetail()" *ngIf="(permissionHblDetail | async)?.allowUpdate"
+                    [buttonSetting]="saveButtonSetting">
                 </app-default-button>
             </ng-container>
 

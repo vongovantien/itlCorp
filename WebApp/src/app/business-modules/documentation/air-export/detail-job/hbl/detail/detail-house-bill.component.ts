@@ -32,7 +32,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     dataReport: Crystal;
 
-    allowUpdate: boolean = false;
+    allowUpdate: boolean | any = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -67,23 +67,13 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                 this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
-
+                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
                 this.getDetailHbl();
             } else {
                 this.gotoList();
             }
         });
-
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-        this._store.select(getDetailHBlPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowUpdate = res.allowUpdate;
-                    }
-                }
-            );
     }
 
     getDetailHbl() {
@@ -109,23 +99,22 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
-        }
-        else {
+        } else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmExistedHbl.show();
-                    } else {
-                        const modelUpdate = this.getDataForm();
-                        this.setDataToUpdate(modelUpdate);
-                        this.updateHbl(modelUpdate);
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (res) {
+                            this.confirmExistedHbl.show();
+                        } else {
+                            const modelUpdate = this.getDataForm();
+                            this.setDataToUpdate(modelUpdate);
+                            this.updateHbl(modelUpdate);
+                        }
                     }
-                }
-            );
+                );
         }
     }
 
