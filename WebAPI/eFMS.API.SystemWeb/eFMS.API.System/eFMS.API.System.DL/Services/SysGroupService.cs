@@ -21,10 +21,15 @@ namespace eFMS.API.System.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUserLevel> sysLevelRepository;
         private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
+        private readonly IContextBase<SysCompany> sysCompanyRepository;
+
 
         public SysGroupService(IContextBase<SysGroup> repository,
             IMapper mapper,
             IContextBase<CatDepartment> departmentRepo,
+            IContextBase<SysOffice> sysOfficeRepo,
+            IContextBase<SysCompany> sysCompanyRepo,
             ICatDepartmentService deptService,
             IContextBase<SysUserLevel> userLevelRepo,
             ICurrentUser currUser,
@@ -36,6 +41,8 @@ namespace eFMS.API.System.DL.Services
             currentUser = currUser;
             sysLevelRepository = userLevelRepo;
             userRepository = userRepo;
+            sysOfficeRepository = sysOfficeRepo;
+            sysCompanyRepository = sysCompanyRepo;
         }
 
         public SysGroupModel GetById(short id)
@@ -77,6 +84,8 @@ namespace eFMS.API.System.DL.Services
         {
             IQueryable<SysGroup> groups = null;
             IQueryable<CatDepartment> departments = null;
+            IQueryable<SysOffice> offices = null;
+
             if (criteria.All == null)
             {
                 groups = DataContext.Get(x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -105,25 +114,56 @@ namespace eFMS.API.System.DL.Services
             }
             if (groups == null) return null;
             groups = groups.Where(x => x.IsSpecial == false || x.IsSpecial == null);
-            var results = groups.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new SysGroupModel
-            {
-                Id = x.Id,
-                Code = x.Code,
-                NameEn = x.NameEn,
-                NameVn = x.NameVn,
-                ShortName = x.ShortName,
-                DepartmentId = x.DepartmentId,
-                ParentId = x.ParentId,
-                ManagerId = x.ManagerId,
-                UserCreated = x.UserCreated,
-                UserModified = x.UserModified,
-                DatetimeCreated = x.DatetimeCreated,
-                DatetimeModified = x.DatetimeModified,
-                Active = x.Active,
-                InactiveOn = x.InactiveOn,
-                DepartmentName = y.DeptNameEn
-            }).OrderByDescending(x => x.DatetimeModified);
+
+            var query = from g in groups
+                        join dept in departmentRepository.Get() on g.DepartmentId equals dept.Id
+                        join office in sysOfficeRepository.Get() on dept.BranchId equals office.Id
+                        join company in sysCompanyRepository.Get() on office.Buid equals company.Id
+                        select new SysGroupModel
+                        {
+                            Id = g.Id,
+                            Code = g.Code,
+                            NameEn = g.NameEn,
+                            NameVn = g.NameVn,
+                            ShortName = g.ShortName,
+                            DepartmentId = dept.Id,
+                            ParentId = g.ParentId,
+                            ManagerId = g.ManagerId,
+                            UserCreated = g.UserCreated,
+                            UserModified = g.UserModified,
+                            DatetimeCreated = g.DatetimeCreated,
+                            DatetimeModified = g.DatetimeModified,
+                            Active = g.Active,
+                            InactiveOn = g.InactiveOn,
+                            DepartmentName = dept.DeptNameEn,
+                            OfficeId = office.Id,
+                            OfficeName = office.ShortName,
+                            CompanyId = company.Id,
+                            CompanyName = company.BunameEn
+                        };
+            var results = query.OrderByDescending(x => x.DatetimeModified);
             return results;
+            //var results = groups.Join(departments, x => x.DepartmentId, y => y.Id, (x, y) => new SysGroupModel             
+            //{
+            //    Id = x.Id,
+            //    Code = x.Code,
+            //    NameEn = x.NameEn,
+            //    NameVn = x.NameVn,
+            //    ShortName = x.ShortName,
+            //    DepartmentId = x.DepartmentId,
+            //    ParentId = x.ParentId,
+            //    ManagerId = x.ManagerId,
+            //    UserCreated = x.UserCreated,
+            //    UserModified = x.UserModified,
+            //    DatetimeCreated = x.DatetimeCreated,
+            //    DatetimeModified = x.DatetimeModified,
+            //    Active = x.Active,
+            //    InactiveOn = x.InactiveOn,
+            //    DepartmentName = y.DeptNameEn,
+            //    OfficeId =  y.BranchId,
+
+            //}).OrderByDescending(x => x.DatetimeModified);
+            // return results;
         }
 
         public IQueryable<SysGroupModel> GetGroupByDepartment(int id)

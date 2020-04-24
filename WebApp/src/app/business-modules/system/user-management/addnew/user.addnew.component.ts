@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { finalize, catchError } from 'rxjs/operators';
+
 @Component({
     selector: 'app-user.addnew',
     templateUrl: './user.addnew.component.html'
@@ -15,14 +16,14 @@ export class UserAddNewComponent extends AppPage {
 
     @ViewChild(FormAddUserComponent, { static: false }) formAdd: FormAddUserComponent;
 
-    constructor(private _progressService: NgProgress,
+    constructor(
+        private _progressService: NgProgress,
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _router: Router) {
         super();
         this._progressRef = this._progressService.ref();
     }
-
     ngOnInit() {
     }
 
@@ -48,7 +49,6 @@ export class UserAddNewComponent extends AppPage {
                 description: this.formAdd.description.value
             };
 
-            console.log(body);
             this._systemRepo.addNewUser(body)
                 .pipe(
                     catchError(this.catchError),
@@ -59,16 +59,12 @@ export class UserAddNewComponent extends AppPage {
                         if (res.status) {
                             this._toastService.success(res.message, '');
                             this._router.navigate([`home/system/user-management/${res.data}`]);
-
-
                         } else {
                             this._toastService.error(res.message, '');
                         }
                     }
                 );
         }
-
-
     }
 }
 
