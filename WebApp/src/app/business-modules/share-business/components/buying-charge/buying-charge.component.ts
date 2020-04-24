@@ -249,7 +249,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (shipment: CsTransaction | OpsTransaction) => {
                     this.shipment = shipment;
-
                 }
             );
     }
@@ -500,7 +499,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         chargeItem.quantity = this.hbl.netWeight;
                     }
                 } else if (this.service === 'logistic') {
-                    chargeItem.quantity = this.shipment.grossWeight;
+                    chargeItem.quantity = this.shipment.netWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.NW);
                 }
@@ -529,7 +528,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         chargeItem.quantity = this.hbl.cw;
                     }
                 } else if (this.service === 'logistic') {
-                    chargeItem.quantity = this.shipment.grossWeight;
+                    chargeItem.quantity = this.shipment.chargeWeight;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'chargeAbleWeight');
                 }
@@ -542,7 +541,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         chargeItem.quantity = this.hbl.packageQty;
                     }
                 } else if (this.service === 'logistic') {
-                    chargeItem.quantity = this.shipment.grossWeight;
+                    chargeItem.quantity = this.shipment.packageQty;
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, 'packageQuantity');
                 }
