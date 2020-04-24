@@ -44,7 +44,7 @@
                 </ul>
             </div>
             <app-default-button (click)="onSaveHBLDetail()" [buttonSetting]="saveButtonSetting"
-                *ngIf="!(isLocked | async)"></app-default-button>
+                *ngIf="!(isLocked | async) && (permissionHblDetail | async)?.allowUpdate"></app-default-button>
             <app-default-button (click)="combackToHBLList()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </app-sub-header>
@@ -53,7 +53,7 @@
             <tabset class="custom-class-tab">
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
                     <ng-container>
-                        <form-create-house-bill-import [isDetail] = "true"> </form-create-house-bill-import>
+                        <form-create-house-bill-import [isDetail]="true"> </form-create-house-bill-import>
                         <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
                     </ng-container>
                 </tab>

@@ -12,7 +12,7 @@ import { HouseBill, DeliveryOrder, CsTransaction } from '@models';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission } from '@share-bussiness';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
@@ -63,9 +63,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirImport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     this.getDetailShipment();
-
-                    // TODO: PERMISSION: USE ASYNC PIPE NOT SUBSCRIBE.
-                    this.getDetailShipmentPermission();
+                    this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();
                 }
@@ -100,22 +98,19 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 (res: CsTransaction) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-                        // TODO why setTimeOut in subscribe? ??? .
-                        setTimeout(() => {
-                            const objArrival = {
-                                arrivalNo: this.shipmentDetail.jobNo + "-A01",
-                                arrivalFirstNotice: new Date()
-                            };
-                            this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
+                        const objArrival = {
+                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
+                            arrivalFirstNotice: new Date()
+                        };
+                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
 
-                            const objDelivery = {
-                                deliveryOrderNo: this.shipmentDetail.jobNo + "-A01",
-                                deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
-                                // *  AUTO GENERATE SENT TO (1) WITH WAREHOUSENAME FROM POD
-                                doheader1: this.shipmentDetail.warehousePodNameVn,
-                            };
-                            this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-                        }, 500);
+                        const objDelivery = {
+                            deliveryOrderNo: this.shipmentDetail.jobNo + "-A01",
+                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
+                            // *  AUTO GENERATE SENT TO (1) WITH WAREHOUSENAME FROM POD
+                            doheader1: this.shipmentDetail.warehousePodNameVn,
+                        };
+                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
 
                     }
                 },

@@ -17,7 +17,7 @@ import { AbstractControl } from '@angular/forms';
 import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
 
 import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
-import { getDimensionVolumesState, getDetailHBlState, GetDetailHBLSuccessAction } from './../../../../../share-business/store';
+import { getDimensionVolumesState, getDetailHBlState, GetDetailHBLSuccessAction, getTransactionPermission } from './../../../../../share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
@@ -41,7 +41,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     jobId: string;
     selectedHbl: any = {}; // TODO model.
-    allowAdd: boolean = false;
     isImport: boolean = false;
 
     constructor(
@@ -67,7 +66,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     this.jobId = param.jobId;
                     this.generateHblNo(CommonEnum.TransactionTypeEnum.AirExport);
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                    this.getDetailShipmentPermission();
+                    this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();
                 }
@@ -286,20 +285,5 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     gotoList() {
         this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
     }
-
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
-    }
-
 
 }

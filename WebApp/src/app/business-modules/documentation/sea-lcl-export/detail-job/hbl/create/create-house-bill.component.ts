@@ -13,7 +13,8 @@ import { SystemConstants } from 'src/constants/system.const';
 import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
-    ShareBussinessHBLGoodSummaryLCLComponent
+    ShareBussinessHBLGoodSummaryLCLComponent,
+    getTransactionPermission
 } from 'src/app/business-modules/share-business';
 
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -79,7 +80,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                 if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                    this.getDetailShipmentPermission();
+                    this.permissionShipments = this._store.select(getTransactionPermission);
+
                 } else {
                     this.gotoList();
                 }
@@ -255,18 +257,5 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
     }
 
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
-    }
 
 }

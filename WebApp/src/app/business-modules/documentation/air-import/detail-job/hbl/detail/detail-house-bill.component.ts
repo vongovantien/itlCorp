@@ -76,16 +76,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                // TODO: PERMISSION: USE ASYNC PIPE NOT SUBSCRIBE.
-                this._store.select(getDetailHBlPermissionState)
-                    .pipe(takeUntil(this.ngUnsubscribe))
-                    .subscribe(
-                        (res: any) => {
-                            if (!!res) {
-                                this.allowUpdate = res.allowUpdate;
-                            }
-                        }
-                    );
+                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
 
                 this.getDetailHbl();
 

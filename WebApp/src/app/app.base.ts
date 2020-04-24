@@ -9,6 +9,7 @@ import { ButtonType } from "./shared/enums/type-button.enum";
 import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
 import moment from "moment/moment";
 import { PermissionShipment } from "./shared/models/document/permissionShipment";
+import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
@@ -36,6 +37,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     isLocked: boolean | any = false;
     isShowUpdate: boolean = true;
     permissionShipments: Observable<PermissionShipment>;
+    permissionHblDetail: Observable<PermissionHouseBill>;
+
 
     _isShowAutoComplete = new BehaviorSubject<boolean>(false);
     $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();
