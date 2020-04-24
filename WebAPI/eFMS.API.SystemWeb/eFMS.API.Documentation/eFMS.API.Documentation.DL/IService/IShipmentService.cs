@@ -19,6 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UnLockShipment(List<LockedLogModel> shipments);
         IQueryable<Shipments> GetShipmentNotDelete();
         List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria,int page,int size, out int rowCount);
+        List<GeneralReportResult> QueryDataGeneralReport(GeneralReportCriteria criteria);
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
         List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
     }

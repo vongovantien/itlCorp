@@ -138,6 +138,18 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Query data for general report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("QueryDataGeneralReport")]
+        public IActionResult QueryDataGeneralReport(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.QueryDataGeneralReport(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Get data for export shipment overview
         /// </summary>
         /// <param name="criteria"></param>

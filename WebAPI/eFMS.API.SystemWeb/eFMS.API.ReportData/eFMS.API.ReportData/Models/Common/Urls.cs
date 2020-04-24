@@ -53,6 +53,7 @@
             public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?jobId=";
             public const string GetDataShipmentOverviewUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverview";
             public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
+            public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
         }
     }
 }

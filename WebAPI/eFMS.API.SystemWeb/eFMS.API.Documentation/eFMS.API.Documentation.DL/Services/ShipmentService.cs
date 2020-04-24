@@ -1092,6 +1092,29 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
+        public List<GeneralReportResult> QueryDataGeneralReport(GeneralReportCriteria criteria)
+        {
+            var dataDocumentation = GeneralReportDocumentation(criteria);
+            IQueryable<GeneralReportResult> list;
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = GeneralReportOperation(criteria);
+                list = dataDocumentation.Union(dataOperation);
+            }
+            else
+            {
+                list = dataDocumentation;
+            }
+            var tempList = list.ToList();
+            int no = 1;
+            tempList.ForEach(fe =>
+            {
+                fe.No = no;
+                no++;
+            });
+            return tempList;
+        }
+
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
             var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);

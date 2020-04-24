@@ -257,6 +257,33 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Standard General Report
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportStandardGeneralReport")]
+        [HttpPost]
+        public async Task<IActionResult> ExportStandardGeneralReport(GeneralReportCriteria criteria)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataStandardGeneralReportUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<GeneralReportResult>>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateStandardGeneralReportExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Standard Report.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export Accounting PL Sheet
         /// </summary>
         /// <param name="criteria"></param>

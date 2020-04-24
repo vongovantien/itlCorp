@@ -67,7 +67,7 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.DL.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Documentation.Service">
-      <HintPath>..\..\DocumentationManagement\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Documentation.Service.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Infrastructure">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
