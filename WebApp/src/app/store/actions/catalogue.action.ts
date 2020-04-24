@@ -27,6 +27,10 @@ export enum CatalogueActionTypes {
     GET_UNIT_SUCCESS = '[Catalogue] Get Unit Success',
     GET_UNIT_FAIL = '[Catalogue] Get Unit Fail',
 
+    GET_PACKAGE = '[Catalogue] Get Package',
+    GET_PACKAGE_SUCCESS = '[Catalogue] Get Package Success',
+    GET_PACKAGE_FAIL = '[Catalogue] Get Package Fail',
+
     GET_CURRENCY = '[Catalogue] Get Currency',
     GET_CURRENCY_SUCCESS = '[Catalogue] Get Currency Success',
     GET_CURRENCY_FAIL = '[Catalogue] Get Currency Fail',
@@ -128,6 +132,22 @@ export class GetCatalogueUnitFailAction implements Action {
 }
 //#endregion
 
+
+//#region Package
+export class GetCataloguePackageAction implements Action {
+    readonly type = CatalogueActionTypes.GET_PACKAGE;
+    constructor(public payload: any = { unitType: CommonEnum.UnitType.PACKAGE, active: true }) { }
+}
+export class GetCataloguePackageSuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_PACKAGE_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCataloguePackageFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_PACKAGE_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
+
 //#region Commodity
 export class GetCatalogueCommodityAction implements Action {
     readonly type = CatalogueActionTypes.GET_COMMODITY;
@@ -216,4 +236,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueWarehouseAction
     | GetCatalogueWarehouseSuccessAction
     | GetCatalogueWarehouseFailAction
+    | GetCataloguePackageAction
+    | GetCataloguePackageSuccessAction
+    | GetCataloguePackageFailAction
     ;

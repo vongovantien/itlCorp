@@ -1,5 +1,6 @@
-<form [formGroup]="formGroup">
-    <div class="m-form m-form--state">
+<div class="m-form m-form--state">
+    <form [formGroup]="formGroup">
+
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="row">
@@ -56,7 +57,7 @@
                             </div>
                             <div class="form-control-feedback"
                                 *ngIf="(clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !clearanceDate.value.startDate)">
-                                Service Date is required!
+                                Clearance Date is required!
                             </div>
                         </div>
                     </div>
@@ -98,7 +99,7 @@
                                 Service Type
                             </label>
                             <ng-select #sp [items]="serviceTypes" placeholder="Please select"
-                                (selected)="selectedServiceType(sp)" (opened)="closeOtherSelects(sp)"
+                                (selected)="selectedServiceType(sp, 'service-type')" (opened)="closeOtherSelects(sp)"
                                 [allowClear]="true" formControlName="serviceType">
                             </ng-select>
                         </div>
@@ -150,17 +151,18 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && cargoType.value === null && isDisableCargo === false }">
+                        <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && cargoType.invalid  && isDisableCargo === false }">
                             <label class="form-control-label" for="">
                                 Cargo Type <span class="m--font-danger"
-                                    *ngIf="isSubmitted && cargoType.value === null && isDisableCargo === false">(*)</span>
+                                    *ngIf="isSubmitted && cargoType.invalid && isDisableCargo === false">(*)</span>
                             </label>
                             <ng-select #ps [items]="cargoTypes" placeholder="Please select" [disabled]="isDisableCargo"
-                                (opened)="closeOtherSelects(ps)" formControlName="cargoType" [allowClear]="true">
+                                (opened)="closeOtherSelects(ps)" (selected)="selectedServiceType(ps, 'cargo-type')"
+                                formControlName="cargoType" [allowClear]="true">
                             </ng-select>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && cargoType.value === null && isDisableCargo === false">
+                                *ngIf="isSubmitted && cargoType.invalid && isDisableCargo === false">
                                 Cargo Type is required
                             </div>
                         </div>
@@ -305,7 +307,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="!!customDeclaration.datetimeCreated">
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Create:</span>
                         <span
@@ -329,7 +331,7 @@
                         <span class="m--font-brand m--margin-left-5">{{customDeclaration.source}}</span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" *ngIf="!!customDeclaration.datetimeCreated">
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">First Customer No:</span>
                         <span class="m--font-brand m--margin-left-5">{{customDeclaration.firstClearanceNo}}</span>
@@ -346,36 +348,35 @@
                 </div>
             </div>
         </div>
-        <div class="form-actions m--align-right">
-            <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                *ngIf="customDeclaration.permission.allowUpdate  && customDeclaration.jobNo === null"
-                (click)="saveCustomClearance()">
+    </form>
+    <!-- <div class="form-actions m--align-right">
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            *ngIf="customDeclaration.permission.allowUpdate  && customDeclaration.jobNo === null"
+            (click)="saveCustomClearance()">
+            <span>
+                <i class="la la la-save"></i>
                 <span>
-                    <i class="la la la-save"></i>
-                    <span>
-                        save
-                    </span>
+                    save
                 </span>
-            </button>
-            <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="saveAndConvert()"
-                *ngIf="customDeclaration.permission.allowUpdate && customDeclaration.jobNo === null">
+            </span>
+        </button>
+        <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="saveAndConvert()"
+            *ngIf="customDeclaration.permission.allowUpdate && customDeclaration.jobNo === null">
+            <span>
+                <i class="la la la-save"></i>
                 <span>
-                    <i class="la la la-save"></i>
-                    <span>
-                        save and convert
-                    </span>
+                    save and convert
                 </span>
-            </button>
-            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                routerLink="/home/operation/custom-clearance">
+            </span>
+        </button>
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+            routerLink="/home/operation/custom-clearance">
+            <span>
+                <i class="la la-ban"></i>
                 <span>
-                    <i class="la la-ban"></i>
-                    <span>
-                        cancel
-                    </span>
+                    cancel
                 </span>
-            </button>
-        </div>
-    </div>
-</form>
+            </span>
+        </button>
+    </div> -->
+</div>

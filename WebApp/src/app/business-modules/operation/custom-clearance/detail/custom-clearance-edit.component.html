@@ -12,5 +12,35 @@
     </div>
 </div>
 <div class="m-content">
-    <custom-clearance-form-detail (isSuccess)="updateSuccess($event)"></custom-clearance-form-detail>
+    <custom-clearance-form-detail></custom-clearance-form-detail>
+    <div class="form-actions m--align-right" *ngIf="!!customDeclaration">
+        <button type="" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+            *ngIf="customDeclaration.permission.allowUpdate  && customDeclaration.jobNo === null"
+            (click)="saveCustomClearance()">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save
+                </span>
+            </span>
+        </button>
+        <button type="" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="saveAndConvert()"
+            *ngIf="customDeclaration.permission.allowUpdate && customDeclaration.jobNo === null">
+            <span>
+                <i class="la la la-save"></i>
+                <span>
+                    save and convert
+                </span>
+            </span>
+        </button>
+        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+            routerLink="/home/operation/custom-clearance">
+            <span>
+                <i class="la la-ban"></i>
+                <span>
+                    cancel
+                </span>
+            </span>
+        </button>
+    </div>
 </div>

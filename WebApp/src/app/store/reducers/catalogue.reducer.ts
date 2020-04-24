@@ -8,6 +8,7 @@ export interface ICatalogueState {
     carriers: Customer[];
     agents: Customer[];
     units: Unit[];
+    packages: Unit[];
     customers: Customer[];
     countries: CountryModel[];
     commodities: Commodity[];
@@ -23,6 +24,7 @@ const initialState: ICatalogueState = {
     carriers: [],
     agents: [],
     units: [],
+    packages: [],
     customers: [],
     commodities: [],
     commodityGroups: [],
@@ -84,6 +86,16 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, units: action.payload };
         }
         case CatalogueActionTypes.GET_UNIT_FAIL: {
+            return { ...state, isLoading: false, };
+        }
+
+        case CatalogueActionTypes.GET_PACKAGE: {
+            return { ...state, isLoading: true };
+        }
+        case CatalogueActionTypes.GET_PACKAGE_SUCCESS: {
+            return { ...state, isLoading: false, packages: action.payload };
+        }
+        case CatalogueActionTypes.GET_PACKAGE_FAIL: {
             return { ...state, isLoading: false, };
         }
 

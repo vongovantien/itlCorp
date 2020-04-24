@@ -80,6 +80,9 @@ export const getCatalogueAgentLoadingState = createSelector(catalogueState, (sta
 export const getCatalogueUnitState = createSelector(catalogueState, (state: ICatalogueState) => state && state.units);
 export const getCatalogueUnitLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+export const getCataloguePackageState = createSelector(catalogueState, (state: ICatalogueState) => state && state.packages);
+export const getCataloguePackageLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
 export const getCatalogueCommodityState = createSelector(catalogueState, (state: ICatalogueState) => state && state.commodities);
 export const getCatalogueCommodityLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 

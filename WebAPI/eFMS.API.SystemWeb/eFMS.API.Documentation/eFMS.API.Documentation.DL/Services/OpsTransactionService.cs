@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CustomsDeclaration> customDeclarationRepository;
         private readonly IContextBase<AcctCdnote> acctCdNoteRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepository;
+        private readonly IContextBase<CatCommodity> commodityRepository;
         private readonly ICsMawbcontainerService mawbcontainerService;
         readonly IUserPermissionService permissionService;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsMawbcontainerService containerService, 
             IUserPermissionService perService,
             IContextBase<CatCurrencyExchange> currencyExchangeRepo,
+            IContextBase<CatCommodity> commodityRepo,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -82,6 +84,7 @@ namespace eFMS.API.Documentation.DL.Services
             permissionService = perService;
             currencyExchangeRepository = currencyExchangeRepo;
             currencyExchangeService = currencyExchange;
+            commodityRepository = commodityRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -429,7 +432,22 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                productService = model.ServiceType;
+                if(model.CargoType != null && model.ServiceType == null)
+                {
+                    model.ServiceType = "Sea";
+                    if (model.CargoType == "FCL")
+                    {
+                        productService = "SeaFCL";
+                    }
+                    else
+                    {
+                        productService = "SeaLCL";
+                    }
+                }
+                else
+                {
+                    productService = model.ServiceType;
+                }
             }
             return productService;
         }
@@ -601,6 +619,11 @@ namespace eFMS.API.Documentation.DL.Services
                     opsTransaction.SumPackages = model.Pcs;
                     opsTransaction.PackageTypeId = unit.Id;
                 }
+                var commodity = commodityRepository.Get(x => x.Code == model.CommodityCode).FirstOrDefault();
+                if(commodity != null)
+                {
+                    opsTransaction.CommodityGroupId = commodity.CommodityGroupId;
+                }
                 int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                 opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
                 var dayStatus = (int)(opsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
@@ -753,6 +776,12 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             opsTransaction.SumPackages = item.Pcs;
                             opsTransaction.PackageTypeId = unit.Id;
+                        }
+
+                        var commodity = commodityRepository.Get(x => x.Code == item.CommodityCode).FirstOrDefault();
+                        if (commodity != null)
+                        {
+                            opsTransaction.CommodityGroupId = commodity.CommodityGroupId;
                         }
                         int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
                         opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);

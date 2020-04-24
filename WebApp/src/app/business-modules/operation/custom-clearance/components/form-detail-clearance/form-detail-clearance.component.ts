@@ -3,22 +3,20 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo, OperationRepo, DocumentationRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { Customer, PortIndex, CountryModel, Commodity, Unit, OpsTransaction } from '@models';
+import { Customer, PortIndex, CountryModel, Commodity, Unit } from '@models';
 import { CommonEnum } from '@enums';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryLoadingState, getCatalogueCountryState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
+import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCatalogueUnitState, GetCatalogueUnitAction, GetCataloguePackageAction, getCataloguePackageState } from '@store';
 import { IShareBussinessState } from '@share-bussiness';
 import { Store } from '@ngrx/store';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { isFulfilled } from 'q';
 
 @Component({
     selector: 'custom-clearance-form-detail',
     templateUrl: './form-detail-clearance.component.html'
 })
 export class CustomClearanceFormDetailComponent extends AppForm implements OnInit {
-    @Output() isSuccess = new EventEmitter<boolean>();
     formGroup: FormGroup;
     customDeclaration: CustomClearance = new CustomClearance();
 
@@ -94,12 +92,12 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCommodityAction());
         this._store.dispatch(new GetCatalogueCountryAction());
-        this._store.dispatch(new GetCatalogueUnitAction());
+        this._store.dispatch(new GetCataloguePackageAction());
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.ports = this._store.select(getCataloguePortState);
         this.countries = this._store.select(getCatalogueCountryState);
         this.commodities = this._store.select(getCatalogueCommodityState);
-        this.units = this._store.select(getCatalogueUnitState);
+        this.units = this._store.select(getCataloguePackageState);
 
         this.initForm();
     }
@@ -226,14 +224,23 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 break;
         }
     }
-    selectedServiceType(event) {
-        const serviceType = event.active[0];
-        if (!!serviceType) {
-            if (serviceType.id === 'Air' || serviceType.id === 'Express') {
-                this.isDisableCargo = true;
-            } else {
-                this.isDisableCargo = false;
-            }
+    selectedServiceType(event, type: string) {
+        switch (type) {
+            case 'service-type':
+                const serviceType = event.active[0];
+                if (!!serviceType) {
+                    if (serviceType.id === 'Air' || serviceType.id === 'Express') {
+                        this.isDisableCargo = true;
+                        this.formGroup.controls['cargoType'].setValue([]);
+                    } else {
+                        this.isDisableCargo = false;
+                    }
+                }
+                break;
+            case 'cargo-type':
+                this.formGroup.controls['cargoType'].setErrors(null);
+                this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(x => x.id === "Sea")]);
+                break;
         }
     }
     getClearance() {
@@ -242,8 +249,8 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.clearanceNo = !!form.clearanceNo ? form.clearanceNo.trim() : null;
         this.customDeclaration.partnerTaxCode = !!form.partnerTaxCode ? form.partnerTaxCode.trim() : null;
         this.customDeclaration.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
-        this.customDeclaration.hblid = !!form.hblid ? form.hblid : null;
-        this.customDeclaration.mblid = !!form.mblid ? form.mblid : null;
+        this.customDeclaration.hblid = !!form.hblid ? form.hblid.trim() : null;
+        this.customDeclaration.mblid = !!form.mblid ? form.mblid.trim() : null;
         this.customDeclaration.gateway = form.gateway;
         this.customDeclaration.exportCountryCode = form.exportCountry;
         this.customDeclaration.importCountryCode = form.importCountry;
@@ -257,42 +264,9 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.shipper = !!form.shipper ? form.shipper.trim() : null;
         this.customDeclaration.consignee = !!form.consignee ? form.consignee.trim() : null;
         this.customDeclaration.note = !!form.note ? form.note.trim() : null;
-        this.customDeclaration.cargoType = !!form.cargoType ? form.cargoType[0].id : null;
-        this.customDeclaration.route = !!form.route ? form.route[0].id : null;
-        this.customDeclaration.serviceType = !!form.serviceType ? form.serviceType[0].id : null;
-        this.customDeclaration.type = !!form.type ? form.type[0].id : null;
-    }
-    saveCustomClearance() {
-        console.log(this.formGroup);
-        this.isSubmitted = true;
-        this.isConvertJob = false;
-        if (this.formGroup.invalid) {
-            return;
-        }
-        this.getClearance();
-        this.updateCustomClearance();
-    }
-    async updateCustomClearance() {
-        const respone = await this._operationRepo.updateCustomDeclaration(this.customDeclaration).toPromise();
-        if (respone['status'] === true) {
-            this._toart.success(respone['message']);
-            this.isSuccess.emit(true);
-        }
-    }
-    saveAndConvert() {
-        this.isSubmitted = true;
-        this.isConvertJob = true;
-        if (this.formGroup.invalid) {
-            return;
-        }
-        this.getClearance();
-        this.updateAndConvertClearance();
-    }
-    async updateAndConvertClearance() {
-        const response = await this._documentation.convertExistedClearanceToJob([this.customDeclaration]).toPromise();
-        if (response.status) {
-            this._toart.success("Convert Successfull!!!");
-            this.isSuccess.emit(true);
-        }
+        this.customDeclaration.cargoType = !!form.cargoType ? (form.cargoType.length > 0 ? form.cargoType[0].id : null) : null;
+        this.customDeclaration.route = !!form.route ? (form.route.length > 0 ? form.route[0].id : null) : null;
+        this.customDeclaration.serviceType = !!form.serviceType ? (form.serviceType.length > 0 ? form.serviceType[0].id : null) : null;
+        this.customDeclaration.type = !!form.type ? (form.type.length > 0 ? form.type[0].id : null) : null;
     }
 }

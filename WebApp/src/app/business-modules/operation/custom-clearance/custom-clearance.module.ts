@@ -12,7 +12,6 @@ import { SelectModule } from 'ng2-select';
 import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './detail/custom-clearance-edit.component';
 import { CustomClearanceImportComponent } from './import/custom-clearance-import.component';
-import { CustomClearanceFormAddComponent } from './components/form-add-custom-clearance/form-add-custom-clearance.component';
 import { CustomClearanceFormDetailComponent } from './components/form-detail-clearance/form-detail-clearance.component';
 
 const routing: Routes = [
@@ -74,7 +73,6 @@ const LIB = [
         CustomClearanceImportComponent,
         CustomClearanceEditComponent,
         CustomClearanceFormSearchComponent,
-        CustomClearanceFormAddComponent,
         CustomClearanceFormDetailComponent
     ],
     providers: [],
