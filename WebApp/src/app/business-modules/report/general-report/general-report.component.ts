@@ -89,13 +89,13 @@ export class GeneralReportComponent extends AppList {
         this.dataList = this._sortService.sort(this.dataList, sort, this.order);
     }
 
-    exportShipmentOverview(){
-        if(this.dataList.length == 0){
+    exportShipmentOverview() {
+        if (this.dataList.length === 0) {
             this._toastService.warning('Please Apply Report');
             return;
-        }
-        else {
+        } else {
             this.isClickSubMenu = false;
+            this._progressRef.start();
             this._exportRepo.exportShipmentOverview(this.dataSearch)
                 .pipe(
                     catchError(this.catchError),
@@ -108,6 +108,26 @@ export class GeneralReportComponent extends AppList {
                     },
                 );
         }
-       
+    }
+
+    exportStandard() {
+        if (this.dataList.length === 0) {
+            this._toastService.warning('Please Apply Report');
+            return;
+        } else {
+            this.isClickSubMenu = false;
+            this._progressRef.start();
+            this._exportRepo.exportStandardGeneralReport(this.dataSearch)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                )
+                .subscribe(
+                    (response: ArrayBuffer) => {
+                        const fileName = "Standard Report (" + this.dataSearch.currency + ").xlsx";
+                        this.downLoadFile(response, "application/ms-excel", fileName);
+                    },
+                );
+        }
     }
 }

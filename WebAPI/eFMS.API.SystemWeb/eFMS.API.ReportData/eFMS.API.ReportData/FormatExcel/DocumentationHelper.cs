@@ -1711,5 +1711,117 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart + 2, 1].Style.Font.Italic = true;
             workSheet.Cells[rowStart + 2, 1].Value = "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData[0].UserExport;
         }
+
+        /// <summary>
+        /// Generate Standard General Report Excel
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateStandardGeneralReportExcel(List<GeneralReportResult> listData, GeneralReportCriteria criteria, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add(string.Format(@"Standard Report ({0})", criteria.Currency));
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDataStandardGeneralReport(workSheet, listData, criteria);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelStandardGeneralReportExport(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 5.5; //Cột A
+            workSheet.Column(2).Width = 14.5; //Cột B
+            workSheet.Column(3).Width = 18; //Cột C
+            workSheet.Column(4).Width = 18; //Cột D
+            workSheet.Column(5).Width = 34; //Cột E
+            workSheet.Column(6).Width = 34; //Cột F
+            workSheet.Column(7).Width = 34; //Cột G
+            workSheet.Column(8).Width = 12.5; //Cột H
+            workSheet.Column(9).Width = 13; //Cột I
+            workSheet.Column(10).Width = 9; //Cột J
+            workSheet.Column(11).Width = 14; //Cột K
+            workSheet.Column(12).Width = 14; //Cột L
+            workSheet.Column(13).Width = 14; //Cột M
+            workSheet.Column(14).Width = 14; //Cột N
+            workSheet.Column(15).Width = 20; //Cột O
+            workSheet.Column(16).Width = 20; //Cột P
+            workSheet.Column(17).Width = 15.5; //Cột Q            
+        }
+
+        private void BinddingDataStandardGeneralReport(ExcelWorksheet workSheet, List<GeneralReportResult> listData, GeneralReportCriteria criteria)
+        {
+            SetWidthColumnExcelStandardGeneralReportExport(workSheet);
+            List<string> headers = new List<string>
+            {
+                "No.", //0
+                "Job ID", //1
+                "MBL/MAWB", //2
+                "HBL/HAWB", //3
+                "Customer", //4
+                "Carrier", //5
+                "Agent", //6
+                "Service Date", //7
+                "Route", //8
+                "Qty", //9
+                "Revenue", //10
+                "Cost", //11
+                "Profit", //12
+                "OBH", //13
+                "P.I.C", //14
+                "Salesman", //15
+                "Service" //16
+            };
+            workSheet.Cells["A1:Q1"].Style.Font.Bold = true;
+            for(int c = 1; c < 18; c++)
+            {
+                workSheet.Cells[1, c].Value = headers[c - 1];
+            }
+
+            int startRow = 2;
+            foreach(var item in listData)
+            {
+                workSheet.Cells[startRow, 1].Value = item.No;
+                workSheet.Cells[startRow, 2].Value = item.JobId;
+                workSheet.Cells[startRow, 3].Value = item.Mawb;
+                workSheet.Cells[startRow, 4].Value = item.Hawb;
+                workSheet.Cells[startRow, 5].Value = item.CustomerName;
+                workSheet.Cells[startRow, 6].Value = item.CarrierName;
+                workSheet.Cells[startRow, 7].Value = item.AgentName;
+                workSheet.Cells[startRow, 8].Value = item.ServiceDate;
+                workSheet.Cells[startRow, 8].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[startRow, 9].Value = item.Route;
+
+                workSheet.Cells[startRow, 10].Value = item.Qty;
+                workSheet.Cells[startRow, 11].Value = item.Revenue;
+                workSheet.Cells[startRow, 12].Value = item.Cost;
+                workSheet.Cells[startRow, 13].Value = item.Profit;
+                workSheet.Cells[startRow, 14].Value = item.Obh;
+                for(int i = 10; i < 15; i++)
+                {
+                    workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[startRow, 15].Value = item.PersonInCharge;
+                workSheet.Cells[startRow, 16].Value = item.Salesman;
+                workSheet.Cells[startRow, 17].Value = item.ServiceName;
+
+                startRow += 1;
+            }
+
+            workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+        }
     }
 }

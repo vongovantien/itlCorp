@@ -5,24 +5,18 @@
         <div class="m-portlet__body">
             <div class="form-actions">
                 <div class="row">
-                    <!-- <div class="col-lg-12">
-                        <button type="button" class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase">
-                            <span>
-                                <i class="la la-download"></i>
-                                <span>
-                                    Export
-                                </span>
-                            </span>
-                        </button>
-                    </div> -->
                     <div class="col-lg-12">
                         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
-                            <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
-                                aria-controls="dropdown-nested">
+                            <button id="button-nested" dropdownToggle type="button"
+                                class="btn btn-danger dropdown-toggle" aria-controls="dropdown-nested">
                                 <i class="la la-upload"></i>Export<span class="caret"></span>
                             </button>
-                            <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                                <li role="menuitem"><a (click)="exportShipmentOverview()" class="dropdown-item pointer">Shipment Overview</a></li>
+                            <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu"
+                                aria-labelledby="button-nested">
+                                <li role="menuitem"><a (click)="exportStandard()" class="dropdown-item pointer">Standard
+                                        Report</a></li>
+                                <li role="menuitem"><a (click)="exportShipmentOverview()"
+                                        class="dropdown-item pointer">Shipment Overview</a></li>
                             </ul>
                         </div>
                     </div>

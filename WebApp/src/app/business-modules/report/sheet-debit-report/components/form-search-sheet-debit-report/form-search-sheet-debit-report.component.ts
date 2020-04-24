@@ -85,7 +85,7 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     ngOnInit() {
         this.initDataInform();
         this.initFormSearch();
-        const partnerGroup = [
+        /*const partnerGroup = [
             CommonEnum.PartnerGroupEnum.CUSTOMER,
             CommonEnum.PartnerGroupEnum.AGENT,
             CommonEnum.PartnerGroupEnum.CARRIER,
@@ -97,8 +97,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             CommonEnum.PartnerGroupEnum.SUPPLIERMATERIAL,
             CommonEnum.PartnerGroupEnum.AIRSHIPSUP,
             CommonEnum.PartnerGroupEnum.PETROLSTATION
-        ];
-        this.customers = this._catalogueRepo.getPartnerByGroups(partnerGroup, null);
+        ];*/
+        // Get All Partner
+        this.customers = this._catalogueRepo.getPartnerByGroups(null, null);
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
