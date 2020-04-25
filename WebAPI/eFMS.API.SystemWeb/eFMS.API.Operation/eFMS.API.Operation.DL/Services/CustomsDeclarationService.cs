@@ -1212,5 +1212,30 @@ namespace eFMS.API.Operation.DL.Services
             }
             return result;
         }
+
+        public List<CustomsDeclarationModel> GetListCustomNoAsignPIC()
+        {
+            //Get list custom có shipment operation chưa bị lock, list shipment đã được assign cho current user hoặc shipment có PIC là current user
+            var userCurrent = currentUser.UserID;
+            var customs = DataContext.Get();
+            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var shipmentsOperation = from ops in shipments
+                                     join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
+                                     where osa.MainPersonInCharge == userCurrent
+                                     select ops;
+            var shipmentPIC = shipments.Where(x => x.BillingOpsId == userCurrent);
+
+            var shipmentMerge = shipmentsOperation.Union(shipmentPIC);
+
+            //Join theo số HBL
+            var query = from cus in customs
+                        join ope in shipmentMerge on cus.Hblid equals ope.Hwbno into ope2
+                        from ope in ope2
+                        select cus;
+
+            var data = mapper.Map<List<CustomsDeclarationModel>>(query);
+            data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
+            return data;
+        }
     }
 }

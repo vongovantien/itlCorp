@@ -147,6 +147,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetListCustomNoAsignPIC">
+            <summary>
+            Get list custom of shipment operation (not locked, shipment asign or PIC is current user) 
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Operation.Controllers.EcusConnectionController">
             <summary>
             A base class for an MVC controller without view support.

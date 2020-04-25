@@ -26,5 +26,6 @@ namespace eFMS.API.Operation.DL.IService
         List<CustomsDeclarationModel> GetCustomsShipmentNotLocked();
         int CheckDetailPermission(int id);
         CustomsDeclarationModel GetDetail(int id);
+        List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
     }
 }

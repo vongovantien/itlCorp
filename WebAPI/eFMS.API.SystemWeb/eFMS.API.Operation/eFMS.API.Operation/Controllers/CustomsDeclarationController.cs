@@ -469,5 +469,16 @@ namespace eFMS.API.Operation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get list custom of shipment operation (not locked, shipment asign or PIC is current user) 
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListCustomNoAsignPIC")]
+        [Authorize]
+        public IActionResult GetListCustomNoAsignPIC()
+        {
+            var data = customsDeclarationService.GetListCustomNoAsignPIC();
+            return Ok(data);
+        }
     }
 }
