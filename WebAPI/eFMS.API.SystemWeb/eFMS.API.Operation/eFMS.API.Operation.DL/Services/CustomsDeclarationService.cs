@@ -287,19 +287,13 @@ namespace eFMS.API.Operation.DL.Services
         public List<CustomsDeclarationModel> GetCustomDeclaration(string keySearch, string customerNo, bool Imported, int pageNumber, int pageSize, out int rowsCount)
         {
             List<CustomsDeclarationModel> returnList = null;
-            string[] clearanceNoArray = null;
+            string[] clearanceNoArray = new string[0];
             string replaceString = keySearch;
             if (keySearch != null)
             {
                 keySearch = keySearch.ToLower().Trim();
                 replaceString = keySearch.Replace("\t", "");
-                replaceString = replaceString.Replace("ismultiple", "");
-                replaceString = replaceString.Replace(" ", "");
                 clearanceNoArray = replaceString.Split(',');
-                if (keySearch == "ismultiple")
-                {
-                    keySearch = String.Empty;
-                }
             }
             else
             {
@@ -307,11 +301,10 @@ namespace eFMS.API.Operation.DL.Services
             }
 
             Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
-            && (keySearch != null && keySearch.Contains("ismultiple") ? clearanceNoArray.Contains(x.ClearanceNo.ToLower()) :
-            x.ClearanceNo.Contains(keySearch) || (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
+            && (clearanceNoArray.Length > 1 && !string.IsNullOrEmpty(keySearch) ? clearanceNoArray.Any(val => x.ClearanceNo.ToLower().Contains(val.ToLower())) :
+            x.ClearanceNo.ToLower().Contains(keySearch) || (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
             || (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
             || (x.Note != null && x.Note.ToLower().Contains(keySearch)) || (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
-
             var data = Get().Where(query);
             if (Imported == true)
             {
