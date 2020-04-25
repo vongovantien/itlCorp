@@ -25,6 +25,7 @@ using eFMS.API.Operation.Service.ViewModels;
 using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
 using eFMS.API.Common.Models;
+using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -284,22 +285,17 @@ namespace eFMS.API.Operation.DL.Services
         }
 
 
-        public List<CustomsDeclarationModel> GetCustomDeclaration(string keySearch, string customerNo, bool Imported, int pageNumber, int pageSize, out int rowsCount)
+        public IQueryable<CustomsDeclarationModel> GetCustomDeclaration(string keySearch, string customerNo, bool Imported, int pageNumber, int pageSize, out int rowsCount)
         {
-            List<CustomsDeclarationModel> returnList = null;
+            IQueryable<CustomsDeclarationModel> returnList = null;
             string[] clearanceNoArray = null;
-            string replaceString = keySearch;
+            string autocompleteKey = string.Empty;
             if (keySearch != null)
             {
                 keySearch = keySearch.ToLower().Trim();
-                replaceString = keySearch.Replace("\t", "");
-                replaceString = replaceString.Replace("ismultiple", "");
-                replaceString = replaceString.Replace(" ", "");
-                clearanceNoArray = replaceString.Split(',');
-                if (keySearch == "ismultiple")
-                {
-                    keySearch = String.Empty;
-                }
+                var replaceString = keySearch.Split(',');
+                autocompleteKey = replaceString.Length > 0 ? replaceString[0] : string.Empty;
+                clearanceNoArray = replaceString.Length > 1? replaceString[1].Split('\n'): null;
             }
             else
             {
@@ -307,12 +303,34 @@ namespace eFMS.API.Operation.DL.Services
             }
 
             Func<CustomsDeclarationModel, bool> query = x => (x.PartnerTaxCode == customerNo)
-            && (keySearch != null && keySearch.Contains("ismultiple") ? clearanceNoArray.Contains(x.ClearanceNo.ToLower()) :
-            x.ClearanceNo.Contains(keySearch) || (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
-            || (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
-            || (x.Note != null && x.Note.ToLower().Contains(keySearch)) || (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
+                                && ((clearanceNoArray != null ? clearanceNoArray.Any(val => x.ClearanceNo.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+                                                                : (x.ClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase)))
+                                     || (x.Hblid != null && x.Hblid.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || (x.ExportCountryCode != null && x.ExportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || (x.ImportCountryCode != null && x.ImportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || (x.CommodityCode != null && x.CommodityCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || (x.FirstClearanceNo != null && x.FirstClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || (x.QtyCont.HasValue && x.QtyCont.ToString().Contains(autocompleteKey))
+                                     || (x.Note != null && x.Note.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+                                     || string.IsNullOrEmpty(autocompleteKey)
+                                );
 
+
+            //|| (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
+            //|| (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
+            //|| (x.Note != null && x.Note.ToLower().Contains(keySearch)) || (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
             var data = Get().Where(query);
+            //var data = DataContext.Get(x => (x.PartnerTaxCode == customerNo)
+            //                    && (clearanceNoArray != null ? clearanceNoArray.Any(val => x.ClearanceNo.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+            //                                                    : (x.ClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.Hblid != null && x.Hblid.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.ExportCountryCode != null && x.ExportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.ImportCountryCode != null && x.ImportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.CommodityCode != null && x.CommodityCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.FirstClearanceNo != null && x.FirstClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                         || (x.QtyCont.HasValue && x.QtyCont.ToString().Contains(autocompleteKey))
+            //                         || (x.Note != null && x.Note.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
+            //                    ));
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
@@ -331,9 +349,12 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     pageNumber = 1;
                 }
-                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                //var s = data.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+                //returnList = s?.ProjectTo<CustomsDeclarationModel>(mapper.ConfigurationProvider);
+                returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize)?.AsQueryable();
             }
             return returnList;
+
         }
 
         private List<CustomsDeclarationModel> MapClearancesToClearanceModels(IQueryable<Object> list)

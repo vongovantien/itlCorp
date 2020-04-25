@@ -47,56 +47,17 @@
                         <th class="table-actions-col no-sorting">
                             <div class="table-actions">
                                 <label class="m-checkbox">
-                                    <input type="checkbox" name="checkAllImported" [checked]="checkAllImported"
+                                    <input type="checkbox" name="checkAllNotImported" [checked]="checkAllImported"
                                         (change)="checkAllImported =! checkAllImported; changeAllImported()">
                                     <span></span>
                                 </label>
                             </div>
                         </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'clearanceNo') }"
-                            (click)="sort('clearanceNo')">
-                            <span>Custom No</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'clearanceDate'), 'sorting_desc': (!isDesc && sortKey == 'clearanceDate') }"
-                            (click)="sort('clearanceDate')">
-                            <span>Clearance Date</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'hblid'), 'sorting_desc': (!isDesc && sortKey == 'hblid') }"
-                            (click)="sort('hblid')">
-                            <span>HBL No</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'exportCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'exportCountryCode') }"
-                            (click)="sort('exportCountryCode')">
-                            <span>Export Country</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'importCountryCode'), 'sorting_desc': (!isDesc && sortKey == 'importCountryCode') }"
-                            (click)="sort('importCountryCode')">
-                            <span>Import Country</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'commodityCode'), 'sorting_desc': (!isDesc && sortKey == 'commodityCode') }"
-                            (click)="sort('commodityCode')">
-                            <span>Commodity Code</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'qtyCont'), 'sorting_desc': (!isDesc && sortKey == 'qtyCont') }"
-                            (click)="sort('qtyCont')">
-                            <span>Qty</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'firstClearanceNo'), 'sorting_desc': (!isDesc && sortKey == 'firstClearanceNo') }"
-                            (click)="sort('firstClearanceNo')">
-                            <span>Parentdoc</span>
-                        </th>
-                        <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                            (click)="sort('note')">
-                            <span>Note</span>
+                        <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
+                            [class]="sortClass(header.sortable ? header.field : '')"
+                            (click)="sortBy(header.sortable ? header.field : '')">
+                            <span>{{header.title}}</span>
+                            <span class="sort-indicator"></span>
                         </th>
                     </tr>
                 </thead>
@@ -145,8 +106,30 @@
                 </tbody>
             </table>
         </div>
-        <app-pagination *ngIf="pagerMaster.totalItems>0" [config]="pagerMaster" (pageChange)="setPageMaster($event)"
-            (pagerObject)="setPageMaster($event)"></app-pagination>
+        <!-- <app-pagination *ngIf="pagerMaster.totalItems>0" [config]="pagerMaster" (pageChange)="setPageMaster($event)"
+            (pagerObject)="setPageMaster($event)"></app-pagination> -->
+        <div class="pagination-nav">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="select-box" style="max-width: 190px">
+                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                            (change)="selectPageSize(pageSize)" name="pagesize">
+                            <ng-container *ngFor="let item of numberToShow; index as i; first as isFirst">
+                                <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page
+                                </option>
+                            </ng-container>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                    <div class="float-right">
+                        <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                            (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]=10>
+                        </pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
