@@ -3,8 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 
 @Component({
     selector: 'app-search-multiple',
-    templateUrl: './search-multiple.component.html',
-    styleUrls: ['./search-multiple.component.scss']
+    templateUrl: './search-multiple.component.html'
 })
 export class SearchMultipleComponent extends PopupBase implements OnInit {
     @Output() isCloseModal = new EventEmitter();
@@ -18,18 +17,15 @@ export class SearchMultipleComponent extends PopupBase implements OnInit {
         this.isCloseModal.emit('');
         this.hide();
     }
-    ApplyToList() {
+    applyToList() {
         if (this.customNoSearch.includes(',')) {
             this.customNoSearch = '';
             return;
         }
-        this.isCloseModal.emit(this.customNoSearch + 'isMultiple');
+        this.isCloseModal.emit(this.customNoSearch);
         this.hide();
     }
-    ChangeCustomNoSearch() {
-
-    }
-    ClearToList() {
+    clear() {
         this.isCloseModal.emit('');
         this.customNoSearch = '';
         this.hide();

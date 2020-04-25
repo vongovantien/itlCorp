@@ -127,8 +127,30 @@
                             </table>
                         </div>
 
-                        <app-pagination currentPage *ngIf="pager.totalItems>0" [config]="pager"
-                            (pageChange)="setPage($event)" (pagerObject)="setPage($event)"></app-pagination>
+                        <div class="pagination-nav">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="select-box" style="max-width: 190px">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize)" name="pagesize">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; index as i; first as isFirst">
+                                                <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page
+                                                </option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                    <div class="float-right">
+                                        <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                            [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                            [(ngModel)]="page" [maxSize]=10>
+                                        </pagination>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

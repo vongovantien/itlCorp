@@ -64,13 +64,6 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.detailComponent.formGroup.controls['route'].setErrors(null);
         if (this.detailComponent.formGroup.invalid) {
             return;
-        } else {
-            if (this.detailComponent.mblid.value == null || this.detailComponent.mblid.value === '') {
-                return;
-            }
-            if (this.detailComponent.hblid.value == null || this.detailComponent.hblid.value === '') {
-                return;
-            }
         }
         this.detailComponent.getClearance();
         this.updateCustomClearance();

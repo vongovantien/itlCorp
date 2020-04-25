@@ -70,14 +70,10 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 finalize(() => this._progressRef.complete()),
                 tap((response: any) => {
                     this.currentJob = response;
-                }),
-                switchMap(() => // * get list cd imported in job
-                    this._operationRepo.getListImportedInJob(this.currentJob.jobNo)
-
-                )
+                })
             ).subscribe(
                 (response: any) => {
-                    this.getListCleranceNotImported();
+                    // this.getListCleranceNotImported();
                     this.getCustomClearanesOfJob(this.currentJob.jobNo);
                 },
             );
@@ -204,7 +200,7 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
     }
 
     showPopupAdd() {
-        this.poupAddMore.getListCleranceNotImported();
+        this.poupAddMore.getClearanceNotImported();
         this.poupAddMore.show();
 
     }
