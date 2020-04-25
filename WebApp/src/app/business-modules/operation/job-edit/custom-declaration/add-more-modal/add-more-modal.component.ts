@@ -39,9 +39,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     form: FormGroup;
     customNo: AbstractControl;
     selectedCustom: any = null;
-    customNoSearch: string = '';
+    // keyMultipleSearch: string = '';
     strKeySearch: string = '';
-    allowAutoComplete = false;
 
     searchCustomButtonSetting: ButtonModalSetting = {
         dataTarget: "search-custom-modal",
@@ -175,7 +174,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         if (keyword !== null && keyword.length < 2 && keyword.length > 0) {
             return 0;
         }
-        if (this.allowAutoComplete === true) { return; }
         this.getListCleranceNotImported();
     }
 
@@ -200,7 +198,9 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     closepp(param: string) {
         this.page = 1;
         this.pageSize = this.numberToShow[1];
-        this.customNoSearch = param;
+        // this.keyMultipleSearch = param;
+        // this.strKeySearch = param;
+        console.log(this.popupSearchMultiple.customNoSearch);
         this.getListCleranceNotImported();
     }
     updateShipmentVolumn(importedData) {
@@ -234,21 +234,26 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
     getListCleranceNotImported() {
         this.notImportedCustomClearances = [];
-        this.isLoading = true;
+        // this.isLoading = true;
         if (this.customNo.value !== '') {
-            if (this.customNoSearch !== 'isMultiple' && this.customNoSearch !== '') {
-                if (this.customNo.value !== '') {
-                    this.customNo.setValue('');
-                }
-                this.strKeySearch = this.customNo.value + ',' + this.customNoSearch;
-                this.strKeySearch = this.customNoSearch;
+            if (this.popupSearchMultiple.customNoSearch !== '') {
+                // if (this.customNo.value !== '') {
+                //     this.customNo.setValue('');
+                // }
+                this.strKeySearch = this.customNo.value + ',' + this.popupSearchMultiple.customNoSearch;
+                // this.strKeySearch = this.keyMultipleSearch;
             } else {
                 this.strKeySearch = this.customNo.value;
             }
         } else {
-            this.strKeySearch = this.customNoSearch;
+            this.strKeySearch = this.popupSearchMultiple.customNoSearch;
         }
-        this.strKeySearch = this.strKeySearch.trim().replace(/(?:\r\n|\r|\n|\\n|\\r|\\t)/g, ',').trim().split(',').filter(i => Boolean(i)).toString();
+        // if (this.keyMultipleSearch !== '') {
+        //     this.strKeySearch = this.keyMultipleSearch;
+        // } else{
+
+        // }
+        // this.strKeySearch = this.strKeySearch.trim().replace(/(?:\r\n|\r|\n|\\n|\\r|\\t)/g, ',').trim().split(',').filter(i => Boolean(i)).toString();
         this.getClearanceNotImported();
     }
     getClearanceNotImported() {
@@ -271,9 +276,10 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
 
     showPopupSearch() {
+        // this.popupSearchMultiple.customNoSearch = '';
+        // this.keyMultipleSearch = '';
+        // this.customNo.setValue('');
         this.popupSearchMultiple.show();
-        this.allowAutoComplete = true;
-        this.customNo.setValue('');
     }
     // app list
     setSortBy(sort?: string, order?: boolean): void {
@@ -306,9 +312,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     close() {
         this.page = 1;
         this.pageSize = this.numberToShow[1];
-        this.allowAutoComplete = true;
-        this.customNoSearch = '';
         this.popupSearchMultiple.customNoSearch = '';
+        this.strKeySearch = '';
         this.customNo.setValue('');
         this.hide();
     }
