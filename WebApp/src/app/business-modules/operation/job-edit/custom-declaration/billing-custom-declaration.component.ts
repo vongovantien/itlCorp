@@ -203,7 +203,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         }
     }
 
-    searchClearanceImported() {
+    searchClearanceImported(event) {
         const keySearch = this.searchImportedString.trim().toLocaleLowerCase();
         if (keySearch !== null && keySearch.length < 2 && keySearch.length > 0) {
             return 0;

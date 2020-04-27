@@ -157,7 +157,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             )
             )
         )
-    closepp() {
+    closepp(event) {
         this.page = 1;
         this.pageSize = this.numberToShow[1];
         this.customNo.setValue('');
