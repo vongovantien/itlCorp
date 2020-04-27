@@ -15,6 +15,8 @@ import { AirImportHBLFormCreateComponent } from './components/form-create-house-
 import { AirImportCreateHBLComponent } from './create/create-house-bill.component';
 import { AirImportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
+import { AirImportDetailJobComponent } from '../detail-job-air-import.component';
 
 
 
@@ -29,8 +31,12 @@ const routing: Routes = [
     },
     {
         path: ':hblId', component: AirImportDetailHBLComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
-    }
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+    },
+    {
+        path: ':hblId/arrivalnotice', component: ShareBusinessReAlertComponent,
+        data: { name: "Arrival Notice", level: 6 },
+    },
 ];
 
 const LIB = [

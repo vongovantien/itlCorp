@@ -1,0 +1,103 @@
+<div class="pre-alert-page">
+    <app-sub-header>
+    </app-sub-header>
+</div>
+<div class="m-content">
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <div class="row">
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                            Send Arrival Notice
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-11">
+                    <div class="row">
+                        <div class="col-md-1">
+
+                            <div class="form-group">
+                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    from
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-11">
+
+                            <div class="form-group">
+                                <input class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    to
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="form-group">
+                                <input class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    cc
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="form-group">
+                                <input class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    subject
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="form-group">
+                                <input class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <textarea class="form-control" rows="10"></textarea>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <button style="float:right" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+        (click)="addattachment.show()">
+        <span>
+            <i class="la la-plus"></i>
+            <span>
+                Add Attachment
+            </span>
+        </span></button>
+    <div class="m-portlet">
+
+    </div>
+</div>
+
+<add-attachment-popup #addattachment>
+
+</add-attachment-popup>
