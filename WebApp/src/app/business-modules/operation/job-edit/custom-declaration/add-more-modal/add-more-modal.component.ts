@@ -161,8 +161,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         this.page = 1;
         this.pageSize = this.numberToShow[1];
         this.customNo.setValue('');
-        console.log(this.popupSearchMultiple.customNoSearch);
-        this.getListCleranceNotImported();
     }
     updateShipmentVolumn(importedData) {
         if (importedData != null) {
@@ -223,6 +221,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
 
     showPopupSearch() {
+        this.customNo.setValue('');
         this.popupSearchMultiple.show();
     }
 
