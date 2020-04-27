@@ -78,6 +78,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.selectedRequestAdvancePayment = new AdvancePaymentRequest(request);
         this.addNewRequestPaymentPopup.action = 'copy';
         this.addNewRequestPaymentPopup.selectedRequest = request;
+        this.addNewRequestPaymentPopup.selectedRequest.id = "00000000-0000-0000-0000-000000000000";
+
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
 
         this.addNewRequestPaymentPopup.initFormUpdate(this.selectedRequestAdvancePayment);
@@ -116,9 +118,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
     openPopupAdd() {
         this.addNewRequestPaymentPopup.action = 'create';
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
-
+        this.addNewRequestPaymentPopup.selectedRequest = new AdvancePaymentRequest();
         this.addNewRequestPaymentPopup.show();
-
     }
 
     changeCurrency(currency: string) {

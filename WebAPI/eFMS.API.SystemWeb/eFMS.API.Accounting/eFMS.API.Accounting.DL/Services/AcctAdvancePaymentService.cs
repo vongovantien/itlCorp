@@ -861,7 +861,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-
+                var today = DateTime.Now;
                 var advance = mapper.Map<AcctAdvancePayment>(model);
 
                 var advanceCurrent = DataContext.Get(x => x.Id == advance.Id).FirstOrDefault();
@@ -876,7 +876,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.DatetimeCreated = advanceCurrent.DatetimeCreated;
                 advance.UserCreated = advanceCurrent.UserCreated;
 
-                advance.DatetimeModified = DateTime.Now;
+                advance.DatetimeModified = today;
                 advance.UserModified = userCurrent;
                 advance.GroupId = advanceCurrent.GroupId;
                 advance.DepartmentId = advanceCurrent.DepartmentId;
@@ -899,7 +899,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
                             //Lấy ra các Request cũ cần update
-                            var requestUpdate = request.Where(x => x.UserCreated != null && x.UserCreated != string.Empty).ToList();
+                            var requestUpdate = request.Where(x => x.Id != Guid.Empty).ToList();
 
                             //Lấy ra các Request có cùng AdvanceNo và không tồn tại trong requestUpdate
                             var requestNeedRemove = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && !requestUpdate.Contains(x)).ToList();
@@ -909,10 +909,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 var hsRequestNeedRemove = acctAdvanceRequestRepo.Delete(x => x.Id == item.Id);
                             }
 
-                            //Lấy ra những request mới (có UserCreated = null)
-                            var requestNew = request.Where(x => x.UserCreated == null || x.UserCreated == string.Empty).ToList();
+                            //Lấy ra những request mới (có Id là Empty)
+                            var requestNew = request.Where(x => x.Id == Guid.Empty).ToList();
                             if (requestNew != null && requestNew.Count > 0)
-                            {
+                            {                                
                                 foreach (var item in requestNew)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -929,7 +929,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 //Cập nhật những request cũ cần update
                                 foreach (var item in requestUpdate)
                                 {
-                                    item.DatetimeModified = DateTime.Now;
+                                    item.DatetimeModified = today;
                                     item.UserModified = userCurrent;
                                     var hsRequestUpdate = acctAdvanceRequestRepo.Update(item, x => x.Id == item.Id);
                                 }
