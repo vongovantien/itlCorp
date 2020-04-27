@@ -1314,6 +1314,9 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var data = GetById(hblId);
             var housebills = new List<SeaHBillofLadingReport>();
+            string _grossWeightConts = string.Empty;
+            string _cbmConts = string.Empty;
+
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
@@ -1350,29 +1353,34 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
                 housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
-                //var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
-                //if (conts != null && conts.Count() > 0)
-                //{
-                //    string hbConstainers = string.Empty;
-                //    var contLast = conts.Last();
-                //    foreach (var cont in conts)
-                //    {
-                //        var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
-                //        if (contUnit != null)
-                //        {
-                //            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? ", " : string.Empty));
-                //        }
-                //    }
-                //    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
-                //    housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
-                //    housebill.MaskNos = housebill.MaskNos?.ToUpper();
-                //}         
-                housebill.MaskNos = data.ContSealNo?.ToUpper(); //Update lại MarkNo: lấy theo field ]Container No/ Cont Type/ Seal No]
+                var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);               
+                if (conts != null && conts.Count() > 0)
+                {
+                    string hbConstainers = string.Empty;
+                    var contLast = conts.Last();
+                    string markNo = string.Empty;
+                    foreach (var cont in conts)
+                    {
+                        var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
+                        if (contUnit != null)
+                        {
+                            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));                            
+                        }                       
+                        markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
+                        _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                    }
+                    hbConstainers += " CONTAINER(S) S.T.C:";
+                    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
+                    //housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
+                    housebill.MaskNos = markNo?.ToUpper();
+                }
+                //housebill.MaskNos = data.ContSealNo?.ToUpper(); //Update lại MarkNo: lấy theo field [Container No/ Cont Type/ Seal No]
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
-                housebill.GrossWeight = data.GrossWeight ?? 0;
+                housebill.GrossWeight = conts.Select(s => s.Gw).Sum() ?? 0;//Tổng grossweight trong list cont;
                 housebill.GrwDecimal = 2;
                 housebill.Unit = "KGS"; //Đang gán cứng (PKS update thành KGS)
-                housebill.CBM = data.Cbm != null ? data.Cbm.Value : 0;
+                housebill.CBM = conts.Select(s => s.Cbm).Sum() ?? 0;//Tổng cbm trong list cont;
                 housebill.CBMDecimal = 2;
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.TotalPackages = string.Empty; //NOT USE
@@ -1400,7 +1408,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.SeaFCL = false; //NOT USE
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
-                housebill.Signature = data.Hbltype ?? string.Empty; //HBL Type
+                housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
                 if (data.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
@@ -1467,8 +1475,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var parameter = new SeaHBillofLadingReportITLFRAMEParams()
                 {
                     Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
-                    GrossWeight = data?.GrossWeight.ToString(),
-                    Measurement = data?.Cbm.ToString(),
+                    GrossWeight = _grossWeightConts, //list grossweight trong list container
+                    Measurement = _cbmConts, //list cbm trong list container
                     TextInfo = "RECEIVED in apparent good order and condition except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document( duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall( without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
                 };                
                 result.SetParameter(parameter);
