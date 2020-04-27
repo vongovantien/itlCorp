@@ -55,6 +55,10 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     dataRequest: any = {};
 
+    configCustomDisplayFields: CommonInterface.IComboGridDisplayField[];
+
+    initShipments: OperationInteface.IShipment[];
+
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccountingRepo,
@@ -64,6 +68,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this.configCustomDisplayFields = [
+            { field: 'clearanceNo', label: 'Custom No' },
+            { field: 'jobNo', label: 'JobID' },
+        ];
+
         this.initForm();
         this.initBasicData();
         this.getListShipment();
@@ -120,18 +129,20 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
         this.advanceNo = data.advanceNo;
 
-        this.customDeclarations = [];
+        // this.customDeclarations = [];
         this.customNo.setValue(null);
 
-        this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
-        if (this.customDeclarations.length === 1) {
-            this.customNo.setValue(this.customDeclarations[0]);
+        if (!!data.customNo) {
+            const _customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+            if (this.customDeclarations.length > 0) {
+                this.customNo.setValue(_customDeclarations[0].clearanceNo);
+            }
         }
     }
 
     onSubmit(form: FormGroup) {
         const body: AdvancePaymentRequest = new AdvancePaymentRequest({
-            customNo: !!form.value.customNo ? form.value.customNo.clearanceNo : '',
+            customNo: this.customNo.value, // !!form.value.customNo ? form.value.customNo.clearanceNo : '',
             amount: form.value.amount,
             requestNote: form.value.note,
             hbl: this.selectedShipmentData.hbl,
@@ -148,6 +159,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             datetimeCreated: this.selectedRequest.datetimeCreated,
             datetimeModified: this.selectedRequest.datetimeModified
         });
+
         if (this.action === 'create') {
             this.checkRequestAdvancePayment(body);
         } else if (this.action === 'copy') {
@@ -168,7 +180,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: OperationInteface.IShipment) => {
-                    this.configShipment.dataSource = <any>res || [];
+                    this.configShipment.dataSource = this.initShipments = <any>res || [];
 
                     // * update config combogrid.
                     this.configShipment.displayFields = [
@@ -221,7 +233,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     getCustomNo() {
-        this._operationRepo.getListCustomsDeclaration()
+        this._operationRepo.getListCustomNoAsignPIC()
             .pipe(
                 catchError(this.catchError),
                 map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),
@@ -239,15 +251,23 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 this.selectedShipment = { field: 'jobId', value: data.hbl };
                 this.selectedShipmentData = data;
 
-                this.customDeclarations = [];
+                // this.customDeclarations = [];
                 this.customNo.setValue(null);
 
-                this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
-                if (this.customDeclarations.length === 1) {
-                    this.customNo.setValue(this.customDeclarations[0]);
+                const _customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+
+                if (_customDeclarations.length > 0) {
+                    this.customNo.setValue(_customDeclarations[0].clearanceNo);
                 }
                 break;
-
+            case 'cd':
+                this.customNo.setValue(data.clearanceNo);
+                const _shipments = this.filterShipmentByCD(data);
+                if (_shipments.length > 0) {
+                    this.selectedShipment = { field: 'jobId', value: _shipments[0].jobId };
+                    this.selectedShipmentData = _shipments[0];
+                }
+                break;
             default:
                 break;
         }
@@ -257,6 +277,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
         return this.initCD.filter((item: CustomDeclaration) => {
             return (item.jobNo === shipment.jobId);
+        });
+    }
+
+    filterShipmentByCD(cd: CustomDeclaration): OperationInteface.IShipment[] {
+        return this.initShipments.filter((item: OperationInteface.IShipment) => {
+            return (item.jobId === cd.jobNo);
         });
     }
 
@@ -280,7 +306,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     onComfirmSaveDupplicateRequestAdvancePayment(form: FormGroup) {
         const body: AdvancePaymentRequest = new AdvancePaymentRequest({
-            customNo: !!form.value.customNo ? form.value.customNo.clearanceNo : '',
+            customNo: this.customNo.value, // !!form.value.customNo ? form.value.customNo.clearanceNo : '',
             amount: form.value.amount,
             requestNote: form.value.note,
             hbl: this.selectedShipmentData.hbl,
@@ -321,5 +347,18 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             && requestInit.advanceType === data.advanceType
             && requestInit.customNo === data.customNo
         );
+    }
+
+    clearData(key: string) {
+        switch (key) {
+            case 'shipment':
+                this.selectedShipmentData = null;
+                break;
+            case 'cd':
+                this.customNo.setValue(null);
+                break;
+            default:
+                break;
+        }
     }
 }

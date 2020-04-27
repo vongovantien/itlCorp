@@ -26,7 +26,6 @@ export class CustomClearanceComponent extends AppList {
     @ViewChild(Permission403PopupComponent, { static: false }) canNotAllowActionPopup: Permission403PopupComponent;
     listCustomDeclaration: CustomDeclaration[] = [];
     searchObject: any = {};
-    listCustomer: any = [];
     listPort: any = [];
     listUnit: any = [];
     menuPermission: SystemInterface.IUserPermission;
@@ -74,14 +73,8 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Status', field: 'jobNo', sortable: true },
         ];
         this.getListCustomsDeclaration();
-        this.getListCustomer();
         this.getListPort();
         this.getListUnit();
-    }
-
-    getListCustomer() {
-        this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.CUSTOMER })
-            .subscribe((res: any) => { this.listCustomer = res; });
     }
 
     getListPort() {

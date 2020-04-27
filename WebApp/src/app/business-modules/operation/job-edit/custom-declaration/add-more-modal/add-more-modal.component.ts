@@ -4,8 +4,6 @@ import { SortService } from 'src/app/shared/services';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
@@ -26,12 +24,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
 
     term$ = new BehaviorSubject<string>('');
     isShow: boolean = false;
-    notImportedData: any[];
-    page: number = 1;
-    totalItems: number = 0;
-    numberToShow: number[] = [3, 15, 30, 50];
-    pageSize: number = this.numberToShow[1];
-    pager: PagerSetting = PAGINGSETTING;
     sort: string = null;
     order: any = false;
     keyword: string = '';
@@ -40,11 +32,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     notImportedCustomClearances: any[] = [];
     checkAllNotImported = false;
     headers: CommonInterface.IHeaderTable[];
-    dataNotImportedSearch: any[];
     form: FormGroup;
     customNo: AbstractControl;
-    selectedCustom: any = null;
-    customNoSearch: string = '';
     strKeySearch: string = '';
 
     searchCustomButtonSetting: ButtonModalSetting = {
@@ -57,7 +46,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         private _documentationRepo: DocumentationRepo,
         private _operationRepo: OperationRepo) {
         super();
-
         this.requestSort = this.sortLocal;
     }
     ngOnInit() {
@@ -75,31 +63,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             { title: 'Note', field: 'note', sortable: true },
         ];
 
-        this.term$.pipe(
-            tap(
-                () => {
-                    this.isLoading = true;
-                }
-            ),
-
-            distinctUntilChanged(),
-            finalize(() => {
-                this.isLoading = false;
-            }),
-            this.autocomplete(300, ((term: any) => this._operationRepo.getListNotImportToJob(this.customNo.value, this.currentJob.customerId, false, this.pager.currentPage, this.pager.pageSize)))
-        ).subscribe(
-            (res: any) => {
-                this.notImportedCustomClearances = res.data || [];
-                this.pager.totalItems = res.totalItems;
-                this.pager.totalPages = res.totalPages;
-            },
-            (error: any) => { },
-            () => { }
-        );
-    }
-    initPager(): any {
-        this.pager.totalItems = 0;
-        this.pager.currentPage = 1;
+        this.requestList = this.getListCleranceNotImported;
     }
 
     sortLocal(sort: string): void {
@@ -108,19 +72,15 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
 
     refreshData() {
         this.keyword = '';
-        this.getListCleranceNotImported();
-    }
-
-    setPage(pager: PagerSetting) {
-        this.pager.currentPage = pager.currentPage;
-        this.pager.totalPages = pager.totalPages;
-        this.pager.pageSize = pager.pageSize;
-        this.notImportedCustomClearances = [];
+        this.page = 1;
+        this.pageSize = this.numberToShow[1];
+        this.customNo.setValue('');
+        this.popupSearchMultiple.customNoSearch = '';
+        this.strKeySearch = '';
         this.getListCleranceNotImported();
     }
 
     changeAllNotImported() {
-
         if (this.checkAllNotImported) {
             this.notImportedCustomClearances.forEach(x => {
                 x.isChecked = true;
@@ -129,15 +89,6 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             this.notImportedCustomClearances.forEach(x => {
                 x.isChecked = false;
             });
-        }
-        const checkedData = this.notImportedCustomClearances.filter(x => x.isChecked === true);
-        if (checkedData.length > 0) {
-            for (let i = 0; i < checkedData.length; i++) {
-                const index = this.notImportedData.indexOf(x => x.id === checkedData[i].id);
-                if (index > -1) {
-                    this.notImportedData[index] = true;
-                }
-            }
         }
     }
 
@@ -183,16 +134,15 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 );
         }
     }
-
     onSearchAutoComplete(keyword: string) {
-        this.pager.currentPage = 1;
-        this.pager.pageSize = 15;
-        this.notImportedCustomClearances = [];
         this.term$.next(keyword.trim());
-        if (keyword.trim() == '') {
 
-            this.getListCleranceNotImported();
+        if (keyword !== null && keyword.length < 2 && keyword.length > 0) {
+            this.strKeySearch = '';
+            this.popupSearchMultiple.customNoSearch = '';
+            return 0;
         }
+        this.getListCleranceNotImported();
     }
 
     autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
@@ -207,25 +157,13 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             )
             )
         )
-
-    selectCustom(custom: any) {
-        this.isShow = false;
-        this.customNo.setValue(custom.id);
-        this.selectedCustom = custom;
-    }
-
-    clearMultipleSearch() {
-        this.customNoSearch = '';
-        this.getListCleranceNotImported();
-
-
-    }
-    closepp(param: string) {
-        this.customNoSearch = param;
+    closepp(event) {
+        this.page = 1;
+        this.pageSize = this.numberToShow[1];
+        this.customNo.setValue('');
+        console.log(this.popupSearchMultiple.customNoSearch);
         this.getListCleranceNotImported();
     }
-
-
     updateShipmentVolumn(importedData) {
         if (importedData != null) {
             this.currentJob.sumGrossWeight = 0;
@@ -249,7 +187,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
             }
 
             this._documentationRepo.updateShipment(this.currentJob).subscribe(
-                (res) => {
+                () => {
 
                 }
             );
@@ -257,43 +195,37 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
     getListCleranceNotImported() {
         this.notImportedCustomClearances = [];
-        this.isLoading = true;
-        if (this.customNo.value != '') {
-            if (this.customNoSearch != 'isMultiple' && this.customNoSearch != '') {
-                if (this.customNo.value != '') {
-                    this.customNo.setValue('');
-                }
-                this.strKeySearch = this.customNo.value + ',' + this.customNoSearch;
-                this.strKeySearch = this.customNoSearch;
+        if (this.customNo.value !== '') {
+            if (this.popupSearchMultiple.customNoSearch !== '') {
+                this.strKeySearch = this.customNo.value + ',' + this.popupSearchMultiple.customNoSearch;
             } else {
                 this.strKeySearch = this.customNo.value;
             }
         } else {
-            this.strKeySearch = this.customNoSearch;
+            this.strKeySearch = this.popupSearchMultiple.customNoSearch;
         }
-        this.strKeySearch = this.strKeySearch.trim().replace(/(?:\r\n|\r|\n|\\n|\\r|\\t)/g, ',').trim().split(',').filter(i => Boolean(i)).toString();
-        this._operationRepo.getListNotImportToJob(this.strKeySearch, this.currentJob.customerId, false, this.pager.currentPage, this.pager.pageSize)
+        this.getClearanceNotImported();
+    }
+    getClearanceNotImported() {
+        this._operationRepo.getListNotImportToJob(this.strKeySearch, this.currentJob.customerId, false, this.page, this.pageSize)
             .pipe(
-                finalize(() => { this.isLoading = false; })
+                finalize(() => {
+                    this.changeAllNotImported();
+                    this.isLoading = false;
+                })
             )
             .subscribe(
                 (res: any) => {
                     this.notImportedCustomClearances = res.data || [];
-                    this.pager.totalItems = res.totalItems;
-
-
-                },
-                (error: any) => {
-                },
-                () => { }
+                    this.totalItems = res.totalItems;
+                }
             );
     }
 
     showPopupSearch() {
         this.popupSearchMultiple.show();
-        this.customNo.setValue('');
     }
-    // app list
+
     setSortBy(sort?: string, order?: boolean): void {
         this.sort = sort ? sort : 'code';
         this.order = order;
@@ -322,8 +254,10 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     }
 
     close() {
-        this.customNoSearch = '';
+        this.page = 1;
+        this.pageSize = this.numberToShow[1];
         this.popupSearchMultiple.customNoSearch = '';
+        this.strKeySearch = '';
         this.customNo.setValue('');
         this.hide();
     }

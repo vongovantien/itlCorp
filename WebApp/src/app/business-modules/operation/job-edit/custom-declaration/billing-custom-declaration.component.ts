@@ -7,34 +7,26 @@ import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
 import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, takeUntil, switchMap, tap } from 'rxjs/operators';
-import { AppPage } from 'src/app/app.base';
+import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+import { AppList } from 'src/app/app.list';
 
 @Component({
     selector: 'app-billing-custom-declaration',
     templateUrl: './billing-custom-declaration.component.html',
 })
-export class BillingCustomDeclarationComponent extends AppPage implements OnInit {
+export class BillingCustomDeclarationComponent extends AppList implements OnInit {
 
     @ViewChild(AddMoreModalComponent, { static: false }) poupAddMore: AddMoreModalComponent;
-    jobId: string = '';
     currentJob: OpsTransaction;
-
-    notImportedCustomClearances: any[];
     customClearances: any[];
-    pagerMaster: PagerSetting = PAGINGSETTING;
-    notImportedData: any[] = [];
     importedData: any[];
+    headers: CommonInterface.IHeaderTable[];
 
     searchImportedString: string = '';
     checkAllImported = false;
-
     dataImportedSearch: any[];
-
-    isDesc = true;
-    sortKey: string = "";
 
     constructor(
         private pagerService: PagingService,
@@ -43,25 +35,38 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
         private _operationRepo: OperationRepo,
         private _activedRouter: ActivatedRoute,
         private _ngProgressService: NgProgress,
+        private _sortService: SortService
 
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+        this.requestSort = this.sortLocal;
+        this.requestList = this.getCustomClearanesOfJob;
 
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'Custom No', field: 'clearanceNo', sortable: true },
+            { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
+            { title: 'HBL No', field: 'hblid', sortable: true },
+            { title: 'Export Country', field: 'exportCountryCode', sortable: true },
+            { title: 'Import Country', field: 'importCountryCode', sortable: true },
+            { title: 'Commodity Code', field: 'commodityCode', sortable: true },
+            { title: 'Qty', field: 'qtyCont', sortable: true },
+            { title: 'Parentdoc', field: 'firstClearanceNo', sortable: true },
+            { title: 'Note', field: 'note', sortable: true },
+        ];
         this._activedRouter.params.subscribe((param: { id: string }) => {
             if (!!param.id) {
-                this.jobId = param.id;
-                this.pagerMaster.currentPage = 1;
-                this.pagerMaster.totalItems = 0;
-                this.getShipmentDetails(this.jobId);
+                this.getShipmentDetails(param.id);
 
             }
         });
     }
-
+    sortLocal(sort: string): void {
+        this.customClearances = this._sortService.sort(this.customClearances, sort, this.order);
+    }
     getShipmentDetails(id: any) {
         this._progressRef.start();
         this._documentRepo.getDetailShipment(id)
@@ -70,21 +75,16 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 finalize(() => this._progressRef.complete()),
                 tap((response: any) => {
                     this.currentJob = response;
-                }),
-                switchMap(() => // * get list cd imported in job
-                    this._operationRepo.getListImportedInJob(this.currentJob.jobNo)
-
-                )
+                })
             ).subscribe(
-                (response: any) => {
-                    this.getListCleranceNotImported();
-                    this.getCustomClearanesOfJob(this.currentJob.jobNo);
+                () => {
+                    this.getCustomClearanesOfJob();
                 },
             );
     }
 
-    getCustomClearanesOfJob(jobNo: string) {
-        this._operationRepo.getListImportedInJob(jobNo).pipe(
+    getCustomClearanesOfJob() {
+        this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
         ).subscribe(
@@ -97,9 +97,10 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 } else {
                     this.importedData = [];
                 }
+                this.totalItems = this.importedData.length;
                 this.dataImportedSearch = this.importedData;
-                this.customClearances = this.importedData;
-                this.setPageMaster(this.pagerMaster);
+                const pager = this.pagerService.getPager(this.totalItems, this.page, this.pageSize);
+                this.customClearances = this.importedData.slice(pager.startIndex, pager.endIndex + 1);
             }
         );
     }
@@ -117,12 +118,6 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
         }
     }
 
-    sort(property) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.customClearances = this.sortService.sort(this.customClearances, property, this.isDesc);
-    }
-
     removeImported() {
         const dataToUpdate = this.importedData.filter(x => x.isChecked === true);
         if (dataToUpdate.length > 0) {
@@ -138,20 +133,12 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                                 takeUntil(this.ngUnsubscribe),
                                 catchError(this.catchError),
                                 finalize(() => {
-                                    this.dataImportedSearch = this.importedData;
-                                    this.setPageMaster(this.pagerMaster);
                                     this.updateShipmentVolumn();
                                 })
                             ).subscribe(
                                 (res: any) => {
-                                    this.importedData = res;
-                                    if (this.importedData != null) {
-                                        this.importedData.forEach(element => {
-                                            element.isChecked = false;
-                                        });
-                                    } else {
-                                        this.importedData = [];
-                                    }
+                                    this.page = 1;
+                                    this.getCustomClearanesOfJob();
                                 }
                             );
                         }
@@ -191,20 +178,8 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
         }
     }
 
-    getListCleranceNotImported() {
-        this._operationRepo.getListNotImportToJob("", this.currentJob.customerId, false, this.pagerMaster.currentPage, this.pagerMaster.pageSize).pipe(
-            takeUntil(this.ngUnsubscribe),
-            catchError(this.catchError),
-            finalize(() => { })
-        ).subscribe(
-            (res: any) => {
-                this.notImportedData = res;
-            }
-        );
-    }
-
     showPopupAdd() {
-        this.poupAddMore.getListCleranceNotImported();
+        this.poupAddMore.getClearanceNotImported();
         this.poupAddMore.show();
 
     }
@@ -219,48 +194,31 @@ export class BillingCustomDeclarationComponent extends AppPage implements OnInit
                 x.isChecked = false;
             });
         }
-        const checkedData = this.customClearances.filter(x => x.isChecked === true);
-        if (checkedData.length > 0) {
-            for (let i = 0; i < checkedData.length; i++) {
-                const index = this.importedData.indexOf(x => x.id === checkedData[i].id);
-                if (index > -1) {
-                    this.importedData[index] = true;
-                }
-            }
-        }
     }
 
     closeAddMore(event: any) {
         if (event) {
-            this.getCustomClearanesOfJob(this.currentJob.jobNo);
-        }
-    }
-
-    setPageMaster(pager: PagerSetting) {
-        this.pagerMaster = this.pagerService.getPager(this.dataImportedSearch.length, pager.currentPage, this.pagerMaster.pageSize, this.pagerMaster.totalPageBtn);
-        this.pagerMaster.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
-        this.pagerMaster.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-        if (this.dataImportedSearch != null) {
-            this.dataImportedSearch = this.sortService.sort(this.dataImportedSearch, 'clearanceNo', true);
-            this.customClearances = this.dataImportedSearch.slice(this.pagerMaster.startIndex, this.pagerMaster.endIndex + 1);
+            this.page = 1;
+            this.getCustomClearanesOfJob();
         }
     }
 
     searchClearanceImported(event) {
-        this.pagerMaster.totalItems = 0;
         const keySearch = this.searchImportedString.trim().toLocaleLowerCase();
         if (keySearch !== null && keySearch.length < 2 && keySearch.length > 0) {
             return 0;
         }
-        this.dataImportedSearch = this.importedData.filter(item => item.clearanceNo.includes(keySearch)
+        this.dataImportedSearch = this.importedData.filter(item => item.clearanceNo.toLocaleLowerCase().includes(keySearch)
             || (item.hblid == null ? '' : item.hblid.toLocaleLowerCase()).includes(keySearch)
             || (item.exportCountryCode == null ? '' : item.exportCountryCode.toLocaleLowerCase()).includes(keySearch)
             || (item.importCountryCode == null ? '' : item.importCountryCode.toLocaleLowerCase()).includes(keySearch)
             || (item.commodityCode == null ? '' : item.commodityCode.toLocaleLowerCase()).includes(keySearch)
             || (item.firstClearanceNo == null ? '' : item.firstClearanceNo.toLocaleLowerCase()).includes(keySearch)
             || (item.qtyCont == null ? '' : item.qtyCont.toString()).includes(keySearch));
-        this.pagerMaster.currentPage = 1;
-        this.pagerMaster.totalItems = this.dataImportedSearch.length;
-        this.setPageMaster(this.pagerMaster);
+        this.page = 1;
+        this.totalItems = this.dataImportedSearch.length;
+
+        const pager = this.pagerService.getPager(this.totalItems, this.page, this.pageSize);
+        this.customClearances = this.dataImportedSearch.slice(pager.startIndex, pager.endIndex + 1);
     }
 }

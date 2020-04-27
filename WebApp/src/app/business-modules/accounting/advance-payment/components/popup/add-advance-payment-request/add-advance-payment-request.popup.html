@@ -38,20 +38,26 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                     [dataSources]="configShipment.dataSource"
                                     [displayFields]="configShipment.displayFields"
-                                    [selectedDisplayFields]="configShipment.selectedDisplayFields" [height]="150">
+                                    [selectedDisplayFields]="configShipment.selectedDisplayFields" [height]="150"
+                                    (remove)="clearData('shipment')">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label>Custom No
-                                </label>
-                                <select class="form-control" name="type" formControlName="customNo">
+                                <label>Custom No</label>
+                                <!-- <select class="form-control" name="type" formControlName="customNo">
                                     <option [ngValue]="null" disabled>Choose CustomNo</option>
                                     <option
                                         *ngFor="let customDeclaration of customDeclarations; let i = index; trackBy: trackByFn"
                                         [ngValue]="customDeclaration">{{customDeclaration.clearanceNo}}</option>
-                                </select>
+                                </select> -->
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'clearanceNo', value:customNo.value}"
+                                    (itemSelected)="onSelectDataFormInfo($event, 'cd')"
+                                    [selectedDisplayFields]="['clearanceNo']" [dataSources]="customDeclarations"
+                                    [displayFields]="configCustomDisplayFields" (remove)="clearData('cd')">
+                                </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
                     </div>
