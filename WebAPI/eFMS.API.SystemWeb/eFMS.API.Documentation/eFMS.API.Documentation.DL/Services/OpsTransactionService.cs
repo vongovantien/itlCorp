@@ -577,6 +577,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ShipmentMode = "External",
                     Mblno = model.Mblid,
                     Hwbno = model.Hblid,
+                    SumContainers = model.QtyCont,
                     ServiceDate = model.ClearanceDate,
                     SumGrossWeight = model.GrossWeight,
                     SumNetWeight = model.NetWeight,
@@ -738,6 +739,7 @@ namespace eFMS.API.Documentation.DL.Services
                             ServiceDate = item.ClearanceDate,
                             SumGrossWeight = item.GrossWeight,
                             SumNetWeight = item.NetWeight,
+                            SumContainers = item.QtyCont,
                             SumCbm = item.Cbm,
                             Shipper = item.Shipper,
                             Consignee = item.Consignee,
@@ -796,6 +798,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         var transaction = mapper.Map<OpsTransaction>(opsTransaction);
                         DataContext.Add(transaction, false);
+
                         item.JobNo = opsTransaction.JobNo;
                         item.UserModified = currentUser.UserID;
                         item.DatetimeModified = DateTime.Now;

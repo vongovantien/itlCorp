@@ -295,7 +295,14 @@ namespace eFMS.API.Operation.DL.Services
                 keySearch = keySearch.ToLower().Trim();
                 var replaceString = keySearch.Split(',');
                 autocompleteKey = replaceString.Length > 0 ? replaceString[0] : string.Empty;
-                clearanceNoArray = replaceString.Length > 1? replaceString[1].Split('\n'): null;
+                if (replaceString.Length > 1)
+                {
+                    clearanceNoArray = replaceString.Length > 1 ? replaceString[1].Split('\n') : null;
+                }
+                else
+                {
+                    clearanceNoArray = replaceString.Length > 0 ? replaceString[0].Split('\n') : null;
+                }
             }
             else
             {
