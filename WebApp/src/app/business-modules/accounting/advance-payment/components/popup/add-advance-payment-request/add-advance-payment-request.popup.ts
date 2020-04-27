@@ -266,7 +266,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                 if (_shipments.length > 0) {
                     this.selectedShipment = { field: 'jobId', value: _shipments[0].jobId };
                     this.selectedShipmentData = _shipments[0];
+                } else {
+                    this.selectedShipment = {};
+                    this.selectedShipmentData = null;
                 }
+
                 break;
             default:
                 break;
