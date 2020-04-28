@@ -35,7 +35,8 @@
                             (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                             <th class="m--w-50 first table-actions-col">
                                 <label class="m-checkbox">
-                                    <input type="checkbox" name="">
+                                    <input type="checkbox" [checked]="checkAll"
+                                        (change)="checkAll=!checkAll; checkAllChange()">
                                     <span></span>
                                 </label>
                             </th>
@@ -46,9 +47,9 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
-                                                <input type="checkbox">
+                                                <input type="checkbox" name="" [checked]="file.isChecked"
+                                                    (change)="file.isChecked=!file.isChecked; removeAllChecked()">
                                                 <span></span>
-
                                             </label>
                                         </div>
                                     </td>

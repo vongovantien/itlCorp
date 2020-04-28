@@ -225,17 +225,19 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="files"></param>
         /// <param name="jobId"></param>
+        /// <param name="isTemp"></param>
         /// <returns></returns>
-        [HttpPut("UploadMultiFiles/{jobId}")]
+        [HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
         [Authorize]
-        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId)
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId,bool? isTemp)
         {
             string folderName = Request.Headers["Module"];
             DocumentFileUploadModel model = new DocumentFileUploadModel
             {
                 Files = files,
                 FolderName = folderName,
-                JobId = jobId
+                JobId = jobId,
+                IsTemp = isTemp
             };
             var result = await sysImageService.UploadDocumentationFiles(model);
             return Ok(result);
@@ -248,6 +250,19 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet("GetFileAttachs")]
         public IActionResult GetAttachedFiles([Required]Guid jobId)
+        {
+            string id = jobId.ToString();
+            var results = sysImageService.Get(x => x.ObjectId == id && x.IsTemp != true);
+            return Ok(results);
+        }
+
+        /// <summary>
+        /// get all attached files in a shipment for pre alert
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetFileAttachsPreAlert")]
+        public IActionResult GetAttachedFilesPreAlert([Required]Guid jobId)
         {
             string id = jobId.ToString();
             var results = sysImageService.Get(x => x.ObjectId == id);

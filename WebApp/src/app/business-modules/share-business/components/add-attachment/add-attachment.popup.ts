@@ -14,7 +14,7 @@ import { Params } from "@angular/router";
     templateUrl: "./add-attachment.popup.html",
 })
 export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implements OnInit {
-
+    checkAll: boolean = false;
     jobId: string;
     files: IShipmentAttachFile[] = [];
 
@@ -45,7 +45,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
 
     getFileShipment(jobId: string) {
         this.isLoading = true;
-        this._documentRepo.getShipmentFilesAttach(jobId).
+        this._documentRepo.getShipmentFilesAttachPreAlert(jobId).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -62,7 +62,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
-            this._documentRepo.uploadFileShipment(this.jobId, fileList)
+            this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -77,9 +77,26 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         }
     }
 
+    checkAllChange() {
+        if (this.checkAll) {
+            this.files.forEach(x => {
+                x.isChecked = true;
+            });
+        } else {
+            this.files.forEach(x => {
+                x.isChecked = false;
+            });
+        }
+    }
+
     onCancel() {
         this.hide();
     }
+
+    removeAllChecked() {
+        this.checkAll = false;
+    }
+
 
 }
 interface IShipmentAttachFile {
@@ -93,4 +110,5 @@ interface IShipmentAttachFile {
     userCreated: string;
     dateTimeCreated: string;
     fileName: string;
+    isChecked: boolean;
 }

@@ -89,6 +89,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if(list.Count > 0)
                 {
+                    list.ForEach(x => x.IsTemp = model.IsTemp);
                     hs = await DataContext.AddAsync(list);
                 }
                 return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
