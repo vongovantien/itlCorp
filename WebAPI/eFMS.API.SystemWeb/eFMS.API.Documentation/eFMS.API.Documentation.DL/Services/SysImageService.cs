@@ -74,7 +74,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Id = Guid.NewGuid(),
                         Url = urlImage,
                         Name = fileName,
-                        Folder = model.FolderName ?? "Shipment",
+                        Folder =  model.FolderName ?? "Shipment",
                         ObjectId = model.JobId.ToString(),
                         UserCreated = currentUser.UserName, //admin.
                         UserModified = currentUser.UserName,

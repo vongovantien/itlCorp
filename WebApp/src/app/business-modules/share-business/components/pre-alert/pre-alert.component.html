@@ -86,7 +86,7 @@
         </div>
     </div>
     <button style="float:right" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-        (click)="addattachment.show()">
+        (click)="showPopup()">
         <span>
             <i class="la la-plus"></i>
             <span>
@@ -98,6 +98,6 @@
     </div>
 </div>
 
-<add-attachment-popup #addattachment>
+<add-attachment-popup (onAdd)="onAddFile($event)">
 
 </add-attachment-popup>

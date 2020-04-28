@@ -1,5 +1,5 @@
 import { PopupBase } from "src/app/popup.base";
-import { OnInit, Component } from "@angular/core";
+import { OnInit, Component, Output, EventEmitter } from "@angular/core";
 import { DocumentationRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
@@ -17,6 +17,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     checkAll: boolean = false;
     jobId: string;
     files: IShipmentAttachFile[] = [];
+    @Output() onAdd: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -87,6 +88,11 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                 x.isChecked = false;
             });
         }
+    }
+
+    onAddToMail() {
+        this.onAdd.emit(this.files.filter(x => x.isChecked === true));
+        this.hide();
     }
 
     onCancel() {

@@ -270,6 +270,15 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [Authorize]
+        [HttpPut("UpdateFileToShipment/{id}")]
+        public IActionResult UpdateFileToShipment([Required]Guid id)
+        {
+
+        }
+
+
+
+        [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]
         public IActionResult DeleteAttachedFile([Required]Guid id)
         {
