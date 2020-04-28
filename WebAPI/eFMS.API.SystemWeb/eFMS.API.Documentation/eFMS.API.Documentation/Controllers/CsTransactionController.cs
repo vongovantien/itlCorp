@@ -270,13 +270,12 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [Authorize]
-        [HttpPut("UpdateFileToShipment/{id}")]
-        public IActionResult UpdateFileToShipment([Required]Guid id)
+        [HttpPut("UpdateFilesToShipment")]
+        public IActionResult UpdateFilesToShipment([FromBody]List<SysImageModel> files)
         {
-
+            var result = sysImageService.UpdateFilesToShipment(files);
+            return Ok(result);
         }
-
-
 
         [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]

@@ -23,10 +23,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
-        public SysImageService(IContextBase<SysImage> repository, 
+        public SysImageService(IContextBase<SysImage> repository,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment,
-            ICurrentUser currUser, 
+            ICurrentUser currUser,
             IOptions<WebUrl> url) : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
@@ -49,6 +49,35 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
         {
             return await WriteFile(model);
+        }
+
+        public HandleState UpdateFilesToShipment(List<SysImageModel> files)
+        {
+
+            var isUpdateDone = new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in files)
+                    {
+                        item.IsTemp = null;
+                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+                        isUpdateDone = Update(item, x => x.Id == item.Id);
+                    }
+                    trans.Commit();
+                    return isUpdateDone;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
 
         private async Task<ResultHandle> WriteFile(DocumentFileUploadModel model)
@@ -74,7 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Id = Guid.NewGuid(),
                         Url = urlImage,
                         Name = fileName,
-                        Folder =  model.FolderName ?? "Shipment",
+                        Folder = model.FolderName ?? "Shipment",
                         ObjectId = model.JobId.ToString(),
                         UserCreated = currentUser.UserName, //admin.
                         UserModified = currentUser.UserName,
@@ -87,7 +116,7 @@ namespace eFMS.API.Documentation.DL.Services
                         list.Add(sysImage);
                     }
                 }
-                if(list.Count > 0)
+                if (list.Count > 0)
                 {
                     list.ForEach(x => x.IsTemp = model.IsTemp);
                     hs = await DataContext.AddAsync(list);

@@ -677,6 +677,12 @@ export class DocumentationRepo {
         );
     }
 
+    updateFilesToShipment(files: any[] = []) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UpdateFilesToShipment`, files).pipe(
+            map((data: any) => data)
+        );
+    }
+
     deleteShipmentFilesAttach(fileId: string) {
         return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteAttachedFile/${fileId}`).pipe(
             map((data: any) => data)
