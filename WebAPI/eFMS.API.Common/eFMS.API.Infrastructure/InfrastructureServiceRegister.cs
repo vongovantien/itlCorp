@@ -57,6 +57,9 @@ namespace eFMS.API.Infrastructure
             services.Configure<WebUrl>(option => {
                 option.Url = configuration.GetSection("WebUrl").Value;
             });
+            services.Configure<ApiUrl>(option => {
+                option.Url = configuration.GetSection("ApiUrl").Value;
+            });
             return services;
         }
         static IServiceCollection AddCrossOrigin(this IServiceCollection services)
