@@ -239,7 +239,9 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 break;
             case 'cargo-type':
                 this.formGroup.controls['cargoType'].setErrors(null);
-                this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(x => x.id === "Sea")]);
+                if (this.serviceType.value === null || this.serviceType.value.length === 0) {
+                    this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(x => x.id === "Sea")]);
+                }
                 break;
         }
     }

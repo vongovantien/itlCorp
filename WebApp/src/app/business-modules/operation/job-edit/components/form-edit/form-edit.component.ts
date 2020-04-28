@@ -144,7 +144,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
             if (this.opsTransaction.productService) {
                 const productService = this.productServices.find(type => type.id === this.opsTransaction.productService);
-                if (!!productService) { this.formEdit.controls['productService'].setValue([]); }
+                if (!!productService) { this.formEdit.controls['productService'].setValue([productService]); }
             }
             if (this.opsTransaction.serviceMode != null) {
                 const serviceMode = this.serviceModes.find(type => type.id === this.opsTransaction.serviceMode);
