@@ -1,12 +1,14 @@
-<div class="dropdown e--combogrid" (clickOutside)="keyword = ''">
-    <input (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
+<div class="dropdown e--combogrid" [class.show]="!showAngledownIcon"
+    (clickOutside)="keyword = ''; showAngledownIcon = false">
+    <input #clkSearch (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
         [disabled]="Disabled" type="text" readonly data-toggle="dropdown"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
-        [placeholder]="loading ? '' : placeholder">
+        [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon">
     <ng-container>
         <div class="e--combogrid_icon">
-            <span class="e--combogrid_icon__dropdown">
+            <span class="e--combogrid_icon__dropdown"
+                (click)="clkSearch.click(); showAngledownIcon = !showAngledownIcon">
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
             </span>
             <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
@@ -22,7 +24,7 @@
         </div>
     </ng-container>
 
-    <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
+    <div class="dropdown-menu  dropdown-menu-right e--combogrid-content" [class.show]="showAngledownIcon">
         <div class="tabel-wrapper table-fixed">
             <div class="table-head-fixed">
                 <div class="table-filter-block">
@@ -49,7 +51,7 @@
                             <ng-container>
                                 <tr class="data-row pointer" #listItem
                                     *cdkVirtualFor="let item of DataSources | filter :keyword: searchKeys; let i= index;trackBy: trackByFn"
-                                    data-id="{{(i+1)}}" (click)="emitSelected(item,i)"
+                                    data-id="{{(i+1)}}" (click)="emitSelected(item,i); showAngledownIcon = false"
                                     [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                     <td *ngFor="let display of DisplayFields; trackBy: trackByFn">
                                         <span [innerHTML]="item[display.field] | highlight : keyword"></span>
