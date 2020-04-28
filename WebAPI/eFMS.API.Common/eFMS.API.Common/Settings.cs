@@ -11,4 +11,8 @@
     {
         public string Url;
     }
+    public class ApiUrl
+    {
+        public string Url;
+    }
 }
