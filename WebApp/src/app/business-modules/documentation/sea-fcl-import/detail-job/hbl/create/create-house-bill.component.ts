@@ -119,7 +119,7 @@ export class CreateHouseBillComponent extends AppForm {
         this.hblGoodSummaryComponent.containerPopup.isAdd = true;
 
         this.hblGoodSummaryComponent.description = "AS PER BILL";
-        this.formHouseBill.notifyPartyDescription.setValue("SAM AS CONSIGNEE");
+        this.formHouseBill.notifyPartyDescription.setValue("SAME AS CONSIGNEE");
 
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
         this.formHouseBill.type = 'SFI';
