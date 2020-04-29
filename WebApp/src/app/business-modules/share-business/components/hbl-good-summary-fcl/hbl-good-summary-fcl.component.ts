@@ -97,6 +97,7 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                         this.description = res.desOfGoods;
                         this.selectedPackage = res.packageType;
                         this.containerDescription = res.contSealNo;
+                        this.packageQty = res.packageQty;
                     }
                 }
             );
