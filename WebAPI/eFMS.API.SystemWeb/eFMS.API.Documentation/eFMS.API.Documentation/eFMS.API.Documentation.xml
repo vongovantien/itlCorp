@@ -496,17 +496,25 @@
             <param name="model">model to update</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.UploadMultiFiles(System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile},System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.UploadMultiFiles(System.Collections.Generic.List{Microsoft.AspNetCore.Http.IFormFile},System.Guid,System.Nullable{System.Boolean})">
             <summary>
             attach multi files to shipment
             </summary>
             <param name="files"></param>
             <param name="jobId"></param>
+            <param name="isTemp"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetAttachedFiles(System.Guid)">
             <summary>
             get all attached files in a shipment
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.GetAttachedFilesPreAlert(System.Guid)">
+            <summary>
+            get all attached files in a shipment for pre alert
             </summary>
             <param name="jobId"></param>
             <returns></returns>

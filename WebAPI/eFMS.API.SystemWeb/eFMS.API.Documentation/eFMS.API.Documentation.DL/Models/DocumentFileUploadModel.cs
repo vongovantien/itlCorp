@@ -9,5 +9,6 @@ namespace eFMS.API.Documentation.DL.Models
         public List<IFormFile> Files { get; set; }
         public string FolderName { get; set; }
         public Guid JobId { get; set; }
+        public bool? IsTemp { get; set; }
     }
 }

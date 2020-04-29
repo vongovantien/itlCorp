@@ -13,6 +13,7 @@ import { AirImportComponent } from './air-import.component';
 import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
 import { AirImportCreateJobComponent } from './create-job/create-job-air-import.component';
 import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -37,7 +38,6 @@ const routing: Routes = [
                             name: "House Bill",
                         },
                     },
-
                 ]
             },
         ]

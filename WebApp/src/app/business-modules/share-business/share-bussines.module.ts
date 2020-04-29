@@ -56,7 +56,7 @@ import {
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
-    ShareContainerImportComponent,
+    ShareContainerImportComponent
 
 } from './components';
 
@@ -66,6 +66,9 @@ import { ShareGoodsImportComponent } from './components/goods-import/goods-impor
 import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 import { ShareBussinessHBLFCLContainerPopupComponent } from './components/hbl-fcl-container/hbl-fcl-container.popup';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
+import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
+
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -111,8 +114,9 @@ const COMPONENTS = [
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
-    ShareBussinessHBLFCLContainerPopupComponent
-
+    ShareBussinessHBLFCLContainerPopupComponent,
+    ShareBusinessReAlertComponent,
+    ShareBusinessAddAttachmentPopupComponent
 ];
 
 

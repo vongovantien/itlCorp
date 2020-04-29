@@ -4,6 +4,7 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
@@ -12,5 +13,8 @@ namespace eFMS.API.Documentation.DL.IService
     {
         Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model);
         Task<HandleState> DeleteFile(Guid id);
+        HandleState UpdateFilesToShipment(List<SysImageModel> files);
+        Task<HandleState> DeleteFileTempPreAlert(Guid id);
+
     }
 }

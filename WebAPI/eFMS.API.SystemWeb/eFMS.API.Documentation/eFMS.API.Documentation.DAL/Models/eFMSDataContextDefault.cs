@@ -689,8 +689,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
 
-                entity.Property(e => e.FlightVesselNo).HasMaxLength(50);
-
                 entity.Property(e => e.GeoCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1703,8 +1701,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
-                entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
-
                 entity.Property(e => e.Eta)
                     .HasColumnName("ETA")
                     .HasColumnType("datetime");
@@ -1751,8 +1747,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.Notes).HasMaxLength(4000);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -1901,8 +1895,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
-                entity.Property(e => e.DesOfGoods).HasMaxLength(1600);
-
                 entity.Property(e => e.DocumentDate).HasColumnType("datetime");
 
                 entity.Property(e => e.DocumentNo).HasMaxLength(500);
@@ -1985,8 +1977,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
-                entity.Property(e => e.HandingInformation).HasMaxLength(250);
-
                 entity.Property(e => e.Hbltype)
                     .HasColumnName("HBLType")
                     .HasMaxLength(20)
@@ -2039,8 +2029,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.MoveType).HasMaxLength(160);
 
                 entity.Property(e => e.NetWeight).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.Notify).HasMaxLength(250);
 
                 entity.Property(e => e.NotifyPartyDescription).HasMaxLength(500);
 
@@ -2118,8 +2106,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ShipperID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.ShippingMark).HasMaxLength(4000);
 
                 entity.Property(e => e.SubAbbr).HasMaxLength(250);
 

@@ -23,10 +23,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
-        public SysImageService(IContextBase<SysImage> repository, 
+        public SysImageService(IContextBase<SysImage> repository,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment,
-            ICurrentUser currUser, 
+            ICurrentUser currUser,
             IOptions<WebUrl> url) : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
@@ -46,9 +46,50 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public async Task<HandleState> DeleteFileTempPreAlert(Guid id)
+        {
+            var item = DataContext.Get(x => x.Id == id && x.IsTemp == true ).FirstOrDefault();
+            if (item == null) return new HandleState("Not have file temp");
+            var result = DataContext.Delete(x => x.Id == id);
+            if (result.Success)
+            {
+                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+            }
+            return result;
+        }
+
         public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
         {
             return await WriteFile(model);
+        }
+
+        public HandleState UpdateFilesToShipment(List<SysImageModel> files)
+        {
+
+            var isUpdateDone = new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in files)
+                    {
+                        item.IsTemp = null;
+                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+                        isUpdateDone = Update(item, x => x.Id == item.Id);
+                    }
+                    trans.Commit();
+                    return isUpdateDone;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
 
         private async Task<ResultHandle> WriteFile(DocumentFileUploadModel model)
@@ -87,8 +128,9 @@ namespace eFMS.API.Documentation.DL.Services
                         list.Add(sysImage);
                     }
                 }
-                if(list.Count > 0)
+                if (list.Count > 0)
                 {
+                    list.ForEach(x => x.IsTemp = model.IsTemp);
                     hs = await DataContext.AddAsync(list);
                 }
                 return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };

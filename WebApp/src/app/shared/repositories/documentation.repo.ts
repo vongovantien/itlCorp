@@ -659,14 +659,26 @@ export class DocumentationRepo {
         );
     }
 
-    uploadFileShipment(jobId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}`, body, 'files').pipe(
+    uploadFileShipment(jobId: string, isTemp: boolean = null, body: any) {
+        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UploadMultiFiles/${jobId}/${isTemp}`, body, 'files').pipe(
             map((data: any) => data)
         );
     }
 
     getShipmentFilesAttach(jobId: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachs`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getShipmentFilesAttachPreAlert(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/GetFileAttachsPreAlert`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateFilesToShipment(files: any[] = []) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/UpdateFilesToShipment`, files).pipe(
             map((data: any) => data)
         );
     }
