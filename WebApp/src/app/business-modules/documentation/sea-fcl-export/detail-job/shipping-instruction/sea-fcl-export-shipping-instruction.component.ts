@@ -33,9 +33,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
-        private _dataService: DataService,
-        private _router: Router,
-        private _systemRepo: SystemRepo) {
+        private _dataService: DataService) {
         super();
     }
 
@@ -118,7 +116,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
     getContainerData() {
         if (this.houseBills != null) {
             let desOfGoods = '';
-            let packages = 0;
+            let packages = '';
             let containerNotes = '';
             let contSealNos = '';
             let gw = 0;
@@ -128,13 +126,13 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 volumn += x.cbm;
                 desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
-                packages += !!x.packageQty ? x.packageQty : 0;
+                packages += !!x.packages ? (x.packages + '\n') : '';
                 contSealNos += !!x.contSealNo ? (x.contSealNo) : '';
             });
             this.billInstructionComponent.shippingInstruction.grossWeight = gw;
             this.billInstructionComponent.shippingInstruction.volume = volumn;
             this.billInstructionComponent.shippingInstruction.goodsDescription = desOfGoods;
-            this.billInstructionComponent.shippingInstruction.packagesNote = packages != null ? + packages + 'xPKGS' : '';
+            this.billInstructionComponent.shippingInstruction.packagesNote = packages;
             this.billInstructionComponent.shippingInstruction.containerNote = containerNotes;
             this.billInstructionComponent.shippingInstruction.containerSealNo = contSealNos;
         }

@@ -14,6 +14,7 @@ using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -31,12 +32,15 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user)
+        private readonly IHostingEnvironment _hostingEnvironment;
+        public CatChargeDefaultAccountController(IStringLocalizer<LanguageSub> localizer, ICatChargeDefaultAccountService service, IMapper imapper, ICurrentUser user,
+            IHostingEnvironment hosting)
         {
             stringLocalizer = localizer;
             catChargeDefaultAccountService = service;
             mapper = imapper;
             currentUser = user;
+            _hostingEnvironment = hosting;
         }
 
         /// <summary>
@@ -261,8 +265,9 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                string templateName = "VoucherTypeAccount" + Templates.ExelImportEx;
-                var result = await new FileHelper().ExportExcel(templateName);
+                string fileName = Templates.CatCharge.ExelImportFileName + Templates.ExelImportEx;
+                string templateName = _hostingEnvironment.ContentRootPath;
+                var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)
                 {
                     return result;

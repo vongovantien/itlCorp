@@ -62,6 +62,9 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.detailComponent.isConvertJob = false;
         this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
         this.detailComponent.formGroup.controls['route'].setErrors(null);
+        if (this.detailComponent.isDisableCargo) {
+            this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
+        }
         if (this.detailComponent.formGroup.invalid) {
             return;
         }

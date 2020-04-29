@@ -40,6 +40,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     SelectedDisplayFields: string[] = [];
     Disabled: boolean = false;
     searchKeys: string[] = [];
+    showAngledownIcon: boolean = false;
 
     keyboardEventsManager: ListKeyManager<any>;
 

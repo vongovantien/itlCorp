@@ -114,17 +114,25 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     getContainerData() {
         if (this.houseBills != null) {
             let desOfGoods = '';
+            let packages = '';
             let containerNotes = '';
+            let contSealNos = '';
+            let gw = 0;
+            let volumn = 0;
             this.houseBills.forEach(x => {
-                this.billInstructionComponent.shippingInstruction.grossWeight = this.billInstructionComponent.shippingInstruction.grossWeight + x.gw;
-                this.billInstructionComponent.shippingInstruction.volume = this.billInstructionComponent.shippingInstruction.volume + x.cbm;
-                desOfGoods = (x.desOfGoods !== null) ? (x.desOfGoods + " ") : null;
-                this.billInstructionComponent.shippingInstruction.goodsDescription = this.billInstructionComponent.shippingInstruction.goodsDescription + desOfGoods;
-                containerNotes = (x.packageContainer !== null) ? (x.packageContainer + "") : null;
-                this.billInstructionComponent.shippingInstruction.containerNote = this.billInstructionComponent.shippingInstruction.containerNote + containerNotes;
-                this.billInstructionComponent.shippingInstruction.packagesNote = this.billInstructionComponent.shippingInstruction.containerNote + containerNotes;
+                gw += x.gw;
+                volumn += x.cbm;
+                desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
+                containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
+                packages += !!x.packages ? (x.packages + '\n') : '';
+                contSealNos += !!x.contSealNo ? (x.contSealNo) : '';
             });
-            this.billInstructionComponent.shippingInstruction.containerSealNo = "";
+            this.billInstructionComponent.shippingInstruction.grossWeight = gw;
+            this.billInstructionComponent.shippingInstruction.volume = volumn;
+            this.billInstructionComponent.shippingInstruction.goodsDescription = desOfGoods;
+            this.billInstructionComponent.shippingInstruction.packagesNote = packages;
+            this.billInstructionComponent.shippingInstruction.containerNote = containerNotes;
+            this.billInstructionComponent.shippingInstruction.containerSealNo = contSealNos;
         }
     }
     initNewShippingInstruction(res: CsTransaction) {
@@ -135,7 +143,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         this.billInstructionComponent.shippingInstruction.bookingNo = res.bookingNo;
         this.billInstructionComponent.shippingInstruction.paymenType = "Prepaid";
         this.billInstructionComponent.shippingInstruction.invoiceDate = new Date();
-        this.billInstructionComponent.shippingInstruction.issuedUser = user.userName
+        this.billInstructionComponent.shippingInstruction.issuedUser = user.userName;
         this.billInstructionComponent.shippingInstruction.supplier = res.coloaderId;
         this.billInstructionComponent.shippingInstruction.consigneeId = res.agentId;
         this.billInstructionComponent.shippingInstruction.pol = res.pol;

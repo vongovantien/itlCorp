@@ -25,6 +25,7 @@ namespace eFMS.API.Accounting.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<OpsTransaction> opsTransactionRepo;
@@ -44,7 +45,8 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
             ICurrentUser user,
-            IOptions<WebUrl> url,
+            IOptions<WebUrl> wUrl,
+            IOptions<ApiUrl> aUrl,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequest,
             IContextBase<SysUser> sysUser,
             IContextBase<OpsTransaction> opsTransaction,
@@ -62,7 +64,8 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
-            webUrl = url;
+            webUrl = wUrl;
+            apiUrl = aUrl;
             acctAdvanceRequestRepo = acctAdvanceRequest;
             sysUserRepo = sysUser;
             opsTransactionRepo = opsTransaction;
@@ -1990,7 +1993,7 @@ namespace eFMS.API.Accounting.DL.Services
             string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
             subject = subject.Replace("[RequesterName]", requesterName);
             subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", CrystalEx.GetLogoEFMS());
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[UserName]", userReciverName);
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[AdvanceNo]", advanceNo);
@@ -2002,6 +2005,7 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailUserReciver
             };
@@ -2062,7 +2066,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Advance Payment from [RequesterName] is approved";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", CrystalEx.GetLogoEFMS());
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is approved at <b>[ApprovedDate]</b> as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li></ul><p>You can click here to check more detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
@@ -2074,6 +2078,7 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
             };
@@ -2114,7 +2119,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             string subject = "eFMS - Advance Payment from [RequesterName] is denied";
             subject = subject.Replace("[RequesterName]", requesterName);
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{0}'/></p></div>", CrystalEx.GetLogoEFMS());
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have an Advance Payment is denied at <b>[DeniedDate]</b> by as below info:</p><p><i>Anh/ Chị có một yêu cầu tạm ứng đã bị từ chối vào lúc <b>[DeniedDate]</b> by với thông tin như sau:</i></p><ul><li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li><li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b><li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li><li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li><li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li><li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
             body = body.Replace("[RequesterName]", requesterName);
             body = body.Replace("[DeniedDate]", DeniedDate.ToString("HH:mm - dd/MM/yyyy"));
             body = body.Replace("[AdvanceNo]", advanceNo);
@@ -2127,6 +2132,7 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
             };

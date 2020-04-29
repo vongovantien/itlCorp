@@ -160,7 +160,7 @@ export class SettlementPaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getListSettlePayment();
+                        this.getListSettlePayment(this.dataSearch);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }

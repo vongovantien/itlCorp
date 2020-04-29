@@ -125,7 +125,7 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Delete Success');
-                        this.getListAdvancePayment();
+                        this.getListAdvancePayment(this.dataSearch);
                     }
                 },
             );
