@@ -91,7 +91,11 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     }
 
     onAddToMail() {
-        this.onAdd.emit(this.files.filter(x => x.isChecked === true));
+        const lstFiles = this.files.filter(x => x.isChecked === true);
+        if (lstFiles.length === 0) {
+            return;
+        }
+        this.onAdd.emit(lstFiles);
         this.hide();
     }
 

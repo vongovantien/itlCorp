@@ -55,6 +55,8 @@
                                     <td> <a [href]="file.url" target="_blank" [title]="file.name"
                                             download>{{file.name}}</a></td>
                                 </tr>
+                                <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                <tr app-table-none-record *ngIf="!files.length && !isLoading"></tr>
                             </ng-container>
                         </tbody>
                     </table>

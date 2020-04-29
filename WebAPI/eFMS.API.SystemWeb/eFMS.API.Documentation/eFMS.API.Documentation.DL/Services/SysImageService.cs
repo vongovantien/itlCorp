@@ -46,6 +46,18 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public async Task<HandleState> DeleteFileTempPreAlert(Guid id)
+        {
+            var item = DataContext.Get(x => x.Id == id && x.IsTemp == true ).FirstOrDefault();
+            if (item == null) return new HandleState("Not have file temp");
+            var result = DataContext.Delete(x => x.Id == id);
+            if (result.Success)
+            {
+                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+            }
+            return result;
+        }
+
         public async Task<ResultHandle> UploadDocumentationFiles(DocumentFileUploadModel model)
         {
             return await WriteFile(model);

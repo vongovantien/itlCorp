@@ -284,6 +284,14 @@ namespace eFMS.API.Documentation.Controllers
             var result = sysImageService.DeleteFile(id);
             return Ok(result);
         }
+
+        [Authorize]
+        [HttpDelete("DeleteFileTempPreAlert/{id}")]
+        public IActionResult DeleteFileTempPreAlert([Required]Guid id)
+        {
+            var result = sysImageService.DeleteFileTempPreAlert(id);
+            return Ok(result);
+        }
         #endregion -- INSERT & UPDATE
 
         #region -- DELETE --
