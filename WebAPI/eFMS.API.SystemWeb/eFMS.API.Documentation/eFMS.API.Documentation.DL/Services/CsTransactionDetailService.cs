@@ -732,7 +732,7 @@ namespace eFMS.API.Documentation.DL.Services
             results.ForEach(fe =>
             {
                 //var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Select(s => s.PackageQuantity != null ? (s.PackageQuantity + " x " + GetUnitNameById(s.PackageTypeId)) : string.Empty);
-                var packages = fe.PackageQty != null ? (fe.PackageQty + "x" + (fe.PackageType != null? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn: "PKGS")) : string.Empty;
+                var packages = fe.PackageQty != null ? (fe.PackageQty + " " + (fe.PackageType != null? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn: string.Empty)) : string.Empty;
                 fe.Packages = string.Join(", ", packages);
             });
             return results;
@@ -922,7 +922,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Qty*Unit Package of list Container HBL
                 //fe.Packages = string.Join(",", csMawbcontainerRepo.Get(x => x.Hblid == fe.Id)
                 //                                                        .Select(s => (s.PackageTypeId != null || s.PackageQuantity != null) ? (s.PackageQuantity + "x" + GetUnitNameById(s.PackageTypeId)) : string.Empty));
-                var packages = fe.PackageQty != null ? (fe.PackageQty + "x" + (fe.PackageType != null ? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn : "PKGS")) : string.Empty;
+                var packages = fe.PackageQty != null ? (fe.PackageQty + " " + (fe.PackageType != null ? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn : string.Empty)) : string.Empty;
                 fe.Packages = string.Join(", ", packages);
             });
             return results.AsQueryable();

@@ -1504,7 +1504,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PSC = opst.SumPackages.HasValue ? opst.SumPackages.Value : 0,
                            CBM = opst.SumCbm.HasValue ? opst.SumCbm.Value : 0,
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                           MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
+                           MBL = (opst.Mblno == null ? (cst.Mawb??string.Empty) : opst.Mblno),
                            StlCSName = string.Empty
                        };
 
@@ -1581,7 +1581,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SltDpComment = string.Empty,
                            Shipper = string.Empty,
                            ShipmentInfo = string.Empty,
-                           MBLNO = (opst.Mblno == null ? cst.Mawb : opst.Mblno),
+                           MBLNO = (opst.Mblno == null ? (cst.Mawb ?? string.Empty) : opst.Mblno),
                            VAT = 0,
                            BFVATAmount = 0,
                            ContainerQty = string.Empty,
