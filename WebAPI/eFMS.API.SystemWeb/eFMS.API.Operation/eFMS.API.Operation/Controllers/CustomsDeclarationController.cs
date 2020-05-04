@@ -174,6 +174,8 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
+            model.DatetimeModified = DateTime.Now;
+            model.UserModified = currentUser.UserID;
             var hs = customsDeclarationService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
