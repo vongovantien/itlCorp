@@ -126,8 +126,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (type.dirty && !type.valid) || (isSubmitted && !type.valid)}">
                             <label class="form-control-label">
-                                Type <span class="m--font-danger"
-                                    *ngIf="(type.dirty && !type.valid) || (isSubmitted && !type.valid)">(*)</span>
+                                Type <span class="m--font-danger">(*)</span>
                             </label>
                             <ng-select #tp [items]=" typeClearances" placeholder="Please select"
                                 (opened)="closeOtherSelects(tp)" formControlName="type" [allowClear]="true">
