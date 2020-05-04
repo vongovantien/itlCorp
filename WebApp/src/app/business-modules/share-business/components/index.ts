@@ -1,3 +1,5 @@
+import { from } from 'rxjs';
+
 export * from './buying-charge/buying-charge.component';
 export * from './obh-charge/obh-charge.component';
 export * from './selling-charge/selling-charge.component';
@@ -57,6 +59,9 @@ export * from './manifest/housebill-in-manifest/housebills-in-manifest.component
 
 export * from './arrival-note-air/arrival-note-air.component';
 export * from './date-time-modified/date-time-modified.component';
+
+export * from './bill-instruction-sea-export/bill-instruction-sea-export.component';
+export * from './bill-instruction-housebills-sea-export/bill-instruction-housebills-sea-export.component';
 
 // TODO export components from shareBussiness.
 

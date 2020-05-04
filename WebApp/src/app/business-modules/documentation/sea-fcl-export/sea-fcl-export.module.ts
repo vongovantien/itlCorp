@@ -16,8 +16,6 @@ import { SeaFCLExportDetailJobComponent } from './detail-job/detail-job-fcl-expo
 import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
-import { SeaFclExportBillInstructionComponent } from './detail-job/shipping-instruction/bill-instruction/sea-fcl-export-bill-instruction.component';
-import { SeaFclExportBillDetailComponent } from './detail-job/shipping-instruction/bill-detail/sea-fcl-export-bill-detail.component';
 import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-export-manifest.component';
 
 const routing: Routes = [
@@ -82,8 +80,6 @@ const LIB = [
         SeaFCLExportCreateJobComponent,
         SeaFCLExportDetailJobComponent,
         SeaFclExportShippingInstructionComponent,
-        SeaFclExportBillInstructionComponent,
-        SeaFclExportBillDetailComponent,
         SeaFclExportManifestComponent,
     ],
     providers: [],
