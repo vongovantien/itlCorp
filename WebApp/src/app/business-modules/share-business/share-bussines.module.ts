@@ -56,7 +56,7 @@ import {
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
-    ShareContainerImportComponent
+    ShareContainerImportComponent,
     ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent
 
@@ -118,7 +118,7 @@ const COMPONENTS = [
     ShareBussinessDateTimeModifiedComponent,
     ShareBussinessHBLFCLContainerPopupComponent,
     ShareBusinessReAlertComponent,
-    ShareBusinessAddAttachmentPopupComponent
+    ShareBusinessAddAttachmentPopupComponent,
     ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent
 
