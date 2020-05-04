@@ -11,18 +11,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CsTransaction } from 'src/app/shared/models';
-import { SeaLclExportBillDetailComponent } from './bill-detail/sea-lcl-export-bill-detail.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
-import { SeaLclExportBillInstructionComponent } from './bill-instruction/sea-lcl-export-bill-instruction.component';
 import { getTransactionPermission, getTransactionLocked } from '../../../../share-business/store';
+import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
 
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
     templateUrl: './sea-lcl-export-shipping-instruction.component.html'
 })
 export class SeaLclExportShippingInstructionComponent extends AppList {
-    @ViewChild(SeaLclExportBillInstructionComponent, { static: false }) billInstructionComponent: SeaLclExportBillInstructionComponent;
-    @ViewChild(SeaLclExportBillDetailComponent, { static: false }) billDetail: SeaLclExportBillDetailComponent;
+    @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComppnent: ShareBussinessBillInstructionSeaExportComponent;
+    @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     jobId: string;
     termTypes: CommonInterface.INg2Select[];
@@ -89,29 +88,29 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             );
     }
     setDataBillInstructionComponent(data: any) {
-        this.billInstructionComponent.shippingInstruction = data;
-
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe(
                 (res) => {
                     if (!!res) {
                         console.log(res);
-                        if (this.billInstructionComponent.shippingInstruction != null) {
-                            this.billInstructionComponent.shippingInstruction.refNo = res.jobNo;
+                        if (data != null) {
+                            this.billSIComppnent.shippingInstruction = data;
+                            this.billSIComppnent.shippingInstruction.refNo = res.jobNo;
                         } else {
                             this.initNewShippingInstruction(res);
-                            this.getContainerData();
+                            this.getGoods();
                         }
-                        this.billInstructionComponent.shippingInstruction.csTransactionDetails = this.houseBills;
-                        this.billInstructionComponent.termTypes = this.termTypes;
-                        this.billInstructionComponent.setformValue(this.billInstructionComponent.shippingInstruction);
-                        console.log(this.billInstructionComponent.shippingInstruction);
+
+                        this.billSIComppnent.shippingInstruction.csTransactionDetails = this.houseBills;
+                        this.billSIComppnent.termTypes = this.termTypes;
+                        this.billSIComppnent.setformValue(this.billSIComppnent.shippingInstruction);
+                        console.log(this.billSIComppnent.shippingInstruction);
                     }
                 }
             );
     }
-    getContainerData() {
+    getGoods() {
         if (this.houseBills != null) {
             let desOfGoods = '';
             let packages = '';
@@ -127,36 +126,37 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 packages += !!x.packages ? (x.packages + '\n') : '';
                 contSealNos += !!x.contSealNo ? (x.contSealNo) : '';
             });
-            this.billInstructionComponent.shippingInstruction.grossWeight = gw;
-            this.billInstructionComponent.shippingInstruction.volume = volumn;
-            this.billInstructionComponent.shippingInstruction.goodsDescription = desOfGoods;
-            this.billInstructionComponent.shippingInstruction.packagesNote = packages;
-            this.billInstructionComponent.shippingInstruction.containerNote = containerNotes;
-            this.billInstructionComponent.shippingInstruction.containerSealNo = contSealNos;
+            this.billSIComppnent.shippingInstruction.grossWeight = gw;
+            this.billSIComppnent.shippingInstruction.volume = volumn;
+            this.billSIComppnent.shippingInstruction.goodsDescription = desOfGoods;
+            this.billSIComppnent.shippingInstruction.packagesNote = packages;
+            this.billSIComppnent.shippingInstruction.containerNote = containerNotes;
+            this.billSIComppnent.shippingInstruction.containerSealNo = contSealNos;
         }
     }
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
-        this.billInstructionComponent.shippingInstruction = new CsShippingInstruction();
-        this.billInstructionComponent.shippingInstruction.refNo = res.jobNo;
-        this.billInstructionComponent.shippingInstruction.bookingNo = res.bookingNo;
-        this.billInstructionComponent.shippingInstruction.paymenType = "Prepaid";
-        this.billInstructionComponent.shippingInstruction.invoiceDate = new Date();
-        this.billInstructionComponent.shippingInstruction.issuedUser = user.userName;
-        this.billInstructionComponent.shippingInstruction.supplier = res.coloaderId;
-        this.billInstructionComponent.shippingInstruction.consigneeId = res.agentId;
-        this.billInstructionComponent.shippingInstruction.pol = res.pol;
-        this.billInstructionComponent.shippingInstruction.pod = res.pod;
-        this.billInstructionComponent.shippingInstruction.loadingDate = res.etd;
+        this.billSIComppnent.shippingInstruction = new CsShippingInstruction();
+        this.billSIComppnent.shippingInstruction.refNo = res.jobNo;
+        this.billSIComppnent.shippingInstruction.bookingNo = res.bookingNo;
+        this.billSIComppnent.shippingInstruction.paymenType = "Prepaid";
+        this.billSIComppnent.shippingInstruction.invoiceDate = new Date();
+        this.billSIComppnent.shippingInstruction.supplier = res.coloaderId;
+        this.billSIComppnent.shippingInstruction.issuedUser = user.id;
+        this.billSIComppnent.shippingInstruction.consigneeId = res.agentId;
+        this.billSIComppnent.shippingInstruction.pol = res.pol;
+        this.billSIComppnent.shippingInstruction.pod = res.pod;
+        this.billSIComppnent.shippingInstruction.loadingDate = res.etd;
+        this.billSIComppnent.shippingInstruction.voyNo = res.flightVesselName + " - " + res.voyNo;
     }
     save() {
-        this.billInstructionComponent.isSubmitted = true;
+        this.billSIComppnent.isSubmitted = true;
         if (!this.checkValidateForm()) {
             return;
         }
 
-        const data = this.billInstructionComponent.onSubmitForm();
+        const data = this.billSIComppnent.onSubmitForm();
         data.jobId = this.jobId;
         this.saveData(data);
     }
@@ -178,9 +178,9 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.billInstructionComponent.formSI.valid
-            || (!!this.billInstructionComponent.loadingDate.value && !this.billInstructionComponent.loadingDate.value.startDate)
-            || (!!this.billInstructionComponent.issueDate.value && !this.billInstructionComponent.issueDate.value.startDate)
+        if (!this.billSIComppnent.formSI.valid
+            || (!!this.billSIComppnent.loadingDate.value && !this.billSIComppnent.loadingDate.value.startDate)
+            || (!!this.billSIComppnent.issueDate.value && !this.billSIComppnent.issueDate.value.startDate)
         ) {
             valid = false;
         }
@@ -190,11 +190,11 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         this.getHouseBills();
     }
     previewSIReport() {
-        if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+        if (this.billSIComppnent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
-        this._documentRepo.previewSIReport(this.billInstructionComponent.shippingInstruction)
+        this._documentRepo.previewSIReport(this.billSIComppnent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -211,11 +211,11 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             );
     }
     previewOCL() {
-        if (this.billInstructionComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+        if (this.billSIComppnent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
-        this._documentRepo.previewOCLReport(this.billInstructionComponent.shippingInstruction)
+        this._documentRepo.previewOCLReport(this.billSIComppnent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

@@ -15,8 +15,6 @@ import { SeaLCLExportDetailJobComponent } from './detail-job/detail-job-lcl-expo
 import { SeaLCLExportLazyLoadModule } from './sea-lcl-export-lazy-load.module';
 import { SeaLclExportManifestComponent } from './detail-job/manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-lcl-export-shipping-instruction.component';
-import { SeaLclExportBillInstructionComponent } from './detail-job/shipping-instruction/bill-instruction/sea-lcl-export-bill-instruction.component';
-import { SeaLclExportBillDetailComponent } from './detail-job/shipping-instruction/bill-detail/sea-lcl-export-bill-detail.component';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
@@ -83,8 +81,6 @@ const LIBS = [
         SeaLCLExportDetailJobComponent,
         SeaLclExportManifestComponent,
         SeaLclExportShippingInstructionComponent,
-        SeaLclExportBillInstructionComponent,
-        SeaLclExportBillDetailComponent,
     ],
     providers: [],
 })

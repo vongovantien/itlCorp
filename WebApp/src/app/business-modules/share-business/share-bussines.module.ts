@@ -57,6 +57,8 @@ import {
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
     ShareContainerImportComponent,
+    ShareBussinessBillInstructionSeaExportComponent,
+    ShareBussinessBillInstructionHousebillsSeaExportComponent
 
 } from './components';
 
@@ -111,7 +113,9 @@ const COMPONENTS = [
     ShareBusinessHousebillsInManifestComponent,
     ShareBusinessArrivalNoteAirComponent,
     ShareBussinessDateTimeModifiedComponent,
-    ShareBussinessHBLFCLContainerPopupComponent
+    ShareBussinessHBLFCLContainerPopupComponent,
+    ShareBussinessBillInstructionSeaExportComponent,
+    ShareBussinessBillInstructionHousebillsSeaExportComponent
 
 ];
 
