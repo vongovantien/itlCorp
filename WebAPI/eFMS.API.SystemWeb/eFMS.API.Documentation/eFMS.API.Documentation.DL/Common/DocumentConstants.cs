@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.DL.Common
 {
     public static class DocumentConstants
     {
-        public static readonly string LG_SHIPMENT = "LG";// Custom Logistic
+        public static readonly string LG_SHIPMENT = "CL";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export
         public static readonly string SIF_SHIPMENT = "SIF"; //Sea FCL Import
         public static readonly string SEL_SHIPMENT = "SEL"; //Sea LCL Export

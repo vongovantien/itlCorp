@@ -769,4 +769,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewSaleSummaryReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/SummarySaleReport`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }

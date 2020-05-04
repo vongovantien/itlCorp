@@ -29,6 +29,7 @@ export class SaleReportComponent extends AppList {
     }
 
     onSearchSaleReport(data: ReportInterface.ISaleReportCriteria) {
+        console.log(data);
         switch (data.typeReport) {
             case CommonEnum.SALE_REPORT_TYPE.SR_MONTHLY:
                 this.previewMonthlyReport(data);
@@ -40,6 +41,7 @@ export class SaleReportComponent extends AppList {
                 this.previewQuaterReport(data);
                 break;
             case CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY:
+                this.previewSummaryReport(data);
                 break;
         }
     }
@@ -92,6 +94,29 @@ export class SaleReportComponent extends AppList {
 
     previewDepartmentReport(data: ReportInterface.ISaleReportCriteria) {
         this._documentationRepo.previewSaleDepartmentReport(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        }
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    previewSummaryReport(data: ReportInterface.ISaleReportCriteria) {
+        this._documentationRepo.previewSaleSummaryReport(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
