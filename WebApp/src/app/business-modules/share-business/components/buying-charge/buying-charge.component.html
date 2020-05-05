@@ -93,8 +93,9 @@
                                         </ng-container>
                                         <ng-container *ngIf="!isShowLoadingPartner">
                                             <input type="text" class="dropdown-toggle form-control" dropdownToggle
-                                                readonly [(ngModel)]="charge.partnerShortName"
-                                                placeholder="Please Select">
+                                                (clickOutside)="handleClickOutSideComboGrid()" readonly
+                                                [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
+                                                (click)="loadDynamicComoGrid(charge,i)">
                                         </ng-container>
                                         <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                             <div class="d-flex justify-content-end dropdown-partner__header">
@@ -103,10 +104,11 @@
                                                     [title]="type.displayName"
                                                     (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
                                             </div>
-                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                            <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                                 (onClick)="onSelectPartner($event, charge)">
-                                            </app-combo-grid>
+                                            </app-combo-grid> -->
+                                            <ng-template #container></ng-template>
                                         </div>
                                     </ng-template>
                                 </div>

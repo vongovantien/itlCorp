@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 @Injectable({
     providedIn: 'root'
 })
 export class DataService {
 
     private messageSource = new BehaviorSubject({ "default": "hello world !" });
+    public $data = new Subject();
+
     currentMessage = this.messageSource.asObservable();
     data: Object = {};
 
