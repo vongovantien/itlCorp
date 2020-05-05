@@ -4,43 +4,135 @@ import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAppState, getParamsRouterState } from '@store';
-import { Params } from '@angular/router';
-
+import { IAppState, getParamsRouterState, getDataRouterState } from '@store';
+import { combineLatest } from 'rxjs';
+import { ChargeConstants } from 'src/constants/charge.const';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { EmailContent } from 'src/app/shared/models/document/emailContent';
+import { Crystal } from '@models';
+import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
 })
 export class ShareBusinessReAlertComponent extends AppList {
     @ViewChild(ShareBusinessAddAttachmentPopupComponent, { static: false }) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
+    @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup: ExportCrystalComponent;
     files: IShipmentAttachFile[] = [];
     jobId: string;
+    hblId: string;
 
+    isSubmited: boolean = false;
+
+    formMail: FormGroup;
+    from: AbstractControl;
+    to: AbstractControl;
+    cc: AbstractControl;
+    subject: AbstractControl;
+    body: AbstractControl;
+
+    dataReport: Crystal = null;
+    dataExportReport: Crystal = null;
+    attachedFile: string[] = [];
+
+    sendMailButtonName: string = '';
+    serviceId: string = '';
+    isExitsArrivalNotice: boolean = true;
+    isCheckedArrivalNotice: boolean = true;
+    isExitsManifest: boolean = true;
+    isCheckedManifest: boolean = true;
+    isExitsMawb: boolean = true;
+    isCheckedMawb: boolean = true;
+    isExitsSI: boolean = true;
+    isCheckedSI: boolean = true;
+
+    pathGeneralArrivalNotice: string = '';
+    pathGeneralManifest: string = '';
+    pathGeneralMawb: string = '';
+    pathGeneralSI: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
-        private _store: Store<IAppState>
-
-    ) {
+        private _store: Store<IAppState>,
+        private _fb: FormBuilder) {
         super();
         this._progressRef = this._ngProgressService.ref();
 
     }
+
     ngOnInit(): void {
-        this._store.select(getParamsRouterState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((params: Params) => {
+        combineLatest([
+            this._store.select(getParamsRouterState),
+            this._store.select(getDataRouterState),
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            take(1)
+        ).subscribe(
+            (params: any) => {
                 if (params.jobId) {
                     this.jobId = params.jobId;
+                    this.hblId = params.hblId;
+                    this.serviceId = params.serviceId;
+                    this.exportFileCrystal(params.serviceId);
+                    this.getContentMail(params.serviceId, params.hblId, params.jobId);
                 }
-            });
+            }
+        );
         this.headers = [
             { title: 'Attach File', field: 'name' }
         ];
+
+        this.formMail = this._fb.group({
+            from: [],
+            to: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            cc: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            subject: ['',
+                Validators.compose([
+                    Validators.required
+                ])
+            ],
+            body: []
+        });
+
+        this.from = this.formMail.controls['from'];
+        this.to = this.formMail.controls['to'];
+        this.cc = this.formMail.controls['cc'];
+        this.subject = this.formMail.controls['subject'];
+        this.body = this.formMail.controls['body'];
+    }
+
+    exportFileCrystal(serviceId: string) {
+        // Export Report Arrival Notice to PDF
+        switch (serviceId) {
+            case ChargeConstants.AI_CODE: // Air Import
+                this.exportCrystalArrivalNoticeToPdf();
+                break;
+            case ChargeConstants.AE_CODE: // Air Export
+                this.exportCrystalManifestToPdf();
+                this.exportCrystalMawbFrameToPdf();
+                break;
+            case ChargeConstants.SFE_CODE: // Sea FCL Export
+                this.exportCrystalSIToPdf();
+                break;
+            case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this.exportCrystalSIToPdf();
+                break;
+            default:
+                break;
+        }
     }
 
     onAddFile(files: any) {
@@ -85,6 +177,315 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     }
 
+    sendMail() {
+        this.isSubmited = true;
+        if (this.formMail.valid) {
+            const _attachFileUpload = this.hashedUrlFileUpload();
+            _attachFileUpload.forEach(element => {
+                this.attachedFile.push(element);
+            });
+            const emailContent: EmailContent = {
+                from: this.from.value,
+                to: this.to.value,
+                cc: this.cc.value,
+                subject: this.subject.value,
+                body: this.body.value,
+                attachFiles: this.attachedFile
+            };
+
+            this._progressRef.start();
+            this._documentRepo.sendMailDocument(emailContent)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => { this._progressRef.complete(); })
+                )
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    },
+                );
+        }
+    }
+
+    hashedUrlFileUpload() {
+        const attachFiles = [];
+        const prefix = "/files/";
+        // tslint:disable-next-line: prefer-for-of
+        for (let i = 0; i < this.files.length; i++) {
+            const urlFile = this.files[i].url;
+            if (urlFile.indexOf(prefix) > -1) {
+                const urlWeb = urlFile.substring(0, urlFile.indexOf(prefix));
+                const url = urlFile.replace(urlWeb, './wwwroot').split('/').join('\\');
+                attachFiles.push(url);
+            }
+        }
+        return attachFiles;
+    }
+
+    getContentMail(serviceId: string, hblId: string, jobId: string) {
+        switch (serviceId) {
+            case ChargeConstants.AI_CODE: // Air Import
+                this.sendMailButtonName = "Send Arrival Notice";
+                this.getInfoMailHBLAirImport(hblId);
+                break;
+            case ChargeConstants.AE_CODE: // Air Export
+                this.sendMailButtonName = "Send Pre Alert";
+                this.getInfoMailHBLAirExport(hblId);
+                break;
+            case ChargeConstants.SFE_CODE: // Sea FCL Export
+                this.sendMailButtonName = "Send S.I";
+                this.getInfoMailSISeaExport(jobId);
+                break;
+            case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this.sendMailButtonName = "Send S.I";
+                this.getInfoMailSISeaExport(jobId);
+                break;
+            default:
+                break;
+        }
+    }
+
+    getInfoMailHBLAirImport(hblId: string) {
+        this._documentRepo.getInfoMailHBLAirImport(hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+            );
+    }
+
+    getInfoMailHBLAirExport(hblId: string) {
+        this._documentRepo.getInfoMailHBLAirExport(hblId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+            );
+    }
+
+    getInfoMailSISeaExport(jobId: string) {
+        this._documentRepo.getInfoMailSISeaExport(jobId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+            );
+    }
+
+    //#region Preview Report
+    previewArrivalNotice() {
+        this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    previewManifest() {
+        this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    previewMawb() {
+        this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    previewSI() {
+
+    }
+    //#endregion Preview Report
+
+    //#region  Export Report
+    exportCrystalArrivalNoticeToPdf() {
+        this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+
+                        this.pathGeneralArrivalNotice = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsArrivalNotice = true;
+                        this.isCheckedArrivalNotice = true;
+                    } else {
+                        // this._toastService.warning('There is no data charge to general report');
+                        this.isExitsArrivalNotice = false;
+                        this.isCheckedArrivalNotice = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalManifestToPdf() {
+        this._documentRepo.previewAirExportManifestByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+
+                        this.pathGeneralManifest = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsManifest = true;
+                        this.isCheckedManifest = true;
+                    } else {
+                        // this._toastService.warning('There is no data charge to general report');
+                        this.isExitsManifest = false;
+                        this.isCheckedManifest = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalMawbFrameToPdf() {
+        this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+
+                        this.pathGeneralMawb = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsMawb = true;
+                        this.isCheckedMawb = true;
+                    } else {
+                        // this._toastService.warning('There is no data charge to general report');
+                        this.isExitsMawb = false;
+                        this.isCheckedMawb = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalSIToPdf() {
+
+    }
+
+    //#endregion Export Report
+
+    onChangeCheckBox() {
+        switch (this.serviceId) {
+            case ChargeConstants.AI_CODE: // Air Import               
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralArrivalNotice, this.isCheckedArrivalNotice);
+                break;
+            case ChargeConstants.AE_CODE: // Air Export               
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedMawb);
+                break;
+            case ChargeConstants.SFE_CODE: // Sea FCL Export
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                break;
+            case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                break;
+            default:
+                break;
+        }
+    }
+
+    UpdateAttachFileByPathGeneralReport(pathGeneral: string, isChecked: boolean) {
+        const idxOf = this.attachedFile.indexOf(pathGeneral);
+        if (!isChecked) {
+            if (idxOf > -1) {
+                this.attachedFile.splice(idxOf, 1);
+            }
+        } else {
+            if (idxOf === -1) {
+                this.attachedFile.push(pathGeneral);
+            }
+        }
+    }
 }
 
 interface IShipmentAttachFile {

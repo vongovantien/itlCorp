@@ -114,5 +114,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = manifestService.PreviewAirExportManifest(model);
             return Ok(result);
         }
+
+        /// <summary>
+        /// preview air export manifest by jobId
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PreviewAirExportManifestByJobId")]
+        [Authorize]
+        public IActionResult PreviewAirExportManifestByJobId(Guid jobId)
+        {
+            var result = manifestService.PreviewAirExportManifestByJobId(jobId);
+            return Ok(result);
+        }
     }
 }

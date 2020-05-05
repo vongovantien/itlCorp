@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewSeaExportManifest(ManifestReportModel model);
         Crystal PreviewSeaImportManifest(ManifestReportModel model);
         Crystal PreviewAirExportManifest(ManifestReportModel model);
+        Crystal PreviewAirExportManifestByJobId(Guid jobId);
     }
 }

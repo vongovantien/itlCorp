@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
@@ -24,6 +25,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsTransaction> transactionRepository;
         readonly IContextBase<CatUnit> unitRepository;
         readonly ICurrentUser currentUser;
+        readonly ICsTransactionDetailService transactionDetailService;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -32,7 +34,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionService transactionService,
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<CatUnit> unitRepo,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            ICsTransactionDetailService transDetailService) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -41,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionRepository = transactionRepo;
             unitRepository = unitRepo;
             currentUser = currUser;
+            transactionDetailService = transDetailService;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -359,6 +363,74 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+            result.AddDataSource(manifests);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
+        public Crystal PreviewAirExportManifestByJobId(Guid jobId)
+        {
+            Crystal result = new Crystal();
+            var _manifest = GetById(jobId);
+            if (_manifest == null)
+            {
+                return null;
+            }
+            var transaction = csTransactionService.GetDetails(jobId);
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+            var housebills = transactionDetailService.Query(criteria);
+            var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
+            _manifest.PolName = _manifest.Pol != null ? ports.Where(x => x.Id == _manifest.Pol)?.FirstOrDefault()?.NameEn : null;
+            _manifest.PodName = _manifest.Pol != null ? ports.Where(x => x.Id == _manifest.Pod)?.FirstOrDefault()?.NameEn : null;
+            var manifests = new List<AirCargoManifestReport>();
+            if (housebills.Count > 0)
+            {
+                foreach (var item in housebills)
+                {
+                    var manifest = new AirCargoManifestReport
+                    {
+                        Billype = "H",
+                        HWBNO = item.Hwbno?.ToUpper(),
+                        Pieces = item.PackageQty?.ToString(),
+                        GrossWeight = item.GrossWeight ?? 0,
+                        ShipperName = item.ShipperDescription?.ToUpper(),
+                        Consignees = item.ConsigneeDescription?.ToUpper(),
+                        Description = item.DesOfGoods,
+                        FirstDest = item.FirstCarrierBy?.ToUpper(),
+                        SecondDest = item.TransitPlaceTo1?.ToUpper(),
+                        ThirdDest = item.TransitPlaceTo2?.ToUpper(),
+                        Notify = item.NotifyPartyDescription?.ToUpper()
+                    };
+                    manifests.Add(manifest);
+                }
+            }
+            if (manifests.Count == 0)
+                return result;
+
+            var parameter = new AirCargoManifestReportParameter
+            {
+                AWB = transaction.Mawb ?? string.Empty,
+                Marks = _manifest.MasksOfRegistration ?? string.Empty,
+                Flight = transaction.FlightVesselName?.ToUpper() ?? string.Empty,
+                PortLading = _manifest.PolName?.ToUpper() ?? string.Empty,
+                PortUnlading = _manifest.PodName?.ToUpper() ?? string.Empty,
+                FlightDate = transaction.FlightDate == null ? string.Empty : transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
+                Shipper = DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
+                Consignee = transaction.AgentName?.ToUpper() ?? string.Empty,
+                Contact = currentUser.UserName
+            };
+            result = new Crystal
+            {
+                ReportName = "Aircargomanifest.rpt",
+                AllowPrint = true,
+                AllowExport = true,
+                IsLandscape = true
+            };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\AirCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

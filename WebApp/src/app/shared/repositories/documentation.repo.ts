@@ -769,4 +769,34 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    getInfoMailHBLAirImport(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirImport`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getInfoMailHBLAirExport(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailHBLAirExport`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getInfoMailSISeaExport(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/GetInfoMailSISeaExport`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    sendMailDocument(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/SendMailDocument`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewAirExportManifestByJobId(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewAirExportManifestByJobId`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
