@@ -128,7 +128,7 @@
                                 </ng-container>
                                 <ng-template #chargeID>
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || isDuplicateChargeCode)}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
                                         <app-combo-grid-virtual-scroll
                                             [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                             (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
@@ -244,7 +244,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateInvoice}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.duplicateInvoice && charge.duplicateCharge}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
                                         placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false"
                                         [disabled]="!!charge.debitNo || !!charge.creditNo || !charge.isFromShipment ? 'disabled': null">

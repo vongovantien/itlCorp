@@ -62,8 +62,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     TYPE: CommonEnum.SurchargeTypeEnum.BUYING_RATE = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
 
     isSubmitted: boolean = false;
-    isDuplicateChargeCode: boolean = false;
-    isDuplicateInvoice: boolean = false;
+    // isDuplicateChargeCode: boolean = false;
+    // isDuplicateInvoice: boolean = false;
 
     selectedSurcharge: CsShipmentSurcharge;
 
@@ -277,7 +277,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
-        [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+        // [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
 
         switch (type) {
             case 'charge':
@@ -595,6 +595,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     checkValidate() {
         let valid: boolean = true;
         for (const charge of this.charges) {
+            // * Reset duplicate flag charge, invoice.
+            charge.duplicateCharge = false;
+            charge.duplicateInvoice = false;
             if (
                 !charge.paymentObjectId
                 || !charge.chargeId
@@ -614,19 +617,77 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         return valid;
     }
 
-    checkDuplicate() {
+    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): any {
+        const testObject = {};
 
+        return inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
+            const itemPropertyName = item[propertyName];
+            if (!!itemPropertyName && itemPropertyName in testObject) {
+                if (propertyName === 'chargeId') {
+                    // item.duplicateCharge = true;
+                    testObject[itemPropertyName].duplicateCharge = true;
+                    // return item;
+                }
+                if (propertyName === 'invoiceNo') {
+                    // item.duplicateInvoice = true;
+                    testObject[itemPropertyName].duplicateInvoice = true;
+                    // return item;
+                }
+            } else {
+                return testObject[itemPropertyName] = item;
+                // delete item.duplicate;
+            }
+        });
+    }
+
+    checkDuplicate() {
         let valid: boolean = true;
         if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
-            this.isDuplicateChargeCode = true;
-            this.isDuplicateInvoice = true;
+
+            const testObjectCharge = {};
+            const testObjectInvoice = {};
+            const idsCharge: string[] = [];
+            const invoices: string[] = [];
+
+            this.charges.forEach(c => {
+                const itemPropertyNameCharge = c['chargeId'];
+                const itemPropertyNameInvoice = c['invoiceNo'];
+
+                if (!!itemPropertyNameCharge && itemPropertyNameCharge in testObjectCharge) {
+                    idsCharge.push(itemPropertyNameCharge);
+                } else {
+                    testObjectCharge[itemPropertyNameCharge] = c;
+                }
+                if (!!itemPropertyNameInvoice && itemPropertyNameInvoice in testObjectInvoice) {
+                    invoices.push(itemPropertyNameInvoice);
+                } else {
+                    testObjectInvoice[itemPropertyNameInvoice] = c;
+                }
+            });
+
+            if (!!idsCharge.length) {
+                this.charges.forEach(c => {
+                    if (idsCharge.includes(c.chargeId)) {
+                        c.duplicateCharge = true;
+                    }
+                });
+            }
+            if (!!invoices.length) {
+                this.charges.forEach(c => {
+                    if (invoices.includes(c.invoiceNo)) {
+                        c.duplicateInvoice = true;
+                    }
+                });
+            }
+            // this.isDuplicateChargeCode = true;
+            // this.isDuplicateInvoice = true;
             valid = false;
             this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         } else {
             valid = true;
-            this.isDuplicateChargeCode = false;
-            this.isDuplicateInvoice = false;
+            // this.isDuplicateChargeCode = false;
+            // this.isDuplicateInvoice = false;
         }
         return valid;
     }
