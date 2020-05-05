@@ -166,7 +166,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     handleStringCont(contOb: { cont: string, quantity: number }) {
-        return `Part of Container ${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''}, `;
+        return `A PART OF CONTAINER ${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''} S.T.C, `;
     }
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {
