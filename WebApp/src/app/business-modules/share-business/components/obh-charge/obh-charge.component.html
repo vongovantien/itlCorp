@@ -177,7 +177,7 @@
                                             (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
                                             [selectedDisplayFields]="['code']" [dataSources]="listUnits"
                                             [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
-                                            (remove)="charge.unitId = null" placeholder="Select Unit">
+                                            (remove)="charge.unitId = null" placeholder="Select Unit" size="15">
                                         </app-combo-grid-virtual-scroll>
                                     </ng-template>
                                 </div>
