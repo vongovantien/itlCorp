@@ -213,28 +213,6 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        ///// <summary>
-        ///// convert a custom clearance to a job
-        ///// </summary>
-        ///// <param name="model"></param>
-        ///// <returns></returns>
-        //[HttpPost("ConvertClearanceToJob")]
-        //[Authorize]
-        //public IActionResult ConvertClearanceToJob(OpsTransactionClearanceModel model)
-        //{
-        //    currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-        //    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-        //    if (permissionRange == PermissionRange.None) return Forbid();
-        //    var hs = transactionService.ConvertClearanceToJob(model);
-        //    var message = HandleError.GetMessage(hs, Crud.Insert);
-        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
-        //    if (!hs.Success)
-        //    {
-        //        return BadRequest(result);
-        //    }
-        //    return Ok(result);
-        //}
-
         /// <summary>
         /// convert a custom clearance to a job
         /// </summary>
