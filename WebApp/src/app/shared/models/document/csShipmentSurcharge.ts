@@ -83,6 +83,10 @@ export class CsShipmentSurcharge {
     paySoano: string = null;
     unitCode: string = null;
 
+    // * Custom
+    duplicateCharge: boolean = false;
+    duplicateInvoice: boolean = false;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

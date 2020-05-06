@@ -1,11 +1,11 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ComponentRef, ComponentFactoryResolver, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, Customer } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -14,7 +14,7 @@ import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAct
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, share, take } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -22,11 +22,15 @@ import * as fromRoot from 'src/app/store';
 import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { AppComboGridComponent } from '@common';
 
 @Component({
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
     styleUrls: ['./buying-charge.component.scss'],
+    entryComponents: [
+        AppComboGridComponent
+    ]
 
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
@@ -35,6 +39,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() service: CommonType.SERVICE_TYPE = 'sea';
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
+
+    @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -62,8 +68,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     TYPE: CommonEnum.SurchargeTypeEnum.BUYING_RATE = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
 
     isSubmitted: boolean = false;
-    isDuplicateChargeCode: boolean = false;
-    isDuplicateInvoice: boolean = false;
+    // isDuplicateChargeCode: boolean = false;
+    // isDuplicateInvoice: boolean = false;
 
     selectedSurcharge: CsShipmentSurcharge;
 
@@ -79,7 +85,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService
+        protected _dataService: DataService,
 
 
     ) {
@@ -100,6 +106,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
         this.permissionShipments = this._store.select(fromStore.getTransactionPermission);
+
+        this._dataService.$data
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (d: Partner) => {
+                    console.log(d);
+                    this.onSelectPartner(d, this.selectedSurcharge);
+                }
+            );
     }
 
     getSurcharge() {
@@ -277,7 +292,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
-        [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+        // [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
 
         switch (type) {
             case 'charge':
@@ -562,7 +577,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
-        if (!!partnerData) {
+        if (!!partnerData && !!chargeItem) {
             chargeItem.partnerShortName = partnerData.shortName;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
@@ -595,6 +610,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     checkValidate() {
         let valid: boolean = true;
         for (const charge of this.charges) {
+            // * Reset duplicate flag charge, invoice.
+            charge.duplicateCharge = false;
+            charge.duplicateInvoice = false;
             if (
                 !charge.paymentObjectId
                 || !charge.chargeId
@@ -614,19 +632,77 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         return valid;
     }
 
-    checkDuplicate() {
+    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): any {
+        const testObject = {};
 
+        return inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
+            const itemPropertyName = item[propertyName];
+            if (!!itemPropertyName && itemPropertyName in testObject) {
+                if (propertyName === 'chargeId') {
+                    // item.duplicateCharge = true;
+                    testObject[itemPropertyName].duplicateCharge = true;
+                    // return item;
+                }
+                if (propertyName === 'invoiceNo') {
+                    // item.duplicateInvoice = true;
+                    testObject[itemPropertyName].duplicateInvoice = true;
+                    // return item;
+                }
+            } else {
+                return testObject[itemPropertyName] = item;
+                // delete item.duplicate;
+            }
+        });
+    }
+
+    checkDuplicate() {
         let valid: boolean = true;
         if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
-            this.isDuplicateChargeCode = true;
-            this.isDuplicateInvoice = true;
+
+            const testObjectCharge = {};
+            const testObjectInvoice = {};
+            const idsCharge: string[] = [];
+            const invoices: string[] = [];
+
+            this.charges.forEach(c => {
+                const itemPropertyNameCharge = c['chargeId'];
+                const itemPropertyNameInvoice = c['invoiceNo'];
+
+                if (!!itemPropertyNameCharge && itemPropertyNameCharge in testObjectCharge) {
+                    idsCharge.push(itemPropertyNameCharge);
+                } else {
+                    testObjectCharge[itemPropertyNameCharge] = c;
+                }
+                if (!!itemPropertyNameInvoice && itemPropertyNameInvoice in testObjectInvoice) {
+                    invoices.push(itemPropertyNameInvoice);
+                } else {
+                    testObjectInvoice[itemPropertyNameInvoice] = c;
+                }
+            });
+
+            if (!!idsCharge.length) {
+                this.charges.forEach(c => {
+                    if (idsCharge.includes(c.chargeId)) {
+                        c.duplicateCharge = true;
+                    }
+                });
+            }
+            if (!!invoices.length) {
+                this.charges.forEach(c => {
+                    if (invoices.includes(c.invoiceNo)) {
+                        c.duplicateInvoice = true;
+                    }
+                });
+            }
+            // this.isDuplicateChargeCode = true;
+            // this.isDuplicateInvoice = true;
             valid = false;
             this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         } else {
             valid = true;
-            this.isDuplicateChargeCode = false;
-            this.isDuplicateInvoice = false;
+            // this.isDuplicateChargeCode = false;
+            // this.isDuplicateInvoice = false;
         }
         return valid;
     }
@@ -937,4 +1013,34 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
+    loadDynamicComoGrid(charge: any, index: number) {
+        // TODO: apply for selling, obh.
+        this.selectedSurcharge = charge;
+        setTimeout(() => {
+            const container = this.widgetTargets.toArray()[index];
+            if (container) {
+                container.clear();
+                const injector = container.injector;
+
+                const cfr: ComponentFactoryResolver = injector.get(ComponentFactoryResolver);
+
+                const componentFactory = cfr.resolveComponentFactory(AppComboGridComponent);
+
+                const componentRef = container.createComponent(componentFactory, 0, injector);
+                this.componentRef = (componentRef) as ComponentRef<AppComboGridComponent<Customer>>;
+
+                this.componentRef.instance.headers = this.headerPartner;
+                this.componentRef.instance.data = this.listPartner;
+                this.componentRef.instance.fields = ['taxCode', 'partnerNameEn'];
+                this.componentRef.instance.active = charge.paymentObjectId;
+            }
+        }, 500);
+
+    }
+
+    handleClickOutSideComboGrid() {
+        this.widgetTargets.toArray().forEach(c => {
+            c.clear();
+        });
+    }
 }

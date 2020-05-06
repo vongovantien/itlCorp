@@ -458,8 +458,8 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.Pol != null)
                 {
                     var portIndexPol = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault();
-                    result.POLCode = portIndexPol.NameEn;
-                    result.POLName = portIndexPol.Code;
+                    result.POLCode = portIndexPol.Code;
+                    result.POLName = portIndexPol.NameEn;
 
                     if (portIndexPol.WarehouseId != null)
                     {

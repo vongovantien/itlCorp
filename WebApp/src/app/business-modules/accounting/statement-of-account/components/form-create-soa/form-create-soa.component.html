@@ -13,7 +13,7 @@
                             (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
                             [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
-                            [height]="200">
+                            (remove)="selectedPartner = {field: 'id', value: null}">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback" *ngIf="isApplied && !selectedPartner.value">
                             Partner is required!
@@ -147,7 +147,9 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label"></label>
-                        <div><a class="pointer" style="text-decoration: underline;" (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span class="text-warning">{{numberOfShipment}} item</span></div>
+                        <div><a class="pointer" style="text-decoration: underline;"
+                                (click)="openInputShipment()">Shipment List</a>&nbsp;&nbsp;<span
+                                class="text-warning">{{numberOfShipment}} item</span></div>
                     </div>
                 </div>
             </div>
@@ -189,4 +191,4 @@
     </div>
 </div>
 
-<input-shipment-popup (onInputShipment) = "onShipmentList($event)"></input-shipment-popup>
+<input-shipment-popup (onInputShipment)="onShipmentList($event)"></input-shipment-popup>
