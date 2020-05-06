@@ -287,9 +287,9 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteFileTempPreAlert/{id}")]
-        public IActionResult DeleteFileTempPreAlert([Required]Guid id)
+        public IActionResult DeleteFileTempPreAlert([Required]Guid jobId)
         {
-            var result = sysImageService.DeleteFileTempPreAlert(id);
+            var result = sysImageService.DeleteFileTempPreAlert(jobId);
             return Ok(result);
         }
         #endregion -- INSERT & UPDATE
