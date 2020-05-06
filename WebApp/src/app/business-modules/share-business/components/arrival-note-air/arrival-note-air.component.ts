@@ -174,7 +174,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.SFI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT })
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.AI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (charges: Charge[]) => {

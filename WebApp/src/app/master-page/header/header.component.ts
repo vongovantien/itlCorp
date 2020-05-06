@@ -38,18 +38,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     ) { }
 
     ngOnInit() {
-        // this._store.select(getClaimUserOfficeState).subscribe((res: any) => {
-        //     if (!!res) {
-        //         this.selectedOffice = this.offices.find(o => o.id === res);
-        //     }
-        // });
-
-        // this._store.select(getClaimUserDepartGrouptate).subscribe((res: any) => {
-        //     if (!!res && res.departmentId && res.groupId) {
-        //         this.selectedDepartmentGroup = this.departmentGroups.find(d => d.departmentId === res.departmentId && d.groupId === res.groupId);
-        //     }
-        // });
-
         this.currenUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         if (!!this.currenUser) {
             this.getOfficeDepartGroupCurrentUser(this.currenUser);
@@ -152,34 +140,32 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        if (this.getCurrentLangFromUrl() === "en") {
-            this.active_flag = this.english_flag;
-            localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "en");
-            localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "en-US");
-        }
-        if (this.getCurrentLangFromUrl() === "vi") {
-            this.active_flag = this.vietnam_flag;
-            localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, "vi");
-            localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "vi-VN");
-        }
+        setTimeout(() => {
+            const currentLang = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
+            if (!!currentLang && currentLang === SystemConstants.LANGUAGES.ENGLISH) {
+                this.active_flag = this.english_flag;
+            }
+            if (!!currentLang && currentLang === SystemConstants.LANGUAGES.VIETNAM) {
+                this.active_flag = this.vietnam_flag;
+            }
+        }, 100);
+
     }
 
     changeLanguage(lang: string) {
         if (lang === localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE)) {
             return;
         } else {
-            if (lang === "en") {
+            if (lang === SystemConstants.LANGUAGES.ENGLISH) {
                 localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, SystemConstants.LANGUAGES.ENGLISH);
                 localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, SystemConstants.LANGUAGES.ENGLISH_API);
-                localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "en-US");
                 const url = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/#" + this.router.url + "/";
                 this.active_flag = this.english_flag;
                 window.location.href = url;
             }
-            if (lang === "vi") {
+            if (lang === SystemConstants.LANGUAGES.VIETNAM) {
                 localStorage.setItem(SystemConstants.CURRENT_CLIENT_LANGUAGE, SystemConstants.LANGUAGES.VIETNAM);
                 localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, SystemConstants.LANGUAGES.VIETNAM_API);
-                localStorage.setItem(SystemConstants.CURRENT_LANGUAGE, "vi-VN");
                 const url = window.location.protocol + "//" + window.location.hostname + "/" + lang + "/#" + this.router.url + "/";
                 this.active_flag = this.vietnam_flag;
                 window.location.href = url;

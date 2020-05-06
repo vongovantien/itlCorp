@@ -155,9 +155,10 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             });
         }
 
-        for (const item of contData) {
-            this.containerDetail += this.handleStringCont(item);
-        }
+        // for (const item of contData) {
+        //     this.containerDetail += this.handleStringCont(item);
+        // }
+        this.containerDetail = 'A PART OF CONTAINER S.T.C';
 
     }
 
@@ -166,7 +167,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     handleStringCont(contOb: { cont: string, quantity: number }) {
-        return `Part of Container ${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''}, `;
+        return `${contOb.quantity}x${!!contOb.cont ? contOb.cont : ''}, `;
     }
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {

@@ -282,8 +282,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
                     // ? filter charge when add service
                     this.configCharge.dataSource = this.filterChargeWithService(this.configCharge.dataSource, this.selectedService.map((service: any) => service.id));
-                    this.configCharge.dataSource.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
-
+                    // this.configCharge.dataSource.push(new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' }));
+                    this.configCharge.dataSource = [...this.configCharge.dataSource, new Charge({ code: 'All', id: 'All', chargeNameEn: 'All' })];
                     this.updateDataSearch('serviceTypeId', this.selectedService.map((service: any) => service.id));
                 }
 

@@ -731,8 +731,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             results.ForEach(fe =>
             {
-                //var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).Select(s => s.PackageQuantity != null ? (s.PackageQuantity + " x " + GetUnitNameById(s.PackageTypeId)) : string.Empty);
-                var packages = fe.PackageQty != null ? (fe.PackageQty + " " + (fe.PackageType != null? catUnitRepo.Get(x => x.Id == fe.PackageType)?.FirstOrDefault()?.UnitNameEn: string.Empty)) : string.Empty;
+                var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
                 fe.Packages = string.Join(", ", packages);
             });
             return results;
@@ -982,7 +981,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = string.Empty;
             var data = catUnitRepo.Get(g => g.Id == id).FirstOrDefault();
-            result = (data != null) ? data.UnitNameEn : "PKGS";
+            result = (data != null) ? data.UnitNameEn : string.Empty;
             return result;
         }
 
@@ -1370,8 +1369,9 @@ namespace eFMS.API.Documentation.DL.Services
                         _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                     }
-                    hbConstainers += " CONTAINER(S) S.T.C:";
-                    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
+                    var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
+                    hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
+                    housebill.Qty = hbConstainers?.ToUpper();
                     //housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
                     housebill.MaskNos = markNo?.ToUpper();
                 }

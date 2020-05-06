@@ -89,7 +89,7 @@ export abstract class AppShareHBLBase extends AppList {
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SaleMan', field: 'saleManName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Package', field: 'packages', sortable: true },
