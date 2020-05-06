@@ -23,6 +23,7 @@ import { SeparateHouseBillComponent } from './components/form-separate-house-bil
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ShareAirExportModule } from '../../share-air-export.module';
 import { InputBookingNotePopupComponent } from './components/input-booking-note/input-booking-note.popup';
+import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -40,6 +41,10 @@ const routing: Routes = [
     {
         path: ':hblId/separate', component: SeparateHouseBillComponent,
         data: { name: "Separate Hawb", path: ":id", level: 6 },
+    },
+    {
+        path: ':hblId/manifest', component: ShareBusinessReAlertComponent,
+        data: { name: "Pre Alert", level: 7, serviceId: ChargeConstants.AE_CODE },
     },
 ];
 

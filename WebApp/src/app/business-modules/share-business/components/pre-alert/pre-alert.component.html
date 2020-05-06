@@ -1,92 +1,97 @@
 <div class="pre-alert-page">
     <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()"></app-default-button>
+        </div>
     </app-sub-header>
 </div>
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <div class="row">
-                <div class="col-md-1">
-                    <div class="form-group">
-                        <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
-                            <i class="fa fa-envelope fa-2x" aria-hidden="true"></i>
-                            Send Arrival Notice
-                        </button>
+            <form [formGroup]="formMail" class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                (click)="sendMail()">
+                                <i class="fa fa-envelope fa-2x" aria-hidden="true"></i>
+                                <span style="margin-top: 5px;">{{sendMailButtonName}}</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-11">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <button style="width:54px;" type="label"
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                        from...
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-11">
+                                <div class="form-group">
+                                    <input class="form-control" disabled="true" formControlName="from" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <button style="width:54px;"
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                        to...
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-11">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (to.dirty && !to.valid) || (isSubmited && !to.valid)}">
+                                    <input class="form-control" formControlName="to" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <button style="width:54px;"
+                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                        cc...
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-11">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (cc.dirty && !cc.valid) || (isSubmited && !cc.valid)}">
+                                    <input class="form-control" formControlName="cc" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <button style="width:54px;" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                                        subject:
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-11">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': (subject.dirty && !subject.valid) || (isSubmited && !subject.valid)}">
+                                    <input class="form-control" formControlName="subject" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-11">
-                    <div class="row">
-                        <div class="col-md-1">
-
-                            <div class="form-group">
-                                <button style="width:54px;" type="label"
-                                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
-                                    from
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-
-                            <div class="form-group">
-                                <input class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-1">
-                            <div class="form-group">
-                                <button style="width:54px;"
-                                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
-                                    to
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-                            <div class="form-group">
-                                <input class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-1">
-                            <div class="form-group">
-                                <button style="width:54px;"
-                                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
-                                    cc
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-                            <div class="form-group">
-                                <input class="form-control" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-1">
-                            <div class="form-group">
-                                <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
-                                    subject
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-11">
-                            <div class="form-group">
-                                <input class="form-control" />
-                            </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div [froalaEditor]="optionEditor" formControlName="body"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <textarea class="form-control" rows="10"></textarea>
-                    </div>
-                </div>
-
-            </div>
-
+            </form>
         </div>
     </div>
     <div class="row">
@@ -98,57 +103,107 @@
                     <span>
                         <i class="la la-plus"></i>
                         <span>
-                            Add Attachment
+                            Add Attachment...
                         </span>
                     </span></button>
             </div>
         </div>
     </div>
     <div class="m-portlet m--margin-top-10">
-        <!-- <div class="m-portlet__head">
-            <div class="m-portlet__head-caption">
-                <div class="m-portlet__head-title">
-                    <h3 class="m-portlet__head-text">
-                        Attached Files
-                    </h3>
-                </div>
-            </div>
-        </div> -->
         <div class="alert-block__heading">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="alert-block__title">
-                    Attached Files
+                    Attached File
                 </h3>
-
             </div>
         </div>
         <div class="m-portlet__body">
             <div class="row">
-                <div class="col-lg-2">
-                    <div class="form-group m-form__group">
-                        <div class="m-checkbox-list">
-                            <label class="m-checkbox m-checkbox--bold">
-                                <input type="checkbox" checked="checked">
-                                <a hef="#">HAWB</a>
-                                <span></span>
-                            </label>
+                <div class="col-lg-3">
+                    <div class="form-group m-form__group" *ngIf="serviceId === 'AI'">
+                        <div class="m-checkbox-inline">
+                            <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedArrivalNotice"
+                                        (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span>
+                                    <a class="pointer" (click)="previewArrivalNotice()">Arrival Notice</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotArrivalNotice>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    Arrival Notice
+                                    <span></span>
+                                </label>
+                            </ng-template>
+                        </div>
 
+                    </div>
+                    <div class="form-group m-form__group" *ngIf="serviceId === 'AE'">
+                        <div class="m-checkbox-inline">
+                            <ng-container *ngIf="isExitsManifest else NotManifest">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedManifest"
+                                        (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span style="margin-right: 40px;"><a class="pointer"
+                                        (click)="previewManifest()">Manifest</a></span>
+                            </ng-container>
+                            <ng-template #NotManifest>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    Manifest
+                                    <span></span>
+                                </label>
+                            </ng-template>
+
+                            <ng-container *ngIf="isExitsMawb else NotMawb">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedMawb" (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span><a class="pointer" (click)="previewMawb()">MAWB</a></span>
+                            </ng-container>
+                            <ng-template #NotMawb>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    MAWB
+                                    <span></span>
+                                </label>
+                            </ng-template>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-form__group" *ngIf="serviceId === 'SFE' || serviceId === 'SLE'">
+                        <div class="m-checkbox-inline">
+                            <ng-container *ngIf="isExitsSI else NotSI">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedSI" (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span>
+                                    <a class="pointer" (click)="previewSI()">SI</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotSI>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    SI
+                                    <span></span>
+                                </label>
+                            </ng-template>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2">
-                    <div class="form-group m-form__group">
-                        <div class="m-checkbox-list">
-                            <label class="m-checkbox m-checkbox--bold">
-                                <input type="checkbox" checked="checked">
-                                <a hef="#">Arrival Notice</a>
-                                <span></span>
-                            </label>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2" *ngFor="let file of files; trackBy:trackByFn">
+                <div class="col-lg-3" *ngFor="let file of files; trackBy:trackByFn">
                     <div class="form-group m-form__group">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
@@ -190,6 +245,14 @@
     </div>
 </div>
 
-<add-attachment-popup (onAdd)="onAddFile($event)">
+<add-attachment-popup (onAdd)="onAddFile($event)"></add-attachment-popup>
 
-</add-attachment-popup>
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
+
+<!--General Report To PDF-->
+<ng-container *ngIf="dataExportReport">
+    <app-export-crystal [data]="dataExportReport"></app-export-crystal>
+</ng-container>
+<!--General Report To PDF-->

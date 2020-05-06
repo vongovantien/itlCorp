@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ExportCrystal.aspx.cs" Inherits="ReportPerview.ExportCrystal" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ExportCrystal.aspx.cs" Inherits="ReportPerview.ExportCrystal" validateRequest="false"%>
 <%@Register Assembly="CrystalDecisions.Web, Version=10.5.3700.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" Namespace="CrystalDecisions.Web" TagPrefix="CR" %>
 
 <!DOCTYPE html>
@@ -9,11 +9,9 @@
 </head>
 <body>
     <form id="form1" runat="server">
-        <div>
-            <asp:Panel ID="pExportCrystal" Width="100%" Height="100%" runat="server">
-                <CR:crystalreportviewer id="rptExportViewer" runat="server" displaygrouptree="true" hascrystallogo="true" bestfitpage="False" width="800px" />
-            </asp:Panel>
-        </div>
+        <asp:Panel ID="pExportCrystal" Width="100%" Height="100%" runat="server">
+            <CR:crystalreportviewer id="rptExportViewer" runat="server" displaygrouptree="true" hascrystallogo="true" bestfitpage="False" width="800px" />
+        </asp:Panel>
     </form>
 </body>
 </html>

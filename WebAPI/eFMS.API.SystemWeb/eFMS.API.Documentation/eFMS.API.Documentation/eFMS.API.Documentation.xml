@@ -236,6 +236,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsManifestController.PreviewAirExportManifestByJobId(System.Guid)">
+            <summary>
+            preview air export manifest by jobId
+            </summary>
+            <param name="jobId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsMawbcontainerController">
             <summary>
             

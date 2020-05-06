@@ -35,7 +35,7 @@ const routing: Routes = [
     },
     {
         path: ':hblId/arrivalnotice', component: ShareBusinessReAlertComponent,
-        data: { name: "Arrival Notice", level: 6 },
+        data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.AI_CODE },
     },
 ];
 

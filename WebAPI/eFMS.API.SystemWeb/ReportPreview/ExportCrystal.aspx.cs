@@ -5,6 +5,8 @@ using ReportPerview.Common;
 using ReportPerview.Models;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.UI;
 
 namespace ReportPerview
@@ -55,52 +57,105 @@ namespace ReportPerview
 
         void ExportCrystalReport(ReportDocument cryRpt, string formatExport, string pathReportGenerate)
         {
-            if (string.IsNullOrEmpty(pathReportGenerate))
+            try
             {
-                throw new Exception("Path report generate not found");
-            }
+                if (string.IsNullOrEmpty(pathReportGenerate))
+                {
+                    throw new Exception("Path report generate not found");
+                }
 
-            if (cryRpt == null)
-            {
-                throw new Exception("Resource not found");
-            }
+                if (cryRpt == null)
+                {
+                    throw new Exception("Resource not found");
+                }
 
-            ExportFormatType exportFormatType = ExportFormatType.NoFormat;
-            string extensionFile = Path.GetExtension(pathReportGenerate);
-            object formatOption = new PdfRtfWordFormatOptions();
-            switch (formatExport)
-            {
-                case "WORD":
-                    exportFormatType = ExportFormatType.WordForWindows;
-                    extensionFile = ".doc";
-                    break;
-                case "PDF":
-                    exportFormatType = ExportFormatType.PortableDocFormat;
-                    break;
-                case "EXCEL":
-                    exportFormatType = ExportFormatType.Excel;
-                    extensionFile = ".xls";
-                    formatOption = new ExcelFormatOptions();
-                    break;
-            }
+                ExportFormatType exportFormatType = ExportFormatType.NoFormat;
+                string extensionFile = Path.GetExtension(pathReportGenerate);
+                object formatOption = new PdfRtfWordFormatOptions();
+                switch (formatExport)
+                {
+                    case "WORD":
+                        exportFormatType = ExportFormatType.WordForWindows;
+                        extensionFile = ".doc";
+                        break;
+                    case "PDF":
+                        exportFormatType = ExportFormatType.PortableDocFormat;
+                        break;
+                    case "EXCEL":
+                        exportFormatType = ExportFormatType.Excel;
+                        extensionFile = ".xls";
+                        formatOption = new ExcelFormatOptions();
+                        break;
+                }
 
-            var downloadReportPath = System.Web.Hosting.HostingEnvironment.MapPath("~/DownloadReports/");
-            //Check exist folder DownloadReports
-            if (!Directory.Exists(downloadReportPath))
-            {
-                Directory.CreateDirectory(downloadReportPath);
-            }
+                var downloadReportPath = System.Web.Hosting.HostingEnvironment.MapPath("~/DownloadReports/");
+                //Check exist folder DownloadReports
+                if (!Directory.Exists(downloadReportPath))
+                {
+                    Directory.CreateDirectory(downloadReportPath);
+                }
 
-            DiskFileDestinationOptions CrDiskFileDestinationOptions = new DiskFileDestinationOptions();
-            CrDiskFileDestinationOptions.DiskFileName = pathReportGenerate;
-            ExportOptions CrExportOptions = cryRpt.ExportOptions;
-            {
-                CrExportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
-                CrExportOptions.ExportFormatType = exportFormatType;
-                CrExportOptions.DestinationOptions = CrDiskFileDestinationOptions;
-                CrExportOptions.FormatOptions = formatOption;
+                DiskFileDestinationOptions CrDiskFileDestinationOptions = new DiskFileDestinationOptions();
+                CrDiskFileDestinationOptions.DiskFileName = pathReportGenerate;
+                ExportOptions CrExportOptions = cryRpt.ExportOptions;
+                {
+                    CrExportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
+                    CrExportOptions.ExportFormatType = exportFormatType;
+                    CrExportOptions.DestinationOptions = CrDiskFileDestinationOptions;
+                    CrExportOptions.FormatOptions = formatOption;
+                }
+                cryRpt.Export();
             }
-            cryRpt.Export();
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        protected override void Render(HtmlTextWriter writer)
+        {
+            string appPath = HttpContext.Current.Request.ApplicationPath;
+            if (appPath != @"/")
+            {
+                // variables
+                string Content = string.Empty;
+
+                // get the fully rendered content of this page so we can do some additional translations if necessary  
+                using (StringWriter sw = new StringWriter())
+                {
+                    using (HtmlTextWriter htmlWriter = new HtmlTextWriter(sw))
+                    {
+                        // render current page content to temp writer  
+                        base.Render(htmlWriter);
+                        //this.RenderChildren(hw);
+
+                        // close writer  
+                        htmlWriter.Close();
+
+                        // get content  
+                        Content = sw.ToString();
+
+                        // DO SOMETHING WITH THE CONTENT
+                        string pattern = @"/CrystalImageHandler.aspx";
+                        string newURL = appPath + @"/CrystalImageHandler.aspx";
+
+                        string pageHTML = Regex.Replace(Content, pattern, newURL, RegexOptions.IgnoreCase);
+
+                        pattern = @"/aspnet_client/system_web/";
+                        newURL = appPath + @"/aspnet_client/system_web/";
+
+                        pageHTML = Regex.Replace(pageHTML, pattern, newURL, RegexOptions.IgnoreCase);
+
+                        Content = pageHTML;
+                    }
+                }
+                // render content
+                writer.Write(Content);
+            }
+            else
+            {
+                base.Render(writer);
+            }
         }
     }
 }

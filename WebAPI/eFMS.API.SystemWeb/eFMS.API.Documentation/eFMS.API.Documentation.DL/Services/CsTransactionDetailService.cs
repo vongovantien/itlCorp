@@ -1613,6 +1613,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(housebills);
             result.FormatType = ExportFormatType.PortableDocFormat;
             var parameter = new HouseAirwayBillLastestReportParams()
