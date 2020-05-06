@@ -18,12 +18,16 @@
             .dropdown-partner {
                 .dropdown-partner__content {
                     width: 320px;
+                    position: absolute;
+                    z-index: 2;
                     // min-height: 294px;
                     // border-radius: 20px;
                     // padding: 0px 2px;
                     .dropdown-partner__header {
                         padding: 10px 0px;
                         border-bottom: 1px solid #dfdfdf;
+                        box-shadow: 0px 0px 15px 1px rgba(69, 65, 78, 0.2);
+                        background: #fff;
                     }
                     // * Combo grid
                     .e--combogrid-content {

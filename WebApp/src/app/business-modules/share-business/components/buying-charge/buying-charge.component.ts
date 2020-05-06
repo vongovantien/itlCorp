@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewContainerRef, ComponentRef, ComponentFactoryResolver, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ComponentRef, ComponentFactoryResolver, ViewChildren, QueryList, Injector, ComponentFactory } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -28,9 +28,7 @@ import { AppComboGridComponent } from '@common';
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
     styleUrls: ['./buying-charge.component.scss'],
-    entryComponents: [
-        AppComboGridComponent
-    ]
+
 
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
@@ -113,6 +111,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (d: Partner) => {
                     console.log(d);
                     this.onSelectPartner(d, this.selectedSurcharge);
+                    this.deleteComponentRef(this.selectedIndexCharge);
                 }
             );
     }
@@ -584,8 +583,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    selectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge) {
+    selectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: CsShipmentSurcharge, index: number) {
         chargeItem.objectBePaid = partnerType.fieldName;
+        chargeItem.isShowPartnerHeader = false;
+        this.selectedIndexCharge = index;
+        this.deleteComponentRef(this.selectedIndexCharge);
+
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
                 chargeItem.partnerShortName = this.hbl.customerName;
@@ -1013,34 +1016,36 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    loadDynamicComoGrid(charge: any, index: number) {
+    loadDynamicComoGrid(charge: CsShipmentSurcharge, index: number) {
         // TODO: apply for selling, obh.
         this.selectedSurcharge = charge;
-        setTimeout(() => {
-            const container = this.widgetTargets.toArray()[index];
-            if (container) {
-                container.clear();
-                const injector = container.injector;
+        charge.isShowPartnerHeader = true;
+        this.selectedIndexCharge = index;
 
-                const cfr: ComponentFactoryResolver = injector.get(ComponentFactoryResolver);
+        const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
 
-                const componentFactory = cfr.resolveComponentFactory(AppComboGridComponent);
-
-                const componentRef = container.createComponent(componentFactory, 0, injector);
-                this.componentRef = (componentRef) as ComponentRef<AppComboGridComponent<Customer>>;
-
-                this.componentRef.instance.headers = this.headerPartner;
-                this.componentRef.instance.data = this.listPartner;
-                this.componentRef.instance.fields = ['taxCode', 'partnerNameEn'];
-                this.componentRef.instance.active = charge.paymentObjectId;
-            }
-        }, 500);
-
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
+        if (!!this.componentRef) {
+            this.componentRef.instance.headers = this.headerPartner;
+            this.componentRef.instance.data = this.listPartner;
+            this.componentRef.instance.fields = ['taxCode', 'partnerNameEn'];
+            this.componentRef.instance.active = charge.paymentObjectId;
+        }
     }
 
-    handleClickOutSideComboGrid() {
-        this.widgetTargets.toArray().forEach(c => {
-            c.clear();
+    deleteComponentRef(index) {
+        const componentRef = this.widgetTargets.toArray()[index];
+        if (!!componentRef) {
+            componentRef.clear();
+        }
+    }
+
+    handleClickOutSideComboGrid(index: number) {
+        this.charges[index].isShowPartnerHeader = false;
+        this.widgetTargets.toArray().forEach((c, i) => {
+            if (i === index) {
+                c.clear();
+            }
         });
     }
 }
