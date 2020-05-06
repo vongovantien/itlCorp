@@ -1055,7 +1055,7 @@ namespace eFMS.API.Documentation.DL.Services
             return code;
         }
 
-        public HandleState CheckAllowConvertJob(List<OpsTransactionClearanceModel> list)
+        public HandleState CheckAllowConvertJob(List<CustomsDeclarationModel> list)
         {
             var result = new HandleState();
             var permissionDetailRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
@@ -1068,7 +1068,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private HandleState GetPermissionDetailConvertClearances(List<OpsTransactionClearanceModel> list, PermissionRange permissionDetailRange)
+        private HandleState GetPermissionDetailConvertClearances(List<CustomsDeclarationModel> list, PermissionRange permissionDetailRange)
         {
             var result = new HandleState();
             switch (permissionDetailRange)
@@ -1077,37 +1077,37 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(403, "You don't have permission to convert");
                     break;
                 case PermissionRange.Owner:
-                    var items = list.Where(x => x.CustomsDeclaration.UserCreated != currentUser.UserID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    var items = list.Where(x => x.UserCreated != currentUser.UserID).Select(x => x.ClearanceNo);
                     if (items.Count() > 0)
                     {
                         result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
                     }
                     break;
                 case PermissionRange.Group:
-                    items = list.Where(x => x.CustomsDeclaration.GroupId != currentUser.GroupId
-                                         && x.CustomsDeclaration.OfficeId != currentUser.OfficeID
-                                         && x.CustomsDeclaration.DepartmentId != currentUser.DepartmentId).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    items = list.Where(x => x.GroupId != currentUser.GroupId
+                                         && x.OfficeId != currentUser.OfficeID
+                                         && x.DepartmentId != currentUser.DepartmentId).Select(x => x.ClearanceNo);
                     if (items.Count() > 0)
                     {
                         result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
                     }
                     break;
                 case PermissionRange.Department:
-                    items = list.Where(x => x.CustomsDeclaration.DepartmentId != currentUser.DepartmentId && x.CustomsDeclaration.OfficeId != currentUser.OfficeID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    items = list.Where(x => x.DepartmentId != currentUser.DepartmentId && x.OfficeId != currentUser.OfficeID).Select(x => x.ClearanceNo);
                     if (items.Count() > 0)
                     {
                         result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
                     }
                     break;
                 case PermissionRange.Office:
-                    items = list.Where(x => x.CustomsDeclaration.OfficeId != currentUser.OfficeID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    items = list.Where(x => x.OfficeId != currentUser.OfficeID).Select(x => x.ClearanceNo);
                     if (items.Count() > 0)
                     {
                         result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
                     }
                     break;
                 case PermissionRange.Company:
-                    items = list.Where(x => x.CustomsDeclaration.CompanyId != currentUser.CompanyID).Select(x => x.CustomsDeclaration.ClearanceNo);
+                    items = list.Where(x => x.CompanyId != currentUser.CompanyID).Select(x => x.ClearanceNo);
                     if (items.Count() > 0)
                     {
                         result = new HandleState(false, "Items: " + String.Join(", ", items.Distinct()) + " . You don't have permission to convert");
