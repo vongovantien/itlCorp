@@ -286,7 +286,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
       shipper: form.shipper,
       consigneeId: form.consignee,
       consigneeDescription: form.consigneeDescription,
-      cargoNoticeRecevier: form.consigneeDescription,
+      cargoNoticeRecevier: form.cargoNoticeRecevier,
       actualShipperId: form.realShipper,
       actualShipperDescription: form.actualShipperDescription,
       actualConsigneeId: form.realconsignee,
