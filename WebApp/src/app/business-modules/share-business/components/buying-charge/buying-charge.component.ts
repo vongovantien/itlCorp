@@ -39,6 +39,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
 
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
+    @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
+
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -74,6 +76,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedIndexCharge: number = -1;
     spinnerpartner: string = 'spinner-partner';
     isShowLoadingPartner: boolean = false;
+    selectedIndexFee: number;
+    isSelectedChargeDynamicCombogrid: boolean = false;
+    isSelectedPartnerDynamicCombogrid: boolean = false;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -110,8 +115,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (d: Partner) => {
                     console.log(d);
-                    this.onSelectPartner(d, this.selectedSurcharge);
-                    this.deleteComponentRef(this.selectedIndexCharge);
+
+
+                    if (this.isSelectedPartnerDynamicCombogrid) {
+                        this.onSelectPartner(d, this.selectedSurcharge);
+                        this.deleteComponentRef(this.selectedIndexCharge, 'partner');
+                    }
+                    if (this.isSelectedChargeDynamicCombogrid) {
+                        this.onSelectDataFormInfo(d, 'charge', this.selectedSurcharge);
+                        this.deleteComponentRef(this.selectedIndexCharge, 'charge');
+
+                    }
                 }
             );
     }
@@ -587,7 +601,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         chargeItem.objectBePaid = partnerType.fieldName;
         chargeItem.isShowPartnerHeader = false;
         this.selectedIndexCharge = index;
-        this.deleteComponentRef(this.selectedIndexCharge);
+        this.deleteComponentRef(this.selectedIndexCharge, 'partner');
 
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
@@ -1017,7 +1031,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     loadDynamicComoGrid(charge: CsShipmentSurcharge, index: number) {
-        // TODO: apply for selling, obh.
+        this.isSelectedChargeDynamicCombogrid = false;
+        this.isSelectedPartnerDynamicCombogrid = true;
+
         this.selectedSurcharge = charge;
         charge.isShowPartnerHeader = true;
         this.selectedIndexCharge = index;
@@ -1033,19 +1049,64 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    deleteComponentRef(index) {
-        const componentRef = this.widgetTargets.toArray()[index];
+    loadDynamicComboGridCharge(charge: CsShipmentSurcharge, index: number) {
+        this.selectedSurcharge = charge;
+        this.selectedIndexCharge = index;
+
+        // * Xác định đang chọn combogrid nào
+        this.isSelectedChargeDynamicCombogrid = true;
+        this.isSelectedPartnerDynamicCombogrid = false;
+
+        const containerRef: ViewContainerRef = this.chargeContainerRef.toArray()[index];
+
+        const componentRef: any = this.renderDynamicComponent(AppComboGridComponent, containerRef);
         if (!!componentRef) {
-            componentRef.clear();
+            componentRef.instance.headers = [
+                { title: 'Name', field: 'chargeNameEn' },
+                { title: 'Unit Price', field: 'unitPrice' },
+                { title: 'Unit', field: 'unitId' },
+                { title: 'Code', field: 'code' },
+            ];
+            componentRef.instance.data = this.listCharges;
+            componentRef.instance.fields = ['chargeNameEn'];
+            componentRef.instance.active = charge.chargeId;
         }
     }
 
-    handleClickOutSideComboGrid(index: number) {
-        this.charges[index].isShowPartnerHeader = false;
-        this.widgetTargets.toArray().forEach((c, i) => {
-            if (i === index) {
-                c.clear();
-            }
-        });
+    deleteComponentRef(index: number, type: string) {
+        switch (type) {
+            case 'partner':
+                const componentRef = this.widgetTargets.toArray()[index];
+                if (!!componentRef) {
+                    componentRef.clear();
+                }
+                break;
+            case 'charge':
+                const componentRefCharge = this.chargeContainerRef.toArray()[index];
+                if (!!componentRefCharge) {
+                    componentRefCharge.clear();
+                }
+        }
+    }
+
+    handleClickOutSideComboGrid(index: number, type: string) {
+        switch (type) {
+            case 'partner':
+                this.charges[index].isShowPartnerHeader = false;
+                this.widgetTargets.toArray().forEach((c, i) => {
+                    if (i === index) {
+                        c.clear();
+                    }
+                });
+                break;
+            case 'charge':
+                this.chargeContainerRef.toArray().forEach((c, i) => {
+                    if (i === index) {
+                        c.clear();
+                    }
+                });
+                break;
+        }
+
     }
 }

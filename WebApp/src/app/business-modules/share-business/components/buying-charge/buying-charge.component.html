@@ -77,7 +77,7 @@
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" [tooltip]="charge.partnerName"
-                                    (clickOutside)="handleClickOutSideComboGrid(i)"
+                                    (clickOutside)="handleClickOutSideComboGrid(i,'partner')"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <ng-container
                                         *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true;else  partnerCharge">
@@ -98,7 +98,7 @@
                                         </ng-container>
                                         <div class="dropdown-partner__content">
                                             <div class="d-flex justify-content-end dropdown-partner__header"
-                                                [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisible'">
+                                                [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
                                                 <a class="text-primary text-underline m--margin-right-20 pointer"
                                                     *ngFor="let type of partnerType; trackBy: trackByFn"
                                                     [title]="type.displayName"
@@ -115,23 +115,31 @@
                             </td>
                             <td>
                                 <ng-container
-                                    *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true;else  chargeID">
+                                    *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true;else chargeID">
                                     <div class="form-group">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.chargeNameEn">
                                     </div>
                                 </ng-container>
                                 <ng-template #chargeID>
-                                    <div class="form-group"
+                                    <div class="form-group pos-rel"
+                                        (clickOutside)="handleClickOutSideComboGrid(i,'charge')"
                                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
-                                        <app-combo-grid-virtual-scroll
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.chargeNameEn"
+                                            (click)="loadDynamicComboGridCharge(charge,i)" placeholder="Select charge">
+
+                                        <div class="dropdown-charge">
+                                            <ng-template #containerCharge></ng-template>
+                                        </div>
+                                        <!-- <app-combo-grid-virtual-scroll
                                             [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                             (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                             [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
                                             [dataSources]="listCharges"
                                             [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                             placeholder="Select charge" (remove)="charge.chargeId = null">
-                                        </app-combo-grid-virtual-scroll>
+                                        </app-combo-grid-virtual-scroll> -->
                                     </div>
                                 </ng-template>
                             </td>

@@ -114,6 +114,14 @@
                 left: -1px;
                 background: #fff;
             }
+
+            .dropdown-charge {
+                position: absolute;
+                z-index: 2;
+            }
         }
+    }
+    .invisibleHeader {
+        display: none !important;
     }
 }
