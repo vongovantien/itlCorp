@@ -178,9 +178,8 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             grossWeight: form.gw,
             chargeWeight: form.chargeWeight,
             poInvoiceNo: form.poinvoiceNo,
-            goodsDeliveryDescription: form.desOfGoods,
+            goodsDeliveryDescription: form.goodsDeliveryDescription,
             finalPOD: form.finalPod,
-            desOfGoods: form.descriptionOfGood
         };
 
         const houseBill = new HouseBill(_merge(form, formData));

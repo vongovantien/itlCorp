@@ -15,5 +15,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DateTimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public bool? IsTemp { get; set; }
     }
 }
