@@ -32,7 +32,7 @@ export class SeaFCLExportHBLComponent extends AppShareHBLBase implements OnInit 
         this.headers = [
             { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
             { title: 'Customer', field: 'customerName', sortable: true },
-            { title: 'SaleMan', field: 'saleManName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
             { title: 'Notify Party', field: 'notifyParty', sortable: true },
             { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
             { title: 'Containers', field: 'containers', sortable: true },
