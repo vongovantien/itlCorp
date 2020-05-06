@@ -17,6 +17,8 @@ import { SeaLclExportManifestComponent } from './detail-job/manifest/sea-lcl-exp
 import { SeaLclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-lcl-export-shipping-instruction.component';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
@@ -49,7 +51,12 @@ const routing: Routes = [
                 path: 'si', component: SeaLclExportShippingInstructionComponent, data: {
                     name: "Shipping Instructions",
                 }
-            }
+            },
+            {
+                path: 'send-si', component: ShareBusinessReAlertComponent, data: {
+                    name: "Shipping Instruction (S.I)", serviceId: ChargeConstants.SLE_CODE
+                }
+            },
         ]
     },
 

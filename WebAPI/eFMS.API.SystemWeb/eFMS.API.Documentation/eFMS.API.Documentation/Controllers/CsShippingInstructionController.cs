@@ -5,6 +5,7 @@ using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -62,6 +63,15 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewFCLOCL(CsShippingInstructionReportModel model)
         {
             var result = shippingInstructionService.PreviewOCL(model);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("PreviewFCLShippingInstructionByJobId")]
+        [Authorize]
+        public IActionResult PreviewFCLShippingInstructionByJobId(Guid jobId)
+        {
+            var result = shippingInstructionService.PreviewFCLShippingInstructionByJobId(jobId);
             return Ok(result);
         }
     }

@@ -3,6 +3,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
@@ -22,6 +23,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsMawbcontainer> containerRepository;
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IContextBase<OpsTransaction> opstransRepository;
+        readonly ICsTransactionDetailService transactionDetailService;
+
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
@@ -29,7 +32,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsMawbcontainer> containerRepo,
             IContextBase<CatUnit> unitRepo,
-            IContextBase<OpsTransaction> opstransRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opstransRepo,
+            ICsTransactionDetailService transDetailService) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
@@ -37,6 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
             containerRepository = containerRepo;
             unitRepository = unitRepo;
             opstransRepository = opstransRepo;
+            transactionDetailService = transDetailService;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -79,11 +84,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 CompanyDescription = "itl company",
-                Contact = model.IssuedUserName,
+                Contact = model.IssuedUserName ?? string.Empty,
                 Tel = string.Empty,
-                Website = string.Empty,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             if (model.CsTransactionDetails == null) return result;
@@ -213,6 +218,89 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             result.AddDataSource(shippingInstructions);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
+        public Crystal PreviewFCLShippingInstructionByJobId(Guid jobId)
+        {
+            var si = GetById(jobId);
+            if (si == null)
+            {
+                return null;
+            }
+            Crystal result = new Crystal();
+
+            var instructions = new List<SeaShippingInstruction>();
+            var units = unitRepository.Get();
+            var parameter = new SeaShippingInstructionParameter
+            {
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
+                CompanyDescription = "itl company",
+                Contact = si.IssuedUserName ?? string.Empty,
+                Tel = string.Empty,
+                Website = DocumentConstants.COMPANY_WEBSITE,
+                DecimalNo = 2
+            };
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+            var housebills = transactionDetailService.Query(criteria);
+            var total = 0;
+            string jobNo = opstransRepository.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo;
+            foreach (var item in housebills)
+            {
+                int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
+                total += (int)(quantity != null ? quantity : 0);
+                string noPieces = string.Empty;
+                if (item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
+                {
+                    var packageType = unitRepository.Get(x => x.Id == item.PackageType)?.FirstOrDefault();
+                    noPieces = noPieces + item.PackageQty + " " + packageType.UnitNameEn;
+                }
+
+                var instruction = new SeaShippingInstruction
+                {
+                    TRANSID = jobNo,
+                    Attn = si.InvoiceNoticeRecevier,
+                    ToPartner = si.SupplierName,
+                    Re = si.BookingNo,
+                    DatePackage = si.InvoiceDate,
+                    ShipperDf = si.Shipper,
+                    GoodsDelivery = si.ConsigneeDescription,
+                    NotitfyParty = si.CargoNoticeRecevier,
+                    PortofLoading = si.PolName,
+                    PortofDischarge = si.PodName,
+                    PlaceDelivery = si.PoDelivery,
+                    Vessel = si.VoyNo,
+                    Etd = si.LoadingDate?.ToString("dd/MM/yyyy"),
+                    ShippingMarks = item.ShippingMark,
+                    Containers = item.Packages,
+                    // ContSealNo = item.SealNo,
+                    NoofPeace = noPieces,
+                    SIDescription = item.DesOfGoods,
+                    GrossWeight = item.GW,
+                    CBM = item.CBM,
+                    Qty = total.ToString(),
+                    RateRequest = si.Remark,
+                    Payment = si.PaymenType,
+                    ShippingMarkImport = string.Empty,
+                    MaskNos = item.ContSealNo
+                };
+                instructions.Add(instruction);
+            }
+            result = new Crystal
+            {
+                ReportName = "SeaShippingInstructionNew.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstruction" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
+            result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;

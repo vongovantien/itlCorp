@@ -17,6 +17,8 @@ import { SeaFCLExportLazyLoadModule } from './sea-fcl-export-lazy-load.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-fcl-export-shipping-instruction.component';
 import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-export-manifest.component';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
@@ -48,6 +50,11 @@ const routing: Routes = [
             {
                 path: 'si', component: SeaFclExportShippingInstructionComponent, data: {
                     name: "Shipping Instructions",
+                }
+            },
+            {
+                path: 'send-si', component: ShareBusinessReAlertComponent, data: {
+                    name: "Shipping Instruction (S.I)", serviceId: ChargeConstants.SFE_CODE
                 }
             },
         ]
