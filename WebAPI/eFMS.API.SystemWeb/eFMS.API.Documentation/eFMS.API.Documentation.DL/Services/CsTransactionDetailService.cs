@@ -1352,12 +1352,12 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
                 housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
-                var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);               
+                var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
+                string hbConstainers = string.Empty;
+                string markNo = string.Empty;
                 if (conts != null && conts.Count() > 0)
-                {
-                    string hbConstainers = string.Empty;
-                    var contLast = conts.Last();
-                    string markNo = string.Empty;
+                {                    
+                    var contLast = conts.Last();                   
                     foreach (var cont in conts)
                     {
                         var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
@@ -1368,14 +1368,12 @@ namespace eFMS.API.Documentation.DL.Services
                         markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
                         _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
-                    }
-                    var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
-                    hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
-                    housebill.Qty = hbConstainers?.ToUpper();
-                    //housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
-                    housebill.MaskNos = markNo?.ToUpper();
+                    }         
                 }
-                //housebill.MaskNos = data.ContSealNo?.ToUpper(); //Update lại MarkNo: lấy theo field [Container No/ Cont Type/ Seal No]
+                var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
+                hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
+                housebill.Qty = hbConstainers?.ToUpper();
+                housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 housebill.GrossWeight = conts.Select(s => s.Gw).Sum() ?? 0;//Tổng grossweight trong list cont;
                 housebill.GrwDecimal = 2;
