@@ -1370,8 +1370,9 @@ namespace eFMS.API.Documentation.DL.Services
                         _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                     }
-                    hbConstainers += " CONTAINER(S) S.T.C:";
-                    housebill.Qty = hbConstainers?.ToUpper(); //Qty Container (Số Lượng container + Cont Type)
+                    var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
+                    hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
+                    housebill.Qty = hbConstainers?.ToUpper();
                     //housebill.MaskNos = string.Join("\r\n", conts.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "-" + x.SealNo : string.Empty));
                     housebill.MaskNos = markNo?.ToUpper();
                 }
