@@ -22,6 +22,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsMawbcontainer> containerRepository;
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IContextBase<OpsTransaction> opstransRepository;
+        private readonly IContextBase<CatUnit> catUnitRepository;
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
@@ -29,7 +30,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsMawbcontainer> containerRepo,
             IContextBase<CatUnit> unitRepo,
-            IContextBase<OpsTransaction> opstransRepo) : base(repository, mapper)
+            IContextBase<OpsTransaction> opstransRepo,
+            IContextBase<CatUnit> catUnitRepo) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
@@ -37,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
             containerRepository = containerRepo;
             unitRepository = unitRepo;
             opstransRepository = opstransRepo;
+            catUnitRepository = catUnitRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -88,17 +91,19 @@ namespace eFMS.API.Documentation.DL.Services
             };
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
-            string jobNo = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault()?.JobNo;
+            int totalPackage = 0;
+            var opsTrans = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+            string jobNo = opsTrans?.JobNo;
+            string noPieces = string.Empty;
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
                 total += (int)(quantity != null?quantity: 0);
-                string noPieces = string.Empty;
-                if(item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
-                {
-                    var packageType = unitRepository.Get(x => x.Id == item.PackageType)?.FirstOrDefault();
-                    noPieces = noPieces + item.PackageQty + " " + packageType.UnitNameEn;
-                }
+                int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
+                totalPackage += (int)(totalPack != null ? totalPack : 0);
+
+                var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
+                noPieces = string.Join(", ", packages);
 
                 var instruction = new SeaShippingInstruction
                 {
@@ -130,6 +135,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
+            parameter.TotalPackage = totalPackage;
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
@@ -139,6 +145,13 @@ namespace eFMS.API.Documentation.DL.Services
             result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
+            return result;
+        }
+        private string GetUnitNameById(short? id)
+        {
+            var result = string.Empty;
+            var data = catUnitRepository.Get(g => g.Id == id).FirstOrDefault();
+            result = (data != null) ? data.UnitNameEn : string.Empty;
             return result;
         }
 
@@ -161,7 +174,8 @@ namespace eFMS.API.Documentation.DL.Services
             var total = 0;
             foreach (var item in model.CsTransactionDetails)
             {
-                total = (int)(total + containerRepository.Get(x => x.Id == item.Id).FirstOrDefault()?.Quantity);
+                int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
+                total += (int)(quantity != null ? quantity : 0);
                 string noPieces = string.Empty;
                 if (item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
                 {
@@ -206,6 +220,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 shippingInstructions.Add(container);
             }
+            parameter.TotalPackage = 0;
             result = new Crystal
             {
                 ReportName = "SeaOnboardContainerList.rpt",
