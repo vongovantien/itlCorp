@@ -87,17 +87,20 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <div class="form-group" (clickOutside)="charge.isShowCharge = false"
-                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId}">
-                                                    <input type="text" class="form-control"
+                                                <div class="form-group pos-rel" (clickOutside)="handleClickOutSide(i)"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.chargeId}"
+                                                    title="Dbclick To Open!">
+                                                    <input type="text" class="form-control dropdown-toggle"
                                                         [(ngModel)]="charge.description"
-                                                        (click)="charge.isShowCharge = true"
-                                                        placeholder="Select charge">
-                                                    <ng-container *ngIf="charge.isShowCharge">
-                                                        <app-combo-grid [headers]="headerCharge" [data]="listCharges"
+                                                        (dblclick)="showCharge(charge,i)" placeholder="Select charge">
+                                                    <ng-container>
+                                                        <!-- <app-combo-grid [headers]="headerCharge" [data]="listCharges"
                                                             [fields]="['chargeNameEn']" [active]="charge.chargeId"
                                                             (onClick)="onSelectCharge($event, charge)">
-                                                        </app-combo-grid>
+                                                        </app-combo-grid> -->
+                                                        <div class="combogrid-charge">
+                                                            <ng-template #container></ng-template>
+                                                        </div>
                                                     </ng-container>
                                                 </div>
                                             </td>

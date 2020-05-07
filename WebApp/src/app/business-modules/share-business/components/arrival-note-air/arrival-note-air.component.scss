@@ -31,5 +31,14 @@
                 }
             }
         }
+
+        .dropdown-charge {
+            position: relative;
+        }
+
+        .combogrid-charge {
+            position: absolute;
+            z-index: 2;
+        }
     }
 }
