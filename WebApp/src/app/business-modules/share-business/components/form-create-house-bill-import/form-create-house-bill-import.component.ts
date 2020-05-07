@@ -417,7 +417,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
             remark: res.remark,
             dateOfIssued: !!res.issueHbldate ? { startDate: new Date(res.issueHbldate), endDate: new Date(res.issueHbldate) } : null, // * Date;
             referenceNo: res.referenceNo,
-            numberOfOrigin: this.numberOfOrigins.filter(i => i.value === res.originBlnumber)[0],
+            numberOfOrigin: !!res.originBlnumber ? this.numberOfOrigins.filter(i => i.value === res.originBlnumber)[0] : null,
             saleMan: res.saleManId,
             customer: res.customerId,
             consignee: res.consigneeId,

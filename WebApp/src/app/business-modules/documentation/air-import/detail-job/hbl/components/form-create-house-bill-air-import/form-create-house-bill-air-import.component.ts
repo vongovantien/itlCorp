@@ -68,7 +68,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     route: AbstractControl;
     packageType: AbstractControl;
     issueHBLDate: AbstractControl;
-    desOfGoods: AbstractControl;
+    goodsDeliveryDescription: AbstractControl;
     // forwardingAgentDescription: AbstractControl;
 
     customers: Observable<Customer[]>;
@@ -264,7 +264,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             warehouseId: [],
             route: [],
             packageQty: [],
-            desOfGoods: [],
+            goodsDeliveryDescription: [],
             poinvoiceNo: [],
 
             // * Combogrid
@@ -323,7 +323,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.shipperDescription = this.formCreate.controls["shipperDescription"];
         this.consigneeDescription = this.formCreate.controls["consigneeDescription"];
         this.issueHBLDate = this.formCreate.controls['issueHBLDate'];
-        this.desOfGoods = this.formCreate.controls['desOfGoods'];
+        this.goodsDeliveryDescription = this.formCreate.controls['goodsDeliveryDescription'];
         this.notifyPartyDescription = this.formCreate.controls['notifyPartyDescription'];
         this.flightDateOrigin = this.formCreate.controls['flightDateOrigin'];
     }
