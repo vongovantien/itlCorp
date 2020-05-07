@@ -112,6 +112,8 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.isDuplicateContPakage = false;
 
         const duplicatedContainer = cloneDeep(this.initContainers[index]);
+        // * RESET ID.
+        duplicatedContainer.id = SystemConstants.EMPTY_GUID;
         this.initContainers = [...this.initContainers, duplicatedContainer];
 
     }

@@ -112,6 +112,8 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         this.isDuplicateContPakage = false;
 
         const duplicatedContainer = cloneDeep(this.initContainers[index]);
+        duplicatedContainer.id = SystemConstants.EMPTY_GUID;
+
         this.initContainers = [...this.initContainers, duplicatedContainer];
 
     }
