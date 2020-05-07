@@ -93,6 +93,10 @@
                                                     <input type="text" class="form-control dropdown-toggle"
                                                         [(ngModel)]="charge.description"
                                                         (dblclick)="showCharge(charge,i)" placeholder="Select charge">
+                                                    <combo-grid-icon (onDelete)="charge.chargeId = null; 
+                                            charge.description = null" (onDropdown)="showCharge(charge,i)"
+                                                        [showDelete]="!!charge.description">
+                                                    </combo-grid-icon>
                                                     <ng-container>
                                                         <!-- <app-combo-grid [headers]="headerCharge" [data]="listCharges"
                                                             [fields]="['chargeNameEn']" [active]="charge.chargeId"

@@ -114,9 +114,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (d: Partner) => {
-                    console.log(d);
-
-
                     if (this.isSelectedPartnerDynamicCombogrid) {
                         this.onSelectPartner(d, this.selectedSurcharge);
                         this.deleteComponentRef(this.selectedIndexCharge, 'partner');
@@ -124,7 +121,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (this.isSelectedChargeDynamicCombogrid) {
                         this.onSelectDataFormInfo(d, 'charge', this.selectedSurcharge);
                         this.deleteComponentRef(this.selectedIndexCharge, 'charge');
-
                     }
                 }
             );
@@ -592,6 +588,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
         if (!!partnerData && !!chargeItem) {
             chargeItem.partnerShortName = partnerData.shortName;
+            chargeItem.partnerName = partnerData.partnerNameEn;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
         }

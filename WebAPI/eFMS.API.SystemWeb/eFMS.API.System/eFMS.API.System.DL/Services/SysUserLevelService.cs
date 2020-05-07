@@ -88,6 +88,7 @@ namespace eFMS.API.System.DL.Services
                           from depart in departs.DefaultIfEmpty()
                           select new SysUserLevelModel
                           {
+                              Id = d.Id,
                               CompanyId = d.CompanyId,
                               OfficeId = d.OfficeId,
                               DepartmentId = d.DepartmentId,

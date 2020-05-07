@@ -1,13 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormAddUserComponent } from '../components/form-add-user/form-add-user.component';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { AppPage } from 'src/app/app.base';
-import { SystemRepo } from 'src/app/shared/repositories';
+import { SystemRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
-import { catchError, finalize } from 'rxjs/operators';
+import { User, UserLevel } from '@models';
+import { ConfirmPopupComponent } from '@common';
+import { AppPage } from 'src/app/app.base';
 import { ToastrService } from 'ngx-toastr';
+
 import { IAddUser } from '../addnew/user.addnew.component';
-import { User, UserLevel } from 'src/app/shared/models';
+import { catchError, finalize } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-user-details',
@@ -15,6 +18,8 @@ import { User, UserLevel } from 'src/app/shared/models';
 })
 export class UserDetailsComponent extends AppPage {
     @ViewChild(FormAddUserComponent, { static: false }) formAdd: FormAddUserComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     formData: IAddUser = {
         sysEmployeeModel: null,
         username: '',
@@ -33,7 +38,9 @@ export class UserDetailsComponent extends AppPage {
         { title: 'Department', field: 'departmentName' },
         { title: 'Position', field: 'position' },
     ];
+
     userLevels: UserLevel[] = [];
+    selectedUserLevel: UserLevel;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -142,9 +149,30 @@ export class UserDetailsComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.userLevels = res;
+                        console.log(this.userLevels);
                     }
                 },
             );
     }
 
+    deleteGroup(lv: UserLevel) {
+        this.selectedUserLevel = lv;
+        this.confirmDeletePopup.show();
+    }
+
+    onSubmitDelete() {
+        this._systemRepo.deleteUserLevel(this.selectedUserLevel.id)
+            .pipe()
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.confirmDeletePopup.hide();
+                        this.getListUserLevelByUserId();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
 }
