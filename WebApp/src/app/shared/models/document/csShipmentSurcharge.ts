@@ -86,6 +86,7 @@ export class CsShipmentSurcharge {
     // * Custom
     duplicateCharge: boolean = false;
     duplicateInvoice: boolean = false;
+    isShowPartnerHeader: boolean = false;
 
     constructor(object?: any) {
         const self = this;

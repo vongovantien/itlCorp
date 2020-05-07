@@ -68,6 +68,7 @@ import { ShareGoodsImportComponent } from './components/goods-import/goods-impor
 import { ValidatorModule } from 'src/app/shared/validators/validator.module';
 import { ShareBussinessHBLFCLContainerPopupComponent } from './components/hbl-fcl-container/hbl-fcl-container.popup';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { AppComboGridComponent } from '@common';
 
 const COMPONENTS = [
     ShareBussinessBuyingChargeComponent,
@@ -162,6 +163,9 @@ const customCurrencyMaskConfig = {
         ...COMPONENTS
     ],
     providers: [],
+    entryComponents: [
+        AppComboGridComponent
+    ]
 })
 export class ShareBussinessModule {
 

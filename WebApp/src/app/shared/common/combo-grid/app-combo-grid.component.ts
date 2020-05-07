@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, SimpleChange, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, SimpleChange, SimpleChanges, ElementRef, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { DataService } from '@services';
 
@@ -8,6 +8,7 @@ import { DataService } from '@services';
     // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComboGridComponent<T> extends AppList {
+    @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
 
     @Input() headers: CommonInterface.IHeaderTable[];
     @Input() data: T[] = [];
@@ -17,14 +18,17 @@ export class AppComboGridComponent<T> extends AppList {
     @Input() active: any;
 
     selectedItem: any = null;
-
     constructor(
         private _dataService: DataService
     ) {
         super();
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        if (this.inputSearch) {
+            setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
+        }
+    }
 
     selectItem(item: any) {
         this.active = item.id;
