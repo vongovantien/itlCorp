@@ -36,7 +36,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             IContextBase<CsTransaction> cstransRepo,
             IContextBase<CatUnit> catUnitRepo,
-            IContextBase<SysCompany> companyRepo) : base(repository, mapper)
+            IContextBase<SysCompany> companyRepo,
+            ICsTransactionDetailService transDetailService) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
@@ -270,7 +271,7 @@ namespace eFMS.API.Documentation.DL.Services
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var housebills = transactionDetailService.Query(criteria);
             var total = 0;
-            string jobNo = opstransRepository.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo;
+            string jobNo = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo;
             foreach (var item in housebills)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
