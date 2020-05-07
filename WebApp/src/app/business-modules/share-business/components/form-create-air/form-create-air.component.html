@@ -234,7 +234,8 @@
                                 <div class="form-group">
                                     <label>Package Qty</label>
                                     <input type="number" class="form-control" formControlName="packageQty"
-                                        placeholder="Package Quantity" integer autoFormatCurrency>
+                                        placeholder="Package Quantity" numeric [decimals]="digitDecimal"
+                                        autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-6">
