@@ -87,13 +87,6 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(hbl);
         }
 
-        //[HttpGet]
-        //[Route("GetHbDetails")]
-        //public CsTransactionDetailModel GetHbDetails(Guid JobId,Guid HbId)
-        //{
-        //    return csTransactionDetailService.GetHbDetails(JobId,HbId);
-        //}
-
         [HttpPost]
         [Route("addNew")]
         [Authorize]

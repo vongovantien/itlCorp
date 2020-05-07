@@ -49,8 +49,13 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     ngOnInit(): void {
         this._store.select(getParamsRouterState).subscribe(
             (p: Params) => {
-                this.hblid = p['hblId'];
-                this.mblid = p['jobId'];
+                if (p['hblId'] !== null) {
+                    this.hblid = p['hblId'];
+                    this.mblid = null;
+                } else {
+                    this.mblid = p['jobId'];
+                    this.hblid = null;
+                }
             }
         );
 
@@ -87,12 +92,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     openContainerListPopup() {
-        if ((!!this.mblid && !!this.hblid) && !this.isSave) {
-            this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.mblid }));
-        }
-
-        if ((!!this.hblid && !!this.mblid) && !this.isSave) {
+        if (!!this.hblid && !this.isSave) {
             this._store.dispatch(new fromStore.GetContainerAction({ hblId: this.hblid }));
+        } else {
+
+            if (!!this.mblid && !this.isSave) {
+                this._store.dispatch(new fromStore.GetContainerAction({ mblid: this.mblid }));
+            }
+
         }
 
         this.goodsImportPopup.show();

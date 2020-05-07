@@ -581,7 +581,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipment = csTransactionRepo.Get(x => x.Id == criteria.JobId).FirstOrDefault();
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
             if (shipment == null) return null;
-            var houseBills = GetHouseBill(shipment.TransactionType);
+            var houseBills = GetHouseBill(shipment.TransactionType).Where(x => x.ParentId == null);
 
             var query = (from detail in houseBills//DataContext.Get()
                          join tran in csTransactionRepo.Get() on detail.JobId equals tran.Id
@@ -724,14 +724,13 @@ namespace eFMS.API.Documentation.DL.Services
                           ShipmentMawb = tran.Mawb,
                           UserCreated = detail.UserCreated
                       };
-            List<CsTransactionDetailModel> results = new List<CsTransactionDetailModel>();
-            if (res.Count() > 0)
-            {
-                results = res.Where(x => x.ParentId == null).OrderByDescending(o => o.DatetimeModified).ToList();
-            }
+            if (res.Select(x => x.Id).Count() == 0) return null;
+            var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
             results.ForEach(fe =>
             {
-                var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
+                var containers = fe.ContSealNo != null? fe.ContSealNo.Split('\n').Where(x => x.Length > 0): null;
+                fe.ContSealNo = containers != null? string.Join(", ", containers): null;
+                var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id && x.PackageTypeId != null).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
                 fe.Packages = string.Join(", ", packages);
             });
             return results;
