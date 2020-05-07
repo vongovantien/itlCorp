@@ -58,8 +58,8 @@ namespace eFMS.API.System.DL.Services
                 result.OfficeName = department.OfficeName;
                 result.CompanyId = department.CompanyId;
                 result.OfficeId = department.BranchId;
-                result.NameUserCreated = userRepository.Get(x => x.Id == department.UserCreated).FirstOrDefault()?.Username;
-                result.NameUserModified = userRepository.Get(x => x.Id == department.UserModified).FirstOrDefault()?.Username;
+                result.NameUserCreated = userRepository.Get(x => x.Id == group.UserCreated).FirstOrDefault()?.Username;
+                result.NameUserModified = userRepository.Get(x => x.Id == group.UserModified).FirstOrDefault()?.Username;
             }
             return result;
         }
