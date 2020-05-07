@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, ViewContainerRef, QueryList, Injector, ComponentFactoryResolver, ComponentFactory, ComponentRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail } from '@models';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, AppComboGridComponent } from '@common';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 import { Observable } from 'rxjs';
 import { Container } from '@angular/compiler/src/i18n/i18n_ast';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
-import { SortService } from '@services';
+import { SortService, DataService } from '@services';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -21,11 +21,12 @@ import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-no
 @Component({
     selector: 'arrival-note-air',
     templateUrl: './arrival-note-air.component.html',
-    styleUrls: ['./arrival-note-air.component.scss']
+    styleUrls: ['./arrival-note-air.component.scss'],
 })
 export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChildren('container', { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
 
     hblArrivalNote: HBLArrivalNote = new HBLArrivalNote();
 
@@ -46,13 +47,16 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
     isSubmitted: boolean = false;
 
+    selectedFreightCharge: ArrivalFreightCharge;
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<any>,
         private _documentRepo: DocumentationRepo,
         private _sortService: SortService,
         private _ngProgress: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _dataService: DataService
     ) {
         super();
 
@@ -103,6 +107,18 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             );
 
         this.isLocked = this._store.select(getTransactionLocked);
+
+        this._dataService.$data
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (v: Charge) => {
+                    this.onSelectCharge(v, this.selectedFreightCharge);
+
+                    const componentRef = this.combogrids.toArray()[this.selectedIndexFreightCharge];
+                    componentRef.clear();
+                }
+            );
+
     }
 
     configData() {
@@ -146,6 +162,8 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         newCharge.hblid = this.hblArrivalNote.hblid;
 
         this.hblArrivalNote.csArrivalFrieghtCharges.push(newCharge);
+
+        console.log(this.combogrids);
     }
 
     deleteFreightCharge(index: number, chargeItem: ArrivalFreightCharge) {
@@ -395,6 +413,29 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
         return valid;
     }
+    showCharge(charge: ArrivalFreightCharge, index: number) {
+        this.selectedFreightCharge = charge;
+        this.selectedIndexFreightCharge = index;
+
+        const comboGridContainerRef: ViewContainerRef = this.combogrids.toArray()[index];
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, comboGridContainerRef);
+
+        if (!!this.componentRef) {
+            this.componentRef.instance.headers = this.headerCharge;
+            this.componentRef.instance.data = this.listCharges;
+            this.componentRef.instance.fields = ['chargeNameEn'];
+            this.componentRef.instance.active = charge.chargeId;
+        }
+    }
+
+    handleClickOutSide(index: number) {
+        this.combogrids.toArray().forEach((c, i) => {
+            if (i === index) {
+                c.clear();
+            }
+        });
+    }
+
 }
 
 interface IExchangeRate {

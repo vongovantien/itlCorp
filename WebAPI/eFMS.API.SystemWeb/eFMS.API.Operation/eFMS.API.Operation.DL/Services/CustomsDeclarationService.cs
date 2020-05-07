@@ -380,7 +380,7 @@ namespace eFMS.API.Operation.DL.Services
                 var exCountryCode = item.ExportCountryCode;
                 clearance.ImportCountryName = countries.FirstOrDefault(x => x.Code == imCountryCode)?.NameEn;
                 clearance.ExportCountryName = countries.FirstOrDefault(x => x.Code == exCountryCode)?.NameEn;
-                clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.PartnerNameEn;
+                clearance.CustomerName = customers.FirstOrDefault(x => x.TaxCode == item.PartnerTaxCode)?.ShortName;
                 clearance.GatewayName = portIndexs.FirstOrDefault(x => x.Code == item.Gateway)?.NameEn;
                 clearance.UserCreatedName = userRepository.Get(x => x.Id == item.UserCreated).FirstOrDefault()?.Username;
                 clearance.UserModifieddName = userRepository.Get(x => x.Id == item.UserModified).FirstOrDefault()?.Username;

@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef } from "@angular/core";
+import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef, Injector, ComponentFactory, } from "@angular/core";
 import { Observable, Subject, throwError, BehaviorSubject } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -222,19 +222,20 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         }
     }
 
-    renderComponent(component: any, containerRef: ViewContainerRef) {
-        const container = containerRef;
-        container.clear();
-        const injector = container.injector;
+    renderDynamicComponent<T>(component: T, containerRef: ViewContainerRef): ComponentRef<T> {
+        if (containerRef) {
+            // containerRef.clear();
+            const injector: Injector = containerRef.injector;
 
-        // tslint:disable-next-line: no-any
-        const cfr: ComponentFactoryResolver = injector.get<any>(ComponentFactoryResolver as any);
+            const cfr: ComponentFactoryResolver = injector.get(ComponentFactoryResolver);
 
-        const componentFactory = cfr.resolveComponentFactory(component);
+            const componentFactory: ComponentFactory<T> = cfr.resolveComponentFactory<T>(component as any);
 
-        const componentRef = container.createComponent(componentFactory, 0, injector);
+            const componentRef: ComponentRef<T> = containerRef.createComponent(componentFactory, 0, injector);
 
-        this.componentRef = componentRef;
+            return componentRef;
+
+        }
     }
 }
 
