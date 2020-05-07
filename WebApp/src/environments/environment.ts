@@ -12,8 +12,8 @@ export const environment = {
                 // CATALOGUE: "localhost:44361",
                 // OPERATION: "test.api-efms.itlvn.com/Operation",
                 OPERATION: "localhost:44365",
-                // SYSTEM: "test.api-efms.itlvn.com/System",
-                SYSTEM: "localhost:44360",
+                SYSTEM: "test.api-efms.itlvn.com/System",
+                // SYSTEM: "localhost:44360",
                 SETTING: "test.api-efms.itlvn.com/Setting",
                 // SETTING: "localhost:44363",
                 REPORT: "http://test.api-efms.itlvn.com/ReportPreview/Default.aspx",
@@ -22,8 +22,8 @@ export const environment = {
                 // EXPORT: "localhost:63492",
                 INDENTITY_SERVER_URL: "http://test.api-efms.itlvn.com/identityserver",
                 // INDENTITY_SERVER_URL: "https://localhost:44369",
-                EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
-                // EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
+                // EXPORT_CRYSTAL: "http://localhost:53717/ExportCrystal.aspx",
+                EXPORT_CRYSTAL: "test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         },
         AUTHORIZATION:
         {
