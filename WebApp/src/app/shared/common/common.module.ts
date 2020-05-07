@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent } from '.';
+import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent, AppComboGridIconComponent } from '.';
 import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from './popup';
 import { SelectModule } from 'ng2-select';
@@ -34,7 +34,8 @@ const COMPONENTS = [
     TableCellComponent,
     AppPermissionButtonComponent,
     ExportCrystalComponent,
-    Permission403PopupComponent
+    Permission403PopupComponent,
+    AppComboGridIconComponent
 ];
 
 @NgModule({

@@ -76,7 +76,7 @@
                                 </td>
                             </ng-container>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner" [tooltip]="charge.partnerName"
+                                <div class="form-group col-md-12 dropdown-partner"
                                     (clickOutside)="handleClickOutSideComboGrid(i,'partner')"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <ng-container
@@ -94,7 +94,12 @@
                                         <ng-container *ngIf="!isShowLoadingPartner">
                                             <input type="text" class="dropdown-toggle form-control" readonly
                                                 [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                                (click)="loadDynamicComoGrid(charge,i)">
+                                                (click)="loadDynamicComoGrid(charge,i)"
+                                                [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
+                                            <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                                charge.partnerShortName = null"
+                                                (onDropdown)="loadDynamicComoGrid(charge,i)"
+                                                [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
                                         </ng-container>
                                         <div class="dropdown-partner__content">
                                             <div class="d-flex justify-content-end dropdown-partner__header"
@@ -104,6 +109,7 @@
                                                     [title]="type.displayName"
                                                     (click)="selectPartnerType(type, charge,i)">{{type.displayName}}</a>
                                             </div>
+
                                             <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                                 (onClick)="onSelectPartner($event, charge)">
@@ -128,7 +134,10 @@
                                         <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.chargeNameEn"
                                             (click)="loadDynamicComboGridCharge(charge,i)" placeholder="Select charge">
-
+                                        <combo-grid-icon (onDelete)="charge.chargeId = null; 
+                                            charge.chargeNameEn = null"
+                                            (onDropdown)="loadDynamicComboGridCharge(charge,i)"
+                                            [showDelete]="!!charge.chargeId"></combo-grid-icon>
                                         <div class="dropdown-charge">
                                             <ng-template #containerCharge></ng-template>
                                         </div>
