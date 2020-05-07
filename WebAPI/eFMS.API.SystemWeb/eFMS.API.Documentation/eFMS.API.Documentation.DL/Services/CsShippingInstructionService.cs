@@ -23,6 +23,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> unitRepository;
         private readonly IContextBase<OpsTransaction> opstransRepository;
         private readonly IContextBase<CatUnit> catUnitRepository;
+        private readonly IContextBase<SysCompany> companyRepository;
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
@@ -31,7 +32,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsMawbcontainer> containerRepo,
             IContextBase<CatUnit> unitRepo,
             IContextBase<OpsTransaction> opstransRepo,
-            IContextBase<CatUnit> catUnitRepo) : base(repository, mapper)
+            IContextBase<CatUnit> catUnitRepo,
+            IContextBase<SysCompany> companyRepo) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
@@ -40,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             opstransRepository = opstransRepo;
             catUnitRepository = catUnitRepo;
+            companyRepository = companyRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -78,21 +81,23 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = new Crystal();
             var instructions = new List<SeaShippingInstruction>();
             var units = unitRepository.Get();
-            var parameter = new SeaShippingInstructionParameter
-            {
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
-                CompanyDescription = "itl company",
-                Contact = model.IssuedUserName,
-                Tel = string.Empty,
-                Website = string.Empty,
-                DecimalNo = 2
-            };
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             int totalPackage = 0;
             var opsTrans = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var parameter = new SeaShippingInstructionParameter
+            {
+                CompanyName = company.BunameEn,
+                CompanyAddress1 = company.AddressEn,
+                CompanyAddress2 = company.AddressVn,
+                CompanyDescription = company.DescriptionEn,
+                Contact = model.IssuedUserName,
+                Tel = company.Tel,
+                Website = company.Website,
+                DecimalNo = 2
+            };
             string jobNo = opsTrans?.JobNo;
             string noPieces = string.Empty;
             foreach (var item in model.CsTransactionDetails)
@@ -159,15 +164,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Crystal result = new Crystal();
             var shippingInstructions = new List<OnBoardContainerReportResult>();
+
+            var opsTrans = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+            var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
-                CompanyDescription = "itl company",
+                CompanyName = company.BunameEn,
+                CompanyAddress1 = company.AddressEn,
+                CompanyAddress2 = company.AddressVn,
+                CompanyDescription = company.DescriptionEn,
                 Contact = model.IssuedUserName,
-                Tel = string.Empty,
-                Website = string.Empty,
+                Tel = company.Tel,
+                Website = company.Website,
                 DecimalNo = 2
             };
             if (model.CsTransactionDetails == null) return result;
@@ -207,7 +215,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Payment = model.PaymenType,
                     NoofPeace = noPieces,
                     Containers = item.ContSealNo,
-                    MaskNos = item.ShippingMark,
+                    MaskNos = item.ContSealNo,
                     SIDescription = item.DesOfGoods,
                     GrossWeight = item.GW,
                     CBM = item.CBM,
