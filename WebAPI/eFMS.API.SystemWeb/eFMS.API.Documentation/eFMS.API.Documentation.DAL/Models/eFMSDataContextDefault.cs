@@ -1966,8 +1966,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(20)
                     .IsUnicode(false);
 
-                entity.Property(e => e.GoodsDeliveryDescription).HasMaxLength(500);
-
                 entity.Property(e => e.GoodsDeliveryId)
                     .HasColumnName("GoodsDeliveryID")
                     .HasMaxLength(50)

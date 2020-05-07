@@ -7,7 +7,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { Unit, HouseBill } from 'src/app/shared/models';
 
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, skip, takeUntil } from 'rxjs/operators';
+import { catchError, skip } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 
 import * as fromStore from '../../store';
@@ -68,8 +68,13 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
     ngOnInit() {
         this._store.select(getParamsRouterState).subscribe(
             (p: Params) => {
-                this.hblid = p['hblId'];
-                this.mblid = p['jobId'];
+                if (p['hblId'] !== null) {
+                    this.hblid = p['hblId'];
+                    this.mblid = null;
+                } else {
+                    this.mblid = p['jobId'];
+                    this.hblid = null;
+                }
             }
         );
 
@@ -177,12 +182,12 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.containerPopup.mblid = this.mblid;
         this.containerPopup.hblid = this.hblid;
 
-        if ((!!this.mblid && !!this.hblid) && !this.isSave) {
-            this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
-        }
-
-        if ((!!this.hblid && !!this.mblid) && !this.isSave) {
+        if ((!!this.hblid) && !this.isSave) {
             this._store.dispatch(new GetContainerAction({ hblId: this.hblid }));
+        } else {
+            if ((!!this.mblid) && !this.isSave) {
+                this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
+            }
         }
 
         this.containerPopup.show();

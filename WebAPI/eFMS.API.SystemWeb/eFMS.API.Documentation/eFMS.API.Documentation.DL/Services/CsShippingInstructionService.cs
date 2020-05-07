@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CsMawbcontainer> containerRepository;
         private readonly IContextBase<CatUnit> unitRepository;
-        private readonly IContextBase<OpsTransaction> opstransRepository;
+        private readonly IContextBase<CsTransaction> cstransRepository;
         private readonly IContextBase<CatUnit> catUnitRepository;
         private readonly IContextBase<SysCompany> companyRepository;
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsMawbcontainer> containerRepo,
             IContextBase<CatUnit> unitRepo,
-            IContextBase<OpsTransaction> opstransRepo,
+            IContextBase<CsTransaction> cstransRepo,
             IContextBase<CatUnit> catUnitRepo,
             IContextBase<SysCompany> companyRepo) : base(repository, mapper)
         {
@@ -40,7 +40,7 @@ namespace eFMS.API.Documentation.DL.Services
             userRepository = userRepo;
             containerRepository = containerRepo;
             unitRepository = unitRepo;
-            opstransRepository = opstransRepo;
+            cstransRepository = cstransRepo;
             catUnitRepository = catUnitRepo;
             companyRepository = companyRepo;
         }
@@ -84,18 +84,18 @@ namespace eFMS.API.Documentation.DL.Services
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
             int totalPackage = 0;
-            var opsTrans = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+            var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
 
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = company.BunameEn,
-                CompanyAddress1 = company.AddressEn,
-                CompanyAddress2 = company.AddressVn,
-                CompanyDescription = company.DescriptionEn,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyDescription = company?.DescriptionEn ?? string.Empty,
                 Contact = model.IssuedUserName,
-                Tel = company.Tel,
-                Website = company.Website,
+                Tel = company?.Tel ?? string.Empty,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             string jobNo = opsTrans?.JobNo;
@@ -103,9 +103,9 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
-                total += (int)(quantity != null?quantity: 0);
+                total += (int)(quantity ?? 0);
                 int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
-                totalPackage += (int)(totalPack != null ? totalPack : 0);
+                totalPackage += (int)(totalPack ?? 0);
 
                 var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
                 noPieces = string.Join(", ", packages);
@@ -165,17 +165,17 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = new Crystal();
             var shippingInstructions = new List<OnBoardContainerReportResult>();
 
-            var opsTrans = opstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+            var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
             var company = companyRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = company.BunameEn,
-                CompanyAddress1 = company.AddressEn,
-                CompanyAddress2 = company.AddressVn,
-                CompanyDescription = company.DescriptionEn,
+                CompanyName = (company?.BunameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = company?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = company?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyDescription = company?.DescriptionEn ?? string.Empty,
                 Contact = model.IssuedUserName,
-                Tel = company.Tel,
-                Website = company.Website,
+                Tel = company?.Tel ?? string.Empty,
+                Website = company?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             if (model.CsTransactionDetails == null) return result;

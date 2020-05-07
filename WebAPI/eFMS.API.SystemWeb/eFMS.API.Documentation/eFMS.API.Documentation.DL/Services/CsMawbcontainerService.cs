@@ -104,7 +104,8 @@ namespace eFMS.API.Documentation.DL.Services
                                Cbm = container.Cbm,
                                ChargeAbleWeight = container.ChargeAbleWeight,
                                UserModified = container.UserModified,
-                               DatetimeModified = container.DatetimeModified
+                               DatetimeModified = container.DatetimeModified,
+                               IsPartOfContainer = container.IsPartOfContainer
                            });
             return results;
         }
