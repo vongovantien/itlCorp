@@ -41,13 +41,13 @@ export class ShareBusinessReAlertComponent extends AppList {
     sendMailButtonName: string = '';
     serviceId: string = '';
     isExitsArrivalNotice: boolean = true;
-    isCheckedArrivalNotice: boolean = true;
+    isCheckedArrivalNotice: boolean = false;
     isExitsManifest: boolean = true;
-    isCheckedManifest: boolean = true;
+    isCheckedManifest: boolean = false;
     isExitsMawb: boolean = true;
-    isCheckedMawb: boolean = true;
+    isCheckedMawb: boolean = false;
     isExitsSI: boolean = true;
-    isCheckedSI: boolean = true;
+    isCheckedSI: boolean = false;
 
     pathGeneralArrivalNotice: string = '';
     pathGeneralManifest: string = '';
@@ -62,7 +62,6 @@ export class ShareBusinessReAlertComponent extends AppList {
         private _fb: FormBuilder) {
         super();
         this._progressRef = this._ngProgressService.ref();
-
     }
 
     ngOnInit(): void {
@@ -78,7 +77,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                     this.jobId = params.jobId;
                     this.hblId = params.hblId;
                     this.serviceId = params.serviceId;
-                    this.exportFileCrystal(params.serviceId);
+                    this.exportFileCrystalToPdf(params.serviceId);
                     this.getContentMail(params.serviceId, params.hblId, params.jobId);
                 }
             }
@@ -114,7 +113,7 @@ export class ShareBusinessReAlertComponent extends AppList {
         this.body = this.formMail.controls['body'];
     }
 
-    exportFileCrystal(serviceId: string) {
+    exportFileCrystalToPdf(serviceId: string) {
         // Export Report Arrival Notice to PDF
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
@@ -168,22 +167,16 @@ export class ShareBusinessReAlertComponent extends AppList {
     showPopup() {
         this.attachmentPopup.files.forEach(element => {
             element.isChecked = false;
-
         });
         this.attachmentPopup.checkAll = false;
         this.attachmentPopup.getFileShipment(this.jobId);
         this.attachmentPopup.show();
-
-
     }
 
     sendMail() {
         this.isSubmited = true;
         if (this.formMail.valid) {
-            const _attachFileUpload = this.hashedUrlFileUpload();
-            _attachFileUpload.forEach(element => {
-                this.attachedFile.push(element);
-            });
+            this.attachFileUpload();
             const emailContent: EmailContent = {
                 from: this.from.value,
                 to: this.to.value,
@@ -203,12 +196,27 @@ export class ShareBusinessReAlertComponent extends AppList {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
+                            this.deleteFileTemp(this.jobId);
                         } else {
                             this._toastService.error(res.message);
                         }
                     },
                 );
         }
+    }
+
+    attachFileUpload() {
+        const _attachFileUpload = this.hashedUrlFileUpload();
+        _attachFileUpload.forEach(element => {
+            const idxOf = this.attachedFile.indexOf(element);
+            if (element !== this.pathGeneralArrivalNotice
+                && element !== this.pathGeneralManifest
+                && element !== this.pathGeneralMawb
+                && element !== this.pathGeneralSI
+                && idxOf === -1) {
+                this.attachedFile.push(element);
+            }
+        });
     }
 
     hashedUrlFileUpload() {
@@ -226,6 +234,19 @@ export class ShareBusinessReAlertComponent extends AppList {
         return attachFiles;
     }
 
+    deleteFileTemp(jobId: string) {
+        this._documentRepo.deleteFileTempPreAlert(jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+
+                },
+            );
+    }
+
+    //#region Content Mail
     getContentMail(serviceId: string, hblId: string, jobId: string) {
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
@@ -296,6 +317,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 },
             );
     }
+    //#endregion Content Mail
 
     //#region Preview Report
     previewArrivalNotice() {
@@ -362,7 +384,24 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     previewSI() {
-
+        this._documentRepo.previewSIReportByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
     }
     //#endregion Preview Report
 
@@ -386,7 +425,6 @@ export class ShareBusinessReAlertComponent extends AppList {
                         this.isExitsArrivalNotice = true;
                         this.isCheckedArrivalNotice = true;
                     } else {
-                        // this._toastService.warning('There is no data charge to general report');
                         this.isExitsArrivalNotice = false;
                         this.isCheckedArrivalNotice = false;
                     }
@@ -413,7 +451,6 @@ export class ShareBusinessReAlertComponent extends AppList {
                         this.isExitsManifest = true;
                         this.isCheckedManifest = true;
                     } else {
-                        // this._toastService.warning('There is no data charge to general report');
                         this.isExitsManifest = false;
                         this.isCheckedManifest = false;
                     }
@@ -440,7 +477,6 @@ export class ShareBusinessReAlertComponent extends AppList {
                         this.isExitsMawb = true;
                         this.isCheckedMawb = true;
                     } else {
-                        // this._toastService.warning('There is no data charge to general report');
                         this.isExitsMawb = false;
                         this.isCheckedMawb = false;
                     }
@@ -449,7 +485,29 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalSIToPdf() {
+        this._documentRepo.previewSIReportByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
 
+                        this.pathGeneralSI = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsSI = true;
+                        this.isCheckedSI = true;
+                    } else {
+                        this.isExitsSI = false;
+                        this.isCheckedSI = false;
+                    }
+                },
+            );
     }
 
     //#endregion Export Report

@@ -43,18 +43,25 @@ namespace eFMS.API.Documentation.DL.Services
 
         public bool SendMailDocument(EmailContentModel emailContent)
         {
-            List<string> toEmails = new List<string>();
-            if (!string.IsNullOrEmpty(emailContent.To))
+            try
             {
-                toEmails = emailContent.To.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                List<string> toEmails = new List<string>();
+                if (!string.IsNullOrEmpty(emailContent.To))
+                {
+                    toEmails = emailContent.To.Split(';').Where(x => x.Trim().ToString() != string.Empty).ToList();
+                }
+                List<string> ccEmails = new List<string>();
+                if (!string.IsNullOrEmpty(emailContent.Cc))
+                {
+                    ccEmails = emailContent.Cc.Split(';').Where(x => x.Trim().ToString() != string.Empty).ToList();
+                }
+                var sendMailResult = SendMail.Send(emailContent.Subject, emailContent.Body, toEmails, emailContent.AttachFiles, ccEmails);
+                return sendMailResult;
             }
-            List<string> ccEmails = new List<string>();
-            if (!string.IsNullOrEmpty(emailContent.Cc))
+            catch (Exception ex)
             {
-                ccEmails = emailContent.Cc.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                return false;
             }
-            var sendMailResult = SendMail.Send(emailContent.Subject, emailContent.Body, toEmails, emailContent.AttachFiles, ccEmails);
-            return sendMailResult;
         }
 
         public EmailContentModel GetInfoMailHBLAirImport(Guid hblId)

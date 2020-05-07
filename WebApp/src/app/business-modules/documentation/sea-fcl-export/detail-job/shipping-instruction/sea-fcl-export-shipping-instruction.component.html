@@ -65,3 +65,9 @@ action?" (onSubmit)="confirmRefresh.hide(); refresh()"></confirm-popup>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
+
+<ul class="m-nav-sticky fms-shipment-sidebar">
+    <li class="m-nav-sticky__item">
+        <a title="Send Shipping Instruction" [routerLink]="['../send-si']">Send S.I</a>
+    </li>
+</ul>

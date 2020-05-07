@@ -805,4 +805,16 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewSIReportByJobId(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLShippingInstructionByJobId`, { jobId: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteFileTempPreAlert(jobId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DeleteFileTempPreAlert/${jobId}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
