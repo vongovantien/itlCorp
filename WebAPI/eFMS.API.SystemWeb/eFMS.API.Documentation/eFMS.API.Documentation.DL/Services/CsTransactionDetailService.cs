@@ -1348,7 +1348,7 @@ namespace eFMS.API.Documentation.DL.Services
                     housebill.PortofDischarge = dataPOD?.NameEn?.ToUpper(); //POD
                     housebill.PortofDischarge = housebill.PortofDischarge?.ToUpper();
                 }
-                housebill.TranShipmentTo = string.Empty; //NOT USE
+                housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
                 housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
@@ -1384,7 +1384,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.TotalPackages = string.Empty; //NOT USE
                 housebill.OriginCode = string.Empty; //NOT USE
                 housebill.ICASNC = string.Empty; //NOT USE
-                housebill.Movement = data.MoveType?.ToUpper(); //Type of move
+                housebill.Movement = data.ServiceType?.ToUpper(); //Type of service
                 housebill.AccountingInfo = string.Empty; //NOT USE
                 housebill.SayWord = "SAY: " + data.InWord?.ToUpper(); //Inword
                 housebill.strOriginLandPP = string.Empty; //NOT USE
@@ -1661,7 +1661,7 @@ namespace eFMS.API.Documentation.DL.Services
                     FlightDate = data.FlightDate,
                     DepartureAirport = data.Route,//data.PODName?.ToUpper(), (change: tuyến sẽ lấy Route)
                     NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
-                    Description = data.DesOfGoods?.ToUpper(),
+                    Description = data.DesOfGoods?.ToUpper() ?? data.GoodsDeliveryDescription?.ToUpper(),
                     WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
                     DeliveryOrderNote = string.Empty,//data.DeliveryOrderNo?.ToUpper(),
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
@@ -1715,7 +1715,7 @@ namespace eFMS.API.Documentation.DL.Services
                     FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
                     NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
-                    Description = data.DesOfGoods?.ToUpper(),
+                    Description = data.DesOfGoods?.ToUpper() ?? data.GoodsDeliveryDescription?.ToUpper(),
                     WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
                     DeliveryOrderNote = string.Empty,//data.DeliveryOrderNo?.ToUpper(),
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),

@@ -278,7 +278,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         }
     }
     previewAuthorizeLetter2() {
-        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId)
+        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -295,7 +295,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
     previewAuthorizeLetter1() {
-        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId)
+        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
