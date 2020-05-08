@@ -178,7 +178,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             grossWeight: form.gw,
             chargeWeight: form.chargeWeight,
             poInvoiceNo: form.poinvoiceNo,
-            goodsDeliveryDescription: form.goodsDeliveryDescription,
+            desOfGoods: form.desOfGoods,
             finalPOD: form.finalPod,
         };
 

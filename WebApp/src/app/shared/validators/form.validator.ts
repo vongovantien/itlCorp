@@ -3,7 +3,6 @@ import { FormGroup, AbstractControl, FormControl, Validators, ValidationErrors, 
 export class FormValidators extends Validators {
 
     public static comparePort(controls: AbstractControl | FormControl | FormGroup): ValidationErrors | any {
-
         const pol: string = controls.get('pol').value;
         const pod: string = controls.get('pod').value;
 
@@ -14,7 +13,6 @@ export class FormValidators extends Validators {
             return { invalidPort: true };
         }
         return null;
-
     }
 
     public static compareGW_CW(controls: AbstractControl | FormControl | FormGroup): ValidationErrors | any {
@@ -36,7 +34,6 @@ export class FormValidators extends Validators {
         return { "required": true };
     }
 
-
     public static compareETA_ETD(controls: AbstractControl | FormControl | FormGroup): ValidationErrors | any {
         const eta: any = controls.get('eta').value;
         const etd: any = controls.get('etd').value;
@@ -50,7 +47,27 @@ export class FormValidators extends Validators {
         return (etaTime >= etdTime) ? null : {
             validateEta_Etd: true
         };
+    }
 
+    public static validateMAWB(controls: AbstractControl | FormControl | FormGroup): ValidationErrors {
+
+        if (controls.valid) {
+            const mawbNo: string = controls.value;
+            const airlineCode: number = +mawbNo.substring(0, 3); // 3-digit number
+            const mawbNumber: number = +mawbNo.substring(4, mawbNo.length - 1);
+            const checkDigit: number = +mawbNo.slice(-1);
+
+            console.log(airlineCode);
+            console.log(mawbNumber);
+            console.log(checkDigit);
+
+            if ((mawbNumber % 7) !== checkDigit) {
+                return { invalidMawb: true };
+            }
+            return null;
+
+        }
+        return null;
     }
 
     // TODO Custom validator Fn here !
