@@ -96,6 +96,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             )
             .subscribe(
                 (res: HBLArrivalNote) => {
+                    console.log(res);
                     if (!!res) {
                         if (!!res.hblid && res.arrivalNo !== null) {
                             this.hblArrivalNote = res;

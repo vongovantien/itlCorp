@@ -47,8 +47,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
-    allowUpdate: boolean = false;
-
 
     constructor(
         protected _progressService: NgProgress,
@@ -68,15 +66,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
 
     ngOnInit() {
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
-        this._store.select(getDetailHBlPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowUpdate = res.allowUpdate;
-                    }
-                }
-            );
     }
 
     ngAfterViewInit() {

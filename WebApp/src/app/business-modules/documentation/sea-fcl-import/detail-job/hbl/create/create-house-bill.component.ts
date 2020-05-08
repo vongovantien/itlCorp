@@ -83,9 +83,7 @@ export class CreateHouseBillComponent extends AppForm {
                             // * Update field inword with container data.
                             this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
                         }
-
                     }
-
                 });
     }
 
@@ -105,7 +103,6 @@ export class CreateHouseBillComponent extends AppForm {
                 this.combackToHBLList();
             }
         });
-
     }
 
     onSelectTab(tabName: HBL_TAB | string) {
@@ -125,7 +122,6 @@ export class CreateHouseBillComponent extends AppForm {
         this.formHouseBill.type = 'SFI';
 
         this._cd.detectChanges();
-
 
     }
 
@@ -238,7 +234,7 @@ export class CreateHouseBillComponent extends AppForm {
                 .pipe(
                     mergeMap((res: any) => {
                         const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
                         };
                         this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
@@ -332,13 +328,6 @@ export class CreateHouseBillComponent extends AppForm {
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
-        // const contData = [];
-        // for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
-        //     contData.push({
-        //         contName: keyName,
-        //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-        //     });
-        // }
 
         for (const item of contObject) {
             if (item.isPartContainer) {
