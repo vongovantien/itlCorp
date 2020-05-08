@@ -19,7 +19,8 @@ namespace eFMS.API.Common.Globals
     {
         public string PrimaryKeyValue { get; set; }
         public object ActionType { get; set; }
-        public PropertyChange PropertyChange { get; set; }
+        public string ActionName { get; set; }
+        public List<PropertyChange> ChangedProperties { get; set; }
         public DateTime DatetimeModified { get; set; }
         public string UserModified { get; set; }
     }

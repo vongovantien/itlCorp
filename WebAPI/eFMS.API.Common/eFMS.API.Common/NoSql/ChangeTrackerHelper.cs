@@ -27,8 +27,8 @@ namespace eFMS.API.Common.NoSql
                     else
                     {
                         var primaryKey = properties.FirstOrDefault(x => x.IsKey());
+                        List<PropertyChange> changedProperties = new List<PropertyChange>();
                         //log.PropertyChange = new List<PropertyChange>();
-                        PropertyChange propertyChange = null;
                         foreach (var prop in properties)
                         {
                             if (prop.Name == "UserModified" || prop.Name == "DatetimeModified"
@@ -45,21 +45,22 @@ namespace eFMS.API.Common.NoSql
                                     OldValue = originalValue,
                                     NewValue = currentValue
                                 };
-                                propertyChange = addObject;
+                                changedProperties.Add(addObject);
                             }
                         }
-                        if (propertyChange != null)
+                        if (changedProperties != null)
                         {
                             var log = new ItemLog { Id = Guid.NewGuid() };
                             log.PropertyCommon = new PropertyCommon
                             {
                                 PrimaryKeyValue = change.OriginalValues[primaryKey.Name].ToString(),
                                 ActionType = EntityState.Modified,
+                                ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
                                 UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.NewObject = change.Entity;
-                            log.PropertyCommon.PropertyChange = propertyChange;
+                            log.PropertyCommon.ChangedProperties = changedProperties;
                             var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                             listLog.Add(objectLog);
                         }
@@ -89,6 +90,7 @@ namespace eFMS.API.Common.NoSql
                     {
                         PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Added,
+                        ActionName = "Added",
                         DatetimeModified = DateTime.Now,
                         UserModified = userLog
                     };
@@ -121,6 +123,7 @@ namespace eFMS.API.Common.NoSql
                     {
                         PrimaryKeyValue = delete.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Deleted,
+                        ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
                         UserModified = currentUser ?? string.Empty
                     };
