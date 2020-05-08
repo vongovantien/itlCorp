@@ -57,10 +57,6 @@ export class FormValidators extends Validators {
             const mawbNumber: number = +mawbNo.substring(4, mawbNo.length - 1);
             const checkDigit: number = +mawbNo.slice(-1);
 
-            console.log(airlineCode);
-            console.log(mawbNumber);
-            console.log(checkDigit);
-
             if ((mawbNumber % 7) !== checkDigit) {
                 return { invalidMawb: true };
             }

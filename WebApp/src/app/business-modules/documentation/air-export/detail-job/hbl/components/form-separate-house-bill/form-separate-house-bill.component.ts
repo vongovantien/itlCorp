@@ -1,19 +1,17 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { AppForm } from 'src/app/app.form';
-import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { AirExportHBLFormCreateComponent } from '../form-create-house-bill-air-export/form-create-house-bill-air-export.component';
-import { HouseBill, DIM } from '@models';
-import { mergeMap, takeUntil, map, tap, catchError } from 'rxjs/operators';
-import { getDetailHBlState, getDimensionVolumesState } from '@share-bussiness';
+import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
-import { forkJoin } from 'rxjs';
+
+import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
+import { catchError } from 'rxjs/operators';
+
 
 @Component({
     selector: 'form-separate-house-bill',
@@ -37,7 +35,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef,
         protected _exportRepo: ExportRepo
     ) {
         super(_progressService,
@@ -47,7 +44,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             _toastService,
             _actionStoreSubject,
             _router,
-            _cd,
             _exportRepo);
     }
 
@@ -67,7 +63,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         this._documentationRepo.getSeparate(hblId)
             .pipe(catchError(this.catchError))
             .subscribe((res: any) => {
-                console.log(res);
                 if (!!res && !!res.id && res.id !== SystemConstants.EMPTY_GUID) {
                     this.hblSeparateId = res.id;
                     this.hblSeprateDetail = res;
@@ -83,7 +78,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
 
     ngAfterViewInit() {
         this.formCreateHBLComponent.isSeparate = true;
-        this._cd.detectChanges();
     }
 
     onCancel() {

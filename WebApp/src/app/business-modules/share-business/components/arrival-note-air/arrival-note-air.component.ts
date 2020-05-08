@@ -20,6 +20,7 @@ import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl'
 
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'arrival-note-air',
@@ -29,7 +30,8 @@ import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators'
 export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
-    @ViewChildren('container', { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
+    // @ViewChildren('container', { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
+    @ViewChildren(InjectViewContainerRefDirective, { read: ViewContainerRef }) public combogrids: QueryList<ViewContainerRef>;
 
     hblArrivalNote: HBLArrivalNote = new HBLArrivalNote();
 
@@ -98,7 +100,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             )
             .subscribe(
                 (res: HBLArrivalNote) => {
-                    console.log(res);
                     if (!!res) {
                         if (!!res.hblid && res.arrivalNo !== null) {
                             this.hblArrivalNote = res;
