@@ -9,8 +9,8 @@ import { Component, OnInit, ViewEncapsulation, Output, EventEmitter, Input } fro
 
 export class AppComboGridIconComponent implements OnInit {
 
-    protected isShowDelete: boolean = false;
-    protected isShowDropdown: boolean = true;
+    isShowDelete: boolean = false;
+    isShowDropdown: boolean = true;
 
     @Output() onDelete: EventEmitter<any> = new EventEmitter<any>();
     @Output() onDropdown: EventEmitter<any> = new EventEmitter<any>();
