@@ -1,6 +1,5 @@
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { NgxSpinnerService } from 'ngx-spinner';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
@@ -114,7 +113,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private _systemRepo: SystemRepo,
-        private _spinner: NgxSpinnerService,
         private _dataService: DataService,
         protected _store: Store<fromShare.ITransactionState>,
 
@@ -224,7 +222,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 this.hbOfladingTypesString = this.hbOfladingTypes.map(x => x.displayName);
                 this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
             } else {
-                this._spinner.show();
                 const commonData: any = await this._documentRepo.getShipmentDataCommon().toPromise();
                 this.serviceTypes = commonData.serviceTypes;
                 this.serviceTypesString = this.serviceTypes.map(a => a.displayName);
@@ -235,7 +232,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         } catch (error) {
         }
         finally {
-            this._spinner.hide();
         }
     }
 

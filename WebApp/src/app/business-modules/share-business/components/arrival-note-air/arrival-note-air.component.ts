@@ -1,22 +1,25 @@
-import { Component, OnInit, ViewChild, ViewChildren, ViewContainerRef, QueryList, Injector, ComponentFactoryResolver, ComponentFactory, ComponentRef } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail } from '@models';
-import { ConfirmPopupComponent, AppComboGridComponent } from '@common';
-import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
-import { Observable } from 'rxjs';
-import { Container } from '@angular/compiler/src/i18n/i18n_ast';
-import { CatalogueRepo, DocumentationRepo } from '@repositories';
-import { SortService, DataService } from '@services';
+import { Component, OnInit, ViewChild, ViewChildren, ViewContainerRef, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
-import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators';
-import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from '@enums';
+import { ConfirmPopupComponent, AppComboGridComponent } from '@common';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
+import { SortService, DataService } from '@services';
+
 import { ChargeConstants } from 'src/constants/charge.const';
+import { AppList } from 'src/app/app.list';
+import { SystemConstants } from 'src/constants/system.const';
+
+import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail, Container } from '@models';
+
 import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../../store';
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
+import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+
+import { Observable } from 'rxjs';
+import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'arrival-note-air',
@@ -90,7 +93,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                 tap((res: any) => {
                     this.hbl = res;
                     this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
-                    // this.containersHBL = res.csMawbcontainers || []; // * Get container from HBL detail.
                 }),
                 switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.SeaFCLImport)) // * Get arrival info.
             )
@@ -119,7 +121,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     componentRef.clear();
                 }
             );
-
     }
 
     configData() {
@@ -163,8 +164,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         newCharge.hblid = this.hblArrivalNote.hblid;
 
         this.hblArrivalNote.csArrivalFrieghtCharges.push(newCharge);
-
-        console.log(this.combogrids);
     }
 
     deleteFreightCharge(index: number, chargeItem: ArrivalFreightCharge) {
@@ -360,16 +359,13 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     onChangeQuantityType(type: string, chargeItem: ArrivalFreightCharge) {
         switch (type) {
             case CommonEnum.QUANTITY_TYPE.GW:
-                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.GW);
                 chargeItem.quantity = this.hbl.grossWeight;
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
-                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.NW);
                 chargeItem.quantity = this.hbl.netWeight;
 
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
-                // chargeItem.quantity = this.calculateContainer(this.containersHBL, CommonEnum.QUANTITY_TYPE.CBM);
                 chargeItem.quantity = this.hbl.cbm;
                 break;
             default:
