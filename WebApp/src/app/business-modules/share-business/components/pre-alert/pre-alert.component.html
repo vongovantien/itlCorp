@@ -119,7 +119,7 @@
         </div>
         <div class="m-portlet__body">
             <div class="row">
-                <div class="col-lg-3">
+                <div class="col-lg-12">
                     <div class="form-group m-form__group" *ngIf="serviceId === 'AI'">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsArrivalNotice else NotArrivalNotice">
@@ -203,7 +203,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3" *ngFor="let file of files; trackBy:trackByFn">
+                <div class="col-lg-12" *ngFor="let file of files; trackBy:trackByFn">
                     <div class="form-group m-form__group">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
