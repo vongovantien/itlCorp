@@ -240,8 +240,13 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
-            contType: container.containerTypeId,
-            contName: container.description || '',
+            package: container.packageTypeName,
+            quantity: container.packageQuantity,
+            isPartContainer: container.isPartOfContainer || false
+        }));
+
+        const contObjectFCL: any[] = (containers || []).map((container: Container | any) => ({
+            contName: container.containerTypeName || '',
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
@@ -252,16 +257,21 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
         //     });
         // }
+        for (const item of contObjectFCL) {
+            if (!item.isPartContainer) {
+                containerDetail += this.handleStringCont(item);
+            }
+        }
 
         for (const item of contObject) {
             if (item.isPartContainer) {
                 containerDetail += "A Part Of ";
+                containerDetail += this.handleStringPackage(item);
             }
-            containerDetail += this.handleStringCont(item);
         }
+
         containerDetail = containerDetail.trim().replace(/\&$/, "");
         containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
-
         return containerDetail || '';
     }
 
@@ -269,21 +279,12 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
 
+    handleStringPackage(contOb: { package: string, quantity: number }) {
+        return contOb.quantity + 'x' + contOb.package + ' & ';
+    }
+
     gotoList() {
         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl`]);
     }
 
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
-    }
 }
