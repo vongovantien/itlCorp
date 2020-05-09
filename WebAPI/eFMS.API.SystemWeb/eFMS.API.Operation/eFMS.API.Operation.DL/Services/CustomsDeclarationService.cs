@@ -29,7 +29,7 @@ using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Operation.DL.Services
 {
-    public class CustomsDeclarationService : RepositoryBaseCache<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
+    public class CustomsDeclarationService : RepositoryBase<CustomsDeclaration, CustomsDeclarationModel>, ICustomsDeclarationService
     {
         private readonly ICatPartnerApiService catPartnerApi;
         private readonly ICatPlaceApiService catPlaceApi;
@@ -43,9 +43,36 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
 
-        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
-            ICacheServiceBase<CustomsDeclaration> cacheService,
-            IMapper mapper,
+        //public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
+        //    ICacheServiceBase<CustomsDeclaration> cacheService,
+        //    IMapper mapper,
+        //    IEcusConnectionService ecusCconnection
+        //    , ICatPartnerApiService catPartner
+        //    , ICatPlaceApiService catPlace
+        //    , ICatCountryApiService country
+        //    , ICatCommodityApiService commodity
+        //    , ICurrentUser user,
+        //    IStringLocalizer<LanguageSub> localizer,
+        //    IContextBase<CatCommodity> commodityRepo,
+        //    IContextBase<OpsTransaction> opsTransaction,
+        //    IContextBase<OpsStageAssigned> opsStageAssigned,
+        //    IContextBase<SysUser> userRepo
+        //    ) : base(repository, cacheService, mapper)
+        //{
+        //    ecusCconnectionService = ecusCconnection;
+        //    catPartnerApi = catPartner;
+        //    catPlaceApi = catPlace;
+        //    countryApi = country;
+        //    commodityApi = commodity;
+        //    currentUser = user;
+        //    stringLocalizer = localizer;
+        //    commodityRepository = commodityRepo;
+        //    opsTransactionRepo = opsTransaction;
+        //    opsStageAssignedRepo = opsStageAssigned;
+        //    userRepository = userRepo;
+        //}
+
+        public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
             , ICatPlaceApiService catPlace
@@ -56,8 +83,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CatCommodity> commodityRepo,
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<OpsStageAssigned> opsStageAssigned,
-            IContextBase<SysUser> userRepo
-            ) : base(repository, cacheService, mapper)
+            IContextBase<SysUser> userRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -114,8 +140,6 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Add(lists);
                     DataContext.SubmitChanges();
                     result = new HandleState(true, lists.Count + stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS]);
-                    ClearCache();
-                    Get();
                 }
                 else
                 {
@@ -420,8 +444,6 @@ namespace eFMS.API.Operation.DL.Services
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
             }
             catch (Exception ex)
             {
@@ -1109,11 +1131,6 @@ namespace eFMS.API.Operation.DL.Services
                 }
                
                 var hs = Add(data);
-                if (hs.Success)
-                {
-                    ClearCache();
-                    Get();
-                }
                 return hs;
             }
             catch (Exception ex)
@@ -1231,8 +1248,6 @@ namespace eFMS.API.Operation.DL.Services
                     var hs = Delete(x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();
-                ClearCache();
-                Get();
             }
             catch (Exception ex)
             {

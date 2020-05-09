@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace eFMS.API.Operation.DL.IService
 {
-    public interface ICustomsDeclarationService : IRepositoryBaseCache<CustomsDeclaration, CustomsDeclarationModel>
+    public interface ICustomsDeclarationService : IRepositoryBase<CustomsDeclaration, CustomsDeclarationModel>
     {
         IQueryable<CustomsDeclarationModel> GetAll();
         object GetClearanceTypeData();

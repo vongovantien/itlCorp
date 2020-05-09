@@ -213,9 +213,6 @@ namespace eFMS.API.Setting.DL.Services
                 var today = DateTime.Now;
                 //Update SetTariff
                 var tariff = mapper.Map<SetTariff>(model.setTariff);
-                //var tariffCurrent = DataContext.Get(x => x.Id == tariff.Id).FirstOrDefault();
-                //tariff.UserCreated = tariffCurrent.UserCreated;
-                //tariff.DatetimeCreated = tariffCurrent.DatetimeCreated;
                 tariff.DatetimeModified = today;
 
                 var hs = DataContext.Update(tariff, x => x.Id == tariff.Id);

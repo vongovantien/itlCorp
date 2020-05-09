@@ -122,10 +122,6 @@ namespace eFMS.API.Operation.Controllers
 
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
-            model.GroupId = currentUser.GroupId;
-            model.DepartmentId = currentUser.DepartmentId;
-            model.OfficeId = currentUser.OfficeID;
-            model.CompanyId = currentUser.CompanyID;
             var hs = ecusConnectionService.Update(model, x => x.Id == model.Id);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

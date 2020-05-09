@@ -155,7 +155,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            var hs = transactionService.Update(model);//.Update(model,x=>x.Id==model.Id);
+            var hs = transactionService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

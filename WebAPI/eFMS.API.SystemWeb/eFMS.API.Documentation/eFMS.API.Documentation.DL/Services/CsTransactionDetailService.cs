@@ -198,26 +198,10 @@ namespace eFMS.API.Documentation.DL.Services
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
                     if (code == 403) return new HandleState(403,"");
-                    
-                    // TODO validate follow service
-                    //if (model.CsMawbcontainers?.Count > 0)
-                    //{
-                    //    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, null, model.Id);
-                    //    if (checkDuplicateCont.Success == false)
-                    //    {
-                    //        return checkDuplicateCont;
-                    //    }
-                    //}
 
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
-
-                    model.UserCreated = hb.UserCreated;
-                    model.DatetimeCreated = hb.DatetimeCreated;
-                    model.GroupId = hb.GroupId;
-                    model.DepartmentId = hb.DepartmentId;
-                    model.OfficeId = hb.OfficeId;
-                    model.CompanyId = hb.CompanyId;
+                    model.Active = true;
 
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)

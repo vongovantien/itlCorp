@@ -103,10 +103,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     model.Charge.UserModified = currentUser.UserID;
                     model.Charge.DatetimeModified = DateTime.Now;
-                    model.Charge.GroupId = currentUser.GroupId;
-                    model.Charge.DepartmentId = currentUser.DepartmentId;
-                    model.Charge.OfficeId = currentUser.OfficeID;
-                    model.Charge.CompanyId = currentUser.CompanyID;
                     var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
                     if (hs.Success == false) return hs;
 

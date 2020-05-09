@@ -1037,6 +1037,8 @@ namespace eFMS.API.Documentation.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new HandleState(403);
+            model.UserModified = currentUser.UserID;
+            model.DatetimeModified = DateTime.Now;
             var hs = Update(model, x => x.Id == model.Id);
             if (hs.Success)
             {

@@ -135,10 +135,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            entity.GroupId = currentUser.GroupId;
-            entity.CompanyId = currentUser.CompanyID;
-            entity.OfficeId = currentUser.OfficeID;
-            entity.DepartmentId = currentUser.DepartmentId;
 
             if (entity.Active == false)
             {

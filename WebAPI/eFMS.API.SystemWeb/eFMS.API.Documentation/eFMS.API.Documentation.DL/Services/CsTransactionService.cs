@@ -176,16 +176,6 @@ namespace eFMS.API.Documentation.DL.Services
             transaction.DepartmentId = _currentUser.DepartmentId;
             transaction.OfficeId = _currentUser.OfficeID;
             transaction.CompanyId = _currentUser.CompanyID;
-
-            var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
-            if (!string.IsNullOrEmpty(employeeId))
-            {
-                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                //if (branchOfUser != null)
-                //{
-                //    transaction.BranchId = (Guid)branchOfUser;
-                //}
-            }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -244,23 +234,10 @@ namespace eFMS.API.Documentation.DL.Services
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
             if (code == 403) return new HandleState(403, "");
-
-            //if (model.CsMawbcontainers.Count > 0)
-            //{
-            //    var checkDuplicateCont = containerService.ValidateContainerList(model.CsMawbcontainers, model.Id, null);
-            //    if (checkDuplicateCont.Success == false)
-            //    {
-            //        return checkDuplicateCont;
-            //    }
-            //}
             var transaction = mapper.Map<CsTransaction>(model);
             transaction.DatetimeModified = DateTime.Now;
-
+            transaction.Active = true;
             transaction.CurrentStatus = job.CurrentStatus;
-            transaction.GroupId = job.GroupId;
-            transaction.DepartmentId = job.DepartmentId;
-            transaction.OfficeId = job.OfficeId;
-            transaction.CompanyId = job.CompanyId;
 
             if (transaction.IsLocked.HasValue)
             {
@@ -268,15 +245,6 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     transaction.LockedDate = DateTime.Now;
                 }
-            }
-            var employeeId = sysUserRepo.Get(x => x.Id == transaction.UserCreated).FirstOrDefault()?.EmployeeId;
-            if (!string.IsNullOrEmpty(employeeId))
-            {
-                //var branchOfUser = sysEmployeeRepo.Get(x => x.Id == employeeId)?.FirstOrDefault().WorkPlaceId;
-                //if (branchOfUser != null)
-                //{
-                //    transaction.BranchId = (Guid)branchOfUser;
-                //}
             }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
