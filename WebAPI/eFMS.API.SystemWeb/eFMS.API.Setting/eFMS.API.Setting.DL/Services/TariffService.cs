@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
@@ -281,7 +279,6 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var hs = DataContext.Delete(x => x.Id == tariffId);
                 if (hs.Success)
                 {

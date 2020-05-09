@@ -2,7 +2,6 @@
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -341,7 +340,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState DeleteCSTransaction(Guid jobId)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var containers = csMawbcontainerRepo.Get(x => x.Mblid == jobId);
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -395,7 +393,6 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState SoftDeleteJob(Guid jobId)
         {
             //Xóa mềm hiện tại chỉ cập nhật CurrentStatus = Canceled cho Shipment Documment.
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = new HandleState();
             try
             {

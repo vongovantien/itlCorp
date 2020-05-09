@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using eFMS.API.Common.NoSql;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -184,7 +183,6 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;
             }

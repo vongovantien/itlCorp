@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using Microsoft.Extensions.Localization;
 using eFMS.API.Catalogue.DL.Common;
-using eFMS.API.Common.NoSql;
 using ITL.NetCore.Connection.Caching;
 using AutoMapper.QueryableExtensions;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -21,12 +21,15 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly ICurrentUser currentUser;
         public CatStageService(IContextBase<CatStage> repository, 
             ICacheServiceBase<CatStage> cacheService, 
             IMapper mapper,
             IStringLocalizer<CatalogueLanguageSub> localizer,
-            IContextBase<CatDepartment> departmentRepo) : base(repository, cacheService, mapper)
+            IContextBase<CatDepartment> departmentRepo,
+            ICurrentUser currUser) : base(repository, cacheService, mapper)
         {
+            currentUser = currUser;
             stringLocalizer = localizer;
             departmentRepository = departmentRepo;
             SetChildren<OpsStageAssigned>("Id", "StageId");
@@ -219,7 +222,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DescriptionEn = item.DescriptionEn,
                         DescriptionVn = item.DescriptionVn,
                         DatetimeCreated = DateTime.Now,
-                        UserCreated = ChangeTrackerHelper.currentUser,
+                        UserCreated = currentUser.UserID,
                         Active = active,
                         InactiveOn = inactiveDate
                     };

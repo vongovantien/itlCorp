@@ -6,7 +6,6 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -163,10 +162,6 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.PartnerId = entity.Id;
                         item.CreateDate = DateTime.Now;
                         item.UserCreated = currentUser.UserID;
-                        //item.CompanyId = currentUser.CompanyID;
-                        //item.OfficeId = currentUser.OfficeID;
-                        //item.GroupId = currentUser.GroupId;
-                        //item.DepartmentId = currentUser.DepartmentId;
                         salemanRepository.Add(item);
                     }
                     else
@@ -184,7 +179,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(string id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -218,11 +213,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
                         data = data.Where(x => salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                        || x.UserCreated == currentUser.UserID).ToList();
+                        || x.UserCreated == currentUser.UserID);
                     }
                     else
                     {
-                        data = data.Where(x => x.UserCreated == currentUser.UserID).ToList();
+                        data = data.Where(x => x.UserCreated == currentUser.UserID);
                     }
                     break;
                 case PermissionRange.Group:
@@ -231,13 +226,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.GroupId == currentUser.GroupId && (x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Department:
@@ -246,13 +241,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Office:
@@ -261,13 +256,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Company:
@@ -276,13 +271,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
             }
@@ -316,11 +311,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
                         data = data.Where(x => salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                        || x.UserCreated == currentUser.UserID).ToList();
+                        || x.UserCreated == currentUser.UserID);
                     }
                     else
                     {
-                        data = data.Where(x => x.UserCreated == currentUser.UserID).ToList();
+                        data = data.Where(x => x.UserCreated == currentUser.UserID);
                     }
                     break;
                 case PermissionRange.Group:
@@ -329,13 +324,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.GroupId == currentUser.GroupId && (x.DepartmentId == currentUser.DepartmentId) && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Department:
@@ -344,13 +339,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.DepartmentId == currentUser.DepartmentId && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Office:
@@ -359,13 +354,13 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
                 case PermissionRange.Company:
@@ -374,23 +369,22 @@ namespace eFMS.API.Catalogue.DL.Services
                         data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
                        || x.UserCreated == currentUser.UserID
                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       ).ToList();
+                       );
                     }
                     else
                     {
                         data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
                         || x.UserCreated == currentUser.UserID
-                        ).ToList();
+                        );
                     }
                     break;
             }
 
-            if (data == null)
+            rowsCount = data.Select(x => x.Id).Count();
+            if (rowsCount == 0)
             {
-                rowsCount = 0;
                 return null;
             }
-            rowsCount = data.Select(x => x.Id).Count();
             IQueryable<CatPartnerViewModel> results = null;
             if (size > 1)
             {
@@ -435,14 +429,11 @@ namespace eFMS.API.Catalogue.DL.Services
             return code;
         }
 
-        private List<CatPartnerViewModel> QueryPaging(CatPartnerCriteria criteria)
+        private IQueryable<CatPartnerViewModel> QueryPaging(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-            var salemans = salemanRepository.Get().ToList();
-
-            var dataSalemans = salemans.Select(x => x.PartnerId);
 
             if (partners == null) return null;
 
@@ -450,7 +441,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          join user in sysUsers on partner.UserCreated equals user.Id
                          join saleman in sysUsers on partner.SalePersonId equals saleman.Id into prods
                          from x in prods.DefaultIfEmpty()
-                         select new { user, partner, saleman = x }
+                         select new { user, partner, x }
                           );
             if (criteria.All == null)
             {
@@ -466,7 +457,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
-                           ))?.AsQueryable();
+                           ));
             }
             else
             {
@@ -484,17 +475,28 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
-                           && (x.partner.Active == criteria.Active || criteria.Active == null))?.AsQueryable();
+                           && (x.partner.Active == criteria.Active || criteria.Active == null));
             }
             if (query == null) return null;
-            List<CatPartnerViewModel> results = new List<CatPartnerViewModel>();
-            foreach (var item in query)
+            var results = query.Select(x => new CatPartnerViewModel
             {
-                var partner = mapper.Map<CatPartnerViewModel>(item.partner);
-                partner.UserCreatedName = item.user?.Username;
-                partner.SalePersonName = item.saleman?.Username;
-                results.Add(partner);
-            }
+                Id = x.partner.Id,
+                PartnerGroup = x.partner.PartnerGroup,
+                PartnerNameVn = x.partner.PartnerNameVn,
+                PartnerNameEn = x.partner.PartnerNameEn,
+                ShortName = x.partner.ShortName,
+                TaxCode = x.partner.TaxCode,
+                SalePersonId = x.partner.SalePersonId,
+                Tel = x.partner.Tel,
+                AddressEn = x.partner.AddressEn,
+                AddressVn = x.partner.AddressVn,
+                Fax = x.partner.Fax,
+                CoLoaderCode = x.partner.CoLoaderCode,
+                AccountNo = x.partner.AccountNo,
+                UserCreatedName = x.user != null?x.user.Username: string.Empty,
+                SalePersonName = x.x!= null? x.x.Username:string.Empty,
+                DatetimeModified = x.partner.DatetimeModified
+            });
             return results;
         }
 
@@ -586,6 +588,8 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
+                var partners = new List<CatPartner>();
+                var salesmans = new List<CatSaleman>();
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
@@ -602,7 +606,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
-                    var saleman = new CatSaleman
+                    var salesman = new CatSaleman
                     {
                         Id = Guid.NewGuid(),
                         Office = item.OfficeId,
@@ -618,14 +622,44 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = currentUser.UserID,
                         Service = item.ServiceId
                     };
-                    DataContext.Add(partner, false);
-                    salemanRepository.Add(saleman, false);
+                    partners.Add(partner);
+                    salesmans.Add(salesman);
                 }
-                DataContext.SubmitChanges();
-                salemanRepository.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(partners);
+                        if (hs.Success)
+                        {
+                            hs = salemanRepository.Add(salesmans);
+                            if (hs.Success)
+                            {
+                                trans.Commit();
+                            }
+                            else
+                            {
+                                trans.Rollback();
+                            }
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        ClearCache();
+                        Get();
+                        trans.Dispose();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -873,10 +907,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
+        public IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
         {
             IQueryable<CatPartnerModel> data = Get();
-            if (criteria == null) return data;
             List<string> grpCodes = new List<string>();
             if (criteria.PartnerGroups != null)
             {
@@ -904,32 +937,50 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 data = data.Where(x => x.Active == criteria.Active || criteria.Active == null);
             }
-            return data;
+            if (data == null) return null;
+            var results = data.Select(x => new CatPartnerViewModel
+            {
+                Id = x.Id,
+                PartnerGroup = x.PartnerGroup,
+                PartnerNameVn = x.PartnerNameVn,
+                PartnerNameEn = x.PartnerNameEn,
+                ShortName = x.ShortName,
+                TaxCode = x.TaxCode,
+                SalePersonId = x.SalePersonId,
+                Tel = x.Tel,
+                AddressEn = x.AddressEn,
+                Fax = x.Fax,
+                CoLoaderCode = x.CoLoaderCode,
+                RoundUpMethod = x.RoundUpMethod,
+                ApplyDim = x.ApplyDim,
+                AccountNo = x.AccountNo
+            });
+            return results;
         }
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            var data = DataContext.Get(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
+            var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
-                                && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
-                                );
+                                && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             if (data == null) return null;
-            var results = data.Select(x => new CatPartnerViewModel {
-                    Id = x.Id,
-                    PartnerGroup = x.PartnerGroup,
-                    PartnerNameVn = x.PartnerNameVn,
-                    PartnerNameEn = x.PartnerNameEn,
-                    ShortName = x.ShortName,
-                    TaxCode = x.TaxCode,
-                    SalePersonId = x.SalePersonId,
-                    Tel = x.Tel,
-                    AddressEn = x.AddressEn,
-                    Fax = x.Fax,
-                    CoLoaderCode = x.CoLoaderCode,
-                    RoundUpMethod = x.RoundUpMethod,
-                    ApplyDim = x.ApplyDim,
-                    AccountNo = x.AccountNo
+            var results = data.Select(x => new CatPartnerViewModel
+            {
+                Id = x.Id,
+                PartnerGroup = x.PartnerGroup,
+                PartnerNameVn = x.PartnerNameVn,
+                PartnerNameEn = x.PartnerNameEn,
+                ShortName = x.ShortName,
+                TaxCode = x.TaxCode,
+                SalePersonId = x.SalePersonId,
+                Tel = x.Tel,
+                AddressEn = x.AddressEn,
+                Fax = x.Fax,
+                CoLoaderCode = x.CoLoaderCode,
+                RoundUpMethod = x.RoundUpMethod,
+                ApplyDim = x.ApplyDim,
+                AccountNo = x.AccountNo
             });
             return results;
         }

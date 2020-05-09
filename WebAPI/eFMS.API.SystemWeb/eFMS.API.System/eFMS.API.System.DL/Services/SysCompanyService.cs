@@ -4,8 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using eFMS.API.Common;
-using eFMS.API.Common.NoSql;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
@@ -150,7 +148,6 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID; //TODO
 
                 var hs = DataContext.Delete(x => x.Id == id);
                 return hs;

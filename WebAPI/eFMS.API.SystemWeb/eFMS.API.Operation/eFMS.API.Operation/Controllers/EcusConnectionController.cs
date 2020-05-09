@@ -4,7 +4,6 @@ using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
@@ -157,8 +156,6 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = ecusConnectionService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -11,7 +11,6 @@ using System.Linq;
 using ITL.NetCore.Common;
 using eFMS.API.Operation.DL.Common;
 using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Common.NoSql;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -47,7 +46,6 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-            //assignedItem.UserCreated = currentUser.UserID;
             var orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
             var hs = DataContext.Add(assignedItem);
@@ -62,7 +60,6 @@ namespace eFMS.API.Operation.DL.Services
 
             if (listToDelete.Count() > 0)
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var list = mapper.Map<List<OpsStageAssigned>>(listToDelete);
                 foreach(var item in list)
                 {

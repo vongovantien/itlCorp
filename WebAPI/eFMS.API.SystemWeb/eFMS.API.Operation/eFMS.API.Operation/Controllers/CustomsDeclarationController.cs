@@ -7,7 +7,6 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Common.Models;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
@@ -203,8 +202,6 @@ namespace eFMS.API.Operation.Controllers
         [Route("Delete")]
         public IActionResult Delete(int id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
-
             var hs = customsDeclarationService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

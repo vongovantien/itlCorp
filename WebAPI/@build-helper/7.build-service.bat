@@ -22,3 +22,4 @@ for %%d in (
 	..\eFMS.API.SystemWeb\eFMS.API.System\eFMS.API.System,
 	..\eFMS.API.SystemWeb\eFMS.API.ReportData
 ) do dotnet build "%%d"
+pause

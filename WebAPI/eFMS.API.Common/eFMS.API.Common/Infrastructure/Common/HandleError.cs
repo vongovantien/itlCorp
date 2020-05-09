@@ -10,10 +10,6 @@ namespace eFMS.API.Common.Infrastructure.Common
         public static string GetMessage(HandleState hs, Crud crud)
         {
             string message = string.Empty;
-            if (hs.Exception != null)
-            {
-                message = hs.Exception.Message;
-            }
             switch (hs.Code)
             {
                 case 200:
@@ -33,6 +29,9 @@ namespace eFMS.API.Common.Infrastructure.Common
                     break;
                 case 403:
                     message = LanguageSub.DO_NOT_HAVE_PERMISSION;
+                    break;
+                default:
+                    message = LanguageSub.MSG_DATA_NOT_FOUND;
                     break;
             }
             return message;

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -176,7 +175,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             if (transactionService.CheckAllowDelete(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });

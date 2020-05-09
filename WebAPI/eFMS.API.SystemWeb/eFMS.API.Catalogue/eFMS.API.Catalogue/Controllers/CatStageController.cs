@@ -11,7 +11,6 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +18,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
-using static eFMS.API.Catalogue.DL.Common.Templates;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -158,7 +156,6 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult DeleteStage(int id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = catStageService.Delete(x => x.Id == id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -254,7 +251,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatStageImportModel> data)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            // ChangeTrackerHelper.currentUser = currentUser.UserID;
             var result = catStageService.Import(data);
             if (result.Success)
             {
