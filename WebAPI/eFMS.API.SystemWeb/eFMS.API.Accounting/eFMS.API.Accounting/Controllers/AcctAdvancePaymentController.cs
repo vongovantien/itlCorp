@@ -2,7 +2,6 @@
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.NoSql;
 using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
@@ -226,8 +225,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
 
             HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
             if (hs.Code == 403)

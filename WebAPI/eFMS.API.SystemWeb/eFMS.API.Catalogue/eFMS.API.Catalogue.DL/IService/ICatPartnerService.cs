@@ -22,7 +22,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Import(List<CatPartnerImportModel> data);
         HandleState Delete(string id);
         HandleState Update(CatPartnerModel model);
-        IQueryable<CatPartnerModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
+        IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria);
         int CheckDetailPermission(string id);
         CatPartnerModel GetDetail(string id);
         int CheckDeletePermission(string id);

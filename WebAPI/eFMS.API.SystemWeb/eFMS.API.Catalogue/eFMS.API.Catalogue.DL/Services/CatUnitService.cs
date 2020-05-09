@@ -4,7 +4,6 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -34,26 +33,18 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
-        public override HandleState Add(CatUnitModel entity)
-        {
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Active = true;
-            entity.UserCreated = entity.UserModified = currentUser.UserID;
-            var unit = mapper.Map<CatUnit>(entity);
-            var hs = DataContext.Add(unit);
-            if (hs.Success)
-            {
-                ClearCache();
-                Get();
-            }
-            return hs;
-        }
         public HandleState Update(CatUnitModel model)
         {
-            var entity = mapper.Map<CatUnit>(model);
+            var entity = DataContext.First(x => x.Id == model.Id);
+            if (entity == null) return new HandleState(404, "Not found");
+            entity.UnitNameEn = model.UnitNameEn;
+            entity.UnitNameVn = model.UnitNameVn;
+            entity.UnitType = model.UnitType;
+            entity.DescriptionEn = model.DescriptionEn;
+            entity.DescriptionVn = model.DescriptionVn;
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
-            if(entity.Active == false)
+            if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;
             }
@@ -67,7 +58,6 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(short id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
@@ -85,14 +75,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatUnitModel> Paging(CatUnitCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
         {
-            IQueryable<CatUnitModel> returnList = null;
             var data = GetBy(criteria);
             if(data == null)
             {
                 rowsCount = 0;
                 return data;
             }
-            rowsCount = data.Count();
+            IQueryable<CatUnitModel> returnList = null;
+            rowsCount = data.Select(x => x.Id).Count();
             data = data.OrderByDescending(x => x.DatetimeModified);
             if (pageSize > 1)
             {
@@ -131,13 +121,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             var data = Get().Where(query);
             return data;
-        }
-
-        public CatUnitModel GetDetail(short id)
-        {
-            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            if (data == null) return null;
-            return mapper.Map<CatUnitModel>(data);
         }
     }
 }

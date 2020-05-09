@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -134,8 +133,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
 
             HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);
             if (hs.Code == 403)

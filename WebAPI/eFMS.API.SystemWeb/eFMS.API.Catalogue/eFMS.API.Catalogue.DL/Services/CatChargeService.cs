@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.Common;
 using Microsoft.Extensions.Localization;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using AutoMapper.QueryableExtensions;
 using ITL.NetCore.Connection.Caching;
@@ -256,7 +255,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 try
                 {
-                    ChangeTrackerHelper.currentUser = currentUser.UserID;
+                    //ChangeTrackerHelper.currentUser = currentUser.UserID;
                     var hs = DataContext.Delete(x => x.Id == id, false);
                     if (hs.Success)
                     {

@@ -3,7 +3,6 @@ using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -89,7 +88,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Delete(string id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
+            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if(hs.Success == true)
             {

@@ -1,4 +1,4 @@
-﻿using eFMS.API.Common.NoSql;
+﻿using eFMS.API.Infrastructure.NoSql;
 using eFMS.API.Operation.Service.Models;
 using Microsoft.EntityFrameworkCore;
 

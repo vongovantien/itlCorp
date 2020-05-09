@@ -6,9 +6,11 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -23,16 +25,18 @@ namespace eFMS.API.Catalogue.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatUnitService catUnitService;
+        private readonly ICurrentUser currentUser;
 
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="localizer">inject IStringLocalizer service</param>
         /// <param name="service">inject ICatUnitService service</param>
-        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service)
+        public CatUnitController(IStringLocalizer<LanguageSub> localizer,ICatUnitService service, ICurrentUser currUser)
         {
             stringLocalizer = localizer;
             catUnitService = service;
+            currentUser = currUser;
         }
 
         /// <summary>
@@ -93,7 +97,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(short id)
         {
-            var data = catUnitService.GetDetail(id);
+            var data = catUnitService.Get(x => x.Id == id);
             return Ok(data);
         }
 
@@ -113,14 +117,20 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            model.UserCreated = model.UserModified = currentUser.UserID;
+            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+            model.Active = true;
             var hs = catUnitService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                if(message == LanguageSub.MSG_DATA_NOT_FOUND)
+                {
+                    return BadRequest(new ResultHandle { Status = hs.Success, Message = hs.Exception.Message });
+                }
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });
             }
-            return Ok(result);  
+            return Ok(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });  
         }
 
         /// <summary>
@@ -141,13 +151,15 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var hs = catUnitService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                if (message == LanguageSub.MSG_DATA_NOT_FOUND)
+                {
+                    return BadRequest(new ResultHandle { Status = hs.Success, Message = hs.Exception.Message });
+                }
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });
             }
-            return Ok(result);
-
+            return Ok(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });
         }
 
         /// <summary>
@@ -159,15 +171,18 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(short id)
         {
-            //var hs = catUnitService.Delete(x => x.Id == id);
             var hs = catUnitService.Delete(id);
+
             var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                if (message == LanguageSub.MSG_DATA_NOT_FOUND)
+                {
+                    return BadRequest(new ResultHandle { Status = hs.Success, Message = hs.Exception.Message });
+                }
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });
             }
-            return Ok(result);
+            return Ok(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value });
         }
 
 

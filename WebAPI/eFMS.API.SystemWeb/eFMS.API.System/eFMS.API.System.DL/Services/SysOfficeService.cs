@@ -6,14 +6,12 @@ using ITL.NetCore.Connection.BL;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.IService;
 using System.Linq;
-using eFMS.API.Common.Helpers;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.Models.Criteria;
 using System;
 using eFMS.API.System.DL.ViewModels;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.System.DL.Services
@@ -175,7 +173,6 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                ChangeTrackerHelper.currentUser = currentUser.UserID;
                 var hs = DataContext.Delete(x => x.Id == id);
                 if (hs.Success)
                 {

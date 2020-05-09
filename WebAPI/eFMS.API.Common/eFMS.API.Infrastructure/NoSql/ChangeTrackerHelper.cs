@@ -1,15 +1,17 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace eFMS.API.Common.NoSql
+namespace eFMS.API.Infrastructure.NoSql
 {
     public static class ChangeTrackerHelper
     {
-        public static string currentUser;
+        //public static string currentUser;
+        public static ICurrentUser currentUser;
         public static List<AuditLog> GetChangModifield(IEnumerable<EntityEntry> entities)
         {
             var modifiedEntities = entities
@@ -57,7 +59,13 @@ namespace eFMS.API.Common.NoSql
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
-                                UserModified = change.CurrentValues["UserModified"]?.ToString()
+                                UserModified = currentUser.UserID,
+                                UserNameModified = currentUser.UserName,
+                                CompanyId = true? currentUser.CompanyID.ToString(): string.Empty,
+                                OfficeId = true? currentUser.OfficeID.ToString(): string.Empty,
+                                DepartmentId = currentUser.DepartmentId,
+                                GroupId = currentUser.GroupId
+                                // UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.ItemObject = change.Entity;
                             log.PropertyCommon.ChangedProperties = changedProperties;
@@ -85,14 +93,20 @@ namespace eFMS.API.Common.NoSql
                     var properties = add.OriginalValues.Properties;
                     var primaryKey = properties.FirstOrDefault(x => x.IsKey());
                     var log = new ItemLog { Id = Guid.NewGuid() };
-                    var userLog = add.Metadata.FindProperty("UserCreated") == null ? currentUser : add.CurrentValues["UserCreated"]?.ToString();
+                    // var userLog = add.Metadata.FindProperty("UserCreated") == null ? currentUser : add.CurrentValues["UserCreated"]?.ToString();
+
                     log.PropertyCommon = new PropertyCommon
                     {
                         PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Added,
                         ActionName = "Added",
                         DatetimeModified = DateTime.Now,
-                        UserModified = userLog
+                        UserModified = currentUser.UserID,
+                        UserNameModified = currentUser.UserName,
+                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser.DepartmentId,
+                        GroupId = currentUser.GroupId
                     };
                     log.ItemObject = add.Entity;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
@@ -125,7 +139,12 @@ namespace eFMS.API.Common.NoSql
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser ?? string.Empty
+                        UserModified = currentUser.UserID,
+                        UserNameModified = currentUser.UserName,
+                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser.DepartmentId,
+                        GroupId = currentUser.GroupId
                     };
                     log.ItemObject = delete.Entity;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };

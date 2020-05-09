@@ -13,15 +13,21 @@ namespace eFMS.API.Common.Globals
     {
         public Guid Id { get; set; }
         public PropertyCommon PropertyCommon { get; set; }
-        public object NewObject { get; set; }
+        public object ItemObject { get; set; }
     }
     public class PropertyCommon
     {
         public string PrimaryKeyValue { get; set; }
         public object ActionType { get; set; }
-        public PropertyChange PropertyChange { get; set; }
+        public string ActionName { get; set; }
+        public List<PropertyChange> ChangedProperties { get; set; }
         public DateTime DatetimeModified { get; set; }
         public string UserModified { get; set; }
+        public string UserNameModified { get; set; }
+        public string CompanyId { get; set; }
+        public string OfficeId { get; set; }
+        public int? DepartmentId { get; set; }
+        public int? GroupId { get; set; }
     }
     public class PropertyChange
     {

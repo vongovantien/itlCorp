@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -140,8 +139,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = acctSOAService.DeleteSOA(soaNo);
             if (hs.Code == 403)
             {

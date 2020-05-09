@@ -1,5 +1,5 @@
 ﻿using eFMS.API.Catalogue.Service.Models;
-using eFMS.API.Common.NoSql;
+using eFMS.API.Infrastructure.NoSql;
 using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Catalogue.Service.Contexts

@@ -19,7 +19,6 @@ using ITL.NetCore.Common;
 using Microsoft.Extensions.Localization;
 using System.Data.SqlClient;
 using eFMS.API.Catalogue.Service.Contexts;
-using eFMS.API.Common.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Infrastructure.Extensions;
@@ -106,7 +105,6 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(Guid id)
         {
-            ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
