@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewContainerRef, ComponentRef, ComponentFactoryResolver, ViewChildren, QueryList, Injector, ComponentFactory } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -1047,6 +1047,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     loadDynamicComboGridCharge(charge: CsShipmentSurcharge, index: number) {
+        // TODO: apply for SELLING, OBH
         this.selectedSurcharge = charge;
         this.selectedIndexCharge = index;
 

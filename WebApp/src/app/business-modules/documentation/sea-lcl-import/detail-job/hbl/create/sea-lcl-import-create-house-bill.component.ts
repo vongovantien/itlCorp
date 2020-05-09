@@ -52,11 +52,10 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string = '';
-    shipmentDetail: CsTransaction; // TODO model.
+    shipmentDetail: CsTransaction;
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
-    allowAdd: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -230,7 +229,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                 .pipe(
                     mergeMap((res: any) => {
                         const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
                         };
                         this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;

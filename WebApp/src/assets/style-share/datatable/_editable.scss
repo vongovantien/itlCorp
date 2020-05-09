@@ -108,7 +108,7 @@
                 border: 0;
                 padding: 4px;
                 &:focus {
-                    box-shadow: 0 0 0 0.2rem rgba(57, 102, 182, 0.25);
+                    outline: auto;
                 }
                 &:disabled {
                     // background: #f4f5f8;

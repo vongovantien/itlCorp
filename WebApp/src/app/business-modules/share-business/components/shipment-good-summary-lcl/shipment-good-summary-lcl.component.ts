@@ -11,8 +11,6 @@ import * as fromStore from './../../store';
 
 import { catchError, skip } from 'rxjs/operators';
 
-
-
 @Component({
     selector: 'shipment-good-summary-lcl',
     templateUrl: './shipment-good-summary-lcl.component.html'
@@ -30,7 +28,7 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromStore.IShareBussinessState>,
-        private _dataService: DataService
+        private _dataService: DataService,
     ) {
         super();
     }
@@ -90,4 +88,5 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
 
     removed($event: any) {
     }
+
 }

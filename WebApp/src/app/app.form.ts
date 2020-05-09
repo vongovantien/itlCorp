@@ -130,6 +130,13 @@ export abstract class AppForm extends AppPage {
     trimInputValue(control: FormControl | AbstractControl, value: string) {
         control.setValue(value != null ? value.trim() : value);
     }
+
+    openNg2Select(ng2Select: SelectComponent) {
+        setTimeout(() => {
+            const ng2 = ng2Select.element.nativeElement.querySelector('.ui-select-search');
+            ng2.dispatchEvent(new Event('click'));
+        });
+    }
 }
 
 

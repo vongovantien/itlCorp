@@ -193,6 +193,13 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         }
     }
 
+    onSelectPartner(partnerData: Partner, chargeItem: CsShipmentSurcharge) {
+        if (!!partnerData) {
+            chargeItem.receiverName = partnerData.shortName;
+            chargeItem.paymentObjectId = partnerData.id;
+        }
+    }
+
     saveOBHSurCharge() {
         if (!this.charges.length) {
             this._toastService.warning("Please add charge");

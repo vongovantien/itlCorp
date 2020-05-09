@@ -17,10 +17,14 @@
                     </div>
                     <div class="col-md-4">
                         <label for="">Package Type:</label>
-                        <ng-select [multiple]="true" [items]="packages" (selected)="selected($event)"
-                            (removed)="removed($event)" placeholder="Please Select" [(ngModel)]="packageTypes"
-                            name="packageTypes">
-                        </ng-select>
+                        <div class="pos-rel">
+                            <ng-select #pkg [multiple]="true" [items]="packages" (selected)="selected($event)"
+                                (removed)="removed($event)" placeholder="Please Select" [(ngModel)]="packageTypes"
+                                name="packageTypes">
+                            </ng-select>
+                            <combo-grid-icon *ngIf="!packageTypes.length" (onDropdown)="openNg2Select(pkg)">
+                            </combo-grid-icon>
+                        </div>
                     </div>
                     <div class="col-md-4">
                         <div class="row m-form m-form--state">

@@ -10,6 +10,9 @@ export * from './required.directive';
 export * from './numeric-input.directive';
 export * from './auto-format-currency.directive';
 export * from './prevent-dbclick.directive';
+export * from './inject-view-container-ref.directive';
+
+
 
 
 
