@@ -48,7 +48,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef,
         protected _dataService: DataService
     ) {
         super();
@@ -68,10 +67,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.gotoList();
                 }
             });
-    }
-
-    ngAfterViewInit() {
-        this._cd.detectChanges();
     }
 
     generateHblNo(transactionType: number) {
@@ -137,7 +132,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 },
             );
     }
-
 
     showImportPopup() {
         const dataSearch = { jobId: this.jobId };
@@ -220,7 +214,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         this.createHbl(houseBill);
     }
 
-
     checkValidateForm() {
         let valid: boolean = true;
         this.setError(this.formCreateHBLComponent.freightPayment);
@@ -240,7 +233,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                 .pipe(
                     mergeMap((res: any) => {
                         const dateNotice = {
-                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : null,
+                            arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
                         };
                         this.arrivalNoteComponent.hblArrivalNote.hblid = res.data;
@@ -271,5 +264,4 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     gotoList() {
         this._router.navigate([`home/documentation/air-import/${this.jobId}/hbl`]);
     }
-
 }

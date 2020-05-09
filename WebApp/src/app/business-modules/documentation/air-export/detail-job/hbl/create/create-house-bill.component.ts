@@ -51,12 +51,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef
 
     ) {
         super();
         this._progressRef = this._progressService.ref();
-
     }
 
     ngOnInit() {
@@ -72,8 +70,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 }
             });
     }
-
-
 
     generateHblNo(transactionType: number) {
         this._documentationRepo.generateHBLNo(transactionType)
@@ -232,7 +228,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 }
             );
-
     }
 
     showImportPopup() {
@@ -274,16 +269,12 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.formCreateHBLComponent.updateFormValue(hbl);
                             this.formCreateHBLComponent.hwbno.setValue(null);
                         }
-
                     }
                 );
         }
-
     }
-
 
     gotoList() {
         this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
     }
-
 }

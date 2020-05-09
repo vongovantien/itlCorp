@@ -64,8 +64,8 @@
                                 </td>
                             </ng-container>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner" dropdown
-                                    [tooltip]="charge.receiverName"
+                                <div class="form-group col-md-12 dropdown-partner"
+                                    (clickOutside)="handleClickOutSideComboGrid(i,'partner')"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
                                     <ng-container
                                         *ngIf="!!charge.creditNo || !!charge.debitNo|| !charge.isFromShipment || (isLocked | async) === true;else  partnerCharge">
@@ -73,20 +73,28 @@
                                             [(ngModel)]="charge.receiverName" placeholder="Please Select">
                                     </ng-container>
                                     <ng-template #partnerCharge>
-                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                        <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.receiverName" placeholder="Partner Name"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null">
-                                        <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                            (click)="loadDynamicComoGrid(charge,i)"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
+                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                            charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
+                                            [showDelete]="!!charge.receiverName"></combo-grid-icon>
+                                        <div class="dropdown-partner__content"
+                                            [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
                                             <div class="d-flex justify-content-end dropdown-partner__header">
                                                 <a class="text-primary text-underline m--margin-right-20 pointer"
                                                     *ngFor="let type of partnerType; trackBy: trackByFn"
                                                     [title]="type.displayName"
                                                     (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
                                             </div>
-                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                            <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                                 (onClick)="onSelectPayerReceiver($event, charge,'receiver')">
-                                            </app-combo-grid>
+                                            </app-combo-grid> -->
+                                            <ng-template #container></ng-template>
+
                                         </div>
                                     </ng-template>
                                 </div>
@@ -112,7 +120,8 @@
                                             </div>
                                             <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"
-                                                (onClick)="onSelectPayerReceiver($event, charge, 'payer')">
+                                                (onClick)="onSelectPayerReceiver($event, charge, 'payer')"
+                                                [isEvent]="false">
                                             </app-combo-grid>
                                         </div>
                                     </ng-template>

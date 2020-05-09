@@ -308,10 +308,17 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Commodities</label>
-                                    <ng-select #commoditiy [items]="commodities"
-                                        (opened)="closeOtherSelects(commoditiy)" [multiple]="true"
-                                        formControlName="commodity" [allowClear]="true" placeholder="Select commodity">
-                                    </ng-select>
+                                    <div class="pos-rel">
+                                        <ng-select #commoditiy [items]="commodities"
+                                            (opened)="closeOtherSelects(commoditiy)" [multiple]="true"
+                                            formControlName="commodity" [allowClear]="true"
+                                            placeholder="Select commodity">
+                                        </ng-select>
+                                        <combo-grid-icon
+                                            *ngIf="!commodity.value || (!!commodity.value && !commodity.value.length)"
+                                            (onDropdown)="openNg2Select(commoditiy)">
+                                        </combo-grid-icon>
+                                    </div>
                                 </div>
                             </div>
                         </div>

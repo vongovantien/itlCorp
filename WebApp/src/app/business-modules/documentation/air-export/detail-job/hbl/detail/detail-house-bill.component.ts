@@ -42,7 +42,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef,
         protected _exportRepo: ExportRepo,
     ) {
         super(
@@ -53,7 +52,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             _toastService,
             _actionStoreSubject,
             _router,
-            _cd
         );
     }
 

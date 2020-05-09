@@ -6,7 +6,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ReportPreviewComponent } from '@common';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent, getDetailHBlPermissionState } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessArrivalNoteAirComponent } from '@share-bussiness';
 
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -50,7 +50,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _cd: ChangeDetectorRef,
         protected _datService: DataService
 
     ) {
@@ -62,7 +61,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             _toastService,
             _actionStoreSubject,
             _router,
-            _cd,
             _datService
         );
     }
@@ -140,7 +138,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         }
     }
 
-
     saveHBL() {
         this.confirmPopup.hide();
         this.formCreateHBLComponent.isSubmitted = true;
@@ -148,8 +145,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
-        }
-        else {
+        } else {
             this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
                 .pipe(
                     catchError(this.catchError),

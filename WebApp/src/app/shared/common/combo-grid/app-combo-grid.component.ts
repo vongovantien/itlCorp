@@ -17,7 +17,12 @@ export class AppComboGridComponent<T> extends AppList {
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Input() active: any;
 
+    @Input() set isEvent(v: boolean) {
+        this.isUsinggDataService = v;
+    }
     selectedItem: any = null;
+
+    isUsinggDataService: boolean = true;
     constructor(
         private _dataService: DataService
     ) {
@@ -33,8 +38,11 @@ export class AppComboGridComponent<T> extends AppList {
     selectItem(item: any) {
         this.active = item.id;
         this.selectedItem = item;
-        this._dataService.$data.next(this.selectedItem);
         this.onClick.emit(this.selectedItem);
+
+        if (this.isUsinggDataService) {
+            this._dataService.$data.next(this.selectedItem);
+        }
     }
 
     clickSearch($event: Event) {
