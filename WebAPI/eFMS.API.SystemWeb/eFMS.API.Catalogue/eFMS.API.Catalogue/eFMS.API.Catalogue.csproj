@@ -57,7 +57,7 @@
 
   <ItemGroup>
     <Reference Include="eFMS.API.Catalogue.DL">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Catalogue.DL.dll</HintPath>
+      <HintPath>..\..\CatalogueManagement\bin\netcoreapp2.2\eFMS.API.Catalogue.DL.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Catalogue.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Catalogue.Service.dll</HintPath>
