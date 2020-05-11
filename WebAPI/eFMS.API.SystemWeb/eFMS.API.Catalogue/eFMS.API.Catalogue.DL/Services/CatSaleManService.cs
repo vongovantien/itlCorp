@@ -8,6 +8,7 @@ using eFMS.API.Catalogue.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
@@ -16,14 +17,14 @@ using System.Linq;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatSalemanService : RepositoryBase<CatSaleman, CatSaleManModel>, ICatSaleManService
+    public class CatSalemanService : RepositoryBaseCache<CatSaleman, CatSaleManModel>, ICatSaleManService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<CatPartner> catPartnerRepository;
 
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo, IContextBase<CatPartner> partnerRepo) : base(repository, mapper)
+        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo, IContextBase<CatPartner> partnerRepo, ICacheServiceBase<CatSaleman> cacheService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -38,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatSaleManModel> GetBy(string partnerId)
         {
-            var data = GetSaleMan().Where(x => x.PartnerId.Trim() == partnerId);
+            var data = DataContext.Get().Where(x => x.PartnerId.Trim() == partnerId);
             var sysUser = sysUserRepository.Get();
             var query = from sale in data
                         join user in sysUser on sale.SaleManId equals user.Id
@@ -60,7 +61,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public Guid? GetSalemanIdByPartnerId(string partnerId)
         {
-            var data = GetSaleMan().Where(x => x.PartnerId == partnerId).OrderBy(x=>x.CreateDate).Select(x=>x.SaleManId).FirstOrDefault();
+            var data = DataContext.Get().Where(x => x.PartnerId == partnerId).OrderBy(x=>x.CreateDate).Select(x=>x.SaleManId).FirstOrDefault();
             if (data == null) return null;
             Guid? salemanId = new Guid(data);
             return salemanId;
@@ -75,6 +76,11 @@ namespace eFMS.API.Catalogue.DL.Services
             saleMan.UserCreated = currentUser.UserID;
 
             var hs = DataContext.Add(saleMan);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
             return hs;
         }
 
@@ -83,18 +89,28 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatSaleman>(model);
             entity.UserModified = currentUser.UserID;
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
             return hs;
         }
         public HandleState Delete(Guid id)
         {
             var hs = DataContext.Delete(x => x.Id == id);
+            if (hs.Success)
+            {
+                ClearCache();
+                Get();
+            }
             return hs;
         }
         #endregion
 
         public IQueryable<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
-            var salesMan = GetSaleMan().Where(x => x.PartnerId == criteria.PartnerId);
+            var salesMan = DataContext.Get().Where(x => x.PartnerId == criteria.PartnerId);
             var sysUser = sysUserRepository.Get();
             var query = from saleman in salesMan
                         join users in sysUser on saleman.SaleManId equals users.Id

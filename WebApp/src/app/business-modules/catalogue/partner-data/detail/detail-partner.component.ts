@@ -173,7 +173,7 @@ export class PartnerDetailComponent extends AppList {
     initHeaderSalemanTable() {
         this.headerSaleman = [
             { title: '', field: '', sortable: false },
-            { title: 'Saleman', field: 'saleman_ID', sortable: true },
+            { title: 'Salesman', field: 'saleman_ID', sortable: true },
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },

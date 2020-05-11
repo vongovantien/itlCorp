@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatSaleManService : IRepositoryBase<CatSaleman, CatSaleManModel>
+    public interface ICatSaleManService : IRepositoryBaseCache<CatSaleman, CatSaleManModel>
     {
         IQueryable<CatSaleman> GetSaleMan();
         IQueryable<CatSaleManViewModel> Query(CatSalemanCriteria criteria);

@@ -16,6 +16,8 @@
         CatCommodity,
         CatPlace,
         CatStage,
-        CatUnit
+        CatUnit,
+        CatSaleman,
+
     }
 }

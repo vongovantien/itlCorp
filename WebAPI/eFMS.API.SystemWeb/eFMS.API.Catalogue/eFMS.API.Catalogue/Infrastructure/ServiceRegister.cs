@@ -36,7 +36,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            
+
             services.AddSingleton<ICacheServiceBase<CatCountry>>(x =>
             new CacheServiceBase<CatCountry>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCountry)));
@@ -84,6 +84,10 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddSingleton<ICacheServiceBase<CatChargeGroup>>(x =>
             new CacheServiceBase<CatChargeGroup>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatChargeGroup)));
+
+            services.AddSingleton<ICacheServiceBase<CatSaleman>>(x =>
+            new CacheServiceBase<CatSaleman>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatSaleman)));
 
             services.AddTransient<ICurrentUser, CurrentUser>();
             //services.AddTransient<ICatBranchService, CatBranchService>();
