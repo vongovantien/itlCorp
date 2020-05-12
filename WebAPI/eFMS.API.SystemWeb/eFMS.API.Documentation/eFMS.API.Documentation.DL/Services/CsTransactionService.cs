@@ -1442,16 +1442,19 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
 
-                Guid jobId = new Guid("3c4fdc20-85b7-4d66-9b5c-adb0a08aeb20");
+                Guid jobId = new Guid("b254dbf4-0edb-4044-a53d-8df5165d8987");
                 var transaction = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
-                for (int i = 0; i < 90000; i++)
+                for (int i = 0; i < 500; i++)
                 {
                     transaction.Id = Guid.NewGuid();
                     transaction.JobNo = CreateJobNoByTransactionType(TransactionTypeEnum.SeaFCLImport, transaction.TransactionType);
                     transaction.Mawb = transaction.JobNo;
-                    transaction.UserCreated = "admin";
+                    transaction.UserCreated = transaction.UserModified = currentUser.UserID;
                     transaction.DatetimeCreated = transaction.DatetimeModified = DateTime.Now;
-                    transaction.UserModified = transaction.UserCreated;
+                    transaction.GroupId = currentUser.GroupId;
+                    transaction.DepartmentId = currentUser.DepartmentId;
+                    transaction.OfficeId = currentUser.OfficeID;
+                    transaction.CompanyId = currentUser.CompanyID;
                     transaction.Active = true;
                     var hsTrans = transactionRepository.Add(transaction, true);
                     var containers = csMawbcontainerRepo.Get(x => x.Mblid == jobId).ToList();
@@ -1500,7 +1503,13 @@ namespace eFMS.API.Documentation.DL.Services
                             countDetail = countDetail + 1;
                             item.Active = true;
                             item.UserCreated = transaction.UserCreated;  //ChangeTrackerHelper.currentUser;
-                            item.DatetimeCreated = DateTime.Now;
+                            item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+
+                            item.GroupId = currentUser.GroupId;
+                            item.DepartmentId = currentUser.DepartmentId;
+                            item.OfficeId = currentUser.OfficeID;
+                            item.CompanyId = currentUser.CompanyID;
+
                             csTransactionDetailRepo.Add(item, true);
                             var houseContainers = csMawbcontainerRepo.Get(x => x.Hblid == houseId);
                             if (houseContainers != null)
