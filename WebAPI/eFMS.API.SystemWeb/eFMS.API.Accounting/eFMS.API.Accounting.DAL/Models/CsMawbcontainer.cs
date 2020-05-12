@@ -28,5 +28,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string OffHireRefNo { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public bool? IsPartOfContainer { get; set; }
     }
 }

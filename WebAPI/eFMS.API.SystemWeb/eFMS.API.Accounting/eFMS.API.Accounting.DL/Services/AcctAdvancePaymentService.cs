@@ -38,7 +38,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
-        readonly ICurrencyExchangeService currencyExchangeService;        
+        readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
 
@@ -112,7 +112,7 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
             PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             if (_permissionRange == PermissionRange.None) return null;
-            
+
             IQueryable<AcctAdvancePayment> advances = null;
             switch (_permissionRange)
             {
@@ -203,18 +203,18 @@ namespace eFMS.API.Accounting.DL.Services
                             !string.IsNullOrEmpty(criteria.Requester) ?
                             (
                                     (ad.Requester == criteria.Requester && currentUser.GroupId != 11)
-                                || (currentUser.GroupId == 11 
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false 
-                                    && apr.Manager == criteria.Requester 
+                                || (currentUser.GroupId == 11
+                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
+                                    && apr.Manager == criteria.Requester
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (currentUser.GroupId == 11 
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == true 
-                                    && apr.Accountant == criteria.Requester 
+                                || (currentUser.GroupId == 11
+                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == true
+                                    && apr.Accountant == criteria.Requester
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (currentUser.GroupId == 11 
-                                    && apr.ManagerApr == criteria.Requester 
+                                || (currentUser.GroupId == 11
+                                    && apr.ManagerApr == criteria.Requester
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (apr.AccountantApr == criteria.Requester 
+                                || (apr.AccountantApr == criteria.Requester
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
                                 || (isManagerDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
                                 || (isAccountantDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
@@ -399,7 +399,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in datamap)
             {
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
-                if(!string.IsNullOrEmpty(requesterID))
+                if (!string.IsNullOrEmpty(requesterID))
                 {
                     string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
                     item.Requester = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
@@ -409,11 +409,11 @@ namespace eFMS.API.Accounting.DL.Services
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
 
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
-                if(surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
+                if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
                 {
                     string _settleCode = surchargeAdvanceNo.SettlementCode;
                     var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
-                    if(data != null)
+                    if (data != null)
                     {
                         item.SettleDate = data.RequesterAprDate;
                     }
@@ -530,7 +530,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
@@ -620,7 +620,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return false;
             }
-        }       
+        }
 
         public bool CheckDeletePermissionByAdvanceNo(string advanceNo)
         {
@@ -676,7 +676,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
@@ -859,7 +859,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
             try
             {
@@ -915,7 +915,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //Lấy ra những request mới (có Id là Empty)
                             var requestNew = request.Where(x => x.Id == Guid.Empty).ToList();
                             if (requestNew != null && requestNew.Count > 0)
-                            {                                
+                            {
                                 foreach (var item in requestNew)
                                 {
                                     item.Id = Guid.NewGuid();
@@ -958,7 +958,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return hs;
             }
         }
-        
+
         #region PREVIEW ADVANCE PAYMENT
         public Crystal Preview(Guid advanceId)
         {
@@ -1336,7 +1336,7 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CheckExistsInfoManagerOfRequester(AcctApproveAdvanceModel approve)
         {
             var userCurrent = currentUser.UserID;
-            
+
             var acctApprove = mapper.Map<AcctApproveAdvance>(approve);
             //Lấy ra brandId của user 
             var brandOfUser = currentUser.OfficeID;
@@ -1480,7 +1480,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return new HandleState(ex.Message.ToString());
             }
         }
-        
+
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
         private HandleState CheckApprovedOfDeptPrevAndDeptCurrent(string advanceNo, ICurrentUser _userCurrent, string deptOfUser)
@@ -1557,9 +1557,9 @@ namespace eFMS.API.Accounting.DL.Services
                 //Accountant Approve
                 var accountantOfUser = userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault();
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup 
+                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
-                    && (_userCurrent.UserID == accountantOfUser 
+                    && (_userCurrent.UserID == accountantOfUser
                         || userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID)))
                 {
                     //Check group DepartmentManager đã được Approve chưa
@@ -1587,7 +1587,7 @@ namespace eFMS.API.Accounting.DL.Services
             else //Trường hợp có leader
             {
                 //Leader Approve
-                if (_userCurrent.GroupId != AccountingConstants.SpecialGroup 
+                if (_userCurrent.GroupId != AccountingConstants.SpecialGroup
                     && _userCurrent.UserID == userBaseService.GetLeaderIdOfUser(advance.Requester))
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
@@ -1768,7 +1768,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var deptCodeRequester = userBaseService.GetInfoDeptOfUser(advance.DepartmentId)?.Code;
                             usersDeputy = userBaseService.GetListUserDeputyByDept(deptCodeRequester);
                         }
-                        else if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false 
+                        else if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
                                 && (userCurrent == userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault()
                                     || userBaseService.GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent)))
                         {
@@ -1791,7 +1791,7 @@ namespace eFMS.API.Accounting.DL.Services
                             //usersDeputy = GetListUserDeputyByDept(deptCodeAccountant);
                         }
                         else if (
-                            userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) 
+                            userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
                             && (userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault()//GetAccountantId(brandOfUserId.ToString()) 
                                 || userBaseService.GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent)))
                         {
@@ -1817,7 +1817,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Nếu currentUser là Accoutant of Requester thì return
-                    if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) 
+                    if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
                         && userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault())
                     {
                         return new HandleState();
@@ -2157,7 +2157,7 @@ namespace eFMS.API.Accounting.DL.Services
             // 1 user vừa có thể là Requester, Manager Dept, Accountant Dept nên khi check Approved cần phải dựa vào group
             // Group 11 chính là group Manager
 
-            if (userCurrent.GroupId != AccountingConstants.SpecialGroup 
+            if (userCurrent.GroupId != AccountingConstants.SpecialGroup
                 && userCurrent.UserID == approveAdvance.Requester) //Requester
             {
                 isApproved = true;
@@ -2166,7 +2166,7 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent.GroupId != AccountingConstants.SpecialGroup 
+            else if (userCurrent.GroupId != AccountingConstants.SpecialGroup
                 && userCurrent.UserID == approveAdvance.Leader) //Leader
             {
                 isApproved = true;
@@ -2177,8 +2177,8 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else if (userCurrent.GroupId == AccountingConstants.SpecialGroup
                 && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId) == false
-                && (userCurrent.UserID == approveAdvance.Manager 
-                    || userCurrent.UserID == approveAdvance.ManagerApr 
+                && (userCurrent.UserID == approveAdvance.Manager
+                    || userCurrent.UserID == approveAdvance.ManagerApr
                     || isDeputyManage)) //Dept Manager
             {
                 isApproved = true;
@@ -2190,12 +2190,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else if (userCurrent.GroupId == AccountingConstants.SpecialGroup
                 && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId)
-                && (userCurrent.UserID == approveAdvance.Accountant 
-                    || userCurrent.UserID == approveAdvance.AccountantApr 
+                && (userCurrent.UserID == approveAdvance.Accountant
+                    || userCurrent.UserID == approveAdvance.AccountantApr
                     || isDeputyAccoutant)) //Accountant Manager
             {
                 isApproved = true;
-                var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any(); 
+                var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
                 if (string.IsNullOrEmpty(approveAdvance.AccountantApr) && approveAdvance.AccountantAprDate == null && isDeptWaitingApprove)
                 {
                     isApproved = false;
@@ -2373,7 +2373,7 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
-        }        
+        }
 
         #region --- EXPORT ADVANCE ---
         public AdvanceExport AdvancePaymentExport(Guid advanceId, string language)
@@ -2381,8 +2381,8 @@ namespace eFMS.API.Accounting.DL.Services
             AdvanceExport dataExport = new AdvanceExport();
             var advancePayment = GetAdvancePaymentByAdvanceId(advanceId);
             if (advancePayment == null) return null;
-          
-            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment, language);           
+
+            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment, language);
             dataExport.ShipmentsAdvance = GetListShipmentAdvanceExport(advancePayment);
             return dataExport;
         }
@@ -2443,8 +2443,16 @@ namespace eFMS.API.Accounting.DL.Services
         private List<InfoShipmentAdvanceExport> GetListShipmentAdvanceExport(AcctAdvancePaymentModel advancePayment)
         {
             var shipmentsAdvance = new List<InfoShipmentAdvanceExport>();
-            
-            foreach (var request in advancePayment.AdvanceRequests)
+            var groupJobByHbl = advancePayment.AdvanceRequests
+                .GroupBy(g => new { g.Hbl })
+                .Select(s => new AcctAdvanceRequestModel
+                {
+                    JobId = s.First().JobId,
+                    Hbl = s.Key.Hbl,
+                    Mbl = s.First().Mbl,
+                    CustomNo = s.First().CustomNo
+                });
+            foreach (var request in groupJobByHbl)
             {
                 string _customer = string.Empty;
                 string _shipper = string.Empty;
@@ -2456,7 +2464,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (request.JobId.Contains("LOG"))
                 {
                     var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
-                    if(ops != null)
+                    if (ops != null)
                     {
                         _customer = catPartnerRepo.Get(x => x.Id == ops.CustomerId).FirstOrDefault()?.PartnerNameVn;
                         _container = ops.ContainerDescription;
@@ -2468,10 +2476,10 @@ namespace eFMS.API.Accounting.DL.Services
                 else
                 {
                     var trans = csTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
-                    if(trans != null)
+                    if (trans != null)
                     {
                         var tranDetail = csTransactionDetailRepo.Get(x => x.JobId == trans.Id && x.Hwbno == request.Hbl).FirstOrDefault();
-                        if(tranDetail != null)
+                        if (tranDetail != null)
                         {
                             _customer = catPartnerRepo.Get(x => x.Id == tranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
                             _shipper = catPartnerRepo.Get(x => x.Id == tranDetail.ShipperId).FirstOrDefault()?.PartnerNameVn;
@@ -2496,11 +2504,23 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
-                    NormAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM ? request.Amount : 0,
-                    InvoiceAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE ? request.Amount : 0,
-                    OtherAmount = request.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER ? request.Amount : 0,
+                    NormAmount = advancePayment.AdvanceRequests
+                                            .Where(x => x.JobId == request.JobId
+                                                    && x.Hbl == request.Hbl
+                                                    && x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM)
+                                            .Select(s => s.Amount).Sum() ?? 0,
+                    InvoiceAmount = advancePayment.AdvanceRequests
+                                            .Where(x => x.JobId == request.JobId
+                                            && x.Hbl == request.Hbl
+                                            && x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE)
+                                            .Select(s => s.Amount).Sum() ?? 0,
+                    OtherAmount = advancePayment.AdvanceRequests
+                                            .Where(x => x.JobId == request.JobId
+                                            && x.Hbl == request.Hbl
+                                            && x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER)
+                                            .Select(s => s.Amount).Sum() ?? 0,
                 };
-                if(advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
+                if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
                 {
                     //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
                     var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
@@ -2514,7 +2534,7 @@ namespace eFMS.API.Accounting.DL.Services
             return shipmentsAdvance;
         }
         #endregion --- EXPORT ADVANCE ---
-        
+
         public void UpdateStatusPaymentOfAdvanceRequest(string settlementCode)
         {
             var hblIdList = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Select(s => s.Hblid).ToList();
