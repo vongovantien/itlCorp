@@ -13,7 +13,6 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { getDetailHBlPermissionState } from './../../../../../share-business/store';
 import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
@@ -88,7 +87,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                     if (!!res) {
                         this.hblDetail = res;
                         // * Dispatch to save containers.
-                        // this._store.dispatch(new fromShareBussiness.SaveContainerAction(res.csMawbcontainers || []));
                         this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(res.csMawbcontainers || []));
 
 

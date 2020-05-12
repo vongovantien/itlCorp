@@ -9,6 +9,7 @@ import { GetCataloguePortAction, getCataloguePortState } from '@store';
 import { CommonEnum } from '@enums';
 import { PortIndex } from '@models';
 import { AppForm } from 'src/app/app.form';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'form-manifest',
@@ -74,11 +75,12 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     }
 
     ngAfterViewInit() {
-        this._cd.detectChanges;
+        this._cd.detectChanges();
     }
 
     getShipmentDetail(id: any) {
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: any) => {
                     if (!!res) {

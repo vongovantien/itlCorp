@@ -50,6 +50,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         super();
     }
     ngOnInit(): void {
+        // this.shipment.permission.allowUpdate = true;
         this._store.select(getParamsRouterState).subscribe(
             (p: Params) => {
                 this.hblid = p['hblId'];
@@ -72,9 +73,10 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
             );
 
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
-            .pipe(skip(1))
+            .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CsTransaction) => {
+                    console.log(res);
                     if (!!res) {
                         this.shipment = new CsTransaction(res);
                         this.containerDetail = res.packageContainer;

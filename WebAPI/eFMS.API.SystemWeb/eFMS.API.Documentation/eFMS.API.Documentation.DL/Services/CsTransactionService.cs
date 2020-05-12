@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IStringLocalizer stringLocalizer;
         readonly IUserPermissionService permissionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
-
+        readonly IContextBase<SysOffice> sysOfficeRepository;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -69,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
             IUserPermissionService perService,
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
+            IContextBase<SysOffice> sysOfficeRepo,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             currentUser = user;
@@ -93,6 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             permissionService = perService;
             freighchargesRepository = freighchargesRepo;
             currencyExchangeService = currencyExchange;
+            sysOfficeRepository = sysOfficeRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -238,6 +240,10 @@ namespace eFMS.API.Documentation.DL.Services
             transaction.DatetimeModified = DateTime.Now;
             transaction.Active = true;
             transaction.CurrentStatus = job.CurrentStatus;
+            transaction.CompanyId = job.CompanyId;
+            transaction.OfficeId = job.OfficeId;
+            transaction.DepartmentId = job.DepartmentId;
+            transaction.GroupId = job.GroupId;
 
             if (transaction.IsLocked.HasValue)
             {
@@ -394,27 +400,39 @@ namespace eFMS.API.Documentation.DL.Services
         #region -- DETAILS --
         private CsTransactionModel GetById(Guid id)
         {
-            var data = DataContext.Get(x => x.Id == id && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).FirstOrDefault();
+            CsTransaction data = DataContext.Get(x => x.Id == id && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).FirstOrDefault();
             if (data == null) return null;
             else
             {
-                var result = mapper.Map<CsTransactionModel>(data);
+                CsTransactionModel result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null)
                 {
                     result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
                     result.ColoaderCode = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.CoLoaderCode;
                 }
-                if (result.AgentId != null) result.AgentName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId)?.PartnerNameEn;
+                if (result.AgentId != null)
+                {
+                    CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
+                    result.AgentName = agent.PartnerNameEn;
+                    result.AgentData = new AgentData
+                    {
+                        NameEn = agent.PartnerNameEn,
+                        NameVn = agent.PartnerNameVn,
+                        Fax = agent.Fax,
+                        Tel = agent.Tel,
+                        Address = agent.AddressEn
+                    };
+                }
 
                 if (result.Pod != null)
                 {
-                    var portIndexPod = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault();
+                    CatPlace portIndexPod = catPlaceRepo.Get(x => x.Id == result.Pod)?.FirstOrDefault();
                     result.PODName = portIndexPod.NameEn;
                     result.PODCode = portIndexPod.Code;
 
                     if(portIndexPod.WarehouseId != null)
                     {
-                        var warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
+                        CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
                         result.WarehousePodNameEn = warehouse.NameEn;
                         result.WarehousePodNameVn = warehouse.NameVn;
                     }
@@ -422,13 +440,22 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (result.Pol != null)
                 {
-                    var portIndexPol = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault();
+                    CatPlace portIndexPol = catPlaceRepo.Get(x => x.Id == result.Pol)?.FirstOrDefault();
                     result.POLCode = portIndexPol.Code;
                     result.POLName = portIndexPol.NameEn;
 
+                    if(portIndexPol.CountryId != null)
+                    {
+                        CatCountry country = catCountryRepo.Get(c => c.Id == portIndexPol.CountryId)?.FirstOrDefault();
+
+                        result.POLCountryCode = country.Code;
+                        result.POLCountryNameEn = country.NameEn;
+                        result.POLCountryNameVn = country.NameVn;
+                    }
+
                     if (portIndexPol.WarehouseId != null)
                     {
-                        var warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
+                        CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
                         result.WarehousePolNameEn = warehouse.NameEn;
                         result.WarehousePolNameVn = warehouse.NameVn;
                     }
@@ -437,6 +464,15 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.DeliveryPlace != null) result.PlaceDeliveryName = catPlaceRepo.Get(x => x.Id == result.DeliveryPlace)?.FirstOrDefault().NameEn;
                 result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+
+                if(result.OfficeId != null)
+                {
+                    SysOffice office = sysOfficeRepository.Get(x => x.Id == result.OfficeId)?.FirstOrDefault();
+                    result.OfficeNameEn = office.BranchNameEn;
+                    result.OfficeNameEn = office.BranchNameEn;
+                    result.OfficeLocation = office.Location;
+                }
+
                 return result;
             }
         }
@@ -481,7 +517,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public CsTransactionModel GetDetails(Guid id)
         {
-            var detail = GetById(id);
+            CsTransactionModel detail = GetById(id);
             if (detail == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
