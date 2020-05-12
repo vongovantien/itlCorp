@@ -1815,7 +1815,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var office = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             var result = new AirwayBillExportResult();
-            result.MawbNo = hbDetail.Mawb;
+            result.MawbNo1 = hbDetail.Mawb;
             var pol = catPlaceRepo.Get(x => x.Id == hbDetail.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == hbDetail.Pod).FirstOrDefault();
             result.AolCode = pol?.Code;
