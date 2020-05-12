@@ -44,7 +44,7 @@
                                 <label class="form-control-label">Salesman In Charge</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
-                                    [selectedDisplayFields]="['username']" [dataSources]="saleMans"
+                                    [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
                                     [displayFields]="[{field: 'username', label: 'User Name'}]"
                                     [disabled]="!customer.value" (remove)="resetFormControl(saleMan)" size="15"
                                     placeholder="Select Salemans">

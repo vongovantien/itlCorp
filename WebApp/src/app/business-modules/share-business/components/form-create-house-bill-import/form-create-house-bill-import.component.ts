@@ -9,7 +9,7 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, catchError } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, catchError, tap } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -443,12 +443,18 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                     this.consignee.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
-                this.saleMans.forEach((item: User) => {
-                    if (listSales.length > 0) {
-                        this.saleMan.setValue(listSales[0].saleManId);
-                    } else if (item.id === data.salePersonId) {
-                        this.saleMan.setValue(item.id);
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                    if (!!res) {
+                        this.saleMan.setValue(res);
+                    } else {
+                        this.saleMans = this.saleMans.pipe(
+                            tap((users: User[]) => {
+                                const user: User = users.find((u: User) => u.id === data.salePersonId);
+                                if (!!user) {
+                                    this.saleMan.setValue(user.id);
+                                }
+                            })
+                        );
                     }
                 });
                 break;
@@ -560,19 +566,12 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
     getListSaleman() {
         this.isLoading = true;
-        this._systemRepo.getListSystemUser().subscribe((res: any) => {
-            if (!!res) {
-                this.saleMans = res;
-                this.isLoading = false;
-            } else {
-                this.saleMans = [];
-            }
-        });
+        this.saleMans = this._systemRepo.getListSystemUser();
 
-        this._catalogueRepo.getListSaleManDetail().pipe(catchError(this.catchError))
-            .subscribe((res: any) => {
-                this.listSaleMan = res || [];
-                this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
-            });
+        // this._catalogueRepo.getListSaleManDetail(null, 'SFI').pipe(catchError(this.catchError))
+        //     .subscribe((res: any) => {
+        //         this.listSaleMan = res || [];
+        //         this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
+        //     });
     }
 }

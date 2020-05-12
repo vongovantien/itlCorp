@@ -12,7 +12,7 @@ import { FormValidators } from 'src/app/shared/validators';
 import { DataService } from '@services';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, skip, finalize } from 'rxjs/operators';
+import { catchError, takeUntil, skip, finalize, tap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
@@ -55,7 +55,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     issueHblplace: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: User[];
+    saleMans: Observable<User[]>;
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -335,16 +335,13 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     }
 
     getSaleMans() {
-        this._systemRepo.getListSystemUser()
-            .pipe(catchError(this.catchError))
-            .subscribe((res: any) => {
-                this.saleMans = res || [];
-            });
-        this._catalogueRepo.getListSaleManDetail().pipe(catchError(this.catchError))
-            .subscribe((res: any) => {
-                this.listSaleMan = res || [];
-                this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
-            });
+        this.saleMans = this._systemRepo.getListSystemUser();
+
+        // this._catalogueRepo.getListSaleManDetail(null, this.type).pipe(catchError(this.catchError))
+        //     .subscribe((res: any) => {
+        //         this.listSaleMan = res || [];
+        //         // this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
+        //     });
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
@@ -430,14 +427,29 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
-                const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
-                this.saleMans.forEach((item: User) => {
-                    if (listSales.length > 0) {
-                        this.saleMan.setValue(listSales[0].saleManId);
-                    } else if (item.id === data.salePersonId) {
-                        this.saleMan.setValue(item.id);
+                // const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
+                // this.saleMans.forEach((item: User) => {
+                //     if (listSales.length > 0) {
+                //         this.saleMan.setValue(listSales[0].saleManId);
+                //     } else if (item.id === data.salePersonId) {
+                //         this.saleMan.setValue(item.id);
+                //     }
+                // });
+                this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
+                    if (!!res) {
+                        this.saleMan.setValue(res);
+                    } else {
+                        this.saleMans = this.saleMans.pipe(
+                            tap((users: User[]) => {
+                                const user: User = users.find((u: User) => u.id === data.salePersonId);
+                                if (!!user) {
+                                    this.saleMan.setValue(user.id);
+                                }
+                            })
+                        );
                     }
                 });
+
                 if (!this.shipper.value) {
                     this.shipper.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
