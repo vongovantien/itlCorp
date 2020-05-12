@@ -20,6 +20,7 @@ export class DepartmentAddNewComponent extends AppForm {
     nameLocal: AbstractControl;
     nameAbbr: AbstractControl;
     office: AbstractControl;
+    email: AbstractControl;
     status: AbstractControl;
     officeList: any[] = [];
     departmentType: AbstractControl;
@@ -73,6 +74,10 @@ export class DepartmentAddNewComponent extends AppForm {
                     Validators.required
                 ])
             ],
+            email: ['',
+                Validators.compose([
+                    Validators.maxLength(150)
+                ])],
             status: [],
             departmentType: [this.departmentTypeActive]
         });
@@ -82,6 +87,7 @@ export class DepartmentAddNewComponent extends AppForm {
         this.nameLocal = this.formAdd.controls['nameLocal'];
         this.nameAbbr = this.formAdd.controls['nameAbbr'];
         this.office = this.formAdd.controls['office'];
+        this.email = this.formAdd.controls['email'];
         this.status = this.formAdd.controls['status'];
         this.departmentType = this.formAdd.controls['departmentType'];
 
@@ -107,6 +113,7 @@ export class DepartmentAddNewComponent extends AppForm {
                 officeName: this.office.value[0].text,
                 companyName: '',
                 deptType: this.departmentTypeActive[0].id,
+                email: this.email.value,
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
@@ -117,7 +124,6 @@ export class DepartmentAddNewComponent extends AppForm {
                 userNameCreated: '',
                 userNameModified: ''
             };
-            console.log(dept);
             this._progressRef.start();
             // Add new Department
             this._systemRepo.addNewDepartment(dept)
