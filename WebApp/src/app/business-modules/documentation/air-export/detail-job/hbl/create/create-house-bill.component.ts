@@ -114,7 +114,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             min: form.min,
             warehouseId: form.warehouseId,
             shipmentType: !!form.shipmenttype && !!form.shipmenttype.length ? form.shipmenttype[0].id : null,
-            rclass: !!form.rclass && !!form.rclass.length ? form.rclass[0].id : null
+            rclass: !!form.rclass && !!form.rclass.length ? form.rclass[0].id : null,
             asArranged: form.asArranged,
             rateCharge: form.asArranged ? form.rateChargeAs : form.rateCharge
         };
