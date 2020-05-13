@@ -1867,5 +1867,39 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion --- Export ---
+
+        public string GenerateHBLNo(string podCode)
+        {
+            if(string.IsNullOrEmpty(podCode))
+            {
+                return null;
+            }
+            string keyword = podCode + DateTime.Now.ToString("yyMM");
+            string hbl = "ITL" + keyword;
+
+            var codes = DataContext.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno);
+            var oders = new List<int>();
+
+            if(codes != null & codes.Count() > 0)
+            {
+                foreach (var code in codes)
+                {
+                    // Lấy 3 ký tự cuối
+                    if (code.Length > 7)
+                    {
+                        oders.Add(int.Parse(code.Substring(code.Length - 3)));
+                    }
+                }
+                int maxCurrentOder = oders.Max();
+
+                hbl += (maxCurrentOder + 1).ToString("000");
+            }
+            else
+            {
+                hbl += "001";
+            }
+
+            return hbl;
+        }
     }
 }

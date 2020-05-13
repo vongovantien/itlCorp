@@ -209,6 +209,13 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(new { hblNo = data });
         }
 
+        [HttpGet("GenerateHBLSeaExport")]
+        public IActionResult GenerateHBLSeaExport(string podCode)
+        {
+            string hblNo = csTransactionDetailService.GenerateHBLNo(podCode);
+            return Ok(new { hblNo = hblNo });
+        }
+
         private string CheckExist(CsTransactionDetailModel model)
         {
             string message = string.Empty;
