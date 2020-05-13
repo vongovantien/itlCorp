@@ -26,9 +26,9 @@
                 <div class="row align-items-center m--margin-bottom-10">
                     <div class="col-md-2">Length</div>
                     <div class="col-md-2">Width</div>
-                    <div class="col-md-2">Height</div>
+                    <div class="col-md-2">Volume</div>
                     <div class="col-md-2">Package</div>
-                    <div class="col-md-3">Height Weight</div>
+                    <div class="col-md-3">Volume Weight</div>
                     <div class="col-md-1 pointer text-center">
 
                     </div>
@@ -40,32 +40,32 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.length === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.length"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.width === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.width"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.height === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.height"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.package === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.package"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="digitDecimal"
-                                        autoFormatCurrency>
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
 
                             </div>
@@ -94,7 +94,7 @@
                 <div class="row pt-2 border border-bottom-0 mt-2 align-items-center pb-2">
                     <div class="col-md-5">
                         <div class="hw-constant d-flex justify-content-center align-items-center">
-                            <div class="font-12">HW Constant</div>
+                            <div class="font-12">VW Constant</div>
                             <input type="number" style="max-width: 100px"
                                 class="form-control mw-100 m--margin-left-10 m--margin-right-10 flex-grow-1"
                                 [(ngModel)]="hwConstant" (ngModelChange)="calculateHWDimension()">
@@ -111,12 +111,12 @@
                     </div>
                     <div class="col-md-2 text-right">
                         <div class="form-group m-form__group">
-                            CBM: <span class="text-danger">{{totalCBM | number: '.0-3'}}</span>
+                            CBM: <span class="text-danger">{{totalCBM | number: '.0-2'}}</span>
                         </div>
                     </div>
                     <div class="col-md-3 text-right">
                         <div class="form-group m-form__group">
-                            Total H.W: <span class="text-danger">{{totalHW | number: '.0-3'}} KGS</span>
+                            Total V.W: <span class="text-danger">{{totalHW | number: '.0-2'}} KGS</span>
                         </div>
                     </div>
                 </div>
