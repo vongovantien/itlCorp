@@ -75,9 +75,13 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (office.dirty && !office.valid) || (isSubmited && !office.valid)}">
                                 <label class="form-control-label">
-                                    Office:
+                                    Office
                                     <span class="text-danger">*</span>
                                 </label>
+                                <!-- <select formControlName="office" class="form-control">
+                                    <option *ngFor="let office of officeList" [ngValue]="office">{{office.text}}
+                                    </option>
+                                </select> -->
                                 <ng-select formControlName="office" [allowClear]="true" [items]="officeList">
                                 </ng-select>
                                 <div class="form-control-feedback"
@@ -89,7 +93,7 @@
                         <div class="col-4">
                             <div class="form-group">
                                 <label class="form-control-label">
-                                    Department Type:
+                                    Department Type
                                 </label>
                                 <ng-select formControlName="departmentType" [allowClear]="false"
                                     [items]="departmentTypeList" [active]="departmentTypeActive"
@@ -100,23 +104,14 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmited && !email.valid) }">
-                                <label class="form-control-label">
-                                    Email:
-                                </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Email"
-                                    formControlName="email">
-                                <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
-                                    Max length must be less than or equal 150
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
                             <div class="form-group">
                                 <label class="form-control-label">
-                                    Status:
+                                    Status
                                 </label>
+                                <!-- <select formControlName="status" class="form-control">
+                                    <option *ngFor="let status of statusList" [ngValue]="status">{{status.title}}
+                                    </option>
+                                </select> -->
                                 <div>
                                     <app-switch [toggle]="status.value" (toggleChange)="status.setValue($event)">
                                     </app-switch>

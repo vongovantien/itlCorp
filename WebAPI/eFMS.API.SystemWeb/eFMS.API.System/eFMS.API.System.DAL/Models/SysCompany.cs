@@ -5,7 +5,7 @@ namespace eFMS.API.System.Service.Models
 {
     public partial class SysCompany
     {
-        
+
         public Guid Id { get; set; }
         public string Code { get; set; }
         public string BunameVn { get; set; }

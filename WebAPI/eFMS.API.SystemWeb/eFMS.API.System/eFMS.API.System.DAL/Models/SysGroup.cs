@@ -13,13 +13,12 @@ namespace eFMS.API.System.Service.Models
         public short ParentId { get; set; }
         public string ManagerId { get; set; }
         public string ShortName { get; set; }
-        public string Email { get; set; }
         public bool? IsSpecial { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
-        public DateTime? InactiveOn { get; set; }        
+        public DateTime? InactiveOn { get; set; }
     }
 }

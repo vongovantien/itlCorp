@@ -76,21 +76,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmitted && !email.valid) }">
-                            <label class="form-control-label">
-                                Email:
-                            </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="Email"
-                                formControlName="email">
-                            <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
-                                Max length must be less than or equal 150
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (active.dirty && !active.valid) || (isSubmitted && !active.valid)}">

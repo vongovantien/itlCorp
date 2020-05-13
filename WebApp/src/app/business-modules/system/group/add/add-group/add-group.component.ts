@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { AppPage } from 'src/app/app.base';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -23,7 +24,6 @@ export class AddGroupComponent extends AppForm implements OnInit {
     groupNameAbbr: AbstractControl;
     department: AbstractControl;
     active: AbstractControl;
-    email: AbstractControl;
     departments: any[] = [];
 
     constructor(protected _router: Router,
@@ -56,10 +56,6 @@ export class AddGroupComponent extends AppForm implements OnInit {
             department: ['', Validators.compose([
                 Validators.required
             ])],
-            email: ['',
-                Validators.compose([
-                    Validators.maxLength(150)
-                ])],
             active: [this.types[0]],
         });
 
@@ -68,7 +64,6 @@ export class AddGroupComponent extends AppForm implements OnInit {
         this.groupNameVN = this.formGroup.controls['groupNameVN'];
         this.groupNameAbbr = this.formGroup.controls['groupNameAbbr'];
         this.department = this.formGroup.controls['department'];
-        this.email = this.formGroup.controls['email'];
         this.active = this.formGroup.controls['active'];
     }
     getDepartments() {
@@ -94,8 +89,7 @@ export class AddGroupComponent extends AppForm implements OnInit {
                 nameVn: this.groupNameVN.value,
                 shortName: this.groupNameAbbr.value,
                 departmentId: this.department.value.id,
-                active: this.active.value.value,
-                email: this.email.value
+                active: this.active.value.value
             };
             this._systemRepo.addNewGroup(body)
                 .pipe(
