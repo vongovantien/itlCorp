@@ -15,7 +15,7 @@ import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChang
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
-import { GetCataloguePortAction, getCataloguePortState, getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 import { NINE } from '@angular/cdk/keycodes';
@@ -36,6 +36,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     consigneeId: AbstractControl;
     forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
+    shipmenttype: AbstractControl;
+    asArranged: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
     pol: AbstractControl;
@@ -95,6 +97,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         { id: 'Collect', text: 'Collect' },
         { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
     ];
+    shipmentTypes: CommonInterface.INg2Select[] = [
+        { id: 'Freehand', text: 'Freehand' },
+        { id: 'Nominated', text: 'Nominated' }
+    ];
     wts: CommonInterface.INg2Select[] = [
         { id: 'PP', text: 'PP' },
         { id: 'CLL', text: 'CLL' }
@@ -130,6 +136,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     isSeparate: boolean = false;
     isCollapsed: boolean = false;
     isUpdateOtherCharge: boolean = false;
+    rateChargeIsNumber: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -165,6 +172,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.currencyId.setValue([currencies.find(currency => currency.id === 'USD')]);
             })
         );
+
+
 
 
 
@@ -208,6 +217,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     });
 
         } else {
+            this.shipmenttype.setValue([this.shipmentTypes.find(sm => sm.id === 'Freehand')]);
             const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
             const currenctUser = JSON.parse(claim)["officeId"];
             this.getDetailOffice(currenctUser);
@@ -243,7 +253,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             mawb: [null, Validators.required],
             hwbno: [null, Validators.required],
             consigneeDescription: [],
-            shipperDescription: [],
+            shipperDescription: [null, Validators.required],
             forwardingAgentDescription: [],
             pickupPlace: [],
             firstCarrierBy: [],
@@ -290,11 +300,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             seaAir: [],
             route: [],
             min: [false],
+            asArranged: [false],
             showDim: [true],
+            totalArranged: [],
             // * Combogrid
             customerId: [null, Validators.required],
             saleManId: [null, Validators.required],
-            shipperId: [null, Validators.required],
+            shipperId: [],
             consigneeId: [],
             forwardingAgentId: [],
             pol: [],
@@ -308,7 +320,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             originBlnumber: [],
             wtorValpayment: [],
             otherPayment: [],
-
+            shipmenttype: [],
             // * Date
             etd: [],
             eta: [],
@@ -332,6 +344,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.pol = this.formCreate.controls["pol"];
         this.pod = this.formCreate.controls["pod"];
         this.hbltype = this.formCreate.controls["hbltype"];
+        this.shipmenttype = this.formCreate.controls["shipmenttype"];
+        this.asArranged = this.formCreate.controls["asArranged"];
         this.freightPayment = this.formCreate.controls["freightPayment"];
         this.currencyId = this.formCreate.controls["currencyId"];
         this.originBlnumber = this.formCreate.controls["originBlnumber"];
@@ -377,8 +391,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
             flightNo: !!data.flightNo ? data.flightNo : null,
+            shipmenttype: !!data.shipmentType ? [(this.shipmentTypes || []).find(type => type.id === data.shipmentType)] : null,
             dimensionDetails: []
-
         };
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
     }
@@ -611,16 +625,31 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
                 }
             );
+
+
     }
 
     onChargeWeightChange() {
+
         this.formCreate.controls['chargeWeight'].valueChanges
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                    if (typeof this.formCreate.controls["rateCharge"] === "number") {
+                        this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                    }
                 }
             );
+
+    }
+
+    onChangeRate() {
+        if (typeof this.formCreate.controls['rateCharge'].value === "number") {
+            this.rateChargeIsNumber = true;
+        } else {
+            this.rateChargeIsNumber = false;
+
+        }
     }
 
     onSeaAirChange() {
@@ -628,13 +657,26 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (!this.formCreate.controls['min'].value) {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
-                    } else {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                    if (typeof this.formCreate.controls["rateCharge"] === "number") {
+                        if (!this.formCreate.controls['min'].value) {
+                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
+                        } else {
+                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                        }
                     }
                 }
             );
+
+    }
+
+    onChangeAsArranged(value: any) {
+        if (value.target.checked) {
+            this.formCreate.controls['rateCharge'].setValue('As Arranged');
+            this.formCreate.controls['total'].setValue('As Arranged');
+        } else {
+            this.formCreate.controls['rateCharge'].setValue(null);
+            this.formCreate.controls['total'].setValue(null);
+        }
     }
 
     onChangeMin(value: any) {

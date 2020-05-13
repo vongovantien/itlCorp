@@ -180,8 +180,8 @@ namespace eFMS.API.Documentation.DL.Services
             result.Pieces = masterbill.PackageQty;
             result.Gw = masterbill.GrossWeight;
             result.Cw = masterbill.ChargeWeight;
-            result.RateCharge = masterbill.RateCharge;
-            result.Total = masterbill.Total;
+            result.RateCharge = masterbill.RateCharge?.ToString();
+            result.Total = masterbill.Total?.ToString();
             result.DesOfGood = masterbill.DesOfGoods;
             result.VolumeField = masterbill.VolumeField;
 
