@@ -8,9 +8,9 @@ namespace eFMS.API.Accounting.Service.Models
         public int Id { get; set; }
         public Guid ChargeId { get; set; }
         public string DebitAccountNo { get; set; }
-        public decimal? DebitVat { get; set; }
+        public string DebitVat { get; set; }
         public string CreditAccountNo { get; set; }
-        public decimal? CreditVat { get; set; }
+        public string CreditVat { get; set; }
         public string Type { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }

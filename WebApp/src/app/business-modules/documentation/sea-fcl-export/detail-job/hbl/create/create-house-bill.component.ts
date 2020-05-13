@@ -21,7 +21,6 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import groupBy from 'lodash/groupBy';
 
 @Component({
     selector: 'app-create-hbl-fcl-export',
@@ -271,7 +270,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+        containerDetail += " Container Onlys. SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
     }
 

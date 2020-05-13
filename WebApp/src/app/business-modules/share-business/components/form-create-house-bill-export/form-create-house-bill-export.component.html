@@ -3,8 +3,8 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
-                        <label required>MBL No</label>
+                    <div class="form-group">
+                        <label>MBL No</label>
                         <input type="text" class="form-control" formControlName="mawb">
                     </div>
                 </div>
@@ -46,13 +46,13 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !consignee.value}">
-                        <label required>Consignee</label>
+                    <div class="form-group">
+                        <label>Consignee</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consignee')"
                             [currentActiveItemId]="{ field: 'id', value: consignee.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="consignees | async"
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(consignee)"
-                            placeholder="Please select consignee" [loading]="isLoadingConsignee">
+                            placeholder="Select consignee" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>

@@ -5,7 +5,9 @@ namespace eFMS.API.Documentation.DL.Models.Exports
 {
     public class AirwayBillExportResult
     {
-        public string MawbNo { get; set; }
+        public string MawbNo1 { get; set; }
+        public string MawbNo2 { get; set; }
+        public string MawbNo3 { get; set; }
         public string AolCode { get; set; }
         public string HawbNo { get; set; }
         public string Shipper { set; get; }
