@@ -178,7 +178,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                                 issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
                                 sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
                                 issueHblplace: this.shipmmentDetail.officeLocation,
-                                onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail),
+                                onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail.polName, this.shipmmentDetail.polCountryNameEn, this.shipmmentDetail.etd),
                                 forwardingAgentDescription: this.shipmmentDetail.officeNameEn,
                                 goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
                                 moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
@@ -234,8 +234,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         return null;
     }
 
-    setDefaultOnboard(shipment: CsTransaction) {
-        return `SHIPPED ON BOARD \n${shipment.polName}, ${shipment.polCountryNameEn} \n${formatDate(shipment.eta, 'mediumDate', 'en')}`;
+    setDefaultOnboard(polName: string, country: string, etd: string) {
+        return `SHIPPED ON BOARD \n${polName}, ${country} \n${formatDate(etd, 'mediumDate', 'en')}`;
     }
 
     initForm() {
@@ -495,6 +495,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+
+                // * CHANGE POL update onBoard Status
+                this.formCreate.controls['onBoardStatus'].setValue(this.setDefaultOnboard((data as PortIndex).nameEn, (data as PortIndex).countryNameEN, this.shipmmentDetail.etd));
                 break;
             case 'pod':
                 this.pod.setValue(data.id);

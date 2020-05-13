@@ -1,4 +1,3 @@
-import { from } from 'rxjs';
 
 export * from './buying-charge/buying-charge.component';
 export * from './obh-charge/obh-charge.component';
@@ -11,7 +10,6 @@ export * from './cd-note/detail-cd-note/detail-cd-note.popup';
 
 export * from './container-import/container-import.component';
 export * from './container-list/container-list.popup';
-export * from './container-import/container-import.component';
 export * from './goods-list/goods-list.popup';
 export * from './hbl-fcl-container/hbl-fcl-container.popup';
 
@@ -25,7 +23,7 @@ export * from './shipment-good-summary/shipment-good-summary.component';
 export * from './shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 export * from './hbl-good-summary-lcl/hbl-good-summary-lcl.component';
 export * from './hbl-good-summary-fcl/hbl-good-summary-fcl.component';
-export * from './hbl-fcl-container/hbl-fcl-container.popup';
+export * from './goods-import/goods-import.component';
 
 export * from './form-create-sea-import/form-create-sea-import.component';
 export * from './form-search-sea/form-search-sea.component';

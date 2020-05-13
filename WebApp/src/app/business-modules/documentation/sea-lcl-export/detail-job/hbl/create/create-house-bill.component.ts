@@ -2,7 +2,6 @@ import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
@@ -22,6 +21,8 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import isUUID from 'validator/lib/isUUID';
+import groupBy from 'lodash/groupBy';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -70,6 +71,11 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                                 c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
+
+                        // * Update field inword with container data.
+                        if (!this.formCreateHBLComponent.isUpdate) {
+                            this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
+                        }
                     }
                 });
     }
@@ -80,20 +86,19 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                 if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                    this.permissionShipments = this._store.select(getTransactionPermission);
 
+                    this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();
                 }
             });
-
     }
 
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
-        this.formCreateHBLComponent.type = 'SLE';
-        const claim = localStorage.getItem('id_token_claims_obj');
-        const currenctUser = JSON.parse(claim)["officeId"];
+        this.formCreateHBLComponent.type = ChargeConstants.SLE_CODE;
+
+        const currenctUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS))["officeId"];
         this.getDetailOffice(currenctUser);
         this._cd.detectChanges();
     }
@@ -250,11 +255,38 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     }
                 },
             );
-
     }
 
     gotoList() {
         this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
+    }
+
+    updateInwordField(containers: Container[]) {
+        if (!containers.length) {
+            return null;
+        }
+        let containerDetail = '';
+
+        const contObject = (containers || []).map((container: Container) => ({
+            package: container.packageTypeName,
+            quantity: container.packageQuantity,
+        }));
+
+        const contData = [];
+        for (const keyName of Object.keys(groupBy(contObject, 'package'))) {
+            contData.push({
+                package: keyName,
+                quantity: groupBy(contObject, 'package')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+        for (const item of contData) {
+            containerDetail += this.handleStringPackage(item);
+        }
+        return containerDetail;
+    }
+
+    handleStringPackage(contOb: { package: string, quantity: number }) {
+        return `${this.utility.convertNumberToWords(contOb.quantity)}${contOb.package} ONLY \n`;
     }
 
 
