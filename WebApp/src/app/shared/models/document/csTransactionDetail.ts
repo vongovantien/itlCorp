@@ -102,7 +102,7 @@ export class CsTransactionDetail {
   packageQty: number = null;
   packageType: string = null;
   transactionType: string = null;
-
+  rateCharge: number = null;
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

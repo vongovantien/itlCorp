@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public decimal? Gw { get; set; }
         public decimal? Cw { get; set; }
         public decimal? RateCharge { get; set; }
-        public decimal? Total { get; set; }
+        public string Total { get; set; }
         public string DesOfGood { get; set; }
         public string VolumeField { get; set; }
         public string PrepaidTotal { get; set; }

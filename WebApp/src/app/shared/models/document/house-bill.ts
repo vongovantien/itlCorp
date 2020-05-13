@@ -55,6 +55,8 @@ export class HouseBill extends BaseModel {
     grossWeight: number = null;
     gw: number = null; // Can be deleted.
     hbltype: string = null;
+    // * Add Field Shipment Type 
+    shipmentType: string = null;
     hwbno: string = null;
     inWord: string = null;
     inactiveOn: string = null;
@@ -141,7 +143,7 @@ export class HouseBill extends BaseModel {
     transitPlaceBy2: string = null;
     issueHblplace: string = null;
     hwConstant: number = null;
-    total: number = null;
+    total: string = null;
     seaAir: number = null;
     rateCharge: number = null;
     min: boolean = false;
@@ -158,7 +160,7 @@ export class HouseBill extends BaseModel {
     permission: PermissionHouseBill = new PermissionHouseBill();
     transactionType: string = null;
     otherCharges: CsOtherCharge[] = [];
-
+    asArranged: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

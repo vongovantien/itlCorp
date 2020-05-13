@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<SysOffice> sysOfficeRepository;
+        readonly IContextBase<CsAirWayBill> airwaybillRepository;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -70,7 +71,8 @@ namespace eFMS.API.Documentation.DL.Services
             IUserPermissionService perService,
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
             IContextBase<SysOffice> sysOfficeRepo,
-            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -95,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             freighchargesRepository = freighchargesRepo;
             currencyExchangeService = currencyExchange;
             sysOfficeRepository = sysOfficeRepo;
+            airwaybillRepository = airwaybillRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -237,13 +240,16 @@ namespace eFMS.API.Documentation.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
             if (code == 403) return new HandleState(403, "");
             var transaction = mapper.Map<CsTransaction>(model);
+            transaction.UserModified = currentUser.UserID;
             transaction.DatetimeModified = DateTime.Now;
             transaction.Active = true;
             transaction.CurrentStatus = job.CurrentStatus;
-            transaction.CompanyId = job.CompanyId;
-            transaction.OfficeId = job.OfficeId;
-            transaction.DepartmentId = job.DepartmentId;
             transaction.GroupId = job.GroupId;
+            transaction.DepartmentId = job.DepartmentId;
+            transaction.OfficeId = job.OfficeId;
+            transaction.CompanyId = job.CompanyId;
+            transaction.DatetimeCreated = job.DatetimeCreated;
+            transaction.UserCreated = job.UserCreated;
 
             if (transaction.IsLocked.HasValue)
             {
@@ -252,6 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
                     transaction.LockedDate = DateTime.Now;
                 }
             }
+            var airwaybill = airwaybillRepository.Get(x => x.JobId == model.Id)?.FirstOrDefault();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -259,6 +266,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
                     if (hsTrans.Success)
                     {
+                        if(airwaybill != null)
+                        {
+                            airwaybill.IssuedBy = model.IssuedBy;
+                            airwaybill.DatetimeModified = DateTime.Now;
+                            airwaybill.UserModified = currentUser.UserID;
+                            var hsAirwayBill = airwaybillRepository.Update(airwaybill, x => x.Id == airwaybill.Id);
+                        }
                         if (model.CsMawbcontainers != null)
                         {
                             var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);

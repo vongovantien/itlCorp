@@ -488,6 +488,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         }
     }
 
+
     updateFormHW(dimensionDetails: DIM[]) {
         const dim = cloneDeep(dimensionDetails);
         if (!!dim.length) {
@@ -508,13 +509,29 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             } else {
                 totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
             }
+            totalHw = Math.round(totalHw * 100) / 100; 
             this.formGroup.patchValue({ hw: totalHw });
+            this.setDefaultChargeWeight();
 
             if (this.dimVolumePopup.isCBMChecked) {
                 this.formGroup.patchValue({ cbm: this.dimVolumePopup.totalCBM });
             }
         } else {
             this.formGroup.patchValue({ hw: null });
+        }
+    }
+    inputChanged() {
+        this.setDefaultChargeWeight();
+    }
+    setDefaultChargeWeight() {
+        if (this.type !== 'import') {
+            let grossWeight = this.formGroup.controls['grossWeight'].value;
+            let hw = this.formGroup.controls['hw'].value;
+            if (grossWeight > hw) {
+                this.formGroup.patchValue({ chargeWeight: grossWeight });
+            } else {
+                this.formGroup.patchValue({ chargeWeight: hw });
+            }
         }
     }
 }

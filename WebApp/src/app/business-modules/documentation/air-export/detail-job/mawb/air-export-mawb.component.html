@@ -419,9 +419,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>GW</label>
-                                    <input type="number" class="form-control" formControlName="grossWeight"
-                                        [decimals]="digitDecimal" numeric autoFormatCurrency>
+                                    <label>G.W</label>
+                                    <input type="number" class="form-control" formControlName="grossWeight" numeric
+                                        [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -434,7 +434,11 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>R.Class</label>
-                                    <input type="text" class="form-control" formControlName="rclass">
+                                    <!-- <input type="text" class="form-control" formControlName="rclass"> -->
+                                    <ng-select #rclass [items]="rClasses" placeholder="Please select"
+                                        [allowClear]="true" (opened)="closeOtherSelects(rclass)"
+                                        formControlName="rclass">
+                                    </ng-select>
                                 </div>
                             </div>
                         </div>
@@ -451,8 +455,8 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>C.W</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight"
-                                        [decimals]="digitDecimal" numeric numeric autoFormatCurrency>
+                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                        [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                         </div>
@@ -499,11 +503,11 @@
                                         <div class="row align-items-center">
                                             <div class="col-md-4">
                                                 HW: <span
-                                                    class="text-primary text-underline">{{totalHW | number: '.0-3' }}</span>
+                                                    class="text-primary text-underline">{{totalHW | number: '.0-2' }}</span>
                                             </div>
                                             <div class="col-md-4">
                                                 CBM: <span
-                                                    class="text-primary text-underline">{{totalCbm | number: '.0-3'}}</span>
+                                                    class="text-primary text-underline">{{totalCbm | number: '.0-2'}}</span>
                                             </div>
                                             <div class="col-md-4 text-right">
                                                 <app-switch size="sm" [toggle]="formMAWB.controls['showDim'].value"
