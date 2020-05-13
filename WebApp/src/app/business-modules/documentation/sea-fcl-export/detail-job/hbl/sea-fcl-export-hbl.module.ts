@@ -19,11 +19,11 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 const routing: Routes = [
     {
         path: '', component: SeaFCLExportHBLComponent,
-        data: { name: 'House Bill List', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
+        data: { name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
     },
     {
         path: 'new', component: SeaFCLExportCreateHBLComponent,
-        data: { name: 'New House Bill Detail', path: ':id', level: 5 }
+        data: { name: 'New House Bill', path: ':id', level: 5 }
     },
     {
         path: ':hblId', component: SeaFCLExportDetailHBLComponent,
