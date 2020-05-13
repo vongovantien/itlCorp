@@ -114,7 +114,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Rclass { get; set; }
         public string ComItemNo { get; set; }
         public string KgIb { get; set; }
-        public string RateCharge { get; set; }
+        public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public string Total { get; set; }
         public int? SeaAir { get; set; }
