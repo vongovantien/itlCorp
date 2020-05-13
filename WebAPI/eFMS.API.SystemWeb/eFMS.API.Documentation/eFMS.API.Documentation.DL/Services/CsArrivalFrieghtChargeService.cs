@@ -273,7 +273,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = new SeaArrivalNotesReport();
                         charge.HWBNO = houserBill.Hwbno?.ToUpper();
                         charge.ArrivalNo = arrival.ArrivalNo?.ToUpper();
-                        charge.ReferrenceNo = houserBill.ReferenceNo?.ToUpper();
+                        charge.ReferrenceNo = houserBill.ReferenceNo?.ToUpper() ?? string.Empty;
                         charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
                         charge.ATTN = houserBill.ShipperDescription?.ToUpper();//Shipper
                         charge.Consignee = houserBill.ConsigneeDescription?.ToUpper();
@@ -323,9 +323,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
                         charge.DOPickup = DateTime.Now;
                         charge.ExVND = frieght.ExchangeRate ?? 0;
-                        charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
-                        charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
-                        charge.DecimalNo = 2;
+                        charge.DecimalSymbol = ".";//Dấu phân cách phần thập phân
+                        charge.DigitSymbol = ",";//Dấu phân cách phần ngàn
+                        charge.DecimalNo = 3;
                         charge.CurrDecimalNo = 2;
 
                         listCharge.Add(charge);
@@ -336,7 +336,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var charge = new SeaArrivalNotesReport();
                     charge.HWBNO = houserBill.Hwbno?.ToUpper();
                     charge.ArrivalNo = arrival.ArrivalNo?.ToUpper();
-                    charge.ReferrenceNo = houserBill.ReferenceNo?.ToUpper();
+                    charge.ReferrenceNo = houserBill.ReferenceNo?.ToUpper() ?? string.Empty;
                     charge.ISSUED = DateTime.Now.ToString("dd/MM/yyyy");//Issued Date
                     charge.ATTN = houserBill.ShipperDescription?.ToUpper();//Shipper
                     charge.Consignee = houserBill.ConsigneeDescription?.ToUpper();
@@ -386,9 +386,9 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.BillType = houserBill.Hbltype; // House Bill of Lading Type
                     charge.DOPickup = DateTime.Now;
                     charge.ExVND = 0;
-                    charge.DecimalSymbol = ",";//Dấu phân cách phần ngàn
-                    charge.DigitSymbol = ".";//Dấu phân cách phần thập phân
-                    charge.DecimalNo = 2;
+                    charge.DecimalSymbol = ".";//Dấu phân cách phần thập phân
+                    charge.DigitSymbol = ",";//Dấu phân cách phần ngàn
+                    charge.DecimalNo = 3;
                     charge.CurrDecimalNo = 2;
 
                     listCharge.Add(charge);
@@ -405,7 +405,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.MAWB = houserBill != null ? houserBill.Mawb?.ToUpper() : string.Empty;
             parameter.Contact = _currentUser;
-            parameter.DecimalNo = 0;
+            parameter.DecimalNo = 3;
             parameter.CurrDecimalNo = 0;
 
             result = new Crystal
@@ -446,7 +446,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                         charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
                         charge.Consignee = _consigneeName?.ToUpper();  //Consignee
-                        charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper();
+                        charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                         charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                         charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
@@ -475,8 +475,8 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ExVND = frieght.ExchangeRate ?? 0;
                         charge.AgentName = _agentName?.ToUpper(); //Agent
                         charge.Notify = houseBill.NotifyParty?.ToUpper(); //Notify Party
-                        charge.DecimalSymbol = string.Empty;
-                        charge.DigitSymbol = string.Empty;
+                        charge.DecimalSymbol = ".";//Dấu phân cách phần thập phân
+                        charge.DigitSymbol = ",";//Dấu phân cách phần ngàn
                         charge.DecimalNo = 0; //NOT USE
                         charge.CurrDecimalNo = 0; //NOT USE
 
@@ -489,7 +489,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                     charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
                     charge.Consignee = _consigneeName?.ToUpper(); //Consignee
-                    charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper();
+                    charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                     charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                     charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
                     charge.CussignedDate = houseBill.FlightDate; //FlightDate (Arrival)
@@ -518,8 +518,8 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.ExVND = 0;
                     charge.AgentName = _agentName?.ToUpper(); //Agent
                     charge.Notify = houseBill.NotifyParty?.ToUpper();
-                    charge.DecimalSymbol = string.Empty;
-                    charge.DigitSymbol = string.Empty;
+                    charge.DecimalSymbol = ".";//Dấu phân cách phần thập phân
+                    charge.DigitSymbol = ",";//Dấu phân cách phần ngàn
                     charge.DecimalNo = 0; //NOT USE
                     charge.CurrDecimalNo = 0; //NOT USE
 
@@ -538,7 +538,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.AccountInfo = string.Empty;
             parameter.Contact = _currentUser;
-            parameter.DecimalNo = 0;
+            parameter.DecimalNo = 3;
             parameter.CurrDecimalNo = 0;
 
             result = new Crystal
