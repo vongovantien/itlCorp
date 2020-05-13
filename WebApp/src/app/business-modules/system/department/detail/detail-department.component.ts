@@ -27,7 +27,6 @@ export class DepartmentDetailComponent extends AppList {
     office: AbstractControl;
     company: AbstractControl;
     status: AbstractControl;
-    email: AbstractControl;
     officeList: any[] = [];
     officeActive: any[] = [];
     departmentType: AbstractControl;
@@ -64,6 +63,7 @@ export class DepartmentDetailComponent extends AppList {
     }
 
     ngOnInit() {
+        //this.getDeptTypes();
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.departmentId = param.id;
@@ -119,10 +119,6 @@ export class DepartmentDetailComponent extends AppList {
                     Validators.required
                 ])
             ],
-            email: ['',
-                Validators.compose([
-                    Validators.maxLength(150)
-                ])],
             company: [],
             status: [],
             departmentType: []
@@ -134,7 +130,6 @@ export class DepartmentDetailComponent extends AppList {
         this.nameAbbr = this.formDetail.controls['nameAbbr'];
         this.office = this.formDetail.controls['office'];
         this.company = this.formDetail.controls['company'];
-        this.email = this.formDetail.controls['email'];
         this.status = this.formDetail.controls['status'];
         this.departmentType = this.formDetail.controls['departmentType'];
     }
@@ -142,6 +137,7 @@ export class DepartmentDetailComponent extends AppList {
     updateDepartment() {
         this.isSubmited = true;
         if (this.formDetail.valid) {
+            console.log(this.departmentTypeActive)
             const dept: Department = {
                 id: this.departmentId,
                 code: this.departmentCode.value,
@@ -152,7 +148,6 @@ export class DepartmentDetailComponent extends AppList {
                 officeName: this.office.value[0].text,
                 companyName: '',
                 deptType: this.departmentTypeActive[0].id,
-                email: this.email.value,
                 userCreated: '',
                 datetimeCreated: '',
                 userModified: '',
@@ -163,7 +158,7 @@ export class DepartmentDetailComponent extends AppList {
                 userNameCreated: '',
                 userNameModified: ''
             };
-
+            console.log(dept);
             this._progressRef.start();
             // Update Info Department
             this._systemRepo.updateDepartment(dept)
@@ -232,6 +227,7 @@ export class DepartmentDetailComponent extends AppList {
                             this.departmentTypeActive = [this.departmentTypeList[indexDeptType]];
                         }
 
+                        console.log(this.departmentTypeActive)
                         this.formDetail.setValue({
                             departmentCode: res.code,
                             nameEn: res.deptNameEn,
@@ -240,8 +236,7 @@ export class DepartmentDetailComponent extends AppList {
                             office: this.officeActive,
                             company: res.companyName,
                             status: res.active,
-                            departmentType: this.departmentTypeActive,
-                            email: res.email
+                            departmentType: this.departmentTypeActive
                         });
 
                     } else {

@@ -129,7 +129,6 @@ namespace eFMS.API.System.DL.Services
                             DepartmentId = dept.Id,
                             ParentId = g.ParentId,
                             ManagerId = g.ManagerId,
-                            Email = g.Email,
                             UserCreated = g.UserCreated,
                             UserModified = g.UserModified,
                             DatetimeCreated = g.DatetimeCreated,

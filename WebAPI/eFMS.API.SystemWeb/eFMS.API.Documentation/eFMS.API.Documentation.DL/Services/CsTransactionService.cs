@@ -237,13 +237,16 @@ namespace eFMS.API.Documentation.DL.Services
             int code = GetPermissionToUpdate(new ModelUpdate { PersonInCharge = job.PersonIncharge, UserCreated = job.UserCreated, CompanyId = job.CompanyId, OfficeId = job.OfficeId, DepartmentId = job.DepartmentId, GroupId = job.GroupId }, permissionRange, job.TransactionType);
             if (code == 403) return new HandleState(403, "");
             var transaction = mapper.Map<CsTransaction>(model);
+            transaction.UserModified = currentUser.UserID;
             transaction.DatetimeModified = DateTime.Now;
             transaction.Active = true;
             transaction.CurrentStatus = job.CurrentStatus;
-            transaction.CompanyId = job.CompanyId;
-            transaction.OfficeId = job.OfficeId;
-            transaction.DepartmentId = job.DepartmentId;
             transaction.GroupId = job.GroupId;
+            transaction.DepartmentId = job.DepartmentId;
+            transaction.OfficeId = job.OfficeId;
+            transaction.CompanyId = job.CompanyId;
+            transaction.DatetimeCreated = job.DatetimeCreated;
+            transaction.UserCreated = job.UserCreated;
 
             if (transaction.IsLocked.HasValue)
             {
