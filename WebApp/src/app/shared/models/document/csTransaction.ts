@@ -38,7 +38,7 @@ export class CsTransaction extends BaseModel {
     pono: string = null;
     personIncharge: string = null;
     personInChargeName: string = null;
-    netWeight: number = 0;
+    netWeight: number = null;
     grossWeight: number = 0;
     chargeWeight: number = 0;
     cbm: number = 0;
@@ -74,7 +74,6 @@ export class CsTransaction extends BaseModel {
     flightDate: any = null;
     hw: number = null;
     hwConstant: number = 6000;
-    netweight: number = null;
 
     dimensionDetails: DIM[] = [];
     issuedBy: string = null;
@@ -92,14 +91,30 @@ export class CsTransaction extends BaseModel {
     warehousePodNameVn: string = null;
     warehousePolNameEn: string = null;
     warehousePolNameVn: string = null;
+    officeNameEn: string = null;
+    officeNameVn: string = null;
+    officeLocation: string = null;
+    polCountryCode: string = null;
+    polCountryNameEn: string = null;
+    polCountryNameVn: string = null;
+    agentData: AgentData = null;
 
     constructor(object?: any) {
         super();
         const self = this;
+        // tslint:disable-next-line: forin
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
             }
         }
     }
+}
+
+class AgentData {
+    nameEn: string;
+    nameVn: string;
+    tel: string;
+    fax: string;
+    address: string;
 }

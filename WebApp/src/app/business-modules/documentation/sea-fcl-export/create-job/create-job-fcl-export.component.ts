@@ -64,6 +64,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         // * Init container
         this.shipmentGoodSummaryComponent.initContainer();
         this.shipmentGoodSummaryComponent.containerPopup.isAdd = true;
+        this.shipmentGoodSummaryComponent.shipment.permission.allowUpdate = true;
         this._cdr.detectChanges();
     }
 
@@ -78,7 +79,7 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
             mawb: form.mawb,
             voyNo: form.voyNo,
             notes: form.notes,
-            personIncharge: form.personalIncharge, // TODO user with Role = CS.
+            personIncharge: form.personalIncharge,
             coloader: form.coloader,
             bookingNo: form.bookingNo,
             flightVesselName: form.flightVesselName,
