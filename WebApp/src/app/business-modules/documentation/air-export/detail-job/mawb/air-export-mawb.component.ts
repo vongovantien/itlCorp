@@ -21,6 +21,7 @@ import _cloneDeep from 'lodash/clone';
 import { Observable, throwError } from 'rxjs';
 import { map, tap, takeUntil, catchError, finalize, skip, switchMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import * as fromShareBussiness from '../../../../share-business/store';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -59,6 +60,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     mblno1: AbstractControl;
     mblno2: AbstractControl;
     mblno3: AbstractControl;
+    rclass: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -94,6 +96,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         { id: 2, text: 'Two (2)' },
         { id: 3, text: 'Three (3)' }
     ];
+    rClasses: CommonInterface.INg2Select[] = [
+        { id: 'M', text: 'M' },
+        { id: 'N', text: 'N' },
+        { id: 'Q', text: 'Q' }
+    ];
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
@@ -109,6 +116,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     isUpdateDIM: boolean = false;
     isUpdateOtherCharge: boolean = false;
 
+    shipmentDetail: CsTransaction;
 
     selectedPrepaid: boolean = false;
     selectedCollect: boolean = false;
@@ -131,8 +139,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         private _toastService: ToastrService,
         private _router: Router,
         private _progressService: NgProgress,
-        private _exportRepo: ExportRepo,
-
+        private _exportRepo: ExportRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -164,6 +171,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }
             }
         );
+        this._store.select(getTransactionDetailCsTransactionState).subscribe(
+            (shipment: CsTransaction) => {
+                this.shipmentDetail = shipment;
+            });
 
         this._activedRoute.params
             .pipe(
@@ -179,6 +190,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: AirwayBill) => {
                     console.log(res);
+                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+
                     if (!!res) {
                         console.log("Update airwaybill");
                         this.airwaybillId = res.id;
@@ -191,7 +204,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         this.updateFormValue(res);
 
                     } else {
-                        this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                        // this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                         console.log("create airwaybill");
                         this.isUpdate = false;
                         this.updateDefaultValue();
@@ -201,7 +214,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     this._router.navigate([`home/documentation/air-export`]);
                 });
     }
-
     updateDefaultValue() {
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
@@ -223,7 +235,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             issuedBy: shipment.issuedBy,
                             mblno1: shipment.coloaderCode,
                             mblno2: shipment.polCode,
-                            mblno3: !!shipment.mawb ? shipment.mawb.slice(-7) : null
+                            mblno3: !!shipment.mawb ? shipment.mawb.slice(-7) : null,
+                            rclass: [this.rClasses.find(sm => sm.id === 'Q')]
                         });
                     }
                 });
@@ -242,7 +255,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             wtorValpayment: !!data.wtorValpayment ? [(this.wts || []).find(type => type.id === data.wtorValpayment)] : null,
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
-            dimensionDetails: []
+            dimensionDetails: [],
+            rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null
 
         };
         this.formMAWB.patchValue(_merge(_cloneDeep(data), formValue));
@@ -284,11 +298,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             dueCarrierCll: [],
             totalCll: [],
             shippingMark: [],
-            issuedBy: [{ value: null, disabled: true }],
+            issuedBy: [{ value: null }],
             sci: [],
             currConvertRate: [],
             ccchargeInDrc: [],
-            desOfGoods: [],
+            desOfGoods: ['CONSOLIDATED CARGO AS PER ATTACHED MANIFEST'],
             otherCharge: [],
             packageQty: [],
             grossWeight: [],
@@ -350,6 +364,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.eta = this.formMAWB.controls["eta"];
         this.flightDate = this.formMAWB.controls["flightDate"];
         this.issuedDate = this.formMAWB.controls["issuedDate"];
+        this.rclass = this.formMAWB.controls["rclass"];
 
         this.onWTVALChange();
         this.otherPaymentChange();
@@ -382,7 +397,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
 
             cbm: this.totalCbm,
             hw: this.totalHW,
-            min: form.min
+            min: form.min,
+            rclass: !!form.rclass && !!form.rclass.length ? form.rclass[0].id : null
         };
 
         const houseBill = new AirwayBill(_merge(form, formData));
@@ -392,6 +408,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     checkValidateForm() {
         let valid: boolean = true;
         [
+            this.rclass,
             this.otherPayment,
             this.originBlnumber,
             this.currencyId,
@@ -446,15 +463,32 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this._documentationRepo.updateAirwayBill(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                finalize(() => this._progressRef.complete()),
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-
+                        this.updateShipment(Object.assign({}, this.shipmentDetail, { issuedBy: body.issuedBy }));
                     } else {
                         this._toastService.error(res.message, '');
+                    }
+                }
+            );
+    }
+
+    updateShipment(shipmentDetail: CsTransaction) {
+        const csTransaction: CsTransaction = new CsTransaction(Object.assign(shipmentDetail));
+        csTransaction.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
+        this._documentationRepo.updateCSTransaction(csTransaction)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                    } else {
                     }
                 }
             );
@@ -473,7 +507,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-
+                        this.updateShipment(Object.assign({}, this.shipmentDetail, { issuedBy: body.issuedBy }));
                     } else {
                         this._toastService.error(res.message, '');
                     }

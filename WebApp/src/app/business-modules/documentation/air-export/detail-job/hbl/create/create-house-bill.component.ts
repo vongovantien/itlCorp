@@ -191,6 +191,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         let valid: boolean = true;
 
         [this.formCreateHBLComponent.hbltype,
+        this.formCreateHBLComponent.rclass,
         this.formCreateHBLComponent.otherPayment,
         this.formCreateHBLComponent.originBlnumber,
         this.formCreateHBLComponent.currencyId,

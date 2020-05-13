@@ -295,7 +295,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             sci: [],
             currConvertRate: [],
             ccchargeInDrc: [],
-            desOfGoods: [],
+            desOfGoods: ['CONSOLIDATED CARGO AS PER ATTACHED MANIFEST'],
             otherCharge: [],
             packageQty: [],
             grossWeight: [],

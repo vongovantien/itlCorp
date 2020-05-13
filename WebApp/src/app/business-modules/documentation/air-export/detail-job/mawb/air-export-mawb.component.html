@@ -434,7 +434,11 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>R.Class</label>
-                                    <input type="text" class="form-control" formControlName="rclass">
+                                    <!-- <input type="text" class="form-control" formControlName="rclass"> -->
+                                    <ng-select #rclass [items]="rClasses" placeholder="Please select"
+                                        [allowClear]="true" (opened)="closeOtherSelects(rclass)"
+                                        formControlName="rclass">
+                                    </ng-select>
                                 </div>
                             </div>
                         </div>
