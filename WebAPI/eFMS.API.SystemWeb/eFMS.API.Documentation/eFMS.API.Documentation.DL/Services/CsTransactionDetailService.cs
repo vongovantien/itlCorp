@@ -202,6 +202,12 @@ namespace eFMS.API.Documentation.DL.Services
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
                     model.Active = true;
+                    model.GroupId = hb.GroupId;
+                    model.DepartmentId = hb.DepartmentId;
+                    model.OfficeId = hb.OfficeId;
+                    model.CompanyId = hb.CompanyId;
+                    model.DatetimeCreated = hb.DatetimeCreated;
+                    model.UserCreated = hb.UserCreated;
 
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
@@ -1815,7 +1821,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var office = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             var result = new AirwayBillExportResult();
-            result.MawbNo = hbDetail.Mawb;
+            result.MawbNo1 = hbDetail.Mawb;
             var pol = catPlaceRepo.Get(x => x.Id == hbDetail.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == hbDetail.Pod).FirstOrDefault();
             result.AolCode = pol?.Code;

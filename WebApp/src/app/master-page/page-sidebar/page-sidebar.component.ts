@@ -3,7 +3,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo } from '@repositories';
 import { Menu } from '@models';
 import { Store } from '@ngrx/store';
-import { IAppState, getClaimUserOfficeState } from '@store';
+import { IAppState } from '@store';
 
 @Component({
     selector: 'app-page-sidebar',
@@ -26,11 +26,12 @@ export class PageSidebarComponent implements OnInit, AfterViewInit {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.getMenu(this.userLogged.officeId);
 
-        this._store.select(getClaimUserOfficeState).subscribe((res: any) => {
-            if (!!res) {
-                this.getMenu(res);
-            }
-        });
+        // this._store.select(getClaimUserOfficeState).subscribe((res: any) => {
+        //     console.log(res);
+        //     if (!!res) {
+        //         this.getMenu(res);
+        //     }
+        // });
     }
 
     getMenu(officeId: string) {

@@ -380,6 +380,7 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpGet("ImportMulti")]
         public IActionResult ImportMulti()
         {

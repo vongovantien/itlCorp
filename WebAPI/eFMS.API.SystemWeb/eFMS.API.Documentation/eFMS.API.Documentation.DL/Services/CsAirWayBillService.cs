@@ -137,7 +137,9 @@ namespace eFMS.API.Documentation.DL.Services
             masterbill.OtherCharges = shipmentOtherChargeService.Get(x => x.JobId == jobId).ToList();
             
             var result = new AirwayBillExportResult();
-            result.MawbNo = masterbill.Mblno1 + masterbill.Mblno2 + masterbill.Mblno3;
+            result.MawbNo1 = masterbill.Mblno1;
+            result.MawbNo2 = masterbill.Mblno2;
+            result.MawbNo3 = masterbill.Mblno3;
             var pol = catPlaceRepo.Get(x => x.Id == masterbill.Pol).FirstOrDefault();
             var pod = catPlaceRepo.Get(x => x.Id == masterbill.Pod).FirstOrDefault();
             result.AolCode = pol?.Code;
@@ -145,7 +147,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Airline lấy từ Shipment
             var airlineId = csTransactionRepo.Get(x => x.Id == masterbill.JobId).FirstOrDefault()?.ColoaderId;
-            result.AirlineNameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.PartnerNameEn;
+            result.AirlineNameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName; // Name ABBR
             result.Consignee = masterbill.ConsigneeDescription;
 
             var _airFrieghtDa = string.Empty;
@@ -178,8 +180,8 @@ namespace eFMS.API.Documentation.DL.Services
             result.Pieces = masterbill.PackageQty;
             result.Gw = masterbill.GrossWeight;
             result.Cw = masterbill.ChargeWeight;
-            result.RateCharge = masterbill.RateCharge;
-            result.Total = masterbill.Total;
+            result.RateCharge = masterbill.RateCharge?.ToString();
+            result.Total = masterbill.Total?.ToString();
             result.DesOfGood = masterbill.DesOfGoods;
             result.VolumeField = masterbill.VolumeField;
 

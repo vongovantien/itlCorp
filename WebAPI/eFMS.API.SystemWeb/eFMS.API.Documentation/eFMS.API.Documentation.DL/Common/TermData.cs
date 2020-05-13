@@ -111,6 +111,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly List<TypeOfMove> TypeOfMoves = new List<TypeOfMove>
         {
             new TypeOfMove { Value = "FCL/FCL-CY/CY", DisplayName = "FCL/FCL-CY/CY" },
+            new TypeOfMove { Value = "LCL/LCL-CY/CY", DisplayName = "LCL/LCL-CY/CY" },
             new TypeOfMove { Value = "LCL/LCL-CFS/CFS", DisplayName = "LCL/LCL-CFS/CFS" },
             new TypeOfMove { Value = "LCL/FCL-CFS/CY", DisplayName = "LCL/FCL-CFS/CY" },
             new TypeOfMove { Value = "FCL/LCL-CY/CFS", DisplayName = "FCL/LCL-CY/CFS" }

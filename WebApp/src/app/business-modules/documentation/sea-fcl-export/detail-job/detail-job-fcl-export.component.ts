@@ -166,9 +166,11 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             );
     }
     saveJob(body: any) {
+        this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -179,8 +181,6 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
-
-
 
                     } else {
                         this._toastService.error(res.message);

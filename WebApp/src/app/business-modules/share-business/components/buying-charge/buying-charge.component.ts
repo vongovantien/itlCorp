@@ -28,8 +28,6 @@ import { AppComboGridComponent } from '@common';
     selector: 'buying-charge',
     templateUrl: './buying-charge.component.html',
     styleUrls: ['./buying-charge.component.scss'],
-
-
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
 
@@ -40,7 +38,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
-
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -1088,23 +1085,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     handleClickOutSideComboGrid(index: number, type: string) {
-        switch (type) {
-            case 'partner':
-                this.charges[index].isShowPartnerHeader = false;
-                this.widgetTargets.toArray().forEach((c, i) => {
-                    if (i === index) {
-                        c.clear();
-                    }
-                });
-                break;
-            case 'charge':
-                this.chargeContainerRef.toArray().forEach((c, i) => {
-                    if (i === index) {
-                        c.clear();
-                    }
-                });
-                break;
+        if (this.selectedIndexCharge !== -1) {
+            switch (type) {
+                case 'partner':
+                    this.charges[index].isShowPartnerHeader = false;
+                    const t = this.widgetTargets.toArray()[index];
+                    t.remove();
+                    break;
+                case 'charge':
+                    const v = this.chargeContainerRef.toArray()[index];
+                    v.remove();
+                    break;
+            }
         }
+
 
     }
 }

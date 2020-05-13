@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Description { get; set; }
         public Guid? BranchId { get; set; }
         public string DeptType { get; set; }
+        public string Email { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

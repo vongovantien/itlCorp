@@ -590,8 +590,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
         private void SetWidthColumnExcelMAWBAirExport(ExcelWorksheet workSheet)
         {
-            workSheet.Column(1).Width = 4.29 + 0.72; //Cột A
-            workSheet.Column(2).Width = 7.29 + 0.72; //Cột B
+            workSheet.Column(1).Width = 5.29 + 0.72; //Cột A
+            workSheet.Column(2).Width = 6.29 + 0.72; //Cột B
             workSheet.Column(3).Width = 5.43 + 0.72; //Cột C
             workSheet.Column(4).Width = 3.86 + 0.72; //Cột D
             workSheet.Column(5).Width = 8.86 + 0.72; //Cột E
@@ -613,18 +613,16 @@ namespace eFMS.API.ReportData.FormatExcel
             SetWidthColumnExcelMAWBAirExport(workSheet);
             workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
 
-            var _mawb1 = airwayBillExport.MawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
-            var _mawb2 = airwayBillExport.MawbNo.Substring(3, airwayBillExport.MawbNo.Length - 3).ToUpper(); //Các ký tự cuối của MAWB
-
+            var _mawb1 = airwayBillExport.MawbNo1?.ToUpper(); //3 ký tự đầu của MAWB
+            var _mawb3 = airwayBillExport.MawbNo3?.ToUpper(); //9 ký tự cuối của MAWB (Box 3)
             workSheet.Cells["A1:N1"].Style.Font.SetFromFont(new Font("Arial", 12));
             workSheet.Cells["A1:N1"].Style.Font.Bold = true;
             workSheet.Cells["A1"].Value = _mawb1; //3 ký tự đầu của MAWB
             workSheet.Cells["B1"].Value = airwayBillExport.AolCode?.ToUpper(); //Mã cảng đi
             workSheet.Cells["C1:E1"].Merge = true;
-            workSheet.Cells["C1"].Value = _mawb2; //Các ký tự cuối của MAWB
-            workSheet.Cells["L1"].Value = _mawb1 + "-"; //3 ký tự đầu của MAWB
-            workSheet.Cells["M1"].Value = _mawb2; //Các ký tự cuối của MAWB
-
+            workSheet.Cells["C1"].Value = _mawb3; //Các ký tự cuối của MAWB
+            workSheet.Cells["L1"].Value = _mawb1 + "-" + _mawb3; //3 ký tự đầu của MAWB
+            
             workSheet.Cells["A3:A12"].Style.Font.Color.SetColor(Color.DarkBlue);
 
             workSheet.Cells["A3:H6"].Style.Font.Bold = true;
@@ -674,9 +672,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["F24"].Style.Numberformat.Format = "dd-MMM-yyyy";
             workSheet.Cells["I24"].Value = airwayBillExport.IssuranceAmount?.ToUpper();
 
-            workSheet.Cells["A27"].Style.Font.Color.SetColor(Color.Red);
-            workSheet.Cells["A27"].Style.Font.Bold = true;
-            workSheet.Cells["A27"].Value = 1;
+            // workSheet.Cells["A27"].Style.Font.Color.SetColor(Color.Red);
+            // workSheet.Cells["A27"].Style.Font.Bold = true;
+            // workSheet.Cells["A27"].Value = 1;
             workSheet.Cells["B27"].Value = airwayBillExport.HandingInfo?.ToUpper(); //Handing Info
 
             workSheet.Cells["A30:I30"].Style.Font.Bold = true;
@@ -761,8 +759,7 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Row(57).Height = 42.75;
             workSheet.Cells["L" + (k + 2) + ":M" + (k + 2)].Style.Font.Bold = true;
             workSheet.Cells["L" + (k + 2) + ":M" + (k + 2)].Style.Font.Size = 12;
-            workSheet.Cells["L" + (k + 2)].Value = _mawb1 + "-";
-            workSheet.Cells["M" + (k + 2)].Value = _mawb2;
+            workSheet.Cells["L" + (k + 2)].Value = _mawb1 + "-" + _mawb3;
         }
 
         /// <summary>
@@ -817,8 +814,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells[1, 1, 100000, 14].Style.Font.SetFromFont(new Font("Arial", 10));
 
-            var _mawb1 = airwayBillExport.MawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
-            var _mawb2 = airwayBillExport.MawbNo.Substring(3, airwayBillExport.MawbNo.Length - 3).ToUpper(); //Các ký tự cuối của MAWB
+            var _mawb1 = airwayBillExport.MawbNo1?.Substring(0, 3).ToUpper(); //3 ký tự đầu của MAWB
+            var _mawb2 = airwayBillExport.MawbNo3?.ToUpper(); //Các ký tự cuối của MAWB
             var _hawb1 = airwayBillExport.HawbNo.Substring(0, 3).ToUpper(); //3 ký tự đầu của HAWB
             var _hawb2 = airwayBillExport.HawbNo.Substring(3, airwayBillExport.HawbNo.Length - 3).ToUpper(); //Các ký tự cuối của HAWB
 

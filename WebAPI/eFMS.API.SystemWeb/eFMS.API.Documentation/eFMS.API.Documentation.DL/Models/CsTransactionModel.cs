@@ -29,6 +29,22 @@ namespace eFMS.API.Documentation.DL.Models
         public string WarehousePodNameVn { get; set; }
         public string WarehousePolNameEn { get; set; }
         public string WarehousePolNameVn { get; set; }
+        public string OfficeNameEn { get; set; }
+        public string OfficeNameVn { get; set; }
+        public string OfficeLocation { get; set; }
+        public string POLCountryNameEn { get; set; }
+        public string POLCountryNameVn { get; set; }
+        public string POLCountryCode { get; set; }
+        public AgentData AgentData { get; set; }
 
+    }
+
+    public class AgentData
+    {
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
+        public string Address { get; set; }
+        public string Tel { get; set; }
+        public string Fax { get; set; }
     }
 }

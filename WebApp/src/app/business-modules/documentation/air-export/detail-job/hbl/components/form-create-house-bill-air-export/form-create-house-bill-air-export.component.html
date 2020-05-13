@@ -3,9 +3,22 @@
         <form class="m-form m-form--state" [formGroup]="formCreate">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
-                        <label required>MAWB No</label>
-                        <input type="text" class="form-control" formControlName="mawb" placeholder="Master airway bill">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
+                                <label required>HAWB No</label>
+                                <input type="text" class="form-control" formControlName="hwbno"
+                                    placeholder="House airway bill">
+                            </div>
+                        </div>
+                        <div class="col-md-6 pl-0">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !mawb.value}">
+                                <label required>MAWB No</label>
+                                <input type="text" class="form-control" formControlName="mawb"
+                                    placeholder="Master airway bill">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -33,16 +46,20 @@
             </div>
             <div class="row div-inside bg-secondary">
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperId.value}">
-                        <label required>Shipper</label>
+                    <div class="form-group">
+                        <label>Shipper</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipper')"
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value, hardValue:!!selectedCustomer ? selectedCustomer.shortName : null}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="shipppers | async"
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(shipperId)"
                             placeholder="Please select shipper">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
-                            formControlName="shipperDescription"></textarea>
+                        <div class="form-group shipper-description"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && !shipperDescription.value}">
+                            <textarea rows="7" class="form-control m-input m-input--square"
+                                formControlName="shipperDescription"></textarea>
+                        </div>
+
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -74,11 +91,12 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':isSubmitted && !hwbno.value}">
-                                <label required>HAWB No</label>
-                                <input type="text" class="form-control" formControlName="hwbno"
-                                    placeholder="House airway bill">
+                            <div class="form-group">
+                                <label>Shipment Type</label>
+                                <ng-select #shipmentType [items]="shipmentTypes" placeholder="Please select"
+                                    [allowClear]="true" (opened)="closeOtherSelects(shipmentType)"
+                                    formControlName="shipmenttype">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">
@@ -416,34 +434,6 @@
 
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>R.Class</label>
-                                <input type="text" class="form-control" formControlName="rclass">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Com Item. No</label>
-                                <input type="text" class="form-control" formControlName="comItemNo">
-
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>C.W</label>
-                                <input type="number" class="form-control" formControlName="chargeWeight"
-                                    [decimals]="digitDecimal" numeric autoFormatCurrency>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="row">
                         <div class="col-md-6 d-flex align-items-end">
                             <div class="form-group">
                                 <label class="m-checkbox m-checkbox--bold">
@@ -452,19 +442,37 @@
                                 </label>
                             </div>
                         </div>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Total</label>
-                                <input currencyMask type="text" class="form-control" formControlName="total">
+                                <label>R.Class</label>
+                                <input type="text" class="form-control" formControlName="rclass">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Rate Charge</label>
-                                <input type="number" class="form-control" formControlName="rateCharge"
+                                <label>C.W</label>
+                                <input type="number" class="form-control" formControlName="chargeWeight"
                                     [decimals]="digitDecimal" numeric autoFormatCurrency>
                             </div>
                         </div>
+
+                        <!-- Comment for change request -->
+                        <!-- <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Com Item. No</label>
+                                <input type="text" class="form-control" formControlName="comItemNo">
+
+                            </div>
+                        </div> -->
+
+                    </div>
+                    <div class="row">
+
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Sea-Air</label>
@@ -472,8 +480,41 @@
                                     [decimals]="digitDecimal" numeric autoFormatCurrency>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Total</label>
+                                <input *ngIf=" asArranged.value === false" currencyMask type="text" class="form-control"
+                                    formControlName="total">
+                                <input *ngIf=" asArranged.value === true" disabled type="text" class="form-control"
+                                    formControlName="total">
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Rate Charge</label>
+                                <input *ngIf="asArranged.value === false " autoFormatCurrency class="form-control"
+                                    formControlName="rateCharge">
+                                <input *ngIf=" asArranged.value === true" class="form-control"
+                                    formControlName="rateCharge">
+
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-group">
+                                <label class="m-checkbox m-checkbox--bold">
+                                    <input type="checkbox" (change)="onChangeAsArranged($event)"
+                                        formControlName="asArranged"> As Arranged
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-12" [class.opacity-5]="!formCreate.controls['showDim'].value">
                     <div class="row align-items-center bg-white p-2 m-0">
                         <div class="col-md-2 font-weight-bold">Volume</div>

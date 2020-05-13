@@ -5,7 +5,9 @@ namespace eFMS.API.Documentation.DL.Models.Exports
 {
     public class AirwayBillExportResult
     {
-        public string MawbNo { get; set; }
+        public string MawbNo1 { get; set; }
+        public string MawbNo2 { get; set; }
+        public string MawbNo3 { get; set; }
         public string AolCode { get; set; }
         public string HawbNo { get; set; }
         public string Shipper { set; get; }
@@ -29,8 +31,8 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public decimal? Pieces { get; set; }
         public decimal? Gw { get; set; }
         public decimal? Cw { get; set; }
-        public decimal? RateCharge { get; set; }
-        public decimal? Total { get; set; }
+        public string RateCharge { get; set; }
+        public string Total { get; set; }
         public string DesOfGood { get; set; }
         public string VolumeField { get; set; }
         public string PrepaidTotal { get; set; }

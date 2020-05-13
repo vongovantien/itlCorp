@@ -52,7 +52,7 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 
 export const routerState = createFeatureSelector<fromRouter.RouterReducerState<IRouterStateUrl>>('routerReducer');
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
-export const claimUserState = createFeatureSelector<any>('claimReducer');
+// export const claimUserState = createFeatureSelector<any>('claimReducer');
 export const menuState = createFeatureSelector<any>('menuReducer');
 
 
@@ -102,9 +102,9 @@ export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (
 export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerState) => state.show);
 
 // * CLAIM USER
-export const getClaimUserState = createSelector(claimUserState, (state: IClaimUserState) => state);
-export const getClaimUserOfficeState = createSelector(claimUserState, (state: IClaimUserState) => state && state.officeId);
-export const getClaimUserDepartGrouptate = createSelector(claimUserState, (state: IClaimUserState) => state && { departmentId: state.departmentId, groupId: state.groupId });
+// export const getClaimUserState = createSelector(claimUserState, (state: IClaimUserState) => state);
+// export const getClaimUserOfficeState = createSelector(claimUserState, (state: IClaimUserState) => state && state.officeId);
+// export const getClaimUserDepartGrouptate = createSelector(claimUserState, (state: IClaimUserState) => state && { departmentId: state.departmentId, groupId: state.groupId });
 
 // * Menu
 export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);

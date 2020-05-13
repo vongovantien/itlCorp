@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
@@ -16,6 +15,8 @@ import { catchError, takeUntil, skip, finalize, tap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
+import { formatDate } from '@angular/common';
+import { ChargeConstants } from 'src/constants/charge.const';
 @Component({
     selector: 'form-create-house-bill-export',
     templateUrl: './form-create-house-bill-export.component.html'
@@ -105,7 +106,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
-        private _spinner: NgxSpinnerService,
         private _dataService: DataService,
     ) {
         super();
@@ -167,6 +167,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         // * set default value for controls from shipment detail.
                         if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                             this.shipmmentDetail = new CsTransaction(shipment);
+
                             this.formCreate.patchValue({
                                 bookingNo: this.shipmmentDetail.bookingNo,
                                 mawb: this.shipmmentDetail.mawb,
@@ -176,7 +177,12 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                                 serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
                                 issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
                                 sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
-                                issueHblplace: localStorage.getItem(SystemConstants.CURRENT_OFFICE) || null,
+                                issueHblplace: this.shipmmentDetail.officeLocation,
+                                onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail),
+                                forwardingAgentDescription: this.shipmmentDetail.officeNameEn,
+                                goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
+                                moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
+                                originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail)
                             });
                             this.ports.subscribe(
                                 ((ports: PortIndex[]) => {
@@ -198,13 +204,38 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                                     }
                                 })
                             );
-
                         }
                     }
                 );
         }
+    }
 
+    setDefaultOriginBLNumber(shipment: CsTransaction) {
+        if (!!shipment.transactionType) {
+            if (shipment.transactionType === ChargeConstants.SFE_CODE) {
+                return [this.originNumbers[3]];
+            }
+            if (shipment.transactionType === ChargeConstants.SLE_CODE) {
+                if (shipment.mbltype === 'Original') {
+                    return [this.originNumbers[3]];
+                } else {
+                    return [this.originNumbers[1]];
+                }
+            }
+        } else {
+            return null;
+        }
+    }
 
+    setDefaultAgentData(shipment: CsTransaction) {
+        if (!!shipment.agentData) {
+            return this.getDescription(shipment.agentData.nameEn, shipment.agentData.address, shipment.agentData.tel, shipment.agentData.fax);
+        }
+        return null;
+    }
+
+    setDefaultOnboard(shipment: CsTransaction) {
+        return `SHIPPED ON BOARD \n${shipment.polName}, ${shipment.polCountryNameEn} \n${formatDate(shipment.eta, 'mediumDate', 'en')}`;
     }
 
     initForm() {
@@ -213,7 +244,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             customer: [null, Validators.required],
             saleMan: [],
             shipper: [null, Validators.required],
-            consignee: [null, Validators.required],
+            consignee: [null],
             notifyParty: [],
             country: [],
             pol: [null, Validators.required],
@@ -232,7 +263,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             issueHbldate: [],
 
             // * Input
-            mawb: [null, Validators.required],
+            mawb: [null],
             hwbno: [null, Validators.required],
             localVoyNo: [],
             finalDestinationPlace: [],
@@ -287,6 +318,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.moveType = this.formCreate.controls["moveType"];
         this.issueHbldate = this.formCreate.controls["issueHbldate"];
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
+
     }
 
     updateFormValue(data: CsTransactionDetail) {
@@ -336,12 +368,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     getSaleMans() {
         this.saleMans = this._systemRepo.getListSystemUser();
-
-        // this._catalogueRepo.getListSaleManDetail(null, this.type).pipe(catchError(this.catchError))
-        //     .subscribe((res: any) => {
-        //         this.listSaleMan = res || [];
-        //         // this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
-        //     });
     }
 
     getDescription(fullName: string, address: string, tel: string, fax: string) {
@@ -353,10 +379,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             strDescription = strDescription + "\n" + address;
         }
         if (!!tel) {
-            strDescription = strDescription + "\nTel No:" + tel;
+            strDescription = strDescription + "\nTel: " + tel;
         }
         if (!!fax) {
-            strDescription = strDescription + "\nFax No:" + fax;
+            strDescription = strDescription + "\nFax: " + fax;
         }
         return strDescription;
     }
@@ -371,9 +397,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
 
         } else {
-            this._spinner.show();
             this._documentRepo.getShipmentDataCommon()
-                .pipe(catchError(this.catchError), finalize(() => this._spinner.hide()))
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (commonData: any) => {
                         this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
@@ -382,11 +407,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
 
                         this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-
                     }
                 );
         }
-
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {

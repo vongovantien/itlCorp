@@ -453,6 +453,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
+                entity.Property(e => e.Email).HasMaxLength(150);
+
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.UserCreated)
@@ -2073,7 +2075,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.RateCharge).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.RateCharge)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Rclass)
                     .HasColumnName("RClass")
@@ -2098,6 +2102,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ServiceType).HasMaxLength(160);
 
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShipperDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ShipperId)
@@ -2115,7 +2123,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("TAXPP")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Total)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.TotalCll)
                     .HasColumnName("TotalCLL")
