@@ -202,6 +202,12 @@ namespace eFMS.API.Documentation.DL.Services
                     model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
                     model.Active = true;
+                    model.GroupId = hb.GroupId;
+                    model.DepartmentId = hb.DepartmentId;
+                    model.OfficeId = hb.OfficeId;
+                    model.CompanyId = hb.CompanyId;
+                    model.DatetimeCreated = hb.DatetimeCreated;
+                    model.UserCreated = hb.UserCreated;
 
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
