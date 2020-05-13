@@ -58,11 +58,13 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             if (param.hblId && isUUID(param.hblId)) {
                 this.hblId = param.hblId;
                 this.jobId = param.jobId;
+
                 this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
-                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
-                this.getDetailHbl();
 
+                this.permissionHblDetail = this._store.select(fromShareBussiness.getDetailHBlPermissionState);
+
+                this.getDetailHbl();
 
             } else {
                 this.gotoList();
@@ -71,6 +73,7 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
     }
 
+    // ! Override ngAfterViewInit in SeaFCLExportCreateHBLComponent
     ngAfterViewInit() {
 
     }
@@ -88,7 +91,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
                         this.hblDetail = res;
                         // * Dispatch to save containers.
                         this._store.dispatch(new fromShareBussiness.GetContainersHBLSuccessAction(res.csMawbcontainers || []));
-
 
                         // * Get container to update model
                         this.getListContainer();
