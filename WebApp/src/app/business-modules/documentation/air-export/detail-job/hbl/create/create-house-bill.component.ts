@@ -113,7 +113,9 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             hwConstant: this.formCreateHBLComponent.hwconstant,
             min: form.min,
             warehouseId: form.warehouseId,
-            shipmentType: !!form.shipmenttype && !!form.shipmenttype.length ? form.shipmenttype[0].id : null
+            shipmentType: !!form.shipmenttype && !!form.shipmenttype.length ? form.shipmenttype[0].id : null,
+            asArranged: form.asArranged,
+            rateCharge: form.asArranged ? form.rateChargeAs : form.rateCharge
         };
 
         const houseBill = new HouseBill(_merge(form, formData));

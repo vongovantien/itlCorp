@@ -160,7 +160,7 @@ export class HouseBill extends BaseModel {
     permission: PermissionHouseBill = new PermissionHouseBill();
     transactionType: string = null;
     otherCharges: CsOtherCharge[] = [];
-
+    asArranged: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;
