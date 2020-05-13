@@ -483,9 +483,9 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Total</label>
-                                <input *ngIf=" rateChargeIsNumber" currencyMask type="text" class="form-control"
+                                <input *ngIf=" asArranged.value === false" currencyMask type="text" class="form-control"
                                     formControlName="total">
-                                <input disabled *ngIf=" !rateChargeIsNumber" type="text" class="form-control"
+                                <input *ngIf=" asArranged.value === true" disabled type="text" class="form-control"
                                     formControlName="total">
                             </div>
                         </div>
@@ -496,9 +496,10 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Rate Charge</label>
-                                <input onChange="onChangeRate()" *ngIf="rateChargeIsNumber" autoFormatCurrency
-                                    class="form-control" formControlName="rateCharge">
-                                <input *ngIf="!rateChargeIsNumber" class="form-control" formControlName="rateCharge">
+                                <input *ngIf="asArranged.value === false " autoFormatCurrency class="form-control"
+                                    formControlName="rateCharge">
+                                <input *ngIf=" asArranged.value === true" class="form-control"
+                                    formControlName="rateCharge">
 
                             </div>
                         </div>
