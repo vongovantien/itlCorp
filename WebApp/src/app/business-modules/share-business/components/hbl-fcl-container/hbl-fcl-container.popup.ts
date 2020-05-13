@@ -1,20 +1,20 @@
 import { Component, ChangeDetectorRef, ViewChild, Input, forwardRef, EventEmitter, Output } from '@angular/core';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { IContainerState } from '@share-bussiness';
+import { IContainerState, ShareContainerImportComponent } from '@share-bussiness';
 import { ConfirmPopupComponent } from '@common';
 import { Unit, Commodity, Container } from '@models';
 import { CommonEnum } from '@enums';
+import { NgxSpinnerService } from 'ngx-spinner';
 
-import { getContainerSaveState, DeleteContainerAction, SaveContainerAction } from '../../store';
+import { DeleteContainerAction, SaveContainerAction, getHBLContainersState } from '../../store';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
-import { ShareContainerImportComponent } from '../container-import/container-import.component';
 
 import cloneDeep from 'lodash/cloneDeep';
-import { takeUntil, catchError } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -49,13 +49,15 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
     selectedIndexContainer: number = -1;
 
     defaultWeightUnit: Unit = null;
-
+    spinnerContainer: string = 'spinnerContainer';
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<IContainerState>,
         protected cdRef: ChangeDetectorRef,
         protected _sortService: SortService,
         protected _toastService: ToastrService,
+        protected _documentRepo: DocumentationRepo,
+        protected _spinner: NgxSpinnerService
     ) {
         super();
 
@@ -67,16 +69,16 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         this.cdRef.detectChanges(); // * tell ChangeDetect update view in app-table-header (field required).
         this.getMasterData();
 
-        // * GET DATA FROM STORE.
-        this._store.select(getContainerSaveState)
+        // * GET DATA CONTAINER FROM STORE.
+        this._store.select(getHBLContainersState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: IContainerState | any) => {
+                    console.log(res);
                     this.containers = res;
                     this.initContainers = cloneDeep(res);
                 }
             );
-
     }
 
     configHeader() {
@@ -309,4 +311,20 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         this.isDuplicateContPakage = false;
     }
 
+    syncShipment() {
+        if (!!this.mblid) {
+            this._spinner.show(this.spinnerContainer);
+            this._documentRepo.getListContainersOfJob({ mblid: this.mblid })
+                .pipe(finalize(() => this._spinner.hide(this.spinnerContainer)))
+                .subscribe(
+                    (res: Container[]) => {
+                        this.initContainers.length = 0;
+                        this.initContainers = [...res];
+                    }
+                );
+
+        } else {
+            console.error("not found mblId");
+        }
+    }
 }
