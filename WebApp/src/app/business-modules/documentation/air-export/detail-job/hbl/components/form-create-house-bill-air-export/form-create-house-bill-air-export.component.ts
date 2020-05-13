@@ -37,6 +37,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
     shipmenttype: AbstractControl;
+    rclass: AbstractControl;
     asArranged: AbstractControl;
     etd: AbstractControl;
     eta: AbstractControl;
@@ -110,6 +111,12 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         { id: 1, text: 'One (1)' },
         { id: 2, text: 'Two (2)' },
         { id: 3, text: 'Three (3)' }
+    ];
+
+    rClasses: CommonInterface.INg2Select[] = [
+        { id: 'M', text: 'M' },
+        { id: 'N', text: 'N' },
+        { id: 'Q', text: 'Q' }
     ];
 
     selectedIndexDIM: number = -1;
@@ -218,6 +225,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
         } else {
             this.shipmenttype.setValue([this.shipmentTypes.find(sm => sm.id === 'Freehand')]);
+            this.rclass.setValue([this.rClasses.find(sm => sm.id === 'Q')]);
             const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
             const currenctUser = JSON.parse(claim)["officeId"];
             this.getDetailOffice(currenctUser);
@@ -360,6 +368,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.forwardingAgentDescription = this.formCreate.controls["forwardingAgentDescription"];
         this.dimensionDetails = <FormArray>this.formCreate.controls["dimensionDetails"];
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
+        this.rclass = this.formCreate.controls["rclass"];
         this.formCreate.get('dimensionDetails')
             .valueChanges
             .pipe(
@@ -392,6 +401,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
             flightNo: !!data.flightNo ? data.flightNo : null,
             shipmenttype: !!data.shipmentType ? [(this.shipmentTypes || []).find(type => type.id === data.shipmentType)] : null,
+            rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null,
             dimensionDetails: []
         };
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));

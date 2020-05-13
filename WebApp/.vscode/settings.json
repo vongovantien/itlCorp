@@ -1,3 +1,4 @@
 {
-    "editor.semanticHighlighting.enabled": false
+    "editor.semanticHighlighting.enabled": false,
+    "explorer.autoReveal": true
 }
