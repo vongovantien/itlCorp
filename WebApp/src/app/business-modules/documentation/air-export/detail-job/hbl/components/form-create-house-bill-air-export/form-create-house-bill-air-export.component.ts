@@ -303,7 +303,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             dueCarrierCll: [],
             totalCll: [],
             shippingMark: [],
-            issuedBy: [{ value: null, disabled: true }],
+            issuedBy: [{ value: null }],
             sci: [],
             currConvertRate: [],
             ccchargeInDrc: [],
@@ -667,13 +667,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-
-                    if (!this.formCreate.controls['min'].value) {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
-                    } else {
-                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                    if (this.formCreate.controls["rateCharge"].value == Number(this.formCreate.controls["rateCharge"].value)) {
+                        if (!this.formCreate.controls['min'].value) {
+                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
+                        } else {
+                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
+                        }
                     }
-
                 }
             );
 
