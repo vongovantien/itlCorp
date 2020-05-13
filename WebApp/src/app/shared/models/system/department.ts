@@ -9,7 +9,6 @@ export class Department {
     companyName: string = '';
     companyId: string = null;
     deptType: string = '';
-    email: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
     userModified: string = '';

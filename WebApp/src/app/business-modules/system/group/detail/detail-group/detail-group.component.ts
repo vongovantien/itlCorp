@@ -37,7 +37,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
     department: AbstractControl;
     officeName: AbstractControl;
     companyName: AbstractControl;
-    email: AbstractControl;
     active: AbstractControl;
     group: Group = null;
     userHeaders: CommonInterface.IHeaderTable[];
@@ -109,8 +108,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             department: this.departments.filter(i => i.id === res.departmentId)[0] || null,
             active: this.types.filter(i => i.value === res.active)[0] || [],
             companyName: res.companyName,
-            officeName: res.officeName,
-            email: res.email
+            officeName: res.officeName
         });
     }
 
@@ -137,10 +135,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
             companyName: [{ value: '', disabled: true }, Validators.compose([
                 Validators.required
             ])],
-            email: ['',
-                Validators.compose([
-                    Validators.maxLength(150)
-                ])],
             active: [this.types[0], Validators.compose([
                 Validators.required
             ])],
@@ -153,7 +147,6 @@ export class GroupDetailComponent extends AppForm implements OnInit {
         this.department = this.formGroup.controls['department'];
         this.officeName = this.formGroup.controls['officeName'];
         this.companyName = this.formGroup.controls['companyName'];
-        this.email = this.formGroup.controls['email'];
         this.active = this.formGroup.controls['active'];
     }
 
@@ -190,8 +183,7 @@ export class GroupDetailComponent extends AppForm implements OnInit {
                 userCreated: this.group.userCreated,
                 datetimeCreated: this.group.datetimeCreated,
                 userModified: this.group.userModified,
-                datetimeModified: this.group.datetimeModified,
-                email: this.email.value
+                datetimeModified: this.group.datetimeModified
             };
             this._systemRepo.updateGroup(body)
                 .pipe(
