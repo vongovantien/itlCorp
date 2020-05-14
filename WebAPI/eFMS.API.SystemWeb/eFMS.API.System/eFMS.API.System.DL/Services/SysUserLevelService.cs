@@ -158,21 +158,13 @@ namespace eFMS.API.System.DL.Services
                     var hsUser = new HandleState();
                     foreach (var item in users)
                     {
-                        //if (item.Id != 0)
-                        //{
-                        //    item.UserModified = currentUser.UserID;
-                        //    item.DatetimeModified = DateTime.Now;
-                        //    hsUser = DataContext.Update(item, x => x.Id == item.Id);
-                        //}
-                        //else
-                        //{
-                        //    item.Active = true;
-                        //    item.GroupId = item.GroupId == 0 ? SystemConstants.SpecialGroup : item.GroupId;
-                        //    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
-                        //    item.UserCreated = item.UserModified = currentUser.UserID;
-                        //    hsUser = DataContext.Add(item, true);
-                        //}
-                        if(item.Id == 0)
+                        if (item.Id != 0)
+                        {
+                            item.UserModified = currentUser.UserID;
+                            item.DatetimeModified = DateTime.Now;
+                            hsUser = DataContext.Update(item, x => x.Id == item.Id);
+                        }
+                        else
                         {
                             item.Active = true;
                             item.GroupId = item.GroupId == 0 ? SystemConstants.SpecialGroup : item.GroupId;
