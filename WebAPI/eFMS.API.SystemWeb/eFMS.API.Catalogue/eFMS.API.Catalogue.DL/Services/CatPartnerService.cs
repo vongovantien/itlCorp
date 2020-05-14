@@ -496,7 +496,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 CompanyId = x.partner.CompanyId,
                 DepartmentId = x.partner.DepartmentId,
                 GroupId = x.partner.GroupId,
-                OfficeId = x.partner.OfficeId
+                OfficeId = x.partner.OfficeId,
+                Active = x.partner.Active
             });
             return results;
         }
