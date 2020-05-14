@@ -503,6 +503,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     onChangeQuantityHint(hintType: string, chargeItem: CsShipmentSurcharge) {
         switch (hintType) {
             case CommonEnum.QUANTITY_TYPE.GW:
+                // * Update UnitPrice to KGS
+                chargeItem = this.updateUnitSurcharge(chargeItem, 'KGS');
                 if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         chargeItem.quantity = this.shipment.grossWeight;
@@ -545,6 +547,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
                 break;
             case CommonEnum.QUANTITY_TYPE.CW:
+                // * Update UnitPrice to KGS
+
+                chargeItem = this.updateUnitSurcharge(chargeItem, 'KGS');
+
                 if (this.service === 'air') {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         chargeItem.quantity = this.shipment.chargeWeight;

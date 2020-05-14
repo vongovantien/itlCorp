@@ -143,8 +143,7 @@
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
                                             <input type="number" class="form-control" [(ngModel)]="charge.quantity"
-                                                placeholder="Quantity"
-                                                (ngModelChange)="onChangeQuantity($event, charge)"
+                                                placeholder="Quantity" (ngModelChange)="onChangeDataUpdateTotal(charge)"
                                                 [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
                                                 numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
@@ -159,7 +158,7 @@
                                             </ng-container>
                                             <ng-template #qtyHint>
                                                 <select class="form-control border" [(ngModel)]="charge.quantityType"
-                                                    (ngModelChange)="onChangeDataUpdateTotal(charge)">
+                                                    (ngModelChange)="onChangeQuantityHint($event,charge)">
                                                     <option value="null">-</option>
                                                     <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
                                                         {{hint.displayName}}</option>
