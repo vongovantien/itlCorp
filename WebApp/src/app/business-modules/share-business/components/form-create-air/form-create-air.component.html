@@ -250,14 +250,15 @@
                                 <div class="form-group">
                                     <label>GW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="grossWeight"
-                                        placeholder="Gross weight" numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                        (input)="inputChanged()" placeholder="Gross weight" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                        [decimals]="digitDecimal" autoFormatCurrency>
+                                        [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                         </div>
@@ -267,15 +268,15 @@
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label>CBM</label>
-                                    <input type="number" class="form-control" formControlName="cbm" numeric
-                                        [decimals]="digitDecimal" autoFormatCurrency>
+                                    <input type="number" class="form-control" formControlName="cbm" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group">
-                                    <label>HW</label>
-                                    <input type="number" class="form-control" formControlName="hw" numeric
-                                        [decimals]="digitDecimal" autoFormatCurrency>
+                                    <label>VW</label>
+                                    <input type="number" class="form-control" formControlName="hw" numeric [decimals]=2
+                                        [digitNumbers]="2" autoFormatDecimal>
                                 </div>
                             </div>
                             <ng-container *ngIf="!shipmentDetail.isLocked">
@@ -331,7 +332,7 @@
                                     <input type="text" class="form-control" formControlName="issuedBy">
                                 </div>
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-12" *ngIf="type === 'import'">
                                 <div class="form-group">
                                     <label>Route</label>
                                     <input type="text" class="form-control" formControlName="route">

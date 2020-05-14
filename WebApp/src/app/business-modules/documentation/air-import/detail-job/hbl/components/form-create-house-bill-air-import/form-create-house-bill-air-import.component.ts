@@ -2,11 +2,11 @@ import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel } from '@models';
+import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel, Unit } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
-import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, GetCatalogueWarehouseAction, getCatalogueWarehouseState, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
 
 import { AppForm } from 'src/app/app.form';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState } from 'src/app/business-modules/share-business/store';
@@ -84,7 +84,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     isLoadingPort: Observable<boolean>;
     units: any[] = [];
-    ngDataUnit: any = [];
+    ngDataUnit: CommonInterface.INg2Select[];
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -144,14 +144,15 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             { id: '3', text: 'Three (3)' }
         ];
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
+        this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueWarehouseAction());
         this.warehouses = this._store.select(getCatalogueWarehouseState);
 
+        this.getUnit();
         this.getCustomers();
         this.getPorts();
         // this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
         this.getSalesman();
-        this.getUnit();
         this.getShipper();
         this.getConsignee();
         this.getNotify();
@@ -177,13 +178,21 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                 forwardingAgentId: shipment.agentId,
                                 arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                                 warehouseId: shipment.warehouseId,
-                                route: shipment.route
+                                route: shipment.route,
+                                packageQty: shipment.packageQty,
+                                grossWeight: shipment.grossWeight,
+                                chargeWeight: shipment.chargeWeight,
                             });
-
+                            setTimeout(() => {
+                                if (!!shipment.packageType) {
+                                    this.formCreate.patchValue({ packageType: [this.ngDataUnit.find(u => u.id === +shipment.packageType)] });
+                                }
+                            }, 500);
                             this._dataService.setDataService("podName", shipment.warehousePodNameVn || "");
                         }
                     }
                 );
+            this.desOfGoods.setValue("AS PER BILL");
         } else {
             this._store.select(getDetailHBlState)
                 .pipe(
@@ -236,13 +245,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getUnit() {
-        this._catalogueRepo.getUnit({ active: true }).subscribe((res: any) => {
-            if (!!res) {
-                const units = res;
-                this.ngDataUnit = units.map(x => ({ text: x.unitNameEn, id: x.id }));
-            }
-
-        });
+        this._store.select(getCatalogueUnitState).subscribe(
+            ((units: Unit[]) => {
+                this.ngDataUnit = this.utility.prepareNg2SelectData(units, 'id', 'code');
+            }),
+        );
     }
 
     initForm() {

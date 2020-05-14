@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
-import { Params } from '@angular/router';
+import { Params, ActivatedRoute } from '@angular/router';
 
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -11,8 +11,7 @@ import { catchError, skip } from 'rxjs/operators';
 import _groupBy from 'lodash/groupBy';
 
 import * as fromStore from '../../store';
-import { getParamsRouterState } from 'src/app/store';
-import { GetContainerAction } from '../../store';
+
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
 import { ShareBussinessHBLFCLContainerPopupComponent } from '../hbl-fcl-container/hbl-fcl-container.popup';
@@ -50,10 +49,13 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
 
     isSave: boolean = false;
 
+    jobId: string;
+
     constructor(
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _activedRoute: ActivatedRoute
     ) {
         super();
 
@@ -62,18 +64,16 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             .subscribe(
                 (units: Unit[]) => { this.packages = units || []; }
             );
-
     }
 
     ngOnInit() {
-        this._store.select(getParamsRouterState).subscribe(
+        this._activedRoute.params.subscribe(
             (p: Params) => {
-                if (p['hblId'] !== null) {
-                    this.hblid = p['hblId'];
-                    this.mblid = null;
-                } else {
+                if (p.jobId) {
                     this.mblid = p['jobId'];
-                    this.hblid = null;
+                }
+                if (p.hblId) {
+                    this.hblid = p['hblId'];
                 }
             }
         );
@@ -182,21 +182,12 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.containerPopup.mblid = this.mblid;
         this.containerPopup.hblid = this.hblid;
 
-        if ((!!this.hblid) && !this.isSave) {
-            this._store.dispatch(new GetContainerAction({ hblId: this.hblid }));
-        } else {
-            if ((!!this.mblid) && !this.isSave) {
-                this._store.dispatch(new GetContainerAction({ mblid: this.mblid }));
-            }
-        }
-
         this.containerPopup.show();
     }
 
     refresh() {
         this.confirmRefresh.show();
     }
-
 
     handleStringContSeal(contNo: string = '', contType: string = '', sealNo: string = '') {
         return `${!!contNo ? contNo + '/' : ''}${!!contType ? contType : ''}${!!sealNo ? '/' : ''}${!!sealNo ? sealNo : ''}\n`;

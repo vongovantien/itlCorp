@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<SysOffice> sysOfficeRepository;
+        readonly IContextBase<CsAirWayBill> airwaybillRepository;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -70,7 +71,8 @@ namespace eFMS.API.Documentation.DL.Services
             IUserPermissionService perService,
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
             IContextBase<SysOffice> sysOfficeRepo,
-            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -95,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             freighchargesRepository = freighchargesRepo;
             currencyExchangeService = currencyExchange;
             sysOfficeRepository = sysOfficeRepo;
+            airwaybillRepository = airwaybillRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -255,6 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
                     transaction.LockedDate = DateTime.Now;
                 }
             }
+            var airwaybill = airwaybillRepository.Get(x => x.JobId == model.Id)?.FirstOrDefault();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -262,6 +266,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
                     if (hsTrans.Success)
                     {
+                        if(airwaybill != null)
+                        {
+                            airwaybill.IssuedBy = model.IssuedBy;
+                            airwaybill.DatetimeModified = DateTime.Now;
+                            airwaybill.UserModified = currentUser.UserID;
+                            var hsAirwayBill = airwaybillRepository.Update(airwaybill, x => x.Id == airwaybill.Id);
+                        }
                         if (model.CsMawbcontainers != null)
                         {
                             var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);

@@ -2075,9 +2075,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.RateCharge)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
+                entity.Property(e => e.RateCharge).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Rclass)
                     .HasColumnName("RClass")

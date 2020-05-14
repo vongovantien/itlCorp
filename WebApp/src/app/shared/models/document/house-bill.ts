@@ -145,7 +145,7 @@ export class HouseBill extends BaseModel {
     hwConstant: number = null;
     total: string = null;
     seaAir: number = null;
-    rateCharge: string = null;
+    rateCharge: number = null;
     min: boolean = false;
     kgIb: number = null;
     rclass: number = null;
@@ -160,7 +160,7 @@ export class HouseBill extends BaseModel {
     permission: PermissionHouseBill = new PermissionHouseBill();
     transactionType: string = null;
     otherCharges: CsOtherCharge[] = [];
-
+    asArranged: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

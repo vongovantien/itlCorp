@@ -87,8 +87,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                     this.jobId = param.jobId;
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                    // * Get default containers from masterbill.
-                    this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                    // * Get default containers from masterbill and dispatch for hbl container state.
+                    this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ mblid: this.jobId }));
                     this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();

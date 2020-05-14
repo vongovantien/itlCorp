@@ -42,8 +42,8 @@
                                     Department Code:
                                     <!-- <span class="text-danger">*</span> -->
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="Department code" formControlName="departmentCode" disabled>
+                                <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                    formControlName="departmentCode" disabled>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (departmentCode.errors | equalError: 'required') || (departmentCode.errors | equalError: 'required') && departmentCode.dirty">
                                     Department code is required!
@@ -61,7 +61,7 @@
                                     Name EN:
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Name EN"
+                                <input type="text" class="form-control m-input m-input--square" placeholder=""
                                     formControlName="nameEn">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (nameEn.errors | equalError: 'required') || (nameEn.errors | equalError: 'required') && nameEn.dirty">
@@ -76,7 +76,7 @@
                                     Name Local:
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Name Local"
+                                <input type="text" class="form-control m-input m-input--square" placeholder=""
                                     formControlName="nameLocal">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (nameLocal.errors | equalError: 'required') || (nameLocal.errors | equalError: 'required') && nameLocal.dirty">
@@ -93,7 +93,7 @@
                                     Name Abbr:
                                     <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Name Abbr"
+                                <input type="text" class="form-control m-input m-input--square" placeholder=""
                                     formControlName="nameAbbr">
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmited && (nameAbbr.errors | equalError: 'required') || (nameAbbr.errors | equalError: 'required') && nameAbbr.dirty">
@@ -105,14 +105,9 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (office.dirty && !office.valid) || (isSubmited && !office.valid)}">
                                 <label class="form-control-label">
-                                    Office
+                                    Office:
                                     <span class="text-danger">*</span>
                                 </label>
-                                <!-- <select formControlName="office" class="form-control">
-                                    <option *ngFor="let office of officeList" [ngValue]="office">
-                                        {{office.text}}
-                                    </option>
-                                </select> -->
                                 <ng-select formControlName="office" [allowClear]="true" [items]="officeList"
                                     [disabled]="isReadonly | async">
                                 </ng-select>
@@ -135,7 +130,7 @@
                     <div class="row">
                         <div class="col-4" *ngIf="!!department">
                             <div class="form-group">
-                                <label class="form-control-label">Department Type</label>
+                                <label class="form-control-label">Department Type:</label>
                                 <ng-select formControlName="departmentType" [allowClear]="false"
                                     [items]="departmentTypeList" [active]="departmentTypeActive"
                                     (selected)="onSelectDataFormInfo($event, 'deptType')">
@@ -143,12 +138,21 @@
                             </div>
                         </div>
                         <div class="col-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmited && !email.valid) }">
+                                <label class="form-control-label">
+                                    Email:
+                                </label>
+                                <input type="text" class="form-control m-input m-input--square" placeholder="Email"
+                                    formControlName="email">
+                                <div class="form-control-feedback" *ngIf="email.errors | equalError: 'maxlength'">
+                                    Max length must be less than or equal 150
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
                             <div class="form-group">
-                                <label class="form-control-label">Status</label>
-                                <!-- <select formControlName="status" class="form-control">
-                                    <option *ngFor="let status of statusList" [ngValue]="status">{{status.title}}
-                                    </option>
-                                </select> -->
+                                <label class="form-control-label">Status:</label>
                                 <div>
                                     <app-switch [toggle]="status.value" (toggleChange)="status.setValue($event)">
                                     </app-switch>

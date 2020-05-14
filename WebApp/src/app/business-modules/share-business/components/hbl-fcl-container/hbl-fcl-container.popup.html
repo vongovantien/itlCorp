@@ -26,6 +26,16 @@
                         </div>
                     </div>
                     <div class="col-md-8 text-right">
+                        <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                            title="Sync" (click)="syncShipment()">
+                            <span>
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Sync Shipment
+                                </span>
+                            </span>
+                        </button>
+
                         <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                             *ngIf="hblid != null || mblid != null" title="Import" (click)="showImportPopup()">
                             <span>
@@ -208,9 +218,14 @@
 
                                 </tr>
                             </ng-container>
-                            <tr *ngIf="!initContainers.length" app-table-none-record [colspan]="headers.length  + 1">
+                            <tr *ngIf="!isLoading && !initContainers.length" app-table-none-record
+                                [colspan]="headers.length  + 1">
                             </tr>
+                            <ngx-spinner bdColor="rgba(242,222,223,0.3)" [name]="spinnerContainer" [fullScreen]="false"
+                                type="ball-spin-clockwise" size="medium">
+                            </ngx-spinner>
                         </tbody>
+
                     </table>
                 </div>
 

@@ -21,8 +21,7 @@ import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission } from 'src/app/business-modules/share-business';
-import groupBy from 'lodash/groupBy';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission } from '@share-bussiness';
 import { DataService } from '@services';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -49,7 +48,6 @@ export class CreateHouseBillComponent extends AppForm {
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
-    allowAdd: boolean = false;
 
     constructor(
         protected _progressService: NgProgress,
@@ -93,11 +91,11 @@ export class CreateHouseBillComponent extends AppForm {
                 this.jobId = param.jobId;
                 this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                // TODO use async pipe not subscribe;
-                this.getDetailShipmentPermission();
-                // * Get default containers from masterbill.
-                this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
+                // * Get default containers from masterbill dispatch to hbl container state.
+                this._store.dispatch(new fromShareBussiness.GetContainersHBLAction({ mblid: this.jobId }));
+
                 this.permissionShipments = this._store.select(getTransactionPermission);
+
                 this.getDetailShipment();
             } else {
                 this.combackToHBLList();
@@ -207,20 +205,6 @@ export class CreateHouseBillComponent extends AppForm {
         this.importHouseBillPopup.typeFCL = 'Import';
         this.importHouseBillPopup.getHourseBill(dataSearch);
         this.importHouseBillPopup.show();
-    }
-
-    getDetailShipmentPermission() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionPermissionState)
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.allowAdd = res.allowUpdate;
-                    }
-                },
-            );
     }
 
     combackToHBLList() {
