@@ -233,25 +233,25 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             this._store.select(getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
                     tap(
-                    (shipment: CsTransaction) => {
-                        // * set default value for controls from shipment detail.
-                        if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                            this.shipmentDetail = new CsTransaction(shipment);
-                            this.jobId = this.shipmentDetail.id;
-                            this.hwconstant = this.shipmentDetail.hwConstant;
-                            this.formCreate.patchValue({
-                                mawb: shipment.mawb,
-                                pod: shipment.pod,
-                                pol: shipment.pol,
-                                etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
-                                eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                                flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
-                                flightNo: shipment.flightVesselName,
-                                warehouseId: shipment.warehouseId,
-                                firstCarrierBy: shipment.flightVesselName
-                            });
+                        (shipment: CsTransaction) => {
+                            // * set default value for controls from shipment detail.
+                            if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                                this.shipmentDetail = new CsTransaction(shipment);
+                                this.jobId = this.shipmentDetail.id;
+                                this.hwconstant = this.shipmentDetail.hwConstant;
+                                this.formCreate.patchValue({
+                                    mawb: shipment.mawb,
+                                    pod: shipment.pod,
+                                    pol: shipment.pol,
+                                    etd: !!shipment.etd ? { startDate: new Date(shipment.etd), endDate: new Date(shipment.etd) } : null,
+                                    eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                                    flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
+                                    flightNo: shipment.flightVesselName,
+                                    warehouseId: shipment.warehouseId,
+                                    firstCarrierBy: shipment.flightVesselName
+                                });
+                            }
                         }
-                    }
                     ),
                     mergeMap(
                         () => this._documentationRepo.getAirwayBill(this.jobId)
@@ -650,8 +650,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .subscribe(
                 (value: number) => {
                     if (this.formCreate.controls["rateCharge"].value == Number(this.formCreate.controls["rateCharge"].value)) {
-                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
-                }
+                        this.formCreate.controls['total'].setValue(value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
+                    }
                 }
             );
 
@@ -665,8 +665,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     if (this.formCreate.controls["rateCharge"].value == Number(this.formCreate.controls["rateCharge"].value)) {
                         this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
                     }
-                }
-            );
+                });
 
     }
 
@@ -675,15 +674,14 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (this.formCreate.controls["rateCharge"].value == Number(this.formCreate.controls["rateCharge"].value)) {
+                    if (this.formCreate.controls["rateCharge"].value === Number(this.formCreate.controls["rateCharge"].value)) {
                         if (!this.formCreate.controls['min'].value) {
                             this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
                         } else {
                             this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
                         }
                     }
-                }
-            );
+                });
 
     }
 
@@ -694,13 +692,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 if (value) {
                     this.formCreate.controls['rateCharge'].setValue(null);
                     this.rateCharge.disable();
-            this.formCreate.controls['total'].setValue('As Arranged');
-        } else {
+                    this.formCreate.controls['total'].setValue('As Arranged');
+                } else {
                     if (this.isUpdate) {
                         this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - this.formCreate.controls['seaAir'].value);
-        }
+                    }
                     this.rateCharge.enable();
-    }
+                }
             });
     }
 

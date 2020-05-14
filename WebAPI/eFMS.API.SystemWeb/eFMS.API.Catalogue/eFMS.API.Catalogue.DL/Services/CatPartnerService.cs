@@ -347,10 +347,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 case PermissionRange.Office:
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
-                        data = data.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
-                       );
+                        data = data.ToList().Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                         || x.UserCreated.IndexOf(currentUser.UserID, StringComparison.OrdinalIgnoreCase) > -1
+                         || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                       )?.AsQueryable();
                     }
                     else
                     {
@@ -491,7 +491,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 AccountNo = x.partner.AccountNo,
                 UserCreatedName = x.user != null?x.user.Username: string.Empty,
                 SalePersonName = x.x!= null? x.x.Username:string.Empty,
-                DatetimeModified = x.partner.DatetimeModified
+                DatetimeModified = x.partner.DatetimeModified,
+                UserCreated = x.partner.UserCreated
             });
             return results;
         }

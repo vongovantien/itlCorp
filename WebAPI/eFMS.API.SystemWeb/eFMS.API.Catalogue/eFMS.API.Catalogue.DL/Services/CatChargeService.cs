@@ -101,8 +101,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 try
                 {
-                    model.Charge.UserModified = currentUser.UserID;
-                    model.Charge.DatetimeModified = DateTime.Now;
+                    model.Charge = SetDefaultUpdateData(model.Charge);
                     var hs = DataContext.Update(model.Charge, x => x.Id == model.Charge.Id, false);
                     if (hs.Success == false) return hs;
 
@@ -149,6 +148,20 @@ namespace eFMS.API.Catalogue.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        private CatCharge SetDefaultUpdateData(CatCharge charge)
+        {
+            charge.UserModified = currentUser.UserID;
+            charge.DatetimeModified = DateTime.Now;
+            var oldCharge = DataContext.First(x => x.Id == charge.Id);
+            charge.UserCreated = oldCharge.UserCreated;
+            charge.DatetimeCreated = oldCharge.DatetimeCreated;
+            charge.GroupId = oldCharge.GroupId;
+            charge.DepartmentId = oldCharge.DepartmentId;
+            charge.OfficeId = oldCharge.OfficeId;
+            charge.CompanyId = oldCharge.CompanyId;
+            return charge;
         }
 
         public CatChargeAddOrUpdateModel GetChargeById(Guid id)
