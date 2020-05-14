@@ -231,7 +231,7 @@ namespace eFMS.API.Setting.DL.Services
 
                     //Update các tariff detail cũ
                     var tariffDetailOld = tariffDetails.Where(x => x.Id != Guid.Empty);
-                                                                //&& setTariffDetailRepo.Get(g => g.TariffId == tariff.Id).Select(s => s.Id).Contains(x.Id));
+                    //&& setTariffDetailRepo.Get(g => g.TariffId == tariff.Id).Select(s => s.Id).Contains(x.Id));
                     if (tariffDetailOld.Count() > 0)
                     {
                         foreach (var item in tariffDetailOld)
@@ -240,7 +240,7 @@ namespace eFMS.API.Setting.DL.Services
                             item.UserModified = model.setTariff.UserModified;
                             //item.DatetimeCreated = setTariffDetailRepo.Get(x => x.Id == item.Id).FirstOrDefault().DatetimeCreated;
                             item.DatetimeModified = DateTime.Now;
-                            var hsTariffDetailUpdate= setTariffDetailRepo.Update(item, x => x.Id == item.Id);
+                            var hsTariffDetailUpdate = setTariffDetailRepo.Update(item, x => x.Id == item.Id);
                         }
                     }
 
@@ -370,7 +370,7 @@ namespace eFMS.API.Setting.DL.Services
 
             }
 
-            if (query ==  null) return null;
+            if (query == null) return null;
             query = query.ToArray().OrderByDescending(x => x.t.DatetimeModified).AsQueryable();
             List<TariffViewModel> results = new List<TariffViewModel>();
             foreach (var item in query)
@@ -378,7 +378,15 @@ namespace eFMS.API.Setting.DL.Services
                 var tariffView = mapper.Map<TariffViewModel>(item.t);
                 tariffView.CustomerName = item.CustomerName != null ? item.CustomerName.ToString() : null;
                 tariffView.SupplierName = item.SupplierName != null ? item.SupplierName.ToString() : null;
-                results.Add(tariffView);
+                tariffView.setTariff = new SetTariffModel
+                {
+                    CompanyId = item.t.CompanyId,
+                    OfficeId = item.t.OfficeId,
+                    DepartmentId = item.t.DepartmentId,
+                    GroupId = item.t.GroupId
+                };
+
+            results.Add(tariffView);
             }
             return results;
         }
@@ -386,7 +394,7 @@ namespace eFMS.API.Setting.DL.Services
         private IQueryable<TariffViewModel> QueryPermission(TariffCriteria criteria, PermissionRange range)
         {
             var list = Query(criteria);
-            if(list == null)
+            if (list == null)
             {
                 return null;
             }
@@ -412,7 +420,7 @@ namespace eFMS.API.Setting.DL.Services
                     data = list.Where(x => x.UserCreated == currentUser.UserID || x.setTariff.OfficeId == currentUser.OfficeID && x.setTariff.CompanyId == currentUser.CompanyID).AsQueryable();
                     break;
                 case PermissionRange.Company:
-                    data = list.Where(x => x.UserCreated == currentUser.UserID || x.setTariff.CompanyId == currentUser.CompanyID).AsQueryable();
+                    data = list.Where(x => x.UserCreated == currentUser.UserID ||  x.setTariff.CompanyId == currentUser.CompanyID).AsQueryable();
                     break;
                 case PermissionRange.All:
                     data = list.AsQueryable();
@@ -478,7 +486,7 @@ namespace eFMS.API.Setting.DL.Services
             data.Permission = new PermissionAllowBase
             {
                 AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
-                AllowDelete = PermissionExtention.GetPermissionDetail(permissionRangeDelete,baseModel,currentUser),
+                AllowDelete = PermissionExtention.GetPermissionDetail(permissionRangeDelete, baseModel, currentUser),
             };
 
             data.UserCreatedName = userRepository.Get(x => x.Id == data.UserCreated).FirstOrDefault()?.Username;
