@@ -29,5 +29,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public Guid? CompanyId { get; set; }
         public int? DepartmentId { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public bool? Active { get; set; }
     }
 }
