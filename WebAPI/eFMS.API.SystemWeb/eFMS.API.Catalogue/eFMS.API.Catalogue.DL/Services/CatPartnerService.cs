@@ -30,11 +30,14 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+
         private readonly IContextBase<CatSaleman> salemanRepository;
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -45,7 +48,8 @@ namespace eFMS.API.Catalogue.DL.Services
             ICatPlaceService place,
             ICatCountryService country,
             IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url,
-            IContextBase<SysOffice> officeRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysOffice> officeRepo,
+            IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -55,6 +59,7 @@ namespace eFMS.API.Catalogue.DL.Services
             countryService = country;
             webUrl = url;
             officeRepository = officeRepo;
+            sysEmployeeRepository = sysEmployeeRepo;
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -85,12 +90,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
             var partner = mapper.Map<CatPartner>(entity);
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
-            partner.Active = true;
+            partner.Active = false;
             partner.GroupId = currentUser.GroupId;
             partner.DepartmentId = currentUser.DepartmentId;
             partner.OfficeId = currentUser.OfficeID;
@@ -107,10 +112,6 @@ namespace eFMS.API.Catalogue.DL.Services
                         x.PartnerId = partner.Id;
                         x.CreateDate = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
-                        //x.CompanyId = currentUser.CompanyID;
-                        //x.OfficeId = currentUser.OfficeID;
-                        //x.GroupId = currentUser.GroupId;
-                        //x.DepartmentId = currentUser.DepartmentId;
                     });
                     partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
                     DataContext.Update(partner, x => x.Id == partner.Id);
@@ -120,7 +121,23 @@ namespace eFMS.API.Catalogue.DL.Services
                 salemanRepository.SubmitChanges();
                 ClearCache();
                 Get();
-                SendMail.Send("Confirm Add Partner", webUrl.Value.Url.ToString() + "/en/#/home/catalogue/partner-data/detail/" + entity.Id, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com" }, null,null);
+                string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+                string fullNameCreatetor = "[" + sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault() + "]";
+                string address = webUrl.Value.Url.ToString() + "/en/#/home/catalogue/partner-data/detail/" + entity.Id;
+                string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+                string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+                string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
+                string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br>" +
+                    "You have a Partner Approval request From" + fullNameCreatetor + " as info bellow: </br>" +
+                    "Bạn có môt yêu cầu xác duyệt đối tượng từ" + fullNameCreatetor + " với thông tin như sau:</br>" +
+                    "\t <b> Partner ID </b> / <i> Mã đối tượng:</i> " + partner.AccountNo + "</br>" +
+                    "\t <b> Catagory </b> / <i> Danh mục: </i>" + partner.PartnerGroup + "</br>" +
+                    "\t <b> Taxcode </b>/ <i> Mã số thuế: </i>" + partner.TaxCode + "</br>" +
+                    "\t <b> Address </b> / <i> Địa chỉ: </i> " + partner.AddressEn + "</br>" +
+                    "\t <b> Requestor </b> / <i> Người yêu cầu: </i> " + fullNameCreatetor + "</br>" + linkEn +"</br>" + linkVn + "</br>" +
+                    "<i> Thanks and Regards </i>" + "</br>" +
+                    "eFMS System </div>") ;
+                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com" }, null, null);
             }
             return hs;
         }
@@ -130,8 +147,8 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
 
-            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans,PartnerGroup = model.PartnerGroup }, permissionRange,null);
-            if (code == 403) return new HandleState(403,"");
+            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
+            if (code == 403) return new HandleState(403, "");
             var entity = mapper.Map<CatPartner>(model);
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
@@ -140,7 +157,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 entity.InactiveOn = DateTime.Now;
             }
-            if(model.SaleMans.Count > 0)
+            if (model.SaleMans.Count > 0)
             {
                 entity.SalePersonId = model.SaleMans.FirstOrDefault().SaleManId.ToString();
             }
@@ -191,7 +208,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> QueryExport(CatPartnerCriteria criteria)
         {
             var data = QueryPaging(criteria);
-           if(data == null)
+            if (data == null)
             {
                 return null;
             }
@@ -288,7 +305,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = QueryPaging(criteria);
-            if(data == null)
+            if (data == null)
             {
                 rowsCount = 0;
                 return null;
@@ -398,7 +415,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate {GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId  = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans,PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             return code;
         }
 
@@ -412,7 +429,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return code;
         }
 
-        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange,int? flagDetail)
+        private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, int? flagDetail)
         {
             int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, flagDetail);
             return code;
@@ -489,8 +506,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 Fax = x.partner.Fax,
                 CoLoaderCode = x.partner.CoLoaderCode,
                 AccountNo = x.partner.AccountNo,
-                UserCreatedName = x.user != null?x.user.Username: string.Empty,
-                SalePersonName = x.x!= null? x.x.Username:string.Empty,
+                UserCreatedName = x.user != null ? x.user.Username : string.Empty,
+                SalePersonName = x.x != null ? x.x.Username : string.Empty,
                 DatetimeModified = x.partner.DatetimeModified,
                 UserCreated = x.partner.UserCreated
             });
@@ -610,7 +627,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         Company = item.CompanyId,
                         SaleManId = item.SalePersonId,
                         FreightPayment = item.PaymentTerm,
-                        EffectDate = item.EffectDate!= null?Convert.ToDateTime(item.EffectDate): (DateTime?)null,
+                        EffectDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
                         Status = true,
                         PartnerId = partner.Id,
                         CreateDate = DateTime.Now,
