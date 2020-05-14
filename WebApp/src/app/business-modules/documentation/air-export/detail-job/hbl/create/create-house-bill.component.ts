@@ -198,6 +198,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         this.formCreateHBLComponent.originBlnumber,
         this.formCreateHBLComponent.currencyId,
         this.formCreateHBLComponent.freightPayment,
+        this.formCreateHBLComponent.shipmenttype,
         this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
 
         if (!this.formCreateHBLComponent.formCreate.valid
