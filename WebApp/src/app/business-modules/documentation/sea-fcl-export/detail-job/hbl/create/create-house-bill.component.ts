@@ -67,7 +67,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                         // * reset mblid in container.
                         if (!!this.containers) {
                             this.containers.forEach(c => {
-                                c.mblid = SystemConstants.EMPTY_GUID;
+                                c.id = c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
 
