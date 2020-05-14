@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Exports;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -20,6 +24,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<CsTransaction> csTransactionRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
+        readonly IContextBase<CatCountry> countryRepo;
+
 
         public CsAirWayBillService(IContextBase<CsAirWayBill> repository, 
             IMapper mapper,
@@ -28,7 +34,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser currUser,
             IContextBase<CatPlace> catPlace,
             IContextBase<CsTransaction> csTransaction,
-            IContextBase<CatPartner> catPartner) : base(repository, mapper)
+            IContextBase<CatPartner> catPartner,
+            IContextBase<CatCountry> catCountry) : base(repository, mapper)
         {
             dimensionDetailService = dimensionService;
             shipmentOtherChargeService = otherChargeService;
@@ -36,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
             catPlaceRepo = catPlace;
             csTransactionRepo = csTransaction;
             catPartnerRepo = catPartner;
+            countryRepo = catCountry;
         }
 
         public CsAirWayBillModel GetBy(Guid jobId)
@@ -201,6 +209,81 @@ namespace eFMS.API.Documentation.DL.Services
             result.IssueOn = masterbill.IssuedPlace;
             result.IssueDate = masterbill.IssuedDate;
             return result;                 
+        }
+        public Crystal PreviewAirwayBill(Guid jobId)
+        {
+            Crystal result = null;
+            var data = GetBy(jobId);
+            var airWayBills = new List<MasterAirwayBillReport>();
+            if (data != null)
+            {
+                var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+                var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+                var awb = new MasterAirwayBillReport();
+                awb.MAWB = data.Mblno1 + data.Mblno2 + data.Mblno3;
+                awb.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
+                awb.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
+                awb.AccountingInfo = "FREIGHT " + data.FreightPayment?.ToUpper(); //'FREIGHT ' + Air Freight
+                awb.AgentIATACode = "37-3 0118/0000"; //Set Default Value
+                if (dataPOL != null)
+                {
+                    awb.DepartureAirport = dataPOL?.NameEn?.ToUpper(); //POL
+                }
+                awb.FirstDestination = data.FirstCarrierTo;
+                awb.FirstCarrier = data.FirstCarrierBy;
+                awb.SecondDestination = data.TransitPlaceTo1;
+                awb.SecondCarrier = data.TransitPlaceBy1;
+                awb.ThirdDestination = data.TransitPlaceTo2;
+                awb.ThirdCarrier = data.TransitPlaceBy2;
+                awb.Currency = data.CurrencyId?.ToUpper(); //Currency
+                awb.CHGSCode = data.Chgs;
+                awb.WTPP = data.Wtpp;
+                awb.WTCLL = data.Wtcll;
+                awb.ORPP = data.OtherPayment == "PP" ? data.OtherPayment : string.Empty;
+                awb.ORCLL = data.OtherPayment == "CLL" ? data.OtherPayment : string.Empty;
+                awb.DlvCarriage = data.Dclrca?.ToUpper(); //DCLR-CA
+                awb.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
+                if (dataPOD != null)
+                {
+                    var podCountry = countryRepo.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                    awb.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    awb.LastDestination = awb.LastDestination?.ToUpper();
+                }
+                awb.FlightNo = data.FlightNo;
+                awb.FlightDate = data.FlightDate;
+                awb.ConnectingFlight = string.Empty; //Để rỗng
+                awb.ConnectingFlightDate = null; //Gán null
+                awb.insurAmount = data.IssuranceAmount?.ToUpper(); //Issurance Amount
+                awb.HandlingInfo = data.HandingInformation?.ToUpper(); //Handing Information
+                awb.Notify = data.Notify?.ToUpper(); //Notify
+                awb.SCI = string.Empty; //NOT USE
+                awb.ReferrenceNo = string.Empty; //NOT USE
+                awb.OSI = string.Empty; //NOT USE
+                awb.ISSUED = string.Empty; //NOT USE
+                awb.ConsigneeID = data.ConsigneeId; //NOT USE
+                awb.ICASNC = string.Empty; //NOT USE
+                awb.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
+                awb.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
+                awb.GrwDecimal = 2; //NOT USE
+                awb.Wlbs = data.KgIb?.ToUpper(); //KgIb
+                awb.RateClass = data.Rclass;
+                awb.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
+                awb.WChargeable = data.ChargeWeight ?? 0; //CW
+                awb.ChWDecimal = 2; //NOT USE
+                awb.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
+                awb.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
+                awb.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
+                awb.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
+                awb.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
+                awb.ValChPP = string.Empty; //NOT USE
+                awb.ValChCC = string.Empty; //NOT USE
+                awb.TxPP = string.Empty; //NOT USE
+                awb.TxCC = string.Empty; //NOT USE
+                awb.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
+
+
+
+            }
         }
     }
 }
