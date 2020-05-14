@@ -231,6 +231,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
+        // TODO SHOULD DISPATCH HBL DETAIL ?.
+        // this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
     }
 
     previewArrivalNotice(_currency: string) {
