@@ -29,7 +29,7 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
                                 <a class="dropdown-item pointer" (click)="getOtherCharge()"
-                                    *ngIf="showSyncOtherCharge">Other Charge</a>
+                                    *ngIf="showSyncOtherCharge">Other</a>
                             </div>
                         </div>
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
