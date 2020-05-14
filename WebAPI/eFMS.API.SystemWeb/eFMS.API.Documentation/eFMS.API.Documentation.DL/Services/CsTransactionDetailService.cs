@@ -1874,7 +1874,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion --- Export ---
 
-        public string GenerateHBLNo(string podCode)
+        public string GenerateHBLNoSeaExport(string podCode)
         {
             if(string.IsNullOrEmpty(podCode))
             {
@@ -1896,9 +1896,17 @@ namespace eFMS.API.Documentation.DL.Services
                         oders.Add(int.Parse(code.Substring(code.Length - 3)));
                     }
                 }
-                int maxCurrentOder = oders.Max();
+                if(oders.Count() > 0)
+                {
+                    int maxCurrentOder = oders.Max();
 
-                hbl += (maxCurrentOder + 1).ToString("000");
+                    hbl += (maxCurrentOder + 1).ToString("000");
+                }
+                else
+                {
+                    hbl += "001";
+                }
+
             }
             else
             {
