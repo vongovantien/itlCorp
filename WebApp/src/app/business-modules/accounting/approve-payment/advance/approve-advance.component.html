@@ -48,6 +48,17 @@
                                         </span>
                                     </span>
                                 </button>
+                                <button
+                                    *ngIf="!approveInfo.isManager && approveInfo.statusApproval === 'RequestApproval'"
+                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                    title="Recall" (click)="recall()">
+                                    <span>
+                                        <i class="la la-undo"></i>
+                                        <span>
+                                            Recall
+                                        </span>
+                                    </span>
+                                </button>
                                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
                                     <app-default-button data-toggle="dropdown" aria-haspopup="true"
                                         aria-expanded="false" [buttonSetting]="previewButtonSetting">

@@ -209,4 +209,24 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 },
             );
     }
+
+    recall() {
+        this._progressRef.start();
+        this._accoutingRepo.recallRequest(this.idAdvPayment)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Recall Is Successfull');
+                        this.getInfoApprove(this.advancePayment.advanceNo);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
+                },
+            );
+    }
 }
