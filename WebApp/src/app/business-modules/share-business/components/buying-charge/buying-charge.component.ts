@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ElementRef, ComponentRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -298,8 +298,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     onSelectDataFormInfo(data: Charge | any, type: string, chargeItem: CsShipmentSurcharge) {
-        // [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
-
         switch (type) {
             case 'charge':
                 chargeItem.chargeId = data.id;
@@ -309,6 +307,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;
                     chargeItem.unitPrice = data.unitPrice;
+                    this.onChangeDataUpdateTotal(chargeItem);
                 }
                 break;
             case 'unit':
@@ -325,7 +324,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const newSurCharge: CsShipmentSurcharge = new CsShipmentSurcharge();
         newSurCharge.currencyId = "USD"; // * Set default.
         newSurCharge.exchangeDate = { startDate: new Date(), endDate: new Date() };
-        newSurCharge.quantity = 0;
+        newSurCharge.quantity = 1;
         newSurCharge.quantityType = null;
         newSurCharge.invoiceDate = null;
         newSurCharge.creditNo = null;
@@ -427,16 +426,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
-    onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(+vat, +chargeItem.quantity, +chargeItem.unitPrice);
-    }
+    // onChangeVat(vat: number, chargeItem: CsShipmentSurcharge) {
+    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+vat, +chargeItem.quantity, +chargeItem.unitPrice);
+    // }
 
-    onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +unitPrice);
-    }
+    // onChangeUnitPrice(unitPrice: number, chargeItem: CsShipmentSurcharge) {
+    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +unitPrice);
+    // }
 
-    onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
-        chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +quantity, +chargeItem.unitPrice);
+    // onChangeQuantity(quantity: number, chargeItem: CsShipmentSurcharge) {
+    //     chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +quantity, +chargeItem.unitPrice);
+    // }
+
+    onChangeDataUpdateTotal(chargeItem: CsShipmentSurcharge) {
+        chargeItem.total = this.utility.calculateTotalAmountWithVat(+chargeItem.vatrate || 0, +chargeItem.quantity, +chargeItem.unitPrice);
     }
 
     updateSurchargeField(type: CommonEnum.SurchargeTypeEnum) {
@@ -1054,7 +1057,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         const containerRef: ViewContainerRef = this.chargeContainerRef.toArray()[index];
 
-        const componentRef: any = this.renderDynamicComponent(AppComboGridComponent, containerRef);
+        const componentRef: ComponentRef<any> = this.renderDynamicComponent(AppComboGridComponent, containerRef);
         if (!!componentRef) {
             componentRef.instance.headers = [
                 { title: 'Name', field: 'chargeNameEn' },
@@ -1085,18 +1088,21 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     handleClickOutSideComboGrid(index: number, type: string) {
-        if (this.selectedIndexCharge !== -1) {
-            switch (type) {
-                case 'partner':
-                    this.charges[index].isShowPartnerHeader = false;
-                    const t = this.widgetTargets.toArray()[index];
+        // if (this.selectedIndexCharge !== -1) {
+        switch (type) {
+            case 'partner':
+                this.charges[index].isShowPartnerHeader = false;
+                const t = this.widgetTargets.toArray()[index];
+                if (!!t) {
                     t.remove();
-                    break;
-                case 'charge':
-                    const v = this.chargeContainerRef.toArray()[index];
+                }
+                break;
+            case 'charge':
+                const v = this.chargeContainerRef.toArray()[index];
+                if (!!v) {
                     v.remove();
-                    break;
-            }
+                }
+                break;
         }
 
 
