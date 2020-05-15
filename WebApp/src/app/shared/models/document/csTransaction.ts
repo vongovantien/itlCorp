@@ -87,13 +87,8 @@ export class CsTransaction extends BaseModel {
     coloaderCode: string = null;
     polCode: string = null;
     podCode: string = null;
-    warehousePodNameEn: string = null;
-    warehousePodNameVn: string = null;
-    warehousePolNameEn: string = null;
-    warehousePolNameVn: string = null;
-    officeNameEn: string = null;
-    officeNameVn: string = null;
-    officeLocation: string = null;
+    warehousePOL: WarehouseData = null;
+    warehousePOD: WarehouseData = null;
     polCountryCode: string = null;
     polCountryNameEn: string = null;
     polCountryNameVn: string = null;
@@ -128,4 +123,10 @@ class OfficeData {
     location: string;
     addressEn: string;
     tel: string;
+}
+
+class WarehouseData {
+    nameEn: string;
+    nameVn: string;
+    nameAbbr: string;
 }
