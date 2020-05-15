@@ -91,7 +91,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
     hbOfladingTypes: CommonInterface.IValueDisplay[];
     serviceTypes: CommonInterface.IValueDisplay[];
-    shipmentDetail: any = {}; // TODO model.
+    shipmentDetail: CsTransaction;
     numberOfOrigins: CommonInterface.ICommonTitleValue[] = [
         { title: 'One(1)', value: 1 },
         { title: 'Two(2)', value: 2 },
@@ -190,7 +190,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
                         }
 
-                        this._dataService.setDataService("podName", this.shipmentDetail.warehousePodNameVn || "");
+                        this._dataService.setDataService("podName", !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : "");
 
                     }
                 );
