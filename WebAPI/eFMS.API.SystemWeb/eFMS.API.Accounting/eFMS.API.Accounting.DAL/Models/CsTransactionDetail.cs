@@ -114,7 +114,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Rclass { get; set; }
         public string ComItemNo { get; set; }
         public string KgIb { get; set; }
-        public string RateCharge { get; set; }
+        public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public string Total { get; set; }
         public int? SeaAir { get; set; }
@@ -139,6 +139,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Route { get; set; }
         public string PoinvoiceNo { get; set; }
         public string ShipmentType { get; set; }
+        public bool? AsArranged { get; set; }
         public short? GroupId { get; set; }
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
