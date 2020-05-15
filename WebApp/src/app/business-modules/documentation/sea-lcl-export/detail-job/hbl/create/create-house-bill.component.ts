@@ -68,7 +68,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
                         if (!!this.containers) {
                             this.containers.forEach(c => {
-                                c.mblid = SystemConstants.EMPTY_GUID;
+                                c.id = c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
 

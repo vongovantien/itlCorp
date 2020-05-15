@@ -136,7 +136,13 @@ export class EcusConnectionComponent extends AppList implements OnInit {
                                         this.formEcus.datetimeModified = res.datetimeModified;
                                         this.formEcus.userModifiedName = res.userModifiedName;
                                         this.formEcus.userCreated = res.userCreated;
+
                                         this.formEcus.isShowUpdate = true;
+
+                                        this.formEcus.companyId = res.companyId;
+                                        this.formEcus.officeId = res.officeId;
+                                        this.formEcus.departmentId = res.departmentId;
+                                        this.formEcus.groupId = res.groupId;
 
                                         this.formEcus.isAllowUpdate = res.permission.allowUpdate;
                                         this.formEcus.show();

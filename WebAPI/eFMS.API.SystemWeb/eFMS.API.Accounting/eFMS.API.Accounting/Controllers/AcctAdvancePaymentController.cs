@@ -613,5 +613,28 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId, language);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Recall Request Advance 
+        /// </summary>
+        /// <param name="advanceId">advanceId that want to retrieve Update Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("RecallRequest")]
+        public IActionResult RecallRequest(Guid advanceId)
+        {
+            var updateApproval = acctAdvancePaymentService.RecallRequest(advanceId);
+            ResultHandle _result;
+            if (!updateApproval.Success)
+            {
+                _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            else
+            {
+                _result = new ResultHandle { Status = updateApproval.Success };
+                return Ok(_result);
+            }
+        }
     }
 }

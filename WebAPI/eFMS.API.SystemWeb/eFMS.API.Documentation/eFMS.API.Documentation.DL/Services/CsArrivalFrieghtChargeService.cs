@@ -265,6 +265,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
+                var packageUnit = unitRepository.Get(x => x.Id == houserBill.PackageType).FirstOrDefault()?.Code;
+                var packageQty = houserBill.PackageQty?.ToString() ?? string.Empty;
 
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
@@ -293,14 +295,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.ForCarrier = string.Empty;
                         charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                         charge.PortofDischarge = podName?.ToUpper();//POD of HBL
-                        charge.PlaceDelivery = podName?.ToUpper();//POD of HBL
-                        charge.ArrivalNote = houserBill.Remark?.ToUpper();//Remark of HBL
+                        charge.PlaceDelivery = houserBill.FinalDestinationPlace?.ToUpper();//Final Destination
+                        charge.ArrivalNote = houserBill.ServiceType?.ToUpper(); //Lấy Service Type [houserBill.Remark?.ToUpper();//Remark of HBL]
 
                         charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
 
                         charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
-                        charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
-                        charge.NoPieces = houserBill.PackageQty != null ? houserBill.PackageQty.ToString() : string.Empty;//Package Qty
+                        charge.Description = houserBill.DesOfGoods;// Description of goods (Description)             
+                        charge.NoPieces = (packageQty != "0" && packageQty != string.Empty) ? packageQty + " " + packageUnit : packageQty;// Package Qty + Package Unit
                         charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
                         charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                         charge.Unit = "KGS"; //Đang gán cứng
@@ -356,14 +358,14 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.ForCarrier = string.Empty;
                     charge.DepartureAirport = polName?.ToUpper();//POL of HBL
                     charge.PortofDischarge = podName?.ToUpper();//POD of HBL
-                    charge.PlaceDelivery = podName?.ToUpper();//POD of HBL
-                    charge.ArrivalNote = houserBill.Remark?.ToUpper();//Remark of HBL
+                    charge.PlaceDelivery = houserBill.FinalDestinationPlace?.ToUpper();//Final Destination
+                    charge.ArrivalNote = houserBill.ServiceType?.ToUpper(); //Lấy Service Type [houserBill.Remark?.ToUpper();//Remark of HBL]
 
                     charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
 
                     charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
                     charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
-                    charge.NoPieces = houserBill.PackageQty != null ? houserBill.PackageQty.ToString() : string.Empty;//Package Qty
+                    charge.NoPieces = (packageQty != "0" && packageQty != string.Empty) ? packageQty + " " + packageUnit : packageQty;// Package Qty + Package Unit
                     charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
                     charge.CBM = houserBill.Cbm ?? 0; //CBM of container
                     charge.Unit = "KGS"; //Đang gán cứng
@@ -407,7 +409,9 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
             parameter.CurrDecimalNo = 0;
-
+            parameter.Day = arrival != null ? arrival.ArrivalFirstNotice?.ToString("dd") : string.Empty;
+            parameter.Month = arrival != null ? arrival.ArrivalFirstNotice?.ToString("MM") : string.Empty;
+            parameter.Year = arrival != null ? arrival.ArrivalFirstNotice?.ToString("yyyy") : string.Empty;
             result = new Crystal
             {
                 ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",

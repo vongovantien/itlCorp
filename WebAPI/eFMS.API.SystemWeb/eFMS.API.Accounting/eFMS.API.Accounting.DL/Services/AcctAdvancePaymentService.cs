@@ -968,8 +968,12 @@ namespace eFMS.API.Accounting.DL.Services
             string strCustomNo = string.Empty;
             int contQty = 0;
             decimal nw = 0;
+            decimal gw = 0;
             int psc = 0;
             decimal cbm = 0;
+            string shipper = string.Empty;
+            string consignee = string.Empty;
+            string customer = string.Empty;
 
             var advance = GetAdvancePaymentByAdvanceId(advanceId);
 
@@ -977,41 +981,58 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (advance.AdvanceRequests.Count > 0)
             {
-                foreach (var jobId in advance.AdvanceRequests.GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId))
+                var groupJobByHbl = advance.AdvanceRequests
+                .GroupBy(g => new { g.Hbl })
+                .Select(s => new AcctAdvanceRequestModel
+                {
+                    JobId = s.First().JobId,
+                    Hbl = s.Key.Hbl,
+                    Mbl = s.First().Mbl,
+                    CustomNo = s.First().CustomNo
+                });
+
+                foreach (var request in groupJobByHbl)
                 {
                     //Lấy ra NW, CBM, PSC, Container Qty
-                    var ops = opsTransactionRepo.Get(x => x.JobNo == jobId).FirstOrDefault();
-
+                    var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
-                        nw += ops.SumNetWeight.HasValue ? ops.SumNetWeight.Value : 0;
-                        psc += ops.SumPackages.HasValue ? ops.SumPackages.Value : 0;
-                        cbm += ops.SumCbm.HasValue ? ops.SumCbm.Value : 0;
+                        nw += ops.SumNetWeight ?? 0;
+                        psc += ops.SumPackages ?? 0;
+                        cbm += ops.SumCbm ?? 0;
+                        gw += ops.SumGrossWeight ?? 0;
+                        string customerNameAbbr = catPartnerRepo.Get(x => x.Id == ops.CustomerId).FirstOrDefault()?.ShortName;
+                        customer += !string.IsNullOrEmpty(customerNameAbbr) && !customer.Contains(customerNameAbbr) ? customerNameAbbr + ", " : string.Empty;
                     }
+                    else
+                    {
+                        var job = csTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
+                        nw += job.NetWeight ?? 0;
+                        psc += job.PackageQty ?? 0;
+                        cbm += job.Cbm ?? 0;
+                        gw += job.GrossWeight ?? 0;
 
-                    //Lấy ra chuỗi JobId
-                    strJobId += !string.IsNullOrEmpty(jobId) ? jobId + "," : string.Empty;
+                        var house = csTransactionDetailRepo.Get(x => x.Hwbno == request.Hbl).FirstOrDefault();
+                        string customerNameAbbr = catPartnerRepo.Get(x => x.Id == house.CustomerId).FirstOrDefault()?.ShortName;
+                        customer += !string.IsNullOrEmpty(customerNameAbbr) && !customer.Contains(customerNameAbbr) ? customerNameAbbr + ", " : string.Empty;
+                        string shipperNameAbbr = catPartnerRepo.Get(x => x.Id == house.ShipperId).FirstOrDefault()?.ShortName;
+                        shipper += !string.IsNullOrEmpty(shipperNameAbbr) && !shipper.Contains(shipperNameAbbr) ? shipperNameAbbr + ", " : string.Empty;
+                        string consigneeNameAbbr = catPartnerRepo.Get(x => x.Id == house.ConsigneeId).FirstOrDefault()?.ShortName;
+                        consignee += !string.IsNullOrEmpty(consigneeNameAbbr) && !consignee.Contains(consigneeNameAbbr) ? consigneeNameAbbr + ", " : string.Empty;
+                    }                   
                 }
 
+                customer = !string.IsNullOrEmpty(customer) ? customer.Substring(0, customer.Length - 2) : string.Empty;
+                shipper = !string.IsNullOrEmpty(shipper) ? shipper.Substring(0, shipper.Length - 2) : string.Empty;
+                consignee = !string.IsNullOrEmpty(consignee) ? consignee.Substring(0, consignee.Length - 2) : string.Empty;
+
+                //Lấy ra chuỗi JobId
+                strJobId = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.JobId)).Select(s => s.JobId));
                 //Lấy ra chuỗi HBL
-                foreach (var hbl in advance.AdvanceRequests.GroupBy(x => x.Hbl).Select(x => x.FirstOrDefault().Hbl))
-                {
-                    strHbl += !string.IsNullOrEmpty(hbl) ? hbl + "," : string.Empty;
-                }
-
+                strHbl = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.Hbl)).Select(s => s.Hbl));
                 //Lấy ra chuỗi CustomNo
-                foreach (var customNo in advance.AdvanceRequests.GroupBy(x => x.CustomNo).Select(x => x.FirstOrDefault().CustomNo))
-                {
-                    strCustomNo += !string.IsNullOrEmpty(customNo) ? customNo + "," : string.Empty;
-                }
-
-                strJobId += ")";
-                strJobId = strJobId.Replace(",)", string.Empty).Replace(")", string.Empty);
-                strHbl += ")";
-                strHbl = strHbl.Replace(",)", string.Empty).Replace(")", string.Empty);
-                strCustomNo += ")";
-                strCustomNo = strCustomNo.Replace(",)", string.Empty).Replace(")", string.Empty);
+                strCustomNo = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.CustomNo)).Select(s => s.CustomNo));                
             }
 
             //Lấy ra tên requester
@@ -1027,6 +1048,7 @@ namespace eFMS.API.Accounting.DL.Services
                 accountantName = string.IsNullOrEmpty(approveAdvance.Accountant) ? null : userBaseService.GetEmployeeByUserId(approveAdvance.Accountant)?.EmployeeNameVn;
             }
 
+            var deptRequester = catDepartmentRepo.Get(x => x.Id == advance.DepartmentId).FirstOrDefault();
             var acctAdvance = new AdvancePaymentRequestReport
             {
                 AdvID = advance.AdvanceNo,
@@ -1035,7 +1057,7 @@ namespace eFMS.API.Accounting.DL.Services
                 AdvTo = "N/A",
                 AdvContactID = "N/A",
                 AdvContact = requesterName,//cần lấy ra username
-                AdvAddress = string.Empty,
+                AdvAddress = deptRequester?.DeptNameAbbr ?? string.Empty, //Department của Requester
                 AdvValue = advance.AdvanceRequests.Select(s => s.Amount).Sum(),
                 AdvCurrency = advance.AdvanceCurrency,
                 AdvCondition = advance.AdvanceNote,
@@ -1087,13 +1109,13 @@ namespace eFMS.API.Accounting.DL.Services
                 CSDecline = null,
                 CSUser = "N/A",
                 CSAppDate = null,
-                Customer = string.Empty,
-                Shipper = string.Empty,
-                Consignee = string.Empty,
+                Customer = customer,
+                Shipper = shipper,
+                Consignee = consignee,
                 ContQty = contQty.ToString(),
                 Noofpieces = psc,
                 UnitPieaces = "N/A",
-                GW = 0,
+                GW = gw,
                 NW = nw,
                 CBM = cbm,
                 ServiceType = "N/A",
@@ -1133,7 +1155,7 @@ namespace eFMS.API.Accounting.DL.Services
                 CompanyAddress2 = AccountingConstants.COMPANY_ADDRESS2,
                 Website = AccountingConstants.COMPANY_WEBSITE,
                 Contact = AccountingConstants.COMPANY_CONTACT,
-                Inword = _inword
+                Inword = _inword ?? string.Empty
             };
 
             result = new Crystal
@@ -2554,6 +2576,66 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     avdReq.StatusPayment = AccountingConstants.STATUS_PAYMENT_SETTLED;
                     var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(avdReq, x => x.Id == avdReq.Id);
+                }
+            }
+        }
+
+        public HandleState RecallRequest(Guid advanceId)
+        {
+            var userCurrent = currentUser.UserID;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var advance = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
+                    if (advance == null)
+                    {
+                        return new HandleState("Not found Advance Payment");
+                    }
+                    else
+                    {
+                        if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED 
+                            || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW)
+                        {
+                            return new HandleState("Advance payment not yet send the request");
+                        }
+                        if (advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
+                            && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
+                            && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
+                        {
+                            return new HandleState("Advance payment approving");
+                        }
+
+                        var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                        //Cập nhật lại approve advance
+                        if (approve != null)
+                        {
+                            approve.UserModified = userCurrent;
+                            approve.DateModified = DateTime.Now;
+                            approve.Comment = "RECALL";
+                            approve.IsDeputy = true;
+                            var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
+                        }
+
+                        //Cập nhật lại advance status của Advance Payment
+                        advance.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
+                        advance.UserModified = userCurrent;
+                        advance.DatetimeModified = DateTime.Now;
+                        var hsUpdateAdvancePayment = DataContext.Update(advance, x => x.Id == advance.Id);
+                        trans.Commit();
+                    }
+                    
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
                 }
             }
         }
