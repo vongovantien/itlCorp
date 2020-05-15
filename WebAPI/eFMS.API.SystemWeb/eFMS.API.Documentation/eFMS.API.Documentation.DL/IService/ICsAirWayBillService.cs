@@ -1,4 +1,5 @@
-﻿using eFMS.API.Documentation.DL.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
@@ -12,5 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
         CsAirWayBillModel GetBy(Guid jobId);
         HandleState Update(CsAirWayBillModel model);
         AirwayBillExportResult AirwayBillExport(Guid jobId);
+        Crystal PreviewAirwayBill(Guid jobId,string reportType);
+
     }
 }

@@ -92,6 +92,15 @@
             <param name="jobId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsAirWayBillController.PreviewAirwayBill(System.Guid,System.String)">
+            <summary>
+            preview house airway bill
+            </summary>
+            <param name="jobId">Id of Job</param>
+            <param name="reportType">report type</param>
+            
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController">
             <summary>
             
