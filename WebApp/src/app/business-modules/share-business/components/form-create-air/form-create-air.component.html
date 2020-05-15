@@ -18,6 +18,17 @@
                             ">
                                 MAWB inputted is not correct format
                             </div>
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
+                            (mawb.errors | equalError:'minlength' 
+                            ) 
+                            ">
+                                MAWB must be have 13 characters
+                            </div>
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
+                            (mawb.errors | equalError:'maxlength') 
+                            ">
+                                MAWB must be have 13 characters
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

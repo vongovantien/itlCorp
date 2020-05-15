@@ -277,7 +277,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                Validators.maxLength(12),
+                Validators.minLength(13),
+                Validators.maxLength(13),
                 FormValidators.validateMAWB
             ])],
             flightVesselName: [],
@@ -509,7 +510,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             } else {
                 totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
             }
-            totalHw = Math.round(totalHw * 100) / 100; 
+            totalHw = Math.round(totalHw * 100) / 100;
             this.formGroup.patchValue({ hw: totalHw });
             this.setDefaultChargeWeight();
 
