@@ -202,23 +202,11 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             );
     }
     getConsignees() {
-        if (this.type === 'lcl') {
-            this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CONSIGNEE).pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            )
-                .subscribe(
-                    (res: any) => {
-                        this.consignees = res;
-                    },
-                );
-        } else {
-            const t = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]).pipe(
-                catchError(this.catchError),
-                finalize(() => { })
-            ).subscribe((res: any) => { this.consignees = res; console.log('load thêm agent'); });
 
-        }
+        const t = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]).pipe(
+            catchError(this.catchError),
+            finalize(() => { })
+        ).subscribe((res: any) => { this.consignees = res; });
     }
     getSuppliers() {
         this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER).pipe(

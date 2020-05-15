@@ -159,10 +159,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
     }
     getExportDefault(res: CsTransaction) {
         this.billSIComppnent.shippingInstruction.cargoNoticeRecevier = "SAME AS CONSIGNEE";
-        if (this.billSIComppnent.type === 'lcl') {
-            this.billSIComppnent.shippingInstruction.containerNote = "A PART Of CONTAINER";
-            this.billSIComppnent.shippingInstruction.containerSealNo = '';
-        }
         if (res.creatorOffice) {
             if (!!res.creatorOffice.nameEn) {
                 this.billSIComppnent.shippingInstruction.shipper = !!res.creatorOffice.nameEn ? res.creatorOffice.nameEn : '';

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
@@ -6,6 +6,7 @@ import { Group } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { ComboGridVirtualScrollComponent } from '@common';
 
 @Component({
     selector: 'usermanagement-add-group-popup',
@@ -13,6 +14,8 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class UserManagementAddGroupPopupComponent extends PopupBase implements OnInit {
+    @ViewChild('combogridGroup', { static: false }) comboGridGroup: ComboGridVirtualScrollComponent;
+
     @Input() userId: string;
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
@@ -75,7 +78,6 @@ export class UserManagementAddGroupPopupComponent extends PopupBase implements O
                     } else {
                         this._toastService.error(res.message);
                     }
-                    console.log(res);
                 }
             );
     }
@@ -84,5 +86,6 @@ export class UserManagementAddGroupPopupComponent extends PopupBase implements O
         this.isSubmitted = false;
         this.selectedGroup = null;
         this.selectedPosition = null;
+        this.comboGridGroup.setCurrentActiveItemId({ field: 'id', value: null });
     }
 }
