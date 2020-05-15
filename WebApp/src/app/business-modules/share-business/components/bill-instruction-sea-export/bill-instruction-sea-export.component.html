@@ -275,16 +275,12 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !poDelivery.value }">
+                            <div class="form-group">
                                 <label class="form-control-label" for="">
-                                    Place of Delivery <span class="m--font-danger">(*)</span>
+                                    Place of Delivery
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square" placeholder=""
                                     autocomplete="nope" name="poDelivery" formControlName="poDelivery">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !poDelivery.value">
-                                    Place of Delivery is required
-                                </div>
                             </div>
                         </div>
                     </div>

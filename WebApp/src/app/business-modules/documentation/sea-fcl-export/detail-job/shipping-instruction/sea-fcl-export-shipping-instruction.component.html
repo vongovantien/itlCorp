@@ -8,8 +8,8 @@
                 Preview SI
             </button>
             <div class="dropdown-menu">
-                <a class="dropdown-item">Export excel</a>
-                <a class="dropdown-item" (click)="previewSIReport()">Crystal Report</a>
+                <a class="dropdown-item">Preview SI Summary</a>
+                <a class="dropdown-item" (click)="previewSIReport()">Preview SI Detail</a>
             </div>
         </div>
         <div class="dropdown m-dropdown m-dropdown--inline">
@@ -48,7 +48,7 @@
             <div class="col-12">
                 <tabset class="custom-class-tab">
                     <tab heading="Bill Instruction">
-                        <bill-instruction-sea-export></bill-instruction-sea-export>
+                        <bill-instruction-sea-export [type]="'fcl'"></bill-instruction-sea-export>
                     </tab>
                     <tab heading="Bill detail">
                         <bill-instruction-housebills-sea-export></bill-instruction-housebills-sea-export>

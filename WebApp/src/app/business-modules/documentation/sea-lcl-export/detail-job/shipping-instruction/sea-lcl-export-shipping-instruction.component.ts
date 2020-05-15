@@ -130,8 +130,8 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             this.billSIComppnent.shippingInstruction.volume = volumn;
             this.billSIComppnent.shippingInstruction.goodsDescription = desOfGoods;
             this.billSIComppnent.shippingInstruction.packagesNote = packages;
-            this.billSIComppnent.shippingInstruction.containerNote = containerNotes;
-            this.billSIComppnent.shippingInstruction.containerSealNo = contSealNos;
+            this.billSIComppnent.shippingInstruction.containerNote = "A PART Of CONTAINER"; // containerNotes;
+            this.billSIComppnent.shippingInstruction.containerSealNo = ""; //contSealNos;
         }
     }
     initNewShippingInstruction(res: CsTransaction) {
@@ -149,6 +149,26 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         this.billSIComppnent.shippingInstruction.pod = res.pod;
         this.billSIComppnent.shippingInstruction.loadingDate = res.etd;
         this.billSIComppnent.shippingInstruction.voyNo = res.flightVesselName + " - " + res.voyNo;
+        this.getExportDefault(res);
+    }
+    getExportDefault(res: CsTransaction) {
+        this.billSIComppnent.shippingInstruction.cargoNoticeRecevier = "SAME AS CONSIGNEE";
+        this.billSIComppnent.shippingInstruction.containerNote = "A PART Of CONTAINER";
+        this.billSIComppnent.shippingInstruction.containerSealNo = '';
+        if (res.creatorOffice) {
+            if (!!res.creatorOffice.nameEn) {
+                this.billSIComppnent.shippingInstruction.shipper = !!res.creatorOffice.nameEn ? res.creatorOffice.nameEn : '';
+                if (!!res.creatorOffice.addressEn) {
+                    this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + '\nAddress: ' + res.creatorOffice.addressEn;
+                }
+                if (!!res.creatorOffice.tel) {
+                    this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + '\nTel: ' + res.creatorOffice.tel;
+                }
+                this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + (!!res.groupEmail ? 'Email: ' + res.groupEmail : '');
+            } else {
+                this.billSIComppnent.shippingInstruction.shipper = !!res.groupEmail ? 'Email: ' + res.groupEmail : '';
+            }
+        }
     }
     save() {
         this.billSIComppnent.isSubmitted = true;

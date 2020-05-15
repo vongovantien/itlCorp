@@ -98,6 +98,9 @@ export class CsTransaction extends BaseModel {
     polCountryNameEn: string = null;
     polCountryNameVn: string = null;
     agentData: AgentData = null;
+    creatorOffice: OfficeData = null;
+    groupEmail: string = null;
+
 
     constructor(object?: any) {
         super();
@@ -117,4 +120,12 @@ class AgentData {
     tel: string;
     fax: string;
     address: string;
+}
+
+class OfficeData {
+    nameEn: string;
+    nameVn: string;
+    location: string;
+    addressEn: string;
+    tel: string;
 }
