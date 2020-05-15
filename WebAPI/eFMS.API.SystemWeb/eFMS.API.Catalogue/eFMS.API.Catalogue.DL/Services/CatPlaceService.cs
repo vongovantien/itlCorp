@@ -255,6 +255,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 AreaName = x.AreaNameVN,
                 LocalAreaName = x.LocalAreaNameVN,
                 FlightVesselNo = x.FlightVesselNo,
+                
             });
         }
 

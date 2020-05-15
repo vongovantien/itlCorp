@@ -103,7 +103,8 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                             deliveryOrderNo: this.shipmentDetail.jobNo + "-A01",
                             deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
                             // *  AUTO GENERATE SENT TO (1) WITH WAREHOUSENAME FROM POD
-                            doheader1: this.shipmentDetail.warehousePodNameVn,
+                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null,
+                            subAbbr: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameAbbr : null
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
 

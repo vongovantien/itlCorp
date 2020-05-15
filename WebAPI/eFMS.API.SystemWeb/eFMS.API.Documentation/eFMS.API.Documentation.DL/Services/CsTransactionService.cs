@@ -443,11 +443,14 @@ namespace eFMS.API.Documentation.DL.Services
                     result.PODName = portIndexPod.NameEn;
                     result.PODCode = portIndexPod.Code;
 
-                    if(portIndexPod.WarehouseId != null)
+                    if (portIndexPod.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePodNameEn = warehouse.NameEn;
-                        result.WarehousePodNameVn = warehouse.NameVn;
+                        result.WarehousePOD = new WarehouseData {
+                            NameEn = warehouse.NameEn,
+                            NameVn = warehouse.NameEn,
+                            NameAbbr = warehouse.DisplayName,
+                        };
                     }
                 }
 
@@ -469,8 +472,12 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPol.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePolNameEn = warehouse.NameEn;
-                        result.WarehousePolNameVn = warehouse.NameVn;
+                        result.WarehousePOL = new WarehouseData
+                        {
+                            NameEn = warehouse.NameEn,
+                            NameVn = warehouse.NameEn,
+                            NameAbbr = warehouse.DisplayName,
+                        };
                     }
                 }
 

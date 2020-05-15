@@ -113,8 +113,7 @@
                                             </div>
                                             <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"
-                                                (onClick)="onSelectPayerReceiver($event, charge, 'payer')"
-                                                [isEvent]="false">
+                                                (onClick)="onSelectPayerReceiver($event, charge, 'payer')">
                                             </app-combo-grid>
                                         </div>
                                     </ng-template>

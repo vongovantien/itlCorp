@@ -131,7 +131,6 @@ export class WarehouseComponent extends AppList implements OnInit {
                     if (!res) {
                         this.infoPopup.show();
                     } else {
-                        console.log(res);
                         this.warehouse = res as Warehouse;
                         this.formPopup.warehouse = res as Warehouse;
 

@@ -210,7 +210,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                                 startDate: new Date(),
                                 endDate: new Date()
                             },
-                            doheader1: this.shipmentDetail.warehousePodNameVn
+                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }

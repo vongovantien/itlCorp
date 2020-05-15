@@ -1,5 +1,5 @@
 import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef, Injector, ComponentFactory, } from "@angular/core";
-import { Observable, Subject, throwError, BehaviorSubject } from "rxjs";
+import { Observable, Subject, throwError, BehaviorSubject, Subscription } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
 
 import { UtilityHelper } from "src/helper";
@@ -47,6 +47,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     componentRef: ComponentRef<any>;
 
+    subscription: Subscription;
 
     cancelButtonSetting: ButtonModalSetting = {
         buttonAttribute: {
@@ -128,6 +129,9 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     ngOnInit(): void { }
 
     ngOnDestroy(): void {
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+        }
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
     }
@@ -224,7 +228,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     renderDynamicComponent<T>(component: T, containerRef: ViewContainerRef): ComponentRef<T> {
         if (containerRef) {
-            // containerRef.clear();
+            containerRef.clear();
             const injector: Injector = containerRef.injector;
 
             const cfr: ComponentFactoryResolver = injector.get(ComponentFactoryResolver);

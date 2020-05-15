@@ -145,7 +145,7 @@ export class CreateHouseBillComponent extends AppForm {
                         const objDelivery = {
                             deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
                             deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
-                            doheader1: this.shipmentDetail.warehousePodNameVn
+                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }

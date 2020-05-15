@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { DataService } from '@services';
 
 @Component({
     selector: 'app-combo-grid',
@@ -14,17 +13,13 @@ export class AppComboGridComponent<T> extends AppList {
     @Input() data: T[] = [];
     @Input() height: 200;
     @Input() fields: string[] = [];
-    @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onClick: EventEmitter<T> = new EventEmitter<T>();
     @Input() active: any;
 
-    @Input() set isEvent(v: boolean) {
-        this.isUsinggDataService = v;
-    }
-    selectedItem: any = null;
 
-    isUsinggDataService: boolean = true;
+    selectedItem: T = null;
+
     constructor(
-        private _dataService: DataService
     ) {
         super();
     }
@@ -39,10 +34,6 @@ export class AppComboGridComponent<T> extends AppList {
         this.active = item.id;
         this.selectedItem = item;
         this.onClick.emit(this.selectedItem);
-
-        if (this.isUsinggDataService) {
-            this._dataService.$data.next(this.selectedItem);
-        }
     }
 
     clickSearch($event: Event) {
