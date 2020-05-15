@@ -48,6 +48,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string CompanyAddress2 { get; set; }
         public string Website { get; set; }
         public int DecimalNo { get; set; }
-        public int TotalPackage { get; set; }
+        public string TotalPackages { get; set; }
     }
 }

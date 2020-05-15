@@ -145,7 +145,14 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
-            parameter.TotalPackage = totalPackage;
+            if(model.CsTransactionDetails.Count > 1)
+            {
+                parameter.TotalPackages = totalPackage + " PKG(S)";
+            }
+            else
+            {
+                parameter.TotalPackages = instructions.FirstOrDefault()?.Containers;
+            }
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
@@ -181,7 +188,8 @@ namespace eFMS.API.Documentation.DL.Services
                 Contact = model.IssuedUserName,
                 Tel = office?.Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
-                DecimalNo = 2
+                DecimalNo = 2,
+                TotalPackages = string.Empty
             };
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
@@ -233,7 +241,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 shippingInstructions.Add(container);
             }
-            parameter.TotalPackage = 0;
+
             result = new Crystal
             {
                 ReportName = "SeaOnboardContainerList.rpt",
@@ -313,6 +321,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
+
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",

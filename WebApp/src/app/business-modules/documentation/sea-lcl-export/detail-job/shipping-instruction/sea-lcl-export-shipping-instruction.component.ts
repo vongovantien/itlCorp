@@ -181,6 +181,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         if (!this.billSIComppnent.formSI.valid
             || (!!this.billSIComppnent.loadingDate.value && !this.billSIComppnent.loadingDate.value.startDate)
             || (!!this.billSIComppnent.issueDate.value && !this.billSIComppnent.issueDate.value.startDate)
+            || (this.billSIComppnent.pod === this.billSIComppnent.pol)
         ) {
             valid = false;
         }
