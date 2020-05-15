@@ -22,6 +22,11 @@ export class EcusConnection {
 
     permission: PermissionShipment = new PermissionShipment();
 
+    companyId: string = null;
+    officeId: string = null;
+    departmentId: number = null;
+    groupId: number = null;
+
 
     constructor(object?: any) {
         const self = this;
