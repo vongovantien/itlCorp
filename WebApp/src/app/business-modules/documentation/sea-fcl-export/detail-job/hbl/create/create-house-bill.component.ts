@@ -279,7 +279,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     handleStringPackage(contOb: { package: string, quantity: number }) {
-        return contOb.quantity + 'x' + contOb.package + ' & ';
+        return contOb.quantity + ' ' + contOb.package + ' & ';
     }
 
     gotoList() {

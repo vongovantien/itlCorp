@@ -89,6 +89,10 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var job = csTransactionRepo.Get(x => x.Id == model.JobId).FirstOrDefault();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(job.TransactionType, currentUser);
+            model.GroupId = _currentUser.GroupId;
+            model.DepartmentId = _currentUser.DepartmentId;
+            model.OfficeId = _currentUser.OfficeID;
+            model.CompanyId = _currentUser.CompanyID;
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
 
@@ -106,10 +110,6 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserModified = model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
-            model.GroupId = _currentUser.GroupId;
-            model.DepartmentId = _currentUser.DepartmentId;
-            model.OfficeId = _currentUser.OfficeID;
-            model.CompanyId = _currentUser.CompanyID;
 
             string contSealNo = string.Empty;
 
@@ -194,18 +194,17 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return new HandleState("Housebill not found !");
                     }
-                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
-                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-                    int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
-                    if (code == 403) return new HandleState(403,"");
-
-                    model.UserModified = currentUser.UserID;
-                    model.DatetimeModified = DateTime.Now;
-                    model.Active = true;
                     model.GroupId = hb.GroupId;
                     model.DepartmentId = hb.DepartmentId;
                     model.OfficeId = hb.OfficeId;
                     model.CompanyId = hb.CompanyId;
+                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+                    int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+                    if (code == 403) return new HandleState(403,"");
+                    model.UserModified = currentUser.UserID;
+                    model.DatetimeModified = DateTime.Now;
+                    model.Active = true;
                     model.DatetimeCreated = hb.DatetimeCreated;
                     model.UserCreated = hb.UserCreated;
 
