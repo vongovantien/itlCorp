@@ -49,7 +49,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string VoucherIdre { get; set; }
         public DateTime? VoucherIdredate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
-        public bool? Kb { get; set; }
         public string AdvanceNo { get; set; }
         public string JobNo { get; set; }
         public string Mblno { get; set; }
