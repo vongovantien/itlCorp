@@ -29,14 +29,12 @@ namespace eFMS.API.Documentation.DL.Models
         public string WarehousePodNameVn { get; set; }
         public string WarehousePolNameEn { get; set; }
         public string WarehousePolNameVn { get; set; }
-        public string OfficeNameEn { get; set; }
-        public string OfficeNameVn { get; set; }
-        public string OfficeLocation { get; set; }
         public string POLCountryNameEn { get; set; }
         public string POLCountryNameVn { get; set; }
         public string POLCountryCode { get; set; }
         public AgentData AgentData { get; set; }
-
+        public OfficeData CreatorOffice { get; set; }
+        public string GroupEmail { get; set; }
     }
 
     public class AgentData
@@ -46,5 +44,13 @@ namespace eFMS.API.Documentation.DL.Models
         public string Address { get; set; }
         public string Tel { get; set; }
         public string Fax { get; set; }
+    }
+    public class OfficeData
+    {
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
+        public string Location { get; set; }
+        public string AddressEn { get; set; }
+        public string Tel { get; set; }
     }
 }

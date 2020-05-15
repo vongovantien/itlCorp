@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
@@ -101,7 +101,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                             this.billSIComppnent.shippingInstruction.refNo = res.jobNo;
                         } else {
                             this.initNewShippingInstruction(res);
-                            this.getContainers();
+                            if (this.billSIComppnent.type === "fcl") {
+                                console.log('this is FCL');
+                                this.getContainers();
+                            }
                         }
 
                         this.billSIComppnent.shippingInstruction.csTransactionDetails = this.houseBills;
@@ -150,6 +153,30 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.billSIComppnent.shippingInstruction.pod = res.pod;
         this.billSIComppnent.shippingInstruction.loadingDate = res.etd;
         this.billSIComppnent.shippingInstruction.voyNo = res.flightVesselName + " - " + res.voyNo;
+        this.billSIComppnent.shippingInstruction.goodsDescription = res.desOfGoods;
+        this.billSIComppnent.shippingInstruction.remark = res.mbltype;
+        this.getExportDefault(res);
+    }
+    getExportDefault(res: CsTransaction) {
+        this.billSIComppnent.shippingInstruction.cargoNoticeRecevier = "SAME AS CONSIGNEE";
+        if (this.billSIComppnent.type === 'lcl') {
+            this.billSIComppnent.shippingInstruction.containerNote = "A PART Of CONTAINER";
+            this.billSIComppnent.shippingInstruction.containerSealNo = '';
+        }
+        if (res.creatorOffice) {
+            if (!!res.creatorOffice.nameEn) {
+                this.billSIComppnent.shippingInstruction.shipper = !!res.creatorOffice.nameEn ? res.creatorOffice.nameEn : '';
+                if (!!res.creatorOffice.addressEn) {
+                    this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + '\nAddress: ' + res.creatorOffice.addressEn;
+                }
+                if (!!res.creatorOffice.tel) {
+                    this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + '\nTel: ' + res.creatorOffice.tel;
+                }
+                this.billSIComppnent.shippingInstruction.shipper = this.billSIComppnent.shippingInstruction.shipper + (!!res.groupEmail ? 'Email: ' + res.groupEmail : '');
+            } else {
+                this.billSIComppnent.shippingInstruction.shipper = !!res.groupEmail ? 'Email: ' + res.groupEmail : '';
+            }
+        }
     }
     save() {
         this.billSIComppnent.isSubmitted = true;
