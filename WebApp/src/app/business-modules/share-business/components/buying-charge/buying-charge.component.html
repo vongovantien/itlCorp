@@ -29,7 +29,7 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
                                 <a class="dropdown-item pointer" (click)="getOtherCharge()"
-                                    *ngIf="showSyncOtherCharge">Other Charge</a>
+                                    *ngIf="showSyncOtherCharge">Other</a>
                             </div>
                         </div>
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
@@ -79,69 +79,55 @@
                                 <div class="form-group col-md-12 dropdown-partner"
                                     (clickOutside)="handleClickOutSideComboGrid(i,'partner')"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
-                                    <ng-container
-                                        *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true;else  partnerCharge">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
-                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select">
+                                    <ng-container *ngIf="isShowLoadingPartner">
+                                        <div class="on-loading text-center">
+                                            <div class="m-loader m-loader--brand">
+                                            </div><span>Loading</span>
+                                        </div>
                                     </ng-container>
-                                    <ng-template #partnerCharge>
-                                        <ng-container *ngIf="isShowLoadingPartner">
-                                            <div class="on-loading text-center">
-                                                <div class="m-loader m-loader--brand">
-                                                </div><span>Loading</span>
-                                            </div>
-                                        </ng-container>
-                                        <ng-container *ngIf="!isShowLoadingPartner">
-                                            <input type="text" class="dropdown-toggle form-control" readonly
-                                                [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                                (click)="loadDynamicComoGrid(charge,i)"
-                                                [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
-                                            <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                    <ng-container *ngIf="!isShowLoadingPartner">
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
+                                            (click)="loadDynamicComoGrid(charge,i)"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
+                                            [disabled]="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true">
+                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                                 charge.partnerShortName = null"
-                                                (onDropdown)="loadDynamicComoGrid(charge,i)"
-                                                [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
-                                        </ng-container>
-                                        <div class="dropdown-partner__content">
-                                            <div class="d-flex justify-content-end dropdown-partner__header"
-                                                [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
-                                                <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                    *ngFor="let type of partnerType; trackBy: trackByFn"
-                                                    [title]="type.displayName"
-                                                    (click)="selectPartnerType(type, charge,i)">{{type.displayName}}</a>
-                                            </div>
+                                            (onDropdown)="loadDynamicComoGrid(charge,i)"
+                                            [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
+                                    </ng-container>
+                                    <div class="dropdown-partner__content">
+                                        <div class="d-flex justify-content-end dropdown-partner__header"
+                                            [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
+                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                [title]="type.displayName"
+                                                (click)="selectPartnerType(type, charge,i)">{{type.displayName}}</a>
+                                        </div>
 
-                                            <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                        <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                                 (onClick)="onSelectPartner($event, charge)">
                                             </app-combo-grid> -->
-                                            <ng-template #container></ng-template>
-                                        </div>
-                                    </ng-template>
+                                        <ng-template #container></ng-template>
+                                    </div>
                                 </div>
                             </td>
                             <td>
-                                <ng-container
-                                    *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true;else chargeID">
-                                    <div class="form-group">
-                                        <input type="text" class="dropdown-toggle form-control" disabled
-                                            [(ngModel)]="charge.chargeNameEn">
-                                    </div>
-                                </ng-container>
-                                <ng-template #chargeID>
-                                    <div class="form-group pos-rel"
-                                        (clickOutside)="handleClickOutSideComboGrid(i,'charge')"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
-                                            [(ngModel)]="charge.chargeNameEn"
-                                            (click)="loadDynamicComboGridCharge(charge,i)" placeholder="Select charge">
-                                        <combo-grid-icon (onDelete)="charge.chargeId = null; 
+                                <div class="form-group pos-rel" (clickOutside)="handleClickOutSideComboGrid(i,'charge')"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
+                                    <input type="text" class="dropdown-toggle form-control" readonly
+                                        [(ngModel)]="charge.chargeNameEn" (click)="loadDynamicComboGridCharge(charge,i)"
+                                        placeholder="Select charge"
+                                        [disabled]="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true">
+                                    <combo-grid-icon (onDelete)="charge.chargeId = null; 
                                             charge.chargeNameEn = null"
-                                            (onDropdown)="loadDynamicComboGridCharge(charge,i)"
-                                            [showDelete]="!!charge.chargeId"></combo-grid-icon>
-                                        <div class="dropdown-charge">
-                                            <ng-template #containerCharge></ng-template>
-                                        </div>
-                                        <!-- <app-combo-grid-virtual-scroll
+                                        (onDropdown)="loadDynamicComboGridCharge(charge,i)"
+                                        [showDelete]="!!charge.chargeId"></combo-grid-icon>
+                                    <div class="dropdown-charge">
+                                        <ng-template #containerCharge></ng-template>
+                                    </div>
+                                    <!-- <app-combo-grid-virtual-scroll
                                             [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                             (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                             [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
@@ -149,8 +135,7 @@
                                             [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                             placeholder="Select charge" (remove)="charge.chargeId = null">
                                         </app-combo-grid-virtual-scroll> -->
-                                    </div>
-                                </ng-template>
+                                </div>
                             </td>
                             <td>
                                 <div class="form-group"
@@ -158,8 +143,7 @@
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
                                             <input type="number" class="form-control" [(ngModel)]="charge.quantity"
-                                                placeholder="Quantity"
-                                                (ngModelChange)="onChangeQuantity($event, charge)"
+                                                placeholder="Quantity" (ngModelChange)="onChangeDataUpdateTotal(charge)"
                                                 [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null"
                                                 numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
@@ -174,7 +158,7 @@
                                             </ng-container>
                                             <ng-template #qtyHint>
                                                 <select class="form-control border" [(ngModel)]="charge.quantityType"
-                                                    (ngModelChange)="onChangeQuantityHint($event, charge)">
+                                                    (ngModelChange)="onChangeQuantityHint($event,charge)">
                                                     <option value="null">-</option>
                                                     <option *ngFor="let hint of quantityHints" [ngValue]="hint.value">
                                                         {{hint.displayName}}</option>
@@ -212,7 +196,7 @@
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
-                                            (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
                                             autoFormatCurrency numeric [decimals]="digitDecimal">
                                     </ng-template>
                                 </div>
@@ -245,7 +229,7 @@
                                     </ng-container>
                                     <ng-template #vatrate>
                                         <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
-                                            (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="%"
                                             [disabled]="!!charge.creditNo || !charge.isFromShipment ? 'disabled': null">
                                     </ng-template>
                                 </div>

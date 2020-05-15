@@ -92,7 +92,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             .pipe(
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
-                tap((res: any) => {
+                tap((res: CsTransactionDetail) => {
                     this.hbl = res;
                     this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
                 }),
@@ -119,7 +119,9 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.onSelectCharge(v, this.selectedFreightCharge);
 
                     const componentRef = this.combogrids.toArray()[this.selectedIndexFreightCharge];
-                    componentRef.clear();
+                    if (componentRef) {
+                        componentRef.clear();
+                    }
                 }
             );
     }
@@ -364,10 +366,15 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                 break;
             case CommonEnum.QUANTITY_TYPE.NW:
                 chargeItem.quantity = this.hbl.netWeight;
-
                 break;
             case CommonEnum.QUANTITY_TYPE.CBM:
                 chargeItem.quantity = this.hbl.cbm;
+                break;
+            case CommonEnum.QUANTITY_TYPE.CW:
+                chargeItem.quantity = this.hbl.chargeWeight;
+                break;
+            case CommonEnum.QUANTITY_TYPE.PACKAGE:
+                chargeItem.quantity = this.hbl.packageQty;
                 break;
             default:
                 break;
@@ -427,11 +434,15 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     }
 
     handleClickOutSide(index: number) {
-        this.combogrids.toArray().forEach((c, i) => {
-            if (i === index) {
-                c.clear();
-            }
-        });
+        const t = this.combogrids.toArray()[index];
+        if (!!t) {
+            t.remove();
+        }
+        // this.combogrids.toArray().forEach((c, i) => {
+        //     if (i === index) {
+        //         c.clear();
+        //     }
+        // });
     }
 
 }

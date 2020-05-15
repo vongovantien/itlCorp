@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
-import { CsShipmentSurcharge, Charge, Partner } from 'src/app/shared/models';
+import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
@@ -27,7 +27,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
-
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
 
     constructor(
@@ -39,8 +38,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService
-
-
 
     ) {
         super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService);
@@ -179,7 +176,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(newSurCharge));
                             }
                         }
-
                     }
                 }
             );
@@ -203,12 +199,15 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.type = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
 
                         this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
-
                     });
 
                     // this.charges = [...this.charges, ...buyingCharges];
                 }
             );
+    }
+
+    syncArrivalNote() {
+
     }
 
 

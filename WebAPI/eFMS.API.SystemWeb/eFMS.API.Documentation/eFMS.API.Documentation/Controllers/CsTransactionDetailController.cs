@@ -212,7 +212,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("GenerateHBLSeaExport")]
         public IActionResult GenerateHBLSeaExport(string podCode)
         {
-            string hblNo = csTransactionDetailService.GenerateHBLNo(podCode);
+            string hblNo = csTransactionDetailService.GenerateHBLNoSeaExport(podCode);
             return Ok(new { hblNo = hblNo });
         }
 
