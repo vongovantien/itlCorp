@@ -18,7 +18,7 @@ import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
 
@@ -53,6 +53,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     isSubmitted: boolean = false;
 
     selectedFreightCharge: ArrivalFreightCharge;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -111,19 +112,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             );
 
         this.isLocked = this._store.select(getTransactionLocked);
-
-        this._dataService.$data
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (v: Charge) => {
-                    this.onSelectCharge(v, this.selectedFreightCharge);
-
-                    const componentRef = this.combogrids.toArray()[this.selectedIndexFreightCharge];
-                    if (componentRef) {
-                        componentRef.clear();
-                    }
-                }
-            );
     }
 
     configData() {
@@ -430,21 +418,24 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             this.componentRef.instance.data = this.listCharges;
             this.componentRef.instance.fields = ['chargeNameEn'];
             this.componentRef.instance.active = charge.chargeId;
+
+            // * Listen Event.
+            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<Charge>).onClick.subscribe(
+                (v: any) => {
+                    this.onSelectCharge(v, this.selectedFreightCharge);
+
+                    this.subscription.unsubscribe();
+                    comboGridContainerRef.clear();
+                });
         }
     }
 
     handleClickOutSide(index: number) {
         const t = this.combogrids.toArray()[index];
         if (!!t) {
-            t.remove();
+            t.clear();
         }
-        // this.combogrids.toArray().forEach((c, i) => {
-        //     if (i === index) {
-        //         c.clear();
-        //     }
-        // });
     }
-
 }
 
 interface IExchangeRate {

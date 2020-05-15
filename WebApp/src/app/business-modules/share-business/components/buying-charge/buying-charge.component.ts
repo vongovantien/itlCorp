@@ -106,21 +106,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.isLocked = this._store.select(fromStore.getTransactionLocked);
         this.permissionShipments = this._store.select(fromStore.getTransactionPermission);
-
-        this._dataService.$data
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (d: Partner) => {
-                    if (this.isSelectedPartnerDynamicCombogrid) {
-                        this.onSelectPartner(d, this.selectedSurcharge);
-                        this.deleteComponentRef(this.selectedIndexCharge, 'partner');
-                    }
-                    if (this.isSelectedChargeDynamicCombogrid) {
-                        this.onSelectDataFormInfo(d, 'charge', this.selectedSurcharge);
-                        this.deleteComponentRef(this.selectedIndexCharge, 'charge');
-                    }
-                }
-            );
     }
 
     getSurcharge() {
@@ -1049,6 +1034,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             this.componentRef.instance.data = this.listPartner;
             this.componentRef.instance.fields = ['taxCode', 'partnerNameEn'];
             this.componentRef.instance.active = charge.paymentObjectId;
+
+            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<Partner>).onClick.subscribe(
+                (v: Partner) => {
+                    this.onSelectPartner(v, this.selectedSurcharge);
+                    this.subscription.unsubscribe();
+                    containerRef.clear();
+                });
         }
     }
 
@@ -1074,6 +1066,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             componentRef.instance.data = this.listCharges;
             componentRef.instance.fields = ['chargeNameEn'];
             componentRef.instance.active = charge.chargeId;
+
+            this.subscription = ((componentRef.instance) as AppComboGridComponent<Charge>).onClick.subscribe(
+                (v: Charge) => {
+                    this.onSelectDataFormInfo(v, 'charge', this.selectedSurcharge);
+
+                    this.subscription.unsubscribe();
+                    containerRef.clear();
+                });
         }
     }
 
