@@ -380,8 +380,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (criteria.PartnerGroup.ToString() == DataEnums.CustomerPartner || criteria.PartnerGroup == 0)
                     {
                         data = data.Where(x => (x.CompanyId == currentUser.CompanyID)
-                       || x.UserCreated == currentUser.UserID
-                       || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
+                        || x.UserCreated == currentUser.UserID
+                        || salemans.Any(y => y.SaleManId == currentUser.UserID && y.PartnerId.Equals(x.Id))
                        );
                     }
                     else
@@ -509,7 +509,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 UserCreatedName = x.user != null ? x.user.Username : string.Empty,
                 SalePersonName = x.x != null ? x.x.Username : string.Empty,
                 DatetimeModified = x.partner.DatetimeModified,
-                UserCreated = x.partner.UserCreated
+                UserCreated = x.partner.UserCreated,
+                CompanyId = x.partner.CompanyId,
+                DepartmentId = x.partner.DepartmentId,
+                GroupId = x.partner.GroupId,
+                OfficeId = x.partner.OfficeId,
+                Active = x.partner.Active
             });
             return results;
         }

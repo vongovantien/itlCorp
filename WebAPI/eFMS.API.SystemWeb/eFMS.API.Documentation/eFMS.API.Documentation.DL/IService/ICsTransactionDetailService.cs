@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.IService
         object ImportCSTransactionDetail(CsTransactionDetailModel model);
         //CsTransactionDetailModel GetHbDetails(Guid JobId, Guid HbId);
         Crystal Preview(CsTransactionDetailModel model);
-        string GenerateHBLNo(string podCode);
+        string GenerateHBLNoSeaExport(string podCode);
 
         int CheckDetailPermission(Guid id);
 

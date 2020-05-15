@@ -47,6 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsAirWayBill> airwaybillRepository;
+        readonly IContextBase<SysGroup> groupRepository;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -72,7 +73,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
             IContextBase<SysOffice> sysOfficeRepo,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
+            IContextBase<CsAirWayBill> airwaybillRepo,
+            IContextBase<SysGroup> groupRepo) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -98,6 +100,7 @@ namespace eFMS.API.Documentation.DL.Services
             currencyExchangeService = currencyExchange;
             sysOfficeRepository = sysOfficeRepo;
             airwaybillRepository = airwaybillRepo;
+            groupRepository = groupRepo;
         }
 
         #region -- INSERT & UPDATE --
@@ -428,14 +431,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
                     result.AgentName = agent.PartnerNameEn;
-                    result.AgentData = new AgentData
-                    {
-                        NameEn = agent.PartnerNameEn,
-                        NameVn = agent.PartnerNameVn,
-                        Fax = agent.Fax,
-                        Tel = agent.Tel,
-                        Address = agent.AddressEn
-                    };
+                    result.AgentData = GetAgent(agent);
                 }
 
                 if (result.Pod != null)
@@ -481,14 +477,43 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if(result.OfficeId != null)
                 {
-                    SysOffice office = sysOfficeRepository.Get(x => x.Id == result.OfficeId)?.FirstOrDefault();
-                    result.OfficeNameEn = office.BranchNameEn;
-                    result.OfficeNameEn = office.BranchNameEn;
-                    result.OfficeLocation = office.Location;
+                    result.CreatorOffice = GetOfficeOfCreator(result.OfficeId);
+                }
+                if(result.GroupId != null)
+                {
+                    var group = groupRepository.Get(x => x.Id == result.GroupId).FirstOrDefault();
+                    result.GroupEmail = group != null ? group.Email : string.Empty;
                 }
 
                 return result;
             }
+        }
+
+        private AgentData GetAgent(CatPartner agent)
+        {
+            var agentData = new AgentData
+            {
+                NameEn = agent.PartnerNameEn,
+                NameVn = agent.PartnerNameVn,
+                Fax = agent.Fax,
+                Tel = agent.Tel,
+                Address = agent.AddressEn
+            };
+            return agentData;
+        }
+
+        private OfficeData GetOfficeOfCreator(Guid? officeId)
+        {
+            SysOffice office = sysOfficeRepository.Get(x => x.Id == officeId)?.FirstOrDefault();
+            var creatorOffice = new OfficeData
+            {
+                NameEn = office.BranchNameEn,
+                NameVn = office.BranchNameVn,
+                Location = office.Location,
+                AddressEn = office.AddressEn,
+                Tel = office.Tel
+            };
+            return creatorOffice;
         }
 
         public int CheckDetailPermission(Guid id)

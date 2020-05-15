@@ -26,7 +26,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
 
     advId: string = '';
     actionList: string = 'update';
-
+    approveInfo: any = null;
     dataReport: any = null;
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -101,6 +101,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                     this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
 
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
+                    this.getInfoApprove(this.advancePayment.advanceNo);
                 },
                 (error: any) => {
                     console.log(error);
@@ -234,6 +235,38 @@ export class AdvancePaymentDetailComponent extends AppPage {
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
+                },
+            );
+    }
+
+    getInfoApprove(advanceNo: string) {
+        this._accoutingRepo.getInfoApprove(advanceNo)
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe(
+                (res: any) => {
+                    this.approveInfo = res;
+                },
+            );
+    }
+
+    recall() {
+        this._progressRef.start();
+        this._accoutingRepo.recallRequest(this.advId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Recall Is Successfull');
+                        this.getDetail(this.advId);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
                 },
             );
     }

@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-md-8">
-                <div class="m--align-right" *ngIf="!(isLocked | async)">
+                <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                         <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="showGetCharge">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -29,8 +29,18 @@
                                 <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')">Standard</a>
                             </div>
                         </div>
-
-                        <button type="button"
+                        <div class="dropdown m-dropdown m-dropdown--inline">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <i class="la la-refresh"></i>Sync charge<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item pointer" (click)="syncBuyingCharge()">Buying</a>
+                                <ng-container *ngIf="showSyncFreight">
+                                    <a class="dropdown-item pointer" (click)="syncFreightCharge()">Arrival Note</a>
+                                </ng-container>
+                            </div>
+                        </div>
+                        <!-- <button type="button"
                             class="btn btn-secondary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
                             (click)="syncBuyingCharge()">
                             <span>
@@ -39,8 +49,8 @@
                                     Sync Buying
                                 </span>
                             </span>
-                        </button>
-                        <ng-container *ngIf="showSyncFreight && !!charges && !charges.length">
+                        </button> -->
+                        <!-- <ng-container *ngIf="showSyncFreight && !!charges && !charges.length"> 
                             <button type="button"
                                 class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
                                 (click)="syncFreightCharge()">
@@ -51,7 +61,7 @@
                                     </span>
                                 </span>
                             </button>
-                        </ng-container>
+                        </ng-container> -->
                         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveSellingSurCharge()">
                         </app-default-button>
                     </ng-container>
@@ -96,38 +106,31 @@
                                 <div class="form-group col-md-12 dropdown-partner"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }"
                                     (clickOutside)="handleClickOutSideComboGrid(i,'partner')">
-                                    <ng-container
-                                        *ngIf="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true ;else partnerCharge">
-                                        <input type="text" class="dropdown-toggle form-control" disabled
-                                            [(ngModel)]="charge.partnerShortName" placeholder="Partner Name">
-                                    </ng-container>
-                                    <ng-template #partnerCharge>
-                                        <input type="text" class="dropdown-toggle form-control" readonly
-                                            [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                            (click)="loadDynamicComoGrid(charge,i)"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
-                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                    <input type="text" class="dropdown-toggle form-control" readonly
+                                        [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
+                                        [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                        (click)="loadDynamicComoGrid(charge,i)"
+                                        [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true">
+                                    <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.partnerShortName = null"
-                                            (onDropdown)="loadDynamicComoGrid(charge,i)"
-                                            [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
+                                        (onDropdown)="loadDynamicComoGrid(charge,i)"
+                                        [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
 
-                                        <div class="dropdown-partner__content"
-                                            [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
-                                            <div class="d-flex justify-content-end dropdown-partner__header">
-                                                <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                    *ngFor="let type of partnerType; trackBy: trackByFn"
-                                                    [title]="type.displayName"
-                                                    (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
-                                            </div>
-                                            <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                    <div class="dropdown-partner__content"
+                                        [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
+                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                [title]="type.displayName"
+                                                (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
+                                        </div>
+                                        <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
                                                 (onClick)="onSelectPartner($event, charge)">
                                             </app-combo-grid> -->
-                                            <ng-template #container></ng-template>
-
-                                        </div>
-                                    </ng-template>
+                                        <ng-template #container></ng-template>
+                                    </div>
                                 </div>
                             </td>
                             <td>
@@ -158,8 +161,7 @@
                                     <div class="row quantity-hint">
                                         <div class="col-md-6 p-r-none">
                                             <input type="number" class="form-control" [(ngModel)]="charge.quantity"
-                                                placeholder="Quantity"
-                                                (ngModelChange)="onChangeQuantity($event, charge)"
+                                                placeholder="Quantity" (ngModelChange)="onChangeDataUpdateTotal(charge)"
                                                 [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null"
                                                 numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
@@ -212,7 +214,7 @@
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
-                                            (ngModelChange)="onChangeUnitPrice($event, charge)" placeholder="Unit Price"
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
                                             autoFormatCurrency numeric [decimals]="digitDecimal">
                                     </ng-template>
                                 </div>
@@ -245,7 +247,7 @@
                                     </ng-container>
                                     <ng-template #vatrate>
                                         <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
-                                            (ngModelChange)="onChangeVat($event, charge)" placeholder="%"
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="%"
                                             [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                     </ng-template>
                                 </div>
@@ -253,7 +255,7 @@
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input currencyMask type="text" class="form-control" [(ngModel)]="charge.total"
-                                        placeholder="Total">
+                                        placeholder="Total" readonly disabled>
                                 </div>
                             </td>
                             <td>

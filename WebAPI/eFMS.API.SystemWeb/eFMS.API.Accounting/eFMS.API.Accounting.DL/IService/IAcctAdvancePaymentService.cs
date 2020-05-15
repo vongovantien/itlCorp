@@ -68,5 +68,7 @@ namespace eFMS.API.Accounting.DL.IService
         AdvanceExport AdvancePaymentExport(Guid advanceId, string language);
 
         void UpdateStatusPaymentOfAdvanceRequest(string settlementCode);
+
+        HandleState RecallRequest(Guid advanceId);
     }
 }

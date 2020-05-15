@@ -69,5 +69,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Contact { get; set; }
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
+        public string Day { get; set; }
+        public string Month { get; set; }
+        public string Year { get; set; }
     }
 }

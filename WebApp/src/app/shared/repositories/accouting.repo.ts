@@ -363,6 +363,12 @@ export class AccountingRepo {
         );
     }
 
+    recallRequest(advanceId: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/RecallRequest`, {}, { advanceId: advanceId })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
 
 

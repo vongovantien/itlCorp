@@ -57,9 +57,6 @@ namespace eFMS.API.System.DL.Services
             companyRepository = companyRepo;
             permissionSampleSpecialRepository = permissionSampleSpecialRepo;
             sysMenuRepository = sysMenuRepo;
-
-            SetChildren<SysUserPermissionSpecial>("Id", "UserPermissionId");
-            SetChildren<SysUserPermissionGeneral>("Id", "UserPermissionId");
         }
 
         public IQueryable<SysUserPermissionModel> GetByUserId(string id)

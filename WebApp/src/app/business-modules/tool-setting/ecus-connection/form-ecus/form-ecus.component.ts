@@ -30,6 +30,10 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     userCreatedName: string;
     datetimeModified: string;
     userModifiedName: string;
+    companyId: string;
+    officeId: string;
+    departmentId: number;
+    groupId: number;
 
     userCreated: string;
 
@@ -121,6 +125,9 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
         } else {
             ecus.userCreated = this.userCreated;
             ecus.datetimeCreated = this.datetimeCreated;
+            ecus.companyId = this.companyId;
+            ecus.officeId = this.officeId;
+            ecus.groupId = this.groupId;
 
             this._operationRepo.updateEcus(ecus).subscribe(
                 (res: CommonInterface.IResult) => {
