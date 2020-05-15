@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model);
         Crystal PreviewOCL(CsShippingInstructionReportModel model);
         Crystal PreviewFCLShippingInstructionByJobId(Guid jobId);
+        Crystal PreviewSISummary(CsShippingInstructionReportModel model);
     }
 }

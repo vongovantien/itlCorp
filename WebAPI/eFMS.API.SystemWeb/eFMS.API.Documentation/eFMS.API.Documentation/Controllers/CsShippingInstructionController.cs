@@ -51,6 +51,12 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpPost("PreviewSISummary")]
+        public IActionResult PreviewSISummary(CsShippingInstructionReportModel model)
+        {
+            var result = shippingInstructionService.PreviewSISummary(model);
+            return Ok(result);
+        }
         [HttpPost]
         [Route("PreviewFCLShippingInstruction")]
         public IActionResult PreviewFCLShippingInstruction(CsShippingInstructionReportModel model)
