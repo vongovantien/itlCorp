@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.DL.IService
         CsAirWayBillModel GetBy(Guid jobId);
         HandleState Update(CsAirWayBillModel model);
         AirwayBillExportResult AirwayBillExport(Guid jobId);
-        Crystal PreviewAirwayBill(Guid jobId);
+        Crystal PreviewAirwayBill(Guid jobId,string reportType);
 
     }
 }

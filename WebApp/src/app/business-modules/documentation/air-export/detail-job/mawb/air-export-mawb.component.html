@@ -6,6 +6,16 @@
         <div class="c-button-actions">
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>Preview<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="preview()">Preview MAWB Frame Single</a>
+                    <a class="dropdown-item pointer" (click)="preview('Full')">Preview MAWB Frame Full</a>
+                </div>
+            </div>
+
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
                     <i class="la la-print"></i>Print<span class="caret"></span>
                 </button>
                 <div class="dropdown-menu">
@@ -24,7 +34,9 @@
                     </app-default-button>
                 </ng-container>
             </ng-container>
-
+            <ng-container *ngIf="dataReport">
+                <app-report-preview [data]="dataReport"></app-report-preview>
+            </ng-container>
             <app-default-button (click)="cf.show()" [buttonSetting]="cancelButtonSetting"></app-default-button>
         </div>
     </div>

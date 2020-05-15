@@ -4,6 +4,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
     public class MasterAirwayBillReport
     {
+        public string AirlineAbbrName { get; set; }
         public string MAWB { get; set; }
         public string HWBNO { get; set; }
         public string ATTN { get; set; }
@@ -76,6 +77,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public byte[] ShipPicture { get; set; }
         public string PicMarks { get; set; }
         public string GoodsDelivery { get; set; }
+        public string FooterName { get; set; }
     }
 
     public class MasterAirwayBillReportParams
