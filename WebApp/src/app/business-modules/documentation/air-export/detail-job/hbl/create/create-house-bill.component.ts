@@ -188,14 +188,13 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-
         [this.formCreateHBLComponent.hbltype,
         this.formCreateHBLComponent.otherPayment,
         this.formCreateHBLComponent.originBlnumber,
         this.formCreateHBLComponent.currencyId,
         this.formCreateHBLComponent.freightPayment,
+        this.formCreateHBLComponent.shipmenttype,
         this.formCreateHBLComponent.wtorValpayment].forEach((control: AbstractControl) => this.setError(control));
-
         if (!this.formCreateHBLComponent.formCreate.valid
             || (!!this.formCreateHBLComponent.etd.value && !this.formCreateHBLComponent.etd.value.startDate)
         ) {
