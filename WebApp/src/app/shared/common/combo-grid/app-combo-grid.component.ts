@@ -14,6 +14,8 @@ export class AppComboGridComponent<T> extends AppList {
     @Input() height: 200;
     @Input() fields: string[] = [];
     @Output() onClick: EventEmitter<T> = new EventEmitter<T>();
+    @Output() clickOutSide: EventEmitter<any> = new EventEmitter<any>();
+
     @Input() active: any;
 
 
@@ -39,5 +41,9 @@ export class AppComboGridComponent<T> extends AppList {
     clickSearch($event: Event) {
         $event.stopPropagation();
         $event.stopImmediatePropagation();
+    }
+
+    onClickOutSide() {
+        this.clickOutSide.emit();
     }
 }
