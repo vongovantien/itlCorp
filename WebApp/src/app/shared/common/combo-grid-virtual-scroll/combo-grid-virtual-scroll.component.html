@@ -4,7 +4,8 @@
         [disabled]="Disabled" type="text" readonly data-toggle="dropdown"
         [value]="displaySelectedStr == '' ? null : displaySelectedStr"
         [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
-        [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon">
+        [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
+        (focus)="onFocusInputPlaceholder($event)">
     <ng-container>
         <div class="e--combogrid_icon">
             <span class="e--combogrid_icon__dropdown"
