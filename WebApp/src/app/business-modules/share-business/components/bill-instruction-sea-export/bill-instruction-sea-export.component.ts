@@ -118,6 +118,12 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
                     this.formSI.controls['shipper'].setValue(office.data.branchNameEn);
                 });
             }
+            if (res.consigneeId != null) {
+                const consignee = this.consignees.find(x => x.id === res.consigneeId);
+                if (consignee !== null) {
+                    this.getConsigneeDescription(consignee);
+                }
+            }
         }
     }
     initForm() {
@@ -242,9 +248,9 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
                 break;
             case 'consignee':
                 this.consignee.setValue(data.id);
-                const indexConsignee = this.consignees.findIndex(x => x.id === data.id);
-                if (indexConsignee > -1) {
-                    this.getConsigneeDescription(this.consignees[indexConsignee]);
+                const consignee = this.consignees.findIndex(x => x.id === data.id);
+                if (consignee !== null) {
+                    this.getConsigneeDescription(consignee);
                 }
                 break;
             case 'realshipper':
