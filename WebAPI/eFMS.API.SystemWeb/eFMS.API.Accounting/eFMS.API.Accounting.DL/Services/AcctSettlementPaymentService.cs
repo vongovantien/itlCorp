@@ -3425,6 +3425,67 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
 
         }
+
         #endregion --- EXPORT SETTLEMENT ---
+
+        public HandleState RecallRequest(Guid settlementId)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    AcctSettlementPayment settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
+                    if (settlement == null)
+                    {
+                        return new HandleState("Not found Settlement Payment");
+                    }
+                    if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED
+                           || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW)
+                    {
+                        return new HandleState("Settlement payment not yet send the request");
+                    }
+                    if (settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                            && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                            && settlement.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
+                    {
+                        return new HandleState("Settlement payment approving");
+                    }
+
+                    AcctApproveSettlement approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+                    //Update Approve Setttlement.
+                    if (approve != null)
+                    {
+                        approve.UserModified = currentUser.UserID;
+                        approve.DateModified = DateTime.Now;
+                        approve.Comment = "RECALL BY " + currentUser.UserName;
+                        approve.IsDeputy = true;
+
+                        HandleState hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
+                        if(!hsUpdateApproveSettlement.Success)
+                        {
+                            return new HandleState("Cannot Update Approve Settlement");
+                        }
+                        settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_NEW;
+                        settlement.UserModified = currentUser.UserID;
+                        settlement.DatetimeModified = DateTime.Now;
+
+                        HandleState hsUpdateSettlementPayment = DataContext.Update(settlement, x => x.Id == settlement.Id);
+
+                        trans.Commit();
+                    }
+
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
     }
 }

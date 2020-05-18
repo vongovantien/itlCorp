@@ -71,5 +71,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode);
 
+        HandleState RecallRequest(Guid settlementId);
+
     }
 }
