@@ -1,18 +1,20 @@
 import { Component, ViewChild, TemplateRef } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { Currency } from 'src/app/shared/models';
-import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
-import { ReportPreviewComponent } from 'src/app/shared/common';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError } from 'rxjs/operators';
-import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
-import { switchMap, tap } from 'rxjs/operators';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+
+import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { AppPage } from 'src/app/app.base';
+
+import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
+import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
+import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
+
+import { finalize, catchError } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-approve-settlement',
@@ -151,7 +153,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message, ' Approve Is Successfull');
-                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo)
+                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -215,6 +217,25 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
+                },
+            );
+    }
+
+    recall() {
+        this._progressRef.start();
+        this._accoutingRepo.RecallRequestSettlement(this.settlementPayment.settlement.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Recall Is Successfull');
+                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
                 },
             );
     }

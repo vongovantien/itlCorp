@@ -369,6 +369,13 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+
+    RecallRequestSettlement(settlementId: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/RecallRequest`, {}, { settlementId: settlementId })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
 
 
