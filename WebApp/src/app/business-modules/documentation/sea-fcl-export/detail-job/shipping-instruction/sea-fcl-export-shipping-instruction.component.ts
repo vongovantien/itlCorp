@@ -204,6 +204,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         if (!this.billSIComppnent.formSI.valid
             || (!!this.billSIComppnent.loadingDate.value && !this.billSIComppnent.loadingDate.value.startDate)
             || (!!this.billSIComppnent.issueDate.value && !this.billSIComppnent.issueDate.value.startDate)
+            || (this.billSIComppnent.pod.value === this.billSIComppnent.pol.value)
         ) {
             valid = false;
         }
