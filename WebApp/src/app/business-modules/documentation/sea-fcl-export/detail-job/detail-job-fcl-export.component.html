@@ -118,6 +118,6 @@
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
     [labelConfirm]="'Yes'"></confirm-popup>
 
-<info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+<info-popup #notAllowDelete [body]="'You are not allowed to delete this job'"></info-popup>
 
 <permission-403-popup></permission-403-popup>
