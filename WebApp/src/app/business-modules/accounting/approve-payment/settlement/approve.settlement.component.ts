@@ -14,6 +14,7 @@ import { SettlementFormCreateComponent } from '../../settlement-payment/componen
 
 import { finalize, catchError } from 'rxjs/operators';
 import { switchMap, tap } from 'rxjs/operators';
+import { timeoutD } from '@decorators';
 
 
 @Component({
@@ -193,13 +194,20 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
-                    setTimeout(() => {
-                        this.previewPopup.frm.nativeElement.submit();
-                        this.previewPopup.show();
-                    }, 1000);
+
+                    this.showPreview();
+                    // setTimeout(() => {
+                    //     this.previewPopup.frm.nativeElement.submit();
+                    //     this.previewPopup.show();
+                    // }, 1000);
 
                 },
             );
+    }
+    @timeoutD(1000)
+    showPreview() {
+        this.previewPopup.frm.nativeElement.submit();
+        this.previewPopup.show();
     }
 
     exportSettlementPayment(language: string) {
