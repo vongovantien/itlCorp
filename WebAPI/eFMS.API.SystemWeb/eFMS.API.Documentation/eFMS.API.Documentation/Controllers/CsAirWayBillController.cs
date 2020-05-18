@@ -99,5 +99,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = airWayBillService.AirwayBillExport(jobId);
             return Ok(result);
         }
+
+        /// <summary>
+        /// preview house airway bill
+        /// </summary>
+        /// <param name="jobId">Id of Job</param>
+        /// <param name="reportType">report type</param>
+        /// 
+        /// <returns></returns>
+        [HttpGet("PreviewAirwayBill")]
+        public IActionResult PreviewAirwayBill(Guid jobId,string reportType)
+        {
+            var result = airWayBillService.PreviewAirwayBill(jobId,reportType);
+            return Ok(result);
+        }
     }
 }

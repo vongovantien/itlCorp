@@ -25,10 +25,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string POLCode { get; set; }
         public string PODCode { get; set; }
         public string ColoaderCode { get; set; }
-        public string WarehousePodNameEn { get; set; }
-        public string WarehousePodNameVn { get; set; }
-        public string WarehousePolNameEn { get; set; }
-        public string WarehousePolNameVn { get; set; }
+        public WarehouseData WarehousePOD { get; set; }
+        public WarehouseData WarehousePOL { get; set; }
         public string POLCountryNameEn { get; set; }
         public string POLCountryNameVn { get; set; }
         public string POLCountryCode { get; set; }
@@ -52,5 +50,14 @@ namespace eFMS.API.Documentation.DL.Models
         public string Location { get; set; }
         public string AddressEn { get; set; }
         public string Tel { get; set; }
+    }
+
+    public class WarehouseData
+    {
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
+        public string NameAbbr { get; set; }
+        public string Location { get; set; }
+
     }
 }

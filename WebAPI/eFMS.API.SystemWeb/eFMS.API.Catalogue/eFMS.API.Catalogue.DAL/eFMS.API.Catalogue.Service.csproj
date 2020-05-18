@@ -57,7 +57,6 @@
     <Compile Remove="Models\SysBu.cs" />
     <Compile Remove="Models\SysCompany.cs" />
     <Compile Remove="Models\SysDepartment.cs" />
-    <Compile Remove="Models\SysEmployee.cs" />
     <Compile Remove="Models\SysGroup.cs" />
     <Compile Remove="Models\SysGroupRole.cs" />
     <Compile Remove="Models\SysImage.cs" />

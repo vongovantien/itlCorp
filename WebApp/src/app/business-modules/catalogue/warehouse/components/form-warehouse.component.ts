@@ -54,6 +54,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             code: [{ value: null, disabled: true }, FormValidators.required],
             warehouseNameEN: [null, FormValidators.required],
             warehouseNameVN: [null, FormValidators.required],
+            displayName: [],
             country: [null, Validators.required],
             province: [null, Validators.required],
             district: [null, Validators.required],
@@ -98,7 +99,8 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
             district: districtActive || [],
             address: res.address,
             active: res.active,
-            flightVesselNo: res.flightVesselNo
+            flightVesselNo: res.flightVesselNo,
+            displayName: res.displayName
         });
     }
 
@@ -138,6 +140,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
         this.warehouse.address = this.address.value;
         this.warehouse.flightVesselNo = this.flightVesselNo.value;
         this.warehouse.active = !!this.isUpdate ? this.active.value : true;
+        this.warehouse.displayName = this.warehouseForm.controls["displayName"].value;
     }
     trimInputForm(formData: any) {
         this.trimInputValue(this.code, formData.code);

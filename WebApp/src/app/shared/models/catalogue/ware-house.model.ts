@@ -16,6 +16,7 @@ export class Warehouse extends BaseModel {
     address: string = null;
     placeType: number = null;
     active?: boolean = null;
+    displayName: string = null;
 
     constructor(data?: any) {
         super();

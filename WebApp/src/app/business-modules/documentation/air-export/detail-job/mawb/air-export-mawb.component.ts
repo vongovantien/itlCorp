@@ -9,7 +9,7 @@ import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
 import { formatDate } from '@angular/common';
-import { InfoPopupComponent, } from '@common';
+import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -33,6 +33,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     @ViewChild(ShareBusinessDIMVolumePopupComponent, { static: false }) dimVolumePopup: ShareBusinessDIMVolumePopupComponent;
     @ViewChild(ShareAirExportOtherChargePopupComponent, { static: false }) otherChargePopup: ShareAirExportOtherChargePopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     formMAWB: FormGroup;
 
@@ -758,6 +759,28 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         this.downLoadFile(response, "application/ms-excel", 'Air Export - TCS.xlsx');
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+
+    preview(reportType: string) {
+        this._documentationRepo.previewAirwayBill(this.jobId, reportType)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );

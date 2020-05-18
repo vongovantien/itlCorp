@@ -598,6 +598,15 @@ export class DocumentationRepo {
         );
     }
 
+    previewAirwayBill(jobId: string, reportType: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsAirWayBill/PreviewAirwayBill`, { jobId: jobId, reportType: reportType }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     previewAirCdNote(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewAirCdNote`, body).pipe(
             map((data: any) => data)

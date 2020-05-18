@@ -464,7 +464,9 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Currency = currencyRepository.Get(x => x.Id == charge.CurrencyId).FirstOrDefault()?.CurrencyName;
                 charge.ExchangeRate = _exchangeRate;
                 charge.Hwbno = hb != null ? hb.Hwbno : opsTransaction?.Hwbno;
-                charge.Unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault()?.UnitNameEn;
+                var unit = unitRepository.Get(x => x.Id == charge.UnitId).FirstOrDefault();
+                charge.Unit = unit?.UnitNameEn;
+                charge.UnitCode = unit?.Code;
                 charge.ChargeCode = catCharge?.Code;
                 charge.NameEn = catCharge?.ChargeNameEn;
                 listSurcharges.Add(charge);
@@ -930,7 +932,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Subject = "LOCAL CHARGES";
                     charge.Description = item.NameEn;//Charge name
                     charge.Quantity = item.Quantity;
-                    charge.Unit = item.Unit;
+                    charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = criteria.Currency;
                     charge.UnitPrice = (item.UnitPrice != null ? item.UnitPrice : 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency
                     charge.VAT = item.Vatrate != null ? item.Vatrate : 0;
@@ -950,7 +952,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyDescription = string.Empty;
 
             parameter.DebitNo = criteria.CreditDebitNo;
-            parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd/MM/yyyy") : string.Empty;//Lấy ngày tạo CDNote
+            parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
             parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
 

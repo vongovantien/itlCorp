@@ -10,7 +10,7 @@
             <div class="modal-body">
                 <form class="m-form m-form m-form--state" [formGroup]="warehouseForm">
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && code.invalid }">
                                 <label class="form-control-label">
@@ -23,7 +23,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && warehouseNameEN.invalid }">
                                 <label class="form-control-label">
@@ -37,7 +37,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && warehouseNameVN.invalid }">
                                 <label class="form-control-label">
@@ -51,9 +51,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Name(Abbr)
+                                </label>
+                                <input type="text" class="form-control m-input" placeholder="Please enter name"
+                                    autocomplete="nope" formControlName="displayName">
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && country.invalid}">
                                 <label class="form-control-label">
@@ -68,7 +77,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && province.invalid }">
                                 <label class="form-control-label">
@@ -83,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && district.invalid }">
                                 <label class="form-control-label">
@@ -97,9 +106,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-4">
+                        <div class="col-lg-3">
                             <div class="form-group"
                                 [ngClass]="{ 'm-form__group has-danger': isSubmitted && address.invalid }">
                                 <label class="form-control-label">
@@ -112,7 +119,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                    </div>
+                    <div class="row">
+
+                        <div class="col-lg-3">
                             <div class="form-group">
                                 <label class="form-control-label">
                                     Flight/Vessel No
@@ -120,7 +130,7 @@
                                 <input type="text" class="form-control m-input" formControlName="flightVesselNo">
                             </div>
                         </div>
-                        <div class="col-lg-4" *ngIf="isUpdate">
+                        <div class="col-lg-3" *ngIf="isUpdate">
                             <div class="form-group">
                                 <label class="form-control-label"> Active </label>
                                 <div class="col-lg-8">

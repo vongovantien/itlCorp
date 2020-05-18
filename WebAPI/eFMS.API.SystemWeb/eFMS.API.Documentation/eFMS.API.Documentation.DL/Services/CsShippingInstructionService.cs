@@ -145,7 +145,14 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
-            parameter.TotalPackage = totalPackage;
+            if(model.CsTransactionDetails.Count > 1)
+            {
+                parameter.TotalPackages = totalPackage + " PKG(S)";
+            }
+            else
+            {
+                parameter.TotalPackages = instructions.FirstOrDefault()?.Containers;
+            }
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
@@ -181,7 +188,8 @@ namespace eFMS.API.Documentation.DL.Services
                 Contact = model.IssuedUserName,
                 Tel = office?.Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
-                DecimalNo = 2
+                DecimalNo = 2,
+                TotalPackages = string.Empty
             };
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
@@ -233,7 +241,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 shippingInstructions.Add(container);
             }
-            parameter.TotalPackage = 0;
+
             result = new Crystal
             {
                 ReportName = "SeaOnboardContainerList.rpt",
@@ -313,6 +321,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
+
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionNew.rpt",
@@ -337,7 +346,6 @@ namespace eFMS.API.Documentation.DL.Services
             var units = unitRepository.Get();
             if (model.CsTransactionDetails == null) return result;
             var total = 0;
-            int totalPackage = 0;
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
 
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
@@ -354,7 +362,12 @@ namespace eFMS.API.Documentation.DL.Services
             };
             string jobNo = opsTrans?.JobNo;
             string noPieces = string.Empty;
-            var instruction = new SeaShippingInstruction
+            foreach (var item in model.CsTransactionDetails)
+            {
+                int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
+                total += (int)(quantity ?? 0);
+            }
+                var instruction = new SeaShippingInstruction
             {
                 TRANSID = jobNo,
                 Attn = model.InvoiceNoticeRecevier,
@@ -383,7 +396,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MaskNos = model.ContainerSealNo
             };
             instructions.Add(instruction);
-            parameter.TotalPackage = totalPackage;
+            parameter.TotalPackages = model.PackagesNote;
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionSummary.rpt",
