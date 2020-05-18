@@ -360,14 +360,17 @@ namespace eFMS.API.Documentation.DL.Services
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
+            int totalPackage = 0;
             string jobNo = opsTrans?.JobNo;
-            string noPieces = string.Empty;
             foreach (var item in model.CsTransactionDetails)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
                 total += (int)(quantity ?? 0);
+
+                int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
+                totalPackage += (int)(totalPack ?? 0);
             }
-                var instruction = new SeaShippingInstruction
+            var instruction = new SeaShippingInstruction
             {
                 TRANSID = jobNo,
                 Attn = model.InvoiceNoticeRecevier,
@@ -385,7 +388,7 @@ namespace eFMS.API.Documentation.DL.Services
                 ShippingMarks = string.Empty,
                 Containers = model.ContainerNote,
                 // ContSealNo = item.SealNo,
-                NoofPeace = noPieces,
+                NoofPeace = model.PackagesNote,
                 SIDescription = model.GoodsDescription,
                 GrossWeight = model.GrossWeight,
                 CBM = model.Volume,
@@ -396,7 +399,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MaskNos = model.ContainerSealNo
             };
             instructions.Add(instruction);
-            parameter.TotalPackages = model.PackagesNote;
+            parameter.TotalPackages = totalPackage + " PKG(S)";
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionSummary.rpt",
