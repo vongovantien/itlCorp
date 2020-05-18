@@ -403,7 +403,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
-            parameter.TotalPackage = totalPackage;
+            parameter.TotalPackages = string.Empty;
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionSummary.rpt",
