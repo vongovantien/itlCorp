@@ -165,7 +165,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     getCustomDecleration() {
-        this.cds = this._operationRepo.getCustomsShipmentNotLocked()
+        this.cds = this._operationRepo.getListCustomNoAsignPIC()
             .pipe(
                 catchError(this.catchError)
             );
@@ -396,6 +396,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             jobNo: this.selectedShipment.jobId,
             mblno: this.selectedShipment.mbl,
             hblno: this.selectedShipment.hbl,
+            quantity: 1
         }));
     }
 
