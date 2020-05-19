@@ -19,7 +19,7 @@ import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-no
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
 import { Observable, Subscription } from 'rxjs';
-import { catchError, takeUntil, switchMap, finalize, tap } from 'rxjs/operators';
+import { catchError, takeUntil, switchMap, finalize, tap, skip } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
@@ -406,6 +406,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
         return valid;
     }
+
     showCharge(charge: ArrivalFreightCharge, index: number) {
         this.selectedFreightCharge = charge;
         this.selectedIndexFreightCharge = index;
@@ -427,13 +428,14 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.subscription.unsubscribe();
                     comboGridContainerRef.clear();
                 });
-        }
-    }
 
-    handleClickOutSide(index: number) {
-        const t = this.combogrids.toArray()[index];
-        if (!!t) {
-            t.clear();
+            ((this.componentRef.instance) as AppComboGridComponent<Charge>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        comboGridContainerRef.clear();
+                    }
+                );
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -27,6 +27,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Output() remove = new EventEmitter<any>();
 
     @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
+    @ViewChild('clkSearch', { static: true }) inputPlaceholder: ElementRef;
+
     @ViewChildren('listItem') listItems: QueryList<any>;
 
     currentItemSelected: any = null;
@@ -43,6 +45,17 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     showAngledownIcon: boolean = false;
 
     keyboardEventsManager: ListKeyManager<any>;
+
+    isFocusSearch: boolean = false;
+
+
+
+    @HostListener('keydown.Enter', ['$event'])
+    onKeydownEnterHandler(event: KeyboardEvent) {
+        if (this.isFocusSearch) {
+            this.inputPlaceholder.nativeElement.click();
+        }
+    }
 
     constructor(
     ) {
@@ -100,22 +113,23 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                 currenIndex--;
 
                 return false;
-            } else if (event.keyCode === ENTER) {
-                // TODO handle event enter when selecting titem.
-                // Set index for item is selecting
-                this.keyboardEventsManager.setActiveItem(this.indexSelected);
-
-                // get item selected.
-                const arrayItems = this.listItems.toArray();
-                const dataSourceIndex: number = +(<ElementRef>arrayItems[this.keyboardEventsManager.activeItemIndex]).nativeElement.getAttribute('id');
-                const itemObject = this.ConstDataSources[dataSourceIndex - 1];
-
-                if (!!this.CurrentActiveItemIdObj) {
-                    // this.setCurrentActiveItemId(Object.assign({}, this.CurrentActiveItemIdObj, { value: itemObject[this.CurrentActiveItemIdObj.field] }));
-                }
-
-                return false;
             }
+            // else if (event.keyCode === ENTER) {
+            //     // TODO handle event enter when selecting titem.
+            //     // Set index for item is selecting
+            //     this.keyboardEventsManager.setActiveItem(this.indexSelected);
+
+            //     // get item selected.
+            //     const arrayItems = this.listItems.toArray();
+            //     const dataSourceIndex: number = +(<ElementRef>arrayItems[this.keyboardEventsManager.activeItemIndex]).nativeElement.getAttribute('id');
+            //     const itemObject = this.ConstDataSources[dataSourceIndex - 1];
+
+            //     if (!!this.CurrentActiveItemIdObj) {
+            //         // this.setCurrentActiveItemId(Object.assign({}, this.CurrentActiveItemIdObj, { value: itemObject[this.CurrentActiveItemIdObj.field] }));
+            //     }
+
+            //     return false;
+            // }
         }
     }
 
@@ -222,5 +236,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (this.inputSearch) {
             setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
         }
+    }
+
+    onFocusInputPlaceholder(e) {
+        this.isFocusSearch = true;
     }
 }

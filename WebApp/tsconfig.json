@@ -30,7 +30,8 @@
             "@constants": ["src/constants"],
             "@share-bussiness": ["src/app/business-modules/share-business"],
             "@store": ["src/app/store"],
-            "@system-constants": ["src/constants"]
+            "@system-constants": ["src/constants"],
+            "@decorators": ["src/app/shared/decorators"]
         }
     }
 }

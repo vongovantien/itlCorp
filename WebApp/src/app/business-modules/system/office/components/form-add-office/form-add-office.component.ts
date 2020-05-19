@@ -106,7 +106,6 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             ).subscribe(
                 (res: any) => {
                     this.companies = res;
-                    console.log(this.companies);
                     this.getCompanyData(this.companies);
                 },
             );

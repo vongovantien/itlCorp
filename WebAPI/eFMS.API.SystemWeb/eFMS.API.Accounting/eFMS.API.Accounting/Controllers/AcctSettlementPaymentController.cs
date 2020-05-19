@@ -678,5 +678,24 @@ namespace eFMS.API.Accounting.Controllers
             List<SettlementExportGroupDefault> data = acctSettlementPaymentService.QueryDataSettlementExport(settlementNoList);
             return Ok(data);
         }
+
+        [HttpPost]
+        [Route("RecallRequest")]
+        [Authorize]
+        public IActionResult RecalRequest(Guid settlementId)
+        {
+            HandleState settlementHandleState = acctSettlementPaymentService.RecallRequest(settlementId);
+            ResultHandle _result;
+            if (!settlementHandleState.Success)
+            {
+                _result = new ResultHandle { Status = settlementHandleState.Success, Message = settlementHandleState.Exception.Message };
+                return BadRequest(_result);
+            }
+            else
+            {
+                _result = new ResultHandle { Status = settlementHandleState.Success };
+                return Ok(_result);
+            }
+        }
     }
 }

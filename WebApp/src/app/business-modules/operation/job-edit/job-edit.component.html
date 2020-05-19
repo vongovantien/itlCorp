@@ -27,7 +27,8 @@
     <ng-container *ngIf="!!opsTransaction && opsTransaction.isLocked === false">
         <div class="c-button-actions">
             <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()">
+                *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()"
+                [disabled]="tab !== 'job-edit'">
                 <span>
                     <i class="la la la-save"></i>
                     <span>
