@@ -36,6 +36,8 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IAcctCDNoteServices, AcctCDNoteServices>();
             services.AddTransient<ICsManifestService, CsManifestService>();
             services.AddTransient<ICsShippingInstructionService, CsShippingInstructionService>();
+            services.AddTransient<ICsBookingNoteService, CsBookingNoteService>();
+
             services.AddTransient<IOpsTransactionService, OpsTransactionService>();
             services.AddTransient<IShipmentService, ShipmentService>();
             services.AddTransient<ICsArrivalFrieghtChargeService, CsArrivalFrieghtChargeService>();
