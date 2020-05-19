@@ -419,8 +419,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
-                                <input type="number" class="form-control" formControlName="grossWeight"
-                                    [decimals]="digitDecimal" numeric [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                <input type="number" class="form-control" formControlName="grossWeight" numeric
+                                    [decimals]="2" autoFormatCurrency>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
                                     GW must be less than or equal to CW
@@ -459,8 +459,8 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>C.W</label>
-                                <input type="number" class="form-control" formControlName="chargeWeight"
-                                    [decimals]="digitDecimal" numeric [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                    [decimals]="2" autoFormatCurrency>
                             </div>
                         </div>
 
@@ -572,18 +572,18 @@
                                                     [class.selected-row]="selectedIndexDIM === j">
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="length" numeric [decimals]=2
-                                                            [digitNumbers]="2" autoFormatDecimal>
+                                                            formControlName="length" numeric [decimals]="2"
+                                                            autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="width" numeric [decimals]=2
-                                                            [digitNumbers]="2" autoFormatDecimal>
+                                                            formControlName="width" numeric [decimals]="2"
+                                                            autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="height" [decimals]="digitDecimal" numeric
-                                                            [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                                            [decimals]="2" autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"

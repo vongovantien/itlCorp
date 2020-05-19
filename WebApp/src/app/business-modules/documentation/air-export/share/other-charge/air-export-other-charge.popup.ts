@@ -115,4 +115,9 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
             return acc;
         }, 0);
     }
+
+    updateTotalAmount(item: CsOtherCharge) {
+        item.amount = item.quantity * item.rate;
+        this.updateDescription();
+    }
 }
