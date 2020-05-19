@@ -9,6 +9,8 @@ export class CsOtherCharge extends BaseModel {
     chargeName: string = null;
     amount: number = null;
     dueTo: string = 'Agent';
+    quantity: number = null;
+    rate: number = null;
 
     constructor(object?: any) {
         super();
