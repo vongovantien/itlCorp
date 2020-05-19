@@ -22,7 +22,8 @@
                                         <input name="keyword"
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             placeholder="Input keyword" (click)="isShow = !isShow"
-                                            formControlName="chargeName" (ngModelChange)="onSearchAutoComplete($event)">
+                                            formControlName="chargeName" (ngModelChange)="onSearchAutoComplete($event)"
+                                            [attr.disabled]="isFromshipment ? '' : null">
                                         <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
                                             <div class="dropdown-menu e--combogrid-content d-block">
                                                 <div class="tabel-wrapper table-fixed">
@@ -70,10 +71,11 @@
                                 <div class="form-group">
                                     <label for="">Shipment <span class="text-danger">(*)</span></label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedShipment"
-                                        [height]="150" (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'shipment')"
                                         [dataSources]="configShipment.dataSource"
                                         [displayFields]="configShipment.displayFields"
-                                        [selectedDisplayFields]="configShipment.selectedDisplayFields">
+                                        [selectedDisplayFields]="configShipment.selectedDisplayFields"
+                                        [disabled]="isFromshipment">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -84,7 +86,7 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'payer')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200">
+                                        [displayFields]="configPartner.displayFields" [disabled]="isFromshipment">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -96,13 +98,15 @@
                                         <div class="form-group">
                                             <label for="">Qty <span class="text-danger">(*)</span></label>
                                             <input type="number" class="form-control" formControlName="qty"
-                                                placeholder="Quantity" (ngModelChange)="calculateTotalAmount()">
+                                                placeholder="Quantity" (ngModelChange)="calculateTotalAmount()"
+                                                [attr.disabled]="isFromshipment ? '' : null">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Unit <span class="text-danger">(*)</span></label>
-                                            <select class="form-control" formControlName="unit">
+                                            <select class="form-control" formControlName="unit"
+                                                [attr.disabled]="isFromshipment ? '' : null">
                                                 <option [ngValue]="null" disabled>Select Unit</option>
                                                 <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
                                                     {{unit.code}}</option>
@@ -115,7 +119,8 @@
                                 <div class="form-group">
                                     <label for="">Unit Price <span class="text-danger">(*)</span></label>
                                     <input class="form-control" formControlName="price" placeholder="Unit Price"
-                                        (ngModelChange)="calculateTotalAmount()">
+                                        (ngModelChange)="calculateTotalAmount()"
+                                        [attr.disabled]="isFromshipment ? '' : null">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -124,14 +129,15 @@
                                         <div class="form-group">
                                             <label for="">Currency</label>
                                             <input type="text" class="form-control" value="VND" disabled
-                                                formControlName="currency">
+                                                formControlName="currency" [attr.disabled]="isFromshipment ? '' : null">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">VAT </label>
                                             <input type="number" class="form-control" formControlName="vat"
-                                                placeholder="VAT" (ngModelChange)="calculateTotalAmount()">
+                                                placeholder="VAT" (ngModelChange)="calculateTotalAmount()"
+                                                [attr.disabled]="isFromshipment ? '' : null">
                                         </div>
                                     </div>
                                 </div>
@@ -150,6 +156,7 @@
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
+                                            [attr.disabled]="isFromshipment ? '' : null"
                                             (change)="onChangeOBHPartnerCheckBox()">
                                         OBH for Customer
                                         <span></span>
@@ -166,8 +173,8 @@
                                         #OBHPartnerComponent (itemSelected)="onSelectDataFormInfo($event, 'obh')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200"
-                                        [disabled]="isDisabledOBHPartner">
+                                        [displayFields]="configPartner.displayFields"
+                                        [disabled]="isDisabledOBHPartner || isFromshipment">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -178,7 +185,8 @@
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Type</label>
-                                            <select class="form-control" formControlName="type">
+                                            <select class="form-control" formControlName="type"
+                                                [attr.disabled]="isFromshipment ? '' : null">
                                                 <option *ngFor="let type of types; trackBy: trackByFn" [ngValue]="type">
                                                     {{type.title}}</option>
                                             </select>
@@ -212,6 +220,10 @@
                                                     [maxDate]="maxDate" name="daterange" readonly [autoApply]="true"
                                                     [singleDatePicker]="true" formControlName="invoiceDate"
                                                     [placeholder]="'Select Invoice Date'" />
+                                                <span class="m-input-icon_clear" (click)="resetFormControl(invoiceDate)"
+                                                    *ngIf="!!invoiceDate.value && !!invoiceDate.value.startDate">
+                                                    <i class="la la-times"></i>
+                                                </span>
                                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                                     <span>
                                                         <i class="la la-calendar"></i>
@@ -225,7 +237,8 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label for="">Custom No</label>
-                                    <select class="form-control" name="type" formControlName="customNo">
+                                    <select class="form-control" name="type" formControlName="customNo"
+                                        [attr.disabled]="isFromshipment ? '' : null">
                                         <option [ngValue]="null" disabled>Choose CustomNo</option>
                                         <option
                                             *ngFor="let customDeclaration of customDeclarations; let i = index; trackBy: trackByFn"
@@ -239,7 +252,7 @@
                                 <div class="form-group">
                                     <label for="">Cont No</label>
                                     <input type="text" class="form-control" formControlName="contNo"
-                                        placeholder="Cont No">
+                                        placeholder="Cont No" [attr.disabled]="isFromshipment ? '' : null">
                                 </div>
                             </div>
                             <div class="col-8">

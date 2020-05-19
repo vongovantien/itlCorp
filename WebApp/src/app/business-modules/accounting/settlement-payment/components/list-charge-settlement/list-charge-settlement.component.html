@@ -126,14 +126,13 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td [class.text-underline]="!surcharge.isFromShipment">
+                                    <td class="text-underline">
                                         <a (click)="updateChargeWithJob(surcharge,i)" class="pointer">
                                             {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                         </a>
                                     </td>
-                                    <td class="text-primary pointer"
-                                        (click)="openSurchargeDetail(surcharge, i, 'update')"
-                                        [class.text-underline]="!surcharge.isFromShipment">
+                                    <td class="text-primary pointer class.text-underline"
+                                        (click)="openSurchargeDetail(surcharge, i, 'update')">
                                         {{surcharge.chargeName}}
                                     </td>
                                     <td>{{surcharge.quantity}}</td>
@@ -177,3 +176,5 @@
 
 <table-list-charge-popup (onChange)="onRequestSurcharge($event)"
     (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
+
+<charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
