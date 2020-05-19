@@ -26,6 +26,7 @@ import { ShareApprovePaymentModule } from '../approve-payment/components/share-a
 import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from './components/popup/table-list-charge/table-list-charge.component';
 import { ShareAccountingModule } from '../share-accouting.module';
+import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 
 const routing: Routes = [
     {
@@ -61,6 +62,7 @@ const COMPONENT = [
     SettlementTableSurchargeComponent,
     SettlementFormCopyPopupComponent,
     SettlementTableListChargePopupComponent,
+    SettlementChargeFromShipmentPopupComponent
 ];
 
 const customCurrencyMaskConfig = {
