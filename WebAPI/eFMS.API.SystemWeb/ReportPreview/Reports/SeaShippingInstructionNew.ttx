@@ -1,7 +1,7 @@
 TRANSID	String	50	
 ShippingMarkImport	Memo		
 CheckAttachNull	String	255	
-DatePackage	Date		
+DatePackage	DateTime		
 ToPartner	String	50	
 Attn	String	255	
 Notify	String	255	

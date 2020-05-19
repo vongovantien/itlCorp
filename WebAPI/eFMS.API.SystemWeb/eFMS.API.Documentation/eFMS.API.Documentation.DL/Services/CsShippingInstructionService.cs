@@ -265,35 +265,38 @@ namespace eFMS.API.Documentation.DL.Services
 
             var instructions = new List<SeaShippingInstruction>();
             var units = unitRepository.Get();
+            var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
+            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
             var parameter = new SeaShippingInstructionParameter
             {
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
-                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
-                CompanyDescription = "itl company",
-                Contact = si.IssuedUserName ?? string.Empty,
-                Tel = string.Empty,
-                Website = DocumentConstants.COMPANY_WEBSITE,
+                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyDescription = string.Empty,
+                Contact = issueBy ?? string.Empty,
+                Tel = office?.Tel ?? string.Empty,
+                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var housebills = transactionDetailService.Query(criteria);
             var total = 0;
-            string jobNo = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo;
+            int totalPackage = 0;
+            string noPieces = string.Empty;
             foreach (var item in housebills)
             {
                 int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
-                total += (int)(quantity != null ? quantity : 0);
-                string noPieces = string.Empty;
-                if (item.PackageQty != null && item.PackageQty != 0 && item.PackageType != null && item.PackageType != 0)
-                {
-                    var packageType = unitRepository.Get(x => x.Id == item.PackageType)?.FirstOrDefault();
-                    noPieces = noPieces + item.PackageQty + " " + packageType.UnitNameEn;
-                }
+                total += (int)(quantity ?? 0);
+                int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
+                totalPackage += (int)(totalPack ?? 0);
+
+                var packages = containerRepository.Get(x => x.Hblid == item.Id).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
+                noPieces = string.Join(", ", packages);
 
                 var instruction = new SeaShippingInstruction
                 {
-                    TRANSID = jobNo,
+                    TRANSID = opsTrans?.JobNo,
                     Attn = si.InvoiceNoticeRecevier,
                     ToPartner = si.SupplierName,
                     Re = si.BookingNo,
@@ -320,6 +323,15 @@ namespace eFMS.API.Documentation.DL.Services
                     MaskNos = item.ContSealNo
                 };
                 instructions.Add(instruction);
+            }
+
+            if (housebills.Count > 1)
+            {
+                parameter.TotalPackages = totalPackage + " PKG(S)";
+            }
+            else
+            {
+                parameter.TotalPackages = instructions.FirstOrDefault()?.Containers;
             }
 
             result = new Crystal
