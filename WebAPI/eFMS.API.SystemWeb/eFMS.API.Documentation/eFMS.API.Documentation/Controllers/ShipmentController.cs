@@ -175,5 +175,16 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// get list of shipment assign or PIC is current user
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetShipmentAssignPIC")]
+        [Authorize]
+        public IActionResult GetShipmentAssignPIC()
+        {
+            var list = shipmentService.GetShipmentAssignPIC();
+            return Ok(list);
+        }
     }
 }

@@ -870,6 +870,12 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentAssignPIC">
+            <summary>
+            get list of shipment assign or PIC is current user
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             

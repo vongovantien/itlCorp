@@ -495,6 +495,64 @@ namespace eFMS.API.Documentation.DL.Services
             var shipments = shipmentsOperation.Union(shipmentsDocumention);
             return shipments;
         }
+
+        public IQueryable<Shipments> GetShipmentAssignPIC()
+        {
+            var userCurrent = currentUser.UserID;           
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            // Shipment ops assign is current user
+            var shipmentsOps = from ops in operations
+                               join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
+                               where osa.MainPersonInCharge == userCurrent
+                               select ops;
+            //Shipment ops PIC is current user
+            var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
+            //Merger Shipment Ops assign & PIC
+            var shipmentsOpsMerge = shipmentsOps.Union(shipmentsOpsPIC).Select(s => new Shipments
+            {
+                Id = s.Id,
+                JobId = s.JobNo,
+                HBL = s.Hwbno,
+                MBL = s.Mblno,
+                CustomerId = s.CustomerId,
+                AgentId = s.AgentId,
+                CarrierId = s.SupplierId,
+                HBLID = s.Hblid,
+                Service = "CL"
+            }).Distinct();
+            
+            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            //Shipment doc assign is current user
+            var shipmentsDoc = from cst in transactions
+                               join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
+                               where osa.MainPersonInCharge == userCurrent
+                               select cst;
+            //Shipment doc PIC is current user
+            var shipmentsDocPIC = transactions.Where(x => x.PersonIncharge == userCurrent);
+            //Merge shipment Doc assign & PIC
+            var shipmentsDocMerge = shipmentsDoc.Union(shipmentsDocPIC);
+            shipmentsDocMerge = shipmentsDocMerge.Distinct();
+
+            var shipmentsDocumention = shipmentsDocMerge.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
+            {
+                Id = x.x.Id,
+                JobId = x.x.JobNo,
+                HBL = x.y.Hwbno,
+                MBL = x.x.Mawb,
+                CustomerId = x.y.CustomerId,
+                AgentId = x.x.AgentId,
+                CarrierId = x.x.ColoaderId,
+                HBLID = x.y.Id,
+                Service = x.x.TransactionType
+            });
+            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+
+            var result = _shipmentsOperation.Union(_shipmentsDocumention);
+            return result.OrderByDescending(o => o.MBL);
+        }
+
         #region -- EXPORT SHIPMENT OVERVIEW
         public IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria)
         {
