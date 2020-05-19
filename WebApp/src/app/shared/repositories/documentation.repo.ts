@@ -838,4 +838,8 @@ export class DocumentationRepo {
             map((data: { hblNo: string }) => data.hblNo)
         );
     }
+
+    getShipmentAssginPIC() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
+    }
 }

@@ -156,7 +156,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     getShipmentCommonData() {
-        this._documentRepo.getShipmentNotLocked().pipe(catchError(this.catchError))
+        this._documentRepo.getShipmentAssginPIC().pipe(catchError(this.catchError))
             .subscribe(
                 (res: OperationInteface.IShipment[]) => {
                     this.shipments = res;
