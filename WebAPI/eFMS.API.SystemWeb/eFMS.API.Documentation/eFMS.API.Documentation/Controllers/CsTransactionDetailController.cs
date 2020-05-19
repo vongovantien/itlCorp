@@ -401,5 +401,25 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewBookingNote(criteria);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Update Input Booking Note 
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("UpdateInputBKNote")]
+        [Authorize]
+        public IActionResult UpdateInputBKNote(BookingNoteCriteria criteria)
+        {
+            var hs = csTransactionDetailService.UpdateInputBKNote(criteria);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

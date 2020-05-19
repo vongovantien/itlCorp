@@ -3,7 +3,7 @@ import { Component, ViewChild, ElementRef } from "@angular/core";
 import { FormGroup, AbstractControl, FormBuilder } from "@angular/forms";
 import { DocumentationRepo } from "@repositories";
 import { catchError, finalize } from "rxjs/operators";
-import { Crystal } from "@models";
+import { Crystal, CsTransactionDetail } from "@models";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -30,6 +30,7 @@ export class InputBookingNotePopupComponent extends PopupBase {
 
     reportType: string = '';
     hblId: string = '';
+    hblDetail: CsTransactionDetail;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
@@ -78,6 +79,7 @@ export class InputBookingNotePopupComponent extends PopupBase {
                 (res: Crystal) => {
                     this.dataReport = JSON.stringify(res);
                     if (res != null && res.dataSource.length > 0) {
+                        this.updateInputBookingNote(body);
                         setTimeout(() => {
                             if (!this.popupReport.isShown) {
                                 this.popupReport.config = this.options;
@@ -92,8 +94,38 @@ export class InputBookingNotePopupComponent extends PopupBase {
             );
     }
 
+    updateInputBookingNote(body: IBookingNoteCriteria) {
+        this._documentationRepo.updateInputBookingNoteAirExport(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.hblDetail.flexId = body.flexId;
+                        this.hblDetail.flightNoRowTwo = body.flightNo2;
+                        this.hblDetail.contactPerson = body.contactPerson;
+                        this.hblDetail.closingTime = body.closingTime;
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
+    bindingFormBN(housebill: CsTransactionDetail) {
+        this.hblDetail = housebill;
+        this.formInputBN.setValue({
+            flexId: this.hblDetail.flexId,
+            flightNo2: this.hblDetail.flightNoRowTwo,
+            contactPerson: this.hblDetail.contactPerson,
+            closingTime: this.hblDetail.closingTime
+        });
+    }
+
     closePopup() {
-        this.formInputBN.reset();
+        // this.formInputBN.reset();
         this.hide();
     }
 

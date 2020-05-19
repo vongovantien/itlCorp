@@ -636,6 +636,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.UpdateInputBKNote(eFMS.API.Documentation.DL.Models.Criteria.BookingNoteCriteria)">
+            <summary>
+            Update Input Booking Note 
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
             <summary>
             

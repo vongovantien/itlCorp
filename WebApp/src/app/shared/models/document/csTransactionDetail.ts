@@ -103,6 +103,10 @@ export class CsTransactionDetail {
   packageType: string = null;
   transactionType: string = null;
   rateCharge: number = null;
+  flexId: string = '';
+  flightNoRowTwo: string = '';
+  contactPerson: string = '';
+  closingTime: string = '';
   constructor(object?: any) {
     const self = this;
     for (const key in object) {
