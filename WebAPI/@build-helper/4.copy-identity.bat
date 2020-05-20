@@ -10,4 +10,3 @@ for %%d in (
 ) do (xcopy "..\eFMS.API.SystemWeb\eFMS.IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.Service.dll" "%%d" /E /Y
 xcopy "..\eFMS.API.SystemWeb\eFMS.IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.Service.pdb" "%%d" /E /Y
 xcopy "..\eFMS.API.SystemWeb\eFMS.IdentityServer\bin\netcoreapp2.2\eFMS.IdentityServer.DL.*" "%%d" /E /Y)
-pause
