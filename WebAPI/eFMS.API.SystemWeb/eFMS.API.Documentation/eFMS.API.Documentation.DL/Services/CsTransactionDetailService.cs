@@ -1338,7 +1338,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper(); //On board status                
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status                
                 housebill.NoPieces = string.Empty; //Tạm thời để trống
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 string hbConstainers = string.Empty;
@@ -1432,7 +1432,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var freightCharges = new List<FreightCharge>() {
-                new FreightCharge(){ FreightCharges = "FREIGHT " + data.FreightPayment?.ToUpper() }
+                new FreightCharge()
+                {
+                    FreightCharges = "FREIGHT " + data.FreightPayment?.ToUpper(),
+                    Collect = data.FreightPayment == "Collect" ? true : false,
+                    RateCharges = "AS ARRANGED",
+                    RevenueTons = "AS ARRANGED"
+                }
             };
 
             result = new Crystal
