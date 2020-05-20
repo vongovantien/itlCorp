@@ -1,4 +1,5 @@
-﻿using eFMS.API.ReportData.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Criteria;
 using eFMS.API.ReportData.Models.Documentation;
 using OfficeOpenXml;
@@ -1459,6 +1460,13 @@ namespace eFMS.API.ReportData.FormatExcel
                "P/M Voucher No.", //31
                "Service" //32
             };
+
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 2, column B
+                excelImage.SetPosition(1, 0, 1, 0);
+            }
 
             workSheet.Cells["Z1:AE1"].Merge = true;
             workSheet.Cells["Z1"].Value = headers[0];
