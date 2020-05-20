@@ -100,7 +100,8 @@ export class AutoFormatCurrencyDirective {
     @HostListener('input', ['$event'])
     onInput(event) {
         // when user on input, check regex
-        const cleanValue = (event.target.value.match(this.digitRegex) || []).join('');
+        const cleanValue = (event.target.value);
+        // const cleanValue = (event.target.value.match(this.digitRegex) || event.target.value.match(new RegExp(/\,/g)) || []).join('');
         if (cleanValue || !event.target.value) {
             this.lastValid = cleanValue;
         }
@@ -113,7 +114,7 @@ export class AutoFormatCurrencyDirective {
         event.preventDefault();
         const pastedInput: string = event.clipboardData
             .getData('text/plain')
-            .replace(/\,/g, '');
+            .replace(/[^0-9.]+/g, '');
         this.el.value = '';
         document.execCommand('insertText', false, pastedInput);
     }
