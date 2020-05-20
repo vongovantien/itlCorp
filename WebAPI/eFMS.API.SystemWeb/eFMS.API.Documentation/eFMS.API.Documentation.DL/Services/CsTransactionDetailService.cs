@@ -207,6 +207,10 @@ namespace eFMS.API.Documentation.DL.Services
                     model.Active = true;
                     model.DatetimeCreated = hb.DatetimeCreated;
                     model.UserCreated = hb.UserCreated;
+                    model.FlexId = hb.FlexId;
+                    model.FlightNoRowTwo = hb.FlightNoRowTwo;
+                    model.ContactPerson = hb.ContactPerson;
+                    model.ClosingTime = hb.ClosingTime;
 
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
@@ -1913,6 +1917,40 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return hbl;
+        }
+
+        public HandleState UpdateInputBKNote(BookingNoteCriteria criteria)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hb = Get(x => x.Id == criteria.HblId).FirstOrDefault();
+                    if (hb == null)
+                    {
+                        return new HandleState("Housebill not found!");
+                    }
+                    hb.FlexId = criteria.FlexId;
+                    hb.FlightNoRowTwo = criteria.FlightNo2;
+                    hb.ContactPerson = criteria.ContactPerson;
+                    hb.ClosingTime = criteria.ClosingTime;
+                    hb.UserModified = currentUser.UserID;
+                    hb.DatetimeModified = DateTime.Now;
+
+                    var isUpdateDone = Update(hb, x => x.Id == criteria.HblId);
+                    trans.Commit();
+                    return isUpdateDone;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
     }
 }

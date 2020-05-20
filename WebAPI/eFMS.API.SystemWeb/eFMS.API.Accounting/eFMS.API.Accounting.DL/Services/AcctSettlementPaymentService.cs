@@ -1319,12 +1319,20 @@ namespace eFMS.API.Accounting.DL.Services
                                 var listChargeShipmentUpdate = csShipmentSurchargeRepo.Get(x => chargeShipmentUpdate.Contains(x.Id)).ToList();
                                 foreach (var item in listChargeShipmentUpdate)
                                 {
+                                    // Phí Chứng từ cho phép cập nhật lại số HD, Ngày HD, Số SerieNo, Note.
+                                    var chargeSettlementCurrentToUpdateCsShipmentSurcharge = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true && x.Id == item.Id)?.FirstOrDefault();
+                                    item.Notes = chargeSettlementCurrentToUpdateCsShipmentSurcharge.Notes;
+                                    item.SeriesNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.SeriesNo;
+                                    item.InvoiceNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceNo;
+                                    item.InvoiceDate = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceDate;
+
                                     item.SettlementCode = settlement.SettlementNo;
                                     item.UserModified = userCurrent;
                                     item.DatetimeModified = DateTime.Now;
                                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
+                            
                             //End --Phí chứng từ (IsFromShipment = true)--
 
                             //Start --Phí hiện trường (IsFromShipment = false)--

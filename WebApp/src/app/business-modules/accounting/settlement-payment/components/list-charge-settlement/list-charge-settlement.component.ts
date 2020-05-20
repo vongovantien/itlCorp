@@ -2,20 +2,24 @@ import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } f
 import { AppList } from 'src/app/app.list';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
-import { Surcharge, Currency, Partner } from 'src/app/shared/models';
-import { BehaviorSubject } from 'rxjs';
+import { Surcharge, Partner } from '@models';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
 import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
-import { SortService } from 'src/app/shared/services';
+import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
+import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
+
+import { CommonEnum } from '@enums';
 
 import _includes from 'lodash/includes';
 import _cloneDeep from 'lodash/cloneDeep';
 import cloneDeep from 'lodash/cloneDeep';
-import { CommonEnum } from '@enums';
+import { BehaviorSubject } from 'rxjs';
+import { timeoutD } from '@decorators';
+
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -29,6 +33,7 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementPaymentManagementPopupComponent, { static: false }) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
     @ViewChild(SettlementTableListChargePopupComponent, { static: true }) tableListChargePopup: SettlementTableListChargePopupComponent;
+    @ViewChild(SettlementChargeFromShipmentPopupComponent, { static: false }) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
 
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -99,6 +104,7 @@ export class SettlementListChargeComponent extends AppList {
     onRequestSurcharge(surcharge: any) {
         // this.surcharges.push(surcharge);
         this.surcharges = [...this.surcharges, ...surcharge];
+        this.surcharges.forEach(x => x.isSelected = false);
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
     }
 
@@ -142,7 +148,7 @@ export class SettlementListChargeComponent extends AppList {
             return;
         } else {
             // * CHECK SURCHARGE IS FROM SHIPMENT.
-            if (!surcharge || surcharge.isFromShipment) {
+            if (!surcharge) {
                 return;
             } else if (this.TYPE === 'LIST') {
                 this.selectedIndexSurcharge = index;
@@ -159,6 +165,8 @@ export class SettlementListChargeComponent extends AppList {
             this.formChargePopup.settlementCode = this.selectedSurcharge.settlementCode;
             this.formChargePopup.initFormUpdate(this.selectedSurcharge);
             this.formChargePopup.calculateTotalAmount();
+
+            this.formChargePopup.isFromshipment = surcharge.isFromShipment;
 
             this.formChargePopup.show();
         }
@@ -179,9 +187,10 @@ export class SettlementListChargeComponent extends AppList {
         data.event.preventDefault();
 
         this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
-        setTimeout(() => {
-            this.paymentManagementPopup.show();
-        }, 500);
+        // setTimeout(() => {
+        //     this.paymentManagementPopup.show();
+        // }, 500);
+        this.showPaymentManagementPopup();
         return false;
     }
 
@@ -254,9 +263,12 @@ export class SettlementListChargeComponent extends AppList {
 
     showPaymentManagement(surcharge: Surcharge) {
         this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
-        setTimeout(() => {
-            this.paymentManagementPopup.show();
-        }, 500);
+        this.showPaymentManagementPopup();
+    }
+
+    @timeoutD(500)
+    showPaymentManagementPopup() {
+        this.paymentManagementPopup.show();
     }
 
     openCopySurcharge(surcharge: Surcharge) {
@@ -283,54 +295,70 @@ export class SettlementListChargeComponent extends AppList {
     updateChargeWithJob(charge: Surcharge, index?: number) {
         if (this.STATE !== 'WRITE') { return; }
         this.selectedIndexSurcharge = index;
-        if (!charge || charge.isFromShipment) {
+        if (!charge) {
             return;
         }
-        const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
-        if (!!shipment) {
-            this.tableListChargePopup.selectedShipment = shipment;
+        if (charge.isFromShipment) {
 
-            // * Filter charge with hblID.
-            const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
-            if (!!surcharges.length) {
-                this.tableListChargePopup.charges = cloneDeep(surcharges);
+            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isFromShipment);
+            this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
+            this.listChargeFromShipmentPopup.show();
+        } else {
+            const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl && charge.isFromShipment === false);
+            if (!!shipment) {
+                this.tableListChargePopup.selectedShipment = shipment;
 
-                this.tableListChargePopup.charges.forEach(item => {
+                // * Filter charge with hblID.
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
+                if (!!surcharges.length) {
+                    this.tableListChargePopup.charges = cloneDeep(surcharges);
 
-                    if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
-                        // get partner theo payerId.
-                        const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);
-                        if (!!partner) {
-                            // swap để map field cho chage obh
-                            item.payer = partner.shortName;
-                            item.obhId = item.paymentObjectId;
-                            item.paymentObjectId = item.payerId;
+                    this.tableListChargePopup.charges.forEach(item => {
+
+                        if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
+                            // get partner theo payerId.
+                            const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.payerId);
+                            if (!!partner) {
+                                // swap để map field cho chage obh
+                                item.payer = partner.shortName;
+                                item.obhId = item.paymentObjectId;
+                                item.paymentObjectId = item.payerId;
+                            }
+                        } else {
+                            // get partner theo paymentObjectId.
+                            const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
+                            if (!!partner) {
+                                item.payer = partner.shortName;
+                            }
                         }
-                    } else {
-                        // get partner theo paymentObjectId.
-                        const partner: Partner = this.tableListChargePopup.listPartner.find(p => p.id === item.paymentObjectId);
-                        if (!!partner) {
-                            item.payer = partner.shortName;
+
+                        if (!!item.invoiceDate && typeof item.invoiceDate === 'string') {
+                            item.invoiceDate = { startDate: new Date(item.invoiceDate), endDate: new Date(item.invoiceDate) };
                         }
-                    }
+                    });
+                    this.tableListChargePopup.getAdvances(shipment.jobId);
+                    // * Update value form.
+                    this.tableListChargePopup.formGroup.patchValue({
+                        shipment: shipment.hblid,
+                        advanceNo: surcharges[0].advanceNo,
+                        customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
+                    });
 
-                    if (!!item.invoiceDate && typeof item.invoiceDate === 'string') {
-                        item.invoiceDate = { startDate: new Date(item.invoiceDate), endDate: new Date(item.invoiceDate) };
-                    }
-                });
-                this.tableListChargePopup.getAdvances(shipment.jobId);
-                // * Update value form.
-                this.tableListChargePopup.formGroup.patchValue({
-                    shipment: shipment.hblid,
-                    advanceNo: surcharges[0].advanceNo,
-                    customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
-                });
-
-                this.tableListChargePopup.isUpdate = true;
-                this.tableListChargePopup.show();
+                    this.tableListChargePopup.isUpdate = true;
+                    this.tableListChargePopup.show();
+                }
             }
-
         }
+    }
+
+    onUpdateChargeFromShipment(surchargeFromShipment: Surcharge[]) {
+        this.selectedIndexSurcharge = null;
+
+        const surChargeisNotFromShipment = this.surcharges.filter(x => !x.isFromShipment);
+        this.surcharges.length = 0;
+        this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment];
+        console.log(this.surcharges);
+
     }
 }
 

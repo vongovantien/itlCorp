@@ -64,7 +64,9 @@ export class SettlementPaymentDetailComponent extends AppPage {
         }
         this.requestSurchargeListComponent.surcharges.forEach(s => {
             if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
-                s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
+                if (Object.prototype.toString.call(s.invoiceDate) === '[object Date]') {
+                    s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
+                }
             }
         });
         this._progressRef.start();

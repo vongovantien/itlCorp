@@ -29,15 +29,15 @@ namespace eFMS.API.Accounting.Service.Contexts
             {
                 if (addedList != null)
                 {
-                    ChangeTrackerHelper.InsertToMongoDb(addedList, EntityState.Added);
+                    ChangeTrackerHelper.InsertToMongoDb(addedList);
                 }
                 if (modifiedList != null)
                 {
-                    ChangeTrackerHelper.InsertToMongoDb(modifiedList, EntityState.Modified);
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList);
                 }
                 if (deletedList != null)
                 {
-                    ChangeTrackerHelper.InsertToMongoDb(deletedList, EntityState.Deleted);
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList);
                 }
             }
             return result;

@@ -838,4 +838,15 @@ export class DocumentationRepo {
             map((data: { hblNo: string }) => data.hblNo)
         );
     }
+
+    updateInputBookingNoteAirExport(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/UpdateInputBKNote`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getShipmentAssginPIC() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
+    }
 }

@@ -20,6 +20,7 @@ namespace CommonInterface {
         field: string;
         value: string;
         data?: any;
+        hardValue?: string;
     }
 
     export interface IResult {
