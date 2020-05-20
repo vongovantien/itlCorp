@@ -27,7 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> officeRepository;
         readonly ICsTransactionDetailService transactionDetailService;
 
-        public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository, 
+        public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository,
             IMapper mapper,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CatPlace> placeRepo,
@@ -54,7 +54,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
             var modelUpdate = mapper.Map<CsShippingInstruction>(model);
-            if(DataContext.Any(x => x.JobId == model.JobId))
+            if (DataContext.Any(x => x.JobId == model.JobId))
             {
                 result = DataContext.Update(modelUpdate, x => x.JobId == model.JobId);
             }
@@ -145,7 +145,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
-            if(model.CsTransactionDetails.Count > 1)
+            if (model.CsTransactionDetails.Count > 1)
             {
                 parameter.TotalPackages = totalPackage + " PKG(S)";
             }
@@ -281,6 +281,10 @@ namespace eFMS.API.Documentation.DL.Services
             };
             CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
             var housebills = transactionDetailService.Query(criteria);
+            if (housebills == null)
+            {
+                return null;
+            }
             var total = 0;
             int totalPackage = 0;
             string noPieces = string.Empty;
@@ -324,7 +328,6 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 instructions.Add(instruction);
             }
-
             if (housebills.Count > 1)
             {
                 parameter.TotalPackages = totalPackage + " PKG(S)";
