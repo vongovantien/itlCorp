@@ -30,6 +30,15 @@ namespace eFMS.API.Documentation.Controllers
             csBookingNoteService = service;
             currentUser = user;
         }
+
+        [HttpPost("Query")]
+        [Authorize]
+        public IActionResult QueryData(CsBookingNoteCriteria criteria)
+        {
+            var data = csBookingNoteService.Query(criteria);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CsBookingNoteCriteria criteria, int page, int size)
@@ -52,7 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             }
             var hs = csBookingNoteService.AddCsBookingNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
