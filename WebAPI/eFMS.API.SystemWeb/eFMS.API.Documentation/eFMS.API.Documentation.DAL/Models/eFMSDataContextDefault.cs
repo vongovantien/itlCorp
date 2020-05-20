@@ -1950,6 +1950,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FirstCarrierTo).HasMaxLength(250);
 
+                entity.Property(e => e.FlexId).HasColumnName("FlexID");
+
                 entity.Property(e => e.FlightDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlightDateOrigin).HasColumnType("datetime");

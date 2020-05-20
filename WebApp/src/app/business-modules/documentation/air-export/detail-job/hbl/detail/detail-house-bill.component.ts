@@ -243,6 +243,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     openInputBookingNote(reportType: string) {
         this.inputBookingNotePopupComponent.reportType = reportType;
         this.inputBookingNotePopupComponent.hblId = this.hblId;
+        this.inputBookingNotePopupComponent.bindingFormBN(this.hblDetail);
         this.inputBookingNotePopupComponent.show();
     }
 }

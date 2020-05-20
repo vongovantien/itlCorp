@@ -59,5 +59,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewBookingNote(BookingNoteCriteria criteria);
 
         IQueryable<CsTransactionDetailModel> GetDataHawbToCheckExisted();
+        HandleState UpdateInputBKNote(BookingNoteCriteria criteria);
     }
 }
