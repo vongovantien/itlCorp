@@ -11,6 +11,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string ChargeName { get; set; }
         public decimal? Amount { get; set; }
         public string DueTo { get; set; }
+        public decimal? Quantity { get; set; }
+        public decimal? Rate { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
     }

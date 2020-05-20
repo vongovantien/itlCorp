@@ -1,5 +1,5 @@
 <div class="modal m-animate-fade-in container-list-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Other Charge</h5>
@@ -9,35 +9,50 @@
             </div>
             <div class="modal-body">
                 <div class="row align-items-center m--margin-bottom-10 font-weight-bold text-center">
-                    <div class="col-md-4" required>Charge Name</div>
-                    <div class="col-md-3" required>Amount</div>
-                    <div class="col-md-4" required>Due To</div>
+                    <div class="col-md-3" required>Charge Code</div>
+                    <div class="col-md-2" required>Qty</div>
+                    <div class="col-md-2" required>Rate</div>
+                    <div class="col-md-2" required>Charge Amount</div>
+                    <div class="col-md-2" required>Due To</div>
                     <div class="col-md-1 pointer text-center"></div>
                 </div>
                 <ng-container *ngIf="!!csOtherChargesTemp; else placeholder">
                     <ng-container *ngFor="let item of csOtherChargesTemp; let i=index; trackBy: trackByFn">
                         <div class="row m--align-center m--margin-bottom-20 m-form m-form--state">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !item.chargeName}">
                                     <input type="text" class="form-control" [(ngModel)]="item.chargeName">
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.amount}">
-                                    <input type="number" class="form-control" numeric [decimals]="digitDecimal"
-                                        placeholder="Amount" [(ngModel)]="item.amount"
-                                        (ngModelChange)="updateDescription()">
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.quantity}">
+                                    <input numeric [decimals]="2" class="form-control" [(ngModel)]="item.quantity"
+                                        (ngModelChange)="updateTotalAmount(item)">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.rate}">
+                                    <input numeric [decimals]="2" class="form-control" [(ngModel)]="item.rate"
+                                        (ngModelChange)="updateTotalAmount(item)">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !item.amount}">
+                                    <input type="text" class="form-control" currencyMask disabled placeholder="Amount"
+                                        [(ngModel)]="item.amount">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !item.dueTo}">
                                     <select [(ngModel)]="item.dueTo" class="form-control"
                                         (ngModelChange)="updateDescription()">
-                                        <option *ngFor="let item of dueToData" [ngValue]="item.value">
-                                            {{item.displayName}}</option>
+                                        <option *ngFor="let dua of dueToData" [ngValue]="dua.value">
+                                            {{dua.displayName}}</option>
                                     </select>
                                 </div>
                             </div>

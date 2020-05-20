@@ -1,10 +1,7 @@
 import { NgModule } from '@angular/core';
-import { AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective } from '.';
-import { LoadModuleDirective } from './load-module.directive';
-import { AutoFormatCurrencyDirective } from './auto-format-currency.directive';
+import { AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective } from '.';
 import { CurrencyPipe } from '@angular/common';
-import { NoDblClickDirective } from './prevent-dbclick.directive';
-import { AutoFormatDecimalDirective } from './number-digit-decimal.directive';
+import { LoadModuleDirective } from './load-module.directive';
 
 const APP_DIRECTIVES = [
     AutofocusDirective,
@@ -21,7 +18,6 @@ const APP_DIRECTIVES = [
     AutoFormatCurrencyDirective,
     NoDblClickDirective,
     InjectViewContainerRefDirective,
-    AutoFormatDecimalDirective
 ];
 @NgModule({
     declarations: [
