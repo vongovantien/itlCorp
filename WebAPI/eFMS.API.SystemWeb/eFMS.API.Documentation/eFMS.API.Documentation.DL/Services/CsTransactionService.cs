@@ -46,7 +46,11 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<SysOffice> sysOfficeRepository;
+<<<<<<< HEAD
         readonly IContextBase<CsAirWayBill> airwaybillRepository;
+=======
+        readonly IContextBase<CatCommodity> commodityRepository;
+>>>>>>> staging/11-05-2020-sprint15
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -72,7 +76,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
             IContextBase<SysOffice> sysOfficeRepo,
             ICurrencyExchangeService currencyExchange,
+<<<<<<< HEAD
             IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
+=======
+            IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
+>>>>>>> staging/11-05-2020-sprint15
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -97,7 +105,11 @@ namespace eFMS.API.Documentation.DL.Services
             freighchargesRepository = freighchargesRepo;
             currencyExchangeService = currencyExchange;
             sysOfficeRepository = sysOfficeRepo;
+<<<<<<< HEAD
             airwaybillRepository = airwaybillRepo;
+=======
+            commodityRepository = commodityRepo;
+>>>>>>> staging/11-05-2020-sprint15
         }
 
         #region -- INSERT & UPDATE --
@@ -1904,13 +1916,13 @@ namespace eFMS.API.Documentation.DL.Services
             var _polFull = pol?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty);
             var _podFull = pod?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty);
 
-            CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
-            var containerList = containerService.Query(contCriteria);
-            var _containerNoList = string.Empty;
-            if (containerList.Count() > 0)
-            {
-                _containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
-            }
+            //CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = jobId };
+            //var containerList = containerService.Query(contCriteria);
+            //var _containerNoList = string.Empty;
+            //if (containerList.Count() > 0)
+            //{
+            //    _containerNoList = String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+            //}
 
             var _transDate = shipment.DatetimeCreated != null ? shipment.DatetimeCreated.Value : DateTime.Now; //CreatedDate of shipment
             var _etdDate = shipment.Etd != null ? shipment.Etd.Value.ToString("dd MMM yyyy") : string.Empty; //ETD
@@ -1919,6 +1931,12 @@ namespace eFMS.API.Documentation.DL.Services
             var _netWeight = shipment.NetWeight ?? 0;//Đang lấy NetWeight của Shipment
             var _chargeWeight = shipment.ChargeWeight ?? 0;//Đang lấy ChargeWeight của Shipment
             var _dateNow = DateTime.Now.ToString("dd MMMM yyyy");
+            var commondity = shipment.Commodity?.ToUpper();
+            if (shipment.TransactionType == "AI" || shipment.TransactionType == "AE")
+            {
+                commondity = commodityRepository.Get(x => x.Code == shipment.Commodity).FirstOrDefault()?.CommodityNameEn;
+            }
+            var _containerNoList = string.Empty;
 
             var listCharge = new List<FormPLsheetReport>();
 
@@ -1944,6 +1962,13 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var surcharge = surchargeService.GetByHB(housebill.Id);
                     surcharges.AddRange(surcharge);
+
+                    CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Hblid = housebill.Id };
+                    var containerList = containerService.Query(contCriteria);                    
+                    if (containerList.Count() > 0)
+                    {
+                        _containerNoList += (!string.IsNullOrEmpty(_containerNoList) ? "\r\n" : "") + String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
+                    }
                 }
 
                 if (surcharges.Count > 0)
@@ -1994,7 +2019,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Nominated = true; //Gán cứng
                         charge.POL = _polFull?.ToUpper();
                         charge.POD = _podFull?.ToUpper();
-                        charge.Commodity = shipment.Commodity?.ToUpper();
+                        charge.Commodity = commondity?.ToUpper();
                         charge.Volumne = string.Empty; //Gán rỗng
                         charge.Carrier = supplier?.PartnerNameEn?.ToUpper();
                         charge.Agent = agent?.PartnerNameEn?.ToUpper();
@@ -2070,7 +2095,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Nominated = true;
                     charge.POL = _polFull?.ToUpper();
                     charge.POD = _podFull?.ToUpper();
-                    charge.Commodity = shipment.Commodity?.ToUpper();
+                    charge.Commodity = commondity?.ToUpper();
                     charge.Carrier = supplier?.PartnerNameEn?.ToUpper();
                     charge.Agent = agent?.PartnerNameEn?.ToUpper();
                     charge.ATTN = shipper?.ToUpper(); //Shipper đầu tiên của list housebill
@@ -2103,7 +2128,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.Nominated = true;
                 charge.POL = _polFull?.ToUpper();
                 charge.POD = _podFull?.ToUpper();
-                charge.Commodity = shipment.Commodity?.ToUpper();
+                charge.Commodity = commondity?.ToUpper();
                 charge.Carrier = supplier?.PartnerNameEn?.ToUpper();
                 charge.Agent = agent?.PartnerNameEn?.ToUpper();
                 charge.ContainerNo = _containerNoList?.ToUpper(); //Danh sách container của Shipment (Format: contNo/SealNo)

@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.Service.Models
     public partial class SysEmployee
     {
         public string Id { get; set; }
-        public Guid CompanyId { get; set; }
+        public Guid? CompanyId { get; set; }
         public string DepartmentId { get; set; }
         public string EmployeeNameVn { get; set; }
         public string EmployeeNameEn { get; set; }
@@ -26,11 +26,11 @@ namespace eFMS.API.Documentation.Service.Models
         public string StaffCode { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
+        public byte[] Signature { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public byte[] Signature { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
     }

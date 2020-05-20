@@ -420,7 +420,7 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
                                 <input type="number" class="form-control" formControlName="grossWeight"
-                                    [decimals]="digitDecimal" numeric [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                    [decimals]="digitDecimal" numeric [decimals]=2 autoFormatCurrency>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
                                     GW must be less than or equal to CW
@@ -460,7 +460,7 @@
                             <div class="form-group">
                                 <label>C.W</label>
                                 <input type="number" class="form-control" formControlName="chargeWeight"
-                                    [decimals]="digitDecimal" numeric [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                    [decimals]="digitDecimal" numeric [decimals]=2 autoFormatCurrency>
                             </div>
                         </div>
 
@@ -486,9 +486,9 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Total</label>
-                                <input *ngIf=" asArranged.value === false" currencyMask type="text" class="form-control"
+                                <input *ngIf=" rateChargeIsNumber" currencyMask type="text" class="form-control"
                                     formControlName="total">
-                                <input *ngIf=" asArranged.value === true" disabled type="text" class="form-control"
+                                <input disabled *ngIf=" !rateChargeIsNumber" type="text" class="form-control"
                                     formControlName="total">
                             </div>
                         </div>
@@ -499,10 +499,9 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Rate Charge</label>
-                                <input *ngIf="asArranged.value === false " autoFormatCurrency class="form-control"
-                                    formControlName="rateCharge">
-                                <input *ngIf=" asArranged.value === true" class="form-control"
-                                    formControlName="rateCharge">
+                                <input onChange="onChangeRate()" *ngIf="rateChargeIsNumber" autoFormatCurrency
+                                    class="form-control" formControlName="rateCharge">
+                                <input *ngIf="!rateChargeIsNumber" class="form-control" formControlName="rateCharge">
 
                             </div>
                         </div>
@@ -568,17 +567,17 @@
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="length" numeric [decimals]=2
-                                                            [digitNumbers]="2" autoFormatDecimal>
+                                                            autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="width" numeric [decimals]=2
-                                                            [digitNumbers]="2" autoFormatDecimal>
+                                                            autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
                                                             formControlName="height" [decimals]="digitDecimal" numeric
-                                                            [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                                            [decimals]=2 autoFormatCurrency>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"

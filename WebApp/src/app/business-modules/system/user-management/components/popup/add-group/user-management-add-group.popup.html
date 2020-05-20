@@ -15,8 +15,9 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && !selectedGroup}">
                                     <label required>Group Name</label>
-                                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectGroup($event)"
-                                        [selectedDisplayFields]="['shortName']" [dataSources]="groups | async"
+                                    <app-combo-grid-virtual-scroll #combogridGroup
+                                        (itemSelected)="onSelectGroup($event)" [selectedDisplayFields]="['shortName']"
+                                        [dataSources]="groups | async"
                                         [displayFields]="[{field: 'shortName', label: 'shortName'}]"
                                         placeholder="Please select group" size="15" (remove)="selectedGroup = null">
                                     </app-combo-grid-virtual-scroll>

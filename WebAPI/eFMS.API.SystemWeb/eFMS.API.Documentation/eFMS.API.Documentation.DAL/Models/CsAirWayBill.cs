@@ -47,12 +47,12 @@ namespace eFMS.API.Documentation.Service.Models
         public int? PackageQty { get; set; }
         public decimal? GrossWeight { get; set; }
         public string Rclass { get; set; }
+        public string KgIb { get; set; }
         public string ComItemNo { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? RateCharge { get; set; }
         public bool? Min { get; set; }
         public decimal? Total { get; set; }
-        public string KgIb { get; set; }
         public int? SeaAir { get; set; }
         public decimal? Hw { get; set; }
         public decimal? Cbm { get; set; }

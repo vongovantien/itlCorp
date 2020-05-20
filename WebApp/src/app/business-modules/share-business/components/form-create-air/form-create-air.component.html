@@ -251,14 +251,14 @@
                                     <label>GW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="grossWeight"
                                         (input)="inputChanged()" placeholder="Gross weight" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
                                     <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                        [decimals]=2 [digitNumbers]="2" autoFormatDecimal>
+                                        [decimals]=2 autoFormatCurrency>
                                 </div>
                             </div>
                         </div>
@@ -269,14 +269,14 @@
                                 <div class="form-group">
                                     <label>CBM</label>
                                     <input type="number" class="form-control" formControlName="cbm" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label>VW</label>
-                                    <input type="number" class="form-control" formControlName="hw" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                    <input type="number" class="form-control" formControlName="hw" numeric
+                                        (input)="inputChanged()" [decimals]=2 autoFormatCurrency>
                                 </div>
                             </div>
                             <ng-container *ngIf="!shipmentDetail.isLocked">

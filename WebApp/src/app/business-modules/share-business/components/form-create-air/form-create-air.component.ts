@@ -509,7 +509,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             } else {
                 totalHw = dim.reduce((acc: number, item: DIM) => acc += item.hw, 0);
             }
-            totalHw = Math.round(totalHw * 100) / 100; 
+            totalHw = Math.round(totalHw * 100) / 100;
             this.formGroup.patchValue({ hw: totalHw });
             this.setDefaultChargeWeight();
 
@@ -525,8 +525,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
     setDefaultChargeWeight() {
         if (this.type !== 'import') {
-            let grossWeight = this.formGroup.controls['grossWeight'].value;
-            let hw = this.formGroup.controls['hw'].value;
+            const grossWeight = this.formGroup.controls['grossWeight'].value;
+            const hw = this.formGroup.controls['hw'].value;
             if (grossWeight > hw) {
                 this.formGroup.patchValue({ chargeWeight: grossWeight });
             } else {

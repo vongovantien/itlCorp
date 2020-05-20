@@ -978,12 +978,11 @@ namespace eFMS.API.Documentation.DL.Services
                 parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
             }
 
-            var _blAmount = (_totalDebit - _totalCredit);
+            var _blAmount = Math.Abs(_totalDebit - _totalCredit);
             parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _blAmount) : String.Format("{0:n}", _blAmount);
 
             //Chuyển tiền Amount thành chữ
-            decimal _balanceAmount = Math.Abs(_blAmount);
-            _balanceAmount = Math.Round(_balanceAmount, 3);
+            decimal _balanceAmount = Math.Round(_blAmount, 3);
             var _inword = string.Empty;
             var _currency = criteria.Currency == DocumentConstants.CURRENCY_LOCAL && _balanceAmount >= 1 ?
                        (_balanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
@@ -1153,8 +1152,7 @@ namespace eFMS.API.Documentation.DL.Services
                 parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
             }
             
-            var _blAmount = _totalDebit - _totalCredit;
-            decimal _balanceAmount = Math.Abs(_blAmount);
+            decimal _balanceAmount = Math.Abs(_totalDebit - _totalCredit);
             parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n}", _balanceAmount);
 
             //Chuyển tiền Amount thành chữ

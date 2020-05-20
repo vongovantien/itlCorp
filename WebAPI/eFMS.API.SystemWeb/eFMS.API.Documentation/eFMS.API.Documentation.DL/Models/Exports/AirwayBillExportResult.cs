@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.DL.Models.Exports
         public decimal? Pieces { get; set; }
         public decimal? Gw { get; set; }
         public decimal? Cw { get; set; }
-        public string RateCharge { get; set; }
+        public decimal? RateCharge { get; set; }
         public string Total { get; set; }
         public string DesOfGood { get; set; }
         public string VolumeField { get; set; }

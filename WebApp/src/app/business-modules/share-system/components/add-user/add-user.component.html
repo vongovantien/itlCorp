@@ -46,7 +46,8 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && !item.position}">
                                     <select class="form-control" [(ngModel)]="item.position" [disabled]="item.id">
                                         <option value="null" disabled>Please select</option>
-                                        <option *ngFor="let position of positions" [ngValue]="item.id">{{position.text}}
+                                        <option *ngFor="let position of positions" [ngValue]="position.id">
+                                            {{position.text}}
                                         </option>
                                     </select>
                                 </div>

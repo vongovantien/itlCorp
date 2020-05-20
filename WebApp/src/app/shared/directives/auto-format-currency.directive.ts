@@ -16,6 +16,10 @@ export class AutoFormatCurrencyDirective {
     private digitRegex: RegExp = new RegExp(this.regexString(), 'g');
 
     private lastValid = '';
+    isReadyClear = false;
+    private specialKeys: string[] = [
+        "Delete", "Backspace", "Tab", "Escape", "Enter", "Home", "End", 'ArrowLeft', 'ArrowRight'
+    ];
 
     constructor(
         private currencyPipe: CurrencyPipe,
@@ -50,12 +54,13 @@ export class AutoFormatCurrencyDirective {
     @HostListener("focus", ["$event.target.value"])
     onFocus(value) {
         this.el.value = value.replace(/[^0-9.]+/g, '');
-        this.el.select();
+        // this.el.select();
     }
 
     @HostListener("blur", ["$event.target.value"])
     onBlur(value) {
         this.el.value = this.currencyPipe.transform(value, this.currencyCode, '', this.digitNumber);
+        this.isReadyClear = false;
     }
 
     @HostListener("keydown.control.z", ["$event.target.value"])
@@ -71,5 +76,32 @@ export class AutoFormatCurrencyDirective {
             this.lastValid = cleanValue;
         }
         this.el.value = cleanValue || this.lastValid;
+    }
+
+    @HostListener("select", ["$event.target.value"])
+    onSelect(value) {
+        this.isReadyClear = true;
+    } @HostListener("keydown", ["$event"])
+    onKeyDown(v) {
+        if (
+            v.ctrlKey === true ||
+            this.specialKeys.indexOf(v.key) !== -1 ||
+            (v.key === "a" && v.ctrlKey === true) || // Allow: Ctrl+A
+            (v.key === 'c' && v.ctrlKey === true) || // Allow: Ctrl+C
+            (v.key === 'v' && v.ctrlKey === true) || // Allow: Ctrl+V
+            (v.key === 'x' && v.ctrlKey === true)  // Allow: Ctrl+X
+        ) {
+            return;
+        }
+        if (this.isReadyClear === true) {
+            if (v.key === 'Backspace') {
+                this.el.value = '';
+            } else {
+                this.el.value = v.key;
+            }
+            console.log(v);
+            this.isReadyClear = false;
+            this.onInput(v);
+        }
     }
 }

@@ -4,7 +4,6 @@ import { LoadModuleDirective } from './load-module.directive';
 import { AutoFormatCurrencyDirective } from './auto-format-currency.directive';
 import { CurrencyPipe } from '@angular/common';
 import { NoDblClickDirective } from './prevent-dbclick.directive';
-import { AutoFormatDecimalDirective } from './number-digit-decimal.directive';
 
 const APP_DIRECTIVES = [
     AutofocusDirective,
@@ -20,8 +19,7 @@ const APP_DIRECTIVES = [
     NumericDirective,
     AutoFormatCurrencyDirective,
     NoDblClickDirective,
-    InjectViewContainerRefDirective,
-    AutoFormatDecimalDirective
+    InjectViewContainerRefDirective
 ];
 @NgModule({
     declarations: [

@@ -41,7 +41,7 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.length === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.length"
                                         (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrencyl>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -49,7 +49,7 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.width === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.width"
                                         (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrencyl>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -57,7 +57,7 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.height === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.height"
                                         (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -65,7 +65,7 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.package === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.package"
                                         (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
-                                        [digitNumbers]="2" autoFormatDecimal>
+                                        autoFormatCurrency>
                                 </div>
 
                             </div>

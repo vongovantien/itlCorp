@@ -640,39 +640,35 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     onChargeWeightChange() {
-
         this.formCreate.controls['chargeWeight'].valueChanges
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (typeof this.formCreate.controls["rateCharge"] === "number") {
-                        this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
-                    }
+                    this.formCreate.controls['total'].setValue(value * this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
                 }
             );
 
     }
-
     onChangeRate() {
         if (typeof this.formCreate.controls['rateCharge'].value === "number") {
             this.rateChargeIsNumber = true;
-        } else {
+        }
+        else {
             this.rateChargeIsNumber = false;
 
         }
     }
+
 
     onSeaAirChange() {
         this.formCreate.controls['seaAir'].valueChanges
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (typeof this.formCreate.controls["rateCharge"] === "number") {
-                        if (!this.formCreate.controls['min'].value) {
-                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
-                        } else {
-                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
-                        }
+                    if (!this.formCreate.controls['min'].value) {
+                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
+                    } else {
+                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
                     }
                 }
             );
