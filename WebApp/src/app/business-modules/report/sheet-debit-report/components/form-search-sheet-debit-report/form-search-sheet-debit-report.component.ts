@@ -497,9 +497,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
             officeId: this.mapObject(this.officeActive, this.officeList), // ---*
             departmentId: this.mapObject(this.departmentActive, this.departmentList), // ---*
             groupId: this.mapObject(this.groupActive, this.groupList), // ---*
-            personInCharge: this.staffType.value[0].id === "PIC" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
-            creator: this.staffType.value[0].id === "CREATOR" ? this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            personInCharge: this.staffType.value[0].id === "PIC" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            salesMan: this.staffType.value[0].id === "SALESMAN" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
+            creator: this.staffType.value[0].id === "CREATOR" ? this.mapObject(this.staffActive, this.staffList) : null, // this.staffActive.map((item) => item.id).toString().replace(/(?:,)/g, ';') : null,
             carrierId: null,
             agentId: null,
             pol: this.pol.value,
