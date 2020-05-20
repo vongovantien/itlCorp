@@ -66,7 +66,6 @@ export class AutoFormatCurrencyDirective {
     onBlur(value) {
         this.el.value = this.currencyPipe.transform(value, this.currencyCode, '', this.digitNumber);
         this.isReadyClear = false;
-
     }
 
     @HostListener("keydown.control.z", ["$event.target.value"])
@@ -90,7 +89,8 @@ export class AutoFormatCurrencyDirective {
             if (v.key === 'Backspace') {
                 this.el.value = '';
             } else {
-                this.el.value = v.key;
+                this.el.value = '';
+                // this.el.value = v.key;
             }
             this.isReadyClear = false;
             this.onInput(v);
@@ -105,5 +105,16 @@ export class AutoFormatCurrencyDirective {
             this.lastValid = cleanValue;
         }
         this.el.value = cleanValue || this.lastValid;
+
+    }
+
+    @HostListener('paste', ['$event'])
+    onPaste(event: ClipboardEvent) {
+        event.preventDefault();
+        const pastedInput: string = event.clipboardData
+            .getData('text/plain')
+            .replace(/\,/g, '');
+        this.el.value = '';
+        document.execCommand('insertText', false, pastedInput);
     }
 }
