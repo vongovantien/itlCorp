@@ -674,12 +674,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (this.formCreate.controls["rateCharge"].value === Number(this.formCreate.controls["rateCharge"].value)) {
-                        if (!this.formCreate.controls['min'].value) {
-                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
-                        } else {
-                            this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
-                        }
+                    if (!this.formCreate.controls['min'].value) {
+                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value * this.formCreate.controls['chargeWeight'].value - value);
+                    } else {
+                        this.formCreate.controls['total'].setValue(this.formCreate.controls['rateCharge'].value - this.formCreate.controls['seaAir'].value);
                     }
                 });
 
@@ -717,14 +715,15 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherChargePopup.show();
     }
 
-    updateOtherCharge(otherCharges: CsOtherCharge[]) {
+    updateOtherCharge(data: { charges: CsOtherCharge[], totalAmountAgent: number, totalAmountCarrier: number }) {
+
         this.isUpdateOtherCharge = true;
         let text: string = '';
-        otherCharges.forEach((i: CsOtherCharge) => {
+        data.charges.forEach((i: CsOtherCharge) => {
             text += `${i.chargeName}: ${i.amount} \n`;
         });
 
         this.formCreate.controls["otherCharge"].setValue(text);
-        this.otherCharges = otherCharges;
+        this.otherCharges = data.charges;
     }
 }

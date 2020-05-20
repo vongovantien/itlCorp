@@ -13,7 +13,7 @@ import cloneDeep from 'lodash/cloneDeep';
 })
 export class ShareAirExportOtherChargePopupComponent extends PopupBase implements OnInit {
 
-    @Output() onUpdate: EventEmitter<CsOtherCharge[]> = new EventEmitter<CsOtherCharge[]>();
+    @Output() onUpdate: EventEmitter<IDataOtherCharge> = new EventEmitter<IDataOtherCharge>();
 
     csOtherCharges: CsOtherCharge[] = [];
     csOtherChargesTemp: CsOtherCharge[] = [];
@@ -68,7 +68,11 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
 
             this.csOtherCharges = cloneDeep(this.csOtherChargesTemp);
 
-            this.onUpdate.emit(this.csOtherCharges);
+            this.onUpdate.emit({
+                charges: this.csOtherCharges,
+                totalAmountAgent: this.totalAgent,
+                totalAmountCarrier: this.totalCarrier
+            });
             this.hide();
         }
     }
@@ -120,4 +124,10 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
         item.amount = item.quantity * item.rate;
         this.updateDescription();
     }
+}
+
+export interface IDataOtherCharge {
+    charges: CsOtherCharge[];
+    totalAmountAgent: any;
+    totalAmountCarrier: any;
 }
