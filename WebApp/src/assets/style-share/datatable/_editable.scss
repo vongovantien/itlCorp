@@ -124,6 +124,18 @@
                 }
             }
         }
+        .table-date {
+            .table-condensed {
+                tr {
+                    th:not(:first-child) {
+                        min-width: 30px;
+                    }
+                    td:not(:first-child) {
+                        min-width: auto;
+                    }
+                }
+            }
+        }
     }
 }
 

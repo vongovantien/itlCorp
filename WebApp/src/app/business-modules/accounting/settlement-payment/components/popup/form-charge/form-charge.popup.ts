@@ -41,7 +41,6 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     };
     selectedShipment: Partial<CommonInterface.IComboGridData> = {};
     selectedShipmentData: OperationInteface.IShipment;
-
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -96,6 +95,10 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     selectedSurcharge: any;
 
     settlementCode: string = '';
+
+    isFromshipment: boolean = false;
+
+    dataShipmentFromExistingCharge: Partial<{ jobId: string, mbl: string, hbl: string }> = {};
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -243,10 +246,19 @@ export class SettlementFormChargePopupComponent extends PopupBase {
         this.selectedShipmentData = this.configShipment.dataSource.filter((i: OperationInteface.IShipment) => i.hblid === data.hblid)[0];
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
+        if (!!this.selectedShipmentData) {
+            this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
+            if (this.customDeclarations.length === 1) {
+                this.customNo.setValue(this.customDeclarations[0]);
+            }
+        } else {
+            // * Nếu không map được shipment thì hiển thị hardValue;
+            this.selectedShipment.hardValue = `${data.jobId} - ${data.mbl} - ${data.hbl}`;
 
-        this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);
-        if (this.customDeclarations.length === 1) {
-            this.customNo.setValue(this.customDeclarations[0]);
+            // * Lưu giá trị để update.
+            this.dataShipmentFromExistingCharge.jobId = data.jobId;
+            this.dataShipmentFromExistingCharge.mbl = data.mbl;
+            this.dataShipmentFromExistingCharge.hbl = data.hbl;
         }
     }
 
@@ -432,12 +444,12 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             invoiceDate: !!this.form.value.invoiceDate && !!this.form.value.invoiceDate.startDate ? formatDate(this.form.value.invoiceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             seriesNo: this.form.value.serieNo,
             typeOfFee: this.form.value.type.value,
-            isFromShipment: false,
+            isFromShipment: this.isFromshipment,
             contNo: this.form.value.contNo,
             clearanceNo: !!this.form.value.customNo ? this.form.value.customNo.clearanceNo : null,
-            jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : null,
-            hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : null,
-            mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : null,
+            jobId: !!this.selectedShipmentData ? this.selectedShipmentData.jobId : (!!this.dataShipmentFromExistingCharge.jobId ? this.dataShipmentFromExistingCharge.jobId : null),
+            hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : (!!this.dataShipmentFromExistingCharge.hbl ? this.dataShipmentFromExistingCharge.hbl : null),
+            mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : (!!this.dataShipmentFromExistingCharge.mbl ? this.dataShipmentFromExistingCharge.mbl : null),
             settlementCode: this.settlementCode,
         });
 

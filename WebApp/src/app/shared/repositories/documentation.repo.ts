@@ -845,4 +845,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    getShipmentAssginPIC() {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
+    }
 }
