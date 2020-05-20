@@ -52,9 +52,7 @@ namespace eFMS.API.Infrastructure.NoSql
                         }
                         if (changedProperties != null)
                         {
-                            var log = new ItemLog { Id = Guid.NewGuid() };
-                            log.PropertyCommon = new PropertyCommon
-                            {
+                            var log = new ItemLog { Id = Guid.NewGuid(),
                                 PrimaryKeyValue = change.OriginalValues[primaryKey.Name].ToString(),
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
@@ -68,7 +66,7 @@ namespace eFMS.API.Infrastructure.NoSql
                                 // UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.ItemObject = change.Entity;
-                            log.PropertyCommon.ChangedProperties = changedProperties;
+                            log.ChangedProperties = changedProperties;
                             var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                             listLog.Add(objectLog);
                         }
@@ -92,11 +90,7 @@ namespace eFMS.API.Infrastructure.NoSql
                     var entityName = add.Entity.GetType().Name;
                     var properties = add.OriginalValues.Properties;
                     var primaryKey = properties.FirstOrDefault(x => x.IsKey());
-                    var log = new ItemLog { Id = Guid.NewGuid() };
-                    // var userLog = add.Metadata.FindProperty("UserCreated") == null ? currentUser : add.CurrentValues["UserCreated"]?.ToString();
-
-                    log.PropertyCommon = new PropertyCommon
-                    {
+                    var log = new ItemLog { Id = Guid.NewGuid(),
                         PrimaryKeyValue = add.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Added,
                         ActionName = "Added",
@@ -132,9 +126,6 @@ namespace eFMS.API.Infrastructure.NoSql
                     var log = new ItemLog
                     {
                         Id = Guid.NewGuid(),
-                    };
-                    log.PropertyCommon = new PropertyCommon
-                    {
                         PrimaryKeyValue = delete.OriginalValues[primaryKey.Name].ToString(),
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
@@ -153,7 +144,7 @@ namespace eFMS.API.Infrastructure.NoSql
             }
             return listLog;
         }
-        public static void InsertToMongoDb(List<AuditLog> list, EntityState state)
+        public static void InsertToMongoDb(List<AuditLog> list)
         {
             if (list == null) return;
             var s = list.GroupBy(x => x.EntityName);
