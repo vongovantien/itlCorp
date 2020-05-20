@@ -33,7 +33,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost("Query")]
         [Authorize]
-        public IActionResult QueryData(CsBookingNoteCriteria criteria)
+        public IActionResult Query(CsBookingNoteCriteria criteria)
         {
             var data = csBookingNoteService.Query(criteria);
             return Ok(data);

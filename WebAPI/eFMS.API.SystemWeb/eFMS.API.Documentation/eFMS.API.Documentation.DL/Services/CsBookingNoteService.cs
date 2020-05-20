@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -13,7 +12,6 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -23,9 +21,6 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         private readonly ICurrentUser currentUser;
-
-
-
         public CsBookingNoteService(IStringLocalizer<LanguageSub> localizer, IMapper mapper,
             IContextBase<CsBookingNote> repository,
             IContextBase<CatPartner> catPartner,
@@ -74,7 +69,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        #endregion
         public HandleState AddCsBookingNote(CsBookingNoteEditModel model)
         {
             var bookingNote = mapper.Map<CsBookingNote>(model);
@@ -133,6 +127,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+        #endregion
 
         #region LIST AND PAGING
         public List<CsBookingNoteModel> Paging(CsBookingNoteCriteria criteria, int page, int size, out int rowsCount)
