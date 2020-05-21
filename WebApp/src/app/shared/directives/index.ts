@@ -11,6 +11,11 @@ export * from './numeric-input.directive';
 export * from './auto-format-currency.directive';
 export * from './prevent-dbclick.directive';
 export * from './inject-view-container-ref.directive';
+export * from './icon-calendar.directive';
+export * from './icon-clear-calendar.directive';
+export * from './load-module.directive';
+
+
 
 
 
