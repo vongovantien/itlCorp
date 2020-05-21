@@ -1,0 +1,247 @@
+<div class="m-animate-fade-in mt-3">
+    <div class="m-form m-form--state">
+        <div class="form">
+            <div class="row">
+                <div class="col-lg-6">
+                    6
+                </div>
+                <div class="col-lg-6">
+                    6
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Shipper</label>
+                        <input type="text" class="form-control m-input">
+                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Consignee</label>
+                        <input type="text" class="form-control">
+                        <textarea rows="7" class="form-control m-input m-input--square"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label required>Date of Stuffing</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD"
+                                        readonly />
+                                    <combo-grid-icon [ShowDropdown]="false" [showDelete]="true"></combo-grid-icon>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Closing Time</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD"
+                                        readonly />
+                                    <combo-grid-icon [ShowDropdown]="false" [showDelete]="true"></combo-grid-icon>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label required>Place of Stuffing</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label required>Contact</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label required>ETD</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD"
+                                        readonly />
+                                    <combo-grid-icon [ShowDropdown]="false" [showDelete]="true"></combo-grid-icon>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>ETA</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETD"
+                                        readonly />
+                                    <combo-grid-icon [ShowDropdown]="false" [showDelete]="true"></combo-grid-icon>
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label required>POL</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>POD</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Vessel</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Voy</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Payment Term</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Freight Rate</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Place of Delivery</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Commodity</label>
+                        <textarea class="form-control" rows="7"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>No of Container(s) of Package(s)</label>
+                        <textarea class="form-control" rows="7"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Special Request</label>
+                        <textarea class="form-control" rows="7"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>GW</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>CBM</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Service Required</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Other term and conditions</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>HBL No</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>No of B/L</label>
+                                <input type="text" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Pick up at</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Drop of at</label>
+                        <input type="text" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <div [froalaEditor]="optionEditor">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

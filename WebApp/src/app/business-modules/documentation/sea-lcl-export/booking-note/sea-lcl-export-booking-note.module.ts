@@ -6,6 +6,9 @@ import { FormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SeaLCLExportBookingNoteDetailComponent } from './detail/detail-booking-note-lcl-export.component';
 import { SeaLCLExportBookingNoteCreateComponent } from './create/create-booking-note-lcl-export.component';
+import { SeaLCLExportFormBookingNoteComponent } from './components/form-booking-note-lcl-export.component';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 
 const routing: Routes = [
     {
@@ -13,11 +16,11 @@ const routing: Routes = [
     },
     {
         path: 'new', component: SeaLCLExportBookingNoteCreateComponent,
-        data: { name: 'New', }
+        data: { name: 'Add New', }
     },
     {
         path: ':bookingNoteId', component: SeaLCLExportBookingNoteDetailComponent,
-        data: { name: 'Detail', }
+        data: { name: 'View/Edit Booking Note', }
     }
 ];
 
@@ -25,13 +28,16 @@ const routing: Routes = [
     imports: [
         CommonModule,
         SharedModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        NgxDaterangepickerMd,
+        FroalaEditorModule.forRoot()
     ],
     exports: [],
     declarations: [
         SeaLCLExportBookingNoteComponent,
         SeaLCLExportBookingNoteCreateComponent,
-        SeaLCLExportBookingNoteDetailComponent
+        SeaLCLExportBookingNoteDetailComponent,
+        SeaLCLExportFormBookingNoteComponent
     ],
     providers: [],
 })
