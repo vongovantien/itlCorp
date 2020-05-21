@@ -223,6 +223,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var airlineId = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault()?.ColoaderId;
                 awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName; // Name ABBR
                 awb.MAWB = data.Mblno1 + data.Mblno2 + data.Mblno3;
+                awb.MBLNO1 = data.Mblno1;
+                awb.MBLNO2 = data.Mblno2;
+                awb.MBLNO3 = data.Mblno3;
                 awb.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
                 awb.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
                 awb.AccountingInfo = "FREIGHT " + data.FreightPayment?.ToUpper(); //'FREIGHT ' + Air Freight
