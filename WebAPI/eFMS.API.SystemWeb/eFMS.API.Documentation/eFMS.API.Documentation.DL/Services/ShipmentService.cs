@@ -766,9 +766,11 @@ namespace eFMS.API.Documentation.DL.Services
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
                 data.ServiceName = item.ProductService;
                 data.JobNo = item.JobNo;
-                data.PolPod = catPlaceRepo.Get(x => x.Id == data.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == data.Pod).Select(t => t.Code).FirstOrDefault();
+                data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
                 data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
+                data.MblMawb = item.Mblno;
+                data.HblHawb = item.Hwbno;
                 #region -- Phí Selling trước thuế --
                 decimal _totalSellAmountFreight = 0;
                 decimal _totalSellAmountTrucking = 0;

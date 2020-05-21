@@ -20,7 +20,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string PayerId { get; set; }
         public string ObjectBePaid { get; set; }
         public string PaymentObjectId { get; set; }
-        public bool? KickBack { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
         public string SettlementCode { get; set; }
@@ -49,6 +48,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string VoucherIdre { get; set; }
         public DateTime? VoucherIdredate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
+        public bool? KickBack { get; set; }
         public string AdvanceNo { get; set; }
         public string JobNo { get; set; }
         public string Mblno { get; set; }
