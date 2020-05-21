@@ -9,7 +9,7 @@
                     <h3>Booking Note</h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button [buttonSetting]="saveButtonSetting">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveBookingNote()">
                             </app-default-button>
 
                             <app-default-button [buttonSetting]="cancelButtonSetting">
@@ -17,10 +17,12 @@
                         </div>
                     </div>
                 </div>
-
+                <hr />
                 <form-booking-note-lcl-export></form-booking-note-lcl-export>
 
             </div>
         </div>
     </div>
 </div>
+
+<info-popup [body]="invalidFormText"></info-popup>

@@ -1,2 +1,40 @@
-<app-sub-header>
-</app-sub-header>
+<div class="create-booking-note-page">
+
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Booking Note</h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveBookingNote()">
+                            </app-default-button>
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <form-booking-note-lcl-export></form-booking-note-lcl-export>
+
+                <div class="row m--margin-top-20">
+                    <div class="col-md-4">
+                        <span>Created: {{csBookingNote.createdDate | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                        <span class="text-success">{{csBookingNote.creatorName}}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <span>Modified: {{csBookingNote.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                        </span> <span class="text-success">{{csBookingNote.modifiedName}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<info-popup [body]="invalidFormText"></info-popup>

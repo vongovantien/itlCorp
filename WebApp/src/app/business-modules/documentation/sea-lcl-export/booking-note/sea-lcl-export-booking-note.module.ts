@@ -2,13 +2,15 @@ import { NgModule } from '@angular/core';
 import { SeaLCLExportBookingNoteComponent } from './sea-lcl-export-booking-note.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SeaLCLExportBookingNoteDetailComponent } from './detail/detail-booking-note-lcl-export.component';
 import { SeaLCLExportBookingNoteCreateComponent } from './create/create-booking-note-lcl-export.component';
 import { SeaLCLExportFormBookingNoteComponent } from './components/form-booking-note-lcl-export.component';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { NgxDaterangepickerMd, LocaleConfig } from 'ngx-daterangepicker-material';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
+import { SelectModule } from 'ng2-select';
+import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
 const routing: Routes = [
     {
@@ -24,13 +26,19 @@ const routing: Routes = [
     }
 ];
 
+const config: LocaleConfig = {
+    format: 'MM/DD/YYYY',
+};
+
 @NgModule({
     imports: [
         CommonModule,
         SharedModule,
         RouterModule.forChild(routing),
-        NgxDaterangepickerMd,
-        FroalaEditorModule.forRoot()
+        NgxDaterangepickerMd.forRoot(config),
+        FroalaEditorModule.forRoot(),
+        ReactiveFormsModule,
+        SelectModule,
     ],
     exports: [],
     declarations: [
