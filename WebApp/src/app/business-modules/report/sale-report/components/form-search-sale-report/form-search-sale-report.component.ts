@@ -472,8 +472,8 @@ export class SaleReportFormSearchComponent extends AppForm {
             { "text": 'Salesman', "id": 'SALESMAN' },
             { "text": 'Creator', "id": 'CREATOR' }
         ];
-        // Default value: Person In Charge
-        this.staffTypeActive = [this.staffTypeList[0]];
+        // Default value: Salesman
+        this.staffTypeActive = [this.staffTypeList[1]];
     }
 
     getTypeReport() {
