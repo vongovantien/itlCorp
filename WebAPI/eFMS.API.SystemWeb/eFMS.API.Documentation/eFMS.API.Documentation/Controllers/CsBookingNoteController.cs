@@ -48,6 +48,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public IActionResult Get(Guid id)
+        {
+            var data = csBookingNoteService.GetDetails(id);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -60,13 +68,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var hs = csBookingNoteService.AddCsBookingNote(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return Ok(hs);
         }
 
         [HttpPut]

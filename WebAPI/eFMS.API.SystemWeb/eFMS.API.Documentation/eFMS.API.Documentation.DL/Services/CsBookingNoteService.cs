@@ -55,7 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
                     return hs;
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bk.Rollback();
                     var result = new HandleState(ex.Message);
@@ -69,7 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         }
 
-        public HandleState AddCsBookingNote(CsBookingNoteEditModel model)
+        public object AddCsBookingNote(CsBookingNoteEditModel model)
         {
             var bookingNote = mapper.Map<CsBookingNote>(model);
             bookingNote.Id = Guid.NewGuid();
@@ -82,14 +82,14 @@ namespace eFMS.API.Documentation.DL.Services
                     var hsBookingNote = DataContext.Add(bookingNote);
                     var result = hsBookingNote;
                     bk.Commit();
-                    return result;
+                    return new { model = bookingNote, result };
 
                 }
                 catch (Exception ex)
                 {
                     bk.Rollback();
                     var result = new HandleState(ex.Message);
-                    return result;
+                    return new { model = new object { }, result };
                 }
                 finally
                 {
@@ -115,7 +115,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     return hs;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     bk.Rollback();
                     var result = new HandleState(ex.Message);
@@ -159,7 +159,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (lstBookingNotes == null) return null;
             if (criteria.All == null)
             {
-                lstBookingNotes = lstBookingNotes.Where(x =>  (x.BookingNo ?? "").IndexOf(criteria.BookingNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                lstBookingNotes = lstBookingNotes.Where(x => (x.BookingNo ?? "").IndexOf(criteria.BookingNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.ShipperName ?? "").IndexOf(criteria.ShipperName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.ConsgineeName ?? "").IndexOf(criteria.ConsigneeName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.POLName ?? "").IndexOf(criteria.POLName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -222,6 +222,37 @@ namespace eFMS.API.Documentation.DL.Services
                         CreatedDate = creator.DatetimeCreated
                     };
             return query;
+        }
+
+        public CsBookingNoteModel GetDetails(Guid id)
+        {
+            CsBookingNoteModel detail = GetById(id);
+            return detail;
+        }
+
+        private CsBookingNoteModel GetById(Guid id)
+        {
+            CsBookingNote data = DataContext.Get(x => x.Id == id)?.FirstOrDefault();
+            if (data == null) return null;
+            else
+            {
+                CsBookingNoteModel result = mapper.Map<CsBookingNoteModel>(data);
+                if (result.Pol != null)
+                {
+                    CatPlace portPOLData = catPlaceRepo.Where(x => x.Id == result.Pol)?.FirstOrDefault();
+                    result.POLName = portPOLData.NameEn;
+                }
+                if (result.Pod != null)
+                {
+                    CatPlace portPODData = catPlaceRepo.Where(x => x.Id == result.Pod)?.FirstOrDefault();
+                    result.PODName = portPODData.NameEn;
+                }
+
+                result.CreatorName = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.ModifiedName = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+
+                return result;
+            }
         }
         #endregion
     }
