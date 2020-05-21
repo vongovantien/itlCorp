@@ -17,7 +17,7 @@ const APP_DIRECTIVES = [
     NumericDirective,
     AutoFormatCurrencyDirective,
     NoDblClickDirective,
-    InjectViewContainerRefDirective,
+    InjectViewContainerRefDirective
 ];
 @NgModule({
     declarations: [

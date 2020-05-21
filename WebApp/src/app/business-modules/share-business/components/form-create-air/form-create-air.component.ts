@@ -526,8 +526,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     }
     setDefaultChargeWeight() {
         if (this.type !== 'import') {
-            let grossWeight = this.formGroup.controls['grossWeight'].value;
-            let hw = this.formGroup.controls['hw'].value;
+            const grossWeight = this.formGroup.controls['grossWeight'].value;
+            const hw = this.formGroup.controls['hw'].value;
             if (grossWeight > hw) {
                 this.formGroup.patchValue({ chargeWeight: grossWeight });
             } else {

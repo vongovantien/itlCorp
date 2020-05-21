@@ -56,7 +56,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.height === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.height"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="2"
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
                                         autoFormatCurrency>
                                 </div>
                             </div>
@@ -64,7 +64,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && item.package === null}">
                                     <input type="number" class="form-control" [(ngModel)]="item.package"
-                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]="2"
+                                        (ngModelChange)="updateHeightWeight(item)" numeric [decimals]=2
                                         autoFormatCurrency>
                                 </div>
 
