@@ -66,7 +66,6 @@ export class AutoFormatCurrencyDirective {
     onBlur(value) {
         this.el.value = this.currencyPipe.transform(value, this.currencyCode, '', this.digitNumber);
         this.isReadyClear = false;
-
     }
 
     @HostListener("keydown.control.z", ["$event.target.value"])
@@ -90,7 +89,8 @@ export class AutoFormatCurrencyDirective {
             if (v.key === 'Backspace') {
                 this.el.value = '';
             } else {
-                this.el.value = v.key;
+                this.el.value = '';
+                // this.el.value = v.key;
             }
             this.isReadyClear = false;
             this.onInput(v);
@@ -100,10 +100,22 @@ export class AutoFormatCurrencyDirective {
     @HostListener('input', ['$event'])
     onInput(event) {
         // when user on input, check regex
-        const cleanValue = (event.target.value.match(this.digitRegex) || []).join('');
+        const cleanValue = (event.target.value);
+        // const cleanValue = (event.target.value.match(this.digitRegex) || event.target.value.match(new RegExp(/\,/g)) || []).join('');
         if (cleanValue || !event.target.value) {
             this.lastValid = cleanValue;
         }
         this.el.value = cleanValue || this.lastValid;
+
+    }
+
+    @HostListener('paste', ['$event'])
+    onPaste(event: ClipboardEvent) {
+        event.preventDefault();
+        const pastedInput: string = event.clipboardData
+            .getData('text/plain')
+            .replace(/[^0-9.]+/g, '');
+        this.el.value = '';
+        document.execCommand('insertText', false, pastedInput);
     }
 }

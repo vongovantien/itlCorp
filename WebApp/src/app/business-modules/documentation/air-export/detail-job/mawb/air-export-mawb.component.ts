@@ -3,7 +3,7 @@ import { AppForm } from 'src/app/app.form';
 import { Store } from '@ngrx/store';
 import { IAppState, getCataloguePortState, GetCataloguePortAction } from '@store';
 import { getTransactionLocked, getTransactionPermission, ShareBusinessDIMVolumePopupComponent, GetDimensionAction, GetShipmentOtherChargeAction, getOtherChargeState, getDimensionVolumesState, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction, getTransactionDetailCsTransactionState, TransactionGetDetailAction, } from '@share-bussiness';
-import { FormGroup, AbstractControl, Validators, FormBuilder, } from '@angular/forms';
+import { FormGroup, AbstractControl, Validators, FormBuilder, FormControl, } from '@angular/forms';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -13,7 +13,7 @@ import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { ShareAirExportOtherChargePopupComponent } from '../../share/other-charge/air-export-other-charge.popup';
+import { ShareAirExportOtherChargePopupComponent, IDataOtherCharge } from '../../share/other-charge/air-export-other-charge.popup';
 import { SystemConstants } from 'src/constants/system.const';
 
 import _merge from 'lodash/merge';
@@ -62,6 +62,15 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     mblno2: AbstractControl;
     mblno3: AbstractControl;
     rclass: AbstractControl;
+    wtpp: AbstractControl;
+    wtcll: AbstractControl;
+    total: AbstractControl; // * TOTAL WITH C.W * RATE - SEAAIR OR EQUAL ASARRANGE.
+    dueAgentPp: AbstractControl;
+    dueAgentCll: AbstractControl;
+    dueCarrierPp: AbstractControl;
+    dueCarrierCll: AbstractControl;
+    totalPp: AbstractControl;
+    totalCll: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -130,6 +139,13 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     airwaybillId: string = '';
 
     isUpdate: boolean = false;
+
+    otherChargedata: IDataOtherCharge = {
+        charges: [],
+        totalAmountAgent: null,
+        totalAmountCarrier: null
+    };
+
 
     constructor(
         private _store: Store<IAppState>,
@@ -309,7 +325,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             grossWeight: [],
             kgIb: [],
             rclass: [],
-            comItemNo: [],
+            // comItemNo: [],
             chargeWeight: [],
             rateCharge: [],
             total: [{ value: null, disabled: true }],
@@ -366,6 +382,18 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.flightDate = this.formMAWB.controls["flightDate"];
         this.issuedDate = this.formMAWB.controls["issuedDate"];
         this.rclass = this.formMAWB.controls["rclass"];
+
+        this.wtpp = this.formMAWB.controls["wtpp"];
+        this.wtcll = this.formMAWB.controls["wtcll"];
+        this.total = this.formMAWB.controls["total"];
+
+        this.dueAgentPp = this.formMAWB.controls["dueAgentPp"];
+        this.dueAgentCll = this.formMAWB.controls["dueAgentCll"];
+        this.dueCarrierPp = this.formMAWB.controls["dueCarrierPp"];
+        this.dueCarrierCll = this.formMAWB.controls["dueCarrierCll"];
+
+        this.totalPp = this.formMAWB.controls["totalPp"];
+        this.totalCll = this.formMAWB.controls["totalCll"];
 
         this.onWTVALChange();
         this.otherPaymentChange();
@@ -569,29 +597,23 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     if (!!value && !!value.length) {
                         switch (value[0].id) {
                             case 'PP':
-                                if (!this.formMAWB.controls["wtpp"].value) {
-                                    this.formMAWB.controls["wtpp"].setValue(this.AA);
-                                    this.formMAWB.controls["wtcll"].setValue(null);
-
-                                    this.formMAWB.controls["totalPp"].setValue(this.AA);
-                                    this.formMAWB.controls["totalCll"].setValue(null);
-
+                                if (!this.wtpp.value) {
+                                    this.updateWtWithTotal(this.total.value);
+                                    this.wtcll.setValue(null);
                                 }
                                 break;
                             case 'CLL':
-                                if (!this.formMAWB.controls["wtcll"].value) {
-                                    this.formMAWB.controls["wtcll"].setValue(this.AA);
-                                    this.formMAWB.controls["wtpp"].setValue(null);
-
-                                    this.formMAWB.controls["totalCll"].setValue(this.AA);
-                                    this.formMAWB.controls["totalPp"].setValue(null);
+                                if (!this.wtcll.value) {
+                                    this.updateWtWithTotal(this.total.value);
+                                    this.wtpp.setValue(null);
                                 }
                                 break;
                         }
-                    } else {
+                        this.updateTotalPrepaidCollect();
 
-                        this.formMAWB.controls["wtpp"].setValue(null);
-                        this.formMAWB.controls["wtcll"].setValue(null);
+                    } else {
+                        this.wtpp.setValue(null);
+                        this.wtcll.setValue(null);
                     }
                 }
             );
@@ -605,27 +627,22 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     if (!!value && !!value.length) {
                         switch (value[0].id) {
                             case 'PP':
-                                if (!this.formMAWB.controls["dueAgentPp"].value) {
-                                    this.formMAWB.controls["dueAgentPp"].setValue(this.AA);
-                                    this.formMAWB.controls["dueAgentCll"].setValue(null);
-
-                                    this.formMAWB.controls["totalPp"].setValue(this.AA);
-                                    this.formMAWB.controls["totalCll"].setValue(null);
+                                if (!this.dueAgentPp.value) {
+                                    this.dueAgentCll.setValue(null);
                                 }
                                 break;
                             case 'CLL':
-                                if (!this.formMAWB.controls["dueAgentCll"].value) {
-                                    this.formMAWB.controls["dueAgentCll"].setValue(this.AA);
-                                    this.formMAWB.controls["dueAgentPp"].setValue(null);
-
-                                    this.formMAWB.controls["totalCll"].setValue(this.AA);
-                                    this.formMAWB.controls["totalPp"].setValue(null);
+                                if (!this.dueAgentCll.value) {
+                                    this.dueAgentPp.setValue(null);
                                 }
                                 break;
                         }
+                        this.updateDueAgentCarrierWithTotalAgent(this.otherChargedata.totalAmountAgent, this.otherChargedata.totalAmountCarrier);
+                        this.updateTotalPrepaidCollect();
+
                     } else {
-                        this.formMAWB.controls["dueAgentPp"].setValue(null);
-                        this.formMAWB.controls["dueAgentCll"].setValue(null);
+                        this.dueAgentPp.setValue(null);
+                        this.dueAgentCll.setValue(null);
                     }
                 }
             );
@@ -636,7 +653,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formMAWB.controls['total'].setValue(value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);
+                    if (this.total.value !== this.AA) {
+                        this.total.setValue(value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);
+                        this.updateWtWithTotal(this.total.value);
+                    }
                 }
             );
     }
@@ -646,7 +666,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    this.formMAWB.controls['total'].setValue(value * this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+                    if (this.total.value !== this.AA) {
+                        this.total.setValue(value * this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+                        this.updateWtWithTotal(this.total.value);
+                    }
                 }
             );
     }
@@ -656,20 +679,109 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (value: number) => {
-                    if (!this.formMAWB.controls['min'].value) {
-                        this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - value);
-                    } else {
-                        this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+                    if (this.total.value !== this.AA) {
+                        if (!this.formMAWB.controls['min'].value) {
+                            this.total.setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - value);
+                            this.updateWtWithTotal(this.total.value);
+
+                        } else {
+                            this.total.setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+                            this.updateWtWithTotal(this.total.value);
+                        }
                     }
                 }
             );
     }
 
-    onChangeMin(value: any) {
-        if (value.target.checked) {
-            this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+    onChangeMin(value: Event) {
+        if (this.total.value !== this.AA) {
+            if ((value.target as HTMLInputElement).checked) {
+                this.total.setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+                this.updateWtWithTotal(this.total.value);
+
+            } else {
+                this.total.setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);
+                this.updateWtWithTotal(this.total.value);
+            }
+        }
+    }
+
+    onChangeAsArranged(value: Event) {
+        if ((value.target as HTMLInputElement).checked) {
+            this.total.setValue(this.AA);
+
+            this.updateWtWithTotal(this.AA);
         } else {
-            this.formMAWB.controls['total'].setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);
+            this.resetFormControl(this.total);
+
+            if (!this.formMAWB.controls['min'].value) {
+                this.total.setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);
+            } else {
+                this.total.setValue(this.formMAWB.controls['rateCharge'].value - this.formMAWB.controls['seaAir'].value);
+            }
+            this.updateWtWithTotal(this.total.value);
+        }
+    }
+
+    updateWtWithTotal(totalValue: any) {
+        if (!!this.wtorValpayment.value) {
+            if ((this.wtorValpayment.value as CommonInterface.INg2Select[])[0].id === 'PP') {
+                this.resetFormControl(this.wtcll);
+                this.wtpp.setValue(totalValue);
+            }
+            if ((this.wtorValpayment.value as CommonInterface.INg2Select[])[0].id === 'CLL') {
+                this.resetFormControl(this.wtpp);
+                this.wtcll.setValue(totalValue);
+            }
+        }
+        this.updateTotalPrepaidCollect();
+
+    }
+
+    updateDueAgentCarrierWithTotalAgent(totalAgent: number = null, totalCarrier: number = null) {
+        if (!!this.otherPayment.value) {
+            if ((this.otherPayment.value as CommonInterface.INg2Select[])[0].id === 'PP') {
+                this.resetFormControl(this.dueAgentCll);
+                this.resetFormControl(this.dueCarrierCll);
+
+                this.dueAgentPp.setValue(totalAgent);
+                this.dueCarrierPp.setValue(totalCarrier);
+            }
+            if ((this.otherPayment.value as CommonInterface.INg2Select[])[0].id === 'CLL') {
+                this.resetFormControl(this.dueAgentPp);
+                this.resetFormControl(this.dueCarrierPp);
+
+                this.dueAgentCll.setValue(totalAgent);
+                this.dueCarrierCll.setValue(totalCarrier);
+            }
+        }
+    }
+
+    updateTotalPrepaidCollect() {
+        if (typeof +(this.wtpp.value) !== 'number'
+            || typeof +(this.dueAgentPp.value) !== 'number'
+            || typeof +(this.dueCarrierPp.value) !== 'number') {
+            this.totalPp.setValue(this.AA);
+        } else {
+            const total: number = +this.wtpp.value + +(this.dueAgentPp.value) + +(this.dueCarrierPp.value);
+            if (isNaN(total)) {
+                this.totalPp.setValue(this.AA);
+            } else {
+                this.totalPp.setValue(total);
+            }
+        }
+
+        if (typeof +(this.wtcll.value) !== 'number'
+            || typeof +(this.dueCarrierCll.value) !== 'number'
+            || typeof +(this.dueCarrierCll.value) !== 'number') {
+            this.totalCll.setValue(this.AA);
+        } else {
+            const total: number = +this.wtcll.value + +(this.dueAgentCll.value) + +(this.dueCarrierCll.value);
+            if (isNaN(total)) {
+                this.totalCll.setValue(this.AA);
+            } else {
+                this.totalCll.setValue(total);
+            }
         }
     }
 
@@ -699,15 +811,23 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.formMAWB.controls["volumeField"].setValue(volumText);
     }
 
-    updateOtherCharge(otherCharges: CsOtherCharge[]) {
+    updateOtherCharge(data: { charges: CsOtherCharge[], totalAmountAgent: number, totalAmountCarrier: number }) {
+        this.otherChargedata = data;
         this.isUpdateOtherCharge = true;
+
+        // * UPDATE OTHER CHARGE TEXTAREAR.
         let text: string = '';
-        otherCharges.forEach((i: CsOtherCharge) => {
+        this.otherChargedata.charges.forEach((i: CsOtherCharge) => {
             text += `${i.chargeName}: ${i.amount} \n`;
         });
 
         this.formMAWB.controls["otherCharge"].setValue(text);
-        this.otherCharges = otherCharges;
+        this.otherCharges = this.otherChargedata.charges;
+
+        // * UPDATE DUE AGENT -	DUE CARRIER SECTION
+        this.updateDueAgentCarrierWithTotalAgent(this.otherChargedata.totalAmountAgent, this.otherChargedata.totalAmountCarrier);
+        this.updateTotalPrepaidCollect();
+
     }
 
     exportMawb() {
@@ -763,7 +883,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 },
             );
     }
-
 
     preview(reportType: string) {
         this._documentationRepo.previewAirwayBill(this.jobId, reportType)
