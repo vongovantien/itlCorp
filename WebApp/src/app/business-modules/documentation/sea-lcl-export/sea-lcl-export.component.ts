@@ -216,4 +216,9 @@ export class SeaLCLExportComponent extends AppList {
                 }
             });
     }
+
+    gotoCreateBookingNote() {
+        this._router.navigate(['home/documentation/sea-lcl-export/booking-note']);
+
+    }
 }
