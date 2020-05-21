@@ -2,13 +2,15 @@ import { NgModule } from '@angular/core';
 import { SeaLCLExportBookingNoteComponent } from './sea-lcl-export-booking-note.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SeaLCLExportBookingNoteDetailComponent } from './detail/detail-booking-note-lcl-export.component';
 import { SeaLCLExportBookingNoteCreateComponent } from './create/create-booking-note-lcl-export.component';
 import { SeaLCLExportFormBookingNoteComponent } from './components/form-booking-note-lcl-export.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
+import { SeaLCLExportBookingNoteFormSearchComponent } from './components/form-search-booking-note/form-search-booking-note.component';
+import { PaginationModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
     {
@@ -28,6 +30,9 @@ const routing: Routes = [
     imports: [
         CommonModule,
         SharedModule,
+        FormsModule,
+        PaginationModule.forRoot(),
+        ReactiveFormsModule,
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
         FroalaEditorModule.forRoot()
@@ -37,7 +42,8 @@ const routing: Routes = [
         SeaLCLExportBookingNoteComponent,
         SeaLCLExportBookingNoteCreateComponent,
         SeaLCLExportBookingNoteDetailComponent,
-        SeaLCLExportFormBookingNoteComponent
+        SeaLCLExportFormBookingNoteComponent,
+        SeaLCLExportBookingNoteFormSearchComponent
     ],
     providers: [],
 })

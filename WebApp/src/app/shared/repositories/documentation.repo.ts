@@ -839,6 +839,15 @@ export class DocumentationRepo {
         );
     }
 
+    getBookingNoteSeaLCLExport(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     updateInputBookingNoteAirExport(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/UpdateInputBKNote`, body).pipe(
             catchError((error) => throwError(error)),

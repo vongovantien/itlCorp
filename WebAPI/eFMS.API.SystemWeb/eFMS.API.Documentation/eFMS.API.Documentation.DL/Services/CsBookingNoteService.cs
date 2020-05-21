@@ -159,26 +159,30 @@ namespace eFMS.API.Documentation.DL.Services
             if (lstBookingNotes == null) return null;
             if (criteria.All == null)
             {
-                lstBookingNotes = lstBookingNotes.Where(x =>  (x.BookingNo ?? "").IndexOf(criteria.BookingNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                lstBookingNotes = lstBookingNotes.Where(x => (x.BookingNo ?? "").IndexOf(criteria.BookingNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.ShipperName ?? "").IndexOf(criteria.ShipperName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.ConsgineeName ?? "").IndexOf(criteria.ConsigneeName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.POLName ?? "").IndexOf(criteria.POLName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.PODName ?? "").IndexOf(criteria.PODName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.CreatorName ?? "").IndexOf(criteria.CreatorName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-
-                           );
+                           && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) &&
+                   (x.CreatedDate.Value.Date <= criteria.ToDate))
+              );
+        
             }
             else
             {
                 lstBookingNotes = lstBookingNotes.Where(x =>
-                     (x.BookingNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                     ((x.BookingNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.ShipperName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.ConsgineeName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.POLName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.PODName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                     )
                      || (x.CreatorName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-
-                     );
+                     && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) &&
+                   (x.CreatedDate.Value.Date <= criteria.ToDate))
+                    );
             }
             lstBookingNotes = lstBookingNotes.OrderByDescending(x => x.DatetimeModified);
             return lstBookingNotes;
@@ -219,7 +223,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Gw = bookingNote.Gw,
                         Cbm = bookingNote.Cbm,
                         CreatorName = creator.Username,
-                        CreatedDate = creator.DatetimeCreated
+                        CreatedDate = bookingNote.CreatedDate
                     };
             return query;
         }
