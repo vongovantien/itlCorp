@@ -1503,7 +1503,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.MAWB = data.Mawb; //NOT USE
                 housebill.HWBNO = data.Hwbno?.ToUpper(); //Housebill No
                 housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
-                housebill.ISSUED = string.Empty; //NOT USE
+                housebill.ISSUED = data.IssuedBy?.ToUpper(); //NOT USE
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
                 housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
@@ -1584,6 +1584,14 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
                 housebill.GoodsDelivery = string.Empty; //Chưa biết
+                var job = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault();
+                string _airlineName = string.Empty;
+                if (job != null)
+                {
+                    var airline = catPartnerRepo.Get(x => x.Id == job.ColoaderId).FirstOrDefault();
+                    _airlineName = airline?.ShortName;
+                }
+                housebill.Airline = _airlineName?.ToUpper();
 
                 housebills.Add(housebill);
             }
@@ -1595,6 +1603,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.HOUSEAIRWAYBILLLASTEST_ITL_FRAME:
                     _reportName = "HouseAirwayBillLastestITLFrame.rpt";
+                    break;
+                case DocumentConstants.HOUSEAIRWAYBILLLASTEST_HAWB_FRAME:
+                    _reportName = "HouseAirwayBillHAWBFrame.rpt";
                     break;
             }
             result = new Crystal

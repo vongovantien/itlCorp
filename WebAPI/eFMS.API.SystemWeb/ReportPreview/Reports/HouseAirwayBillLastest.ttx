@@ -70,3 +70,4 @@ Dimensions	String	255
 ShipPicture	BLOB		
 PicMarks	String	255	
 GoodsDelivery	String	255	
+Airline	String	255	
