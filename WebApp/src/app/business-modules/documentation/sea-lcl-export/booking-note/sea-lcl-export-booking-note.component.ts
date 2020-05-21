@@ -19,6 +19,11 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
     criteria: any = {};
     bookingNotes: any = [];
 
+    sortLocal(sort: string): void {
+        this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
+    }
+
+
     constructor(private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _sortService: SortService,
@@ -58,14 +63,28 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         } else {
             this.criteria.all = null;
         }
+        if (this.dataSearch.type === 'creatorName') {
+            this.criteria.creatorName = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'bookingNo') {
+            this.criteria.bookingNo = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'shipperName') {
+            this.criteria.shipperName = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'consigneeName') {
+            this.criteria.shipperName = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'polName') {
+            this.criteria.polName = this.dataSearch.keyword;
+        }
+        if (this.dataSearch.type === 'podName') {
+            this.criteria.podName = this.dataSearch.keyword;
+        }
         this.criteria.fromDate = this.dataSearch.fromDate;
         this.criteria.toDate = this.dataSearch.toDate;
         console.log(this.dataSearch);
         this.searchBookingNote();
-    }
-
-    sortLocal(sort: string): void {
-        this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
     }
 
     searchBookingNote() {

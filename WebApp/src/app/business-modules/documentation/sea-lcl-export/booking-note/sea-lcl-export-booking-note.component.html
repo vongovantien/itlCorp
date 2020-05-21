@@ -48,10 +48,10 @@
                                                 {{bkn.consigneeName}}
                                             </td>
                                             <td>
-                                                {{bkn.etd}}
+                                                {{bkn.etd | date: 'dd/MM/yyyy'}}
                                             </td>
                                             <td>
-                                                {{bkn.eta}}
+                                                {{bkn.eta | date: 'dd/MM/yyyy'}}
                                             </td>
                                             <td>
                                                 {{bkn.polName}}
@@ -69,7 +69,7 @@
                                                 {{bkn.creatorName}}
                                             </td>
                                             <td>
-                                                {{bkn.createdDate}}
+                                                {{bkn.createdDate | date: 'dd/MM/yyyy'}}
                                             </td>
 
                                         </tr>

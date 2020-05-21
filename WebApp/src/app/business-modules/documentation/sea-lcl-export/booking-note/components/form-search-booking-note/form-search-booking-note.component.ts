@@ -73,6 +73,14 @@ export class SeaLCLExportBookingNoteFormSearchComponent extends AppForm {
             displayName: this.defaultSetting.displayName,
             searchString: ""
         };
+        const searchData = {
+            type: null,
+            keyword: null,
+            fromDate: null,
+            toDate: null
+        };
+        this.dateFromTo = null;
+        this.onSearch.emit(searchData);
     }
 
 }
