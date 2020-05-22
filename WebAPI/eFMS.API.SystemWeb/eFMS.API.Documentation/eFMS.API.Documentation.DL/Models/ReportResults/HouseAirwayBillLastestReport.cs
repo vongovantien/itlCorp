@@ -76,6 +76,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public byte[] ShipPicture { get; set; }
         public string PicMarks { get; set; }
         public string GoodsDelivery { get; set; }
+        public string Airline { get; set; }
     }
 
     public class HouseAirwayBillLastestReportParams

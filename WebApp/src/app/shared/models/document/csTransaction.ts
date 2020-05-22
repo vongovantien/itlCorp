@@ -123,8 +123,8 @@ class OfficeData {
     location: string;
     addressEn: string;
     tel: string;
+    fax: string;
 }
-
 class WarehouseData {
     nameEn: string;
     nameVn: string;

@@ -521,7 +521,8 @@ namespace eFMS.API.Documentation.DL.Services
                 NameVn = office.BranchNameVn,
                 Location = office.Location,
                 AddressEn = office.AddressEn,
-                Tel = office.Tel
+                Tel = office.Tel,
+                Fax = office.Fax
             };
             return creatorOffice;
         }
