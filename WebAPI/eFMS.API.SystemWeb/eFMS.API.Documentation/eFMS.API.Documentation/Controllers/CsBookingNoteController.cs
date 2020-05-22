@@ -128,5 +128,14 @@ namespace eFMS.API.Documentation.Controllers
             return message;
         }
 
+        [HttpGet]
+        [Route("PreviewHBSeaBookingNote")]
+        [Authorize]
+        public IActionResult PreviewHBSeaBookingNote(Guid id)
+        {
+            var result = csBookingNoteService.PreviewHBSeaBookingNote(id);
+            return Ok(result);
+        }
+
     }
 }

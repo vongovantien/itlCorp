@@ -866,6 +866,12 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
     }
 
+    previewHLSeaBookingNoteById(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/PreviewHBSeaBookingNote`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     createCsBookingNote(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/AddNew`, body).pipe(
             map((data: any) => data)

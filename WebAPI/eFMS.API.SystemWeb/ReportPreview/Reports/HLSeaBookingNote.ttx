@@ -1,0 +1,44 @@
+BookingID	String	50	
+TransID	String	50	
+LotNo	String	50	
+DateMaking	DateTime	
+Revision	String	150	
+Attn	String	150	
+PartnerID	String	50	
+PartnerName	String	150	
+Email	String	150	
+Address	String	255	
+Homephone	String	50	
+Workphone	String	50	
+Fax	String	50	
+Cell	String	50	
+Taxcode	String	50	
+ConsigneeCode	String	50	
+ConsigneeName	String	150	
+ConsigneeAddress	String	255	
+ReceiptAt	String	150	
+Deliveryat	String	150	
+ServiceMode	String	150	
+SC	String	50	
+PortofLading	String	150	
+PortofUnlading	String	150	
+ModeSea	String	50	
+EstimatedVessel	String	50	
+LoadingDate	DateTime	
+DestinationDate	DateTime	
+Quantity	String	50	
+ContainerSize	String	50	
+Commidity	String	150	
+GrosWeight	Number	
+CBMSea	Number	
+SpecialRequest	String	150	
+CloseTime20	String	255	
+CloseTime40	String	255	
+CloseTimeLCL	String	255	
+PickupAt	String	150	
+DropoffAt	String	150	
+ContainerNo	String	150	
+HBLData	String	50	
+BlCorrection	String	50	
+SCIACI	String	50	
+Remark	Memo	

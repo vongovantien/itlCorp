@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -21,17 +23,20 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         private readonly ICurrentUser currentUser;
+        readonly IContextBase<CatCountry> countryRepo;
         public CsBookingNoteService(IStringLocalizer<LanguageSub> localizer, IMapper mapper,
             IContextBase<CsBookingNote> repository,
             IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace,
             IContextBase<SysUser> sysUser,
-            ICurrentUser user) : base(repository, mapper)
+            ICurrentUser user,
+            IContextBase<CatCountry> catCountry) : base(repository, mapper)
         {
             catPartnerRepo = catPartner;
             catPlaceRepo = catPlace;
             sysUserRepo = sysUser;
             currentUser = user;
+            countryRepo = catCountry;
         }
         #region CUD
         public HandleState UpdateCsBookingNote(CsBookingNoteEditModel model)
@@ -257,5 +262,107 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
         #endregion
+
+        #region PREVIEW
+        public Crystal PreviewHBSeaBookingNote(Guid id)
+        {
+            Crystal result = null;
+            var data = Get(x => x.Id == id).FirstOrDefault();
+            if (data == null)
+            {
+                return null;
+            }
+            var bookingNotes = new List<HLSeaBooingNoteReport>();
+            var bookingNote = new HLSeaBooingNoteReport();
+            bookingNote.BookingID = data.BookingNo?.ToUpper();
+            bookingNote.TransID = data.Id.ToString();
+            bookingNote.LotNo = string.Empty; //NOT USE
+            bookingNote.DateMaking = null; //NOT USE
+            bookingNote.Revision = data.Revision?.ToUpper();
+            bookingNote.Attn = data.To?.ToUpper();
+            bookingNote.PartnerID = string.Empty; //NOT USE
+            bookingNote.PartnerName = data.ShipperDescription?.ToUpper(); //Shipper Description
+            bookingNote.Email = string.Empty; //NOT USE
+            bookingNote.Address = string.Empty; //NOT USE
+            bookingNote.Homephone = data.TelFrom; // Tel From
+            bookingNote.Workphone = data.TelTo; // Tel To
+            bookingNote.Fax = string.Empty; //NOT USE
+            bookingNote.Cell = string.Empty; //NOT USE
+            bookingNote.Taxcode = string.Empty; //NOT USE
+            var consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault();
+            bookingNote.ConsigneeCode = consignee?.AccountNo; //NOT USE            
+            bookingNote.ConsigneeName = data.ConsigneeDescription?.ToUpper(); //Consignee Description
+            bookingNote.ConsigneeAddress = consignee?.AddressEn?.ToUpper(); //NOT USE
+            bookingNote.ReceiptAt = data.DateOfStuffing?.ToString("dd/MM/yyyy"); //Date Of Stuffing
+            bookingNote.Deliveryat = data.PlaceOfStuffing?.ToUpper(); //Place Of Stuffing
+            bookingNote.ServiceMode = data.ServiceRequired?.ToUpper(); //Service Requeired
+            bookingNote.SC = data.Contact?.ToUpper(); //Contact
+            
+            var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+            if (dataPOL != null)
+            {
+                var polCountry = countryRepo.Get(x => x.Id == dataPOL.CountryId).FirstOrDefault()?.NameEn;
+                bookingNote.PortofLading = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty);
+                bookingNote.PortofLading = bookingNote.PortofLading?.ToUpper();
+            }
+            
+            var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+            if (dataPOD != null)
+            {
+                var podCountry = countryRepo.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
+                bookingNote.PortofUnlading = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty);
+                bookingNote.PortofUnlading = bookingNote.PortofUnlading?.ToUpper();
+            }
+
+            bookingNote.ModeSea = string.Empty; //NOT USE
+            bookingNote.EstimatedVessel = (data.Vessel + " / " + data.Voy)?.ToUpper(); //Vessel/ Voy
+            bookingNote.LoadingDate = data.Etd;
+            bookingNote.DestinationDate = data.Eta;
+            bookingNote.Quantity = string.Empty; //NOT USE
+            bookingNote.ContainerSize = data.NoOfContainer; //No of Container(s) or Package(s)
+            bookingNote.Commidity = data.Commodity?.ToUpper();
+            bookingNote.GrosWeight = data.Gw;
+            bookingNote.CBMSea = data.Cbm;
+            bookingNote.SpecialRequest = data.SpecialRequest;
+            bookingNote.CloseTime20 = data.OtherTerms; //Other terms & conditions
+            bookingNote.CloseTime40 = data.PlaceOfDelivery; //Place Of Delivery
+            bookingNote.CloseTimeLCL = data.ClosingTime?.ToString("HH tt, dd MMM yyyy");
+            bookingNote.PickupAt = data.PickupAt; //Pick-up at
+            bookingNote.DropoffAt = data.DropoffAt; //Drop-off at
+            bookingNote.ContainerNo = string.Empty; //NOT USE
+            bookingNote.HBLData = data.NoOfBl; //No of B/L
+            bookingNote.BlCorrection = data.FreightRate; //Freight Rate
+            bookingNote.SCIACI = data.PaymentTerm; //Payment Term
+            bookingNote.Remark = ReportUltity.ReplaceHtmlBaseForPreviewReport(data.Note);
+
+            bookingNotes.Add(bookingNote);
+
+            var parameter = new HLSeaBooingNoteReportParameter();
+            parameter.ContactList = data?.From?.ToUpper() ?? string.Empty;
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.Contact = currentUser.UserName;
+            parameter.DecimalNo = 3;
+            parameter.HBL = data?.HblNo ?? string.Empty;
+
+            result = new Crystal
+            {
+                ReportName = "HLSeaBooingNote.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\HLSeaBooingNote" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+
+            result.AddDataSource(bookingNotes);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+        #endregion PREVIEW
     }
 }
