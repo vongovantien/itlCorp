@@ -1,13 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { SeaLCLExportBookingNoteCreateComponent } from '../create/create-booking-note-lcl-export.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from '@repositories';
 import { csBookingNote } from '@models';
+import { NgProgress } from '@ngx-progressbar/core';
 
-import { map, tap, switchMap } from 'rxjs/operators';
+import { map, tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
+import _merge from 'lodash/merge';
+import { SubHeaderComponent } from '@common';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-detail',
@@ -15,9 +19,10 @@ import isUUID from 'validator/lib/isUUID';
 })
 
 export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingNoteCreateComponent implements OnInit {
+    @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
 
     bookingNoteId: string;
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
+    ACTION: CommonType.ACTION_FORM = 'UPDATE';
 
     csBookingNote: csBookingNote = new csBookingNote();
 
@@ -25,9 +30,14 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
         protected _toastService: ToastrService,
-        private _activedRoute: ActivatedRoute
+        private _activedRoute: ActivatedRoute,
+        private _ngProgressService: NgProgress,
+        private _cd: ChangeDetectorRef
+
     ) {
-        super(_toastService, _documentRepo, _router)
+        super(_toastService, _documentRepo, _router);
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit() { }
@@ -42,11 +52,14 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                 this.bookingNoteId = !!param.bookingNoteId ? param.bookingNoteId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
+
                 } else {
                     this.ACTION = null;
                 }
+                this._cd.detectChanges();
 
-                // this._cd.detectChanges();
+                console.log(this.ACTION);
+
             }),
             switchMap(() => of(this.bookingNoteId)),
         ).subscribe(
@@ -65,13 +78,115 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
             .subscribe(
                 (res: csBookingNote) => {
                     this.csBookingNote = new csBookingNote(res);
-                    console.log(res);
+                    console.log(this.csBookingNote);
+                    this.updateFormCsBookingNote(res);
                 }
             );
+    }
+
+    onSaveBookingNote() {
+        this.formBookingNoteComponent.isSubmitted = true;
+
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+
+        const modelAdd: csBookingNote = this.onSubmitData();
+
+
+        if (this.ACTION === 'COPY') {
+            modelAdd.id = SystemConstants.EMPTY_GUID;
+            this.createBookingNote(modelAdd);
+        } else {
+            //  * Update field
+            modelAdd.id = this.bookingNoteId;
+            modelAdd.userCreated = this.csBookingNote.createdDate;
+            modelAdd.createdDate = this.csBookingNote.createdDate;
+            this.saveBookingNote(modelAdd);
+        }
+    }
+
+    createBookingNote(body: csBookingNote) {
+        this._documentRepo.createCsBookingNote(body)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: { model: csBookingNote, result: any }) => {
+                    if (res.result.success) {
+                        this._toastService.success(res.result.message);
+
+                        this._router.navigate([`home/documentation/sea-lcl-export/booking-note/`, res.model.id]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
+                    }
+                }
+            );
+    }
+
+    saveBookingNote(body: csBookingNote) {
+        this._progressRef.start();
+        this._documentRepo.updateCsBookingNote(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        return this._documentRepo.getDetailCsBookingNote(this.bookingNoteId);
+                    }
+                    of(res);
+                })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult | csBookingNote | any) => {
+                    if (!!res && res.status === false) {
+                        this._toastService.error(res.message);
+                    } else {
+                        this.updateFormCsBookingNote(res);
+                    }
+                }
+            );
+    }
+
+    updateFormCsBookingNote(res: csBookingNote) {
+        if (!!this.ACTION && this.ACTION.toLowerCase() === 'copy') {
+            this.headerComponent.resetBreadcrumb("Add New");
+
+            // * Reset few value.
+            const formData: csBookingNote | any = {
+                bookingNo: null,
+                dateOfStuffing: null,
+                etd: null,
+                eta: null,
+
+                paymentTerm: !!res.paymentTerm ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
+
+            };
+            this.formBookingNoteComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+        } else {
+            const formData: csBookingNote | any = {
+                etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
+                eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
+                closingTime: !!res.closingTime ? { startDate: new Date(res.closingTime), endDate: new Date(res.closingTime) } : null,
+                dateOfStuffing: !!res.dateOfStuffing ? { startDate: new Date(res.dateOfStuffing), endDate: new Date(res.dateOfStuffing) } : null,
+
+                paymentTerm: !!res.paymentTerm ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
+
+                pol: res.pol,
+                pod: res.pod,
+                shipperId: res.shipperId,
+                consigneeId: res.consigneeId,
+            };
+            this.formBookingNoteComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+        }
     }
 
     gotoList() {
         this._router.navigate(["home/documentation/sea-lcl-export/booking-note"]);
 
+    }
+
+    gotoDuplicate() {
+        this._router.navigate(["home/documentation/sea-lcl-export/booking-note", this.bookingNoteId], { queryParams: { action: 'COPY' } });
     }
 }

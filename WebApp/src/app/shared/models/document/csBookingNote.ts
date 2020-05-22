@@ -4,9 +4,9 @@ export class csBookingNote {
     id: string = SystemConstants.EMPTY_GUID;
     jobId: string = null;
     from: string = null;
-    TelFrom: string = null;
-    To: string = null;
-    TelTo: string = null;
+    telFrom: string = null;
+    to: string = null;
+    telTo: string = null;
     revision: string = null;
     bookingNo: string = null;
     shipperId: string = null;
@@ -38,7 +38,8 @@ export class csBookingNote {
     pickupAt: string = null;
     dropoffAt: string = null;
     note: string = null;
-    usercreated: string = null;
+
+    userCreated: string = null;
     createdDate: string = null;
     userModified: string = null;
     datetimeModified: string = null;

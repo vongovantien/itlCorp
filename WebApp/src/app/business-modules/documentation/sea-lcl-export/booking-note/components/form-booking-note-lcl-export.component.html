@@ -3,7 +3,8 @@
         <div class="form" [formGroup]="formGroup">
             <div class="row">
                 <div class="col-lg-6">
-                    <div class="form-group row">
+                    <div class="form-group row"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || from.dirty) && !from.valid }">
                         <div class="col-lg-2">
                             <label required>From</label>
                         </div>
@@ -29,7 +30,8 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="form-group row">
+                    <div class="form-group row"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || to.dirty) && !to.valid }">
                         <div class="col-lg-2">
                             <label required>To</label>
                         </div>
@@ -45,9 +47,10 @@
                             <input type="text" class="form-control" formControlName="telTo">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row "
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || bookingNo.dirty) && !bookingNo.valid }">
                         <div class="col-lg-2">
-                            <label>Booking No</label>
+                            <label required>Booking No</label>
                         </div>
                         <div class="col-lg-10">
                             <input type="text" class="form-control" formControlName="bookingNo">
@@ -83,7 +86,8 @@
                 <div class="col-lg-4">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (dateOfStuffing.dirty && !dateOfStuffing.value) 
+                            || (isSubmitted && !!dateOfStuffing.value && !dateOfStuffing.value.startDate)}">
                                 <label required>Date of Stuffing</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -109,13 +113,15 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || placeOfStuffing.dirty) && !placeOfStuffing.valid }">
                                 <label required>Place of Stuffing</label>
                                 <input type="text" class="form-control" formControlName="placeOfStuffing">
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || contact.dirty) && !contact.valid }">
                                 <label required>Contact</label>
                                 <input type="text" class="form-control" formControlName="contact">
                             </div>
@@ -125,7 +131,8 @@
                 <div class="col-lg-4">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
+                            || (isSubmitted && !!etd.value && !etd.value.startDate)}">
                                 <label required>ETD</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -151,7 +158,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || pol.dirty) && !pol.valid }">
                         <label required>POL</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
@@ -195,7 +203,7 @@
                                 <label>Payment Term</label>
                                 <ng-select #airFreight [items]="termTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(airFreight)" formControlName="paymentTerm"
-                                    placeholder="Payment Term">
+                                    placeholder="Please Select">
                                 </ng-select>
                             </div>
                         </div>

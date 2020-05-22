@@ -5,7 +5,8 @@ import { CommonEnum } from '@enums';
 import { Customer, PortIndex } from '@models';
 
 import { Observable } from 'rxjs';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'form-booking-note-lcl-export',
@@ -26,6 +27,11 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     paymentTerm: AbstractControl;
     dateOfStuffing: AbstractControl;
     closingTime: AbstractControl;
+    from: AbstractControl;
+    to: AbstractControl;
+    placeOfStuffing: AbstractControl;
+    contact: AbstractControl;
+    bookingNo: AbstractControl;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
@@ -65,14 +71,14 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
 
     initForm() {
         this.formGroup = this._fb.group({
-            from: [],
+            from: [null, Validators.required],
             telFrom: [],
-            to: [],
+            to: [null, Validators.required],
             telTo: [],
             revision: [],
-            bookingNo: [],
-            placeOfStuffing: [],
-            contact: [],
+            bookingNo: [null, Validators.required],
+            placeOfStuffing: [null, Validators.required],
+            contact: [null, Validators.required],
             vessel: [],
             voy: [],
             shipperDescription: [],
@@ -95,12 +101,12 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
 
             shipperId: [],
             consigneeId: [],
-            pol: [],
+            pol: [null, Validators.required],
             pod: [],
 
-            dateOfStuffing: [],
+            dateOfStuffing: [null, Validators.required],
             closingTime: [],
-            etd: [],
+            etd: [null, Validators.required],
             eta: [],
 
             paymentTerm: [],
@@ -116,6 +122,12 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
         this.dateOfStuffing = this.formGroup.controls['dateOfStuffing'];
         this.pol = this.formGroup.controls['pol'];
         this.pod = this.formGroup.controls['pod'];
+        this.paymentTerm = this.formGroup.controls['paymentTerm'];
+        this.from = this.formGroup.controls['from'];
+        this.to = this.formGroup.controls['to'];
+        this.contact = this.formGroup.controls['contact'];
+        this.placeOfStuffing = this.formGroup.controls['placeOfStuffing'];
+        this.bookingNo = this.formGroup.controls['bookingNo'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {

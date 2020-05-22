@@ -9,10 +9,34 @@
                     <h3>Booking Note</h3>
                     <div>
                         <div class="c-button-actions">
+                            <ng-container *ngIf="ACTION === 'UPDATE' || ACTION === null">
+                                <div class="dropdown m-dropdown m-dropdown--inline">
+                                    <button class="btn btn-default dropdown-toggle" type="button"
+                                        data-toggle="dropdown">
+                                        <i class="la la-eye"></i>Preview<span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item pointer">Preview with USD</a>
+                                        <a class="dropdown-item pointer">Preview with VND</a>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="confirmDuplicatePopup.show()">
+                                    <span>
+                                        <i class="la la-copy"></i>
+                                        <span>
+                                            Duplicate
+                                        </span>
+                                    </span>
+                                </button>
+                            </ng-container>
+
+
                             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveBookingNote()">
                             </app-default-button>
 
-                            <app-default-button [buttonSetting]="cancelButtonSetting">
+                            <app-default-button [buttonSetting]="cancelButtonSetting"
+                                (onClick)="confirmCancelPopup.show()">
                             </app-default-button>
                         </div>
                     </div>
@@ -38,3 +62,9 @@
 </div>
 
 <info-popup [body]="invalidFormText"></info-popup>
+
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?"
+    (onSubmit)="confirmCancelPopup.hide(); gotoList()"></confirm-popup>
+
+<confirm-popup #confirmDuplicatePopup body="Do you want to duplicate this booking note"
+    (onSubmit)="confirmDuplicatePopup.hide(); gotoDuplicate()"></confirm-popup>

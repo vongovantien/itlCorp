@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
+import { AbstractControl } from '@angular/forms';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-create',
@@ -44,7 +45,15 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
     }
 
     checkValidateForm(): boolean {
-        return true;
+        this.setError(this.formBookingNoteComponent.paymentTerm);
+
+        let valid: boolean = true;
+        if (!this.formBookingNoteComponent.formGroup.valid
+            || (!!this.formBookingNoteComponent.etd.value && !this.formBookingNoteComponent.etd.value.startDate)
+            || (!!this.formBookingNoteComponent.dateOfStuffing.value && !this.formBookingNoteComponent.dateOfStuffing.value.startDate)) {
+            valid = false;
+        }
+        return valid;
     }
 
     onSubmitData(): csBookingNote {
@@ -75,12 +84,16 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
                     if (res.result.success) {
                         this._toastService.success(res.result.message);
 
-                        this._router.navigate([`home/documentation/lcl-export/${res.model.id}`]);
+                        this._router.navigate([`home/documentation/sea-lcl-export/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
                 }
             );
+    }
+
+    gotoList() {
+        this._router.navigate(["documentation/sea-lcl-export/booking-note"]);
     }
 
 }
