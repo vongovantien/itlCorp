@@ -113,14 +113,14 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if(id != Guid.Empty)
             {
-                if(csBookingNoteService.Any(x => x.BookingNo == bookingNo && x.Id != id))
+                if(csBookingNoteService.Any(x => x.BookingNo != null && x.BookingNo == bookingNo && x.Id != id))
                 {
                     message = "Booking No is existed !";
                 }
             }
             else
             {
-                if(csBookingNoteService.Any(x=>x.BookingNo == bookingNo))
+                if(csBookingNoteService.Any(x=> x.BookingNo != null && x.BookingNo == bookingNo))
                 {
                     message = "Booking No is existed !";
                 }
