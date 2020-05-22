@@ -22,6 +22,8 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
 
     idBookingNote: string = '';
 
+    _fromDate: Date = this.createMoment().startOf('month').toDate();
+    _toDate: Date = this.createMoment().endOf('month').toDate();
     sortLocal(sort: string): void {
         this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
     }
@@ -55,12 +57,8 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         this.dataSearch = {
             type: 'All'
         };
-
-        const date = new Date();
-        const firstDay = new Date(date.getFullYear(), date.getMonth(), 2);
-        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-        this.criteria.fromDate = firstDay;
-        this.criteria.toDate = lastDay;
+        this.criteria.fromDate = this._fromDate;
+        this.criteria.toDate = this._toDate;
         this.searchBookingNote();
     }
 
