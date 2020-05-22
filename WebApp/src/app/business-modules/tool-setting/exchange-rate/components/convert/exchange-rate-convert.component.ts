@@ -10,6 +10,7 @@ import { Currency } from '@models';
 export class ExchangeRateConvertComponent extends AppForm implements OnInit {
 
     convertDate: any;
+    date: null;
     convert: any = {
         selectedRangeDate: null,
         fromCurrency: null,
@@ -30,8 +31,8 @@ export class ExchangeRateConvertComponent extends AppForm implements OnInit {
     ngOnInit(): void {
         this.getcurrencies();
     }
-
     convertRate(form) {
+        this.date = this.convert.selectedRangeDate.startDate;
         if (form.valid && this.convert.fromCurrency != null && this.convert.toCurrency != null && this.convert.selectedRangeDate.startDate !== null) {
             this._catalogueRepo.convertExchangeRate(new Date(this.convert.selectedRangeDate.startDate).toISOString(), this.convert.fromCurrency, this.convert.toCurrency)
                 .subscribe((response) => {

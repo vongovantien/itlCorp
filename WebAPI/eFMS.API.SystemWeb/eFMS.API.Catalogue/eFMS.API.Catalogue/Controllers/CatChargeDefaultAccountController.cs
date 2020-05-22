@@ -264,7 +264,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             try
             {
-                string fileName = Templates.CatCharge.ExelImportFileName + Templates.ExelImportEx;
+                string fileName = Templates.CatChargeDefaultAccount.ExelImportFileName + Templates.ExelImportEx;
                 string templateName = _hostingEnvironment.ContentRootPath;
                 var result = await new FileHelper().ExportExcel(templateName, fileName);
                 if (result != null)

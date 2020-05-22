@@ -69,8 +69,6 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
                     this._progressRef.complete();
                     if (this.data != null) {
                         this.getData();
-                    } else {
-                        this.reset();
                     }
                 })
             )
@@ -132,17 +130,18 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
         }
     }
 
-    import() {
+    import(element) {
         if (this.data == null) { return; }
         if (this.totalInvalidRow > 0) {
             this.importAlert.show();
         } else {
             console.log("container from import excel", this.data);
             this._store.dispatch(new fromStore.AddContainersAction(this.data));
+            this.reset(element);
             this.hide();
         }
     }
-    reset() {
+    reset(element) {
         this.data = null;
         this.importedData = [];
         this.totalItems = 0;
@@ -150,9 +149,10 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
         this.totalInvalidRow = 0;
         this.duplicatedError = null;
         this.existedError = null;
+        element.value = "";
     }
-    close() {
-        this.reset();
+    close(element) {
+        this.reset(element);
         this.hide();
     }
 }
