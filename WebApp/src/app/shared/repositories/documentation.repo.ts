@@ -849,4 +849,10 @@ export class DocumentationRepo {
     getShipmentAssginPIC() {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
     }
+
+    previewHLSeaBookingNoteById(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/PreviewHBSeaBookingNote`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }

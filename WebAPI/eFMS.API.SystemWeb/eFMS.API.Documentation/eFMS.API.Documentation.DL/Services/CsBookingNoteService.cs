@@ -248,7 +248,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.Revision = data.Revision?.ToUpper();
             bookingNote.Attn = data.To?.ToUpper();
             bookingNote.PartnerID = string.Empty; //NOT USE
-            bookingNote.PartnerName = string.Empty; //Shipper Description (Sửa sau)
+            bookingNote.PartnerName = data.ShipperDescription?.ToUpper(); //Shipper Description
             bookingNote.Email = string.Empty; //NOT USE
             bookingNote.Address = string.Empty; //NOT USE
             bookingNote.Homephone = data.TelFrom; // Tel From
@@ -258,7 +258,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.Taxcode = string.Empty; //NOT USE
             var consignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault();
             bookingNote.ConsigneeCode = consignee?.AccountNo; //NOT USE            
-            bookingNote.ConsigneeName = string.Empty; //Consignee Description (Sửa sau)
+            bookingNote.ConsigneeName = data.ConsigneeDescription?.ToUpper(); //Consignee Description
             bookingNote.ConsigneeAddress = consignee?.AddressEn?.ToUpper(); //NOT USE
             bookingNote.ReceiptAt = data.DateOfStuffing?.ToString("dd/MM/yyyy"); //Date Of Stuffing
             bookingNote.Deliveryat = data.PlaceOfStuffing?.ToUpper(); //Place Of Stuffing
@@ -293,7 +293,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.SpecialRequest = data.SpecialRequest;
             bookingNote.CloseTime20 = data.OtherTerms; //Other terms & conditions
             bookingNote.CloseTime40 = data.PlaceOfDelivery; //Place Of Delivery
-            bookingNote.CloseTimeLCL = data.ClosingTime?.ToString("HH tt, dd MMM yy");
+            bookingNote.CloseTimeLCL = data.ClosingTime?.ToString("HH tt, dd MMM yyyy");
             bookingNote.PickupAt = data.PickupAt; //Pick-up at
             bookingNote.DropoffAt = data.DropoffAt; //Drop-off at
             bookingNote.ContainerNo = string.Empty; //NOT USE
@@ -305,7 +305,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNotes.Add(bookingNote);
 
             var parameter = new HLSeaBooingNoteReportParameter();
-            parameter.ContactList = string.Empty;
+            parameter.ContactList = data?.From?.ToUpper() ?? string.Empty;
             parameter.CompanyName = DocumentConstants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
