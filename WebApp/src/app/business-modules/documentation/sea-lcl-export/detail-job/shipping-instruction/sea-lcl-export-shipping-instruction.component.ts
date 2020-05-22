@@ -14,7 +14,7 @@ import { CsTransaction } from 'src/app/shared/models';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { getTransactionPermission, getTransactionLocked } from '../../../../share-business/store';
 import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
-
+import _groupBy from 'lodash/groupBy';
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
     templateUrl: './sea-lcl-export-shipping-instruction.component.html'
@@ -112,25 +112,48 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     getGoods() {
         if (this.houseBills != null) {
-            // let desOfGoods = '';
-            let packages = '';
+            const lstPackages = [];
             let containerNotes = '';
             let gw = 0;
             let volumn = 0;
             this.houseBills.forEach(x => {
                 gw += x.gw;
                 volumn += x.cbm;
-                // desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
-                packages += !!x.packages ? (x.packages + '\n') : '';
+                if (!!x.packages) {
+                    const a = x.packages.split(", ");
+                    if (a.length > 0) {
+                        a.forEach(element => {
+                            const b = element.split(" ");
+                            if (b.length > 1) {
+                                lstPackages.push({ quantity: b[0], package: b[1] });
+                            }
+                        });
+                    }
+                }
             });
+            const packages = this.getPackages(lstPackages);
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
-            // this.billSIComponent.shippingInstruction.goodsDescription = desOfGoods;
             this.billSIComponent.shippingInstruction.packagesNote = packages;
-            this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER"; // containerNotes;
-            this.billSIComponent.shippingInstruction.containerSealNo = ""; //contSealNos;
+            this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER";
+            this.billSIComponent.shippingInstruction.containerSealNo = "";
         }
+    }
+    getPackages(lstPackages: any[]): string {
+        const t = _groupBy(lstPackages, "package");
+        let packages = '';
+        for (const key in t) {
+            // check if the property/key is defined in the object itself, not in parent
+            if (t.hasOwnProperty(key)) {
+                let sum = 0;
+                t[key].forEach(x => {
+                    sum = sum + Number(x.quantity);
+                });
+                packages += sum + " " + key + "\n";
+            }
+        }
+        return packages;
     }
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
