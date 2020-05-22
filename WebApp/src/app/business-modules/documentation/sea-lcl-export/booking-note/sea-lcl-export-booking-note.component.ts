@@ -109,7 +109,7 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
             this.criteria.shipperName = this.dataSearch.keyword;
         }
         if (this.dataSearch.type === 'consigneeName') {
-            this.criteria.shipperName = this.dataSearch.keyword;
+            this.criteria.consigneeName = this.dataSearch.keyword;
         }
         if (this.dataSearch.type === 'polName') {
             this.criteria.polName = this.dataSearch.keyword;
