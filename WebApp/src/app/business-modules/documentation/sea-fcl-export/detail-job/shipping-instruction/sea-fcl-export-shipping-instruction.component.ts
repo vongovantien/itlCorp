@@ -177,9 +177,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             } else {
                 if (!!res.groupEmail) {
                     this.billSIComponent.shippingInstruction.shipper = !!res.groupEmail ? '\nEmail: ' + res.groupEmail : '';
+                }
             }
         }
-    }
     }
     save() {
         this.billSIComponent.isSubmitted = true;
@@ -211,7 +211,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         if (!this.billSIComponent.formSI.valid
             || (!!this.billSIComponent.loadingDate.value && !this.billSIComponent.loadingDate.value.startDate)
             || (!!this.billSIComponent.issueDate.value && !this.billSIComponent.issueDate.value.startDate)
-            || (this.billSIComppnent.pod.value === this.billSIComppnent.pol.value)
+            || (this.billSIComponent.pod.value === this.billSIComponent.pol.value)
         ) {
             valid = false;
         }
@@ -221,11 +221,11 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.getHouseBills();
     }
     previewSummaryReport() {
-        if (this.billSIComppnent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+        if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
-        this._documentRepo.previewSummaryReport(this.billSIComppnent.shippingInstruction)
+        this._documentRepo.previewSummaryReport(this.billSIComponent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
