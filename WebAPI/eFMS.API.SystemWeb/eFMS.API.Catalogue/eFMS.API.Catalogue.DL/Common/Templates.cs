@@ -20,6 +20,7 @@
         }
         public struct CatChargeDefaultAccount
         {
+            public static string ExelImportFileName = "VoucherTypeAccount";
             public struct NameCaching
             {
                 public static string ListName = "ChargeDefaultAccounts";
