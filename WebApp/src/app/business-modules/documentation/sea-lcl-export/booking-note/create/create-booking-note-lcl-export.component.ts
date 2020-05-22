@@ -93,7 +93,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
     }
 
     gotoList() {
-        this._router.navigate(["documentation/sea-lcl-export/booking-note"]);
+        this._router.navigate(["home/documentation/sea-lcl-export/booking-note"]);
     }
 
 }

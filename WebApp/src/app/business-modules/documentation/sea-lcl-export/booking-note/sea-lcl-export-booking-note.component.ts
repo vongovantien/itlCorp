@@ -109,7 +109,7 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
             this.criteria.shipperName = this.dataSearch.keyword;
         }
         if (this.dataSearch.type === 'consigneeName') {
-            this.criteria.shipperName = this.dataSearch.keyword;
+            this.criteria.consigneeName = this.dataSearch.keyword;
         }
         if (this.dataSearch.type === 'polName') {
             this.criteria.polName = this.dataSearch.keyword;
@@ -149,6 +149,10 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
                     }
                 },
             );
+    }
+
+    gotoDetail(id: string) {
+        this._router.navigate([`/home/documentation/sea-lcl-export/booking-note/${id}`]);
     }
 
 }
