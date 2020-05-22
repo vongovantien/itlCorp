@@ -721,6 +721,7 @@ namespace eFMS.API.Documentation.DL.Services
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
             results.ForEach(fe =>
             {
+                fe.Containers = fe.ContSealNo;
                 var containers = fe.ContSealNo != null? fe.ContSealNo.Split('\n').Where(x => x.Length > 0): null;
                 fe.ContSealNo = containers != null? string.Join(", ", containers): null;
                 var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id && x.PackageTypeId != null).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
