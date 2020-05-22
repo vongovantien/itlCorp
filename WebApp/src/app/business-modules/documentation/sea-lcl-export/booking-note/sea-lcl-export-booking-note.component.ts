@@ -151,4 +151,8 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
             );
     }
 
+    gotoDetail(id: string) {
+        this._router.navigate([`/home/documentation/sea-lcl-export/booking-note/${id}`]);
+    }
+
 }

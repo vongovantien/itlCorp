@@ -43,7 +43,7 @@
                                         </div>
                                     </td>
                                     <td class="text-underline text-primary pointer">
-                                        <a>{{bkn.bookingNo}}</a>
+                                        <a (click)="gotoDetail(bkn.id)">{{bkn.bookingNo}}</a>
                                     </td>
                                     <td>
                                         {{bkn.shipperName}}
