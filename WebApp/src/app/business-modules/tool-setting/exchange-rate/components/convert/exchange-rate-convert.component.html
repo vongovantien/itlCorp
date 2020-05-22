@@ -73,8 +73,7 @@
                 <hr>
                 <div class="form-group" *ngIf="rate">
                     <label class="form-control-label" for="">
-                        Date: <span
-                            class="m--font-primary">{{ convert.selectedRangeDate.startDate | date: 'MMMM dd. yyyy'}}</span>
+                        Date: <span class="m--font-primary">{{ date | date: 'MMMM dd. yyyy'}}</span>
                     </label>
                     <div class="border m--padding-10 bg-secondary" *ngIf="convert.fromCurrency && convert.toCurrency">
                         <ng-container>
