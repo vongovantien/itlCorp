@@ -1542,7 +1542,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    housebill.LastDestination = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
                     housebill.LastDestination = housebill.LastDestination?.ToUpper();
                 }
                 housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No

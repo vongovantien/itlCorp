@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
@@ -18,7 +19,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState AddCsBookingNote(CsBookingNoteEditModel model);
         HandleState UpdateCsBookingNote(CsBookingNoteEditModel model);
         HandleState DeleteCsBookingNote(Guid bookingNoteId);
-
+        Crystal PreviewHBSeaBookingNote(Guid id);
 
 
 
