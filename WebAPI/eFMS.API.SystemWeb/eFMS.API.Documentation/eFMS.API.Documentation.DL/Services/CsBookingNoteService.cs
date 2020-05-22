@@ -161,7 +161,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 lstBookingNotes = lstBookingNotes.Where(x => (x.BookingNo ?? "").IndexOf(criteria.BookingNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.ShipperName ?? "").IndexOf(criteria.ShipperName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && (x.ConsgineeName ?? "").IndexOf(criteria.ConsigneeName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                           && (x.ConsigneeName ?? "").IndexOf(criteria.ConsigneeName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.POLName ?? "").IndexOf(criteria.POLName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.PODName ?? "").IndexOf(criteria.PODName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.CreatorName ?? "").IndexOf(criteria.CreatorName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -175,7 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                 lstBookingNotes = lstBookingNotes.Where(x =>
                      ((x.BookingNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.ShipperName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                     || (x.ConsgineeName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                     || (x.ConsigneeName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.POLName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.PODName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.CreatorName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -213,7 +213,7 @@ namespace eFMS.API.Documentation.DL.Services
                         BookingNo = bookingNote.BookingNo,
                         ShipperName = shipper.ShortName,
                         JobId = bookingNote.JobId,
-                        ConsgineeName = consignee.ShortName,
+                        ConsigneeName = consignee.ShortName,
                         Etd = bookingNote.Etd,
                         Eta = bookingNote.Eta,
                         POLName = pol.NameEn,
