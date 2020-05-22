@@ -4,7 +4,7 @@
         <div class="modal-content m-form m-form--state">
             <div class="modal-header">
                 <h5 class="modal-title">Import container</h5>
-                <button type="button" class="close" aria-label="Close" (click)="close()">
+                <button type="button" class="close" aria-label="Close" (click)="close(fileInput)">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -16,9 +16,9 @@
                             <div class="m-form m-form--state">
                                 <div class="row">
                                     <div class="col-lg-4">
-                                        <input type="file" id="inputFile" class="form-control m-input m-input--square"
-                                            placeholder="" (change)="chooseFile($event)" onclick="this.value=null;"
-                                            accept=".xlsx">
+                                        <input #fileInput type="file" id="inputFile"
+                                            class="form-control m-input m-input--square" placeholder=""
+                                            (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
                                         <span class="m-form__help">
                                             <a class="btn-link" href="javascript:void(0)"
                                                 (click)="downloadFile()">Download sample</a>
@@ -59,7 +59,7 @@
                                     </button>
                                     <button type="button"
                                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                        (click)="import()">
+                                        (click)="import(fileInput)">
                                         <span>
                                             <i class="la la-save"></i>
                                             <span>
@@ -205,7 +205,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="close()">
+                    (click)="close(fileInput)">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
