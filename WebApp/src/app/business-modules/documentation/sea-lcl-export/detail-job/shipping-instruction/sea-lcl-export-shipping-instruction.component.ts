@@ -112,16 +112,13 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     getGoods() {
         if (this.houseBills != null) {
-            // let desOfGoods = '';
             const lstPackages = [];
-            let packages = '';
             let containerNotes = '';
             let gw = 0;
             let volumn = 0;
             this.houseBills.forEach(x => {
                 gw += x.gw;
                 volumn += x.cbm;
-                // desOfGoods += !!x.desOfGoods ? (x.desOfGoods + '\n') : '';
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
                 if (!!x.packages) {
                     const a = x.packages.split(", ");
@@ -135,26 +132,28 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                     }
                 }
             });
-            console.log(lstPackages);
-            const t = _groupBy(lstPackages, "package");
-            for (const key in t) {
-                // check if the property/key is defined in the object itself, not in parent
-                if (t.hasOwnProperty(key)) {
-                    console.log(key, t[key]);
-                    let sum = 0;
-                    t[key].forEach(x => {
-                        sum = sum + Number(x.quantity);
-                    });
-                    packages += sum + " " + key + "\n";
-                }
-            }
+            const packages = this.getPackages(lstPackages);
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
-            // this.billSIComponent.shippingInstruction.goodsDescription = desOfGoods;
             this.billSIComponent.shippingInstruction.packagesNote = packages;
-            this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER"; // containerNotes;
-            this.billSIComponent.shippingInstruction.containerSealNo = ""; // contSealNos;
+            this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER";
+            this.billSIComponent.shippingInstruction.containerSealNo = "";
         }
+    }
+    getPackages(lstPackages: any[]): string {
+        const t = _groupBy(lstPackages, "package");
+        let packages = '';
+        for (const key in t) {
+            // check if the property/key is defined in the object itself, not in parent
+            if (t.hasOwnProperty(key)) {
+                let sum = 0;
+                t[key].forEach(x => {
+                    sum = sum + Number(x.quantity);
+                });
+                packages += sum + " " + key + "\n";
+            }
+        }
+        return packages;
     }
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));

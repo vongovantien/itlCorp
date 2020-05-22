@@ -61,7 +61,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 this.billDetail.housebills = res;
 
                 this.getBillingInstruction(this.jobId);
-                console.log(this.houseBills);
             },
         );
     }
@@ -84,8 +83,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    console.log('shipping instruction');
-                    console.log(res);
                     this.setDataBillInstructionComponent(res);
                 },
             );
@@ -96,14 +93,12 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res) => {
                     if (!!res) {
-                        console.log(res);
                         if (data != null) {
                             this.billSIComponent.shippingInstruction = data;
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
                         } else {
                             this.initNewShippingInstruction(res);
                             if (this.billSIComponent.type === "fcl") {
-                                console.log('this is FCL');
                                 this.getContainers();
                             }
                         }
@@ -111,7 +106,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
                         this.billSIComponent.termTypes = this.termTypes;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
-                        console.log(this.billSIComponent.shippingInstruction);
                     }
                 }
             );
@@ -120,7 +114,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         if (this.houseBills != null) {
             // let desOfGoods = '';
             const lstPackages = [];
-            let packages = '';
+            // let packages = '';
             let containerNotes = '';
             let contSealNos = '';
             let gw = 0;
@@ -142,24 +136,28 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                     }
                 }
             });
-            const t = _groupBy(lstPackages, "package");
-            for (const key in t) {
-                // check if the property/key is defined in the object itself, not in parent
-                if (t.hasOwnProperty(key)) {
-                    console.log(key, t[key]);
-                    let sum = 0;
-                    t[key].forEach(x => {
-                        sum = sum + Number(x.quantity);
-                    });
-                    packages += sum + " " + key + "\n";
-                }
-            }
+            const packages = this.getPackages(lstPackages);
             this.billSIComponent.shippingInstruction.grossWeight = gw;
             this.billSIComponent.shippingInstruction.volume = volumn;
             this.billSIComponent.shippingInstruction.packagesNote = packages;
             this.billSIComponent.shippingInstruction.containerNote = containerNotes;
             this.billSIComponent.shippingInstruction.containerSealNo = contSealNos;
         }
+    }
+    getPackages(lstPackages: any[]): string {
+        const t = _groupBy(lstPackages, "package");
+        let packages = '';
+        for (const key in t) {
+            // check if the property/key is defined in the object itself, not in parent
+            if (t.hasOwnProperty(key)) {
+                let sum = 0;
+                t[key].forEach(x => {
+                    sum = sum + Number(x.quantity);
+                });
+                packages += sum + " " + key + "\n";
+            }
+        }
+        return packages;
     }
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
