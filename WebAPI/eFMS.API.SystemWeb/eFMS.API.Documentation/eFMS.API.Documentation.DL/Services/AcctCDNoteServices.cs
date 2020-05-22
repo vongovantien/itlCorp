@@ -889,24 +889,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
-                    //var exchangeRate = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == item.CurrencyId && x.CurrencyToId == criteria.Currency)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
                     decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
-                    /*if ((exchangeRate != null && exchangeRate.Rate != 0))
-                    {
-                        _exchangeRate = exchangeRate.Rate;
-                    }
-                    else
-                    {
-                        //Exchange Rate ngược
-                        var exchangeRateReverse = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == exchargeDateSurcharge.Value.Date && x.CurrencyFromId == criteria.Currency && x.CurrencyToId == item.CurrencyId)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-                        _exchangeRate = (exchangeRateReverse != null && exchangeRateReverse.Rate != 0) ? 1 / exchangeRateReverse.Rate : 1;
-                    }*/
-
+                    
                     var charge = new SeaDebitAgentsNewReport();
                     //Thông tin Partner
+                    var partner = partnerRepositoty.Get(x => x.Id == data.PartnerId).FirstOrDefault();
                     charge.PartnerID = data.PartnerId?.ToUpper();
                     charge.PartnerName = data.PartnerNameEn?.ToUpper();
-                    charge.Address = data.PartnerShippingAddress?.ToUpper();
+                    charge.Address = (DocumentConstants.CURRENCY_LOCAL == criteria.Currency && data.CDNote.Type == "DEBIT") ? partner.AddressVn : partner.AddressEn;//Lấy địa chỉ Billing
                     charge.Workphone = data.PartnerTel?.ToUpper();
                     charge.Fax = data.PartnerFax?.ToUpper();
                     charge.Taxcode = data.PartnerTaxcode?.ToUpper();

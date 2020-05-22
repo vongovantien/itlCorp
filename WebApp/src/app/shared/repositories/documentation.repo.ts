@@ -817,4 +817,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    generateHBLSeaExport(podCode: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/GenerateHBLSeaExport`, { podCode }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: { hblNo: string }) => data.hblNo)
+        );
+    }
 }

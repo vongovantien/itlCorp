@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -14,7 +13,6 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { getDetailHBlPermissionState } from './../../../../../share-business/store';
 import { ChargeConstants } from 'src/constants/charge.const';
 
 @Component({

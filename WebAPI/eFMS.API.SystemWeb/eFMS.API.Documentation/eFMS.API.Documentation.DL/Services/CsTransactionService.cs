@@ -46,11 +46,9 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<SysOffice> sysOfficeRepository;
-<<<<<<< HEAD
         readonly IContextBase<CsAirWayBill> airwaybillRepository;
-=======
+        readonly IContextBase<SysGroup> groupRepository;
         readonly IContextBase<CatCommodity> commodityRepository;
->>>>>>> staging/11-05-2020-sprint15
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -76,11 +74,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
             IContextBase<SysOffice> sysOfficeRepo,
             ICurrencyExchangeService currencyExchange,
-<<<<<<< HEAD
-            IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
-=======
+            IContextBase<CsAirWayBill> airwaybillRepo,
+            IContextBase<SysGroup> groupRepo,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
->>>>>>> staging/11-05-2020-sprint15
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -105,11 +101,9 @@ namespace eFMS.API.Documentation.DL.Services
             freighchargesRepository = freighchargesRepo;
             currencyExchangeService = currencyExchange;
             sysOfficeRepository = sysOfficeRepo;
-<<<<<<< HEAD
             airwaybillRepository = airwaybillRepo;
-=======
+            groupRepository = groupRepo;
             commodityRepository = commodityRepo;
->>>>>>> staging/11-05-2020-sprint15
         }
 
         #region -- INSERT & UPDATE --
@@ -440,14 +434,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
                     result.AgentName = agent.PartnerNameEn;
-                    result.AgentData = new AgentData
-                    {
-                        NameEn = agent.PartnerNameEn,
-                        NameVn = agent.PartnerNameVn,
-                        Fax = agent.Fax,
-                        Tel = agent.Tel,
-                        Address = agent.AddressEn
-                    };
+                    result.AgentData = GetAgent(agent);
                 }
 
                 if (result.Pod != null)
@@ -493,14 +480,44 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if(result.OfficeId != null)
                 {
-                    SysOffice office = sysOfficeRepository.Get(x => x.Id == result.OfficeId)?.FirstOrDefault();
-                    result.OfficeNameEn = office.BranchNameEn;
-                    result.OfficeNameEn = office.BranchNameEn;
-                    result.OfficeLocation = office.Location;
+                    result.CreatorOffice = GetOfficeOfCreator(result.OfficeId);
+                }
+                if(result.GroupId != null)
+                {
+                    var group = groupRepository.Get(x => x.Id == result.GroupId).FirstOrDefault();
+                    result.GroupEmail = group != null ? group.Email : string.Empty;
                 }
 
                 return result;
             }
+        }
+
+        private AgentData GetAgent(CatPartner agent)
+        {
+            var agentData = new AgentData
+            {
+                NameEn = agent.PartnerNameEn,
+                NameVn = agent.PartnerNameVn,
+                Fax = agent.Fax,
+                Tel = agent.Tel,
+                Address = agent.AddressEn
+            };
+            return agentData;
+        }
+
+        private OfficeData GetOfficeOfCreator(Guid? officeId)
+        {
+            SysOffice office = sysOfficeRepository.Get(x => x.Id == officeId)?.FirstOrDefault();
+            var creatorOffice = new OfficeData
+            {
+                NameEn = office.BranchNameEn,
+                NameVn = office.BranchNameVn,
+                Location = office.Location,
+                AddressEn = office.AddressEn,
+                Tel = office.Tel,
+                Fax = office.Fax
+            };
+            return creatorOffice;
         }
 
         public int CheckDetailPermission(Guid id)

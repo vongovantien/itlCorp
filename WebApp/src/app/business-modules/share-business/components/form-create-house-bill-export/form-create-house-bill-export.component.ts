@@ -4,14 +4,14 @@ import { Store } from '@ngrx/store';
 
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex } from '@models';
+import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, Shipment } from '@models';
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
 import { DataService } from '@services';
 
-import { Observable } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, takeUntil, skip, finalize, tap, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
@@ -99,7 +99,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     isLoadingShipper: boolean = false;
     isLoadingConsignee: boolean = false;
 
-
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -145,7 +144,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.countries = this._store.select(getCatalogueCountryState);
 
         if (this.isUpdate) {
-            // * get detail HBL from store.
             this._store.select(fromShareBussiness.getDetailHBlState)
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
                 .subscribe(
@@ -155,59 +153,65 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         }
                     }
                 );
-
-
         } else {
-
-            // * get detail shipment from store.
-            this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-                .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
-                .subscribe(
-                    (shipment: CsTransactionDetail) => {
-                        // * set default value for controls from shipment detail.
-                        if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                            this.shipmmentDetail = new CsTransaction(shipment);
-
-                            this.formCreate.patchValue({
-                                bookingNo: this.shipmmentDetail.bookingNo,
-                                mawb: this.shipmmentDetail.mawb,
-                                oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
-                                pod: this.shipmmentDetail.pod,
-                                pol: this.shipmmentDetail.pol,
-                                serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
-                                issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
-                                sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
-                                issueHblplace: this.shipmmentDetail.officeLocation,
-                                onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail),
-                                forwardingAgentDescription: this.shipmmentDetail.officeNameEn,
-                                goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
-                                moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
-                                originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail)
-                            });
-                            this.ports.subscribe(
-                                ((ports: PortIndex[]) => {
-                                    if (!!this.shipmmentDetail.pol) {
-                                        const placeDelivery: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pod);
-                                        if (!!placeDelivery) {
-                                            this.formCreate.patchValue({
-                                                placeDelivery: placeDelivery.nameEn,
-                                            });
-                                        }
-                                    }
-                                    if (!!this.shipmmentDetail.pol) {
-                                        const placeReceipt: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pol);
-                                        if (!!placeReceipt) {
-                                            this.formCreate.patchValue({
-                                                placeReceipt: placeReceipt.nameEn,
-                                            });
-                                        }
-                                    }
-                                })
-                            );
-                        }
-                    }
-                );
+            this.getShipmentDetailAndUpdateDefault();
         }
+    }
+
+    getShipmentDetailAndUpdateDefault() {
+        // * get detail shipment from store.
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
+                tap((shipment: CsTransaction) => {
+                    // * set default value for controls from shipment detail.
+                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                        this.shipmmentDetail = new CsTransaction(shipment);
+                        this.formCreate.patchValue({
+                            bookingNo: this.shipmmentDetail.bookingNo,
+                            mawb: this.shipmmentDetail.mawb,
+                            oceanVoyNo: (!!this.shipmmentDetail.flightVesselName ? this.shipmmentDetail.flightVesselName : '') + ' - ' + (!!this.shipmmentDetail.voyNo ? this.shipmmentDetail.voyNo : ''),
+                            pod: this.shipmmentDetail.pod,
+                            pol: this.shipmmentDetail.pol,
+                            serviceType: !!this.shipmmentDetail.typeOfService ? [{ id: this.shipmmentDetail.typeOfService, text: this.shipmmentDetail.typeOfService }] : null,
+                            issueHbldate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
+                            sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
+                            issueHblplace: this.shipmmentDetail.officeLocation,
+                            onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail.polName, this.shipmmentDetail.polCountryNameEn, this.shipmmentDetail.etd),
+                            forwardingAgentDescription: this.shipmmentDetail.officeNameEn,
+                            goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
+                            moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
+                            originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail)
+                        });
+                    }
+                }),
+                mergeMap((res: CsTransaction) => this._documentRepo.generateHBLSeaExport(res.podCode)))
+            .pipe(tap((hblNo: string) => {
+                this.hwbno.setValue(hblNo);
+            }))
+            .subscribe(
+                (hblNo: any) => {
+                    this.ports.subscribe(
+                        ((ports: PortIndex[]) => {
+                            if (!!this.shipmmentDetail.pol) {
+                                const placeDelivery: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pod);
+                                if (!!placeDelivery) {
+                                    this.formCreate.patchValue({
+                                        placeDelivery: placeDelivery.nameEn,
+                                    });
+                                }
+                            }
+                            if (!!this.shipmmentDetail.pol) {
+                                const placeReceipt: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pol);
+                                if (!!placeReceipt) {
+                                    this.formCreate.patchValue({
+                                        placeReceipt: placeReceipt.nameEn,
+                                    });
+                                }
+                            }
+                        })
+                    );
+                }
+            );
     }
 
     setDefaultOriginBLNumber(shipment: CsTransaction) {
@@ -234,8 +238,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         return null;
     }
 
-    setDefaultOnboard(shipment: CsTransaction) {
-        return `SHIPPED ON BOARD \n${shipment.polName}, ${shipment.polCountryNameEn} \n${formatDate(shipment.eta, 'mediumDate', 'en')}`;
+    setDefaultOnboard(polName: string, country: string, etd: string) {
+        return `SHIPPED ON BOARD \n${polName}, ${country} \n${formatDate(etd, 'mediumDate', 'en')}`;
     }
 
     initForm() {
@@ -495,6 +499,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+
+                // * CHANGE POL update onBoard Status
+                this.formCreate.controls['onBoardStatus'].setValue(this.setDefaultOnboard((data as PortIndex).nameEn, (data as PortIndex).countryNameEN, this.shipmmentDetail.etd));
                 break;
             case 'pod':
                 this.pod.setValue(data.id);

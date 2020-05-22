@@ -85,9 +85,14 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        if (typeof this.hblDetail.rateCharge === "number") {
-                            this.formCreateHBLComponent.rateChargeIsNumber = true;
-                        }
+                        // if (!isNaN(parseInt(this.hblDetail.rateCharge))) {
+                        //     this.formCreateHBLComponent.rateChargeIsNumber = true;
+                        // } else {
+                        //     this.formCreateHBLComponent.asArranged.setValue(true);
+                        // }
+                        // if (this.hblDetail.rateCharge != Number(this.hblDetail.rateCharge)) {
+                        //     this.formCreateHBLComponent.asArranged.setValue(true);
+                        // }
                     }
                 },
             );

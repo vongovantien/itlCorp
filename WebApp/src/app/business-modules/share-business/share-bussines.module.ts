@@ -58,15 +58,15 @@ import {
     ShareBussinessDateTimeModifiedComponent,
     ShareContainerImportComponent,
     ShareBussinessBillInstructionSeaExportComponent,
-    ShareBussinessBillInstructionHousebillsSeaExportComponent
+    ShareBussinessBillInstructionHousebillsSeaExportComponent,
+    ShareBussinessHBLFCLContainerPopupComponent,
+    ShareGoodsImportComponent
 
 } from './components';
 
 
 import { reducers, effects } from './store';
-import { ShareGoodsImportComponent } from './components/goods-import/goods-import.component';
 import { ValidatorModule } from 'src/app/shared/validators/validator.module';
-import { ShareBussinessHBLFCLContainerPopupComponent } from './components/hbl-fcl-container/hbl-fcl-container.popup';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
