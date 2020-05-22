@@ -12,6 +12,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string PODName { get; set; }
         public string POLName { get; set; }
         public string CreatorName { get; set; }
+        public string ModifiedName { get; set; }
+
 
     }
 }

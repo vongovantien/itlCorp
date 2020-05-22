@@ -14,7 +14,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string Revision { get; set; }
         public string BookingNo { get; set; }
         public string ShipperId { get; set; }
+        public string ShipperDescription { get; set; }
         public string ConsigneeId { get; set; }
+        public string ConsigneeDescription { get; set; }
         public DateTime? DateOfStuffing { get; set; }
         public DateTime? ClosingTime { get; set; }
         public string PlaceOfStuffing { get; set; }

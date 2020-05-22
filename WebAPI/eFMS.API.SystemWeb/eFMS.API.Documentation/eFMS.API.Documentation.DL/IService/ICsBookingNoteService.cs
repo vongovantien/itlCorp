@@ -15,10 +15,10 @@ namespace eFMS.API.Documentation.DL.IService
     {
         List<CsBookingNoteModel> Paging(CsBookingNoteCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<CsBookingNoteModel> Query(CsBookingNoteCriteria criteria);
-        HandleState AddCsBookingNote(CsBookingNoteEditModel model);
+        object AddCsBookingNote(CsBookingNoteEditModel model);
         HandleState UpdateCsBookingNote(CsBookingNoteEditModel model);
         HandleState DeleteCsBookingNote(Guid bookingNoteId);
-
+        CsBookingNoteModel GetDetails(Guid id);
 
 
 

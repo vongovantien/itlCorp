@@ -1220,6 +1220,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Commodity).HasMaxLength(250);
 
+                entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
+
                 entity.Property(e => e.ConsigneeId)
                     .HasMaxLength(30)
                     .IsUnicode(false);
@@ -1283,6 +1285,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Revision).HasMaxLength(250);
 
                 entity.Property(e => e.ServiceRequired).HasMaxLength(250);
+
+                entity.Property(e => e.ShipperDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ShipperId)
                     .HasMaxLength(30)
