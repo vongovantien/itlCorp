@@ -168,10 +168,10 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             } else {
                 if (!!res.groupEmail) {
                     this.billSIComponent.shippingInstruction.shipper = this.billSIComponent.shippingInstruction.shipper + (!!res.groupEmail ? '\nEmail: ' + res.groupEmail : '');
-            }
+                }
                 this.billSIComponent.shippingInstruction.shipper = !!res.groupEmail ? 'Email: ' + res.groupEmail : '';
+            }
         }
-    }
     }
     save() {
         this.billSIComponent.isSubmitted = true;
@@ -201,10 +201,10 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.billSIComppnent.formSI.valid
-            || (!!this.billSIComppnent.loadingDate.value && !this.billSIComppnent.loadingDate.value.startDate)
-            || (!!this.billSIComppnent.issueDate.value && !this.billSIComppnent.issueDate.value.startDate)
-            || (this.billSIComppnent.pod.value === this.billSIComppnent.pol.value)
+        if (!this.billSIComponent.formSI.valid
+            || (!!this.billSIComponent.loadingDate.value && !this.billSIComponent.loadingDate.value.startDate)
+            || (!!this.billSIComponent.issueDate.value && !this.billSIComponent.issueDate.value.startDate)
+            || (this.billSIComponent.pod.value === this.billSIComponent.pol.value)
         ) {
             valid = false;
         }
@@ -235,11 +235,11 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             );
     }
     previewSummaryReport() {
-        if (this.billSIComppnent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+        if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
-        this._documentRepo.previewSummaryReport(this.billSIComppnent.shippingInstruction)
+        this._documentRepo.previewSummaryReport(this.billSIComponent.shippingInstruction)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
