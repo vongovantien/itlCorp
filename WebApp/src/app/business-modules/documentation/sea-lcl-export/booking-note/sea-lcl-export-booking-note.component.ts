@@ -51,9 +51,16 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
             { title: 'Creator', field: 'creatorName', sortable: true },
             { title: 'Create Date', field: 'createDate', sortable: true },
         ];
+
         this.dataSearch = {
             type: 'All'
         };
+
+        const date = new Date();
+        const firstDay = new Date(date.getFullYear(), date.getMonth(), 2);
+        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+        this.criteria.fromDate = firstDay;
+        this.criteria.toDate = lastDay;
         this.searchBookingNote();
     }
 
