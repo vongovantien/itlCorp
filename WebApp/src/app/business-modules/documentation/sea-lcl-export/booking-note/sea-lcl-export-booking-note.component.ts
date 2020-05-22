@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -6,23 +6,25 @@ import { SortService } from '@services';
 import { Router } from '@angular/router';
 import { DocumentationRepo } from '@repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
-import { User } from '@models';
-
+import { ConfirmPopupComponent } from '@common';
 @Component({
     selector: 'app-sea-lcl-export-booking-note',
     templateUrl: './sea-lcl-export-booking-note.component.html'
 })
 
 export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit {
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+
     headers: CommonInterface.IHeaderTable[];
 
     criteria: any = {};
     bookingNotes: any = [];
 
+    idBookingNote: string = '';
+
     sortLocal(sort: string): void {
         this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
     }
-
 
     constructor(private _progressService: NgProgress,
         private _toastService: ToastrService,
@@ -54,6 +56,35 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         };
         this.searchBookingNote();
     }
+
+    searchBookingNote() {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._documentRepo.getBookingNoteSeaLCLExport(this.page, this.pageSize, Object.assign({}, this.criteria))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+                map((data: any) => {
+                    if (data.data != null) {
+                        return {
+                            data: data.data,
+                            totalItems: data.totalItems,
+                        };
+                    }
+                    return {
+                        data: null,
+                        totalItems: 0,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.totalItems = res.totalItems || 0;
+                    this.bookingNotes = res.data;
+                    console.log(this.bookingNotes);
+                },
+            );
+    }
+
     onSearchBookingNote(dataSearch: any) {
         this.dataSearch = dataSearch;
         this.page = 1;
@@ -83,35 +114,36 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         }
         this.criteria.fromDate = this.dataSearch.fromDate;
         this.criteria.toDate = this.dataSearch.toDate;
-        console.log(this.dataSearch);
         this.searchBookingNote();
     }
 
-    searchBookingNote() {
+    showDeletePopup(id: string) {
+        this.confirmDeletePopup.show();
+        this.idBookingNote = id;
+    }
+
+    onDeleteBookingNote() {
+        this.confirmDeletePopup.hide();
+        this.deleteBookingNote(this.idBookingNote);
+    }
+
+    deleteBookingNote(id: string) {
         this.isLoading = true;
         this._progressRef.start();
-        this._documentRepo.getBookingNoteSeaLCLExport(this.page, this.pageSize, Object.assign({}, this.criteria))
+        this._documentRepo.deleteBookingNoteSeaLCLExport(id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
-                map((data: any) => {
-                    if (data.data != null) {
-                        return {
-                            data: data.data,
-                            totalItems: data.totalItems,
-                        };
-                    }
-                    return {
-                        data: null,
-                        totalItems: 0,
-                    };
-                })
             ).subscribe(
-                (res: any) => {
-                    this.totalItems = res.totalItems || 0;
-                    this.bookingNotes = res.data;
-                    console.log(this.bookingNotes);
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.searchBookingNote();
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
                 },
             );
     }
+
 }

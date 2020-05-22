@@ -12,7 +12,6 @@
                                 <form>
                                     <div class="input-group m-input-group m-input-group--square">
                                         <div class="input-group-prepend">
-
                                             <button type="button" class="btn btn-secondary dropdown-toggle"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 {{searchObject.displayName}}
@@ -35,16 +34,13 @@
                                             aria-label="Text input with dropdown button"
                                             [(ngModel)]="searchObject.searchString" name="searchString"
                                             (change)="searchObject.searchString = searchObject.searchString.trim()">
-
                                     </div>
-
                                 </form>
                             </ng-container>
                         </div>
 
                     </div>
                     <div class="col-lg-2">
-
                         <div class="form-group form-control-serviceDateFromTo daterange-rtl">
                             <label class="form-control-label" for="">
                                 Date
@@ -55,13 +51,10 @@
                                 [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
                                 readonly />
                         </div>
-
                     </div>
                 </div>
-
             </form>
             <div class="form-actions">
-
                 <div class="row">
                     <div class="col-lg-6"></div>
                     <div class="col-lg-6 m--align-right">
@@ -84,7 +77,6 @@
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

@@ -848,6 +848,13 @@ export class DocumentationRepo {
         );
     }
 
+    deleteBookingNoteSeaLCLExport(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     updateInputBookingNoteAirExport(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/UpdateInputBKNote`, body).pipe(
             catchError((error) => throwError(error)),

@@ -165,8 +165,8 @@ namespace eFMS.API.Documentation.DL.Services
                            && (x.POLName ?? "").IndexOf(criteria.POLName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.PODName ?? "").IndexOf(criteria.PODName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.CreatorName ?? "").IndexOf(criteria.CreatorName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                           && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) &&
-                   (x.CreatedDate.Value.Date <= criteria.ToDate) || criteria.FromDate == null || criteria.ToDate == null)
+                           && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate)
+                           && (x.CreatedDate.Value.Date <= criteria.ToDate) || criteria.FromDate == null || criteria.ToDate == null)
               );
         
             }
@@ -178,10 +178,8 @@ namespace eFMS.API.Documentation.DL.Services
                      || (x.ConsgineeName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.POLName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.PODName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                     || (x.CreatorName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                     )
-                     && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) &&
-                   (x.CreatedDate.Value.Date <= criteria.ToDate ) || criteria.FromDate == null || criteria.ToDate == null)
+                     || (x.CreatorName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                     && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) && (x.CreatedDate.Value.Date <= criteria.ToDate ) || criteria.FromDate == null || criteria.ToDate == null)
                     );
             }
             lstBookingNotes = lstBookingNotes.OrderByDescending(x => x.DatetimeModified);

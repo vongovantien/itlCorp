@@ -1,6 +1,5 @@
-import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
 @Component({
@@ -9,23 +8,23 @@ import { formatDate } from '@angular/common';
 })
 export class SeaLCLExportBookingNoteFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchBookingNote> = new EventEmitter<ISearchBookingNote>();
+
     configSearch: any;
     defaultSetting: any = { fieldName: 'All', displayName: 'All' };
     settingFields: any[] = [this.defaultSetting];
-    formSearch: FormGroup;
     dateFromTo: any;
     searchObject: any = {
         field: "",
         displayName: "",
         searchString: ""
     };
-
     constructor(
     ) {
         super();
         this.requestSearch = this.searchData;
         this.requestReset = this.onReset;
     }
+
     ngOnInit(): void {
         this.configSearch = {
             settingFields: <CommonInterface.IValueDisplay[]>[
@@ -46,6 +45,7 @@ export class SeaLCLExportBookingNoteFormSearchComponent extends AppForm {
         this.searchObject.displayName = this.defaultSetting.displayName;
         this.searchObject.searchString = this.configSearch.searchString;
     }
+
     searchTypeChange(field, event) {
         if (field == 'All') {
             this.searchObject.displayName = "All";
@@ -54,6 +54,7 @@ export class SeaLCLExportBookingNoteFormSearchComponent extends AppForm {
         }
         this.searchObject.field = field.fieldName;
     }
+
     searchData() {
 
         const searchData = {
