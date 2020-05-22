@@ -760,10 +760,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (!!csShipmentSurcharge.length) {
                         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                             csShipmentSurcharge.forEach((c: CsShipmentSurcharge) => {
+                                this.onChangeDataUpdateTotal(c);
                                 this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                             });
                         } else {
                             csShipmentSurcharge.forEach((c: CsShipmentSurcharge) => {
+                                this.onChangeDataUpdateTotal(c);
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                             });
                         }
