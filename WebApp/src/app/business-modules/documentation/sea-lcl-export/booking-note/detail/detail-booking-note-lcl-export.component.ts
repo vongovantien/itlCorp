@@ -10,7 +10,7 @@ import { map, tap, switchMap, catchError, finalize, concatMap } from 'rxjs/opera
 import { of, combineLatest } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
-import { SubHeaderComponent } from '@common';
+import { SubHeaderComponent, ReportPreviewComponent } from '@common';
 import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
@@ -20,12 +20,13 @@ import { SystemConstants } from 'src/constants/system.const';
 
 export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingNoteCreateComponent implements OnInit {
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     bookingNoteId: string;
     ACTION: CommonType.ACTION_FORM = 'UPDATE';
 
     csBookingNote: csBookingNote = new csBookingNote();
-
+    dataReport: any = null;
     constructor(
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
@@ -188,5 +189,27 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
 
     gotoDuplicate() {
         this._router.navigate(["home/documentation/sea-lcl-export/booking-note", this.bookingNoteId], { queryParams: { action: 'COPY' } });
+    }
+
+    previewBookingNote() {
+        this._progressRef.start();
+        this._documentRepo.previewHLSeaBookingNoteById(this.bookingNoteId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

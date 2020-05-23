@@ -10,16 +10,15 @@
                     <div>
                         <div class="c-button-actions">
                             <ng-container *ngIf="ACTION === 'UPDATE' || ACTION === null">
-                                <div class="dropdown m-dropdown m-dropdown--inline">
-                                    <button class="btn btn-default dropdown-toggle" type="button"
-                                        data-toggle="dropdown">
-                                        <i class="la la-eye"></i>Preview<span class="caret"></span>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item pointer">Preview with USD</a>
-                                        <a class="dropdown-item pointer">Preview with VND</a>
-                                    </div>
-                                </div>
+                                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                                    (click)="previewBookingNote()">
+                                    <span>
+                                        <i class="la la-eye"></i>
+                                        <span>
+                                            Preview
+                                        </span>
+                                    </span>
+                                </button>
                                 <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="confirmDuplicatePopup.show()">
                                     <span>
@@ -68,3 +67,7 @@
 
 <confirm-popup #confirmDuplicatePopup body="Do you want to duplicate this booking note"
     (onSubmit)="confirmDuplicatePopup.hide(); gotoDuplicate()"></confirm-popup>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>
