@@ -109,7 +109,7 @@
                             <ng-container
                                 *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
                                 <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
-                                    [class.invalid-row]="surcharge.isFromShipment">
+                                    [class.bg-warning]="surcharge.isFromShipment">
                                     <td class=" table-actions-col">
                                         <div class="table-actions">
                                             <label class="m-checkbox">
@@ -132,7 +132,7 @@
                                             {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                         </a>
                                     </td>
-                                    <td class="text-primary pointer class.text-underline"
+                                    <td class="text-primary pointer text-underline"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')">
                                         {{surcharge.chargeName}}
                                     </td>

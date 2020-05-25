@@ -5,7 +5,7 @@
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
-                <tr class="">
+                <tr [class.bg-warning]="surcharge.isFromShipment">
                     <td class="table-actions-col">
                         <div class="m-checkbox-list d-flex justify-content-center">
                             <label class="m-checkbox">
@@ -23,8 +23,7 @@
                             </ng-container>
                         </div>
                     </td>
-                    <td class="text-primary pointer" (click)="openSurchargeDetail(surcharge, i)"
-                        [class.text-underline]="!surcharge.isFromShipment">
+                    <td class="text-primary pointer text-underline" (click)="openSurchargeDetail(surcharge, i)">
                         {{surcharge.chargeName}}
                     </td>
                     <td>{{surcharge.quantity}}</td>
