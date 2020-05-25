@@ -47,11 +47,13 @@ export class SettlementTableSurchargeComponent extends AppList {
     }
 
     openSurchargeDetail(surcharge: Surcharge, index: number) {
-        if (surcharge.isFromShipment) {
-            return;
-        } else {
-            this.onClickSurcharge.emit(surcharge);
-        }
+        // if (surcharge.isFromShipment) {
+        //     return;
+        // } else {
+        //     this.onClickSurcharge.emit(surcharge);
+        // }
+        this.onClickSurcharge.emit(surcharge);
+
     }
 
     checkUncheckAllCharge() {

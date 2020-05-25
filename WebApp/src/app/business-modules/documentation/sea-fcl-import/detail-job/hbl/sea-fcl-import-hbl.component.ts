@@ -43,6 +43,20 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
         }
     }
 
+    configHBL() {
+        this.headers = [
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'Customer', field: 'customerName', sortable: true },
+            { title: 'Salesman', field: 'saleManName', sortable: true },
+            { title: 'Departure', field: 'finalDestinationPlace', sortable: true },
+            { title: 'Destination', field: 'finalDestinationPlace', sortable: true },
+            { title: 'Container', 'field': 'containers', sortable: true },
+            { title: 'Package', field: 'packages', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
+            { title: 'CBM', field: 'cbm', sortable: true }
+        ];
+    }
+
     gotoCreate() {
         this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl/new`]);
     }

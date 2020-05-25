@@ -264,7 +264,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 Active = x.Active,
                 InActiveOn = x.InActiveOn,
                 CountryName = currentCulture.IetfLanguageTag == "en-US" ? x.CountryNameEN : x.CountryNameVN,
-                AreaName = x.AreaNameVN,
+                AreaName = currentCulture.IetfLanguageTag == "en-US" ? x.AreaNameEN : x.AreaNameVN,
                 LocalAreaName = x.LocalAreaNameVN,
                 FlightVesselNo = x.FlightVesselNo,
                 

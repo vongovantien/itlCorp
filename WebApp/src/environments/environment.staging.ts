@@ -1,7 +1,7 @@
 
 
 export const environment = {
-    production: true,
+    production: false,
     local: false,
     HOST: {
         WEB_URL: "staging.api-efms.itlvn.com",
