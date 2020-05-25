@@ -1,7 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { catchError, map, finalize, takeUntil } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
@@ -14,6 +13,8 @@ import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Router } from '@angular/router';
 import { IAppState, getMenuUserPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { SystemConstants } from 'src/constants/system.const';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -31,7 +32,6 @@ export class CustomClearanceComponent extends AppList {
     menuPermission: SystemInterface.IUserPermission;
     messageConvertError: string = '';
     clearancesToConvert: CustomDeclaration[] = [];
-
     headers: CommonInterface.IHeaderTable[];
     constructor(
         private _store: Store<IAppState>,
@@ -48,6 +48,12 @@ export class CustomClearanceComponent extends AppList {
         this.requestList = this.getListCustomsDeclaration;
         this.requestSort = this.sortCD;
         this._progressRef = this._ngProgressService.ref();
+        this.dataSearch = {
+            fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
+            toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            imPorted: false,
+            personHandle: JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id
+        };
     }
 
     ngOnInit() {
@@ -87,10 +93,16 @@ export class CustomClearanceComponent extends AppList {
             .subscribe((res: any) => { this.listUnit = res; });
     }
 
-    getListCustomsDeclaration(dataSearch?: any) {
+    onSearchClearance(dataSearch?: any) {
+        this.dataSearch = dataSearch;
+        this.page = 1;
+        this.getListCustomsDeclaration();
+    }
+
+    getListCustomsDeclaration() {
         this.isLoading = true;
         this._progressRef.start();
-        const body = dataSearch || {};
+        const body = this.dataSearch || {};
         this._operationRepo.getListCustomDeclaration(this.page, this.pageSize, body)
             .pipe(
                 catchError(this.catchError),
