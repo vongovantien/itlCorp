@@ -1,0 +1,77 @@
+AirlineAbbrName	String	255
+MAWB	String	255	
+HWBNO	String	50
+MBLNO1	String	50
+MBLNO2	String	50
+MBLNO3	String	50	
+ATTN	String	255	
+ISSUED	String	255	
+ConsigneeID	String	50	
+Consignee	String	250	
+ICASNC	String	250	
+AccountingInfo	String	250	
+AgentIATACode	String	50	
+AccountNo	String	50	
+DepartureAirport	String	150	
+ReferrenceNo	String	50	
+OSI	Memo		
+FirstDestination	String	255	
+FirstCarrier	String	50	
+SecondDestination	String	255	
+SecondCarrier	String	50	
+ThirdDestination	String	50	
+ThirdCarrier	String	50	
+Currency	String	50	
+CHGSCode	String	50	
+WTPP	String	255	
+WTCLL	String	255	
+ORPP	String	255	
+ORCLL	String	255	
+DlvCarriage	String	255	
+DlvCustoms	String	255	
+LastDestination	String	50	
+FlightNo	String	50	
+FlightDate	DateTime		
+ConnectingFlight	String	150	
+ConnectingFlightDate	DateTime		
+insurAmount	String	255	
+HandlingInfo	String	250	
+Notify	String	255	
+SCI	String	50	
+NoPieces	String	150	
+GrossWeight	Number		
+GrwDecimal	Number		
+Wlbs	String	50	
+RateClass	String	50	
+ItemNo	String	150	
+WChargeable	Number		
+ChWDecimal	Number		
+Rchge	String	255	
+Ttal	String	255	
+Description	Memo		
+WghtPP	String	50	
+WghtCC	String	50	
+ValChPP	String	50	
+ValChCC	String	50	
+TxPP	String	50	
+TxCC	String	50	
+OrchW	String	255	
+OChrVal	String	50	
+TTChgAgntPP	String	50	
+TTChgAgntCC	String	50	
+TTCarrPP	String	50	
+TTCarrCC	String	50	
+TtalPP	String	50	
+TtalCC	String	50	
+CurConvRate	String	50	
+CCChgDes	String	50	
+SpecialNote	String	255	
+ShipperCertf	String	255	
+ExecutedOn	String	50	
+ExecutedAt	String	50	
+Signature	String	50	
+Dimensions	String	255	
+ShipPicture	BLOB		
+PicMarks	String	255	
+GoodsDelivery	String	255
+FooterName	String	50	
