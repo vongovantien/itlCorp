@@ -93,6 +93,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.DepartmentId = _currentUser.DepartmentId;
             model.OfficeId = _currentUser.OfficeID;
             model.CompanyId = _currentUser.CompanyID;
+            model.UserCreated = _currentUser.UserID;
+            model.UserModified = model.UserCreated = currentUser.UserID;
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
 
@@ -104,10 +106,8 @@ namespace eFMS.API.Documentation.DL.Services
                     return checkDuplicateCont;
                 }
             }
-            model.UserCreated = currentUser.UserID;
             model.DatetimeCreated = DateTime.Now;
             model.Id = Guid.NewGuid();
-            model.UserModified = model.UserCreated = currentUser.UserID;
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
 
@@ -199,11 +199,11 @@ namespace eFMS.API.Documentation.DL.Services
                     model.OfficeId = hb.OfficeId;
                     model.CompanyId = hb.CompanyId;
                     model.UserCreated = hb.UserCreated;
+                    model.UserModified = currentUser.UserID;
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
                     if (code == 403) return new HandleState(403,"");
-                    model.UserModified = currentUser.UserID;
                     model.DatetimeModified = DateTime.Now;
                     model.Active = true;
                     model.DatetimeCreated = hb.DatetimeCreated;
@@ -211,7 +211,6 @@ namespace eFMS.API.Documentation.DL.Services
                     model.FlightNoRowTwo = hb.FlightNoRowTwo;
                     model.ContactPerson = hb.ContactPerson;
                     model.ClosingTime = hb.ClosingTime;
-
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
