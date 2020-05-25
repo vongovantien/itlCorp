@@ -177,16 +177,8 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
-                                formControlName="closingDate" />
-                            <span class="m-input-icon_clear" (click)="resetFormControl(closingDate)"
-                                *ngIf="!!closingDate.value && !!closingDate.value.startDate">
-                                <i class="la la-times"></i>
-                            </span>
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                formControlName="closingDate" (remove)="resetFormControl(closingDate)" calendar
+                                [allowRemove]="!!closingDate.value && !!closingDate.value.startDate" />
                         </div>
                     </div>
                 </div>
@@ -198,16 +190,8 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="sailingDate" name="daterange" placeholder="Select" readonly
-                                formControlName="sailingDate" />
-                            <span class="m-input-icon_clear" (click)="resetFormControl(sailingDate)"
-                                *ngIf="!!sailingDate.value && !!sailingDate.value.startDate">
-                                <i class="la la-times"></i>
-                            </span>
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                formControlName="sailingDate" (remove)="resetFormControl(sailingDate)" calendar
+                                [allowRemove]="!!sailingDate.value && !!sailingDate.value.startDate" />
                         </div>
                     </div>
                 </div>
@@ -263,16 +247,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHbldate" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHbldate)"
-                                        *ngIf="!!issueHbldate.value && !!issueHbldate.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="issueHbldate" (remove)="resetFormControl(issueHbldate)"
+                                        calendar
+                                        [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate" />
                                 </div>
                             </div>
                         </div>

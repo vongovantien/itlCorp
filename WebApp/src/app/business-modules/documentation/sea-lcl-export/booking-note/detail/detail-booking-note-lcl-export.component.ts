@@ -27,6 +27,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
 
     csBookingNote: csBookingNote = new csBookingNote();
     dataReport: any = null;
+
     constructor(
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
@@ -58,9 +59,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                     this.ACTION = null;
                 }
                 this._cd.detectChanges();
-
-                console.log(this.ACTION);
-
             }),
             switchMap(() => of(this.bookingNoteId)),
         ).subscribe(
@@ -79,7 +77,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
             .subscribe(
                 (res: csBookingNote) => {
                     this.csBookingNote = new csBookingNote(res);
-                    console.log(this.csBookingNote);
                     this.updateFormCsBookingNote(res);
                 }
             );
@@ -114,7 +111,8 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
             .subscribe(
                 (res: { model: csBookingNote, result: any }) => {
                     if (res.result.success) {
-                        this._toastService.success(res.result.message);
+                        this._toastService.success("New data added");
+                        this.headerComponent.resetBreadcrumb("View/Edit Booking Note");
 
                         this._router.navigate([`home/documentation/sea-lcl-export/booking-note/`, res.model.id]);
                     } else {
