@@ -169,7 +169,8 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         this.billSIComponent.shippingInstruction.pol = res.pol;
         this.billSIComponent.shippingInstruction.pod = res.pod;
         this.billSIComponent.shippingInstruction.loadingDate = res.etd;
-        this.billSIComponent.shippingInstruction.voyNo = res.flightVesselName + " - " + res.voyNo;
+        this.billSIComponent.shippingInstruction.voyNo = (!!res.flightVesselName ? res.flightVesselName : '') + " - " + (!!res.voyNo ? res.voyNo : '');
+        this.billSIComponent.shippingInstruction.remark = res.mbltype;
         this.getExportDefault(res);
     }
     getExportDefault(res: CsTransaction) {
