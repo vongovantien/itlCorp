@@ -120,7 +120,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             }
             if (res.consigneeId != null) {
                 const consignee = this.consignees.find(x => x.id === res.consigneeId);
-                if (consignee !== null) {
+                if (!!consignee) {
                     this.getConsigneeDescription(consignee);
                 }
             }
@@ -212,7 +212,20 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
         const t = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]).pipe(
             catchError(this.catchError),
             finalize(() => { })
-        ).subscribe((res: any) => { this.consignees = res; });
+        ).subscribe((res: any) => {
+            this.consignees = res;
+            this.getCurrentAgent();
+        });
+    }
+    getCurrentAgent() {
+        if (!!this.shippingInstruction) {
+            if (this.shippingInstruction.consigneeId != null) {
+                const consignee = this.consignees.find(x => x.id === this.shippingInstruction.consigneeId);
+                if (!!consignee) {
+                    this.getConsigneeDescription(consignee);
+                }
+            }
+        }
     }
     getSuppliers() {
         this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER).pipe(
@@ -248,9 +261,9 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
                 break;
             case 'consignee':
                 this.consignee.setValue(data.id);
-                const consignee = this.consignees.findIndex(x => x.id === data.id);
-                if (consignee !== null) {
-                    this.getConsigneeDescription(consignee);
+                const indexConsignee = this.consignees.findIndex(x => x.id === data.id);
+                if (indexConsignee > -1) {
+                    this.getConsigneeDescription(this.consignees[indexConsignee]);
                 }
                 break;
             case 'realshipper':
