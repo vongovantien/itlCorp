@@ -14,7 +14,7 @@ import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAct
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share, take } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, share, take, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -1041,8 +1041,18 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (v: Partner) => {
                     this.onSelectPartner(v, this.selectedSurcharge);
                     this.subscription.unsubscribe();
+                    this.charges[index].isShowPartnerHeader = false;
+
                     containerRef.clear();
                 });
+            ((this.componentRef.instance) as AppComboGridComponent<Partner>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        this.charges[index].isShowPartnerHeader = false;
+                        containerRef.clear();
+                    }
+                );
         }
     }
 
@@ -1069,6 +1079,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             componentRef.instance.fields = ['chargeNameEn'];
             componentRef.instance.active = charge.chargeId;
 
+            // * Listen EventEmiter    
             this.subscription = ((componentRef.instance) as AppComboGridComponent<Charge>).onClick.subscribe(
                 (v: Charge) => {
                     this.onSelectDataFormInfo(v, 'charge', this.selectedSurcharge);
@@ -1076,6 +1087,15 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this.subscription.unsubscribe();
                     containerRef.clear();
                 });
+
+            // * Listen ClickOutside    
+            ((componentRef.instance) as AppComboGridComponent<Charge>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        containerRef.clear();
+                    }
+                );
         }
     }
 
@@ -1087,32 +1107,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     componentRef.clear();
                 }
                 break;
-            case 'charge':
-                const componentRefCharge = this.chargeContainerRef.toArray()[index];
-                if (!!componentRefCharge) {
-                    componentRefCharge.clear();
-                }
+            // case 'charge':
+            //     const componentRefCharge = this.chargeContainerRef.toArray()[index];
+            //     if (!!componentRefCharge) {
+            //         componentRefCharge.clear();
+            //     }
         }
-    }
-
-    handleClickOutSideComboGrid(index: number, type: string) {
-        // if (this.selectedIndexCharge !== -1) {
-        switch (type) {
-            case 'partner':
-                this.charges[index].isShowPartnerHeader = false;
-                const t = this.widgetTargets.toArray()[index];
-                if (!!t) {
-                    t.remove();
-                }
-                break;
-            case 'charge':
-                const v = this.chargeContainerRef.toArray()[index];
-                if (!!v) {
-                    v.remove();
-                }
-                break;
-        }
-
-
     }
 }

@@ -57,7 +57,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             )
             .subscribe(
                 (res: any) => {
-                    if (!!res && res.deliveryOrderNo !== null) {
+                    if (!!res) {
                         this.deliveryOrder = new DeliveryOrder(res);
                         this.deliveryOrder.deliveryOrderPrintedDate = {
                             startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),

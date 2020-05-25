@@ -70,7 +70,7 @@
                         "test-vi": {
                             "optimization": true,
                             "outputHashing": "none",
-                            "sourceMap": false,
+                            "sourceMap": true,
                             "extractCss": true,
                             "namedChunks": true,
                             "aot": true,
@@ -97,7 +97,7 @@
                         "staging-vi": {
                             "optimization": true,
                             "outputHashing": "none",
-                            "sourceMap": false,
+                            "sourceMap": true,
                             "extractCss": true,
                             "namedChunks": true,
                             "aot": true,
@@ -124,7 +124,7 @@
                         "test-en": {
                             "optimization": true,
                             "outputHashing": "none",
-                            "sourceMap": false,
+                            "sourceMap": true,
                             "extractCss": true,
                             "baseHref": "/en/",
                             "namedChunks": true,
@@ -152,7 +152,7 @@
                         "staging-en": {
                             "optimization": true,
                             "outputHashing": "none",
-                            "sourceMap": false,
+                            "sourceMap": true,
                             "extractCss": true,
                             "baseHref": "/en/",
                             "namedChunks": true,

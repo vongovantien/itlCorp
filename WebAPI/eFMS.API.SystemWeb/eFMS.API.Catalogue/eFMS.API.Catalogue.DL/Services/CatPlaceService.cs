@@ -82,14 +82,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Update(CatPlaceModel model)
         {
-            var entity = mapper.Map<CatPlace>(model);
-            entity.DatetimeModified = DateTime.Now;
-            entity.UserModified = currentUser.UserID;
-
-            if (entity.Active == false)
-            {
-                entity.InactiveOn = DateTime.Now;
-            }
+            var entity = GetModelToUpdate(model);
             var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
             {
@@ -98,6 +91,25 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return result;
         }
+
+        private CatPlace GetModelToUpdate(CatPlaceModel model)
+        {
+            var entity = mapper.Map<CatPlace>(model);
+            var place = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            entity.GroupId = place.GroupId;
+            entity.DepartmentId = place.DepartmentId;
+            entity.OfficeId = place.OfficeId;
+            entity.CompanyId = place.CompanyId;
+
+            if (entity.Active == false)
+            {
+                entity.InactiveOn = DateTime.Now;
+            }
+            return entity;
+        }
+
         public HandleState Delete(Guid id)
         {
             var hs = DataContext.Delete(x => x.Id == id);
@@ -252,7 +264,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 Active = x.Active,
                 InActiveOn = x.InActiveOn,
                 CountryName = currentCulture.IetfLanguageTag == "en-US" ? x.CountryNameEN : x.CountryNameVN,
-                AreaName = x.AreaNameVN,
+                AreaName = currentCulture.IetfLanguageTag == "en-US" ? x.AreaNameEN : x.AreaNameVN,
                 LocalAreaName = x.LocalAreaNameVN,
                 FlightVesselNo = x.FlightVesselNo,
                 
