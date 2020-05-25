@@ -27,6 +27,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
 
     csBookingNote: csBookingNote = new csBookingNote();
     dataReport: any = null;
+
     constructor(
         protected _router: Router,
         protected _documentRepo: DocumentationRepo,
@@ -58,9 +59,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                     this.ACTION = null;
                 }
                 this._cd.detectChanges();
-
-                console.log(this.ACTION);
-
             }),
             switchMap(() => of(this.bookingNoteId)),
         ).subscribe(

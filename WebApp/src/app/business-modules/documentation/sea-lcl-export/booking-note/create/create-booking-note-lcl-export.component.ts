@@ -4,13 +4,13 @@ import { SeaLCLExportFormBookingNoteComponent } from '../components/form-booking
 import { InfoPopupComponent } from '@common';
 import { csBookingNote } from '@models';
 
-import _merge from 'lodash/merge';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from '@repositories';
 import { Router } from '@angular/router';
+
 import { catchError } from 'rxjs/operators';
-import { AbstractControl } from '@angular/forms';
+import _merge from 'lodash/merge';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-create',
@@ -40,7 +40,6 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
         }
 
         const modelAdd: csBookingNote = this.onSubmitData();
-        console.log(modelAdd);
         this.saveBookingNote(modelAdd);
     }
 
@@ -61,7 +60,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
         const formData = {
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
-            closingTime: !!form.closingTime && !!form.closingTime.startDate ? formatDate(form.closingTime.startDate, 'yyyy-MM-dd', 'en') : null,
+            closingTime: !!form.closingTime && !!form.closingTime.startDate ? formatDate(form.closingTime.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
             dateOfStuffing: !!form.dateOfStuffing && !!form.dateOfStuffing.startDate ? formatDate(form.dateOfStuffing.startDate, 'yyyy-MM-dd', 'en') : null,
 
             paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,

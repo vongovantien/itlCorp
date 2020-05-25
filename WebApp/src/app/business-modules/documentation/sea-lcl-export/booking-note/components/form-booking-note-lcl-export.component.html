@@ -104,11 +104,11 @@
                                 <label>Closing Time</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl daterange-rtl-custom">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                        [alwaysShowCalendars]="true" name="daterange" placeholder="Select date" readonly
-                                        formControlName="closingTime" calendar
+                                        [locale]="{format: 'HH:mm MMM YYYY'}" [singleDatePicker]="true" name="daterange"
+                                        placeholder="Select date" readonly formControlName="closingTime" calendar
                                         [allowRemove]="!!closingTime.value && !!closingTime.value.startDate"
-                                        (remove)="resetFormControl(closingTime)" />
+                                        (remove)="resetFormControl(closingTime)" [timePicker]="true"
+                                        [timePicker24Hour]="true" />
                                 </div>
                             </div>
                         </div>
