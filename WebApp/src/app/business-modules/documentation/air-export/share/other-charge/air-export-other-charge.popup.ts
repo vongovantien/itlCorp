@@ -54,6 +54,7 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
 
     closePopup() {
         this.csOtherChargesTemp = cloneDeep(this.csOtherCharges);
+        this.updateDescription();
         this.isSubmitted = false;
         this.hide();
     }
