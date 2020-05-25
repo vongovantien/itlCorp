@@ -275,7 +275,6 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        [AuthorizeEx(Menu.catWarehouse, UserPermission.Update)]
         public IActionResult Put(Guid id, CatPlaceEditModel model)
         {
 
