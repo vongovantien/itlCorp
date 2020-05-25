@@ -2324,7 +2324,7 @@ namespace eFMS.API.Accounting.DL.Services
                            };
             var mergeAdvRequest = queryOps.Union(queryDoc);
 
-            //Get advance theo shipment và advance chưa làm settlement
+            //Get advance theo shipment và advance chưa làm settlement; order giảm dần theo ngày request date
             var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
             return data.ToList();
         }

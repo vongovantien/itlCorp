@@ -304,7 +304,7 @@ export class SettlementListChargeComponent extends AppList {
             this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             this.listChargeFromShipmentPopup.show();
         } else {
-            const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl && charge.isFromShipment === false);
+            const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {
                 this.tableListChargePopup.selectedShipment = shipment;
 
@@ -337,13 +337,17 @@ export class SettlementListChargeComponent extends AppList {
                         }
                     });
                     this.tableListChargePopup.getAdvances(shipment.jobId);
+
+                    const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
+                    if (!!selectedCD) {
+                        this.tableListChargePopup.selectedCD = selectedCD;
+                    }
                     // * Update value form.
                     this.tableListChargePopup.formGroup.patchValue({
                         shipment: shipment.hblid,
                         advanceNo: surcharges[0].advanceNo,
                         customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
                     });
-
                     this.tableListChargePopup.isUpdate = true;
                     this.tableListChargePopup.show();
                 }
