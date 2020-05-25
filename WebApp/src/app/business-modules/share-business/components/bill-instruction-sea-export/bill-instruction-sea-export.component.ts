@@ -120,7 +120,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             }
             if (res.consigneeId != null) {
                 const consignee = this.consignees.find(x => x.id === res.consigneeId);
-                if (consignee !== null) {
+                if (!!consignee) {
                     this.getConsigneeDescription(consignee);
                 }
             }

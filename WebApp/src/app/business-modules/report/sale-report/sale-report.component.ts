@@ -54,7 +54,7 @@ export class SaleReportComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    if (res != null) {
+                    if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
                             setTimeout(() => {
