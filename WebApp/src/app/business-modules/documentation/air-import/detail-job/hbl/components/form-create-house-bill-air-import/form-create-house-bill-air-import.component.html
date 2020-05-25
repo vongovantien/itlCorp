@@ -102,19 +102,10 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ETA" readonly
-                                        formControlName="eta" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(eta)"
-                                        *ngIf="!!eta.value && !!eta.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="eta" (remove)="resetFormControl(eta)" calendar
+                                        [allowRemove]="!!eta.value && !!eta.value.startDate" />
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
@@ -123,17 +114,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ATA" readonly
-                                        formControlName="arrivalDate" />
-                                    <span class="m-input-icon_clear"
-                                        (click)="resetFormControl(formCreate.controls['arrivalDate'])"
-                                        *ngIf="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="arrivalDate"
+                                        (remove)="resetFormControl(formCreate.controls['arrivalDate'])" calendar
+                                        [allowRemove]="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -208,16 +191,8 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="flightDate" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(flightDate)"
-                                        *ngIf="!!flightDate.value && !!flightDate.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="flightDate" (remove)="resetFormControl(flightDate)" calendar
+                                        [allowRemove]="!!flightDate.value && !!flightDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -238,16 +213,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="flightDateOrigin" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(flightDateOrigin)"
-                                        *ngIf="!!flightDateOrigin.value && !!flightDateOrigin.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="flightDateOrigin" (remove)="resetFormControl(flightDateOrigin)"
+                                        calendar
+                                        [allowRemove]="!!flightDateOrigin.value && !!flightDateOrigin.value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -329,16 +297,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHBLDate" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHBLDate)"
-                                        *ngIf="!!issueHBLDate.value && !!issueHBLDate.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="issueHBLDate" (remove)="resetFormControl(issueHBLDate)"
+                                        calendar
+                                        [allowRemove]="!!issueHBLDate.value && !!issueHBLDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
