@@ -8,7 +8,6 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { getParamsRouterState } from 'src/app/store';
 import { Params, Router } from '@angular/router';
-import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -217,26 +216,21 @@ export class SeaLclExportManifestComponent extends AppList {
                 })
             ).subscribe(
                 (res: any) => {
-                    this.AddHblToManifestPopup.houseBills = this.housebills;
-
-                    res.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
-                        element.isChecked = false;
-                        if (element["manifestRefNo"] == null || element["manifestRefNo"] === '') {
-                            element.isRemoved = true;
-                        } else {
-                            element.isRemoved = false;
-                        }
-                    });
-                    this.housebills = res;
-                    this.getTotalWeight();
-                    // const hasHbl = this.housebills.some(element => element.isRemoved === false);
-                    // if (!hasHbl) {
-                    //     this.housebills.forEach(element => {
-                    //         element.isRemoved = false;
-                    //     });
-                    // }
-                    this.houseBillInManifest.housebills = this.housebills;
-                    this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
+                    if (!!res) {
+                        this.AddHblToManifestPopup.houseBills = this.housebills;
+                        res.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
+                            element.isChecked = false;
+                            if (element["manifestRefNo"] == null || element["manifestRefNo"] === '') {
+                                element.isRemoved = true;
+                            } else {
+                                element.isRemoved = false;
+                            }
+                        });
+                        this.housebills = res;
+                        this.getTotalWeight();
+                        this.houseBillInManifest.housebills = this.housebills;
+                        this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
+                    }
                 },
             );
     }
