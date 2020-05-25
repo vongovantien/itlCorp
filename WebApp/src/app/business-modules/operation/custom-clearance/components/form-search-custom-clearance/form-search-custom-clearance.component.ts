@@ -120,7 +120,6 @@ export class CustomClearanceFormSearchComponent extends AppForm {
     }
 
     resetSearch() {
-        this.onSearch.emit({});
         this.personalHandle.setValue(this.users.filter((user: User) => user.id === this.userLogged.id)[0]);
         this.clearanceNo.setValue(null);
         this.clearanceDate.setValue({
@@ -130,7 +129,7 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         this.importDate.setValue(null);
         this.type.setValue(null);
         this.importStatus.setValue(this.status[1]);
-
+        this.searchCustomClearance();
     }
 }
 
