@@ -86,8 +86,9 @@
                 <div class="col-lg-4">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (dateOfStuffing.dirty && !dateOfStuffing.value) 
-                            || (isSubmitted && !!dateOfStuffing.value && !dateOfStuffing.value.startDate)}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (dateOfStuffing.dirty && !dateOfStuffing.value) 
+                            || (isSubmitted && (!dateOfStuffing.value || !!dateOfStuffing.value && !dateOfStuffing.value.startDate))}">
                                 <label required>Date of Stuffing</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -132,7 +133,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
-                            || (isSubmitted && !!etd.value && !etd.value.startDate)}">
+                            || (isSubmitted  && (!etd.value || !!etd.value && !etd.value.startDate))}">
                                 <label required>ETD</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd

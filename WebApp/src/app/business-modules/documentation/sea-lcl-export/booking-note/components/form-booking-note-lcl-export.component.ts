@@ -70,8 +70,10 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     }
 
     initForm() {
+        const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
         this.formGroup = this._fb.group({
-            from: [null, Validators.required],
+            from: [userLogged.preferred_username, Validators.required], // * Default english name
             telFrom: [],
             to: [null, Validators.required],
             telTo: [],
