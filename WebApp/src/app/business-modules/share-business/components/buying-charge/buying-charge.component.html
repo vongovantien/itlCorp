@@ -77,7 +77,6 @@
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
-                                    (clickOutside)="handleClickOutSideComboGrid(i,'partner')"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <ng-container *ngIf="isShowLoadingPartner">
                                         <div class="on-loading text-center">
@@ -114,7 +113,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group pos-rel" (clickOutside)="handleClickOutSideComboGrid(i,'charge')"
+                                <div class="form-group pos-rel"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
                                     <input type="text" class="dropdown-toggle form-control" readonly
                                         [(ngModel)]="charge.chargeNameEn" (click)="loadDynamicComboGridCharge(charge,i)"
