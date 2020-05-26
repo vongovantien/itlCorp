@@ -14,7 +14,7 @@ import { StageManagementAddPopupComponent } from './components/form-create/form-
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS Stage' },
         children: [
             {
                 path: '', component: StageManagementComponent

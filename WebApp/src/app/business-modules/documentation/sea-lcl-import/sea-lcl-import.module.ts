@@ -17,7 +17,7 @@ import { SeaLCLImportLazyLoadModule } from './sea-lcl-import-lazy-load.module';
 const routing: Routes = [
     {
         path: '', component: SeaLCLImportComponent, data: {
-            name: "",
+            name: "", title: 'eFMS Sea LCL Import'
         },
     },
     {

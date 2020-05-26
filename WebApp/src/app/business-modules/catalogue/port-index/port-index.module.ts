@@ -13,7 +13,7 @@ import { FormPortIndexComponent } from './components/form-port-index.component';
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS PortIndex' },
         children: [
             {
                 path: '', component: PortIndexComponent

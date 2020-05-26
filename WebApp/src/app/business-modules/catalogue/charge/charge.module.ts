@@ -18,7 +18,7 @@ import { VoucherListComponent } from './components/voucher-list/voucher-list.com
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS Charge' },
         children: [
             {
                 path: '', component: ChargeComponent

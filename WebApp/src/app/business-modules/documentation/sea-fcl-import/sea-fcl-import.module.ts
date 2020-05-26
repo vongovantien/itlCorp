@@ -18,7 +18,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 const routing: Routes = [
     {
         path: '', component: SeaFCLImportManagementComponent, data: {
-            name: "",
+            name: "", title: 'eFMS Sea FCL Import'
         },
     },
     {

@@ -20,10 +20,10 @@ import { ShareApprovePaymentModule } from '../approve-payment/components/share-a
 const routing: Routes = [
     {
         path: "",
-        data: { name: "" },
+        data: { name: "", title: 'eFMS Advance Payment' },
         children: [
             {
-                path: '', component: AdvancePaymentComponent//,data: {reuse: true}
+                path: '', component: AdvancePaymentComponent
             },
             {
                 path: "new", component: AdvancePaymentAddNewComponent,

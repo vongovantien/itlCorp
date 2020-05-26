@@ -30,7 +30,9 @@ import { SettlementChargeFromShipmentPopupComponent } from './components/popup/c
 
 const routing: Routes = [
     {
-        path: '', data: { name: "", },
+        path: '', data: {
+            name: "", title: 'eFMS Settlement Payment'
+        },
         children: [
             {
                 path: '', component: SettlementPaymentComponent
