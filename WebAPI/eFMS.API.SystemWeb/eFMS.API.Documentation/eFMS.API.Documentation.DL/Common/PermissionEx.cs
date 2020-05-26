@@ -228,7 +228,7 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.SaleManId == currentUser.UserID || model.UserCreated == currentUser.UserID)
+                    if (model.SaleManId == currentUser.UserID || model.UserCreated == currentUser.UserID) 
                     {
                         code = 200;
                     }
