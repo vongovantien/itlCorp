@@ -1,6 +1,6 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 
-import { PreviousRouteService, JwtService, SortService, ApiService, PagingService, BaseService, AuthGuardService, DataService } from '@services';
+import { PreviousRouteService, JwtService, SortService, ApiService, PagingService, BaseService, AuthGuardService, DataService, SEOService } from '@services';
 
 
 @NgModule({
@@ -16,7 +16,8 @@ import { PreviousRouteService, JwtService, SortService, ApiService, PagingServic
         AuthGuardService,
         DataService,
         PreviousRouteService,
-        JwtService
+        JwtService,
+        SEOService
     ],
 })
 export class ServiceModule {
