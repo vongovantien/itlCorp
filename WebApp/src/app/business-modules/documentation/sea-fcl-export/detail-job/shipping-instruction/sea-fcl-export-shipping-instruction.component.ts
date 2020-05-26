@@ -123,7 +123,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 gw += x.gw;
                 volumn += x.cbm;
                 containerNotes += !!x.packageContainer ? (x.packageContainer + '\n') : '';
-                contSealNos += !!x.containers ? (x.containers) : '\n';
+                if (!!x.containers) {
+                    contSealNos += this.getContSealNo(x.containers);
+                }
                 if (!!x.packages) {
                     const a = x.packages.split(", ");
                     if (a.length > 0) {
@@ -143,6 +145,21 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             this.billSIComponent.shippingInstruction.containerNote = containerNotes;
             this.billSIComponent.shippingInstruction.containerSealNo = contSealNos;
         }
+    }
+    getContSealNo(containers: any) {
+        let contSealNos = '';
+        const contseal = containers.split("; ");
+        if (contseal.length > 0) {
+            contseal.forEach(element => {
+                if (element.length > 0) {
+                    if (element.includes('\n')) {
+                        element = element.substring(0, element.length - 2);
+                    }
+                    contSealNos += element + '\n';
+                }
+            });
+        }
+        return contSealNos;
     }
     getPackages(lstPackages: any[]): string {
         const t = _groupBy(lstPackages, "package");

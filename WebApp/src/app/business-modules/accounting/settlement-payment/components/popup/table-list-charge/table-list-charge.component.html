@@ -29,7 +29,7 @@
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{field:'clearanceNo', value:customNo.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'cd')"
-                                    [selectedDisplayFields]="['clearanceNo']" [dataSources]="cds | async"
+                                    [selectedDisplayFields]="['clearanceNo']" [dataSources]="cds"
                                     [displayFields]="configCustomDisplayFields" (remove)="resetFormControl(customNo)">
                                 </app-combo-grid-virtual-scroll>
                             </div>

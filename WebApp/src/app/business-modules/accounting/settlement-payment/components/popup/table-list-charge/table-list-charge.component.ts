@@ -39,7 +39,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     listUnits: Observable<Unit[]>;
     shipments: OperationInteface.IShipment[];
-    cds: CustomDeclaration[] = [];
+    cds: CustomDeclaration[];
     advs: IAdvanceShipment[] = [];
     listPartner: Partner[] = [];
 
@@ -67,6 +67,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     isDuplicateChargeCode: boolean = false;
     isDuplicateInvoice: boolean = false;
 
+    initShipments: OperationInteface.IShipment[];
+    initCDs: CustomDeclaration[];
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
@@ -159,15 +161,21 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this._documentRepo.getShipmentAssginPIC().pipe(catchError(this.catchError))
             .subscribe(
                 (res: OperationInteface.IShipment[]) => {
-                    this.shipments = res;
+                    this.shipments = this.initShipments = res;
                 }
             );
     }
 
     getCustomDecleration() {
-        this.cds = this._operationRepo.getListCustomNoAsignPIC()
+        this._operationRepo.getListCustomNoAsignPIC()
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                map((response: any[]) => response.map((item: CustomDeclaration) => new CustomDeclaration(item))),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.cds = this.initCDs = res || [];
+                },
             );
     }
 
@@ -189,7 +197,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         if (!!advance) {
                             this.advanceNo.setValue(advance.advanceNo);
                             this.selectedAdvance = advance;
+                        } else {
+                            this.selectedAdvance = null;
                         }
+                    }
+                    if (!this.advs) {
+                        this.selectedAdvance = null;
                     }
                 }
             );
@@ -252,15 +265,43 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.comboGridCharges.forEach(c => {
                     c.displaySelectedStr = '';
                 });
+
+                this.customNo.setValue(null);
+                const _customDeclarations = this.filterCDByShipment(data);
+
+                if (_customDeclarations.length > 0) {
+                    this.customNo.setValue(_customDeclarations[0].clearanceNo);
+                }
                 break;
             case 'cd':
                 this.selectedCD = data;
-                if (!this.shipment.value) {
-
-                    this.shipment.setValue(data.jobNo);
-                    this.getMasterCharges(this.serviceTypeId);
-                }
                 this.customNo.setValue(data.clearanceNo);
+
+                this.advanceNo.reset();
+                this.advs.length = 0;
+
+                const _shipments = this.filterShipmentByCD(data);
+                if (_shipments.length > 0) {
+                    this.shipment.setValue(_shipments[0].hblid);
+                    this.getMasterCharges(this.serviceTypeId);
+                    this.selectedShipment = _shipments[0];
+
+                    // * check list charge current => Has charge exist after master charge changed.
+                    this.charges.forEach((charge: Surcharge) => {
+                        if (!this.checkExistCharge(charge.chargeId, this.listCharges)) {
+                            charge.chargeId = null;
+                            charge.chargeName = null;
+                        }
+                    });
+                    // * Reset charge name.
+                    this.comboGridCharges.forEach(c => {
+                        c.displaySelectedStr = '';
+                    });
+
+                    this.getAdvances(data.jobNo);
+                } else {
+                    this.selectedAdvance = null;
+                }
                 break;
             case 'advanceNo':
                 this.selectedAdvance = data;
@@ -282,6 +323,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             return false;
         }
         return charges.some((charge: Surcharge) => (charge.chargeId === chargeId));
+    }
+
+    filterCDByShipment(shipment: OperationInteface.IShipment): CustomDeclaration[] {
+        return this.initCDs.filter((item: CustomDeclaration) => {
+            return (item.jobNo === shipment.jobId);
+        });
+    }
+
+    filterShipmentByCD(cd: CustomDeclaration): OperationInteface.IShipment[] {
+        return this.initShipments.filter((item: OperationInteface.IShipment) => {
+            return (item.jobId === cd.jobNo);
+        });
     }
 
     onSelectDataTableInfo(data: any, chargeItem: Surcharge, type: string) {
@@ -398,6 +451,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             hblno: this.selectedShipment.hbl,
             quantity: 1
         }));
+        console.log(this.charges);
     }
 
     duplicateCharge(index: number) {
@@ -446,6 +500,14 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         const listChargesToSave = cloneDeep(this.charges);
         for (const charge of listChargesToSave) {
+            // *start: cập nhật shipment charges
+            charge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
+            charge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
+            charge.jobId = this.selectedShipment.jobId;
+            charge.jobNo = this.selectedShipment.jobId;
+            charge.mblno = this.selectedShipment.mbl;
+            charge.hblno = this.selectedShipment.hbl;
+            // *end: cập nhật shipment charges
 
             if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
                 // swap để map field cho chage obh
@@ -462,6 +524,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             }
         }
 
+        // TODO: check id in list has valid guid. to defind update or create.
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
