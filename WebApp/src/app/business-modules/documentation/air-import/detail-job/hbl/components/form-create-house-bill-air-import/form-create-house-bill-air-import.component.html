@@ -290,7 +290,7 @@
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (formCreate.errors | equalError:'invalidGW') }">
                                 <label>G.W</label>
                                 <input type="number" class="form-control" formControlName="grossWeight" numeric
-                                    [decimals]=2 autoFormatCurrency>
+                                    [decimals]="digitDecimal" autoFormatCurrency [digits]=2>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && (formCreate.errors | equalError:'invalidGW')">
                                     GW must be less than or equal CW
@@ -301,7 +301,7 @@
                             <div class="form-group">
                                 <label>C.W</label>
                                 <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                    [decimals]=2 autoFormatCurrency>
+                                    [decimals]="digitDecimal" autoFormatCurrency [digits]=2>
                             </div>
                         </div>
                         <div class="col-md-12">
