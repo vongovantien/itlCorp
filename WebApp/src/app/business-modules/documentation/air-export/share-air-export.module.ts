@@ -5,7 +5,19 @@ import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { ModalModule } from 'ngx-bootstrap';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { FormsModule } from '@angular/forms';
+import { NgxCurrencyModule, CurrencyMaskConfig } from 'ngx-currency';
 
+const customCurrencyMaskConfig: CurrencyMaskConfig = {
+    align: "right",
+    allowNegative: false,
+    allowZero: true,
+    decimal: ".",
+    precision: 2,
+    prefix: "",
+    suffix: "",
+    thousands: ",",
+    nullable: true
+};
 @NgModule({
     declarations: [
         ShareAirExportOtherChargePopupComponent
@@ -15,7 +27,9 @@ import { FormsModule } from '@angular/forms';
         CommonComponentModule,
         ModalModule,
         DirectiveModule,
-        FormsModule
+        FormsModule,
+        NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
+
     ],
     exports: [
         ShareAirExportOtherChargePopupComponent

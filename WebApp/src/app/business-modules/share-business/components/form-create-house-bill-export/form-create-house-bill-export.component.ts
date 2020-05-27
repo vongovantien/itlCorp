@@ -10,7 +10,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
 import { DataService } from '@services';
 
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError, takeUntil, skip, finalize, tap, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
@@ -260,6 +260,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             hbltype: [null, Validators.required],
             serviceType: [],
             freightPayment: [null, Validators.required],
+            originBlnumber: [[this.originNumbers[1]]],
 
             // * date
             sailingDate: [null, Validators.required],
@@ -273,13 +274,12 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             finalDestinationPlace: [],
             oceanVoyNo: [null, Validators.required],
             shipperDescription: [],
-            consigneeDescription: [],
+            consigneeDescription: [null, Validators.required],
             notifyPartyDescription: ['SAME AS CONSIGNEE'],
             bookingNo: [],
             goodsDeliveryDescription: [],
             forwardingAgentDescription: [],
             placeFreightPay: [null, Validators.required],
-            originBlnumber: [],
             issueHblplace: [],
             referenceNo: [],
             exportReferenceNo: [],
@@ -528,6 +528,12 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 break;
             default:
                 break;
+        }
+    }
+
+    onSelectHblType(data: CommonInterface.INg2Select) {
+        if (!!data && data.id === 'Original') {
+            this.originBlnumber.setValue([this.originNumbers[3]]);
         }
     }
 }
