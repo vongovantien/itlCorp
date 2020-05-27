@@ -430,7 +430,7 @@ namespace eFMS.API.Documentation.Controllers
             if (id == Guid.Empty)
             {
                 //Check trùng theo từng service
-                if (model.Mawb != null)
+                if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                     && x.TransactionType == model.TransactionType
@@ -443,7 +443,7 @@ namespace eFMS.API.Documentation.Controllers
             else
             {
                 //Check trùng theo từng service
-                if (model.Mawb != null)
+                if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
                         && x.TransactionType == model.TransactionType
