@@ -236,7 +236,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
             .subscribe(
                 (shipment: CsTransaction) => {
-                    console.log(shipment);
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
 
                         this.formMAWB.patchValue({
@@ -709,10 +708,12 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     onChangeAsArranged(value: Event) {
         if ((value.target as HTMLInputElement).checked) {
             this.total.setValue(this.AA);
+            this.formMAWB.controls['rateCharge'].disable();
 
             this.updateWtWithTotal(this.AA);
         } else {
             this.resetFormControl(this.total);
+            this.formMAWB.controls['rateCharge'].enable();
 
             if (!this.formMAWB.controls['min'].value) {
                 this.total.setValue(this.formMAWB.controls['rateCharge'].value * this.formMAWB.controls['chargeWeight'].value - this.formMAWB.controls['seaAir'].value);

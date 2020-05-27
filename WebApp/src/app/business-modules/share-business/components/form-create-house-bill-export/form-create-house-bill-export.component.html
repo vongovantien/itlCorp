@@ -54,8 +54,11 @@
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(consignee)"
                             placeholder="Select consignee" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
-                            formControlName="consigneeDescription"></textarea>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && !consigneeDescription.value}">
+                            <textarea rows="7" class="form-control m-input m-input--square"
+                                formControlName="consigneeDescription"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -82,7 +85,8 @@
                         [ngClass]="{'m-form__group has-danger':  (hbltype.dirty && !hbltype.valid) || (isSubmitted && !hbltype.valid)}">
                         <label required>HBL Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
-                            formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
+                            (selected)="onSelectHblType($event)" formControlName="hbltype"
+                            (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                         </ng-select>
                     </div>
                 </div>
