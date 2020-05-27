@@ -48,7 +48,7 @@ namespace eFMS.API.Common.Globals
 
         public static readonly List<CommonDataEx> NumberOfOriginBls = new List<CommonDataEx>
         {
-            new CommonDataEx { Key = 0, Value = "ZERO" },
+            new CommonDataEx { Key = 0, Value = "ZERO (0)" },
             new CommonDataEx { Key = 1, Value = "ONE (1)" },
             new CommonDataEx { Key = 2, Value = "TWO (2)" },
             new CommonDataEx { Key = 3, Value = "THREE (3)" },

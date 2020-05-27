@@ -542,18 +542,18 @@
                                                     [class.selected-row]="selectedIndexDIM === j">
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="length" numeric [decimals]="2"
-                                                            autoFormatCurrency>
+                                                            formControlName="length" numeric [decimals]="digitDecimal"
+                                                            autoFormatCurrency [digits]=2>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="width" numeric [decimals]="2"
-                                                            autoFormatCurrency>
+                                                            formControlName="width" numeric [decimals]="digitDecimal"
+                                                            autoFormatCurrency [digits]=2>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
-                                                            formControlName="height" numeric [decimals]="2"
-                                                            autoFormatCurrency>
+                                                            formControlName="height" numeric [decimals]="digitDecimal"
+                                                            autoFormatCurrency [digits]=2>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control"
