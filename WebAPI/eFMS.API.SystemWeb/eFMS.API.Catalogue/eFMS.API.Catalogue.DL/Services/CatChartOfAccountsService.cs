@@ -33,12 +33,18 @@ namespace eFMS.API.Catalogue.DL.Services
             chartRepository = chartRepo;
         }
 
-        public IQueryable<CatChartOfAccountsModel> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount)
         {
+            var data = Query(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
 
         }
         
-        public IQueryable<CatChartOfAccountsModel> Query(CatChartOfAccountsCriteria criteria)
+        public IQueryable<CatChartOfAccounts> Query(CatChartOfAccountsCriteria criteria)
         {
             var data = chartRepository.Get();
             if(criteria.All == null)
@@ -46,10 +52,24 @@ namespace eFMS.API.Catalogue.DL.Services
                 data = data.Where(x => (x.AccountCode ?? "").IndexOf(criteria.AccountCode ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (x.AccountNameLocal ?? "").IndexOf(criteria.AccountNameLocal ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (x.AccountNameEn ?? "").IndexOf(criteria.AccountNameEn ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Active == criteria.Active || criteria.Active == null)
-
-                );
+                                        && (x.Active == criteria.Active || criteria.Active == null));
             }
+            else
+            {
+                if (criteria.All == "active")
+                {
+                    criteria.Active = true;
+                }
+                if (criteria.All == "inactive")
+                {
+                    criteria.Active = false;
+                }
+                data = data.Where(x => (x.AccountCode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                     || (x.AccountNameLocal ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                     || (x.AccountNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                     && (x.Active == criteria.Active || criteria.Active == null));
+            }
+            return data;
         }
     }
 }
