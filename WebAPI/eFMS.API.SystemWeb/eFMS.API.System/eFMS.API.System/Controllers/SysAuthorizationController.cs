@@ -2,6 +2,7 @@
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -72,6 +73,20 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
+        /// check permission of user to view a authorize
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        [Authorize]
+        public IActionResult CheckDetailPermission(int id)
+        {
+            var result = sysAuthorizationService.CheckDetailPermission(id);
+            if (result == 403) return Ok(false);
+            return Ok(true);
+        }
+
+        /// <summary>
         /// Get Authorization by id
         /// </summary>
         /// <param name="id"></param>
@@ -80,6 +95,12 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetAuthorizationById(int id)
         {
+            var statusCode = sysAuthorizationService.CheckDetailPermission(id);
+            if (statusCode == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var result = sysAuthorizationService.GetAuthorizationById(id);
             return Ok(result);
         }
@@ -95,6 +116,13 @@ namespace eFMS.API.System.Controllers
         public IActionResult Insert(SysAuthorizationModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            ICurrentUser _currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.sysAuthorize);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
 
             if (CheckExistsDateRangeAuthorization(model))
             {
@@ -164,6 +192,23 @@ namespace eFMS.API.System.Controllers
         }
 
         /// <summary>
+        /// Check delete permission
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckDeletePermission/{id}")]
+        [Authorize]
+        public IActionResult CheckDeletePermission(int id)
+        {
+            var result = sysAuthorizationService.CheckDeletePermission(id);
+            if (result == 403)
+            {
+                return Ok(false);
+            }
+            return Ok(true);
+        }
+
+        /// <summary>
         /// Delete Authorization
         /// </summary>
         /// <param name="id"></param>
@@ -173,6 +218,12 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Delete(int id)
         {
+            var statusCode = sysAuthorizationService.CheckDeletePermission(id);
+            if (statusCode == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
             var item = sysAuthorizationService.GetAuthorizationById(id);
             if (item.Active == true)
             {
@@ -225,7 +276,7 @@ namespace eFMS.API.System.Controllers
                 if (model.EndDate != null)
                 {
                     authorizationCheckEndDate = sysAuthorizationService.Get(x => x.EndDate != null && x.Active == true)
-                        .Where(x => 
+                        .Where(x =>
                            x.UserId == model.UserId
                         && x.AssignTo == model.AssignTo
                         && x.Services == model.Services
@@ -235,7 +286,7 @@ namespace eFMS.API.System.Controllers
                         .FirstOrDefault();
                 }
                 var authorizationCheckStartDate = sysAuthorizationService.Get(x => x.EndDate == null && x.Active == true)
-                        .Where(x => 
+                        .Where(x =>
                            x.UserId == model.UserId
                         && x.AssignTo == model.AssignTo
                         && x.Services == model.Services

@@ -5,7 +5,7 @@ import { SystemRepo } from "@repositories";
 import { SortService } from "@services";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, map } from "rxjs/operators";
-import { ConfirmPopupComponent } from "@common";
+import { ConfirmPopupComponent, Permission403PopupComponent } from "@common";
 import { AuthorizationAddPopupComponent } from "./components/popup/add-authorization/add-authorization.popup";
 import { User, Authorization } from "@models";
 import { SystemConstants } from "src/constants/system.const";
@@ -17,7 +17,7 @@ import { SystemConstants } from "src/constants/system.const";
 export class AuthorizationComponent extends AppList {
   @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
   @ViewChild(AuthorizationAddPopupComponent, { static: false }) authorizationAddPopupComponent: AuthorizationAddPopupComponent;
-
+  @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
   headers: CommonInterface.IHeaderTable[];
 
   authorizations: Authorization[] = [];
@@ -73,7 +73,7 @@ export class AuthorizationComponent extends AppList {
       ).subscribe(
         (res: any) => {
           this.totalItems = res.totalItems || 0;
-          this.authorizations = res.data;
+          this.authorizations = res.data || [];
         },
       );
   }
@@ -126,6 +126,17 @@ export class AuthorizationComponent extends AppList {
     this.searchAuthorization();
   }
 
+  viewDetail(authorization: Authorization): void {
+    this._systemRepo.checkDetailAuthorizePermission(authorization.id)
+      .subscribe((value: boolean) => {
+        if (value) {
+          this.showDetailAuthorization(authorization);
+        } else {
+          this.permissionPopup.show();
+        }
+      });
+  }
+
   showDetailAuthorization(authorization) {
     this._systemRepo.getAuthorizationById(authorization.id).subscribe(
       (res: any) => {
@@ -142,6 +153,17 @@ export class AuthorizationComponent extends AppList {
         }
       },
     );
+  }
+
+  prepareDeleteAuthorization(authorization: Authorization) {
+    this._systemRepo.checkDeleteAuthorizePermission(authorization.id)
+      .subscribe((value: boolean) => {
+        if (value) {
+          this.showConfirmDelete(authorization);
+        } else {
+          this.permissionPopup.show();
+        }
+      });
   }
 
   showConfirmDelete(data: any) {

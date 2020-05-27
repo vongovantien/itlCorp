@@ -126,6 +126,7 @@
   "MSG_ITEM_EXISTED_USER_ON_USER_LEVEL": "User existed on {0}! Please Check highlight field!!",
   "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE": "Phòng kế toán đã tồn tại trong Office. Vui lòng kiểm tra lại",
   //----------start: User Permission
-  "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "Duplicate role on user {0}!Please Check hight field!!"
+  "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "Duplicate role on user {0}!Please Check hight field!!",
   //-- end
+  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện" //403
 }

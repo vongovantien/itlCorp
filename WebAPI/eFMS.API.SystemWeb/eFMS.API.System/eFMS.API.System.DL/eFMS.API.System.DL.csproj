@@ -88,6 +88,9 @@
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
+    </Reference>
     <Reference Include="eFMS.API.System.Service">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.System.Service.dll</HintPath>
     </Reference>
