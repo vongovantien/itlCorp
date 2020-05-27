@@ -1,6 +1,6 @@
 export class DeliveryOrder {
     hblid: string = null;
-    deliveryOrderNo: string = null;
+    deliveryOrderNo: string = '';
     transactionType: number = null;
     userDefault: string = null;
     doheader1: string = null;

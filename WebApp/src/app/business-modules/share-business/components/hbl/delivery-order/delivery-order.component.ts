@@ -22,7 +22,7 @@ import * as fromShare from './../../../store';
 export class ShareBusinessDeliveryOrderComponent extends AppForm {
     @Input() isAir: boolean = false;
 
-    deliveryOrder: DeliveryOrder = null;
+    deliveryOrder: DeliveryOrder = new DeliveryOrder();
 
     header: string = '';
     footer: string = '';
@@ -57,6 +57,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             )
             .subscribe(
                 (res: any) => {
+                    console.log(res);
                     if (!!res) {
                         this.deliveryOrder = new DeliveryOrder(res);
                         this.deliveryOrder.deliveryOrderPrintedDate = {

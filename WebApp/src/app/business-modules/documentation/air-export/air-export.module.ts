@@ -21,7 +21,7 @@ import { ShareAirExportModule } from './share-air-export.module';
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" }, children: [
+        path: '', data: { name: "", title: 'eFMS Air Export' }, children: [
             {
                 path: '', component: AirExportComponent
             },

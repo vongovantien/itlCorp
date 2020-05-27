@@ -189,13 +189,14 @@ namespace eFMS.API.Documentation.DL.Services
                             housebill.NotifyPartyDescription,
                             HBLID = housebill.Id,
                             housebill.Hwbno,
-                            housebill.NetWeight,
+                            housebill.GrossWeight,
                             housebill.Cbm,
                             housebill.ShipperDescription,
                             housebill.ConsigneeDescription,
                             housebill.SaleManId,
                             shipment.Eta,
-                            shipment.Etd
+                            shipment.Etd,
+                            shipment.TypeOfService
                         });
             if (data == null) return null;
             var results = new List<MonthlySaleReportResult>();
@@ -218,13 +219,13 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.NetWeight == null ? 0 : (decimal)item.NetWeight,
+                    KGS = item.GrossWeight == null ? 0 : (decimal)item.GrossWeight,
                     CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
-                    TpyeofService = item.TransactionType.Contains("I") ? "IMP" : "EXP",
+                    TpyeofService = item.TypeOfService != null? (item.TypeOfService.Contains("LCL")?"LCL": string.Empty): string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
                     Shipper = item.ShipperDescription,
                     Consignee = item.ConsigneeDescription,
                     LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd
@@ -449,10 +450,22 @@ namespace eFMS.API.Documentation.DL.Services
                     employeeContact = employee != null ? employee.EmployeeNameVn ?? string.Empty : string.Empty;
                 }
                 var company = companyRepository.Get(x => x.Id == currentUser.CompanyID).FirstOrDefault();
+                DateTime? dateFrom = null;
+                DateTime? dateTo = null;
+                if(criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
+                {
+                    dateFrom = criteria.CreatedDateFrom;
+                    dateTo = criteria.CreatedDateTo;
+                }
+                else if(criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+                {
+                    dateFrom = criteria.ServiceDateFrom;
+                    dateTo = criteria.ServiceDateTo;
+                }
                 var parameter = new MonthlySaleReportParameter
                 {
-                    FromDate = DateTime.Now,
-                    ToDate = DateTime.Now,
+                    FromDate = (DateTime)dateFrom,
+                    ToDate = (DateTime)dateTo,
                     Contact = employeeContact,
                     CompanyName = company != null ? (company.BunameVn ?? string.Empty) : string.Empty,
                     CompanyAddress1 = company != null ? (company.AddressVn ?? string.Empty) : string.Empty,

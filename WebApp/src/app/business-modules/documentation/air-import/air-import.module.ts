@@ -17,7 +17,7 @@ import { ShareBusinessReAlertComponent } from '../../share-business/components/p
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" }, children: [
+        path: '', data: { name: "", title: 'eFMS Air Import' }, children: [
             {
                 path: '', component: AirImportComponent
             },

@@ -20,7 +20,7 @@ import { PartnerOtherChargePopupComponent } from './components/other-charge/part
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS Partner' },
         children: [
             {
                 path: '', component: PartnerComponent

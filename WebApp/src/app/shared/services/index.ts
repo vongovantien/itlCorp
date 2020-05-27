@@ -7,5 +7,6 @@ export * from './data.service';
 export * from './load-module.service';
 export * from './jwt.service';
 export * from './previous-route';
+export * from './seo.service';
 
 
