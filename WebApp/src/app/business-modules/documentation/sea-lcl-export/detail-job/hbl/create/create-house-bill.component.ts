@@ -268,7 +268,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
-            package: container.packageTypeName,
+            package: container.description,
             quantity: container.packageQuantity,
         }));
 
