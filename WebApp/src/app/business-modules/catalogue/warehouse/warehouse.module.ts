@@ -15,7 +15,7 @@ import { FormWarehouseComponent } from './components/form-warehouse.component';
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" }, children: [
+        path: '', data: { name: "", title: 'eFMS Warehouse' }, children: [
             {
                 path: '', component: WarehouseComponent,
             },

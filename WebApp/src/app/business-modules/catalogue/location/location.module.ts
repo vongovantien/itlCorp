@@ -21,7 +21,7 @@ import { AppWardComponent } from './ward/ward.component';
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS Location' },
         children: [
             {
                 path: '', component: LocationComponent,

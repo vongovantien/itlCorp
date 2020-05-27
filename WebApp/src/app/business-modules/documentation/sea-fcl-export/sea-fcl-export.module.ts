@@ -23,7 +23,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 const routing: Routes = [
     {
         path: '', component: SeaFCLExportComponent, data: {
-            name: "",
+            name: "", title: 'eFMS Sea FCL Export'
         },
     },
     {

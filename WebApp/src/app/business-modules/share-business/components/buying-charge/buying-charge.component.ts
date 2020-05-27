@@ -1006,6 +1006,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.type = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
 
+                                this.onChangeDataUpdateTotal(c);
                                 // * Update Quantity with hint
                                 if (!!c.quantityType) {
                                     this.onChangeQuantityHint(c.quantityType, c);

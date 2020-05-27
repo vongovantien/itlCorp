@@ -1,10 +1,12 @@
 
 import { Component } from '@angular/core';
-import { Router, Event, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
+import { Router, Event, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, ActivatedRoute } from '@angular/router';
 import { NgProgress, NgProgressRef } from '@ngx-progressbar/core';
 import { OAuthService, OAuthEvent, OAuthInfoEvent, TokenResponse } from 'angular-oauth2-oidc';
 import { ToastrService } from 'ngx-toastr';
 import { JwtService } from './shared/services/jwt.service';
+import { SEOService } from './shared/services/seo.service';
+import { map, filter, mergeMap, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-root',
@@ -21,7 +23,9 @@ export class AppComponent {
         private _ngProgressService: NgProgress,
         private oauthService: OAuthService,
         private _toast: ToastrService,
-        private _jwt: JwtService
+        private _jwt: JwtService,
+        private _seoService: SEOService,
+        private _activatedRoute: ActivatedRoute
     ) {
         this.progressRef = this._ngProgressService.ref();
         this.oauthService.setStorage(localStorage);
@@ -29,25 +33,41 @@ export class AppComponent {
     }
 
     ngOnInit() {
-        this.router.events.subscribe((event: Event) => {
-            switch (true) {
-                case event instanceof NavigationStart: {
-                    this.isLoading = true;
-                    this.progressRef.start();
-                    break;
+        this.router.events.pipe(
+            tap((event: Event) => {
+                switch (true) {
+                    case event instanceof NavigationStart: {
+                        this.isLoading = true;
+                        this.progressRef.start();
+                        break;
+                    }
+                    case event instanceof NavigationEnd:
+                    case event instanceof NavigationCancel:
+                    case event instanceof NavigationError: {
+                        this.progressRef.complete();
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
-
-                case event instanceof NavigationEnd:
-                case event instanceof NavigationCancel:
-                case event instanceof NavigationError: {
-                    this.progressRef.complete();
-                    break;
+            })
+        ).pipe(
+            filter((event) => event instanceof NavigationEnd),
+            map(() => this._activatedRoute),
+            map((route) => {
+                while (route.firstChild) {
+                    route = route.firstChild;
                 }
-                default: {
-                    break;
-                }
+                return route;
+            }),
+            filter((route) => route.outlet === 'primary'),
+            mergeMap((route) => route.data)
+        ).subscribe(
+            (routeData: { name: string, title: string }) => {
+                this._seoService.updateTitle(routeData.title || 'eFMS');
             }
-        });
+        );
 
         this.oauthService.events.subscribe(
             (e: OAuthEvent) => {

@@ -15,7 +15,7 @@ import { CommodityGroupListComponent } from './components/list-commodity-group/l
 
 const routing: Routes = [
     {
-        path: '', data: { name: "" },
+        path: '', data: { name: "", title: 'eFMS Commodity' },
         children: [
             {
                 path: '', component: CommodityComponent

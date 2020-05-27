@@ -21,7 +21,7 @@ import { ShareAccountingModule } from '../share-accouting.module';
 const routing: Routes = [
     {
         path: "",
-        data: { name: "", },
+        data: { name: "", title: 'eFMS Statement Of Account' },
         children: [
             {
                 path: "", component: StatementOfAccountComponent,

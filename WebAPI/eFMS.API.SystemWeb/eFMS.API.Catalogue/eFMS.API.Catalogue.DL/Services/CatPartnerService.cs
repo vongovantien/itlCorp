@@ -67,13 +67,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "SupplierId");
             SetChildren<OpsTransaction>("Id", "AgentId");
             SetChildren<CatPartnerCharge>("Id", "PartnerId");
-            //SetChildren<CsShippingInstruction>("Id", "Shipper");
-            //SetChildren<CsShippingInstruction>("Id", "Supplier");
-            //SetChildren<CsShippingInstruction>("Id", "ConsigneeId");
-            //SetChildren<CsShippingInstruction>("Id", "ActualShipperId");
-            //SetChildren<CsShippingInstruction>("Id", "ActualConsigneeId");
             SetChildren<CsManifest>("Id", "Supplier");
-            SetChildren<CatSaleman>("Id", "PartnerId");
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -149,14 +143,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
-            var entity = mapper.Map<CatPartner>(model);
-            entity.DatetimeModified = DateTime.Now;
-            entity.UserModified = currentUser.UserID;
-
-            if (entity.Active == false)
-            {
-                entity.InactiveOn = DateTime.Now;
-            }
+            var entity = GetModelToUpdate(model);
             if (model.SaleMans.Count > 0)
             {
                 entity.SalePersonId = model.SaleMans.FirstOrDefault().SaleManId.ToString();
@@ -190,6 +177,25 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
+
+        private CatPartner GetModelToUpdate(CatPartnerModel model)
+        {
+            var entity = mapper.Map<CatPartner>(model);
+            var partner = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            entity.GroupId = partner.GroupId;
+            entity.DepartmentId = partner.DepartmentId;
+            entity.OfficeId = partner.OfficeId;
+            entity.CompanyId = partner.CompanyId;
+            if (entity.Active == false)
+            {
+                entity.InactiveOn = DateTime.Now;
+            }
+            return entity;
+        }
+
         public HandleState Delete(string id)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;

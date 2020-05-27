@@ -85,7 +85,6 @@ export class ShareBusinessFormManifestComponent extends AppForm {
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-                        console.log(this.shipmentDetail);
                         if (this.supplier.value === null) {
                             this.supplier.setValue(this.shipmentDetail.supplierName);
                         }
