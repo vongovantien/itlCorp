@@ -561,5 +561,17 @@ export class SystemRepo {
             );
     }
 
+    checkDetailAuthorizePermission(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    checkDeleteAuthorizePermission(id: number) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/CheckDeletePermission/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

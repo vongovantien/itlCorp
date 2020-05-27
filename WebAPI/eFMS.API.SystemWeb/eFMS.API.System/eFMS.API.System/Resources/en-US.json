@@ -136,9 +136,9 @@
   "MSG_ITEM__EXISTED_ACCOUNTANT_DEPT_IN_OFFICE": "Accounting department in the office already exists. Please check again",
   //-- end
   //- user level
-  "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "You can only add one role in an office, please change the office or check the existing role on system!"
+  "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "You can only add one role in an office, please change the office or check the existing role on system!",
   //end
-
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission" //403
 
 
 }

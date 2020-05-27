@@ -1,3 +1,5 @@
+import { PermissionShipment } from "../document/permissionShipment";
+
 export class Authorization {
     id: number = 0;
     userId: string = '';
@@ -16,6 +18,11 @@ export class Authorization {
     servicesName: string = '';
     userNameAssignTo: string = '';
     userNameAssign: string = '';
+    groupId: number = 0;
+    departmentId: number = 0;
+    officeId: string = '';
+    companyId: string = '';
+    permission: PermissionShipment = new PermissionShipment();
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
