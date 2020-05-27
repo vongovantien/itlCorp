@@ -839,6 +839,22 @@ export class DocumentationRepo {
         );
     }
 
+    getBookingNoteSeaLCLExport(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteBookingNoteSeaLCLExport(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
     updateInputBookingNoteAirExport(body: any) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransactionDetail/UpdateInputBKNote`, body).pipe(
             catchError((error) => throwError(error)),
@@ -848,5 +864,27 @@ export class DocumentationRepo {
 
     getShipmentAssginPIC() {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPIC`);
+    }
+
+    previewHLSeaBookingNoteById(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/PreviewHBSeaBookingNote`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    createCsBookingNote(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/AddNew`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateCsBookingNote(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailCsBookingNote(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsBookingNote/${id}`);
     }
 }

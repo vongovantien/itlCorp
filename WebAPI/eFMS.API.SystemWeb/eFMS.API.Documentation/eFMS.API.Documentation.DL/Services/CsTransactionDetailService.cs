@@ -94,7 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = _currentUser.OfficeID;
             model.CompanyId = _currentUser.CompanyID;
             model.UserCreated = _currentUser.UserID;
-            model.UserModified = model.UserCreated = currentUser.UserID;
+            model.UserModified = model.UserCreated = _currentUser.UserID;
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
 
@@ -1541,7 +1541,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    housebill.LastDestination = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
                     housebill.LastDestination = housebill.LastDestination?.ToUpper();
                 }
                 housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No

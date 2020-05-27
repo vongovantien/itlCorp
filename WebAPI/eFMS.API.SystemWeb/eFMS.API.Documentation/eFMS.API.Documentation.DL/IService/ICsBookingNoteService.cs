@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
@@ -15,10 +16,11 @@ namespace eFMS.API.Documentation.DL.IService
     {
         List<CsBookingNoteModel> Paging(CsBookingNoteCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<CsBookingNoteModel> Query(CsBookingNoteCriteria criteria);
-        HandleState AddCsBookingNote(CsBookingNoteEditModel model);
+        object AddCsBookingNote(CsBookingNoteEditModel model);
         HandleState UpdateCsBookingNote(CsBookingNoteEditModel model);
         HandleState DeleteCsBookingNote(Guid bookingNoteId);
-
+        CsBookingNoteModel GetDetails(Guid id);
+        Crystal PreviewHBSeaBookingNote(Guid id);
 
 
 

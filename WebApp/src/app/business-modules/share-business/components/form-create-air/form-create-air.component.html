@@ -13,21 +13,15 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                             <label required>MAWB No </label>
-                            <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)">
-                            <div class="form-control-feedback" *ngIf="isSubmitted && mawb.errors | equalError:'invalidMawb' 
+                            <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)"
+                                placeholder="xxx-xxxx xxxx">
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb' 
                             ">
                                 MAWB inputted is not correct format
                             </div>
                             <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
-                            (mawb.errors | equalError:'minlength' 
-                            ) 
-                            ">
-                                MAWB must be have 13 characters
-                            </div>
-                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && 
-                            (mawb.errors | equalError:'maxlength') 
-                            ">
-                                MAWB must be have 13 characters
+                            mawb.errors | equalError:'pattern':''">
+                                MAWB must be xxx-xxxx xxxx
                             </div>
                         </div>
                     </div>
