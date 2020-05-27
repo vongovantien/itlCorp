@@ -1900,7 +1900,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            string keyword = podCode + DateTime.Now.ToString("yyMM");
+            string keyword = (string.IsNullOrEmpty(podCode) ? "" : podCode)  + DateTime.Now.ToString("yyMM");
             string hbl = "ITL" + keyword;
 
             var codes = DataContext.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno);
@@ -1911,7 +1911,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var code in codes)
                 {
                     // Lấy 3 ký tự cuối
-                    if (code.Length > 7)
+                    if (code.Length > 7 && isNumeric(code.Substring(code.Length - 3)))
                     {
                         oders.Add(int.Parse(code.Substring(code.Length - 3)));
                     }
@@ -1934,6 +1934,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return hbl;
+        }
+
+        private bool isNumeric(string n)
+        {
+           return int.TryParse(n, out int _);
         }
 
         public HandleState UpdateInputBKNote(BookingNoteCriteria criteria)
