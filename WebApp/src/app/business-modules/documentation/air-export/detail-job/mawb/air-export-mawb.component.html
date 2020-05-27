@@ -402,8 +402,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>G.W</label>
-                                    <input type="number" class="form-control" formControlName="grossWeight" numeric
-                                        [decimals]="2" autoFormatCurrency>
+                                    <input type="text" class="form-control" formControlName="grossWeight"
+                                        autoFormatCurrency numeric [decimals]="digitDecimal" digits=2>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -437,8 +437,8 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>C.W</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                        [decimals]="2" autoFormatCurrency>
+                                    <input type="text" class="form-control" formControlName="chargeWeight"
+                                        autoFormatCurrency numeric [decimals]="digitDecimal" digits=2>
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -607,29 +607,6 @@
                                             <div class="form-group">
                                                 <label>Issue By</label>
                                                 <input type="text" class="form-control" formControlName="issuedBy">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>SCI</label>
-                                                <input type="text" class="form-control" formControlName="sci">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>Curr Convert Rate</label>
-                                                <input type="text" class="form-control"
-                                                    formControlName="currConvertRate">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label>CC Charge in Drc</label>
-                                                <input type="text" class="form-control" formControlName="ccchargeInDrc">
                                             </div>
                                         </div>
                                     </div>

@@ -8,7 +8,7 @@ import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { User, CsTransactionDetail, csBookingNote } from 'src/app/shared/models';
+import { User, csBookingNote, CsTransaction } from 'src/app/shared/models';
 
 import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -122,10 +122,9 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), skip(1))
             .subscribe(
-                (res: CsTransactionDetail | any) => {
+                (res: CsTransaction) => {
                     if (!!res) {
                         try {
-
                             this._route.queryParams.subscribe((param: Params) => {
                                 if (param.action === 'copy') {
                                     res.jobNo = null;
@@ -142,7 +141,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
                                 mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
                                 typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
-                                term: !!res.shipmentType ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
+                                term: !!res.shipmentType ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
 
                                 coloader: res.coloaderId,
