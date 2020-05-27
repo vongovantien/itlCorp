@@ -5,12 +5,14 @@ import { CurrencyPipe } from '@angular/common';
     selector: '[autoFormatCurrency]',
 })
 export class AutoFormatCurrencyDirective {
+    @Input() digits: number = 3;
     @Input() set decimals(number: number) {
         this.setRegex(number);
+        this.digitNumber = '.0-' + this.digits;
     }
 
     currencyCode: string = '';
-    digitNumber = '.0-3';
+    digitNumber = '.0-';
 
     private el: HTMLInputElement;
     private digitRegex: RegExp = new RegExp(this.regexString(), 'g');

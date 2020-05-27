@@ -402,8 +402,8 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>G.W</label>
-                                    <input type="number" class="form-control" formControlName="grossWeight" numeric
-                                        [decimals]="2" autoFormatCurrency>
+                                    <input type="text" class="form-control" formControlName="grossWeight"
+                                        autoFormatCurrency numeric [decimals]="digitDecimal" digits=2>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -437,8 +437,8 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>C.W</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
-                                        [decimals]="2" autoFormatCurrency>
+                                    <input type="text" class="form-control" formControlName="chargeWeight"
+                                        autoFormatCurrency numeric [decimals]="digitDecimal" digits=2>
                                 </div>
                             </div>
                             <div class="col-lg-4">

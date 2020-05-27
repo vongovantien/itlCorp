@@ -109,7 +109,7 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.SumNetWeight == null ? 0 : (decimal)item.SumNetWeight,
+                    KGS = item.SumGrossWeight == null ? 0 : (decimal)item.SumGrossWeight,
                     CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
                     SharedProfit = 0,
                     OtherCharges = 0,
