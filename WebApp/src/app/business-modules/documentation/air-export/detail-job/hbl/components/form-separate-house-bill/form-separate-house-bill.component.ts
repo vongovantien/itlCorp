@@ -6,11 +6,12 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
 import { DocumentationRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { HouseBill } from '@models';
+import { HouseBill, CsOtherCharge } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
 import { catchError } from 'rxjs/operators';
+import { InitShipmentOtherChargeAction } from '@share-bussiness';
 
 
 @Component({
@@ -68,10 +69,11 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
                     this.hblSeprateDetail = res;
                     this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(res.id));
                     this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(res.id));
-
+                    this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(res.id));
                 } else {
                     this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
                     this._store.dispatch(new fromShareBussiness.GetDimensionHBLAction(this.hblId));
+                    this._store.dispatch(new fromShareBussiness.GetHBLOtherChargeAction(this.hblId));
                 }
             });
     }

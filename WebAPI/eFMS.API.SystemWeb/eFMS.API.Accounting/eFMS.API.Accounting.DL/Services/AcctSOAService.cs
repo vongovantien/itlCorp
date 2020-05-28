@@ -1980,7 +1980,7 @@ namespace eFMS.API.Accounting.DL.Services
                     string[] commodityArr = commodity.Split(',');
                     foreach(var item in commodityArr)
                     {
-                        commodityName = commodityName + "," + catCommodityRepo.Get(x=>x.Code == item).Select(t=>t.CommodityNameVn).FirstOrDefault() ;
+                        commodityName = commodityName + "," + catCommodityRepo.Get(x=>x.CommodityNameEn == item.Replace("\n","")).Select(t=>t.CommodityNameEn).FirstOrDefault() ;
                     }
                     commodityName =  commodityName.Substring(1);
                 }
