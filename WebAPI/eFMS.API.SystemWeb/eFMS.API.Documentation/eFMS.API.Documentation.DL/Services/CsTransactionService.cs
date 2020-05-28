@@ -427,8 +427,11 @@ namespace eFMS.API.Documentation.DL.Services
                 CsTransactionModel result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null)
                 {
-                    result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
-                    result.ColoaderCode = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.CoLoaderCode;
+                    CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
+                    result.SupplierName = coloaderPartner.PartnerNameEn;
+                    result.ColoaderCode = coloaderPartner.CoLoaderCode;
+                    result.RoundUpMethod = coloaderPartner.RoundUpMethod;
+                    result.ApplyDim = coloaderPartner.ApplyDim;
                 }
                 if (result.AgentId != null)
                 {
