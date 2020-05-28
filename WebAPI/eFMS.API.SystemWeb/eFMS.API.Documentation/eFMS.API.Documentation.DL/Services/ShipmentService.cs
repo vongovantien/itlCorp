@@ -1543,7 +1543,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var _podCode = catPlaceRepo.Get(x => x.Id == item.Pod).FirstOrDefault()?.Code;
                 data.Route = _polCode + "/" + _podCode;
 
-                data.Qty = item.Qty;
+                //Qty lấy theo Housebill
+                var houseBill = detailRepository.Get(x => x.Id == item.HblId).FirstOrDefault();
+                data.Qty = houseBill?.PackageQty ?? 0;
 
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;
