@@ -1,0 +1,36 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} Account</h5>
+                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="m-form m-form--state" [formGroup]="formChart">
+
+                    <div class="col-lg-6">
+                        <div class="form-group row"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && !formChart.controls['accountCode'].valid }">
+                            <label class="col-lg-4 col-form-label form-control-label" required> Account Code
+                            </label>
+                            <div class="col-lg-8">
+                                <input type="text" class="form-control m-input m-input--square"
+                                    placeholder="Please enter currency code" formControlName="code"
+                                    [attr.disabled]="!isUpdate ? null : 'disabled'">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+            <div class="modal-footer m--align-center c-button-actions">
+                <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="hide()"></app-default-button>
+            </div>
+        </div>
+    </div>
+</div>

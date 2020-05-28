@@ -1,0 +1,85 @@
+<app-sub-header>
+    <div class="c-button-actions">
+        <app-default-button [buttonSetting]="addButtonSetting" (click)="showAdd()"
+            [dataTarget]="addButtonSetting.dataTarget">
+        </app-default-button>
+    </div>
+</app-sub-header>
+<div class="m-content">
+    <div class="m-portlet">
+        <form-search-chart-of-accounts (onSearch)="onSearchCharge($event)"> </form-search-chart-of-accounts>
+        <div class="m-form">
+            <div class="m-portlet__body">
+                <div class="table-wrapper" id="">
+                    <table class="table table-striped table-brand dataTable">
+                        <thead app-table-header [headers]="headers"
+                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            <th class="m--w-50 first">Actions
+                            </th>
+                        </thead>
+                        <tbody *ngIf="chartOfAccounts">
+                            <ng-container *ngIf="!!chartOfAccounts.length">
+                                <tr *ngFor="let item of chartOfAccounts">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions" style="width: 70px">
+                                            <app-permission-button type="detail">
+                                            </app-permission-button>
+                                            <app-permission-button type="delete">
+                                            </app-permission-button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span>{{item.accountCode}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{item.accountNameLocal}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{item.accountNameEn}}</span>
+                                    </td>
+                                    <td>
+                                        <span [ngClass]="item.active ? 'text-success' : 'text-danger'">
+                                            {{ item.active ? 'Active' : 'Inactive'}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngIf="!chartOfAccounts.length && !isLoading" app-table-none-record
+                                [colspan]="headers.length + 1">
+                            </tr>
+                            <tr *ngIf="isLoading" app-table-row-loading>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="pagination-nav ">
+                    <div class="row">
+                        <div *ngIf="!!chartOfAccounts.length" class="col-sm-6">
+                            <div class="tatable__pager-size">
+                                <div class="select-box">
+                                    <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                        (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                        <ng-container
+                                            *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                            <option [ngValue]="item">{{item}} line / screen</option>
+                                        </ng-container>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                            <div class="float-right">
+                                <pagination [boundaryLinks]="true" [maxSize]=5 [totalItems]="totalItems"
+                                    [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)" [(ngModel)]="page">
+                                </pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<form-create-chart-of-accounts-popup></form-create-chart-of-accounts-popup>

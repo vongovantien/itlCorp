@@ -10,6 +10,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string AccountCode { get; set; }
         public string AccountNameLocal { get; set; }
         public string AccountNameEn { get; set; }
-        public bool? Active { get; set; }
+        public string Active { get; set; }
     }
 }

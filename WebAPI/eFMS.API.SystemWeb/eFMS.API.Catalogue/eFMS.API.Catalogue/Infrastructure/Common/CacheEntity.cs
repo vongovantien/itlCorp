@@ -18,6 +18,7 @@
         CatStage,
         CatUnit,
         CatSaleman,
+        catChartOfAccounts
 
     }
 }

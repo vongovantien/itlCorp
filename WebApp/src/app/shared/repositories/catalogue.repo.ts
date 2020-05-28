@@ -225,6 +225,15 @@ export class CatalogueRepo {
         }
     }
 
+    getListChartOfAccounts(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getListSaleman(partnerId: string) {
         // const header: HttpHeaders = new HttpHeaders();
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })

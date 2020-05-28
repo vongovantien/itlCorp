@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
@@ -13,5 +14,12 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         IQueryable<CatChartOfAccounts> Query(CatChartOfAccountsCriteria criteria);
         IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount);
+
+        object Add(CatChartOfAccounts model);
+        HandleState Update(CatChartOfAccounts model);
+        HandleState Delete(Guid idAcc);
+        CatChartOfAccountsModel GetDetail(Guid id);
+
+
     }
 }
