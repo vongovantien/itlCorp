@@ -15,10 +15,13 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatChartOfAccounts> Query(CatChartOfAccountsCriteria criteria);
         IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount);
 
-        object Add(CatChartOfAccounts model);
+        //HandleState Add(CatChartOfAccounts model);
         HandleState Update(CatChartOfAccounts model);
         HandleState Delete(Guid idAcc);
         CatChartOfAccountsModel GetDetail(Guid id);
+        bool CheckAllowDelete(Guid id);
+        bool CheckAllowViewDetail(Guid id);
+
 
 
     }

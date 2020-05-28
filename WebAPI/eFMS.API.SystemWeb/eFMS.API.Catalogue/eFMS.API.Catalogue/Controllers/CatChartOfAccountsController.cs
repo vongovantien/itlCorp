@@ -10,6 +10,8 @@ using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using ITL.NetCore.Connection.BL;
+using eFMS.API.Catalogue.DL.Models;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -60,9 +62,9 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPost]
-        [Route("addNew")]
+        [Route("Add")]
         [Authorize]
-        public IActionResult Add(CatChartOfAccounts model)
+        public IActionResult Add(CatChartOfAccountsModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkExistMessage = CheckExist(model.AccountCode, Guid.Empty);
@@ -71,7 +73,9 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var hs = catChartAccountsService.Add(model);
-            return Ok(hs);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            return Ok(result);
         }
 
         [HttpPut]
@@ -95,6 +99,22 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            bool resultDelete = catChartAccountsService.CheckAllowDelete(id);
+            return Ok(resultDelete);
+        }
+
+
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            bool resultDelete = catChartAccountsService.CheckAllowViewDetail(id);
+            return Ok(resultDelete);
+        }
 
         [HttpDelete]
         [Route("Delete")]

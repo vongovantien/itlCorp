@@ -5,7 +5,7 @@ import { SortService } from '@services';
 import { CatalogueRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { ChartOfAccounts } from 'src/app/shared/models/catalogue/catChartOfAccounts.model';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { FormCreateChartOfAccountsPopupComponent } from './components/form-create-chart-of-accounts/form-create-chart-of-accounts.popup';
@@ -18,8 +18,10 @@ import { FormCreateChartOfAccountsPopupComponent } from './components/form-creat
 export class ChartOfAccountsComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormCreateChartOfAccountsPopupComponent, { static: false }) formPopup: FormCreateChartOfAccountsPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) info403Popup: Permission403PopupComponent;
 
     chartOfAccounts: ChartOfAccounts[] = [];
+    chart: ChartOfAccounts = new ChartOfAccounts();
     constructor(private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _sortService: SortService,
@@ -52,9 +54,34 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
     showAdd() {
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [false, false];
 
-
         this.formPopup.formChart.reset();
+        this.formPopup.active.setValue(true);
         this.formPopup.show();
+    }
+
+    showDetail(chart: ChartOfAccounts) {
+        this._catalogueRepo.checkAllowGetDetailChartOfAccounts(chart.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this.chart = chart;
+                        [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
+
+                        this.formPopup.formChart.setValue({
+                            accountCode: chart.accountCode,
+                            accountNameLocal: chart.accountNameLocal,
+                            accountNameEn: chart.accountNameEn,
+                            active: chart.active
+                        });
+                        this.formPopup.idChart = this.chart.id;
+
+                        this.formPopup.show();
+                    } else {
+                        this.info403Popup.show();
+                    }
+                }
+            );
+
     }
 
     searchChart() {
@@ -98,6 +125,45 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
                 this.dataSearch.active = dataSearch.keyword;
             }
         }
+        this.searchChart();
+    }
+
+    showConfirmDelete(item: ChartOfAccounts) {
+        this._catalogueRepo.checkAllowDeleteChartOfAccounts(item.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this.chart = item;
+                        this.confirmDeletePopup.show();
+                    } else {
+                        this.info403Popup.show();
+                    }
+                }
+            );
+    }
+
+    onDelete() {
+        this.confirmDeletePopup.hide();
+        this._progressRef.start();
+        this._catalogueRepo.deleteChartOfAccounts(this.chart.id)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (response: CommonInterface.IResult) => {
+                    if (response.status) {
+                        this._toastService.success(response.message);
+                        this.dataSearch = {};
+                        this.searchChart();
+                    } else {
+                        this._toastService.error(response.message);
+                    }
+                }
+            );
+    }
+
+
+
+    resetSearch(event: any) {
+        this.dataSearch = {};
         this.searchChart();
     }
 }

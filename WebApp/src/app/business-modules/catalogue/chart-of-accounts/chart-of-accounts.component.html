@@ -1,8 +1,6 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <app-default-button [buttonSetting]="addButtonSetting" (click)="showAdd()"
-            [dataTarget]="addButtonSetting.dataTarget">
-        </app-default-button>
+        <app-permission-button (onClick)="showAdd()" type="add" title="Add New"></app-permission-button>
     </div>
 </app-sub-header>
 <div class="m-content">
@@ -22,9 +20,9 @@
                                 <tr *ngFor="let item of chartOfAccounts">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
-                                            <app-permission-button type="detail">
+                                            <app-permission-button type="detail" (click)="showDetail(item)">
                                             </app-permission-button>
-                                            <app-permission-button type="delete">
+                                            <app-permission-button type="delete" (onClick)="showConfirmDelete(item)">
                                             </app-permission-button>
                                         </div>
                                     </td>
@@ -82,4 +80,6 @@
 
     </div>
 </div>
-<form-create-chart-of-accounts-popup></form-create-chart-of-accounts-popup>
+<form-create-chart-of-accounts-popup (onChange)="resetSearch($event)"></form-create-chart-of-accounts-popup>
+<confirm-popup body="You want to delete this currency" (onSubmit)="onDelete()"></confirm-popup>
+<permission-403-popup></permission-403-popup>

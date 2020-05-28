@@ -225,6 +225,46 @@ export class CatalogueRepo {
         }
     }
 
+    addChartOfAccounts(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateChartOfAccounts(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    checkAllowDeleteChartOfAccounts(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailChartOfAccounts(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteChartOfAccounts(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatChartOfAccounts/Delete`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
+
+
     getListChartOfAccounts(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/paging`, body, {
             page: '' + page,

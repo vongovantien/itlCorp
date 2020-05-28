@@ -16,6 +16,11 @@ export class FormCreateChartOfAccountsPopupComponent extends PopupBase implement
 
     isSubmitted: boolean = false;
     isUpdate: boolean = false;
+
+    active: AbstractControl;
+
+    idChart: string = '';
+
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService) {
@@ -29,5 +34,58 @@ export class FormCreateChartOfAccountsPopupComponent extends PopupBase implement
             accountNameEn: [null, Validators.required],
             active: [true],
         });
+        this.active = this.formChart.controls['active'];
+
     }
+
+    onSubmit() {
+        this.isSubmitted = true;
+        const formData = this.formChart.getRawValue();
+        if (this.formChart.valid) {
+            const body: IChart = {
+                accountCode: this.formChart.controls['accountCode'].value,
+                accountNameEn: this.formChart.controls['accountNameEn'].value,
+                accountNameLocal: this.formChart.controls['accountNameLocal'].value,
+                active: formData.active
+            };
+
+            if (this.isUpdate) {
+                body.id = this.idChart;
+                this._catalogueRepo.updateChartOfAccounts(body)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            this.onHandleResult(res);
+                        }
+                    );
+            } else {
+                this._catalogueRepo.addChartOfAccounts(body)
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            this.onHandleResult(res);
+                        }
+                    );
+            }
+        }
+    }
+
+    onHandleResult(res: CommonInterface.IResult) {
+        if (res.status) {
+            this._toastService.success(res.message);
+
+            this.hide();
+            this.onChange.emit(true);
+        } else {
+            this._toastService.error(res.message);
+        }
+    }
+
+
+}
+
+interface IChart {
+    id?: string;
+    accountCode: string;
+    accountNameEn: string;
+    accountNameLocal: string;
+    active: boolean;
 }

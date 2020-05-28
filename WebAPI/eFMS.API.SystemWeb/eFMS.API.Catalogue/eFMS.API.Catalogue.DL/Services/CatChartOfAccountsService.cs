@@ -37,7 +37,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
-        public object Add(CatChartOfAccounts model)
+        public override HandleState Add(CatChartOfAccountsModel model)
         {
             model.Id = Guid.NewGuid();
             model.UserCreated = model.UserModified = currentUser.UserID;
@@ -58,14 +58,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         ClearCache();
                         Get();
                     }
-                    return new { model, result };
+                    return result;
 
                 }
                 catch (Exception ex)
                 {
                     bk.Rollback();
                     var result = new HandleState(ex.Message);
-                    return new { model = new object { }, result };
+                    return result;
                 }
                 finally
                 {
@@ -87,7 +87,7 @@ namespace eFMS.API.Catalogue.DL.Services
             model.CompanyId = accObj.CompanyId;
             model.DepartmentId = accObj.DepartmentId;
             model.GroupId = accObj.GroupId;
-            var resultToUpdate = GetPermissionDetail(permissionRange, model);
+            var resultToUpdate = GetPermission(permissionRange, model);
             if (!resultToUpdate) return new HandleState(403, "");
             // en check permission
 
@@ -127,6 +127,26 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
         }
+        public bool CheckAllowDelete(Guid id)
+        {
+            var queryDetail = Get(x => x.Id == id).FirstOrDefault();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);//Set default
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            bool resultDelete = false;
+            resultDelete = GetPermission(permissionRangeDelete, queryDetail);
+            return resultDelete;
+        }
+
+        public bool CheckAllowViewDetail(Guid id)
+        {
+            var queryDetail = Get(x => x.Id == id).FirstOrDefault();
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);//Set default
+            var permissionRangeDetail = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            bool resultDelete = false;
+            resultDelete = GetPermission(permissionRangeDetail, queryDetail);
+            return resultDelete;
+        }
+
         public HandleState Delete(Guid accId)
         {
             using (var accTrans = DataContext.DC.Database.BeginTransaction())
@@ -162,7 +182,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatChartOfAccountsModel GetDetail(Guid id)
         {
             var queryDetail = Get(x => x.Id == id).FirstOrDefault();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             bool resultDelete = false;
@@ -205,16 +225,16 @@ namespace eFMS.API.Catalogue.DL.Services
 
             queryDetail.Permission = new PermissionAllowBase
             {
-                AllowUpdate = GetPermissionDetail(permissionRangeWrite, queryDetail),
+                AllowUpdate = GetPermission(permissionRangeWrite, queryDetail),
                 AllowDelete = resultDelete
             };
             return queryDetail;
         }
 
-        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, CatChartOfAccounts model)
+        private bool GetPermission(PermissionRange permissionRange, CatChartOfAccounts model)
         {
             bool result = false;
-            switch (permissionRangeWrite)
+            switch (permissionRange)
             {
                 case PermissionRange.All:
                     result = true;
