@@ -403,7 +403,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.onChangeAsArranged();
     }
 
-    updateFormValue(data: HouseBill) {
+    updateFormValue(data: HouseBill, isImport: boolean = false) {
         const formValue = {
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
@@ -421,6 +421,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null,
             dimensionDetails: []
         };
+        if (isImport) {
+            formValue.issueHbldate = { startDate: new Date(), endDate: new Date() };
+        }
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
     }
 
