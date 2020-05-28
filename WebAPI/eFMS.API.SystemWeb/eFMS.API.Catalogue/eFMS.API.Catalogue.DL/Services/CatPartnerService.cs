@@ -141,7 +141,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
 
-            int code = GetPermissionToUpdate(new ModelUpdate { UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = model.GroupId, DepartmentId = model.DepartmentId, OfficeId = model.OfficeId, CompanyId = model.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
             var entity = GetModelToUpdate(model);
             if (model.SaleMans.Count > 0)
