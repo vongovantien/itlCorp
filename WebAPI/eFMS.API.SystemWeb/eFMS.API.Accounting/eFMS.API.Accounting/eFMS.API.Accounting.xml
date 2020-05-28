@@ -511,5 +511,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.PreviewAccountStatementFull(System.String)">
+            <summary>
+            Preview Account Statement Full By SOA No
+            </summary>
+            <param name="soaNo">Soa No</param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
