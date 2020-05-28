@@ -29,6 +29,9 @@ const routes: Routes = [
       name: "Account Receivable Payable",
     }
   },
+  {
+    path: 'management', loadChildren: () => import('./accounting-management/accounting-managment.module').then(m => m.AccountingManagementModule), data: { name: 'Management' }
+  },
   // TODO another MODULE...
 ];
 
