@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, Shipment } from '@models';
+import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, Shipment, csBookingNote } from '@models';
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
@@ -16,13 +16,23 @@ import { catchError, takeUntil, skip, finalize, tap, mergeMap } from 'rxjs/opera
 import * as fromShareBussiness from './../../../share-business/store';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
 import { formatDate } from '@angular/common';
-import { ChargeConstants } from 'src/constants/charge.const';
+import { JobConstants, ChargeConstants } from '@constants';
+import { AppComboGridComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
 @Component({
     selector: 'form-create-house-bill-export',
     templateUrl: './form-create-house-bill-export.component.html'
 })
 export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm implements OnInit {
+
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+
     @Input() isUpdate: boolean = false;
+    @Input() set type(t: string) { console.log(t); this._type = t; }
+
+    get type() { return this._type; }
+
+    private _type: string = ChargeConstants.SLI_CODE;
 
     formCreate: FormGroup;
     customer: AbstractControl;
@@ -63,9 +73,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
 
-    serviceTypes: CommonInterface.INg2Select[];
-    ladingTypes: CommonInterface.INg2Select[];
-    termTypes: CommonInterface.INg2Select[];
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
+    typeOfMoves: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.TYPEOFMOVES;
 
     originNumbers: CommonInterface.INg2Select[] = [
         { id: '0', text: 'Zero (0)' },
@@ -73,9 +84,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         { id: 2, text: 'Two (2)' },
         { id: 3, text: 'Three (3)' }];
 
-    typeOfMoves: CommonInterface.INg2Select[];
     listSaleMan: any = [];
-    type: string = '';
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -99,6 +108,8 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     isLoadingShipper: boolean = false;
     isLoadingConsignee: boolean = false;
 
+    csBookingNotes: csBookingNote[] = [];
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -113,7 +124,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     ngOnInit() {
         this.initForm();
         this.getSaleMans();
-        this.getDropdownData();
+
+        if (this.type === ChargeConstants.SLE_CODE) {
+            this.getCSBookingNotes();
+        }
 
         this.isLoadingCustomer = true;
         this.isLoadingShipper = true;
@@ -392,28 +406,10 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     }
 
     getDropdownData() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-
-            this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-            this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-            this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
-
-        } else {
-            this._documentRepo.getShipmentDataCommon()
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (commonData: any) => {
-                        this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-                        this.ladingTypes = this.utility.prepareNg2SelectData(commonData.billOfLadings, 'value', 'displayName');
-                        this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-                        this.typeOfMoves = this.utility.prepareNg2SelectData(commonData.typeOfMoves, 'value', 'displayName');
-
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-                    }
-                );
-        }
+        this.serviceTypes = JobConstants.COMMON_DATA.SERVICETYPES;
+        this.ladingTypes = JobConstants.COMMON_DATA.BILLOFLADINGS;
+        this.termTypes = JobConstants.COMMON_DATA.FREIGHTTERMS;
+        this.typeOfMoves = JobConstants.COMMON_DATA.TYPEOFMOVES;
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {
@@ -536,4 +532,58 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             this.originBlnumber.setValue([this.originNumbers[3]]);
         }
     }
+
+    getCSBookingNotes() {
+        this._documentRepo.getBookingNoteSeaLCLExport().subscribe(
+            (res: csBookingNote[]) => {
+                this.csBookingNotes = res;
+            }
+        );
+    }
+
+    showBookingNote() {
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.bookingNoteContainerRef.viewContainerRef);
+
+        if (!!this.componentRef) {
+            this.componentRef.instance.headers = <CommonInterface.IHeaderTable[]>[{ title: 'Booking Note', field: 'bookingNo' }];
+            this.componentRef.instance.data = this.csBookingNotes;
+            this.componentRef.instance.fields = ['bookingNo'];
+
+            // * Listen Event.
+            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).onClick.subscribe(
+                (bookingNote: csBookingNote) => {
+                    const formData: IBookingNoteFormHBL = {
+                        bookingNo: bookingNote.bookingNo,
+                        shipper: bookingNote.shipperId,
+                        consignee: bookingNote.consigneeId,
+                        placeDelivery: bookingNote.placeOfDelivery,
+                        shipperDescription: bookingNote.shipperDescription,
+                        consigneeDescription: bookingNote.consigneeDescription
+                    };
+                    this.formCreate.patchValue(formData);
+
+                    // this._dataService.$data.next({ cbm: bookingNote.cbm, gw: bookingNote.gw, commodity: bookingNote.commodity });
+
+                    this.subscription.unsubscribe();
+                    this.bookingNoteContainerRef.viewContainerRef.clear();
+                });
+
+            ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        this.bookingNoteContainerRef.viewContainerRef.clear();
+                    }
+                );
+        }
+    }
+}
+
+interface IBookingNoteFormHBL {
+    shipper: string;
+    consignee: string;
+    bookingNo: string;
+    placeDelivery: string;
+    shipperDescription: string;
+    consigneeDescription: string;
 }

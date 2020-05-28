@@ -234,7 +234,10 @@ namespace eFMS.API.Documentation.DL.Services
                         PaymentTerm = bookingNote.PaymentTerm,
                         Commodity = bookingNote.Commodity,
                         CreatorName = creator.Username,
-                        CreatedDate = bookingNote.CreatedDate
+                        CreatedDate = bookingNote.CreatedDate,
+                        PlaceOfDelivery = bookingNote.PlaceOfDelivery,
+                        ShipperDescription = bookingNote.ShipperDescription,
+                        ConsigneeDescription = bookingNote.ConsigneeDescription
                     };
             return query;
         }

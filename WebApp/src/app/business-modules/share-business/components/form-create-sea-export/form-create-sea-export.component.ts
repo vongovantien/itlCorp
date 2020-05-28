@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewContainerRef, ViewChild, ComponentRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -20,9 +20,6 @@ import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { AppComboGridComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { DataService } from '@services';
-
-
-
 @Component({
     selector: 'form-create-sea-export',
     templateUrl: './form-create-sea-export.component.html'
@@ -30,8 +27,8 @@ import { DataService } from '@services';
 
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
 
-    @ViewChild(InjectViewContainerRefDirective, { static: true }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
-    @Input() set type(t: string) { this._type = t; }
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @Input() set type(t: string) { console.log(t); this._type = t; }
 
     get type() { return this._type; }
 
@@ -277,8 +274,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
                     const formData: IBookingNoteFormData = {
                         bookingNo: bookingNote.bookingNo,
-                        eta: bookingNote.eta,
-                        etd: bookingNote.etd,
+                        eta: !!bookingNote.eta ? { startDate: new Date(bookingNote.eta), endDate: new Date(bookingNote.eta) } : null,
+                        etd: !!bookingNote.etd ? { startDate: new Date(bookingNote.etd), endDate: new Date(bookingNote.etd) } : null,
                         pol: bookingNote.pol,
                         pod: bookingNote.pod,
                         term: [{ id: bookingNote.paymentTerm, text: bookingNote.paymentTerm }],
@@ -308,8 +305,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
 interface IBookingNoteFormData {
     bookingNo: string;
-    eta: string;
-    etd: string;
+    eta: any;
+    etd: any;
     pol: string;
     pod: string;
     term: CommonInterface.INg2Select[];
