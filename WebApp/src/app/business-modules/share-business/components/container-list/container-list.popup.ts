@@ -274,6 +274,15 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         }
     }
 
+    getDescriptionName(containerId: string | number) {
+        const containers: Unit[] = this.containerUnits.filter(c => c.id === containerId);
+        if (!!containers.length) {
+            return containers[0].descriptionEn;
+        } else {
+            return null;
+        }
+    }
+
     closePopup() {
         this.isSubmitted = false;
         this.initContainers = cloneDeep(this.containers);

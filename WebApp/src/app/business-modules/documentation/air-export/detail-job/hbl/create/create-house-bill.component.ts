@@ -269,7 +269,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.formCreateHBLComponent.jobId = hbl.jobId;
                             this.formCreateHBLComponent.hblId = hbl.id;
                             this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
-                            this.formCreateHBLComponent.updateFormValue(hbl);
+
+                            this.formCreateHBLComponent.updateFormValue(hbl, true);
                             this.formCreateHBLComponent.hwbno.setValue(null);
                         }
                     }

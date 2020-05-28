@@ -97,6 +97,8 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
         this.initContainers = this._sortService.sort(this.initContainers, this.sortField, this.order)
     }
 
+
+
     onSaveContainerList() {
         this.isSubmitted = true;
         if (this.checkValidateContainer()) {
@@ -104,11 +106,12 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
             if (this.checkDuplicate()) {
 
                 this.containers = cloneDeep(this.initContainers);
-
+                console.log(this.containers);
                 for (const container of this.containers) {
                     container.commodityName = this.getCommodityName(container.commodityId);
                     container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
+                    container.description = this.getDescriptionName(container.containerTypeId);
                     if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
                         container.quantity = 1;
                     }

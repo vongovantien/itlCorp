@@ -245,7 +245,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }));
 
         const contObjectFCL: any[] = (containers || []).map((container: Container | any) => ({
-            contName: container.containerTypeName || '',
+            contName: container.description || '',
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
@@ -270,7 +270,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Onlys. SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
+        containerDetail += " Container Only. SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
     }
 
