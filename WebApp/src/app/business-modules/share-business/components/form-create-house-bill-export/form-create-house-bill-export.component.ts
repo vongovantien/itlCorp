@@ -8,9 +8,8 @@ import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortI
 import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
-import { DataService } from '@services';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, takeUntil, skip, finalize, tap, mergeMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
@@ -19,6 +18,7 @@ import { formatDate } from '@angular/common';
 import { JobConstants, ChargeConstants } from '@constants';
 import { AppComboGridComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
+
 @Component({
     selector: 'form-create-house-bill-export',
     templateUrl: './form-create-house-bill-export.component.html'
@@ -32,7 +32,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     get type() { return this._type; }
 
-    private _type: string = ChargeConstants.SLI_CODE;
+    private _type: string = ChargeConstants.SLI_CODE; // SLE | SLI
 
     formCreate: FormGroup;
     customer: AbstractControl;
@@ -77,31 +77,11 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
     termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
     typeOfMoves: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.TYPEOFMOVES;
+    originNumbers: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
 
-    originNumbers: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'Zero (0)' },
-        { id: 1, text: 'One (1)' },
-        { id: 2, text: 'Two (2)' },
-        { id: 3, text: 'Three (3)' }];
-
-    listSaleMan: any = [];
-
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-
-    displayFieldsCountry: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Country Code' },
-        { field: 'nameEn', label: 'Name EN' },
-    ];
-
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
     shipmmentDetail: CsTransaction = new CsTransaction();
     isLoadingCustomer: boolean = false;
@@ -116,7 +96,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
-        private _dataService: DataService,
     ) {
         super();
     }
@@ -198,7 +177,11 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         });
                     }
                 }),
-                mergeMap((res: CsTransaction) => this._documentRepo.generateHBLSeaExport(res.podCode)))
+                mergeMap((res: CsTransaction) => {
+                    if (!!res.podCode) {
+                        return this._documentRepo.generateHBLSeaExport(res.podCode);
+                    } else { return of(""); }
+                }))
             .pipe(tap((hblNo: string) => {
                 this.hwbno.setValue(hblNo);
             }))
@@ -450,14 +433,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         switch (type) {
             case 'customer':
                 this.customer.setValue(data.id);
-                // const listSales = this.listSaleMan.filter(x => x.partnerId === data.id);
-                // this.saleMans.forEach((item: User) => {
-                //     if (listSales.length > 0) {
-                //         this.saleMan.setValue(listSales[0].saleManId);
-                //     } else if (item.id === data.salePersonId) {
-                //         this.saleMan.setValue(item.id);
-                //     }
-                // });
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id).subscribe((res: any) => {
                     if (!!res) {
                         this.saleMan.setValue(res);

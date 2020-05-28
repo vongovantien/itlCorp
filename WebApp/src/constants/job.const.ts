@@ -117,6 +117,28 @@ export class JobConstants {
                 id: "FCL/LCL-CY/CFS",
                 text: "FCL/LCL-CY/CFS"
             }
+        ],
+        BLNUMBERS: <CommonInterface.INg2Select[]>[
+            { id: '0', text: 'Zero (0)' },
+            { id: 1, text: 'One (1)' },
+            { id: 2, text: 'Two (2)' },
+            { id: 3, text: 'Three (3)' }]
+    };
+
+    public static CONFIG = {
+        COMBOGRID_PARTNER: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'shortName', label: 'Name ABBR' },
+            { field: 'partnerNameEn', label: 'Name EN' },
+            { field: 'taxCode', label: 'Tax Code' },
+        ],
+        COMBOGRID_PORT: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'code', label: 'Port Code' },
+            { field: 'nameEn', label: 'Port Name' },
+            { field: 'countryNameEN', label: 'Country' },
+        ],
+        COMBOGRID_COUNTRY: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'code', label: 'Country Code' },
+            { field: 'nameEn', label: 'Name EN' },
         ]
     };
 
