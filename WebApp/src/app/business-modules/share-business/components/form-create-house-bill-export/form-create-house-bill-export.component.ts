@@ -32,7 +32,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     get type() { return this._type; }
 
-    private _type: string = ChargeConstants.SLI_CODE; // SLE | SLI
+    private _type: string = ChargeConstants.SFE_CODE; // SLE | SFE
 
     formCreate: FormGroup;
     customer: AbstractControl;
@@ -271,7 +271,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             finalDestinationPlace: [],
             oceanVoyNo: [null, Validators.required],
             shipperDescription: [],
-            consigneeDescription: [null, Validators.required],
+            consigneeDescription: [null, this.type === ChargeConstants.SFE_CODE ? Validators.required : null],
             notifyPartyDescription: ['SAME AS CONSIGNEE'],
             bookingNo: [],
             goodsDeliveryDescription: [],
@@ -386,13 +386,6 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             strDescription = strDescription + "\nFax: " + fax;
         }
         return strDescription;
-    }
-
-    getDropdownData() {
-        this.serviceTypes = JobConstants.COMMON_DATA.SERVICETYPES;
-        this.ladingTypes = JobConstants.COMMON_DATA.BILLOFLADINGS;
-        this.termTypes = JobConstants.COMMON_DATA.FREIGHTTERMS;
-        this.typeOfMoves = JobConstants.COMMON_DATA.TYPEOFMOVES;
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {
@@ -527,7 +520,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             // * Listen Event.
             this.subscription = ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).onClick.subscribe(
                 (bookingNote: csBookingNote) => {
-                    const formData: IBookingNoteFormHBL = {
+                    const formData: IBookingNoteSyncFormHBL = {
                         bookingNo: bookingNote.bookingNo,
                         shipper: bookingNote.shipperId,
                         consignee: bookingNote.consigneeId,
@@ -554,7 +547,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     }
 }
 
-interface IBookingNoteFormHBL {
+interface IBookingNoteSyncFormHBL {
     shipper: string;
     consignee: string;
     bookingNo: string;
