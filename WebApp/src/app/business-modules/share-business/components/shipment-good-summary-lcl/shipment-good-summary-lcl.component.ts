@@ -9,7 +9,7 @@ import { SystemConstants } from 'src/constants/system.const';
 
 import * as fromStore from './../../store';
 
-import { catchError, skip } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'shipment-good-summary-lcl',
@@ -64,6 +64,15 @@ export class ShareBussinessShipmentGoodSummaryLCLComponent extends AppForm imple
                     }
                 }
             );
+
+        // * Listen event Select Booking Note
+        this._dataService.$data.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+            (data: { gw: number, cbm: number, commodity: string }) => {
+                this.gw = data.gw;
+                this.cbm = data.cbm;
+                this.commodities = data.commodity;
+            }
+        );
     }
 
     getPackage() {

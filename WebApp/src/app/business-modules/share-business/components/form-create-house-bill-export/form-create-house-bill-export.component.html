@@ -93,7 +93,13 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Booking No</label>
-                        <input type="text" class="form-control" formControlName="bookingNo">
+                        <div class="pos-rel">
+                            <input type="text" class="form-control" formControlName="bookingNo">
+                            <ng-container *ngIf="type === 'SLE'">
+                                <combo-grid-icon (onDropdown)="showBookingNote()"> </combo-grid-icon>
+                                <ng-template inject></ng-template>
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
