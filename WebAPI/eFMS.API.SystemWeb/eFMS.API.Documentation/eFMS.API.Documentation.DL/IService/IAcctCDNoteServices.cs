@@ -21,6 +21,6 @@ namespace eFMS.API.Documentation.DL.IService
         bool CheckAllowDelete(Guid cdNoteId);
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
         Crystal PreviewAir(PreviewCdNoteCriteria criteria);
-        IQueryable<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
+        List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
     }
 }
