@@ -23,10 +23,10 @@ namespace eFMS.API.Documentation.DL.Models
         public string AgentName { get; set; }
         public string QTy { get; set; }
         public short? PackageType { get; set; }
-        public string Cont20 { get; set; }
-        public string Cont40 { get; set; }
-        public string Cont40HC { get; set; }
-        public string Cont45 { get; set; }
+        public int? Cont20 { get; set; }
+        public int? Cont40 { get; set; }
+        public int? Cont40HC { get; set; }
+        public int? Cont45 { get; set; }
         public decimal? GW { get; set; }
         public decimal? CW { get; set; }
         public decimal? CBM { get; set; }

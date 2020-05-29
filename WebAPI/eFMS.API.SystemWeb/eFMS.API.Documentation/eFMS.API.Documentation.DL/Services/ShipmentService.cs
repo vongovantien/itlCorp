@@ -721,7 +721,16 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                data.TotalBuy = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + _totalBuyAmountKB;
+                if(data.TotalBuyKB > 0)
+                {
+                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyKB;
+                    data.TotalBuyOthers = 0;
+                }
+                else
+                {
+                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers;
+                }
+                //data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalSellOthers + _totalBuyAmountKB;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
 
@@ -1047,10 +1056,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("20") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("40") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("40´HC") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("45") ? house.PackageContainer.Substring(1) : string.Empty,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
@@ -1091,10 +1100,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("20") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("40") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("40HC") ? house.PackageContainer.Substring(1) : string.Empty,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) && house.PackageContainer.Contains("45") ? house.PackageContainer.Substring(1) : string.Empty,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
