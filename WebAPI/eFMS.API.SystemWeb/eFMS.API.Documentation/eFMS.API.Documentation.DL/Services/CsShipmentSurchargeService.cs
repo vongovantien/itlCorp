@@ -473,14 +473,36 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            var housebills = tranDetailRepository.Get(x => (x.Pod == criteria.POL || criteria.POL == null)
+            var housebills = tranDetailRepository.Get(x => (x.Pol == criteria.POL || criteria.POL == null)
                                                         && (x.Pod == criteria.POD || criteria.POD == null)
                                                         && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                                         && (x.ConsigneeId == criteria.ConsigneeId || string.IsNullOrEmpty(criteria.ConsigneeId))
                                                         && x.JobId == shipment.Id
                                                 ).Select(x => x.Id).ToList();
             if (housebills.Count == 0) return null;
-            var charges = DataContext.Get(x => housebills.Contains(x.Hblid) && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType)));
+            var charges = DataContext.Get(x => housebills.Contains(x.Hblid) 
+                            && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType))
+                            && (x.IsFromShipment == true))
+                            .Select(x => new CsShipmentSurcharge {
+                                Type = x.Type,
+                                ChargeId = x.ChargeId,
+                                Quantity = x.Quantity,
+                                QuantityType = x.QuantityType,
+                                UnitId = x.UnitId,
+                                UnitPrice = x.UnitPrice,
+                                CurrencyId = x.CurrencyId,
+                                IncludedVat = x.IncludedVat,
+                                Vatrate = x.Vatrate,
+                                Total = x.Total,
+                                PayerId = x.PayerId,
+                                ObjectBePaid = x.ObjectBePaid,
+                                PaymentObjectId = x.PaymentObjectId,
+                                ExchangeDate = x.ExchangeDate,
+                                Notes = x.Notes,
+                                IsFromShipment = true,
+                                TypeOfFee = x.TypeOfFee,
+                                KickBack = x.KickBack
+                            });
             if (charges.Select(x => x.Id).Count() == 0) return null;
             var results = charges.ProjectTo<CsShipmentSurchargeModel>(mapper.ConfigurationProvider);
             return results;
