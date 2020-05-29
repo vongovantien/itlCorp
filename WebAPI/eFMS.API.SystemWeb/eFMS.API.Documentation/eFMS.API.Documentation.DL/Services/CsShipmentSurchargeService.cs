@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -459,6 +460,30 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-        
+
+        public IQueryable<CsShipmentSurchargeModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
+        {
+            // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var shipment = csTransactionRepository.Get(x => x.PersonIncharge == criteria.PersonInCharge 
+                                                        && x.TransactionType == transactionType
+                                                        && x.Id != criteria.CurrentJobId)?.OrderByDescending(x => x.DatetimeCreated)?.FirstOrDefault();
+            if (shipment == null) return null;
+            if(criteria.ShippingLine != null && shipment.ColoaderId != criteria.ShippingLine)
+            {
+                return null;
+            }
+            var housebills = tranDetailRepository.Get(x => (x.Pod == criteria.POL || criteria.POL == null)
+                                                        && (x.Pod == criteria.POD || criteria.POD == null)
+                                                        && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                                        && (x.ConsigneeId == criteria.ConsigneeId || string.IsNullOrEmpty(criteria.ConsigneeId))
+                                                        && x.JobId == shipment.Id
+                                                ).Select(x => x.Id).ToList();
+            if (housebills.Count == 0) return null;
+            var charges = DataContext.Get(x => housebills.Contains(x.Hblid) && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType)));
+            if (charges.Select(x => x.Id).Count() == 0) return null;
+            var results = charges.ProjectTo<CsShipmentSurchargeModel>(mapper.ConfigurationProvider);
+            return results;
+        }
     }
 }

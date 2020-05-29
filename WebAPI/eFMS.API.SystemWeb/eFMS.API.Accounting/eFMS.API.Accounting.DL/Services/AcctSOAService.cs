@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
@@ -37,6 +38,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysOffice> officeRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
+        readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
 
@@ -59,7 +61,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatCommodityGroup> catCommodityGroup,
-            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<SysCompany> sysCompany) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -79,6 +82,7 @@ namespace eFMS.API.Accounting.DL.Services
             catCommodityRepo = catCommodity;
             catCommodityGroupRepo = catCommodityGroup;
             currencyExchangeService = currencyExchange;
+            sysCompanyRepo = sysCompany;
         }
 
         #region -- Insert & Update SOA
@@ -2114,6 +2118,140 @@ namespace eFMS.API.Accounting.DL.Services
 
             return dataResult;
         }
+
+        #region -- Preview --
+        public Crystal PreviewAccountStatementFull(string soaNo)
+        {
+            //SOANo: type charge is SELL or OBH-SELL (DEBIT)
+            //PaySOANo: type charge is BUY or OBH-BUY (CREDIT)
+            Crystal result = null;
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            if (soa == null) return null;
+            var chargesOfSOA = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
+            var partner = catPartnerRepo.Get(x => x.Id == soa.Customer).FirstOrDefault();
+
+            var soaCharges = new List<AccountStatementFullReport>();
+            foreach (var charge in chargesOfSOA)
+            {
+                string _mawb = string.Empty;
+                string _hwbNo = string.Empty;
+                string _customNo = string.Empty;
+                #region -- Info MBL, HBL --
+                var ops = opsTransactionRepo.Get(x => x.Hblid == charge.Hblid).FirstOrDefault();
+                if (ops != null)
+                {
+                    _mawb = ops.Mblno;
+                    _hwbNo = ops.Hwbno;
+                    _customNo = GetTopClearanceNoByJobNo(ops.JobNo);
+                } 
+                else
+                {
+                    var houseBillDoc = csTransactionDetailRepo.Get(x => x.Id == charge.Hblid).FirstOrDefault();
+                    if (houseBillDoc != null)
+                    {
+                        _hwbNo = houseBillDoc.Hwbno;
+                        var masterBillDoc = csTransactionRepo.Get(x => x.Id == houseBillDoc.JobId).FirstOrDefault();
+                        if (masterBillDoc != null)
+                        {
+                            _mawb = masterBillDoc.Mawb;
+                            _customNo = GetTopClearanceNoByJobNo(masterBillDoc.JobNo);
+                        }
+                    }
+                }
+                #endregion -- Info MBL, HBL --
+
+                #region -- Info CD Note --
+                var cdNote = acctCdnoteRepo.Get(x => x.Code == charge.DebitNo || x.Code == charge.CreditNo).FirstOrDefault();
+                #endregion -- Info CD Note --
+
+                // Exchange Rate from currency charge to current soa
+                var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, soa.Currency?.Trim());
+                var _amount = charge.Total * exchangeRate;
+                var soaCharge = new AccountStatementFullReport();
+                soaCharge.PartnerID = partner?.Id;
+                soaCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En
+                soaCharge.PersonalContact = partner?.ContactPerson?.ToUpper();
+                soaCharge.Email = string.Empty; //NOT USE
+                soaCharge.Address = partner?.AddressEn?.ToUpper(); //Address En 
+                soaCharge.Workphone = partner?.WorkPhoneEx;
+                soaCharge.Fax = string.Empty; //NOT USE
+                soaCharge.Taxcode = string.Empty; //NOT USE
+                soaCharge.TransID = string.Empty; //NOT USE
+                soaCharge.MAWB = _mawb; //MBLNo
+                soaCharge.HWBNO = _hwbNo; //HBLNo
+                soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
+                soaCharge.Order = string.Empty; //NOT USE
+                soaCharge.InvID = cdNote?.Code; //CD Note Code
+                soaCharge.Amount = _amount;
+                soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
+                soaCharge.Dpt = !string.IsNullOrEmpty(soa.Soano) ? true : false; //Is Debit charge?
+                soaCharge.Vessel = string.Empty; //NOT USE
+                soaCharge.Routine = string.Empty; //NOT USE
+                soaCharge.LoadingDate = null; //NOT USE
+                soaCharge.CustomerID = string.Empty; //NOT USE
+                soaCharge.CustomerName = string.Empty; //NOT USE
+                soaCharge.ArrivalDate = null; //NOT USE
+                soaCharge.TpyeofService = string.Empty; //NOT USE
+                soaCharge.SOANO = string.Empty; //NOT USE
+                soaCharge.SOADate = null; //NOT USE
+                soaCharge.FromDate = null; //NOT USE
+                soaCharge.ToDate = null; //NOT USE
+                soaCharge.OAmount = null; //NOT USE
+                soaCharge.SAmount = null; //NOT USE
+                soaCharge.CurrOP = string.Empty; //NOT USE
+                soaCharge.Notes = string.Empty; //NOT USE
+                soaCharge.IssuedBy = string.Empty; //NOT USE
+                soaCharge.Shipper = string.Empty; //NOT USE
+                soaCharge.Consignee = string.Empty; //NOT USE
+                soaCharge.OtherRef = string.Empty; //NOT USE
+                soaCharge.Volumne = string.Empty; //NOT USE
+                soaCharge.POBH = null; //NOT USE
+                soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
+                soaCharge.CustomNo = _customNo;
+
+                soaCharges.Add(soaCharge);
+            }
+
+            //Info Company, Office of User Created SOA
+            //var company = sysCompanyRepo.Get(x => x.Id == soa.CompanyId).FirstOrDefault();
+            var office = officeRepo.Get(x => x.Id == soa.OfficeId).FirstOrDefault();
+
+            var parameter = new AccountStatementFullReportParams();
+            parameter.UptoDate = soa.SoaformDate?.ToString("dd/MM/yyyy") ?? string.Empty; //From To SOA
+            parameter.dtPrintDate = soa.DatetimeCreated?.ToString("dd/MM/yyyy") ?? string.Empty; //Created Date SOA
+            parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
+            parameter.CompanyDescription = string.Empty; //NOT USE
+            parameter.CompanyAddress1 = office?.AddressEn;
+            parameter.CompanyAddress2 = string.Format(@"Tel: {0} Fax: {1}", office?.Tel, office?.Fax);
+            parameter.Website = string.Empty; //Office ko có field Website
+            parameter.IbanCode = string.Empty; //NOT USE
+            parameter.AccountName = office?.BankAccountNameEn?.ToUpper() ?? string.Empty;
+            parameter.AccountNameEn = office?.BankAccountNameVn?.ToUpper() ?? string.Empty;
+            parameter.BankName = office?.BankNameLocal?.ToUpper() ?? string.Empty;
+            parameter.BankNameEn = office?.BankNameEn?.ToUpper() ?? string.Empty;
+            parameter.SwiftAccs = office?.SwiftCode ?? string.Empty;
+            parameter.AccsUSD = office?.BankAccountUsd ?? string.Empty;
+            parameter.AccsVND = office?.BankAccountVnd ?? string.Empty;
+            parameter.BankAddress = office?.BankAddressLocal?.ToUpper() ?? string.Empty;
+            parameter.BankAddressEn = office?.BankAddressEn?.ToUpper() ?? string.Empty;
+            parameter.Paymentterms = string.Empty; //NOT USE
+            parameter.Contact = currentUser.UserName?.ToUpper() ?? string.Empty;
+            parameter.CurrDecimalNo = 3;
+            parameter.RefNo = soa?.Soano; //SOA No
+            parameter.Email = office?.Email ?? string.Empty;
+
+            result = new Crystal
+            {
+                ReportName = "AccountStatement_Full.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(soaCharges);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+        #endregion -- Preview --
 
     }
 }

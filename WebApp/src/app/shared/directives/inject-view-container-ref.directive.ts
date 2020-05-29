@@ -4,6 +4,6 @@ import { Directive, ViewContainerRef } from '@angular/core';
     selector: '[inject]'
 })
 export class InjectViewContainerRefDirective {
-    constructor(private viewContainerRef: ViewContainerRef) {
+    constructor(public viewContainerRef: ViewContainerRef) {
     }
 }

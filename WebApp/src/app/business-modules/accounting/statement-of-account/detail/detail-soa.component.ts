@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
@@ -7,12 +7,13 @@ import { SOA } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ReportPreviewComponent } from '@common';
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
 })
 export class StatementOfAccountDetailComponent extends AppList {
-
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
 
@@ -22,6 +23,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     isClickSubMenu: boolean = false;
 
     dataExportSOA: ISOAExport;
+    dataReport: any = null;
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -48,6 +50,7 @@ export class StatementOfAccountDetailComponent extends AppList {
             { title: 'Debit', field: 'debit', sortable: true },
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'C/D Note', field: 'cdNote', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
@@ -160,6 +163,28 @@ export class StatementOfAccountDetailComponent extends AppList {
                         this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
                     } else {
                         this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
+    previewAccountStatementFull(soaNo: string) {
+        this._progressRef.start();
+        this._accoutingRepo.previewAccountStatementFull(soaNo)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );

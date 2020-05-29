@@ -376,6 +376,12 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+
+    previewAccountStatementFull(soaNo: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/PreviewAccountStatementFull`, {}, { soaNo: soaNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

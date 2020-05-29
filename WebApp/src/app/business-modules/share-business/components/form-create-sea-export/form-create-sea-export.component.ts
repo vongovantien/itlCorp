@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -8,22 +8,31 @@ import { Customer } from 'src/app/shared/models/catalogue/customer.model';
 import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { User, CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
+import { User, csBookingNote, CsTransaction } from 'src/app/shared/models';
 
 import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getCatalogueCarrierLoadingState, getCatalogueAgentLoadingState, getCataloguePortLoadingState } from '@store';
-import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from '@validators';
-
+import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
+import { AppComboGridComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { DataService } from '@services';
 @Component({
     selector: 'form-create-sea-export',
     templateUrl: './form-create-sea-export.component.html'
 })
 
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
+
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
+    @Input() set type(t: string) { console.log(t); this._type = t; }
+
+    get type() { return this._type; }
+
+    private _type: string = ChargeConstants.SLI_CODE;
 
     formGroup: FormGroup;
     etd: AbstractControl;
@@ -44,7 +53,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
-
+    csBookingNotes: csBookingNote[] = [];
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -58,24 +67,17 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         { field: 'countryNameEN', label: 'Country' },
     ];
 
-    serviceTypes: CommonInterface.INg2Select[] = [];
+    displayFieldBookingNote: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'bookingNo', label: 'Booking No' },
+    ];
 
-    ladingTypes: CommonInterface.INg2Select[] = [
-        { id: 'Copy', text: 'Copy' },
-        { id: 'Original', text: 'Original' },
-        { id: 'Sea Waybill', text: 'Sea Waybill' },
-        { id: 'Surrendered', text: 'Surrendered' },
-    ];
-    shipmentTypes: CommonInterface.INg2Select[] = [
-        { id: 'Freehand', text: 'Freehand' },
-        { id: 'Nominated', text: 'Nominated' }
-    ];
-    termTypes: CommonInterface.INg2Select[] = [
-        { id: "Collect", text: "Collect" },
-        { id: "Prepaid", text: "Prepaid" }
-    ];
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     userLogged: User;
+
     isLoadingPort: Observable<boolean>;
     isLoadingAgent: Observable<boolean>;
     isLoadingCarrier: Observable<boolean>;
@@ -85,8 +87,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         private _fb: FormBuilder,
         private _store: Store<fromShare.IShareBussinessState>,
         private _route: ActivatedRoute,
-        private _systemRepo: SystemRepo
-
+        private _systemRepo: SystemRepo,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -107,9 +109,11 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
         this.isLoadingCarrier = this._store.select(getCatalogueCarrierLoadingState);
 
-
         this.getUserLogged();
-        this.getServices();
+
+        if (this.type === ChargeConstants.SLE_CODE) {
+            this.getBookingNotes();
+        }
 
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
@@ -131,7 +135,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
-
 
                                 mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
                                 typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
@@ -230,14 +233,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.personalIncharge.disable();
     }
 
-    getServices() {
-        this._documentRepo.getShipmentDataCommon().subscribe(
-            (commonData: any) => {
-                this.serviceTypes = this.utility.prepareNg2SelectData(commonData.serviceTypes, 'value', 'displayName');
-            }
-        );
-    }
-
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
@@ -256,6 +251,67 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                 break;
         }
     }
+
+    getBookingNotes() {
+        this._documentRepo.getBookingNoteSeaLCLExport().subscribe(
+            (res: csBookingNote[]) => {
+                this.csBookingNotes = res;
+            }
+        );
+    }
+
+    showBookingNote() {
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.bookingNoteContainerRef.viewContainerRef);
+
+        if (!!this.componentRef) {
+            this.componentRef.instance.headers = <CommonInterface.IHeaderTable[]>[{ title: 'Booking Note', field: 'bookingNo' }];
+            this.componentRef.instance.data = this.csBookingNotes;
+            this.componentRef.instance.fields = ['bookingNo'];
+
+            // * Listen Event.
+            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).onClick.subscribe(
+                (bookingNote: csBookingNote) => {
+
+                    const formData: IBookingNoteFormData = {
+                        bookingNo: bookingNote.bookingNo,
+                        eta: !!bookingNote.eta ? { startDate: new Date(bookingNote.eta), endDate: new Date(bookingNote.eta) } : null,
+                        etd: !!bookingNote.etd ? { startDate: new Date(bookingNote.etd), endDate: new Date(bookingNote.etd) } : null,
+                        pol: bookingNote.pol,
+                        pod: bookingNote.pod,
+                        term: [{ id: bookingNote.paymentTerm, text: bookingNote.paymentTerm }],
+                        flightVesselName: bookingNote.vessel,
+                        voyNo: bookingNote.voy
+                    };
+
+                    this.formGroup.patchValue(formData);
+
+                    // * FIRE DATA FOR SHIPMENT GOOD SUMMARY LCL.
+                    this._dataService.$data.next({ cbm: bookingNote.cbm, gw: bookingNote.gw, commodity: bookingNote.commodity });
+
+                    this.subscription.unsubscribe();
+                    this.bookingNoteContainerRef.viewContainerRef.clear();
+                });
+
+            ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        this.bookingNoteContainerRef.viewContainerRef.clear();
+                    }
+                );
+        }
+    }
+}
+
+interface IBookingNoteFormData {
+    bookingNo: string;
+    eta: any;
+    etd: any;
+    pol: string;
+    pod: string;
+    term: CommonInterface.INg2Select[];
+    flightVesselName: string;
+    voyNo: string;
 }
 
 

@@ -840,12 +840,17 @@ export class DocumentationRepo {
     }
 
     getBookingNoteSeaLCLExport(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/paging`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsBookingNote/Query`, body, {});
+        }
+
     }
 
     deleteBookingNoteSeaLCLExport(id: string) {
