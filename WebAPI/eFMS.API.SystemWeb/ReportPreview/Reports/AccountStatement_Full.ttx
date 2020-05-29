@@ -1,0 +1,40 @@
+PartnerID	String	50	
+PartnerName	String	150	
+PersonalContact	String	150	
+Email	String	150	
+Address	String	255	
+Workphone	String	255	
+Fax	String	255	
+Taxcode	String	50	
+TransID	String	50	
+MAWB	String	50	
+HWBNO	Memo	50	
+DateofInv	String	50	
+Order	String	255	
+InvID	String	50	
+Amount	Number	
+Curr	String	50	
+Dpt	Boolean	
+Vessel	String	255	
+Routine	String	255	
+LoadingDate	DateTime	
+CustomerID	String	255	
+CustomerName	String	255	
+ArrivalDate	DateTime	
+TpyeofService	String	50	
+SOANO	String	255	
+SOADate	DateTime	
+FromDate	DateTime	
+ToDate	DateTime	
+OAmount	Number	
+SAmount	Number	
+CurrOP	String	255	
+Notes	String	255	
+IssuedBy	String	255	
+Shipper	String	255	
+Consignee	String	255	
+OtherRef	String	255	
+Volumne	String	255	
+POBH	Number	
+ROBH	Number	
+CustomNo	String	255	

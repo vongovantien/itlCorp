@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -58,7 +59,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         SOAOPSModel GetSOAOPS(string soaNo);
 
-
+        Crystal PreviewAccountStatementFull(string soaNo);
 
     }
 }

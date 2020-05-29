@@ -104,8 +104,7 @@
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }"
-                                    (clickOutside)="handleClickOutSideComboGrid(i,'partner')">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <input type="text" class="dropdown-toggle form-control" readonly
                                         [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
                                         [disabled]="isShowLoadingPartner ? 'disabled': null"

@@ -367,5 +367,19 @@ namespace eFMS.API.Accounting.Controllers
             return data;
         }
 
+        /// <summary>
+        /// Preview Account Statement Full By SOA No
+        /// </summary>
+        /// <param name="soaNo">Soa No</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PreviewAccountStatementFull")]
+        [Authorize]
+        public IActionResult PreviewAccountStatementFull(string soaNo)
+        {
+            var result = acctSOAService.PreviewAccountStatementFull(soaNo);
+            return Ok(result);
+        }
+
     }
 }

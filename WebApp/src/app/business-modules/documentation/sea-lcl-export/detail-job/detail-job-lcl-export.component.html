@@ -61,7 +61,7 @@
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
 
-                <form-create-sea-export>
+                <form-create-sea-export type="SLE">
                     <ng-container *ngIf="!!shipmentDetail">
                         <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
                             [userCreated]="shipmentDetail.userNameCreated"

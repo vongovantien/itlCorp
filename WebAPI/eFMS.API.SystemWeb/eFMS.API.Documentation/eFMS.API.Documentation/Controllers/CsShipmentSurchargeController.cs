@@ -295,6 +295,22 @@ namespace eFMS.API.Documentation.Controllers
 
             return dataSearch;
         }
+
+        /// <summary>
+        /// get recently charges
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetRecentlyCharges")]
+        public IActionResult GetRecentlyCharges(RecentlyChargeCriteria criteria)
+        {
+            if( criteria.PersonInCharge == null)
+            {
+                return Ok(null);
+            }
+            var results = csShipmentSurchargeService.GetRecentlyCharges(criteria);
+            return Ok(results);
+        }
     }
 }
 
