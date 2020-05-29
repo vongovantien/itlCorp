@@ -122,6 +122,6 @@ export class SystemConstants {
         TIME_MASK: [/\d/, /\d/, ':', /\d/, /\d/],
         DATE_MASK: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
         DATETIME_MASK: [/\d/, /\d/, ':', /\d/, /\d/, ' ', /\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
-        NUMBER_MASK: [/^\d+$/]
+        NUMERIC: /[^0-9.]+/g
     };
 }
