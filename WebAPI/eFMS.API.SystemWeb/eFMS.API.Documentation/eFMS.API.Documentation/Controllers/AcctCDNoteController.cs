@@ -5,6 +5,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -158,6 +159,14 @@ namespace eFMS.API.Documentation.Controllers
         {
             var result = cdNoteServices.PreviewAir(criteria);
             return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(CDNoteCriteria criteria, int page, int size)
+        {
+            var results = cdNoteServices.Paging(criteria, page, size, out int rowsCount);
+            return Ok(results);
         }
     }
 }
