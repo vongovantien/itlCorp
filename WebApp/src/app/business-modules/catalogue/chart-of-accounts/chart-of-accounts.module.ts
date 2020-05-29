@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { ChartOfAccountsComponent } from './chart-of-accounts.component';
 import { FormSearchChartOfAccountsComponent } from './components/form-search-chart-of-accounts/form-search-chart-of-accounts.component';
 import { FormCreateChartOfAccountsPopupComponent } from './components/form-create-chart-of-accounts/form-create-chart-of-accounts.popup';
+import { ChartOfAccountsImportComponent } from './chart-of-accounts-import/chart-of-accounts-import.component';
 
 
 const routing: Routes = [
@@ -19,6 +20,7 @@ const routing: Routes = [
     },
     {
 
+        path: 'import', component: ChartOfAccountsImportComponent, data: { name: "Import" }
     },
     {
 
@@ -49,7 +51,8 @@ const config: LocaleConfig = {
     declarations: [
         FormSearchChartOfAccountsComponent,
         FormCreateChartOfAccountsPopupComponent,
-        ChartOfAccountsComponent
+        ChartOfAccountsComponent,
+        ChartOfAccountsImportComponent
     ],
     providers: [],
 })

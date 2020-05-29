@@ -19,8 +19,11 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Update(CatChartOfAccounts model);
         HandleState Delete(Guid idAcc);
         CatChartOfAccountsModel GetDetail(Guid id);
+        List<CatChartOfAccountsImportModel> CheckValidImport(List<CatChartOfAccountsImportModel> list);
         bool CheckAllowDelete(Guid id);
         bool CheckAllowViewDetail(Guid id);
+        HandleState Import(List<CatChartOfAccountsImportModel> data);
+        IQueryable<CatChartOfAccounts> QueryExport(CatChartOfAccountsCriteria criteria);
 
 
 

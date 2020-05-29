@@ -110,5 +110,16 @@
         public static readonly string MSG_STAGE_CODE_DUPLICATE = "MSG_STAGE_CODE_DUPLICATE";
         public static readonly string MSG_STAGE_STATUS_EMPTY = "MSG_STAGE_STATUS_EMPTY";
         #endregion
+        #region Chart Of Accounts
+        public static readonly string MSG_CHART_CODE_EMPTY = "MSG_CHART_CODE_EMPTY";
+        public static readonly string MSG_CHART_NAME_LOCAL_EMPTY = "MSG_CHART_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_CHART_NAME_EN_EMPTY = "MSG_CHART_NAME_EN_EMPTY";
+        public static readonly string MSG_CHART_STATUS_NOT_VALID = "MSG_CHART_STATUS_NOT_VALID";
+        public static readonly string MSG_CHART_CODE_EXISTED = "MSG_CHART_CODE_EXISTED";
+
+
+
+
+        #endregion
     }
 }

@@ -12,6 +12,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using ITL.NetCore.Connection.BL;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Common;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -27,12 +35,14 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatChartOfAccountsService catChartAccountsService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public CatChartOfAccountsController(IStringLocalizer<LanguageSub> localizer, ICatChartOfAccountsService service, ICurrentUser user)
+        public CatChartOfAccountsController(IStringLocalizer<LanguageSub> localizer, ICatChartOfAccountsService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catChartAccountsService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpPost("Query")]
@@ -97,6 +107,86 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet("downloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+
+            try
+            {
+                string fileName = Templates.CatChartOfAccounts.ExelImportFileName + Templates.ExelImportEx;
+                string templateName = _hostingEnvironment.ContentRootPath;
+                var result = await new FileHelper().ExportExcel(templateName, fileName);
+                if (result != null)
+                {
+                    return result;
+                }
+                else
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CatChartOfAccountsImportModel> data)
+        {
+            var hs = catChartAccountsService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("UpLoadFile")]
+        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CatChartOfAccountsImportModel> list = new List<CatChartOfAccountsImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var acc = new CatChartOfAccountsImportModel
+                    {
+                        IsValid = true,
+                        AccountCode  = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        AccountNameLocal = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        AccountNameEn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 4].Value?.ToString().Trim()
+                    };
+                    list.Add(acc);
+                }
+                var data = catChartAccountsService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+
+        }
+
+        [HttpPost]
+        [Route("QueryExport")]
+        [Authorize]
+        public IActionResult QueryExport(CatChartOfAccountsCriteria criteria)
+        {
+            var results = catChartAccountsService.QueryExport(criteria);
+            return Ok(results);
         }
 
         [HttpGet("CheckAllowDelete/{id}")]

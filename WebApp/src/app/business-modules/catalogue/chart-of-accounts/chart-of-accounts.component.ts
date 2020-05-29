@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from '@services';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
@@ -26,7 +26,7 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
-        private _router: Router) {
+        private _exportRepo: ExportRepo) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchChart;
@@ -105,7 +105,6 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
             );
     }
 
-
     onSearchCharge(dataSearch: any) {
         this.dataSearch = {};
         if (dataSearch.type === 'All') {
@@ -160,10 +159,18 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
             );
     }
 
-
-
     resetSearch(event: any) {
         this.dataSearch = {};
         this.searchChart();
     }
+
+    export() {
+        this._exportRepo.exportChartOfAccounts(this.dataSearch)
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", 'ChartOfAccounts.xlsx');
+                },
+            );
+    }
+
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -105,12 +105,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     var hs = DataContext.Update(model, x => x.Id == model.Id);
                     accTrans.Commit();
-                    if (hs.Success)
-                    {
-                        ClearCache();
-                        Get();
-
-                    }
                     return hs;
 
                 }
@@ -122,6 +116,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 finally
                 {
+                    ClearCache();
+                    Get();
                     accTrans.Dispose();
                 }
             }
@@ -157,8 +153,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (hs.Success)
                     {
                         accTrans.Commit();
-                        ClearCache();
-                        Get();
                     }
                     else
                     {
@@ -174,11 +168,138 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 finally
                 {
+                    ClearCache();
+                    Get();
                     accTrans.Dispose();
                 }
             }
         }
 
+        public List<CatChartOfAccountsImportModel> CheckValidImport(List<CatChartOfAccountsImportModel> list)
+        {
+            list.ForEach(item =>
+            {
+                //check empty account code
+                if (string.IsNullOrEmpty(item.AccountCode))
+                {
+                    item.AccountCodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (DataContext.Any(x => x.AccountCode == item.AccountCode))
+                    {
+                        item.AccountCodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_CODE_EXISTED, item.AccountCode];
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.AccountNameLocal))
+                {
+                    item.AccountNameLocalError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_NAME_LOCAL_EMPTY];
+                    item.IsValid = false;
+                }
+
+                if (string.IsNullOrEmpty(item.AccountNameEn))
+                {
+                    item.AccountNameEnError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_NAME_EN_EMPTY];
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.Status) && item.Status?.ToLower() != "active" && item.Status?.ToLower() != "inactive")
+                {
+                    item.StatusError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_STATUS_NOT_VALID, item.Status];
+                    item.IsValid = false;
+                }
+            });
+            return list;
+        }
+
+        public HandleState Import(List<CatChartOfAccountsImportModel> data)
+        {
+            try
+            {
+                var chartOfAccounts = new List<CatChartOfAccounts>();
+                foreach (var item in data)
+                {
+                    var chart = mapper.Map<CatChartOfAccounts>(item);
+                    bool active = false; 
+                    if(item.Status?.ToLower() == "active")
+                    {
+                        active = true;
+                    }
+                    else if (item.Status?.ToLower() == "inactive")
+                    {
+                        active = false;
+                    }
+                    else
+                    {
+                        active = false;
+                    }
+                    chart.UserCreated = currentUser.UserID;
+                    chart.DatetimeModified = DateTime.Now;
+                    chart.DatetimeCreated = DateTime.Now;
+                    chart.Id = Guid.NewGuid();
+                    chart.Active = active;
+                    chart.CompanyId = currentUser.CompanyID;
+                    chart.OfficeId = currentUser.OfficeID;
+                    chart.GroupId = currentUser.GroupId;
+                    chart.DepartmentId = currentUser.DepartmentId;
+                    chartOfAccounts.Add(chart);
+                }
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(chartOfAccounts);
+                        if (hs.Success)
+                        {
+                            if (hs.Success)
+                            {
+                                trans.Commit();
+                            }
+                            else
+                            {
+                                trans.Rollback();
+                            }
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        ClearCache();
+                        Get();
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public IQueryable<CatChartOfAccounts> QueryExport(CatChartOfAccountsCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if(rangeSearch == 0)  return null; 
+
+            IQueryable<CatChartOfAccounts> data = Query(criteria);
+            if (data == null) return null;
+
+            IQueryable<CatChartOfAccounts> dataPermission = null;
+            dataPermission = QueryByPermission(data, rangeSearch);
+            return dataPermission?.OrderByDescending(x=>x.DatetimeModified);
+        }
+        
         public CatChartOfAccountsModel GetDetail(Guid id)
         {
             var queryDetail = Get(x => x.Id == id).FirstOrDefault();
@@ -281,17 +402,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         #endregion
 
-        public IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount)
+        private IQueryable<CatChartOfAccounts> QueryByPermission(IQueryable<CatChartOfAccounts> data , PermissionRange range)
         {
-            var data = Query(criteria);
-            if (data == null)
-            {
-                rowsCount = 0;
-                return null;
-            }
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            switch (rangeSearch)
+            switch (range)
             {
                 case PermissionRange.None:
                     data = null;
@@ -314,7 +427,26 @@ namespace eFMS.API.Catalogue.DL.Services
                     data = data.Where(x => x.CompanyId == currentUser.CompanyID);
                     break;
             }
-            rowsCount = data.Select(x => x.Id).Count();
+            return data;
+        }
+
+        public IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catChartOfAccounts);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if(rangeSearch == 0)
+            {
+                rowsCount = 0;
+                return null;
+            }
+            var data = Query(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+            IQueryable<CatChartOfAccounts> dataPermission = QueryByPermission(data, rangeSearch);
+            rowsCount = dataPermission.Select(x => x.Id).Count();
             if (rowsCount == 0)
             {
                 return null;
@@ -326,7 +458,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     page = 1;
                 }
-                results = data.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).AsQueryable();
+                results = dataPermission.OrderByDescending(x => x.DatetimeModified).Skip((page - 1) * size).Take(size).AsQueryable();
             }
             return results;
         }
@@ -335,7 +467,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var data = chartRepository.Get();
             bool? active = null;
-  
+
             if (criteria.All == null)
             {
                 if (criteria.Active?.ToLower() == "active")

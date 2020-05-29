@@ -262,8 +262,22 @@ export class CatalogueRepo {
         );
     }
 
+    downloadChartOfAccounts() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatChartOfAccounts/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
+    upLoadChartOfAccountsFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/UploadFile`, files, "uploadedFile");
+    }
 
+    importChartOfAccounts(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatChartOfAccounts/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 
     getListChartOfAccounts(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/paging`, body, {

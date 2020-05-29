@@ -1,6 +1,9 @@
 <app-sub-header>
     <div class="c-button-actions">
         <app-permission-button (onClick)="showAdd()" type="add" title="Add New"></app-permission-button>
+        <app-permission-button routerLink="/home/catalogue/chart-of-accounts/import" title="Import" type="import">
+        </app-permission-button>
+        <app-permission-button type="export" (onClick)="export()" title="Export"></app-permission-button>
     </div>
 </app-sub-header>
 <div class="m-content">
@@ -81,5 +84,5 @@
     </div>
 </div>
 <form-create-chart-of-accounts-popup (onChange)="resetSearch($event)"></form-create-chart-of-accounts-popup>
-<confirm-popup body="You want to delete this currency" (onSubmit)="onDelete()"></confirm-popup>
+<confirm-popup body="You want to delete this chart" (onSubmit)="onDelete()"></confirm-popup>
 <permission-403-popup></permission-403-popup>
