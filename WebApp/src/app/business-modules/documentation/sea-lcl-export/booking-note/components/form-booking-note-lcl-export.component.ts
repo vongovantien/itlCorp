@@ -7,6 +7,7 @@ import { Customer, PortIndex } from '@models';
 import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'form-booking-note-lcl-export',
@@ -37,22 +38,9 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     consignees: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
-
-    termTypes: CommonInterface.INg2Select[] = [
-        { id: 'Prepaid', text: 'Prepaid' },
-        { id: 'Collect', text: 'Collect' },
-    ];
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -64,7 +52,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     ngOnInit() {
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR, active: true });
 
         this.initForm();
     }
