@@ -173,7 +173,7 @@ namespace eFMS.API.Documentation.DL.Services
                            && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate)
                            && (x.CreatedDate.Value.Date <= criteria.ToDate) || criteria.FromDate == null || criteria.ToDate == null)
               );
-        
+
             }
             else
             {
@@ -184,7 +184,7 @@ namespace eFMS.API.Documentation.DL.Services
                      || (x.POLName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.PODName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                      || (x.CreatorName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                     && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) && (x.CreatedDate.Value.Date <= criteria.ToDate ) || criteria.FromDate == null || criteria.ToDate == null)
+                     && ((x.CreatedDate.HasValue && x.CreatedDate.Value.Date >= criteria.FromDate) && (x.CreatedDate.Value.Date <= criteria.ToDate) || criteria.FromDate == null || criteria.ToDate == null)
                     );
             }
             lstBookingNotes = lstBookingNotes.OrderByDescending(x => x.DatetimeModified);
@@ -219,14 +219,25 @@ namespace eFMS.API.Documentation.DL.Services
                         ShipperName = shipper.ShortName,
                         JobId = bookingNote.JobId,
                         ConsigneeName = consignee.ShortName,
+                        ConsigneeId = consignee.Id,
+                        ShipperId = shipper.Id,
+                        Pol = pol.Id,
+                        Pod = pod.Id,
                         Etd = bookingNote.Etd,
                         Eta = bookingNote.Eta,
                         POLName = pol.NameEn,
                         PODName = pod.NameEn,
                         Gw = bookingNote.Gw,
                         Cbm = bookingNote.Cbm,
+                        Vessel = bookingNote.Vessel,
+                        Voy = bookingNote.Voy,
+                        PaymentTerm = bookingNote.PaymentTerm,
+                        Commodity = bookingNote.Commodity,
                         CreatorName = creator.Username,
-                        CreatedDate = bookingNote.CreatedDate
+                        CreatedDate = bookingNote.CreatedDate,
+                        PlaceOfDelivery = bookingNote.PlaceOfDelivery,
+                        ShipperDescription = bookingNote.ShipperDescription,
+                        ConsigneeDescription = bookingNote.ConsigneeDescription
                     };
             return query;
         }
@@ -297,7 +308,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.Deliveryat = data.PlaceOfStuffing?.ToUpper(); //Place Of Stuffing
             bookingNote.ServiceMode = data.ServiceRequired?.ToUpper(); //Service Requeired
             bookingNote.SC = data.Contact?.ToUpper(); //Contact
-            
+
             var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
             if (dataPOL != null)
             {
@@ -305,7 +316,7 @@ namespace eFMS.API.Documentation.DL.Services
                 bookingNote.PortofLading = dataPOL?.NameEn + (!string.IsNullOrEmpty(polCountry) ? ", " + polCountry : string.Empty);
                 bookingNote.PortofLading = bookingNote.PortofLading?.ToUpper();
             }
-            
+
             var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
             if (dataPOD != null)
             {

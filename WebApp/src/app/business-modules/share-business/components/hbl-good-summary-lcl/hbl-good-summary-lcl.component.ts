@@ -150,7 +150,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         });
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
-            cont: container.containerTypeName || '',
+            cont: container.description || '',
             quantity: container.quantity
         }));
 

@@ -1896,11 +1896,11 @@ namespace eFMS.API.Documentation.DL.Services
 
         public string GenerateHBLNoSeaExport(string podCode)
         {
-            if(string.IsNullOrEmpty(podCode))
+            if(string.IsNullOrEmpty(podCode) || podCode == "null")
             {
                 return null;
             }
-            string keyword = (string.IsNullOrEmpty(podCode) ? "" : podCode)  + DateTime.Now.ToString("yyMM");
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode)  + DateTime.Now.ToString("yyMM");
             string hbl = "ITL" + keyword;
 
             var codes = DataContext.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno);
