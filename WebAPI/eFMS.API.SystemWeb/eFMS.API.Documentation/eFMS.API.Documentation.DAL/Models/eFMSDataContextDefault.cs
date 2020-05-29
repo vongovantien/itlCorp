@@ -1516,6 +1516,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AcctManagementId).HasColumnName("AcctManagementID");
+
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
                 entity.Property(e => e.Cdclosed)
