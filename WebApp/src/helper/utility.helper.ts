@@ -1,4 +1,6 @@
 import { SystemConstants } from "src/constants/system.const";
+import { ChargeConstants } from "@constants";
+import { CommonEnum } from "@enums";
 
 export class UtilityHelper {
     prepareNg2SelectData(dataSource: any[], id: any, text: any): CommonInterface.INg2Select[] {
@@ -144,5 +146,18 @@ export class UtilityHelper {
                 return num;
             }
         }
+    }
+
+    getTransationType(type: string) {
+        return new Map([
+            [ChargeConstants.AE_CODE, [CommonEnum.TransactionTypeEnum.AirExport]],
+            [ChargeConstants.AI_CODE, [CommonEnum.TransactionTypeEnum.AirImport]],
+            [ChargeConstants.SFE_CODE, [CommonEnum.TransactionTypeEnum.SeaFCLExport]],
+            [ChargeConstants.SFI_CODE, [CommonEnum.TransactionTypeEnum.SeaFCLImport]],
+            [ChargeConstants.SLE_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLExport]],
+            [ChargeConstants.SLI_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLImport]],
+            [ChargeConstants.CL_CODE, [CommonEnum.TransactionTypeEnum.CustomLogistic]],
+            [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
+        ]).get(type)[0];
     }
 }
