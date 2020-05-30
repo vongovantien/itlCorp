@@ -892,4 +892,10 @@ export class DocumentationRepo {
     getDetailCsBookingNote(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsBookingNote/${id}`);
     }
+
+    getRecentlyCharges(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GetRecentlyCharges`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
