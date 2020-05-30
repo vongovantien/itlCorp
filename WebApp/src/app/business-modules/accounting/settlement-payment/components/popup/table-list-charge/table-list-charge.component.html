@@ -155,7 +155,7 @@
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
                                                 <input type="number" class="form-control" [(ngModel)]="charge.vatrate"
                                                     (ngModelChange)="calculateTotal($event,charge.quantity,charge.unitPrice, charge)"
-                                                    placeholder="%" max="100" numeric [decimals]="digitDecimal">
+                                                    placeholder="%">
                                             </div>
                                         </td>
                                         <td class="disabled">
