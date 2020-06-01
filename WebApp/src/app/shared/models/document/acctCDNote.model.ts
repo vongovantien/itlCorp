@@ -43,4 +43,5 @@ export class AcctCDNote {
   listShipmentSurcharge: CsShipmentSurcharge[] = [];
   transactionTypeEnum: TransactionTypeEnum = 0;
   flexId: string = null;
+  status: string = null;
 }
