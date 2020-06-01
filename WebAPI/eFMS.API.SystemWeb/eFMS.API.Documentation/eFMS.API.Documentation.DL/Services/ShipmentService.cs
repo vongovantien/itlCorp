@@ -29,6 +29,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<CatCharge> catChargeRepo;
+        readonly IContextBase<CatUnit> catUnitRepo;
+
         readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysUserLevel> sysUserLevelRepo;
@@ -49,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatChargeGroup> catChargeGroup,
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysUserLevel> sysUserLevel,
+            IContextBase<CatUnit> catUnit,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             opsRepository = ops;
@@ -66,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             sysUserLevelRepo = sysUserLevel;
             currencyExchangeService = currencyExchange;
+            catUnitRepo = catUnit;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -623,6 +627,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
                 data.GW = item.GW;
                 data.CW = item.CW;
+                data.CBM = item.CBM;
+                data.Cont20 = item.Cont20;
+                data.Cont40 = item.Cont40;
+                data.Cont40HC = item.Cont40HC;
+                data.Cont45 = item.Cont45;
+                data.QTy = item.QTy;
                 #region -- Phí Selling trước thuế --
                 decimal _totalSellAmountFreight = 0;
                 decimal _totalSellAmountTrucking = 0;
@@ -690,19 +700,52 @@ namespace eFMS.API.Documentation.DL.Services
                     // tinh total phi chargeGroup freight
                     if (charGroupObj?.Name == "Freight")
                     {
-                        _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if(charge.KickBack == true)
+                        {
+                            _totalBuyAmountFreight = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
+
                     }
                     if (charGroupObj?.Name == "Trucking")
                     {
-                        _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountTrucking = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        }
+
                     }
                     if (charGroupObj?.Name == "Handling")
                     {
-                        _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountHandling = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
                     if (charGroupObj?.Name == "Other")
                     {
-                        _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountOther = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
                     if (charge.KickBack == true)
                     {
@@ -716,7 +759,16 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyHandling = _totalBuyAmountHandling;
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
-                data.TotalBuy = data.TotalSellFreight + data.TotalSellTrucking + data.TotalSellHandling + data.TotalSellOthers + _totalBuyAmountKB;
+                if(data.TotalBuyKB > 0)
+                {
+                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyKB;
+                    data.TotalBuyOthers = 0;
+                }
+                else
+                {
+                    data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers;
+                }
+                //data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalSellOthers + _totalBuyAmountKB;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
 
@@ -1024,6 +1076,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId into housebill
                                     from house in housebill.DefaultIfEmpty()
+                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    from unit in units.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1042,11 +1096,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
-                                        QTy = house.PackageQty,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
@@ -1058,7 +1111,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Commodity = master.Commodity,
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
-                                        Created = master.DatetimeCreated
+                                        Created = master.DatetimeCreated,
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code
 
 
                                     };
@@ -1069,6 +1123,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBills = detailRepository.Get().Where(queryTranDetail);
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId
+                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    from unit in units.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1087,11 +1143,10 @@ namespace eFMS.API.Documentation.DL.Services
                                         Shipper = house.ShipperId,
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
-                                        QTy = house.PackageQty,
-                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont20").Count : 0,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40").Count : 0,
-                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont40HC").Count : 0,
-                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "xCont45").Count : 0,
+                                        Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
+                                        Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
@@ -1103,7 +1158,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Commodity = master.Commodity,
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
-                                        Created = master.DatetimeCreated
+                                        Created = master.DatetimeCreated,
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code
                                     };
                 return queryShipment;
             }
