@@ -26,7 +26,9 @@
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')"
+                                    *ngIf="showSyncStandard">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
                         </div>
                         <div class="dropdown m-dropdown m-dropdown--inline">

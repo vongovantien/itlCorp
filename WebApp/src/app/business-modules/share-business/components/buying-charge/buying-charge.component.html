@@ -30,6 +30,7 @@
                                 <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
                                 <a class="dropdown-item pointer" (click)="getOtherCharge()"
                                     *ngIf="showSyncOtherCharge">Other</a>
+                                <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
                         </div>
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">

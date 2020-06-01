@@ -13,8 +13,8 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share, take, skip } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { catchError, takeUntil, finalize, share, take, skip, map, tap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -1021,6 +1021,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
+    getRecentlyCharge() {
+        const body: IRecentlyCharge = {
+            currentJobId: this.shipment.id,
+            personInCharge: this.shipment.personIncharge,
+            transactionType: this.utility.getTransationType(this.shipment.transactionType),
+            shippingLine: this.shipment.coloaderId,
+
+            consigneeId: this.hbl.consigneeId,
+            pol: this.hbl.pol,
+            pod: this.hbl.pod,
+            chargeType: this.TYPE,
+            customerId: this.hbl.customerId,
+        };
+        this._documentRepo.getRecentlyCharges(body)
+            .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
+            .subscribe(
+                (charges: CsShipmentSurcharge[]) => {
+                    if (!charges.length) {
+                        this._toastService.warning("Not found recently charge");
+                        return;
+                    }
+                    if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
+                        });
+                    }
+                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+                        });
+                    }
+                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
+                        });
+                    }
+                }
+            );
+    }
+
     loadDynamicComoGrid(charge: CsShipmentSurcharge, index: number) {
         this.isSelectedChargeDynamicCombogrid = false;
         this.isSelectedPartnerDynamicCombogrid = true;
@@ -1115,4 +1158,16 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             //     }
         }
     }
+}
+
+interface IRecentlyCharge {
+    currentJobId: string;
+    personInCharge: string;
+    transactionType: number;
+    shippingLine: string;
+    customerId: string;
+    consigneeId: string;
+    pol: string;
+    pod: string;
+    chargeType: string; // * BUY/SELL/OBH
 }

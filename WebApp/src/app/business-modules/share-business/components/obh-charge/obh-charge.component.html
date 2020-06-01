@@ -20,7 +20,15 @@
             </div>
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                    <div class="m--align-right">
+                    <div class="m--align-right c-button-actions">
+                        <div class="dropdown m-dropdown m-dropdown--inline">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <i class="la la-download"></i> Get Charge<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
+                            </div>
+                        </div>
                         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveOBHSurCharge()">
                         </app-default-button>
                     </div>
@@ -64,34 +72,6 @@
                                 </td>
                             </ng-container>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
-                                    <input type="text" class="dropdown-toggle form-control" readonly
-                                        [(ngModel)]="charge.receiverName" placeholder="Partner Name"
-                                        [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                        (click)="loadDynamicComoGrid(charge,i)"
-                                        [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null"
-                                        [disabled]="!!charge.creditNo || !!charge.debitNo|| !charge.isFromShipment || (isLocked | async) === true">
-                                    <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
-                                            charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
-                                        [showDelete]="!!charge.receiverName"></combo-grid-icon>
-                                    <div class="dropdown-partner__content"
-                                        [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
-                                        <div class="d-flex justify-content-end dropdown-partner__header">
-                                            <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                *ngFor="let type of partnerType; trackBy: trackByFn"
-                                                [title]="type.displayName"
-                                                (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
-                                        </div>
-                                        <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                                [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
-                                                (onClick)="onSelectPayerReceiver($event, charge,'receiver')">
-                                            </app-combo-grid> -->
-                                        <ng-template #container></ng-template>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown [tooltip]="charge.payerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.payerName ||charge.paymentObjectId === charge.payerId )}">
                                     <ng-container
@@ -116,6 +96,30 @@
                                             </app-combo-grid>
                                         </div>
                                     </ng-template>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group col-md-12 dropdown-partner"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
+                                    <input type="text" class="dropdown-toggle form-control" readonly
+                                        [(ngModel)]="charge.receiverName" placeholder="Partner Name"
+                                        [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                        (click)="loadDynamicComoGrid(charge,i)"
+                                        [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null"
+                                        [disabled]="!!charge.creditNo || !!charge.debitNo|| !charge.isFromShipment || (isLocked | async) === true">
+                                    <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                            charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
+                                        [showDelete]="!!charge.receiverName"></combo-grid-icon>
+                                    <div class="dropdown-partner__content"
+                                        [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
+                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                [title]="type.displayName"
+                                                (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
+                                        </div>
+                                        <ng-template #container></ng-template>
+                                    </div>
                                 </div>
                             </td>
                             <td>

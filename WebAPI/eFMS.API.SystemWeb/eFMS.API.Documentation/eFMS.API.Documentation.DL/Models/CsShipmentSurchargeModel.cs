@@ -4,6 +4,5 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class CsShipmentSurchargeModel:CsShipmentSurcharge
     {
-
     }
 }

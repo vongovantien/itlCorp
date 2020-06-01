@@ -27,6 +27,8 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
+    @Input() showSyncStandard: boolean = true;
+
     TYPE: any = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
 
     constructor(
