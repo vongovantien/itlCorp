@@ -700,19 +700,52 @@ namespace eFMS.API.Documentation.DL.Services
                     // tinh total phi chargeGroup freight
                     if (charGroupObj?.Name == "Freight")
                     {
-                        _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if(charge.KickBack == true)
+                        {
+                            _totalBuyAmountFreight = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountFreight += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
+
                     }
                     if (charGroupObj?.Name == "Trucking")
                     {
-                        _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountTrucking = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountTrucking += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        }
+
                     }
                     if (charGroupObj?.Name == "Handling")
                     {
-                        _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountHandling = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountHandling += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
                     if (charGroupObj?.Name == "Other")
                     {
-                        _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                        if (charge.KickBack == true)
+                        {
+                            _totalBuyAmountOther = 0;
+                        }
+                        else
+                        {
+                            _totalBuyAmountOther += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+
+                        }
                     }
                     if (charge.KickBack == true)
                     {
