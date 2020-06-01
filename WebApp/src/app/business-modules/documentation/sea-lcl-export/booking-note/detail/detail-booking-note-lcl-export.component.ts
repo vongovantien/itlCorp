@@ -1,17 +1,18 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { SeaLCLExportBookingNoteCreateComponent } from '../create/create-booking-note-lcl-export.component';
 import { Router, ActivatedRoute } from '@angular/router';
+
 import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo } from '@repositories';
 import { csBookingNote } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
+import { SubHeaderComponent, ReportPreviewComponent, ConfirmPopupComponent } from '@common';
+import { SystemConstants } from '@constants';
 
 import { map, tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
-import { SubHeaderComponent, ReportPreviewComponent } from '@common';
-import { SystemConstants } from 'src/constants/system.const';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-detail',
@@ -26,7 +27,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
     ACTION: CommonType.ACTION_FORM = 'UPDATE';
 
     csBookingNote: csBookingNote = new csBookingNote();
-    dataReport: any = null;
 
     constructor(
         protected _router: Router,
@@ -35,11 +35,9 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
         private _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
         private _cd: ChangeDetectorRef
-
     ) {
         super(_toastService, _documentRepo, _router);
         this._progressRef = this._ngProgressService.ref();
-
     }
 
     ngOnInit() { }
@@ -182,7 +180,6 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
 
     gotoList() {
         this._router.navigate(["home/documentation/sea-lcl-export/booking-note"]);
-
     }
 
     gotoDuplicate() {
@@ -209,5 +206,10 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                     }
                 },
             );
+    }
+
+    showDuplicateConfirm(f: ConfirmPopupComponent) {
+        this.formBookingNoteComponent.isSubmitted = false;
+        f.show();
     }
 }

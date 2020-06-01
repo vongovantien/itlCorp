@@ -83,7 +83,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
                     if (res.result.success) {
                         this._toastService.success("New data added");
 
-                        this._router.navigate([`home/documentation/sea-lcl-export/${res.model.id}`]);
+                        this._router.navigate([`home/documentation/sea-lcl-export/booking-note/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }
