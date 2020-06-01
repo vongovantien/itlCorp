@@ -574,7 +574,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
                                                             && x.Hblid == item.Hblid
                                                             && x.KickBack == true);
-                foreach (var charge in _chargeBuy)
+                foreach (var charge in _chargeBuyKB)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -705,7 +705,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _chargeBuyKB = surchargeRepository.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
                                                             && x.Hblid == item.HBLID
                                                             && x.KickBack == true);
-                foreach (var charge in _chargeBuy)
+                foreach (var charge in _chargeBuyKB)
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
