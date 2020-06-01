@@ -1079,7 +1079,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code
 
 
                                     };
@@ -1126,7 +1126,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code
                                     };
                 return queryShipment;
             }
