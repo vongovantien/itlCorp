@@ -28,8 +28,18 @@ export class AssignStagePopupComponent extends PopupBase {
     selectedStage: Partial<CommonInterface.IComboGridData> = {};
     selectedStageData: any;
 
+    configUser: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'username', label: 'User Name' },
+            { field: 'employeeNameVn', label: 'Full Name' },
+        ],
+        dataSource: [],
+        selectedDisplayFields: ['username'],
+    };
+    selectedUserData: any;
+
     users: User[] = [];
-    selectedUser: any = null;
     activeUser: any[] = [];
 
     description: string = '';
@@ -37,6 +47,8 @@ export class AssignStagePopupComponent extends PopupBase {
     isSubmitted: boolean = false;
     job: OpsTransaction;
     isAsignment: boolean = false;
+    selectedUser: Partial<CommonInterface.IComboGridData> = {};
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -79,8 +91,7 @@ export class AssignStagePopupComponent extends PopupBase {
                 .subscribe(
                     (data: any) => {
                         this.users = data || [];
-
-                        this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
+                        this.configUser.dataSource = data || [];
                     },
                 );
         }
@@ -88,14 +99,14 @@ export class AssignStagePopupComponent extends PopupBase {
 
     assignStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser || !this.selectedStage.value) {
+        if (!this.selectedUser.value || !this.selectedStage.value) {
             return;
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
             jobId: this.job.id,
             stageId: this.selectedStageData.id,
-            mainPersonInCharge: !!this.selectedUser ? this.selectedUser.id : null,
+            mainPersonInCharge: this.selectedUserData.id,
             description: this.description
         };
         this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
@@ -112,10 +123,24 @@ export class AssignStagePopupComponent extends PopupBase {
             );
     }
 
+    removeStage() {
+        this.selectedStage = {};
+    }
+
+    removeUser() {
+        this.selectedUser = {};
+    }
+
     onSelectStage(stage: any) {
         this.selectedStageData = stage;
         this.selectedStage = { field: 'stageNameEn', value: stage.stageNameEn };
     }
+
+    onSelectUser(user: any) {
+        this.selectedUserData = user;
+        this.selectedUser = { field: 'username', value: user.username };
+    }
+
 
     closePopup() {
         this.hide();

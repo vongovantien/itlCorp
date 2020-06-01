@@ -18,8 +18,9 @@
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedStage" [height]="150"
                                 (itemSelected)="onSelectStage($event)" [dataSources]="configStage.dataSource"
                                 [displayFields]="configStage.displayFields"
-                                [selectedDisplayFields]="configStage.selectedDisplayFields">
+                                [selectedDisplayFields]="configStage.selectedDisplayFields" (remove)="removeStage()">
                             </app-combo-grid-virtual-scroll>
+
                             <div class="form-control-feedback" *ngIf="isSubmitted && !selectedStage.value">
                                 Stage is required!
                             </div>
@@ -27,12 +28,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.id}">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.value}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
-                            <ng-select [allowClear]="false" [items]="users" (selected)="selectedUser = $event">
-                            </ng-select>
-                            <div class="form-control-feedback" *ngIf="isSubmitted && !selectedUser.id">
-                                Assign To is required!
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedUser" [height]="150"
+                                (itemSelected)="onSelectUser($event)" [dataSources]="configUser.dataSource"
+                                [displayFields]="configUser.displayFields"
+                                [selectedDisplayFields]="configUser.selectedDisplayFields" (remove)="removeUser()">
+                            </app-combo-grid-virtual-scroll>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !selectedUser.value">
+                                User is required!
                             </div>
                         </div>
                     </div>
