@@ -1270,11 +1270,12 @@ namespace eFMS.API.Operation.DL.Services
 
             var shipmentMerge = shipmentsOperation.Union(shipmentPIC);
 
-            //Join theo số HBL
+            //Join theo số JobNo
             var query = from cus in customs
-                        join ope in shipmentMerge on cus.Hblid equals ope.Hwbno into ope2
+                        join ope in shipmentMerge on cus.JobNo equals ope.JobNo into ope2
                         from ope in ope2
                         select cus;
+
 
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);
             data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
