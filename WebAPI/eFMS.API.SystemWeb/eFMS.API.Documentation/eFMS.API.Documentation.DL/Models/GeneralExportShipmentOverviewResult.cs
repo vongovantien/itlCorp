@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string ShipmentType { get; set; }
         public string Salesman { get; set; }
         public string AgentName { get; set; }
-        public int? QTy { get; set; }
+        public string QTy { get; set; }
         public short? PackageType { get; set; }
         public int? Cont20 { get; set; }
         public int? Cont40 { get; set; }

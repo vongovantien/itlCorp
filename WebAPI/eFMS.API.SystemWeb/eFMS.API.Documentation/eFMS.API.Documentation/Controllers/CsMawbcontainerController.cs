@@ -174,10 +174,12 @@ namespace eFMS.API.Documentation.Controllers
                 List<CsMawbcontainerImportModel> list = new List<CsMawbcontainerImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
+                    var containerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim();
+                    if (containerTypeName.Contains("´")) containerTypeName = containerTypeName.Replace("´", "'");
                     var container = new CsMawbcontainerImportModel
                     {
                         IsValid = true,
-                        ContainerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                        ContainerTypeName = containerTypeName,
                         QuantityError = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         ContainerNo = worksheet.Cells[row, 3].Value == null ? string.Empty : worksheet.Cells[row, 3].Value.ToString().Trim(),
                         SealNo = worksheet.Cells[row, 4].Value == null ? string.Empty : worksheet.Cells[row, 4].Value.ToString().Trim(),
@@ -229,10 +231,12 @@ namespace eFMS.API.Documentation.Controllers
                 List<CsMawbcontainerImportModel> list = new List<CsMawbcontainerImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
+                    var containerType = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim();
+                    if (containerType.Contains("´")) containerType = containerType.Replace("´", "'");
                     var container = new CsMawbcontainerImportModel
                     {
                         IsValid = true,
-                        ContainerTypeName = worksheet.Cells[row, 1].Value == null ? string.Empty : worksheet.Cells[row, 1].Value.ToString().Trim(),
+                        ContainerTypeName = containerType,
                         QuantityError = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         GwError = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         CbmError = worksheet.Cells[row, 4].Value?.ToString().Trim(),
