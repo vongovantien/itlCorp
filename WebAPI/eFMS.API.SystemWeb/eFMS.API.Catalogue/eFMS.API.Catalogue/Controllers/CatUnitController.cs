@@ -112,6 +112,8 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatUnitModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            if (model.Code.Contains("´")) model.Code = model.Code.Replace("´", "'");
+            if (model.UnitNameEn.Contains("´")) model.UnitNameEn = model.UnitNameEn.Replace("´", "'");
             var checkExistMessage = CheckExist(0, model);
             if (checkExistMessage.Length > 0)
             {
