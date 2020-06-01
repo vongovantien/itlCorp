@@ -260,5 +260,13 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportChartOfAccounts(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportChartOfAccounts`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 }
 

@@ -18,6 +18,16 @@
                 public static string ListName = "CatCharge";
             }
         }
+
+        public struct CatChartOfAccounts
+        {
+            public static string ExelImportFileName = "ChartOfAccounts";
+            public struct NameCaching
+            {
+                public static string ListName = "CatChartOfAccounts";
+            }
+        }
+
         public struct CatChargeDefaultAccount
         {
             public static string ExelImportFileName = "VoucherTypeAccount";

@@ -169,11 +169,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportChartOfAccounts(eFMS.API.ReportData.Models.CatChartOfAccountsCriteria)">
+            <summary>
+            Export Chart Of Accounts
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
             <summary>
             export Custom Clearance
             </summary>
             <returns></returns>
+            
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
             <summary>

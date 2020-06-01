@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'location', loadChildren: () => import('./location/location.module').then(m => m.LocationModule), data: { name: 'Location' } },
   { path: 'charge', loadChildren: () => import('./charge/charge.module').then(m => m.ChargeModule), data: { name: 'Charge' } },
   { path: 'currency', loadChildren: () => import('./currency/currency.module').then(m => m.CurrencyModule), data: { name: 'Currency' } },
+  { path: 'chart-of-accounts', loadChildren: () => import('./chart-of-accounts/chart-of-accounts.module').then(m => m.ChartOfAccountsModule), data: { name: 'Chart Of Accounts' } },
 
   // TODO other module...
 ];

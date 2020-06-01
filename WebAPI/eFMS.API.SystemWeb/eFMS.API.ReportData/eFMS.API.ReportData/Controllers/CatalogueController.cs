@@ -251,9 +251,30 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Chart Of Accounts
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportChartOfAccounts")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportChartOfAccounts(CatChartOfAccountsCriteria catChartOfAccountsCriteria)
+        {
+            Helper helper = new Helper();
+            var accessToken = Request.Headers["Authorization"].ToString();
+
+            var responseFromApi = await HttpServiceExtension.PostAPI(catChartOfAccountsCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatChartOfAccountsUrl,accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatChartOfAccounts>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
+            var stream = helper.CreateChartOfAccountExcelFile(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.CurrencyName);
+        }
+
+
+        /// <summary>
         /// export Custom Clearance
         /// </summary>
         /// <returns></returns>
+        /// 
         #endregion
         #region Custom Clearance
         [Route("CustomsDeclaration/ExportCustomClearance")]
