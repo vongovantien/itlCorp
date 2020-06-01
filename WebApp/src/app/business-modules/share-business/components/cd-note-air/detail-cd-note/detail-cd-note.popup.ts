@@ -113,7 +113,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         const listCurrency = [];
         const listCharge = [];
         for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
-            listCurrency.push(currency)
+            listCurrency.push(currency);
         }
         for (const charge of this.CdNoteDetail.listSurcharges) {
             listCharge.push(charge);

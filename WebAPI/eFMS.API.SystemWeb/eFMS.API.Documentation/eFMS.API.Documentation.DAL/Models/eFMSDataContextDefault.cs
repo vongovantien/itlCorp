@@ -133,6 +133,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.StatementDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Status).HasMaxLength(50);
+
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TrackingTransportBill)

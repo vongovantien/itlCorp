@@ -253,7 +253,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.currencyId = "VND" // in the future , this id must be local currency of each country
+            this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
             this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
             const arrayCharges = [];

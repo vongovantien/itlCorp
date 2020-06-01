@@ -157,6 +157,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.Code = CreateCode(model.Type, model.TransactionTypeEnum);
                 model.UserCreated = currentUser.UserID;
                 model.DatetimeCreated = DateTime.Now;
+                model.Status = TermData.CD_NOTE_NEW;
                 var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
