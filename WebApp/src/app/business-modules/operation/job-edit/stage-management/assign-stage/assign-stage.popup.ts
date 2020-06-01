@@ -47,7 +47,7 @@ export class AssignStagePopupComponent extends PopupBase {
     isSubmitted: boolean = false;
     job: OpsTransaction;
     isAsignment: boolean = false;
-    selectedUser: Partial<CommonInterface.IComboGridData> = {};
+    selectedUser: any;
 
 
     constructor(
@@ -90,7 +90,7 @@ export class AssignStagePopupComponent extends PopupBase {
                 )
                 .subscribe(
                     (data: any) => {
-                        this.users = data || [];
+                        // this.users = data || [];
                         this.configUser.dataSource = data || [];
                     },
                 );
@@ -147,7 +147,7 @@ export class AssignStagePopupComponent extends PopupBase {
 
         // * Reset value
         this.description = '';
-        // this.selectedUser = null;
+        this.selectedUser = {};
         this.selectedStage = {};
         this.isSubmitted = false;
     }
