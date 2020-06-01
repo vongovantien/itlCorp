@@ -140,6 +140,10 @@ namespace eFMS.API.Accounting.Service.Models
         public string PoinvoiceNo { get; set; }
         public string ShipmentType { get; set; }
         public bool? AsArranged { get; set; }
+        public string FlexId { get; set; }
+        public string FlightNoRowTwo { get; set; }
+        public string ContactPerson { get; set; }
+        public string ClosingTime { get; set; }
         public short? GroupId { get; set; }
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }

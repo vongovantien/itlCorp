@@ -1,10 +1,12 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -19,5 +21,6 @@ namespace eFMS.API.Documentation.DL.IService
         bool CheckAllowDelete(Guid cdNoteId);
         Crystal PreviewSIF(PreviewCdNoteCriteria criteria);
         Crystal PreviewAir(PreviewCdNoteCriteria criteria);
+        List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
     }
 }
