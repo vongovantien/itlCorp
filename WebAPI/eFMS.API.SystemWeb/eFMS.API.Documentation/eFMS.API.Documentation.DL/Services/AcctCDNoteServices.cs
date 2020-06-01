@@ -1228,30 +1228,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-
-        private IQueryable<CDNoteModel> Get(CDNoteCriteria criteria)
-        {
-            var data = Query(criteria)?.Select(x => new CDNoteModel{
-                ReferenceNo = x.Code,
-                PartnerId = x.PartnerId,
-                Id = x.Id,
-                IssuedDate = x.DatetimeCreated,
-                Status = "New"
-            })?.ToList();
-            var charges = surchargeRepository.Get(x => data.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
-                .Select(x => new CDNoteModel {
-                    ReferenceNo = string.IsNullOrEmpty(x.DebitNo)? x.CreditNo: x.DebitNo,
-                    HBLNo = x.Hblno,
-                    Currency = x.CurrencyId,
-                    Total = x.Total
-                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new { x.Key.Currency, x.Key.ReferenceNo, Total = x.Sum(y => y.Total) });
-            
-            return null;
-        }
         public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
-            var data = Query(criteria)?.Select(x => new CDNoteModel
+            var cdNotes = Query(criteria)?.Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
                 PartnerId = x.PartnerId,
@@ -1261,63 +1241,71 @@ namespace eFMS.API.Documentation.DL.Services
                 Creator = x.UserCreated,
                 JobId = x.JobId
             })?.ToList();
-            var charges = surchargeRepository.Get(x => data.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
+            if (cdNotes == null)
+            {
+                rowsCount = 0;
+                return results;
+            }
+            var cdNotesGroupByCurrency = surchargeRepository.Get(x => cdNotes.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
                 .Select(x => new CDNoteModel
                 {
                     ReferenceNo = string.IsNullOrEmpty(x.DebitNo) ? x.CreditNo : x.DebitNo,
                     HBLNo = x.Hblno,
                     Currency = x.CurrencyId,
                     Total = x.Total
-                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new { x.Key.Currency, x.Key.ReferenceNo, HBLNo = string.Join(";", x.Select(i => i.HBLNo)), Total = x.Sum(y => y.Total) });
+                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency, ReferenceNo = x.Key.ReferenceNo, HBLNo = string.Join(";", x.Select(i => i.HBLNo)), Total = x.Sum(y => y.Total) });
             
-            rowsCount = charges.Count();
-            if (data == null)
-            {
-                return results;
-            }
+            rowsCount = cdNotesGroupByCurrency.Count();
             if (size > 0)
             {
                 if (page < 1)
                 {
                     page = 1;
                 }
-                charges = charges.Skip((page - 1) * size).Take(size);
-                var s = (from cd in data
-                         join charge in charges on cd.ReferenceNo equals charge.ReferenceNo
-                         join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id
-                         join creator in sysUserRepo.Get() on cd.Creator equals creator.Id
-                         select new CDNoteModel {
-                             Id = cd.Id,
-                             JobId = cd.JobId,
-                             PartnerId = partner.Id,
-                             PartnerName = partner.PartnerNameEn,
-                             ReferenceNo = cd.ReferenceNo,
-                             Total = charge.Total,
-                             Currency = charge.Currency,
-                             IssuedDate = cd.IssuedDate,
-                             Creator = creator.Username,
-                             HBLNo = charge.HBLNo
-                         })?.AsQueryable();
-                results = new List<CDNoteModel>();
-                foreach(var item in s)
-                {
-                    var ops = opstransRepository.Get(op => op.Id == item.JobId).FirstOrDefault();
-                    if (ops != null)
-                    {
-                        item.JobNo = ops.JobNo;
-                    }
-                    else
-                    {
-                        var cs = cstransRepository.Get(trans => trans.Id == item.JobId).FirstOrDefault();
-                        if (cs != null)
-                        {
-                            item.JobNo = cs.JobNo;
-                        }
-                    }
+                cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
+                results = GetCDNotes(cdNotes, cdNotesGroupByCurrency);
+            }
+            return results;
+        }
 
-                    item.Status = "New";
-                    results.Add(item);
+        private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
+        {
+            var data = (from cd in cdNotes
+                     join charge in cdNotesGroupByCurrency on cd.ReferenceNo equals charge.ReferenceNo
+                     join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id
+                     join creator in sysUserRepo.Get() on cd.Creator equals creator.Id
+                     select new CDNoteModel
+                     {
+                         Id = cd.Id,
+                         JobId = cd.JobId,
+                         PartnerId = partner.Id,
+                         PartnerName = partner.PartnerNameEn,
+                         ReferenceNo = cd.ReferenceNo,
+                         Total = charge.Total,
+                         Currency = charge.Currency,
+                         IssuedDate = cd.IssuedDate,
+                         Creator = creator.Username,
+                         HBLNo = charge.HBLNo
+                     })?.AsQueryable();
+            var results = new List<CDNoteModel>();
+            foreach (var item in data)
+            {
+                var ops = opstransRepository.Get(op => op.Id == item.JobId).FirstOrDefault();
+                if (ops != null)
+                {
+                    item.JobNo = ops.JobNo;
                 }
+                else
+                {
+                    var cs = cstransRepository.Get(trans => trans.Id == item.JobId).FirstOrDefault();
+                    if (cs != null)
+                    {
+                        item.JobNo = cs.JobNo;
+                    }
+                }
+
+                item.Status = "New";
+                results.Add(item);
             }
             return results;
         }
