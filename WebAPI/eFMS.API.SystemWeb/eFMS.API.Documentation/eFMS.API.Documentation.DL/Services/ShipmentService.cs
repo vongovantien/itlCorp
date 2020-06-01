@@ -29,6 +29,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<CatCharge> catChargeRepo;
+        readonly IContextBase<CatUnit> catUnitRepo;
+
         readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysUserLevel> sysUserLevelRepo;
@@ -49,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatChargeGroup> catChargeGroup,
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysUserLevel> sysUserLevel,
+            IContextBase<CatUnit> catUnit,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             opsRepository = ops;
@@ -66,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysOfficeRepo = sysOffice;
             sysUserLevelRepo = sysUserLevel;
             currencyExchangeService = currencyExchange;
+            catUnitRepo = catUnit;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -628,6 +632,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Cont40 = item.Cont40;
                 data.Cont40HC = item.Cont40HC;
                 data.Cont45 = item.Cont45;
+                data.QTy = item.QTy;
                 #region -- Phí Selling trước thuế --
                 decimal _totalSellAmountFreight = 0;
                 decimal _totalSellAmountTrucking = 0;
@@ -1038,6 +1043,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId into housebill
                                     from house in housebill.DefaultIfEmpty()
+                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    from unit in units.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1071,7 +1078,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Commodity = master.Commodity,
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
-                                        Created = master.DatetimeCreated
+                                        Created = master.DatetimeCreated,
+                                        QTy = house.PackageQty.ToString() + unit.Code
 
 
                                     };
@@ -1082,6 +1090,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBills = detailRepository.Get().Where(queryTranDetail);
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId
+                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    from unit in units.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1115,7 +1125,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         Commodity = master.Commodity,
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
-                                        Created = master.DatetimeCreated
+                                        Created = master.DatetimeCreated,
+                                        QTy = house.PackageQty.ToString() + unit.Code
                                     };
                 return queryShipment;
             }
