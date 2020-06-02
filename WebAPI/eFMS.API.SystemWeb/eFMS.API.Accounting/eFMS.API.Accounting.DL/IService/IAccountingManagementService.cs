@@ -11,5 +11,6 @@ namespace eFMS.API.Accounting.DL.IService
     public interface IAccountingManagementService : IRepositoryBase<AccAccountingManagement, AccAccountingManagementModel>
     {
         HandleState Delete(Guid id);
+        int CheckDeletePermission(Guid id);
     }
 }

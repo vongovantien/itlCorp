@@ -90,5 +90,9 @@
 
         #endregion
 
+        #region ACOUNTING MANAGEMENT
+        public static readonly string ACCOUNTING_VOUCHER_TYPE = "Voucher";
+        public static readonly string ACCOUNTING_INVOICE_TYPE = "Invoice";
+        #endregion
     }
 }
