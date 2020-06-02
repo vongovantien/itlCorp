@@ -21,7 +21,6 @@ export class FormAddPartnerComponent extends AppForm {
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: true;
     parentCustomers: any[] = [];
-    parentCustomerss: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
     shippingProvinces: any[] = [];

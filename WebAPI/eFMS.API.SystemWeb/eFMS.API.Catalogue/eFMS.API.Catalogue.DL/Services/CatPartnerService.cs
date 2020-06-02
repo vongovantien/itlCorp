@@ -86,6 +86,15 @@ namespace eFMS.API.Catalogue.DL.Services
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
             var partner = mapper.Map<CatPartner>(entity);
+            if (string.IsNullOrEmpty(partner.InternalReferenceNo))
+            {
+                var refPartner = DataContext.Get(x => x.TaxCode == partner.TaxCode && string.IsNullOrEmpty(partner.InternalReferenceNo)).FirstOrDefault();
+                partner.ParentId = refPartner.Id;
+            }
+            else
+            {
+                partner.ParentId = partner.Id;
+            }
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
             partner.UserCreated = partner.UserModified = currentUser.UserID;
