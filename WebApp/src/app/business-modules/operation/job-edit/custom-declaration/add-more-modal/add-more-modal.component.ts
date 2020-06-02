@@ -2,14 +2,14 @@ import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angu
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap } from 'rxjs/operators';
+import { takeUntil, debounceTime, switchMap, skip, distinctUntilChanged, finalize, tap, catchError } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { SearchMultipleComponent } from '../components/search-multiple/search-multiple.component';
-import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 
 @Component({
     selector: 'app-add-more-modal',
@@ -34,6 +34,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
     headers: CommonInterface.IHeaderTable[];
     form: FormGroup;
     customNo: AbstractControl;
+    partnerTaxcode = '';
     strKeySearch: string = '';
 
     searchCustomButtonSetting: ButtonModalSetting = {
@@ -205,7 +206,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         this.getClearanceNotImported();
     }
     getClearanceNotImported() {
-        this._operationRepo.getListNotImportToJob(this.strKeySearch, this.currentJob.customerId, false, this.page, this.pageSize)
+        this._operationRepo.getListNotImportToJob(this.strKeySearch, this.partnerTaxcode, false, this.page, this.pageSize)
             .pipe(
                 finalize(() => {
                     this.changeAllNotImported();
