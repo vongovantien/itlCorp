@@ -640,15 +640,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Update Approve Advance
         /// </summary>
-        /// <param name="advanceIds">advanceIds that want to retrieve Update Approve</param>
-        /// <param name="voucherNo">advanceIds that want to retrieve Update Approve</param>
-        /// <param name="voucherDate">advanceIds that want to retrieve Update Approve</param>
+        /// <param name="model">advanceIds that want to retrieve Update Approve</param>
         /// <returns></returns>
         [HttpPost]
         [Route("UpdatePaymentVoucher")]
-        public IActionResult UpdatePaymentVoucher(List<Guid> advanceIds, string voucherNo, DateTime? voucherDate )
+        public IActionResult UpdatePaymentVoucher(AcctAdvancePaymentModel model)
         {
-            var updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(advanceIds, voucherNo, voucherDate);
+            var updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(model);
             ResultHandle result;
             if (!updatePayment.Success)
             {
@@ -661,6 +659,28 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(result);
             }
         }
+
+        /// <summary>
+        /// Get advances to unlock
+        /// </summary>
+        /// <param name="lstVoucher"></param>
+        /// <returns></returns>
+        [HttpPost("CheckExistedVoucherInAdvance")]
+        public IActionResult CheckExistedVoucherInAdvance(List<AccAdvancePaymentUpdateVoucher> lstVoucher)
+        {
+            List<AccAdvancePaymentUpdateVoucher> lstVoucherData = new List<AccAdvancePaymentUpdateVoucher>();
+
+            foreach (var item in lstVoucher)
+            {
+                if(acctAdvancePaymentService.Any(x=>x.Id == item.Id && x.VoucherNo != null))
+                {
+                    lstVoucherData.Add(item);
+                }
+            }
+            var result = new { lstVoucherData };
+            return Ok(result);
+        }
+
 
     }
 }

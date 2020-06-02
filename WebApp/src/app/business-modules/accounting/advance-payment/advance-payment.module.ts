@@ -17,6 +17,7 @@ import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/appro
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from "ngx-currency";
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
+import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 const routing: Routes = [
     {
         path: "",
@@ -47,6 +48,7 @@ const COMPONENTS = [
     AdvancePaymentFormCreateComponent,
     AdvancePaymentListRequestComponent,
     AdvancePaymentAddRequestPopupComponent,
+    UpdatePaymentVoucherPopupComponent,
     AdvancePaymentFormsearchComponent,
 ];
 

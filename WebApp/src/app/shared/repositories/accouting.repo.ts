@@ -90,6 +90,20 @@ export class AccountingRepo {
             );
     }
 
+    updateVoucherAdvancePayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UpdatePaymentVoucher`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkExistedVoucherInAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/CheckExistedVoucherInAdvance`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     // add new advance payment with payment request
     addNewAdvancePayment(body: any = {}): Observable<any> {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/Add`, body)

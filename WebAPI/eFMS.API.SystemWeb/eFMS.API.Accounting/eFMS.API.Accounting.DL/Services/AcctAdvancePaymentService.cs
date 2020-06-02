@@ -18,6 +18,7 @@ using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -285,7 +286,9 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = ad.DatetimeModified,
                            StatusApproval = ad.StatusApproval,
                            PaymentMethod = ad.PaymentMethod,
-                           Amount = re.Amount
+                           Amount = re.Amount,
+                           VoucherNo = ad.VoucherNo,
+                           VoucherDate = ad.VoucherDate
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -304,7 +307,9 @@ namespace eFMS.API.Accounting.DL.Services
                 x.UserModified,
                 x.DatetimeModified,
                 x.StatusApproval,
-                x.PaymentMethod
+                x.PaymentMethod,
+                x.VoucherNo,
+                x.VoucherDate
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -320,6 +325,8 @@ namespace eFMS.API.Accounting.DL.Services
                 UserModified = s.Key.UserModified,
                 DatetimeModified = s.Key.DatetimeModified,
                 StatusApproval = s.Key.StatusApproval,
+                VoucherNo = s.Key.VoucherNo,
+                VoucherDate = s.Key.VoucherDate,
                 AdvanceStatusPayment = GetAdvanceStatusPayment(s.Key.AdvanceNo),
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
@@ -2640,18 +2647,18 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState UpdatePaymentVoucher(List<Guid> advanceIds, string voucherNo, DateTime? voucherDate)
+        public HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var hs = new HandleState();
-                    foreach (var id in advanceIds)
+                    foreach (var id in model.advancePaymentIds)
                     {
-                        var advance = DataContext.Get(x => x.Id == id).FirstOrDefault();
-                        advance.VoucherNo = voucherNo;
-                        advance.VoucherDate = voucherDate;
+                        var advance = DataContext.Get(x => x.Id == new Guid( id)).FirstOrDefault();
+                        advance.VoucherNo = model.VoucherNo;
+                        advance.VoucherDate = model.VoucherDate;
                         hs = DataContext.Update(advance, x => x.Id == advance.Id);
                     }
                     trans.Commit();

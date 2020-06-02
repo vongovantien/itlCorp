@@ -70,7 +70,7 @@ namespace eFMS.API.Accounting.DL.IService
         void UpdateStatusPaymentOfAdvanceRequest(string settlementCode);
 
         HandleState RecallRequest(Guid advanceId);
-        HandleState UpdatePaymentVoucher(List<Guid> advanceIds, string voucherNo, DateTime? voucherDate);
+        HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model);
 
     }
 }
