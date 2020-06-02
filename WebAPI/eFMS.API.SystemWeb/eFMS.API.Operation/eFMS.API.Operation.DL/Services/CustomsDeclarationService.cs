@@ -43,35 +43,6 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
 
-        //public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
-        //    ICacheServiceBase<CustomsDeclaration> cacheService,
-        //    IMapper mapper,
-        //    IEcusConnectionService ecusCconnection
-        //    , ICatPartnerApiService catPartner
-        //    , ICatPlaceApiService catPlace
-        //    , ICatCountryApiService country
-        //    , ICatCommodityApiService commodity
-        //    , ICurrentUser user,
-        //    IStringLocalizer<LanguageSub> localizer,
-        //    IContextBase<CatCommodity> commodityRepo,
-        //    IContextBase<OpsTransaction> opsTransaction,
-        //    IContextBase<OpsStageAssigned> opsStageAssigned,
-        //    IContextBase<SysUser> userRepo
-        //    ) : base(repository, cacheService, mapper)
-        //{
-        //    ecusCconnectionService = ecusCconnection;
-        //    catPartnerApi = catPartner;
-        //    catPlaceApi = catPlace;
-        //    countryApi = country;
-        //    commodityApi = commodity;
-        //    currentUser = user;
-        //    stringLocalizer = localizer;
-        //    commodityRepository = commodityRepo;
-        //    opsTransactionRepo = opsTransaction;
-        //    opsStageAssignedRepo = opsStageAssigned;
-        //    userRepository = userRepo;
-        //}
-
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
