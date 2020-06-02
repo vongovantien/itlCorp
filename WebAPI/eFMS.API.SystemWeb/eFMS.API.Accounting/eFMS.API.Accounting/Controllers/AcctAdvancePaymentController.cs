@@ -636,5 +636,31 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(_result);
             }
         }
+
+        /// <summary>
+        /// Update Approve Advance
+        /// </summary>
+        /// <param name="advanceIds">advanceIds that want to retrieve Update Approve</param>
+        /// <param name="voucherNo">advanceIds that want to retrieve Update Approve</param>
+        /// <param name="voucherDate">advanceIds that want to retrieve Update Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpdatePaymentVoucher")]
+        public IActionResult UpdatePaymentVoucher(List<Guid> advanceIds, string voucherNo, DateTime? voucherDate )
+        {
+            var updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(advanceIds, voucherNo, voucherDate);
+            ResultHandle result;
+            if (!updatePayment.Success)
+            {
+                result = new ResultHandle { Status = updatePayment.Success, Message = updatePayment.Exception.Message };
+                return BadRequest(result);
+            }
+            else
+            {
+                result = new ResultHandle { Status = updatePayment.Success };
+                return Ok(result);
+            }
+        }
+
     }
 }

@@ -1020,7 +1020,7 @@ namespace eFMS.API.Accounting.DL.Services
                         shipper += !string.IsNullOrEmpty(shipperNameAbbr) && !shipper.Contains(shipperNameAbbr) ? shipperNameAbbr + ", " : string.Empty;
                         string consigneeNameAbbr = catPartnerRepo.Get(x => x.Id == house.ConsigneeId).FirstOrDefault()?.ShortName;
                         consignee += !string.IsNullOrEmpty(consigneeNameAbbr) && !consignee.Contains(consigneeNameAbbr) ? consigneeNameAbbr + ", " : string.Empty;
-                    }                   
+                    }
                 }
 
                 customer = !string.IsNullOrEmpty(customer) ? customer.Substring(0, customer.Length - 2) : string.Empty;
@@ -1032,7 +1032,7 @@ namespace eFMS.API.Accounting.DL.Services
                 //Lấy ra chuỗi HBL
                 strHbl = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.Hbl)).Select(s => s.Hbl));
                 //Lấy ra chuỗi CustomNo
-                strCustomNo = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.CustomNo)).Select(s => s.CustomNo));                
+                strCustomNo = string.Join(", ", groupJobByHbl.Where(x => !string.IsNullOrEmpty(x.CustomNo)).Select(s => s.CustomNo));
             }
 
             //Lấy ra tên requester
@@ -2595,13 +2595,13 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED 
+                        if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED
                             || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW)
                         {
                             return new HandleState("Advance payment not yet send the request");
                         }
-                        if (advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
-                            && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
+                        if (advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                            && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                             && advance.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                         {
                             return new HandleState("Advance payment approving");
@@ -2625,11 +2625,41 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateAdvancePayment = DataContext.Update(advance, x => x.Id == advance.Id);
                         trans.Commit();
                     }
-                    
+
                     return new HandleState();
                 }
                 catch (Exception ex)
                 {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        public HandleState UpdatePaymentVoucher(List<Guid> advanceIds, string voucherNo, DateTime? voucherDate)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = new HandleState();
+                    foreach (var id in advanceIds)
+                    {
+                        var advance = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                        advance.VoucherNo = voucherNo;
+                        advance.VoucherDate = voucherDate;
+                        hs = DataContext.Update(advance, x => x.Id == advance.Id);
+                    }
+                    trans.Commit();
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+
                     trans.Rollback();
                     return new HandleState(ex.Message);
                 }

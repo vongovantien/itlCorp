@@ -10,6 +10,8 @@
         <adv-payment-form-search (onSearch)="onSearchAdvPayment($event)"></adv-payment-form-search>
         <div class="m-portlet">
             <div class="m-form">
+                <app-permission-button title="Add New" [routerLink]="'/home/accounting/advance-payment/new'">
+                </app-permission-button>
                 <div class="m-portlet__body">
                     <perfect-scrollbar style="max-height: 900px">
                         <div class="table-wrapper table-scrollable" id="adv-payment-list-table">
