@@ -1,12 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagingService } from 'src/app/shared/services/paging-service';
-import { SystemConstants } from 'src/constants/system.const';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
-import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -30,12 +27,12 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
 
     constructor(
         private pagerService: PagingService,
-        private sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _operationRepo: OperationRepo,
         private _activedRouter: ActivatedRoute,
         private _ngProgressService: NgProgress,
-        private _sortService: SortService
+        private _sortService: SortService,
+        private _catalogueRepo: CatalogueRepo
 
     ) {
         super();
@@ -72,7 +69,10 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         this._documentRepo.getDetailShipment(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
+                finalize(() => {
+                    this.getCurrentCustomer(this.currentJob.customerId);
+                    this._progressRef.complete();
+                }),
                 tap((response: any) => {
                     this.currentJob = response;
                 })
@@ -83,6 +83,20 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             );
     }
 
+    getCurrentCustomer(customerId: string) {
+        this._catalogueRepo.getDetailPartner(customerId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.poupAddMore.partnerTaxcode = res.taxCode;
+                    }
+                }
+            );
+    }
     getCustomClearanesOfJob() {
         this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
             takeUntil(this.ngUnsubscribe),
@@ -136,7 +150,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
                                     this.updateShipmentVolumn();
                                 })
                             ).subscribe(
-                                (res: any) => {
+                                () => {
                                     this.page = 1;
                                     this.getCustomClearanesOfJob();
                                 }
@@ -203,7 +217,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         }
     }
 
-    searchClearanceImported(event) {
+    searchClearanceImported() {
         const keySearch = this.searchImportedString.trim().toLocaleLowerCase();
         if (keySearch !== null && keySearch.length < 2 && keySearch.length > 0) {
             return 0;
