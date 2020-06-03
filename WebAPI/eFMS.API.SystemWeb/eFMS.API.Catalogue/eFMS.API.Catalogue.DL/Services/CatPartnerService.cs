@@ -88,12 +88,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var partner = mapper.Map<CatPartner>(entity);
             if (string.IsNullOrEmpty(partner.InternalReferenceNo))
             {
-                var refPartner = DataContext.Get(x => x.TaxCode == partner.TaxCode && string.IsNullOrEmpty(partner.InternalReferenceNo)).FirstOrDefault();
-                partner.ParentId = refPartner.Id;
+                partner.ParentId = partner.Id;
             }
             else
             {
-                partner.ParentId = partner.Id;
+                var refPartner = DataContext.Get(x => x.TaxCode == partner.TaxCode && string.IsNullOrEmpty(x.InternalReferenceNo)).FirstOrDefault();
+                partner.ParentId = refPartner.Id;
             }
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
