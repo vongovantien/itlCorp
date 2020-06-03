@@ -324,6 +324,7 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.Soano)
                             || !string.IsNullOrEmpty(surcharge.PaySoano)
                             || !string.IsNullOrEmpty(surcharge.SettlementCode)
+                            || surcharge.AcctManagementId != null
                          select detail);
             if (query.Any())
             {

@@ -5,6 +5,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
@@ -32,7 +33,20 @@ namespace eFMS.API.Accounting.Controllers
             accountingService = accService;
         }
 
+        [Authorize]
+        [HttpGet("CheckAllowDelete")]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            var result = accountingService.CheckDeletePermission(id);
+            if (result == 403)
+            {
+                return Ok(false);
+            }
+            return Ok(true);
+        }
+
         [HttpDelete]
+        [Authorize]
         public IActionResult Delete(Guid id)
         {
             HandleState hs = accountingService.Delete(id);

@@ -15,5 +15,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState Delete(Guid id);
         List<PartnerOfAcctManagementResult> GetChargeSellForInvoiceByCriteria(PartnerOfAcctManagementCriteria criteria);
         List<PartnerOfAcctManagementResult> GetChargeForVoucherByCriteria(PartnerOfAcctManagementCriteria criteria);
+        int CheckDeletePermission(Guid id);
     }
 }

@@ -4,6 +4,9 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -73,15 +76,48 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState Delete(Guid id)
         {
-            var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            if (data != null)
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                if (data.Type == AccountingConstants.TypeAcctManagement_Voucher)
+                try
                 {
-
+                    var data = DataContext.Get(x => x.Id == id).FirstOrDefault();
+                    var hs = DataContext.Delete(x => x.Id == id);
+                    if (hs.Success)
+                    {
+                        var charges = surchargeRepository.Get(x => x.AcctManagementId == id);
+                        foreach(var item in charges)
+                        {
+                            item.AcctManagementId = null;
+                            if(data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                            {
+                                item.VoucherId = null;
+                                item.VoucherIddate = null;
+                            }
+                            if(data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                            {
+                                item.InvoiceNo = null;
+                                item.InvoiceDate = null;
+                            }
+                            item.DatetimeModified = DateTime.Now;
+                            item.UserModified = currentUser.UserID;
+                            surchargeRepository.Update(item, x => x.Id == item.Id, false);
+                        }
+                        surchargeRepository.SubmitChanges();
+                        DataContext.SubmitChanges();
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
                 }
             }
-            return new HandleState();
         }
 
         #region --- INVOICE ---
