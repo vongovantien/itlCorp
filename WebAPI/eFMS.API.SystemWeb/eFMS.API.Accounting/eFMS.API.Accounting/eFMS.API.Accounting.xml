@@ -9,6 +9,43 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeSellForInvoiceByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">
+            <summary>
+            Get charges sell (Debit) to issue Invoice by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeForVoucherByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">
+            <summary>
+            Get charges to issue Voucher by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AccAccountingManagementCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Accounting Management by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Add(eFMS.API.Accounting.DL.Models.AccAccountingManagementModel)">
+            <summary>
+            Add new Accounting Management (Invoice or Voucher)
+            </summary>
+            <param name="model">object to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.Update(eFMS.API.Accounting.DL.Models.AccAccountingManagementModel)">
+            <summary>
+            Update Accounting Management (Invoice or Voucher)
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

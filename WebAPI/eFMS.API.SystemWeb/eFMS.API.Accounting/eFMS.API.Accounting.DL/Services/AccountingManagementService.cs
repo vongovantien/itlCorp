@@ -33,6 +33,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CatPlace> placeRepo;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
+        private readonly IContextBase<SysEmployee> employeeRepo;
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
             ICurrentUser cUser,
@@ -50,7 +51,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> partner,
             IContextBase<SysUser> user,
             IContextBase<CatPlace> place,
-            IContextBase<AcctSettlementPayment> settlementPayment) : base(repository, mapper)
+            IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<SysEmployee> employee) : base(repository, mapper)
         {
             currentUser = cUser;
             currencyExchangeService = exchangeService;
@@ -68,6 +70,7 @@ namespace eFMS.API.Accounting.DL.Services
             userRepo = user;
             placeRepo = place;
             settlementPaymentRepo = settlementPayment;
+            employeeRepo = employee;
         }
 
         #region --- DELETE ---
@@ -82,15 +85,15 @@ namespace eFMS.API.Accounting.DL.Services
                     if (hs.Success)
                     {
                         var charges = surchargeRepo.Get(x => x.AcctManagementId == id);
-                        foreach(var item in charges)
+                        foreach (var item in charges)
                         {
                             item.AcctManagementId = null;
-                            if(data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                            if (data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                             {
                                 item.VoucherId = null;
                                 item.VoucherIddate = null;
                             }
-                            if(data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                            if (data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                             {
                                 item.InvoiceNo = null;
                                 item.InvoiceDate = null;
@@ -193,14 +196,15 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var query = ExpressionQuery(criteria);
             var partners = partnerRepo.Get();
-            var users = userRepo.Get();            
+            var users = userRepo.Get();
             var acct = DataContext.Get(query);
             var data = from acc in acct
-                       join pat in partners on acc.PartnerId equals pat.ParentId into pat2
+                       join pat in partners on acc.PartnerId equals pat.Id into pat2
                        from pat in pat2.DefaultIfEmpty()
                        join user in users on acc.UserCreated equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
-                       select new AccAccountingManagementResult {
+                       select new AccAccountingManagementResult
+                       {
                            Id = acc.Id,
                            VoucherId = acc.VoucherId,
                            InvoiceNoTempt = acc.InvoiceNoTempt,
@@ -213,7 +217,7 @@ namespace eFMS.API.Accounting.DL.Services
                            CreatorName = user.Username,
                            Status = acc.Status //Status Invoice
                        };
-            return data.OrderByDescending(o => o.DatetimeModified);
+            return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
         #endregion --- LIST PAGING ---
 
@@ -248,7 +252,7 @@ namespace eFMS.API.Accounting.DL.Services
                                          ChargeName = chg.ChargeNameVn,
                                          JobNo = ops.JobNo,
                                          Hbl = ops.Hwbno,
-                                         ContraAccount = chgDef.DebitAccountNo,
+                                         ContraAccount = chgDef.CreditAccountNo,
                                          OrgAmount = sur.Quantity * sur.UnitPrice,
                                          Vat = sur.Vatrate,
                                          OrgVatAmount = sur.Total,
@@ -296,7 +300,7 @@ namespace eFMS.API.Accounting.DL.Services
                                              ChargeName = chg.ChargeNameVn,
                                              JobNo = cst.JobNo,
                                              Hbl = cstd.Hwbno,
-                                             ContraAccount = chgDef.DebitAccountNo,
+                                             ContraAccount = chgDef.CreditAccountNo,
                                              OrgAmount = sur.Quantity * sur.UnitPrice,
                                              Vat = sur.Vatrate,
                                              OrgVatAmount = sur.Total,
@@ -445,7 +449,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             ChargeName = chg.ChargeNameVn,
                                             JobNo = ops.JobNo,
                                             Hbl = ops.Hwbno,
-                                            ContraAccount = chgDef.DebitAccountNo,
+                                            ContraAccount = chgDef.CreditAccountNo,
                                             OrgAmount = sur.Quantity * sur.UnitPrice,
                                             Vat = sur.Vatrate,
                                             OrgVatAmount = sur.Total,
@@ -495,7 +499,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 ChargeName = chg.ChargeNameVn,
                                                 JobNo = cst.JobNo,
                                                 Hbl = cstd.Hwbno,
-                                                ContraAccount = chgDef.DebitAccountNo,
+                                                ContraAccount = chgDef.CreditAccountNo,
                                                 OrgAmount = sur.Quantity * sur.UnitPrice,
                                                 Vat = sur.Vatrate,
                                                 OrgVatAmount = sur.Total,
@@ -534,7 +538,7 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return dataBuySell;
         }
-       
+
         private List<ChargeOfAccountingManagementModel> GetChargeObhBuyForVoucher(Expression<Func<ChargeOfAccountingManagementModel, bool>> query)
         {
             //Chỉ lấy những phí có type là OBH
@@ -571,7 +575,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            ChargeName = chg.ChargeNameVn,
                                            JobNo = ops.JobNo,
                                            Hbl = ops.Hwbno,
-                                           ContraAccount = chgDef.DebitAccountNo,
+                                           ContraAccount = chgDef.CreditAccountNo,
                                            OrgAmount = sur.Quantity * sur.UnitPrice,
                                            Vat = sur.Vatrate,
                                            OrgVatAmount = sur.Total,
@@ -623,7 +627,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                ChargeName = chg.ChargeNameVn,
                                                JobNo = cst.JobNo,
                                                Hbl = cstd.Hwbno,
-                                               ContraAccount = chgDef.DebitAccountNo,
+                                               ContraAccount = chgDef.CreditAccountNo,
                                                OrgAmount = sur.Quantity * sur.UnitPrice,
                                                Vat = sur.Vatrate,
                                                OrgVatAmount = sur.Total,
@@ -662,7 +666,7 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return dataObhBuy;
         }
-        
+
         public List<ChargeOfAccountingManagementModel> GetChargeForVoucher(Expression<Func<ChargeOfAccountingManagementModel, bool>> query)
         {
             //BUY & SELL
@@ -754,7 +758,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                 fe.InputRefNo = _inputRefNoHadFoundCharge;
                 var userIdRequester = settlementPaymentRepo.Get(x => x.SettlementNo == fe.Charges[0].SettlementCode).FirstOrDefault()?.Requester;
-                fe.SettlementRequester = userRepo.Get(x => x.Id == userIdRequester).FirstOrDefault()?.Username;
+                var employeeIdRequester = userRepo.Get(x => x.Id == userIdRequester).FirstOrDefault()?.EmployeeId;
+                fe.SettlementRequester = employeeRepo.Get(x => x.Id == employeeIdRequester).FirstOrDefault()?.EmployeeNameVn;
             });
             return chargeGroupByPartner;
         }
@@ -764,17 +769,19 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState AddAcctMgnt(AccAccountingManagementModel model)
         {
             try
-            {                
-                var accounting = mapper.Map<AccAccountingManagement>(model);
-                accounting.Status = "New";
+            {
+                model.Id = Guid.NewGuid();
+                model.Status = "New";
                 //Tính toán total amount theo currency
-                accounting.TotalAmount = CaculatorTotalAmount(model);
-                accounting.UserCreated = accounting.UserModified = currentUser.UserID;
-                accounting.DatetimeCreated = accounting.DatetimeModified = DateTime.Now;
-                accounting.GroupId = currentUser.GroupId;
-                accounting.DepartmentId = currentUser.DepartmentId;
-                accounting.OfficeId = currentUser.OfficeID;
-                accounting.CompanyId = currentUser.CompanyID;
+                model.TotalAmount = CaculatorTotalAmount(model);
+                model.UserCreated = model.UserModified = currentUser.UserID;
+                model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+                model.GroupId = currentUser.GroupId;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.OfficeId = currentUser.OfficeID;
+                model.CompanyId = currentUser.CompanyID;
+                var accounting = mapper.Map<AccAccountingManagement>(model);
+                
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -831,7 +838,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var accounting = mapper.Map<AccAccountingManagement>(model);
                 var acctCurrent = DataContext.Get(x => x.Id == accounting.Id).FirstOrDefault();
-                if (acctCurrent == null) return new HandleState("Not found " + (acctCurrent.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "Vat Invoice" : "Voucher"));
+                var accountingType = (acctCurrent.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "Vat Invoice" : "Voucher");
+                if (acctCurrent == null) return new HandleState("Not found " + accountingType);
                 //Tính toán total amount theo currency
                 accounting.TotalAmount = CaculatorTotalAmount(model);
                 accounting.UserModified = currentUser.UserID;
@@ -913,14 +921,58 @@ namespace eFMS.API.Accounting.DL.Services
             decimal total = 0;
             if (!string.IsNullOrEmpty(model.Currency))
             {
-                model.Charges.ForEach(fe => {
+                model.Charges.ForEach(fe =>
+                {
                     var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
                     total += exchangeRate * fe.OrgVatAmount ?? 0;
                 });
             }
             return total;
         }
+
+        public string GenerateVoucherId()
+        {
+            int monthCurrent = DateTime.Now.Month;
+            string year = DateTime.Now.Year.ToString();
+            string month = (monthCurrent < 10 ? "0" : string.Empty) + monthCurrent.ToString();
+            string no = "001";
+            
+            var voucherNewests = Get(x => x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month).OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
+            var voucherNewest = voucherNewests.FirstOrDefault();
+            if (!string.IsNullOrEmpty(voucherNewest))
+            {
+                var _noNewest = voucherNewest.Substring(7, 3);
+                if (_noNewest != "999")
+                {
+                    no = (Convert.ToInt32(_noNewest) + 1).ToString();
+                    no = no.PadLeft(3, '0');
+                }
+            }
+            var voucher = year + "FDT" + no + "/" + month;
+            return voucher;
+        }
         #endregion -- CREATE/UPDATE ---
+
+        #region --- DETAIL ---
+        public AccAccountingManagementModel GetById(Guid id)
+        {
+            var accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var result = mapper.Map<AccAccountingManagementModel>(accounting);
+            if (accounting != null)
+            {
+                Expression<Func<ChargeOfAccountingManagementModel, bool>> expressionQuery = chg => chg.AcctManagementId == id;
+                if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                {
+                    result.Charges = GetChargeSellForInvoice(expressionQuery);
+                }
+                else
+                {
+                    result.Charges = GetChargeForVoucher(expressionQuery);
+                }
+            }
+            return result;
+        }       
+        #endregion --- DETAIL ---
 
     }
 }

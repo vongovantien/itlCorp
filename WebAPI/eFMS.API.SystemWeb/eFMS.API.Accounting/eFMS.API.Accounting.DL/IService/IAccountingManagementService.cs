@@ -19,6 +19,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<AccAccountingManagementResult> Paging(AccAccountingManagementCriteria criteria, int page, int size, out int rowsCount);
         HandleState AddAcctMgnt(AccAccountingManagementModel model);
         HandleState UpdateAcctMngt(AccAccountingManagementModel model);
-
+        string GenerateVoucherId();
+        AccAccountingManagementModel GetById(Guid id);
     }
 }
