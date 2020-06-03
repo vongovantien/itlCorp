@@ -71,6 +71,10 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState RecallRequest(Guid advanceId);
         HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model);
+        List<AccAdvancePaymentVoucherImportModel> CheckValidImport(List<AccAdvancePaymentVoucherImportModel> list, bool validDate);
+        HandleState Import(List<AccAdvancePaymentVoucherImportModel> data);
+
+
 
     }
 }

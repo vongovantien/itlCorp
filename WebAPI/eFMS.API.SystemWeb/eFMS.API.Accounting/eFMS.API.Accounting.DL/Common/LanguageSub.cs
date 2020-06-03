@@ -134,5 +134,17 @@ namespace eFMS.API.Accounting.DL.Common
         //#region Name field
         //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
         //#endregion
+        #region voucher advance payment
+        public static readonly string MSG_ADVANCE_NO_EMPTY = "MSG_ADVANCE_NO_EMPTY";
+        public static readonly string MSG_ADVANCE_NO_NOT_EXIST = "MSG_ADVANCE_NO_NOT_EXIST";
+        public static readonly string MSG_VOUCHER_NO_EMPTY = "MSG_VOUCHER_NO_EMPTY";
+        public static readonly string MSG_VOUCHER_DATE_EMPTY = "MSG_VOUCHER_DATE_EMPTY";
+        public static readonly string MSG_ADVANCE_NO_DUPLICATE = "MSG_ADVANCE_NO_DUPLICATE";
+        public static readonly string MSG_VOUCHER_DATE_NOT_VALID = "MSG_VOUCHER_DATE_NOT_VALID";
+
+
+
+
+        #endregion
     }
 }

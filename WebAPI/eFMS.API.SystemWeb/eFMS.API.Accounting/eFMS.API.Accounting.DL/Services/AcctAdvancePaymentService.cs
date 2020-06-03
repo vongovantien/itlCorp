@@ -19,6 +19,8 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Localization;
+using System.Globalization;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -42,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
         readonly IUserBaseService userBaseService;
+        private readonly IStringLocalizer stringLocalizer;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -61,7 +64,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
             IContextBase<CatCurrencyExchange> catCurrencyExchange,
-            ICurrencyExchangeService currencyExchange,
+            ICurrencyExchangeService currencyExchange, IStringLocalizer<LanguageSub> localizer,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -82,6 +85,7 @@ namespace eFMS.API.Accounting.DL.Services
             catCurrencyExchangeRepo = catCurrencyExchange;
             currencyExchangeService = currencyExchange;
             userBaseService = userBase;
+            stringLocalizer = localizer;
         }
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -2675,6 +2679,89 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+        public HandleState Import(List<AccAdvancePaymentVoucherImportModel> data)
+        {
+            try
+            {
+                var lstAdvance = new List<AcctAdvancePayment>();
+                foreach(var item in data)
+                {
+                    var advance = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo ).FirstOrDefault();
+                    advance.VoucherNo = item.VoucherNo;
+                    advance.VoucherDate = item.VoucherDate;
+                    lstAdvance.Add(advance);
+                }
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach(var item in lstAdvance)
+                        {
+                            DataContext.Update(item , x=>x.Id == item.Id);
+                        }
+                        trans.Commit();
+                        return new HandleState();
+                    }
+                    catch(Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public List<AccAdvancePaymentVoucherImportModel> CheckValidImport(List<AccAdvancePaymentVoucherImportModel> list, bool validDate)
+        {
+            DateTime dt;
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.AdvanceNo))
+                {
+                    item.AdvanceNoError = stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!DataContext.Any(x => x.AdvanceNo == item.AdvanceNo))
+                    {
+                        item.AdvanceNoError = stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_NOT_EXIST, item.AdvanceNo];
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.AdvanceNo?.ToLower() == item.AdvanceNo?.ToLower()) > 1)
+                    {
+                        item.AdvanceNoError = string.Format(stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_DUPLICATE], item.AdvanceNo);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.VoucherNo))
+                {
+                    item.VoucherNoError = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_NO_EMPTY];
+                    item.IsValid = false;
+                }
+
+                if (!item.VoucherDate.HasValue && !validDate)
+                {
+                    item.VoucherDateError = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_DATE_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (validDate) item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
+                }
+
+            });
+            return list;
         }
     }
 }

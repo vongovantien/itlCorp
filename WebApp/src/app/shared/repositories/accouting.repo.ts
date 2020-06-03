@@ -103,6 +103,24 @@ export class AccountingRepo {
         );
     }
 
+    upLoadVoucherAdvanceFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UploadFile`, files, "uploadedFile");
+    }
+
+    downloadVoucherAdvanceFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importVoucherAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 
     // add new advance payment with payment request
     addNewAdvancePayment(body: any = {}): Observable<any> {

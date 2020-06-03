@@ -9,13 +9,14 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             Contructor
             </summary>
             <param name="localizer"></param>
             <param name="service"></param>
             <param name="user"></param>
+            <param name="hostingEnvironment"></param>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria,System.Int32,System.Int32)">
             <summary>
@@ -199,6 +200,19 @@
             Get advances to unlock
             </summary>
             <param name="lstVoucher"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.DownloadExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read data from file excel
+            </summary>
+            <param name="uploadedFile"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
