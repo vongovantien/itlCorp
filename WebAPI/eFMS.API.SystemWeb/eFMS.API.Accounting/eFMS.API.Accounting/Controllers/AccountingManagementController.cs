@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -46,6 +47,20 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpPost("GetChargeSellForInvoiceByCriteria")]
+        public IActionResult GetChargeSellForInvoiceByCriteria(PartnerOfAcctManagementCriteria criteria)
+        {
+            var result = accountingService.GetChargeSellForInvoiceByCriteria(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("GetChargeForVoucherByCriteria")]
+        public IActionResult GetChargeForVoucherByCriteria(PartnerOfAcctManagementCriteria criteria)
+        {
+            var result = accountingService.GetChargeForVoucherByCriteria(criteria);
             return Ok(result);
         }
     }

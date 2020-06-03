@@ -90,5 +90,8 @@
 
         #endregion
 
+        public static readonly string TypeAcctManagement_Invoice = "Invoice";
+        public static readonly string TypeAcctManagement_Voucher = "Voucher";
+
     }
 }

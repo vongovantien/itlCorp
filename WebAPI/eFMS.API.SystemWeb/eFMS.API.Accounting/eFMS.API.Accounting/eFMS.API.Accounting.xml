@@ -4,6 +4,11 @@
         <name>eFMS.API.Accounting</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.
