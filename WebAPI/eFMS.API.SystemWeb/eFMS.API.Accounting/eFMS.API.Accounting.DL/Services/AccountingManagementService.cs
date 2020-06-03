@@ -4,9 +4,6 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
-using eFMS.API.Common.Globals;
-using eFMS.API.Common.Models;
-using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -15,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -74,6 +70,7 @@ namespace eFMS.API.Accounting.DL.Services
             settlementPaymentRepo = settlementPayment;
         }
 
+        #region --- DELETE ---
         public HandleState Delete(Guid id)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -84,7 +81,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var hs = DataContext.Delete(x => x.Id == id);
                     if (hs.Success)
                     {
-                        var charges = surchargeRepository.Get(x => x.AcctManagementId == id);
+                        var charges = surchargeRepo.Get(x => x.AcctManagementId == id);
                         foreach(var item in charges)
                         {
                             item.AcctManagementId = null;
@@ -100,9 +97,9 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
-                            surchargeRepository.Update(item, x => x.Id == item.Id, false);
+                            surchargeRepo.Update(item, x => x.Id == item.Id, false);
                         }
-                        surchargeRepository.SubmitChanges();
+                        surchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
                     }
@@ -119,6 +116,106 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+
+        public int CheckDeletePermission(Guid id)
+        {
+            return 1;
+        }
+        #endregion --- DELETE ---
+
+        #region --- LIST PAGING ---
+        public List<AccAccountingManagementResult> Paging(AccAccountingManagementCriteria criteria, int page, int size, out int rowsCount)
+        {
+            var data = GetData(criteria);
+            if (data == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+
+            //Phân trang
+            var _totalItem = data.Select(s => s.Id).Count();
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                data = data.Skip((page - 1) * size).Take(size);
+            }
+
+            return data.ToList();
+        }
+
+        private Expression<Func<AccAccountingManagement, bool>> ExpressionQuery(AccAccountingManagementCriteria criteria)
+        {
+            Expression<Func<AccAccountingManagement, bool>> query = q => true;
+            if (!string.IsNullOrEmpty(criteria.TypeOfAcctManagement))
+            {
+                query = query.And(x => x.Type == criteria.TypeOfAcctManagement);
+            }
+
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                query = query.And(x => criteria.ReferenceNos.Contains(x.VoucherId) || criteria.ReferenceNos.Contains(x.InvoiceNoReal) || criteria.ReferenceNos.Contains(x.InvoiceNoTempt));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                query = query.And(x => x.PartnerId == criteria.PartnerId);
+            }
+
+            if (criteria.IssueDateFrom != null && criteria.IssueDateTo != null)
+            {
+                query = query.And(x =>
+                    x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.IssueDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.IssueDateTo.Value.Date : false);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CreatorId))
+            {
+                query = query.And(x => x.UserCreated == criteria.CreatorId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.InvoiceStatus))
+            {
+                query = query.And(x => x.Status == criteria.InvoiceStatus);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.VoucherType))
+            {
+                query = query.And(x => x.VoucherType == criteria.VoucherType);
+            }
+            return query;
+        }
+
+        private IQueryable<AccAccountingManagementResult> GetData(AccAccountingManagementCriteria criteria)
+        {
+            var query = ExpressionQuery(criteria);
+            var partners = partnerRepo.Get();
+            var users = userRepo.Get();            
+            var acct = DataContext.Get(query);
+            var data = from acc in acct
+                       join pat in partners on acc.PartnerId equals pat.ParentId into pat2
+                       from pat in pat2.DefaultIfEmpty()
+                       join user in users on acc.UserCreated equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       select new AccAccountingManagementResult {
+                           Id = acc.Id,
+                           VoucherId = acc.VoucherId,
+                           InvoiceNoTempt = acc.InvoiceNoTempt,
+                           InvoiceNoReal = acc.InvoiceNoReal,
+                           PartnerName = pat.PartnerNameVn,
+                           TotalAmount = acc.TotalAmount,
+                           Currency = acc.Currency,
+                           Date = acc.Date, //Invoice Date or Voucher Date
+                           DatetimeCreated = acc.DatetimeCreated, //Issue Date
+                           CreatorName = user.Username,
+                           Status = acc.Status //Status Invoice
+                       };
+            return data.OrderByDescending(o => o.DatetimeModified);
+        }
+        #endregion --- LIST PAGING ---
 
         #region --- INVOICE ---
         private List<ChargeOfAccountingManagementModel> GetChargeSellForInvoice(Expression<Func<ChargeOfAccountingManagementModel, bool>> query)
@@ -662,6 +759,168 @@ namespace eFMS.API.Accounting.DL.Services
             return chargeGroupByPartner;
         }
         #endregion --- VOUCHER ---
+
+        #region --- CREATE/UPDATE ---
+        public HandleState AddAcctMgnt(AccAccountingManagementModel model)
+        {
+            try
+            {                
+                var accounting = mapper.Map<AccAccountingManagement>(model);
+                accounting.Status = "New";
+                //Tính toán total amount theo currency
+                accounting.TotalAmount = CaculatorTotalAmount(model);
+                accounting.UserCreated = accounting.UserModified = currentUser.UserID;
+                accounting.DatetimeCreated = accounting.DatetimeModified = DateTime.Now;
+                accounting.GroupId = currentUser.GroupId;
+                accounting.DepartmentId = currentUser.DepartmentId;
+                accounting.OfficeId = currentUser.OfficeID;
+                accounting.CompanyId = currentUser.CompanyID;
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(accounting);
+                        if (hs.Success)
+                        {
+                            var chargesOfAcct = model.Charges;
+                            foreach (var chargeOfAcct in chargesOfAcct)
+                            {
+                                var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
+                                charge.AcctManagementId = accounting.Id;
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                                {
+                                    charge.VoucherId = accounting.VoucherId;
+                                    charge.VoucherIddate = accounting.Date;
+                                }
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                                {
+                                    charge.InvoiceNo = accounting.InvoiceNoReal;
+                                    charge.InvoiceDate = accounting.Date;
+                                }
+                                charge.DatetimeModified = DateTime.Now;
+                                charge.UserModified = currentUser.UserID;
+                                surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                            }
+                            surchargeRepo.SubmitChanges();
+                            DataContext.SubmitChanges();
+                            trans.Commit();
+                        }
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
+        public HandleState UpdateAcctMngt(AccAccountingManagementModel model)
+        {
+            try
+            {
+                var accounting = mapper.Map<AccAccountingManagement>(model);
+                var acctCurrent = DataContext.Get(x => x.Id == accounting.Id).FirstOrDefault();
+                if (acctCurrent == null) return new HandleState("Not found " + (acctCurrent.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "Vat Invoice" : "Voucher"));
+                //Tính toán total amount theo currency
+                accounting.TotalAmount = CaculatorTotalAmount(model);
+                accounting.UserModified = currentUser.UserID;
+                accounting.DatetimeModified = DateTime.Now;
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Update(accounting, x => x.Id == accounting.Id);
+                        if (hs.Success)
+                        {
+                            // Gỡ bỏ hết charge có tham chiếu tới Id Accounting
+                            // Gỡ bỏ luôn các Invoice No, Invoice Date, Voucher No, Voucher Date
+                            var surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == accounting.Id);
+                            foreach (var surchargeOfAcct in surchargeOfAcctCurrent)
+                            {
+                                surchargeOfAcct.AcctManagementId = null;
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                                {
+                                    surchargeOfAcct.VoucherId = null;
+                                    surchargeOfAcct.VoucherIddate = null;
+                                }
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                                {
+                                    surchargeOfAcct.InvoiceNo = null;
+                                    surchargeOfAcct.InvoiceDate = null;
+                                }
+                                surchargeOfAcct.DatetimeModified = DateTime.Now;
+                                surchargeOfAcct.UserModified = currentUser.UserID;
+                                surchargeRepo.Update(surchargeOfAcct, x => x.Id == surchargeOfAcct.Id, false);
+                            }
+
+                            //Update lại
+                            var chargesOfAcctUpdate = model.Charges;
+                            foreach (var chargeOfAcct in chargesOfAcctUpdate)
+                            {
+                                var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
+                                charge.AcctManagementId = accounting.Id;
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                                {
+                                    charge.VoucherId = accounting.VoucherId;
+                                    charge.VoucherIddate = accounting.Date;
+                                }
+                                if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                                {
+                                    charge.InvoiceNo = accounting.InvoiceNoReal;
+                                    charge.InvoiceDate = accounting.Date;
+                                }
+                                charge.DatetimeModified = DateTime.Now;
+                                charge.UserModified = currentUser.UserID;
+                                surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                            }
+                            surchargeRepo.SubmitChanges();
+                            DataContext.SubmitChanges();
+                            trans.Commit();
+                        }
+                        return hs;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+
+        private decimal CaculatorTotalAmount(AccAccountingManagementModel model)
+        {
+            decimal total = 0;
+            if (!string.IsNullOrEmpty(model.Currency))
+            {
+                model.Charges.ForEach(fe => {
+                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
+                    total += exchangeRate * fe.OrgVatAmount ?? 0;
+                });
+            }
+            return total;
+        }
+        #endregion -- CREATE/UPDATE ---
 
     }
 }

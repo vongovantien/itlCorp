@@ -5,8 +5,9 @@ using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models
 {
-    public class AccAccountingManagementModel: AccAccountingManagement
+    public class AccAccountingManagementResult : AccAccountingManagement
     {
-        public List<ChargeOfAccountingManagementModel> Charges { get; set; }
+        public string PartnerName { get; set; }
+        public string CreatorName { get; set; }
     }
 }
