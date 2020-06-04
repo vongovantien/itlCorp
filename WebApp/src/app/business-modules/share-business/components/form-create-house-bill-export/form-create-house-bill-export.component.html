@@ -55,7 +55,7 @@
                             placeholder="Select consignee" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':isSubmitted && !consigneeDescription.value}">
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && (type === 'SFE' && !consigneeDescription.value)}">
                             <textarea rows="7" class="form-control m-input m-input--square"
                                 formControlName="consigneeDescription"></textarea>
                         </div>
