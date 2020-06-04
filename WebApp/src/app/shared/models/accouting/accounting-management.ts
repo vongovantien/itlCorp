@@ -130,3 +130,37 @@ export class PartnerOfAcctManagementCriteria {
         }
     }
 }
+
+export class AccAccountingManagementResult extends AccAccountingManagement {
+    partnerName: string = null;
+    creatorName: string = null;
+    // tslint:disable-next-line: no-any
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class AccAccountingManagementCriteria {
+    referenceNos: string[] = [];
+    partnerId: string = null;
+    issuedDate: string = null;
+    creatorId: string = null;
+    invoiceStatus: string = null;
+    voucherType: string = null;
+    typeOfAcctManagement: string = null;
+    // tslint:disable-next-line: no-any
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}

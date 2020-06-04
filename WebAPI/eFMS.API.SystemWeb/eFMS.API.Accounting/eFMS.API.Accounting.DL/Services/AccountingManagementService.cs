@@ -169,10 +169,9 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => x.PartnerId == criteria.PartnerId);
             }
 
-            if (criteria.IssueDateFrom != null && criteria.IssueDateTo != null)
+            if (criteria.IssuedDate != null)
             {
-                query = query.And(x =>
-                    x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.IssueDateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.IssueDateTo.Value.Date : false);
+                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
             }
 
             if (!string.IsNullOrEmpty(criteria.CreatorId))
