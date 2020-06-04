@@ -131,7 +131,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     "\t <b> Requestor </b> / <i> Người yêu cầu: </i> " + fullNameCreatetor + "</br> </br>" + linkEn +"</br>" + linkVn + "</br> </br>" +
                     "<i> Thanks and Regards </i>" + "</br> </br>" +
                     "eFMS System </div>") ;
-                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com" }, null, null);
+                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
             }
             return hs;
         }
