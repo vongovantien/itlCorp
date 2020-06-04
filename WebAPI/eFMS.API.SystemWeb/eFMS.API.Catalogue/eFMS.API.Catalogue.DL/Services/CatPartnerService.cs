@@ -146,7 +146,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
                 string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
                 string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
-            string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
+                string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
                 string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
                 string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
                 string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
