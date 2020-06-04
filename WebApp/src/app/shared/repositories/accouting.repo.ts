@@ -382,6 +382,68 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    checkAllowDeleteAcctMngt(soaNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckAllowDelete/${soaNo}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteAcctMngt(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getChargeSellForInvoiceByCriteria(criteria: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetChargeSellForInvoiceByCriteria`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getChargeForVoucherByCriteria(criteria: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetChargeForVoucherByCriteria`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getListAcctMngt(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewAcctMgnt(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateAcctMngt(body: any = {}): Observable<any> {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Update`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    generateVoucherId() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateVoucherId`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailAcctMngt(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetById`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

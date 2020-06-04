@@ -7,5 +7,6 @@ namespace eFMS.API.Accounting.DL.Models
 {
     public class AccAccountingManagementModel: AccAccountingManagement
     {
+        public List<ChargeOfAccountingManagementModel> Charges { get; set; }
     }
 }

@@ -26,6 +26,9 @@ namespace eFMS.API.Accounting.Infrastructure
 
             CreateMap<AcctAdvanceRequest, AcctAdvanceRequestModel>();
             CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
+
+            CreateMap<AccAccountingManagement, AccAccountingManagementModel>();
+            CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
         }
     }
 }
