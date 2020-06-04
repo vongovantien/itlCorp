@@ -755,23 +755,25 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
                         dateToPase = DateTime.Parse(date, culture);
+                        ValidDate = true;
                     }
                     else if (date == null)
                     {
                         ValidDate = false;
                     }
-                    else
-                    {
-                        CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPase = DateTime.Parse(date, culture);
-                    }
+                    //else
+                    //{
+                    //    CultureInfo culture = new CultureInfo("es-ES");
+                    //    dateToPase = DateTime.Parse(date, culture);
+                    //}
                     var acc = new AccAdvancePaymentVoucherImportModel
                     {
                         IsValid = true,
                         AdvanceNo = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         VoucherNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         VoucherDate = !string.IsNullOrEmpty(date) ? dateToPase : (DateTime?)null,
-                        
+                        ValidVoucherDate = ValidDate ? true : false
+
                     };
                     list.Add(acc);
                 }

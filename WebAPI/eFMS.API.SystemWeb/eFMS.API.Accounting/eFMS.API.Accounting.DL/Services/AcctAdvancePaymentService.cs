@@ -2750,14 +2750,18 @@ namespace eFMS.API.Accounting.DL.Services
                     item.IsValid = false;
                 }
 
-                if (!item.VoucherDate.HasValue && !validDate)
+                if (!item.VoucherDate.HasValue)
                 {
                     item.VoucherDateError = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_DATE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    if (validDate) item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
+                    if (!item.ValidVoucherDate) item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
+                }
+                if (!item.ValidVoucherDate)
+                {
+                    item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
                 }
 
             });
