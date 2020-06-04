@@ -21,7 +21,6 @@ export class FormAddPartnerComponent extends AppForm {
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: true;
     parentCustomers: any[] = [];
-    parentCustomerss: any[] = [];
     partnerGroups: any[] = [];
     countries: any[] = [];
     shippingProvinces: any[] = [];
@@ -89,12 +88,11 @@ export class FormAddPartnerComponent extends AppForm {
     ngOnInit() {
         this.initForm();
     }
-
+    groups: string = 'ALL';
     onChange(event: any, type: string) {
         switch (type) {
             case 'shippingCountry':
                 this.getShippingProvinces(event.id, !!this.shippingProvince.value && this.shippingProvince.value.length > 0 ? this.shippingProvince.value[0].id : null);
-                console.log(event.id);
                 console.log(this.shippingCountry.value)
                 console.log(this.shippingProvince.value);
                 break;
@@ -102,7 +100,8 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getBillingProvinces(event.id, !!this.billingProvince.value && this.shippingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
                 break;
             case 'category':
-                const isShowSaleMan = this.checkRequireSaleman(event.id);
+                this.groups = this.groups + ";" + event.id;
+                const isShowSaleMan = this.checkRequireSaleman();
                 this.requireSaleman.emit(isShowSaleMan);
                 break;
         }
@@ -118,34 +117,18 @@ export class FormAddPartnerComponent extends AppForm {
                 this.partnerForm.controls['billingProvince'].setValue([]);
                 break;
             case 'category':
-                const isShowSaleMan = this.checkRequireSaleman(event.id, false);
+                this.groups = this.groups.replace(event.id, '');
+                const isShowSaleMan = this.checkRequireSaleman();
                 this.requireSaleman.emit(isShowSaleMan);
                 break;
         }
     }
-    checkRequireSaleman(partnerGroup: string, isAdded = true): boolean {
-        if (isAdded) {
-            if (partnerGroup != null) {
-                if (partnerGroup.includes('CUSTOMER')) {
-                    return true;
-                }
-            } else {
-                return false;
-            }
-            if (partnerGroup == null) {
-                return false;
-            } else if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
+    checkRequireSaleman(): boolean {
 
-                return true;
-            } else {
-                return false;
-            }
+        if (this.groups.includes("ALL") || this.groups.includes("CUSTOMER")) {
+            return true;
         } else {
-            if (partnerGroup != null) {
-                if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
-                    return false;
-                }
-            }
+            return false;
         }
     }
     getBillingProvinces(countryId?: number, provinceId: string = null) {
@@ -189,8 +172,7 @@ export class FormAddPartnerComponent extends AppForm {
 
                     }
                 );
-        }
-        else {
+        } else {
             this._catalogueRepo.getProvinces()
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
@@ -307,7 +289,7 @@ export class FormAddPartnerComponent extends AppForm {
 
     setFormData(partner: Partner) {
         console.log(partner);
-        const isShowSaleMan = this.checkRequireSaleman(partner.partnerGroup);
+        const isShowSaleMan = this.checkRequireSaleman();
         this.requireSaleman.emit(isShowSaleMan);
         const partnerGroupActives = this.getPartnerGroupActives(partner.partnerGroup.split(';'));
         let index = -1;
