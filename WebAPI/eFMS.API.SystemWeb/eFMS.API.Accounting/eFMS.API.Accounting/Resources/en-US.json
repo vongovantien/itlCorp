@@ -119,6 +119,7 @@
   "MSG_VOUCHER_NO_EMPTY": "Voucher no is not allow empty!|wrong",
   "MSG_VOUCHER_DATE_EMPTY": "Voucher date is not allow empty!|wrong",
   "MSG_VOUCHER_DATE_NOT_VALID": "Voucher date {0} not valid!|wrong",
+
   //------------end  : VOUCHER
 
   "DO_NOT_HAVE_PERMISSION": "Do not have permission"

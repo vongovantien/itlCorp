@@ -9,6 +9,8 @@ namespace eFMS.API.Accounting.DL.Models
         public string VoucherNoError { get; set; }
         public string VoucherDateError { get; set; }
         public bool ValidVoucherDate { get; set; }
+        public string VoucherDateStr { get; set; }
+
 
     }
 }

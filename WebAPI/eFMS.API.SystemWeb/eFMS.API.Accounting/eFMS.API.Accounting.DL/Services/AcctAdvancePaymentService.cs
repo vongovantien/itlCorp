@@ -2755,14 +2755,6 @@ namespace eFMS.API.Accounting.DL.Services
                     item.VoucherDateError = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_DATE_EMPTY];
                     item.IsValid = false;
                 }
-                else
-                {
-                    if (!item.ValidVoucherDate) item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
-                }
-                if (!item.ValidVoucherDate)
-                {
-                    item.VoucherDateError = AccountingLanguageSub.MSG_VOUCHER_DATE_NOT_VALID;
-                }
 
             });
             return list;
