@@ -93,7 +93,14 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 var refPartner = DataContext.Get(x => x.TaxCode == partner.TaxCode && string.IsNullOrEmpty(x.InternalReferenceNo)).FirstOrDefault();
-                partner.ParentId = refPartner.Id;
+                if(refPartner == null)
+                {
+                    partner.ParentId = entity.Id;
+                }
+                else
+                {
+                    partner.ParentId = refPartner.Id;
+                }
             }
             partner.DatetimeCreated = DateTime.Now;
             partner.DatetimeModified = DateTime.Now;
@@ -152,6 +159,19 @@ namespace eFMS.API.Catalogue.DL.Services
 
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = model.GroupId, DepartmentId = model.DepartmentId, OfficeId = model.OfficeId, CompanyId = model.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
+            if (!string.IsNullOrEmpty(model.InternalReferenceNo))
+            {
+                var refPartner = DataContext.Get(x => x.TaxCode == model.TaxCode && string.IsNullOrEmpty(x.InternalReferenceNo)).FirstOrDefault();
+                if(refPartner == null)
+                {
+                    model.ParentId = model.Id;
+                }
+                else
+                {
+                    model.ParentId = refPartner.Id;
+                }
+            }
+
             var entity = GetModelToUpdate(model);
             if (model.SaleMans.Count > 0)
             {

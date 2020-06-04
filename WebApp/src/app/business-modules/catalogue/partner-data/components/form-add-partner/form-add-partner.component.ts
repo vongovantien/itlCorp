@@ -123,6 +123,7 @@ export class FormAddPartnerComponent extends AppForm {
         }
     }
     checkRequireSaleman(partnerGroup: string, isAdded = true): boolean {
+        console.log(this.partnerGroups);
         if (isAdded) {
             if (partnerGroup != null) {
                 if (partnerGroup.includes('CUSTOMER')) {
@@ -142,7 +143,7 @@ export class FormAddPartnerComponent extends AppForm {
         } else {
             if (partnerGroup != null) {
                 if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
-                    return false;
+                    return true;
                 }
             }
         }
@@ -188,8 +189,7 @@ export class FormAddPartnerComponent extends AppForm {
 
                     }
                 );
-        }
-        else {
+        } else {
             this._catalogueRepo.getProvinces()
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
