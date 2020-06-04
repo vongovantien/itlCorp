@@ -121,17 +121,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
                 string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
                 string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
-                string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br>" +
-                    "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" +
-                    "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i></br>" +
-                    "\t <b> Partner ID </b> / <i> Mã đối tượng:</i> " + partner.AccountNo + "</br>" +
-                    "\t <b> Catagory </b> / <i> Danh mục: </i>" + partner.PartnerGroup + "</br>" +
-                    "\t <b> Taxcode </b>/ <i> Mã số thuế: </i>" + partner.TaxCode + "</br>" +
-                    "\t <b> Address </b> / <i> Địa chỉ: </i> " + partner.AddressEn + "</br>" +
-                    "\t <b> Requestor </b> / <i> Người yêu cầu: </i> " + fullNameCreatetor + "</br> </br>" + linkEn +"</br>" + linkVn + "</br> </br>" +
+                string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
+                    "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" + 
+                    "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+                    "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+                    "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+                    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                    "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
+                    "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn +"</br>" + linkVn + "</br> </br>" +
                     "<i> Thanks and Regards </i>" + "</br> </br>" +
                     "eFMS System </div>") ;
-                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
+                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com","alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
             }
             return hs;
         }
