@@ -17,11 +17,13 @@ export * from './catalogue/commonity-group.model';
 export * from './catalogue/country.model';
 export * from './catalogue/ware-house.model';
 export * from './catalogue//catPartnerCharge.model';
+export * from './catalogue/catChartOfAccounts.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
 export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
+export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel } from './accouting/accounting-management';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

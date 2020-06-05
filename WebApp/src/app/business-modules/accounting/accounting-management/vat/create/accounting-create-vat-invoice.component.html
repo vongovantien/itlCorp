@@ -1,0 +1,26 @@
+<div class="create-booking-note-page">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Create Invoice</h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <app-default-button [buttonSetting]="saveButtonSetting">
+                            </app-default-button>
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <form-create-vat-invoice (onSearchInputRef)="getListPartnerCharge($event)"></form-create-vat-invoice>
+
+            </div>
+        </div>
+    </div>
+</div>

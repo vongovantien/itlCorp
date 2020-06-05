@@ -21,5 +21,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateAcctMngt(AccAccountingManagementModel model);
         string GenerateVoucherId();
         AccAccountingManagementModel GetById(Guid id);
+        string GenerateInvoiceNoTemp();
     }
 }

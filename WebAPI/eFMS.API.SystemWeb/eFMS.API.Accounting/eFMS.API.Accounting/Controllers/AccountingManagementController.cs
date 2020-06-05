@@ -128,6 +128,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
             }
 
+            var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
+            if (isExistedInvoiceNoTempSerie)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+            }
+
             if (model.Charges.Count == 0)
             {
                 string accountType = model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "VAT Invoice" : "Voucher";
@@ -161,6 +167,12 @@ namespace eFMS.API.Accounting.Controllers
             if (isExisedVoucherId)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
+            }
+
+            var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
+            if (isExistedInvoiceNoTempSerie)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
             }
 
             if (model.Charges.Count == 0)
@@ -214,6 +226,34 @@ namespace eFMS.API.Accounting.Controllers
         {
             var detail = accountingService.GetById(id);
             return Ok(detail);
+        }
+
+        [HttpGet("GenerateInvoiceNoTemp")]
+        public IActionResult GenerateInvoiceNoTemp()
+        {
+            var invoiceNoTemp = accountingService.GenerateInvoiceNoTemp();
+            return Ok(new { InvoiceNoTemp = invoiceNoTemp });
+        }
+
+        [HttpGet("CheckInvoiceNoTempSerieExist")]
+        public IActionResult CheckInvoiceNoTempSerieExist(string invoiceNoTemp, string serie, Guid? acctId)
+        {
+            var isExited = CheckExistedInvoiceNoTempSerie(invoiceNoTemp, serie, acctId);
+            return Ok(isExited);
+        }
+
+        private bool CheckExistedInvoiceNoTempSerie(string invoiceNoTemp, string serie, Guid? acctId)
+        {
+            var isExited = false;
+            if (acctId == Guid.Empty || acctId == null)
+            {
+                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie).Any();
+            }
+            else
+            {
+                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.Id != acctId).Any();
+            }
+            return isExited;
         }
     }
 }

@@ -6,10 +6,12 @@ import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePayment, AdvancePaymentRequest, User } from 'src/app/shared/models';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
+import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-advance-payment',
@@ -19,6 +21,13 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(AdvancePaymentFormsearchComponent, { static: false }) formSearch: AdvancePaymentFormsearchComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(UpdatePaymentVoucherPopupComponent, { static: false }) popupUpdateVoucher: UpdatePaymentVoucherPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+    @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
+    @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
+
+
+
 
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
@@ -30,6 +39,17 @@ export class AdvancePaymentComponent extends AppList {
     userLogged: User;
 
     dataSearch: any = {};
+
+    advancePaymentIds: string[] = [];
+
+
+    checkAll = false;
+    paymentHasStatusDone = false;
+    messageVoucherExisted: string = '';
+
+
+
+
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -58,7 +78,8 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusApproval', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Description', field: 'advanceNote', sortable: true },
-
+            { title: 'VoucherNo', field: 'voucherNo', sortable: true },
+            { title: 'VoucherDate', field: 'voucherDate', sortable: true },
         ];
 
         this.headerGroupRequest = [
@@ -69,6 +90,7 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Status Payment', field: 'statusPayment', sortable: true },
         ];
+
         this.getUserLogged();
         this.getListAdvancePayment(this.dataSearch);
     }
@@ -95,6 +117,8 @@ export class AdvancePaymentComponent extends AppList {
                 (res: any) => {
                     this.advancePayments = res.data || [];
                     this.totalItems = res.totalItems || 0;
+                    const objPayment = this.advancePayments.find(x => x.statusApproval === 'Done');
+                    this.paymentHasStatusDone = !!objPayment ? true : false;
                 },
             );
     }
@@ -195,6 +219,129 @@ export class AdvancePaymentComponent extends AppList {
                 }
             );
     }
+
+    checkAllChange() {
+        if (this.checkAll) {
+            this.advancePayments.forEach(x => {
+                if (x.statusApproval === 'Done') {
+                    x.isChecked = true;
+                }
+            });
+        } else {
+            this.advancePayments.forEach(x => {
+                x.isChecked = false;
+            });
+        }
+    }
+
+    removeAllChecked() {
+        this.checkAll = false;
+    }
+
+    showPopupUpdateVoucher() {
+        this.infoPopup.title = 'Cannot Update Voucher';
+        this.infoPopup.body = 'Opps, Please check advance to update voucher !!';
+        this.messageVoucherExisted = '';
+        this.popupUpdateVoucher.voucherNo.setValue(null);
+        this.popupUpdateVoucher.voucherDate.setValue(null);
+        this.popupUpdateVoucher.isSubmitted = false;
+        const objChecked = this.advancePayments.find(x => x.isChecked);
+        if (!objChecked) {
+            this.infoPopup.show();
+            return;
+        } else {
+            const lstadvancePaymentsToCheck = this.advancePayments.filter(x => x.isChecked);
+            this._accoutingRepo.checkExistedVoucherInAdvance(lstadvancePaymentsToCheck)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (!!res && res.lstVoucherData.length > 0) {
+                            res.lstVoucherData.forEach(item => {
+                                this.messageVoucherExisted += item.advanceNo + " has existed in " + item.voucherNo + "</br>";
+                            });
+                            this.messageVoucherExisted += "<br>" + " Would you like to keep updating?";
+                            this.confirmExistedVoucher.show();
+                        } else {
+                            this.popupUpdateVoucher.show();
+                        }
+                    }
+                );
+        }
+    }
+
+    onSubmitUpdateVoucher() {
+        this.confirmExistedVoucher.hide();
+        this.popupUpdateVoucher.show();
+    }
+
+    removeSelectedVoucher() {
+        const objChecked = this.advancePayments.find(x => x.isChecked);
+        if (!objChecked) {
+            this.infoPopup.title = 'Cannot Remove Voucher!';
+            this.infoPopup.body = 'Opps, Please check advance to remove voucher';
+            this.infoPopup.show();
+            return;
+        } else if (objChecked.voucherNo != null) {
+            this.confirmRemoveSelectedVoucher.show();
+        } else {
+            this.infoPopup.title = 'Not Have Voucher!';
+            this.infoPopup.body = 'Opps, Advance do not have voucher';
+            this.infoPopup.show();
+        }
+    }
+
+    onRemoveSelectedVoucher() {
+        this.confirmRemoveSelectedVoucher.hide();
+        this.advancePaymentIds = [];
+        this.advancePayments.forEach(item => {
+            if (item.isChecked) {
+                this.advancePaymentIds.push(item.id);
+            }
+        });
+        const body: any = {
+            advancePaymentIds: this.advancePaymentIds,
+            voucherNo: null,
+            voucherDate: null
+        };
+        this.updateVoucherAdvancePayment(body);
+    }
+
+    applyVoucher($event: any) {
+        const objVoucher = $event;
+        this.advancePaymentIds = [];
+        this.advancePayments.forEach(item => {
+            if (item.isChecked) {
+                this.advancePaymentIds.push(item.id);
+            }
+        });
+
+        const body: any = {
+            advancePaymentIds: this.advancePaymentIds,
+            voucherNo: objVoucher.voucherNo,
+            voucherDate: !!objVoucher.voucherDate && !!objVoucher.voucherDate.startDate ? formatDate(objVoucher.voucherDate.startDate, 'yyyy-MM-dd', 'en') : null
+        };
+        this.updateVoucherAdvancePayment(body);
+    }
+
+    updateVoucherAdvancePayment(body: any) {
+        this._accoutingRepo.updateVoucherAdvancePayment(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.checkAll = false;
+                        this.getListAdvancePayment(this.dataSearch);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
+                }
+            );
+    }
+
 }
 
 

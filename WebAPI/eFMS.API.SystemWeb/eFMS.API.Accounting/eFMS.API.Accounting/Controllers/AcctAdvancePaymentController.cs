@@ -14,6 +14,13 @@ using Microsoft.Extensions.Localization;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using System.Collections.Generic;
 using eFMS.API.Common.Infrastructure.Common;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -29,6 +36,8 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         private readonly ICurrentUser currentUser;
+        private readonly IHostingEnvironment _hostingEnvironment;
+
 
         /// <summary>
         /// Contructor
@@ -36,11 +45,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user)
+        /// <param name="hostingEnvironment"></param>
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
+            _hostingEnvironment = hostingEnvironment;
+
         }
 
         /// <summary>
@@ -54,7 +66,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("Paging")]
         [Authorize]
         public IActionResult Paging(AcctAdvancePaymentCriteria criteria, int pageNumber, int pageSize)
-        {            
+        {
             var data = acctAdvancePaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
@@ -209,7 +221,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.CheckDeletePermissionByAdvanceId(id);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// delete an advance payment existed item
         /// </summary>
@@ -307,7 +319,7 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctAdvancePaymentService.CheckUpdatePermissionByAdvanceId(model.Id);
-            if(isAllowUpdate == false)
+            if (isAllowUpdate == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -403,7 +415,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveAndSendRequest(AcctAdvancePaymentModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
+
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
@@ -636,5 +648,137 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(_result);
             }
         }
+
+        /// <summary>
+        /// Update Approve Advance
+        /// </summary>
+        /// <param name="model">advanceIds that want to retrieve Update Approve</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpdatePaymentVoucher")]
+        public IActionResult UpdatePaymentVoucher(AcctAdvancePaymentModel model)
+        {
+            var updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(model);
+            ResultHandle result;
+            if (!updatePayment.Success)
+            {
+                result = new ResultHandle { Status = updatePayment.Success, Message = updatePayment.Exception.Message };
+                return BadRequest(result);
+            }
+            else
+            {
+                result = new ResultHandle { Status = updatePayment.Success };
+                return Ok(result);
+            }
+        }
+
+        /// <summary>
+        /// Get advances to unlock
+        /// </summary>
+        /// <param name="lstVoucher"></param>
+        /// <returns></returns>
+        [HttpPost("CheckExistedVoucherInAdvance")]
+        public IActionResult CheckExistedVoucherInAdvance(List<AccAdvancePaymentUpdateVoucher> lstVoucher)
+        {
+            List<AccAdvancePaymentUpdateVoucher> lstVoucherData = new List<AccAdvancePaymentUpdateVoucher>();
+
+            foreach (var item in lstVoucher)
+            {
+                if (acctAdvancePaymentService.Any(x => x.Id == item.Id && x.VoucherNo != null))
+                {
+                    lstVoucherData.Add(item);
+                }
+            }
+            var result = new { lstVoucherData };
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<AccAdvancePaymentVoucherImportModel> data)
+        {
+            var hs = acctAdvancePaymentService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = Templates.AccAdvance.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                bool ValidDate = false;
+                DateTime temp;
+
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<AccAdvancePaymentVoucherImportModel> list = new List<AccAdvancePaymentVoucherImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string date = worksheet.Cells[row, 3].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+                    if (DateTime.TryParse(date, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(date, culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(date, culture);
+                    }
+                    var acc = new AccAdvancePaymentVoucherImportModel
+                    {
+                        IsValid = true,
+                        AdvanceNo = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        VoucherNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        VoucherDate = !string.IsNullOrEmpty(date) ? dateToPase : (DateTime?)null,
+
+                    };
+                    list.Add(acc);
+                }
+                var data = acctAdvancePaymentService.CheckValidImport(list, ValidDate);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+
     }
 }
