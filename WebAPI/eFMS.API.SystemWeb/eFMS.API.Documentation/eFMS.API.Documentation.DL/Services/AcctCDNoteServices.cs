@@ -1223,7 +1223,7 @@ namespace eFMS.API.Documentation.DL.Services
                                             );
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
-                string[] refNos = criteria.ReferenceNos.Split('\n');
+                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
                 results = results.Where(x => refNos.Contains(x.Code));
             }
             return results;
@@ -1239,7 +1239,7 @@ namespace eFMS.API.Documentation.DL.Services
                 IssuedDate = x.DatetimeCreated,
                 Status = "New",
                 Creator = x.UserCreated,
-                JobId = x.JobId
+                JobId = x.JobId,
             })?.ToList();
             if (cdNotes == null)
             {
@@ -1252,8 +1252,15 @@ namespace eFMS.API.Documentation.DL.Services
                     ReferenceNo = string.IsNullOrEmpty(x.DebitNo) ? x.CreditNo : x.DebitNo,
                     HBLNo = x.Hblno,
                     Currency = x.CurrencyId,
-                    Total = x.Total
-                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency, ReferenceNo = x.Key.ReferenceNo, HBLNo = string.Join(";", x.Select(i => i.HBLNo)), Total = x.Sum(y => y.Total) });
+                    Total = x.Total,
+                    VoucherId = x.VoucherId,
+                    InvoiceNo = x.InvoiceNo
+                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency,
+                    ReferenceNo = x.Key.ReferenceNo,
+                    HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
+                    Total = x.Sum(y => y.Total),
+                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued" : "New"
+                });
             
             rowsCount = cdNotesGroupByCurrency.Count();
             if (size > 0)
@@ -1285,7 +1292,8 @@ namespace eFMS.API.Documentation.DL.Services
                          Currency = charge.Currency,
                          IssuedDate = cd.IssuedDate,
                          Creator = creator.Username,
-                         HBLNo = charge.HBLNo
+                         HBLNo = charge.HBLNo,
+                         Status = charge.Status
                      })?.AsQueryable();
             var results = new List<CDNoteModel>();
             foreach (var item in data)
@@ -1303,8 +1311,6 @@ namespace eFMS.API.Documentation.DL.Services
                         item.JobNo = cs.JobNo;
                     }
                 }
-
-                item.Status = "New";
                 results.Add(item);
             }
             return results;

@@ -161,12 +161,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// get invoice - cd note
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
         public IActionResult Paging(CDNoteCriteria criteria, int page, int size)
         {
-            var results = cdNoteServices.Paging(criteria, page, size, out int rowsCount);
-            return Ok(results);
+            var data = cdNoteServices.Paging(criteria, page, size, out int rowsCount);
+            var result = new { data, totalItems = rowsCount, page, size };
+            return Ok(result);
         }
     }
 }

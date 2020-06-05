@@ -898,4 +898,12 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    pagingInvoiceAndCDNotes(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
