@@ -11,6 +11,9 @@ import { AccountingManagementDebitCreditInvoiceComponent } from './debit-credit/
 import { AccountingManagementVatInvoiceComponent } from './vat/accounting-vat-invoice.component';
 import { AccountingManagementVoucherComponent } from './voucher/accounting-voucher.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
+import { SelectModule } from 'ng2-select';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routing: Routes = [
     {
@@ -36,13 +39,15 @@ const routing: Routes = [
         SharedModule,
         TabsModule.forRoot(),
         NgxDaterangepickerMd,
-
+        SelectModule,
+        ReactiveFormsModule,
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,
         AccountingManagementVatInvoiceComponent,
         AccountingManagementVoucherComponent,
         AccountingManagementFormSearchComponent,
+        AccountingManagementFormSearchVatVoucherComponent
     ],
 
     exports: [],

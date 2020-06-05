@@ -476,6 +476,25 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    generateInvoiceNoTemp() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateInvoiceNoTemp`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkVoucherIdExist(voucherId: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/AccountingManagement/CheckVoucherIdExist/voucherId=${voucherId}&acctId=${acctId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkInvoiceNoTempSerieExist(invoiceNoTemp: string, serie: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/AccountingManagement/CheckInvoiceNoTempSerieExist/invoiceNoTemp=${invoiceNoTemp}&serie=${serie}&acctId=${acctId}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

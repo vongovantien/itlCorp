@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 
     ],
     exports: [ShareAccountingInputShipmentPopupComponent],
-    declarations: [ ShareAccountingInputShipmentPopupComponent ],
+    declarations: [ShareAccountingInputShipmentPopupComponent],
     providers: [],
 })
 export class ShareAccountingModule { }
