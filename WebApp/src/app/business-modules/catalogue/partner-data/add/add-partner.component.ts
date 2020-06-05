@@ -74,6 +74,7 @@ export class AddPartnerDataComponent extends AppList {
                 this.partnerType = Number(prams.partnerType);
                 if (this.partnerType === '3') {
                     this.isShowSaleMan = true;
+                    this.formPartnerComponent.groups = 'ALL';
                 }
             }
         });
