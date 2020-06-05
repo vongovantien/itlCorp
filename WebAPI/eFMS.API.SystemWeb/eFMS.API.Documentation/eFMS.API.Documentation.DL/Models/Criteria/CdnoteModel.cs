@@ -18,5 +18,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public DateTime? IssuedDate { get; set; }
         public string Creator { get; set; }
         public string Status { get; set; }
+        public string InvoiceNo { get; set; }
+        public string VoucherId { get; set; }
     }
 }

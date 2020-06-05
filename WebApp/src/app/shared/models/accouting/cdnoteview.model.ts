@@ -11,6 +11,7 @@ export class CDNoteViewModel {
     issuedDate: Date = null;
     creator: string = '';
     status: string = '';
+    isSelected: boolean = false;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

@@ -22,7 +22,8 @@ import { AccountingManagementSelectPartnerPopupComponent } from './components/po
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './store';
 import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
-
+import { PaginationModule } from 'ngx-bootstrap';
+import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
 
 const routing: Routes = [
     {
@@ -61,6 +62,7 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducer),
+        PaginationModule.forRoot()
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,
@@ -71,7 +73,8 @@ const routing: Routes = [
         AccountingManagementCreateVATInvoiceComponent,
         AccountingManagementFormCreateVATInvoiceComponent,
         AccountingManagementInputRefNoPopupComponent,
-        AccountingManagementSelectPartnerPopupComponent
+        AccountingManagementSelectPartnerPopupComponent,
+        AccountingDetailCdNoteComponent
     ],
 
     exports: [],

@@ -14,6 +14,7 @@ import { formatDate } from '@angular/common';
 
 export class AccountingManagementFormSearchComponent extends AppForm implements OnInit {
     @Output() onSearch: EventEmitter<ISearchDataInvoiceCDNote> = new EventEmitter<ISearchDataInvoiceCDNote>();
+    @Output() onReset: EventEmitter<ISearchDataInvoiceCDNote> = new EventEmitter<ISearchDataInvoiceCDNote>();
     partners: Observable<Customer[]>;
     creators: Observable<User[]>;
     filterTypes: CommonInterface.INg2Select[] =
@@ -102,7 +103,11 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.onSearch.emit(body);
     }
     resetSearch() {
+        this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
+        this.resetFormControl(this.partner);
+        this.resetFormControl(this.creator);
+        this.onReset.emit(<any>{ transactionType: null });
     }
 }
 interface ISearchDataInvoiceCDNote {

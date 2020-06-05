@@ -5,7 +5,8 @@
             <tabset class="custom-class-tab">
                 <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
 
-                    <form-search-accounting-management (onSearch)=searchInvoiceAndCDNotes($event)>
+                    <form-search-accounting-management (onSearch)="searchInvoiceAndCDNotes($event)"
+                        (onReset)="resetSearch($event)">
                     </form-search-accounting-management>
 
                     <div class="m-portlet">
@@ -21,12 +22,24 @@
                                         <th class="first table-actions-col"></th>
                                     </thead>
                                     <tbody>
-                                        <ng-container *ngIf="!!cdNotes.length">
+                                        <ng-container *ngIf="!!cdNotes">
                                             <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
-
+                                                    <div class="table-actions">
+                                                        <label class="m-checkbox">
+                                                            <input *ngIf="cdNote.status !== 'New'; else allowChecked"
+                                                                type="checkbox" disabled="disabled">
+                                                            <ng-template #allowChecked>
+                                                                <input type="checkbox" [(ngModel)]="cdNote.isSelected">
+                                                            </ng-template>
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
                                                 </td>
-                                                <td>{{cdNote.referenceNo}}</td>
+                                                <td>
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDetailCDNote(cdNote.jobId, cdNote.referenceNo)">{{cdNote.referenceNo}}</a>
+                                                </td>
                                                 <td>{{cdNote.jobNo}}</td>
                                                 <td>
                                                     {{cdNote.hblNo}}
@@ -34,18 +47,44 @@
                                                 <td>
                                                     {{cdNote.partnerName}}
                                                 </td>
-                                                <td>{{ cdNote.total}</td>
-                                                <td>{{ cdNote.currency}</td>
+                                                <td>{{ cdNote.total}}</td>
+                                                <td>{{ cdNote.currency}}</td>
                                                 <td>{{ cdNote.issuedDate}}</td>
                                                 <td>{{ cdNote.creator}}</td>
-                                                <td></td>
+                                                <td>{{ cdNote.status}}</td>
                                             </tr>
                                         </ng-container>
-                                        <tr app-table-none-record *ngIf="!isLoading" [colspan]="headers.length + 1">
+                                        <tr app-table-none-record *ngIf="!isLoading && !cdNotes.length"
+                                            [colspan]="headers.length + 1">
                                         </tr>
                                         <tr app-table-loading *ngIf="isLoading"></tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="pagination-nav">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="tatable__pager-size">
+                                            <div class="select-box">
+                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                    (change)="selectPageSize(pageSize)" name="pagesize">
+                                                    <ng-container
+                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                        <div class="float-right">
+                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                [(ngModel)]="page" [maxSize]="10">
+                                            </pagination>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -56,3 +95,4 @@
         </div>
     </div>
 </div>
+<accounting-detail-cd-note></accounting-detail-cd-note>
