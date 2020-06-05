@@ -90,6 +90,38 @@ export class AccountingRepo {
             );
     }
 
+    updateVoucherAdvancePayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UpdatePaymentVoucher`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkExistedVoucherInAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/CheckExistedVoucherInAdvance`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    upLoadVoucherAdvanceFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UploadFile`, files, "uploadedFile");
+    }
+
+    downloadVoucherAdvanceFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importVoucherAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+
     // add new advance payment with payment request
     addNewAdvancePayment(body: any = {}): Observable<any> {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/Add`, body)

@@ -25,6 +25,9 @@ export class AdvancePayment {
     paymentMethodName: string = '';
     userNameCreated: string = '';
     userNameModified: string = '';
+    isChecked: boolean = false;
+    voucherNo: string = '';
+    voucherDate: string = '';
 
     constructor(object?: any) {
         const self = this;
