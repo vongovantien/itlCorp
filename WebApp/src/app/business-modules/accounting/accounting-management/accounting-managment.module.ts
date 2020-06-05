@@ -22,8 +22,6 @@ import { AccountingManagementSelectPartnerPopupComponent } from './components/po
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './store';
 import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SelectModule } from 'ng2-select';
 
 
 const routing: Routes = [
@@ -38,8 +36,8 @@ const routing: Routes = [
         children: [
             {
                 path: '', component: AccountingManagementVatInvoiceComponent, data: { name: '' }
-    },
-    {
+            },
+            {
                 path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: '' }
             }
         ]
@@ -53,7 +51,6 @@ const routing: Routes = [
 @NgModule({
     imports: [
         CommonModule,
-        FormsModule,
         RouterModule.forChild(routing),
         ShareBussinessModule,
         SharedModule,
@@ -64,8 +61,6 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducer),
-
-
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,
