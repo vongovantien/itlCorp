@@ -604,7 +604,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var isOtherSOA = false;
                     foreach (var item in charges)
                     {
-                        isOtherSOA |= (item.Soano != null || item.PaySoano != null);
+                        isOtherSOA |= (item.Soano != null || item.Soano != string.Empty || item.PaySoano != null || item.PaySoano != string.Empty);
                     }
                     if (isOtherSOA == true)
                     {

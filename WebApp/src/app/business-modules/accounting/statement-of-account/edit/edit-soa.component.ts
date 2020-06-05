@@ -49,6 +49,7 @@ export class StatementOfAccountEditComponent extends AppList {
         private _dataService: DataService,
         private _progressService: NgProgress,
 
+
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -126,7 +127,7 @@ export class StatementOfAccountEditComponent extends AppList {
                         strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
                         jobIds: [],
                         hbls: [],
-                        mbls:[]
+                        mbls: []
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },
@@ -256,10 +257,15 @@ export class StatementOfAccountEditComponent extends AppList {
                             this._toastService.success(`SOA ${res.data.soano} is successfull`, 'Update Success');
 
                             // * get detail again
-                            this.getDetailSOA(this.soaNO, this.currencyLocal);
+                            // this.getDetailSOA(this.soaNO, this.currencyLocal);
 
                             // * init checkbox all
                             this.isCheckAllCharge = false;
+                            this._router.navigate([`/home/accounting/statement-of-account/detail/`], {
+                                queryParams: { no: this.soaNO, currency: this.currencyLocal }
+                            });
+
+
                         }
                     },
                 );

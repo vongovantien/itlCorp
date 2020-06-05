@@ -255,5 +255,12 @@ namespace eFMS.API.Accounting.Controllers
             }
             return isExited;
         }
+
+        [HttpGet("GetDataAcctMngtExport")]
+        public IActionResult GetDataAcctMngtExport(string typeOfAcctMngt)
+        {
+            var data = accountingService.GetDataAcctMngtExport(typeOfAcctMngt);
+            return Ok(data);
+        }
     }
 }

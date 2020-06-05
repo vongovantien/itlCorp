@@ -78,6 +78,8 @@
         #region -- TYPE SOA--
         public static readonly string TYPE_SOA_CREDIT = "Credit";
         public static readonly string TYPE_SOA_DEBIT = "Debit";
+        public static readonly string TYPE_SOA_OBH = "Obh";
+
 
 
 
