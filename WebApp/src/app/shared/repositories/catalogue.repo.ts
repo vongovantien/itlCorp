@@ -279,17 +279,21 @@ export class CatalogueRepo {
         );
     }
 
-    getListChartOfAccounts(page?: number, size?: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/paging`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
+    getListChartOfAccounts(page?: number, size?: number, body: any = { active: 'active' }) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                map((data: any) => data)
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatChartOfAccounts/Query`, body, {});
+        }
+
     }
 
     getListSaleman(partnerId: string) {
-        // const header: HttpHeaders = new HttpHeaders();
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
             .pipe(
                 map((data: any) => data)
