@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -333,7 +334,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -533,7 +534,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -662,7 +663,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -993,5 +994,85 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- DETAIL ---
 
+        #region --- EXPORT ---
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
+            return customNos.FirstOrDefault();
+        }
+
+        public List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt)
+        {
+            var accountings = DataContext.Get(x => x.Type == typeOfAcctMngt);            
+            var partners = partnerRepo.Get();
+            var data = new List<AccountingManagementExport>();
+            foreach(var acct in accountings)
+            {
+                Expression<Func<ChargeOfAccountingManagementModel, bool>> expressionQuery = chg => chg.AcctManagementId == acct.Id;
+                var charges = new List<ChargeOfAccountingManagementModel>();
+                if (acct.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                {
+                    charges = GetChargeSellForInvoice(expressionQuery);
+                }
+                else
+                {
+                    charges = GetChargeForVoucher(expressionQuery); ;
+                }
+                foreach(var charge in charges)
+                {
+                    string _deptCode = string.Empty;
+                    if (!string.IsNullOrEmpty(charge.JobNo))
+                    {
+                        if (charge.JobNo.Contains("LOG"))
+                        {
+                            _deptCode = "OPS";
+                        }
+                        else if (charge.JobNo.Contains("A"))
+                        {
+                            _deptCode = "AIR";
+                        }
+                        else if (charge.JobNo.Contains("S"))
+                        {
+                            _deptCode = "SEA";
+                        }
+                    }
+                    string _paymentMethod = string.Empty;
+                    if (!string.IsNullOrEmpty(acct.PaymentMethod))
+                    {
+                        if (acct.PaymentMethod.Contains("Cash"))
+                        {
+                            _paymentMethod = "TM";
+                        }
+                        else if (acct.PaymentMethod.Contains("Bank"))
+                        {
+                            _paymentMethod = "CK";
+                        }
+                    }
+                    var vatPartner = partners.Where(x => x.Id == charge.VatPartnerId).FirstOrDefault();
+                    var partnerAcct = partners.Where(x => x.Id == acct.PartnerId).FirstOrDefault();
+                    var item = new AccountingManagementExport();
+                    item = mapper.Map<AccountingManagementExport>(charge);
+                    item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
+                    item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
+                    item.PartnerId = partnerAcct.AccountNo; //Partner ID trên VAT Invoice Or Voucher
+                    item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
+                    item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
+                    item.Description = acct.Description;
+                    item.IsTick = true; //Default is True
+                    item.PaymentTerm = 0; //Default is 0                    
+                    item.DepartmentCode =  _deptCode;
+                    item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);                   
+                    item.PaymentMethod = _paymentMethod;
+                    item.StatusInvoice = string.Empty;
+                    item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
+                    item.ReleaseDateEInvoice = null;
+
+                    data.Add(item);
+                }
+            }
+            
+            return data;
+        }
+        #endregion --- EXPORT ---
     }
 }

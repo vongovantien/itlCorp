@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -22,5 +23,6 @@ namespace eFMS.API.Accounting.DL.IService
         string GenerateVoucherId();
         AccAccountingManagementModel GetById(Guid id);
         string GenerateInvoiceNoTemp();
+        List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt);
     }
 }
