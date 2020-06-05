@@ -870,7 +870,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            Service = "CL",
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                            ExchangeDate = sur.ExchangeDate,
-                                           FinalExchangeRate = sur.FinalExchangeRate
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           TypeCharge = chg.Type
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -1950,7 +1951,7 @@ namespace eFMS.API.Accounting.DL.Services
             if(soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
             soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
-                charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower());
+                charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
             }
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
             var partner = catPartnerRepo.Get();
