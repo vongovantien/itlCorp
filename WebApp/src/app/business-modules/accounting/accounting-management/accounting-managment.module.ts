@@ -20,9 +20,10 @@ import { AccountingManagementCreateVATInvoiceComponent } from './vat/create/acco
 import { AccountingManagementFormCreateVATInvoiceComponent } from './components/form-create-vat-invoice/form-create-vat-invoice.component';
 import { AccountingManagementInputRefNoPopupComponent } from './components/popup/input-ref-no/input-ref-no.popup';
 import { AccountingManagementSelectPartnerPopupComponent } from './components/popup/select-partner/select-partner.popup';
+import { AccountingManagementListChargeComponent } from './components/list-charge/list-charge-accouting-management.component';
+import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
 
 import { reducers } from './store';
-import { AccountingManagementListChargeComponent } from './components/list-charge/list-charge-accouting-management.component';
 
 const routing: Routes = [
     {
@@ -61,14 +62,13 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducers),
-
-
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,
         AccountingManagementVatInvoiceComponent,
         AccountingManagementVoucherComponent,
         AccountingManagementFormSearchComponent,
+        AccountingManagementFormSearchVatVoucherComponent,
         AccountingManagementCreateVATInvoiceComponent,
         AccountingManagementFormCreateVATInvoiceComponent,
         AccountingManagementInputRefNoPopupComponent,

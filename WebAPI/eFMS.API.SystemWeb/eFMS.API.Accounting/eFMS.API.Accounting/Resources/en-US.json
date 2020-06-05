@@ -112,6 +112,15 @@
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : STAGE
+  //------------start: VOUCHER PAYMENT
+  "MSG_ADVANCE_NO_DUPLICATE": "Advance no {0} has been duplicated!|wrong",
+  "MSG_ADVANCE_NO_EMPTY": "Advance no is not allow empty!|wrong",
+  "MSG_ADVANCE_NO_NOT_EXIST": "Advance no not exist",
+  "MSG_VOUCHER_NO_EMPTY": "Voucher no is not allow empty!|wrong",
+  "MSG_VOUCHER_DATE_EMPTY": "Voucher date is not allow empty!|wrong",
+  "MSG_VOUCHER_DATE_NOT_VALID": "Voucher date {0} not valid!|wrong",
+
+  //------------end  : VOUCHER
 
   "DO_NOT_HAVE_PERMISSION": "Do not have permission"
 }

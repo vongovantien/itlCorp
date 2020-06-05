@@ -395,7 +395,7 @@ export class PartnerDetailComponent extends AppList {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -455,7 +455,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {

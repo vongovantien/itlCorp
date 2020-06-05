@@ -208,7 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherId = acc.VoucherId,
                            InvoiceNoTempt = acc.InvoiceNoTempt,
                            InvoiceNoReal = acc.InvoiceNoReal,
-                           PartnerName = pat.PartnerNameVn,
+                           PartnerName = pat.ShortName,
                            TotalAmount = acc.TotalAmount,
                            Currency = acc.Currency,
                            Date = acc.Date, //Invoice Date or Voucher Date
@@ -254,7 +254,7 @@ namespace eFMS.API.Accounting.DL.Services
                                          ContraAccount = chgDef.CreditAccountNo,
                                          OrgAmount = sur.Quantity * sur.UnitPrice,
                                          Vat = sur.Vatrate,
-                                         OrgVatAmount = sur.Total,
+                                         OrgVatAmount = 0, //Tính toán bên dưới
                                          VatAccount = chgDef.DebitVat,
                                          Currency = sur.CurrencyId,
                                          ExchangeDate = sur.ExchangeDate,
@@ -263,7 +263,7 @@ namespace eFMS.API.Accounting.DL.Services
                                          AmountVnd = 0, //Tính toán bên dưới
                                          VatAmountVnd = 0, //Tính toán bên dưới
                                          VatPartnerId = sur.PaymentObjectId,
-                                         VatPartnerCode = pat.AccountNo,
+                                         VatPartnerCode = pat.TaxCode, //Tax code
                                          VatPartnerName = pat.PartnerNameVn,
                                          VatPartnerAddress = pat.AddressVn,
                                          ObhPartner = null,
@@ -302,7 +302,7 @@ namespace eFMS.API.Accounting.DL.Services
                                              ContraAccount = chgDef.CreditAccountNo,
                                              OrgAmount = sur.Quantity * sur.UnitPrice,
                                              Vat = sur.Vatrate,
-                                             OrgVatAmount = sur.Total,
+                                             OrgVatAmount = 0, //Tính toán bên dưới
                                              VatAccount = chgDef.DebitVat,
                                              Currency = sur.CurrencyId,
                                              ExchangeDate = sur.ExchangeDate,
@@ -311,7 +311,7 @@ namespace eFMS.API.Accounting.DL.Services
                                              AmountVnd = 0, //Tính toán bên dưới
                                              VatAmountVnd = 0, //Tính toán bên dưới
                                              VatPartnerId = sur.PaymentObjectId,
-                                             VatPartnerCode = pat.AccountNo,
+                                             VatPartnerCode = pat.TaxCode, //Tax code
                                              VatPartnerName = pat.PartnerNameVn,
                                              VatPartnerAddress = pat.AddressVn,
                                              ObhPartner = null,
@@ -333,6 +333,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -451,7 +452,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             ContraAccount = chgDef.CreditAccountNo,
                                             OrgAmount = sur.Quantity * sur.UnitPrice,
                                             Vat = sur.Vatrate,
-                                            OrgVatAmount = sur.Total,
+                                            OrgVatAmount = 0, //Tính toán bên dưới
                                             VatAccount = chgDef.DebitVat,
                                             Currency = sur.CurrencyId,
                                             ExchangeDate = sur.ExchangeDate,
@@ -460,7 +461,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             AmountVnd = 0, //Tính toán bên dưới
                                             VatAmountVnd = 0, //Tính toán bên dưới
                                             VatPartnerId = sur.PaymentObjectId,
-                                            VatPartnerCode = pat.AccountNo,
+                                            VatPartnerCode = pat.TaxCode, //Tax code
                                             VatPartnerName = pat.PartnerNameVn,
                                             VatPartnerAddress = pat.AddressVn,
                                             ObhPartner = null,
@@ -501,7 +502,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 ContraAccount = chgDef.CreditAccountNo,
                                                 OrgAmount = sur.Quantity * sur.UnitPrice,
                                                 Vat = sur.Vatrate,
-                                                OrgVatAmount = sur.Total,
+                                                OrgVatAmount = 0, //Tính toán bên dưới
                                                 VatAccount = chgDef.DebitVat,
                                                 Currency = sur.CurrencyId,
                                                 ExchangeDate = sur.ExchangeDate,
@@ -510,7 +511,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 AmountVnd = 0, //Tính toán bên dưới
                                                 VatAmountVnd = 0, //Tính toán bên dưới
                                                 VatPartnerId = sur.PaymentObjectId,
-                                                VatPartnerCode = pat.AccountNo,
+                                                VatPartnerCode = pat.TaxCode, //Tax code
                                                 VatPartnerName = pat.PartnerNameVn,
                                                 VatPartnerAddress = pat.AddressVn,
                                                 ObhPartner = null,
@@ -532,6 +533,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -577,7 +579,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            ContraAccount = chgDef.CreditAccountNo,
                                            OrgAmount = sur.Quantity * sur.UnitPrice,
                                            Vat = sur.Vatrate,
-                                           OrgVatAmount = sur.Total,
+                                           OrgVatAmount = 0, //Tính toán bên dưới
                                            VatAccount = chgDef.DebitVat,
                                            Currency = sur.CurrencyId,
                                            ExchangeDate = sur.ExchangeDate,
@@ -586,7 +588,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            AmountVnd = 0, //Tính toán bên dưới
                                            VatAmountVnd = 0, //Tính toán bên dưới
                                            VatPartnerId = sur.PayerId,
-                                           VatPartnerCode = pat.AccountNo,
+                                           VatPartnerCode = pat.TaxCode, //Tax code
                                            VatPartnerName = pat.PartnerNameVn,
                                            VatPartnerAddress = pat.AddressVn,
                                            ObhPartner = obhPat.PartnerNameVn,
@@ -629,7 +631,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                ContraAccount = chgDef.CreditAccountNo,
                                                OrgAmount = sur.Quantity * sur.UnitPrice,
                                                Vat = sur.Vatrate,
-                                               OrgVatAmount = sur.Total,
+                                               OrgVatAmount = 0, //Tính toán bên dưới
                                                VatAccount = chgDef.DebitVat,
                                                Currency = sur.CurrencyId,
                                                ExchangeDate = sur.ExchangeDate,
@@ -638,7 +640,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                AmountVnd = 0, //Tính toán bên dưới
                                                VatAmountVnd = 0, //Tính toán bên dưới
                                                VatPartnerId = sur.PayerId,
-                                               VatPartnerCode = pat.AccountNo,
+                                               VatPartnerCode = pat.TaxCode, //Tax code
                                                VatPartnerName = pat.PartnerNameVn,
                                                VatPartnerAddress = pat.AddressVn,
                                                ObhPartner = obhPat.PartnerNameVn,
@@ -660,6 +662,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat.Value));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -780,7 +783,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
                 var accounting = mapper.Map<AccAccountingManagement>(model);
-                
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -793,6 +796,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
+                                charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                                 {
                                     charge.VoucherId = accounting.VoucherId;
@@ -856,6 +860,7 @@ namespace eFMS.API.Accounting.DL.Services
                             foreach (var surchargeOfAcct in surchargeOfAcctCurrent)
                             {
                                 surchargeOfAcct.AcctManagementId = null;
+                                surchargeOfAcct.FinalExchangeRate = null;
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                                 {
                                     surchargeOfAcct.VoucherId = null;
@@ -877,6 +882,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
+                                charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                                 {
                                     charge.VoucherId = accounting.VoucherId;
@@ -935,7 +941,7 @@ namespace eFMS.API.Accounting.DL.Services
             string year = DateTime.Now.Year.ToString();
             string month = (monthCurrent < 10 ? "0" : string.Empty) + monthCurrent.ToString();
             string no = "001";
-            
+
             var voucherNewests = Get(x => x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month).OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
             var voucherNewest = voucherNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(voucherNewest))
@@ -949,6 +955,20 @@ namespace eFMS.API.Accounting.DL.Services
             }
             var voucher = year + "FDT" + no + "/" + month;
             return voucher;
+        }
+
+        public string GenerateInvoiceNoTemp()
+        {
+            string no = "0000001";
+            int outNum = 0;
+            var invoiceNos = Get(x => int.TryParse(x.InvoiceNoTempt, out outNum)).OrderByDescending(o => o.InvoiceNoTempt).Select(s => s.InvoiceNoTempt);
+            var invoiceNoNewest = invoiceNos.FirstOrDefault();
+            if (!string.IsNullOrEmpty(invoiceNoNewest))
+            {
+                no = (Convert.ToInt32(invoiceNoNewest) + 1).ToString();
+                no = no.PadLeft(7, '0');
+            }
+            return no;
         }
         #endregion -- CREATE/UPDATE ---
 
@@ -970,7 +990,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return result;
-        }       
+        }
         #endregion --- DETAIL ---
 
     }
