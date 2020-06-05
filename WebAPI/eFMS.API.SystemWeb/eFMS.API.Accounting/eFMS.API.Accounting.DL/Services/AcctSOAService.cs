@@ -1966,14 +1966,14 @@ namespace eFMS.API.Accounting.DL.Services
                                  ToDate = s.SoatoDate
                              };
 
-            var results = charge.GroupBy(x => x.JobId).AsQueryable();
+            var results = charge.GroupBy(x => new { x.JobId, x.HBLID}).AsQueryable();
 
             foreach (var group in results)
             {
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
                 exportSOAOPS.Charges = new List<ChargeSOAResult>();
-                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.Commodity).FirstOrDefault();
-                var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.CommodityGroupId).FirstOrDefault();
+                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
                 string commodityName = string.Empty;
                 if(commodity != null)
                 {
