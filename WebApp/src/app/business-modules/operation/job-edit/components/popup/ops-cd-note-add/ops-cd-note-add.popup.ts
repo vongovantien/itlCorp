@@ -112,7 +112,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
-            { field: 'id', label: 'Partner ID' },
+            { field: 'accountNo', label: 'Partner ID' },
             { field: 'shortName', label: 'Partner ABBR' },
             { field: 'partnerNameEn', label: 'Partner Name' },
             { field: 'taxCode', label: 'Tax Code' },
