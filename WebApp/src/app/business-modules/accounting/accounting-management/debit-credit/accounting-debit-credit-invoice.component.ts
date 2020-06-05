@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
+import { DocumentationRepo } from '@repositories';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { CDNoteViewModel } from 'src/app/shared/models/accouting/cdnoteview.model';
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';
 @Component({
@@ -11,9 +14,11 @@ type TAB = 'CDI' | 'VAT' | 'VOUCHER';
 export class AccountingManagementDebitCreditInvoiceComponent extends AppList implements OnInit {
 
     selectedTab: TAB = 'CDI';
+    cdNotes: CDNoteViewModel[];
 
     constructor(
-        private _router: Router
+        private _router: Router,
+        private _documentationRepo: DocumentationRepo
     ) {
         super();
     }
@@ -43,5 +48,27 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                 break;
             }
         }
+    }
+    searchInvoiceAndCDNotes(event) {
+        this.dataSearch = event;
+        this._progressRef.start();
+        this._documentationRepo.pagingInvoiceAndCDNotes(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                }),
+                map((data: any) => {
+                    return {
+                        data: data.data.map((item: any) => new CDNoteViewModel(item)),
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.totalItems = res.totalItems || 0;
+                    this.cdNotes = res.data;
+                },
+            );
     }
 }

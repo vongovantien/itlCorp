@@ -5,7 +5,8 @@
             <tabset class="custom-class-tab">
                 <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
 
-                    <form-search-accounting-management></form-search-accounting-management>
+                    <form-search-accounting-management (onSearch)=searchInvoiceAndCDNotes($event)>
+                    </form-search-accounting-management>
 
                     <div class="m-portlet">
                         <div class="m-portlet__body">
@@ -20,8 +21,25 @@
                                         <th class="first table-actions-col"></th>
                                     </thead>
                                     <tbody>
-                                        <ng-container>
+                                        <ng-container *ngIf="!!cdNotes.length">
+                                            <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
 
+                                                </td>
+                                                <td>{{cdNote.referenceNo}}</td>
+                                                <td>{{cdNote.jobNo}}</td>
+                                                <td>
+                                                    {{cdNote.hblNo}}
+                                                </td>
+                                                <td>
+                                                    {{cdNote.partnerName}}
+                                                </td>
+                                                <td>{{ cdNote.total}</td>
+                                                <td>{{ cdNote.currency}</td>
+                                                <td>{{ cdNote.issuedDate}}</td>
+                                                <td>{{ cdNote.creator}}</td>
+                                                <td></td>
+                                            </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading" [colspan]="headers.length + 1">
                                         </tr>

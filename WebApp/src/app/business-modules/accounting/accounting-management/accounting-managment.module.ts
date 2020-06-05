@@ -11,6 +11,8 @@ import { AccountingManagementDebitCreditInvoiceComponent } from './debit-credit/
 import { AccountingManagementVatInvoiceComponent } from './vat/accounting-vat-invoice.component';
 import { AccountingManagementVoucherComponent } from './voucher/accounting-voucher.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { SelectModule } from 'ng2-select';
 
 const routing: Routes = [
     {
@@ -31,11 +33,14 @@ const routing: Routes = [
 @NgModule({
     imports: [
         CommonModule,
+        FormsModule,
         RouterModule.forChild(routing),
         ShareBussinessModule,
         SharedModule,
         TabsModule.forRoot(),
         NgxDaterangepickerMd,
+        ReactiveFormsModule,
+        SelectModule
 
     ],
     declarations: [
