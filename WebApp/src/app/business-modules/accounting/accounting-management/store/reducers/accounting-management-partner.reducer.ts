@@ -20,8 +20,14 @@ export const initialState: IAccountingManagementPartnerState = {
     charges: []
 };
 
-export const accountingManagementPartnerReducer = createReducer(initialState, on(accountingManagementActions.SelectPartner,
-    (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
-        ...state, charges: payload.charges, ...payload
-    })));
+export const accountingManagementPartnerReducer = createReducer(initialState,
+    on(accountingManagementActions.SelectPartner,
+        (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
+            ...state, charges: payload.charges, ...payload
+        })),
+    on(accountingManagementActions.InitPartner,
+        () => ({
+            ...initialState,
+        })),
+);
 

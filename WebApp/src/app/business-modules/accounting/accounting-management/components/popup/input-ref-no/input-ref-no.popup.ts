@@ -7,6 +7,8 @@ import { PartnerOfAcctManagementResult } from '@models';
 
 import { ToastrService } from 'ngx-toastr';
 import { AccountingManagementSelectPartnerPopupComponent } from '../select-partner/select-partner.popup';
+import { IAccountingManagementState, SelectPartner } from '../../../store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'input-ref-no-popup',
@@ -46,7 +48,8 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
 
     constructor(
         private _accountingRepo: AccountingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<IAccountingManagementState>
     ) {
         super();
     }
@@ -89,10 +92,17 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
             .subscribe(
                 (res: PartnerOfAcctManagementResult[]) => {
                     if (!!res && !!res.length) {
-                        this.selectPartnerPopup.listPartners = res;
-                        this.selectPartnerPopup.selectedPartner = null;
+                        if (res.length === 1) {
+                            this._store.dispatch(SelectPartner(res[0]));
+                            this.hide();
+                            return;
+                        } else {
+                            this.selectPartnerPopup.listPartners = res;
+                            this.selectPartnerPopup.selectedPartner = null;
 
-                        this.selectPartnerPopup.show();
+                            this.selectPartnerPopup.show();
+                        }
+
                     } else {
                         this._toastService.warning("Not found data");
                     }

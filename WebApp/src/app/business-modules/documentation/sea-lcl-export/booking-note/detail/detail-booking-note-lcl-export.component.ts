@@ -213,3 +213,4 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
         f.show();
     }
 }
+

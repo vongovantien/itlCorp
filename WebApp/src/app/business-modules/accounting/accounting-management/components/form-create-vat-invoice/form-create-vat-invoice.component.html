@@ -5,7 +5,8 @@
                 <div class="col-lg-6">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerId.dirty) && !partnerId.valid }">
                                 <label required>Partner Name</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                     [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
@@ -18,19 +19,20 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label>Personal Name</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="personalName">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label>Address</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="partnerAddress">
                             </div>
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label>Description</label>
-                                <textarea class="form-control" cols="30" rows="5"></textarea>
+                                <textarea class="form-control" cols="30" rows="5"
+                                    formControlName="description"></textarea>
                             </div>
                         </div>
                     </div>
@@ -38,9 +40,11 @@
                 <div class="col-lg-6">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || voucherId.dirty) && !voucherId.valid }">
                                 <label required>Voucher ID</label>
-                                <input type="text" class="form-control" placeholder="Voucher">
+                                <input type="text" class="form-control" placeholder="Voucher"
+                                    formControlName="voucherId">
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -57,22 +61,25 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || invoiceNoTempt.dirty) && !invoiceNoTempt.valid }">
                                 <label required>Invoice No (Temp)</label>
-                                <input type="text" class="form-control" placeholder="Invoice Temp">
+                                <input type="text" class="form-control" placeholder="Invoice Temp"
+                                    formControlName="invoiceNoTempt">
                             </div>
 
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Real Invoice</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" formControlName="invoiceNoReal">
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || serie.dirty) && !serie.valid }">
                                 <label required>Series</label>
-                                <input type="text" class="form-control" placeholder="Series No">
+                                <input type="text" class="form-control" placeholder="Series No" formControlName="serie">
                             </div>
 
                         </div>
@@ -88,7 +95,7 @@
                             <div class="form-group">
                                 <label>Account No</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'account')"
-                                    [currentActiveItemId]="{ field: 'id', value: accountNo.value}"
+                                    [currentActiveItemId]="{ field: 'accountCode', value: accountNo.value}"
                                     [selectedDisplayFields]="['accountCode','accountNameLocal']"
                                     [dataSources]="chartOfAccounts | async" [displayFields]="displayFieldsChartAccount"
                                     (remove)="resetFormControl(accountNo)" placeholder="Charts of account">
@@ -98,7 +105,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Total Amount</label>
-                                <input type="text" class="form-control" placeholder="Total">
+                                <input type="text" class="form-control" placeholder="Total"
+                                    formControlName="totalAmount">
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -111,11 +119,13 @@
                         </div>
                         <div class="col-lg-12">
                             <div class="row">
-                                <div class="col-lg-6">
-                                    <span class="m-badge m-badge--danger m-badge--wide">New</span>
+                                <div class="col-lg-6 w-100">
+                                    <button class="btn btn-danger  m-btn--uppercase w-100" type="button">
+                                        <span>{{formGroup.controls["status"].value}}</span>
+                                    </button>
                                 </div>
-                                <div class="col-lg-6">
-                                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                <div class="col-lg-6 w-100">
+                                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase w-100"
                                         type="button" (click)="refNoPopup.show()">
                                         <span>
                                             <i class="la la-edit"></i>
@@ -132,7 +142,7 @@
                 <div class="col-lg-12">
                     <div class="form-group">
                         <label>Attach Document Info</label>
-                        <textarea class="form-control" cols="30" rows="5"></textarea>
+                        <textarea class="form-control" cols="30" rows="5" formControlName="attachDocInfo"></textarea>
                     </div>
                 </div>
             </div>

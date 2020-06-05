@@ -1,5 +1,8 @@
+import { SystemConstants } from "@constants";
+// tslint:disable: no-any
+
 export class AccAccountingManagement {
-    id: string = '00000000-0000-0000-0000-000000000000';
+    id: string = SystemConstants.EMPTY_GUID;
     partnerId: string = null;
     personalName: string = null;
     partnerAddress: string = null;
@@ -19,13 +22,13 @@ export class AccAccountingManagement {
     type: string = null;
     groupId: number = 0;
     departmentId: number = 0;
-    officeId: string = '00000000-0000-0000-0000-000000000000';
-    companyId: string = '00000000-0000-0000-0000-000000000000';
+    officeId: string = SystemConstants.EMPTY_GUID;
+    companyId: string = SystemConstants.EMPTY_GUID;
     userCreated: string = null;
     datetimeCreated: string = null;
     userModified: string = null;
     datetimeModified: string = null;
-    // tslint:disable-next-line: no-any
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -37,8 +40,8 @@ export class AccAccountingManagement {
 }
 
 export class ChargeOfAccountingManagementModel {
-    surchargeId: string = '00000000-0000-0000-0000-000000000000';
-    chargeId: string = '00000000-0000-0000-0000-000000000000';
+    surchargeId: string = SystemConstants.EMPTY_GUID;
+    chargeId: string = SystemConstants.EMPTY_GUID;
     chargeCode: string = null;
     chargeName: string = null;
     jobNo: string = null;
@@ -69,8 +72,9 @@ export class ChargeOfAccountingManagementModel {
     mbl: string = null;
     soaNo: string = null;
     settlementCode: string = null;
-    acctManagementId: string = '00000000-0000-0000-0000-000000000000';
-    // tslint:disable-next-line: no-any
+    acctManagementId: string = SystemConstants.EMPTY_GUID;
+    // * Custom
+    isSelected: boolean = false;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -83,7 +87,9 @@ export class ChargeOfAccountingManagementModel {
 
 export class AccAccountingManagementModel extends AccAccountingManagement {
     charges: ChargeOfAccountingManagementModel[] = new Array<ChargeOfAccountingManagementModel>();
-    // tslint:disable-next-line: no-any
+
+    userNameCreated: string = null;
+    userNameModified: string = null;
     constructor(object?: any) {
         super();
         const self = this;
@@ -102,7 +108,6 @@ export class PartnerOfAcctManagementResult {
     settlementRequester: string = null;
     inputRefNo: string = null;
     charges: ChargeOfAccountingManagementModel[] = new Array<ChargeOfAccountingManagementModel>();
-    // tslint:disable-next-line: no-any
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -120,8 +125,7 @@ export class PartnerOfAcctManagementCriteria {
     hbls: string[] = [];
     mbls: string[] = [];
     settlementCodes: string[] = [];
-    // tslint:disable-next-line: no-any
-    constructor(object?: any) {
+    constructor(object?: object) {
         const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
@@ -134,7 +138,7 @@ export class PartnerOfAcctManagementCriteria {
 export class AccAccountingManagementResult extends AccAccountingManagement {
     partnerName: string = null;
     creatorName: string = null;
-    // tslint:disable-next-line: no-any
+
     constructor(object?: any) {
         super();
         const self = this;

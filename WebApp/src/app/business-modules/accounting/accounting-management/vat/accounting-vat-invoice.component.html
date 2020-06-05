@@ -1,5 +1,11 @@
 <div class="vat-invoice-wrapper  m-animate-fade-in">
-    <app-sub-header> </app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
+                routerLink="/home/accounting/management/vat-invoice/new">
+            </app-default-button>
+        </div>
+    </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
@@ -36,7 +42,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
-                                                    <a>{{invoice.voucherId}}</a>
+                                                    <a [routerLink]="['./'+invoice.id]">{{invoice.voucherId}}</a>
                                                 </td>
                                                 <td>{{invoice.invoiceNoTempt}}</td>
                                                 <td>{{invoice.invoiceNoReal}}</td>

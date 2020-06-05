@@ -10,9 +10,10 @@ import { IAccountingManagementState, SelectPartner } from '../../../store';
 })
 export class AccountingManagementSelectPartnerPopupComponent extends PopupBase implements OnInit {
 
+    @Output() onSelect: EventEmitter<PartnerOfAcctManagementResult> = new EventEmitter<PartnerOfAcctManagementResult>();
+
     listPartners: PartnerOfAcctManagementResult[] = [];
 
-    @Output() onSelect: EventEmitter<PartnerOfAcctManagementResult> = new EventEmitter<PartnerOfAcctManagementResult>();
     selectedPartner: PartnerOfAcctManagementResult;
 
     constructor(

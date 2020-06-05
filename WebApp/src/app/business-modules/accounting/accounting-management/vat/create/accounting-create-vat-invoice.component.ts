@@ -1,9 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { ToastrService } from 'ngx-toastr';
-import { PartnerOfAcctManagementResult } from '@models';
+import { AccAccountingManagementModel } from '@models';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { InfoPopupComponent } from '@common';
+import { formatDate } from '@angular/common';
+import { AccountingRepo } from '@repositories';
 
-import { AccountingManagementSelectPartnerPopupComponent } from '../../components/popup/select-partner/select-partner.popup';
+import { AccountingManagementFormCreateVATInvoiceComponent } from '../../components/form-create-vat-invoice/form-create-vat-invoice.component';
+import { AccountingManagementListChargeComponent } from '../../components/list-charge/list-charge-accouting-management.component';
+import { IAccountingManagementState, SelectPartner, InitPartner } from '../../store';
+
+import { catchError } from 'rxjs/operators';
+import _merge from 'lodash/merge';
 
 
 @Component({
@@ -12,15 +22,78 @@ import { AccountingManagementSelectPartnerPopupComponent } from '../../component
 })
 export class AccountingManagementCreateVATInvoiceComponent extends AppForm implements OnInit {
 
+    @ViewChild(AccountingManagementFormCreateVATInvoiceComponent, { static: false }) formCreateComponent: AccountingManagementFormCreateVATInvoiceComponent;
+    @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
+
     constructor(
-        private _toastService: ToastrService
+        protected _toastService: ToastrService,
+        protected _accountingRepo: AccountingRepo,
+        protected _store: Store<IAccountingManagementState>
+
     ) {
         super();
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        this._store.dispatch(InitPartner());
+    }
 
-    getListPartnerCharge(data: PartnerOfAcctManagementResult[]) {
-        console.log(data);
+    onSubmitSaveInvoice() {
+        this.formCreateComponent.isSubmitted = true;
+
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+
+        if (!this.listChargeComponent.charges.length) {
+            this._toastService.warning("VAT Invoice don't have any charge in this period, Please check it again!");
+            return;
+        }
+
+        const modelAdd: AccAccountingManagementModel = this.onSubmitData();
+        modelAdd.type = 'Invoice';
+
+        modelAdd.charges = [...this.listChargeComponent.charges];
+        console.log(modelAdd);
+
+        this.saveInvoice(modelAdd);
+    }
+
+    checkValidateForm() {
+        this.setError(this.formCreateComponent.currency);
+        this.setError(this.formCreateComponent.paymentMethod);
+
+        let valid: boolean = true;
+        if (!this.formCreateComponent.formGroup.valid) {
+            valid = false;
+        }
+        return valid;
+    }
+
+    onSubmitData(): AccAccountingManagementModel {
+        const form: { [name: string]: any } = this.formCreateComponent.formGroup.getRawValue();
+        const formData = {
+            date: !!form.date && !!form.date.startDate ? formatDate(form.date.startDate, 'yyyy-MM-dd', 'en') : null,
+            paymentMethod: !!form.paymentMethod && !!form.paymentMethod.length ? form.paymentMethod[0].id : null,
+            currency: !!form.currency && !!form.currency.length ? form.currency[0].id : null,
+        };
+
+        return new AccAccountingManagementModel(Object.assign(_merge(form, formData)));
+    }
+
+    saveInvoice(body: AccAccountingManagementModel) {
+        this._accountingRepo.addNewAcctMgnt(body)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
     }
 }

@@ -24,6 +24,7 @@ import { AccountingManagementListChargeComponent } from './components/list-charg
 import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
 
 import { reducers } from './store';
+import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
 
 const routing: Routes = [
     {
@@ -39,7 +40,10 @@ const routing: Routes = [
                 path: '', component: AccountingManagementVatInvoiceComponent, data: { name: '' }
             },
             {
-                path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: '' }
+                path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: 'New' }
+            },
+            {
+                path: ':vatInvoiceId', component: AccountingManagementDetailVatInvoiceComponent, data: { name: 'Edit' }
             }
         ]
     },
@@ -73,7 +77,8 @@ const routing: Routes = [
         AccountingManagementFormCreateVATInvoiceComponent,
         AccountingManagementInputRefNoPopupComponent,
         AccountingManagementSelectPartnerPopupComponent,
-        AccountingManagementListChargeComponent
+        AccountingManagementListChargeComponent,
+        AccountingManagementDetailVatInvoiceComponent
     ],
 
     exports: [],
