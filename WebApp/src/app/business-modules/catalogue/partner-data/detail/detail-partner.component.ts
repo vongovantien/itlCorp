@@ -92,7 +92,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     RequireSaleman(partnerGroup: string): boolean {
-        this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
                 return true;
@@ -114,7 +113,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.partner = res;
-                        this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
+                        // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         this.formPartnerComponent.setFormData(this.partner);
                     }
                 }
@@ -122,7 +121,6 @@ export class PartnerDetailComponent extends AppList {
 
     }
     checkRequireSaleman(partnerGroup: string): boolean {
-        this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
                 return true;

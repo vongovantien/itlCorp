@@ -66,6 +66,7 @@ export class FormAddPartnerComponent extends AppForm {
     coLoaderCode: AbstractControl;
     roundUp: AbstractControl;
     applyDim: AbstractControl;
+    groups: string = '';
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -88,7 +89,6 @@ export class FormAddPartnerComponent extends AppForm {
     ngOnInit() {
         this.initForm();
     }
-    groups: string = 'ALL';
     onChange(event: any, type: string) {
         switch (type) {
             case 'shippingCountry':

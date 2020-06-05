@@ -25,6 +25,8 @@ import { AccountingManagementFormSearchVatVoucherComponent } from './components/
 
 import { reducers } from './store';
 import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
+import { PaginationModule } from 'ngx-bootstrap';
+import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
 
 const routing: Routes = [
     {
@@ -66,6 +68,7 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducers),
+        PaginationModule.forRoot()
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,
@@ -78,7 +81,8 @@ const routing: Routes = [
         AccountingManagementInputRefNoPopupComponent,
         AccountingManagementSelectPartnerPopupComponent,
         AccountingManagementListChargeComponent,
-        AccountingManagementDetailVatInvoiceComponent
+        AccountingManagementDetailVatInvoiceComponent,
+        AccountingDetailCdNoteComponent
     ],
 
     exports: [],
