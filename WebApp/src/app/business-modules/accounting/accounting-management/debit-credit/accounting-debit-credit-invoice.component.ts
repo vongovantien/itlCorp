@@ -7,6 +7,7 @@ import { CDNoteViewModel } from 'src/app/shared/models/accouting/cdnoteview.mode
 import { SortService } from '@services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-note/detail-cd-note.component';
+import { SystemConstants } from '@constants';
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';
 @Component({
@@ -105,5 +106,27 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         this.cdNoteDetailPopupComponent.cdNote = refNo;
         this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, refNo);
         this.cdNoteDetailPopupComponent.show();
+    }
+
+    issueVatInvoice() {
+
+
+    }
+
+    issueVoucher() {
+
+    }
+
+    searchRef() {
+        const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
+            cdNotes: null,
+            soaNos: null,
+            jobNos: null,
+            hbls: null,
+            mbls: null,
+            settlementCodes: null
+        };
+
+        body.cdNotes = this.keyword.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: string) => item.trim());
     }
 }

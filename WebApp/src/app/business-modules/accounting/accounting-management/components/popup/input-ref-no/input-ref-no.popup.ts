@@ -57,7 +57,7 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
     ngOnInit() { }
 
     searchRef() {
-        const body: ISearchInputRef = {
+        const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
             cdNotes: null,
             soaNos: null,
             jobNos: null,
@@ -111,11 +111,4 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
     }
 }
 
-interface ISearchInputRef {
-    cdNotes: string[];
-    soaNos: string[];
-    jobNos: string[];
-    hbls: string[];
-    mbls: string[];
-    settlementCodes: string[];
-}
+
