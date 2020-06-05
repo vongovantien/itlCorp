@@ -2,8 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { PartnerOfAcctManagementResult } from '@models';
 import { Store } from '@ngrx/store';
-import { IAccountingManagementState } from '../../../store/reducers/accounting-management.reducer';
-import { SelectPartner } from '../../../store';
+import { IAccountingManagementState, SelectPartner } from '../../../store';
 
 @Component({
     selector: 'select-partner-popup',
@@ -26,12 +25,11 @@ export class AccountingManagementSelectPartnerPopupComponent extends PopupBase i
 
     selectPartner(item: PartnerOfAcctManagementResult) {
         this.selectedPartner = item;
-
     }
 
     onSubmitSelectPartner() {
         if (!!this.selectedPartner) {
-            // this._store.dispatch(SelectPartner(this.selectedPartner))
+            this._store.dispatch(SelectPartner(this.selectedPartner));
             this.hide();
             this.onSelect.emit(this.selectedPartner);
         }

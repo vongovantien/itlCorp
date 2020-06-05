@@ -11,6 +11,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
 @Component({
     selector: 'form-create-vat-invoice',
@@ -18,8 +19,6 @@ import { map } from 'rxjs/operators';
 })
 
 export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm implements OnInit {
-
-    @Output() onSearchInputRef: EventEmitter<PartnerOfAcctManagementResult[]> = new EventEmitter<PartnerOfAcctManagementResult[]>();
 
     formGroup: FormGroup;
 
@@ -67,6 +66,17 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.chartOfAccounts = this._catalogueRepo.getListChartOfAccounts();
 
         this.initForm();
+
+        this._store.select(getAccoutingManagementPartnerState)
+            .subscribe(
+                (res: IAccountingManagementPartnerState) => {
+                    if (!!res.partnerId) {
+                        if (!this.formGroup.controls['partnerId'].value) {
+                            this.formGroup.controls['partnerId'].setValue(res.partnerId);
+                        }
+                    }
+                }
+            );
     }
 
     initForm() {
@@ -109,9 +119,5 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             default:
                 break;
         }
-    }
-
-    onSearchRefNo(data) {
-        this.onSearchInputRef.emit(data);
     }
 }

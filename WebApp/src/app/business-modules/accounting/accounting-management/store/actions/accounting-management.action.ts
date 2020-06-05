@@ -1,4 +1,4 @@
-import { Action, createAction, props } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
 import { PartnerOfAcctManagementResult } from '@models';
 
 export enum AccountingManagementActionTypes {
@@ -6,3 +6,4 @@ export enum AccountingManagementActionTypes {
 }
 
 export const SelectPartner = createAction(AccountingManagementActionTypes.SELECT_PARTNER, props<PartnerOfAcctManagementResult>());
+

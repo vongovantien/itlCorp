@@ -15,9 +15,6 @@ import { AccountingManagementSelectPartnerPopupComponent } from '../select-partn
 
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
     @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
-
-    @Output() onSearchInputRef: EventEmitter<PartnerOfAcctManagementResult> = new EventEmitter<PartnerOfAcctManagementResult>();
-
     @Input() set type(t: string) {
         this._type = t;
         if (this._type !== 'invoice') {
@@ -88,7 +85,7 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
             default:
                 break;
         }
-        this._accountingRepo.getChargeForVoucherByCriteria(body)
+        this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
             .subscribe(
                 (res: PartnerOfAcctManagementResult[]) => {
                     if (!!res && !!res.length) {
@@ -102,12 +99,6 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                 }
             );
     }
-
-    selectPartner(data: PartnerOfAcctManagementResult) {
-        this.hide();
-        this.onSearchInputRef.emit(data);
-    }
-
 }
 
 interface ISearchInputRef {

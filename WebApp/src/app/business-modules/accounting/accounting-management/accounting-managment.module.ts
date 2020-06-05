@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -19,8 +20,9 @@ import { AccountingManagementCreateVATInvoiceComponent } from './vat/create/acco
 import { AccountingManagementFormCreateVATInvoiceComponent } from './components/form-create-vat-invoice/form-create-vat-invoice.component';
 import { AccountingManagementInputRefNoPopupComponent } from './components/popup/input-ref-no/input-ref-no.popup';
 import { AccountingManagementSelectPartnerPopupComponent } from './components/popup/select-partner/select-partner.popup';
-import { StoreModule } from '@ngrx/store';
-import { reducer } from './store';
+
+import { reducers } from './store';
+import { AccountingManagementListChargeComponent } from './components/list-charge/list-charge-accouting-management.component';
 
 const routing: Routes = [
     {
@@ -58,7 +60,7 @@ const routing: Routes = [
         ReactiveFormsModule,
         ModalModule,
         FormsModule,
-        StoreModule.forFeature('accounting-management', reducer),
+        StoreModule.forFeature('accounting-management', reducers),
 
 
     ],
@@ -70,7 +72,8 @@ const routing: Routes = [
         AccountingManagementCreateVATInvoiceComponent,
         AccountingManagementFormCreateVATInvoiceComponent,
         AccountingManagementInputRefNoPopupComponent,
-        AccountingManagementSelectPartnerPopupComponent
+        AccountingManagementSelectPartnerPopupComponent,
+        AccountingManagementListChargeComponent
     ],
 
     exports: [],

@@ -1,7 +1,19 @@
 
-import { Action } from "@ngrx/store";
-import { IAccountingManagementState, accountingManagementReducer } from "../reducers/accounting-management.reducer";
+import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
+import { IAccountingManagementPartnerState, accountingManagementPartnerReducer } from "./accounting-management-partner.reducer";
 
-export function reducer(state: IAccountingManagementState | undefined, action: Action) {
-    return accountingManagementReducer(state, action);
+export * from './accounting-management-partner.reducer';
+export interface IAccountingManagementState {
+    partner: IAccountingManagementPartnerState;
 }
+
+
+// * SELECTOR
+export const accountingManagementState = createFeatureSelector<IAccountingManagementState>('accounting-management');
+export const getAccoutingManagementPartnerState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state.partner);
+
+
+export const reducers: ActionReducerMap<IAccountingManagementState> = {
+    partner: accountingManagementPartnerReducer
+};
+
