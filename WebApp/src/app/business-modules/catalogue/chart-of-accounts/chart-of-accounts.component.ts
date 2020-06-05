@@ -120,7 +120,7 @@ export class ChartOfAccountsComponent extends AppList implements OnInit {
             if (dataSearch.type === 'accountNameEn') {
                 this.dataSearch.accountNameEn = dataSearch.keyword;
             }
-            if (dataSearch.type === 'status') {
+            if (dataSearch.type === 'active') {
                 this.dataSearch.active = dataSearch.keyword;
             }
         }
