@@ -870,7 +870,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            Service = "CL",
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                            ExchangeDate = sur.ExchangeDate,
-                                           FinalExchangeRate = sur.FinalExchangeRate
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           TypeCharge = chg.Type
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -1950,7 +1951,7 @@ namespace eFMS.API.Accounting.DL.Services
             if(soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
             soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
-                charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower());
+                charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
             }
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
             var partner = catPartnerRepo.Get();
@@ -1966,14 +1967,14 @@ namespace eFMS.API.Accounting.DL.Services
                                  ToDate = s.SoatoDate
                              };
 
-            var results = charge.GroupBy(x => x.JobId).AsQueryable();
+            var results = charge.GroupBy(x => new { x.JobId, x.HBLID}).AsQueryable();
 
             foreach (var group in results)
             {
                 ExportSOAOPS exportSOAOPS = new ExportSOAOPS();
                 exportSOAOPS.Charges = new List<ChargeSOAResult>();
-                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.Commodity).FirstOrDefault();
-                var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key).Select(t => t.CommodityGroupId).FirstOrDefault();
+                var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
                 string commodityName = string.Empty;
                 if(commodity != null)
                 {
