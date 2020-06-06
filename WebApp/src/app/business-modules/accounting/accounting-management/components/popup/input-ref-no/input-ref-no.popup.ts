@@ -104,7 +104,7 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                         }
 
                     } else {
-                        this._toastService.warning("Not found data");
+                        this._toastService.warning("Not found data charge");
                     }
                 }
             );

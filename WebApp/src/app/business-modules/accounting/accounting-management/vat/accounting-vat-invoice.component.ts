@@ -6,7 +6,6 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-accounting-vat-invoice',
@@ -14,13 +13,14 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class AccountingManagementVatInvoiceComponent extends AppList implements OnInit {
+
     invoices: AccAccountingManagementResult[] = [];
+
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -72,7 +72,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
                 map((data: any) => {
                     return {
                         // tslint:disable-next-line: no-any
-                        data: data.data.map((item: any) => new AccAccountingManagementResult(item)),
+                        data: (data.data || []).map((item: any) => new AccAccountingManagementResult(item)),
                         totalItems: data.totalItems,
                     };
                 })

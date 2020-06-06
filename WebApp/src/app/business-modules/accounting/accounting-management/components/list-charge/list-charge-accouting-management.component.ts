@@ -8,6 +8,7 @@ import { IAccountingManagementState, getAccountingManagementPartnerChargeState }
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from '@common';
 import { timeoutD } from '@decorators';
+import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -60,6 +61,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         ];
 
         this._store.select(getAccountingManagementPartnerChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (charges: ChargeOfAccountingManagementModel[]) => {
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {

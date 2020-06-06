@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { ToastrService } from 'ngx-toastr';
 import { AccAccountingManagementModel } from '@models';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { InfoPopupComponent } from '@common';
 import { formatDate } from '@angular/common';
@@ -10,7 +9,7 @@ import { AccountingRepo } from '@repositories';
 
 import { AccountingManagementFormCreateVATInvoiceComponent } from '../../components/form-create-vat-invoice/form-create-vat-invoice.component';
 import { AccountingManagementListChargeComponent } from '../../components/list-charge/list-charge-accouting-management.component';
-import { IAccountingManagementState, SelectPartner, InitPartner } from '../../store';
+import { IAccountingManagementState, InitPartner } from '../../store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
@@ -36,7 +35,6 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
     }
 
     ngOnInit(): void {
-        this._store.dispatch(InitPartner());
     }
 
     onSubmitSaveInvoice() {
@@ -95,5 +93,9 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                     }
                 }
             );
+    }
+
+    ngOnDestroy() {
+        this._store.dispatch(InitPartner());
     }
 }

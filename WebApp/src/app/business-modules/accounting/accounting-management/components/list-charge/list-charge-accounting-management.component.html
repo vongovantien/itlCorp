@@ -80,7 +80,7 @@
                     </ng-container>
                     <tr app-table-none-record *ngIf="!isLoading && !charges.length" [colspan]="headers.length + 1">
                     </tr>
-                    <tr app-table-loading *ngIf="isLoading"></tr>
+                    <tr app-table-row-loading *ngIf="isLoading"></tr>
                 </tbody>
             </table>
         </div>

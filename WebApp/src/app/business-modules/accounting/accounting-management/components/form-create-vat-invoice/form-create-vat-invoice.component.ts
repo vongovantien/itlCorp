@@ -12,7 +12,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from
 import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
-import { map, debounceTime } from 'rxjs/operators';
+import { map, debounceTime, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'form-create-vat-invoice',
@@ -68,6 +68,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.initForm();
 
         this._store.select(getAccoutingManagementPartnerState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: IAccountingManagementPartnerState) => {
                     if (!!res.partnerId) {
