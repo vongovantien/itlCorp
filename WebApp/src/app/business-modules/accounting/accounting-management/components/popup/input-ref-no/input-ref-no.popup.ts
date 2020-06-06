@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 import { AccountingRepo } from '@repositories';
@@ -16,7 +16,9 @@ import { Store } from '@ngrx/store';
 })
 
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
+
     @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
+
     @Input() set type(t: string) {
         this._type = t;
         if (this._type !== 'invoice') {
@@ -29,6 +31,8 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                 { title: 'MBL', value: 'mbls' },
                 { title: 'Debit Note', value: 'cdNotes' },
             ];
+            this.selectedOpion = this.optionsType[5];
+
         }
     }
 
@@ -57,6 +61,9 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
     ngOnInit() { }
 
     searchRef() {
+        if (!this.selectedOpion) {
+            return;
+        }
         const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
             cdNotes: null,
             soaNos: null,
@@ -88,26 +95,50 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
             default:
                 break;
         }
-        this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
-            .subscribe(
-                (res: PartnerOfAcctManagementResult[]) => {
-                    if (!!res && !!res.length) {
-                        if (res.length === 1) {
-                            this._store.dispatch(SelectPartner(res[0]));
-                            this.hide();
-                            return;
+        if (this.type === 'invoice') {
+            this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this.hide();
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
+
+                                this.selectPartnerPopup.show();
+                            }
+
                         } else {
-                            this.selectPartnerPopup.listPartners = res;
-                            this.selectPartnerPopup.selectedPartner = null;
-
-                            this.selectPartnerPopup.show();
+                            this._toastService.warning("Not found data charge");
                         }
-
-                    } else {
-                        this._toastService.warning("Not found data charge");
                     }
-                }
-            );
+                );
+        } else {
+            this._accountingRepo.getChargeForVoucherByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this.hide();
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
+
+                                this.selectPartnerPopup.show();
+                            }
+
+                        } else {
+                            this._toastService.warning("Not found data charge");
+                        }
+                    }
+                );
+        }
+
     }
 }
 

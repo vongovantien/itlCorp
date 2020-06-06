@@ -1,5 +1,10 @@
 <div class="voucher-wrapper  m-animate-fade-in">
-    <app-sub-header> </app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="addButtonSetting" routerLink="/home/accounting/management/voucher/new">
+            </app-default-button>
+        </div>
+    </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
@@ -35,14 +40,14 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
-                                                    <a>{{voucher.voucherId}}</a>
+                                                    <a [routerLink]="['./'+voucher.id]">{{voucher.voucherId}}</a>
                                                 </td>
                                                 <td>{{voucher.partnerName}}</td>
                                                 <td>{{voucher.totalAmount | number: '.0-3'}}</td>
                                                 <td>{{voucher.currency}}</td>
                                                 <td>{{voucher.date | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{voucher.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
-                                                <td>{{voucher.creatorName}}</td>
+                                                <td class="text-success">{{voucher.creatorName}}</td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !vouchers.length"

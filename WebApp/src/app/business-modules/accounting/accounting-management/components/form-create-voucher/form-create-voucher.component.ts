@@ -1,25 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-
-import { CatalogueRepo, AccountingRepo } from '@repositories';
+import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { JobConstants, AccountingConstants } from '@constants';
-import { ChartOfAccounts, Partner } from '@models';
-import { CommonEnum } from '@enums';
-import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
+import { Partner, ChartOfAccounts } from '@models';
 
+import { CatalogueRepo } from '@repositories';
+import { Store } from '@ngrx/store';
+import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { CommonEnum } from '@enums';
 import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
-import { Observable, forkJoin } from 'rxjs';
-import { map, debounceTime, takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
+
 
 @Component({
-    selector: 'form-create-vat-invoice',
-    templateUrl: './form-create-vat-invoice.component.html'
+    selector: 'form-create-voucher',
+    templateUrl: './form-create-voucher.component.html',
 })
-
-export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm implements OnInit {
+export class AccountingManagementFormCreateVoucherComponent extends AppForm implements OnInit {
 
     formGroup: FormGroup;
 
@@ -28,17 +27,15 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
     voucherId: AbstractControl;
     date: AbstractControl;
-    invoiceNoTempt: AbstractControl;
-    invoiceNoReal: AbstractControl;
-    serie: AbstractControl;
     paymentMethod: AbstractControl;
     accountNo: AbstractControl;
     totalAmount: AbstractControl;
     currency: AbstractControl;
-    status: AbstractControl;
+    voucherType: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
+    voucherTypes: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountCode', label: 'Account Code' },
@@ -53,7 +50,6 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
-        private _accountingRepo: AccountingRepo
     ) {
         super();
     }
@@ -81,7 +77,6 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                     }
                 }
             );
-        this.generateVoucherId();
     }
 
     initForm() {
@@ -95,36 +90,27 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
             voucherId: [null, Validators.required],
             date: [{ startDate: new Date(), endDate: new Date() }],
-            invoiceNoTempt: [null, Validators.required],
-            invoiceNoReal: [{ value: null, disabled: true }],
-            serie: [null, Validators.required],
+            invoiceNoTempt: [],
+            invoiceNoReal: [],
+
+            voucherType: [],
             paymentMethod: [],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
-            status: ['New'],
+            status: [],
         });
 
         this.partnerId = this.formGroup.controls['partnerId'];
         this.voucherId = this.formGroup.controls['voucherId'];
-        this.invoiceNoTempt = this.formGroup.controls['invoiceNoTempt'];
-        this.invoiceNoReal = this.formGroup.controls['invoiceNoReal'];
+
         this.date = this.formGroup.controls['date'];
-        this.serie = this.formGroup.controls['serie'];
         this.paymentMethod = this.formGroup.controls['paymentMethod'];
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
-
-        this.invoiceNoTempt.valueChanges
-            .pipe(
-                debounceTime(400)
-            )
-            .subscribe(
-                (res) => {
-                    this.invoiceNoReal.setValue(res);
-                }
-            );
+        this.voucherType = this.formGroup.controls['voucherType'];
     }
+
 
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
@@ -137,19 +123,5 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             default:
                 break;
         }
-    }
-
-    generateVoucherId() {
-        forkJoin([
-            this._accountingRepo.generateVoucherId(),
-            this._accountingRepo.generateInvoiceNoTemp(),
-        ])
-            .subscribe(
-                (res: any[]) => {
-                    this.voucherId.setValue(res[0].voucherId);
-                    this.invoiceNoTempt.setValue(res[1].invoiceNoTemp);
-                    this.invoiceNoReal.setValue(res[1].invoiceNoTemp);
-                }
-            );
     }
 }

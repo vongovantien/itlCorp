@@ -27,6 +27,9 @@ import { reducers } from './store';
 import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
 import { PaginationModule } from 'ngx-bootstrap';
 import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
+import { AccountingManagementCreateVoucherComponent } from './voucher/create/accounting-create-voucher.component';
+import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
+import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 
 const routing: Routes = [
     {
@@ -50,7 +53,18 @@ const routing: Routes = [
         ]
     },
     {
-        path: 'voucher', component: AccountingManagementVoucherComponent, data: { name: 'Voucher' }
+        path: 'voucher', data: { name: 'Voucher' },
+        children: [
+            {
+                path: '', component: AccountingManagementVoucherComponent, data: { name: '' }
+            },
+            {
+                path: 'new', component: AccountingManagementCreateVoucherComponent, data: { name: 'New' }
+            },
+            {
+                path: ':voucherId', component: AccountingManagementDetailVoucherComponent, data: { name: 'Edit' }
+            }
+        ]
     },
 
 ];
@@ -82,7 +96,10 @@ const routing: Routes = [
         AccountingManagementSelectPartnerPopupComponent,
         AccountingManagementListChargeComponent,
         AccountingManagementDetailVatInvoiceComponent,
-        AccountingDetailCdNoteComponent
+        AccountingDetailCdNoteComponent,
+        AccountingManagementCreateVoucherComponent,
+        AccountingManagementFormCreateVoucherComponent,
+        AccountingManagementDetailVoucherComponent
     ],
 
     exports: [],

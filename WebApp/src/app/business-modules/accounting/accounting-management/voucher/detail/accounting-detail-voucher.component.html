@@ -1,0 +1,41 @@
+<div class="create-booking-note-page">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Edit Voucher</h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSubmitSaveInvoice()">
+                            </app-default-button>
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <form-create-voucher></form-create-voucher>
+
+                <div class="row m--margin-top-20">
+                    <div class="col-md-6">
+                        <span>Created: {{accountingManagement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                        <span class="text-success">{{accountingManagement.userNameCreated}}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span>Modified: {{accountingManagement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                        </span> <span class="text-success">{{accountingManagement.userNameModified}}</span>
+                    </div>
+                </div>
+
+                <list-charge-accounting-management type="voucher"></list-charge-accounting-management>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<info-popup [body]="invalidFormText"></info-popup>

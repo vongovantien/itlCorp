@@ -1,27 +1,27 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+
 import { AccountingRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
+import { IAccountingManagementState } from '../../store';
 import { AccAccountingManagementModel } from '@models';
 
-import { IAccountingManagementState } from '../../store';
+import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
 
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
+import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
 
 @Component({
-    selector: 'app-accounting-detail-vat-invoice',
-    templateUrl: './accounting-detail-vat-invoice.component.html',
+    selector: 'app-accounting-detail-voucher',
+    templateUrl: './accounting-detail-voucher.component.html',
 })
-export class AccountingManagementDetailVatInvoiceComponent extends AccountingManagementCreateVATInvoiceComponent implements OnInit {
+export class AccountingManagementDetailVoucherComponent extends AccountingManagementCreateVoucherComponent implements OnInit {
 
-    vatInvoiceId: string;
-
+    voucherId: string;
     accountingManagement: AccAccountingManagementModel = new AccAccountingManagementModel();
 
     constructor(
@@ -40,14 +40,14 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
     ngOnInit(): void {
         this._activedRoute.params.pipe(
             tap((param: Params) => {
-                this.vatInvoiceId = !!param.vatInvoiceId ? param.vatInvoiceId : '';
+                this.voucherId = !!param.voucherId ? param.voucherId : '';
             }),
-            switchMap(() => of(this.vatInvoiceId)),
+            switchMap(() => of(this.voucherId)),
         )
             .subscribe(
-                (vatInvoiceId: string) => {
-                    if (isUUID(vatInvoiceId)) {
-                        this.getDetailVatInvoice(vatInvoiceId);
+                (voucherId: string) => {
+                    if (isUUID(voucherId)) {
+                        this.getDetailVoucher(voucherId);
                     } else {
                         this.gotoList();
                     }
@@ -55,23 +55,24 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
             );
     }
 
-    getDetailVatInvoice(id: string) {
+    getDetailVoucher(id: string) {
         this._accountingRepo.getDetailAcctMngt(id)
             .subscribe(
                 (res: AccAccountingManagementModel) => {
                     this.accountingManagement = new AccAccountingManagementModel(res);
-                    this.updateFormInvoice(res);
+                    this.updateFormVoucher(res);
                     this.updateChargeList(res);
 
                 }
             );
     }
 
-    updateFormInvoice(res: AccAccountingManagementModel) {
+    updateFormVoucher(res: AccAccountingManagementModel) {
         const formData: AccAccountingManagementModel | any = {
             date: !!res.date ? { startDate: new Date(res.date), endDate: new Date(res.date) } : null,
             paymentMethod: !!res.paymentMethod ? [{ id: res.paymentMethod, text: res.paymentMethod }] : null,
             currency: !!res.currency ? [{ id: res.currency, text: res.currency }] : null,
+            voucherType: !!res.voucherType ? [{ id: res.voucherType, text: res.voucherType }] : null,
 
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
@@ -99,7 +100,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
         modelAdd.charges = [...this.listChargeComponent.charges];
 
         //  * Update field
-        modelAdd.id = this.vatInvoiceId;
+        modelAdd.id = this.voucherId;
         modelAdd.status = this.accountingManagement.status;
         modelAdd.type = this.accountingManagement.type;
         modelAdd.companyId = this.accountingManagement.companyId;
@@ -109,10 +110,10 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
         modelAdd.userCreated = this.accountingManagement.userCreated;
         modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
 
-        this.saveInvoice(modelAdd);
+        this.saveVoucher(modelAdd);
     }
 
-    saveInvoice(body: AccAccountingManagementModel) {
+    saveVoucher(body: AccAccountingManagementModel) {
         this._progressRef.start();
         this._accountingRepo.updateAcctMngt(body)
             .pipe(
@@ -121,7 +122,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                 concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        return this._accountingRepo.getDetailAcctMngt(this.vatInvoiceId);
+                        return this._accountingRepo.getDetailAcctMngt(this.voucherId);
                     }
                     of(res);
                 })
@@ -131,14 +132,15 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                     if (!!res && res.status === false) {
                         this._toastService.error(res.message);
                     } else {
-                        this.updateFormInvoice(res);
+                        this.updateFormVoucher(res);
                     }
                 }
             );
     }
 
 
+
     gotoList() {
-        this._router.navigate(["home/accounting/management/vat-invoice"]);
+        this._router.navigate(["home/accounting/management/voucher"]);
     }
 }

@@ -1,13 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ChargeOfAccountingManagementModel } from '@models';
-import { SortService } from '@services';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
+
+import { SortService } from '@services';
+import { ConfirmPopupComponent } from '@common';
+import { timeoutD } from '@decorators';
+import { ChargeOfAccountingManagementModel } from '@models';
 
 import { AppList } from 'src/app/app.list';
 import { IAccountingManagementState, getAccountingManagementPartnerChargeState } from '../../store';
-import { ToastrService } from 'ngx-toastr';
-import { ConfirmPopupComponent } from '@common';
-import { timeoutD } from '@decorators';
+
 import { takeUntil } from 'rxjs/operators';
 
 
@@ -16,6 +18,44 @@ import { takeUntil } from 'rxjs/operators';
     templateUrl: './list-charge-accounting-management.component.html',
 })
 export class AccountingManagementListChargeComponent extends AppList implements OnInit {
+    @Input() set type(t: string) {
+        this._type = t;
+        if (this._type !== 'invoice') {
+            this.headers = [
+                { title: 'Code', field: 'chargeCode', sortable: true, },
+                { title: 'Charge Name', field: 'chargeName', },
+                { title: 'Job No', field: 'jobNo', sortable: true },
+                { title: 'HBL', field: 'hbl', sortable: true },
+                { title: 'Countra Account', field: 'countraAccount', sortable: true },
+                { title: 'Org Amount', field: 'orgAmount', sortable: true },
+                { title: 'VAT', field: 'vat', sortable: true },
+                { title: 'Org VAT Amount', field: 'orgVatAmount', sortable: true },
+                { title: 'VAT Account', field: 'vatAccount', sortable: true },
+                { title: 'Currency', field: 'currency', sortable: true },
+                { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
+                { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
+                { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
+                { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+                { title: 'Serie', field: 'serie', sortable: true },
+                { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+                { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
+                { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
+                { title: 'Debit Note', field: 'CdNoteNo', sortable: true },
+                { title: 'SOA No', field: 'soaNo', sortable: true },
+                { title: 'Qty', field: 'qty', sortable: true },
+                { title: 'Unit', field: 'unitName', sortable: true },
+                { title: 'Unit Price', field: 'unitPrice', sortable: true },
+                { title: 'MBL', field: 'mbl', sortable: true },
+            ];
+        }
+    }
+
+    get type() {
+        return this._type;
+    }
+
+    private _type: string = 'invoice';
+
     @ViewChild(ConfirmPopupComponent, { static: true }) confirmRemovePopup: ConfirmPopupComponent;
 
     charges: ChargeOfAccountingManagementModel[] = [];
@@ -25,6 +65,30 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     totalAmountVat: number;
 
     contentConfirmRemoveCharge: string;
+
+    headers = [
+        { title: 'Code', field: 'chargeCode', sortable: true, },
+        { title: 'Charge Name', field: 'chargeName', },
+        { title: 'Job No', field: 'jobNo', sortable: true },
+        { title: 'HBL', field: 'hbl', sortable: true },
+        { title: 'Countra Account', field: 'countraAccount', sortable: true },
+        { title: 'Org Amount', field: 'orgAmount', sortable: true },
+        { title: 'VAT', field: 'vat', sortable: true },
+        { title: 'Org VAT Amount', field: 'orgVatAmount', sortable: true },
+        { title: 'VAT Account', field: 'vatAccount', sortable: true },
+        { title: 'Currency', field: 'currency', sortable: true },
+        { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
+        { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
+        { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
+        { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
+        { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
+        { title: 'Debit Note', field: 'CdNoteNo', sortable: true },
+        { title: 'SOA No', field: 'soaNo', sortable: true },
+        { title: 'Qty', field: 'qty', sortable: true },
+        { title: 'Unit', field: 'unitName', sortable: true },
+        { title: 'Unit Price', field: 'unitPrice', sortable: true },
+        { title: 'MBL', field: 'mbl', sortable: true },
+    ];
 
     constructor(
         private _sortService: SortService,
@@ -36,29 +100,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     }
 
     ngOnInit(): void {
-        this.headers = [
-            { title: 'Code', field: 'chargeCode', sortable: true, },
-            { title: 'Charge Name', field: 'chargeName', },
-            { title: 'Job No', field: 'jobNo', sortable: true },
-            { title: 'HBL', field: 'hbl', sortable: true },
-            { title: 'Countra Account', field: 'countraAccount', sortable: true },
-            { title: 'Org Amount', field: 'orgAmount', sortable: true },
-            { title: 'VAT', field: 'vat', sortable: true },
-            { title: 'Org VAT Amount', field: 'orgVatAmount', sortable: true },
-            { title: 'VAT Account', field: 'vatAccount', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
-            { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
-            { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
-            { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
-            { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
-            { title: 'Debit Note', field: 'CdNoteNo', sortable: true },
-            { title: 'SOA No', field: 'soaNo', sortable: true },
-            { title: 'Qty', field: 'qty', sortable: true },
-            { title: 'Unit', field: 'unitName', sortable: true },
-            { title: 'Unit Price', field: 'unitPrice', sortable: true },
-            { title: 'MBL', field: 'mbl', sortable: true },
-        ];
+
 
         this._store.select(getAccountingManagementPartnerChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -152,7 +194,6 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         if (!cdNoteNo.length) {
             return '';
         }
-        console.log(cdNoteNo);
         return cdNoteNo.join(",\n");
     }
 }
