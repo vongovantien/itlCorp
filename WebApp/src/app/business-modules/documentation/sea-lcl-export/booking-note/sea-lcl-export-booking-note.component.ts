@@ -51,7 +51,7 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
             { title: 'GW', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
-            { title: 'Create Date', field: 'createDate', sortable: true },
+            { title: 'Create Date', field: 'createdDate', sortable: true },
         ];
 
         this.dataSearch = {

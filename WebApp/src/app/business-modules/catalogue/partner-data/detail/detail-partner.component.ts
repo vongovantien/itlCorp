@@ -92,7 +92,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     RequireSaleman(partnerGroup: string): boolean {
-        this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
                 return true;
@@ -114,7 +113,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.partner = res;
-                        this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
+                        // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         this.formPartnerComponent.setFormData(this.partner);
                     }
                 }
@@ -122,7 +121,6 @@ export class PartnerDetailComponent extends AppList {
 
     }
     checkRequireSaleman(partnerGroup: string): boolean {
-        this.isShowSaleMan = false;
         if (partnerGroup != null) {
             if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
                 return true;
@@ -291,9 +289,9 @@ export class PartnerDetailComponent extends AppList {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),
             this._catalogueRepo.getProvinces(),
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER),
+            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.ALL),
             this._catalogueRepo.getPartnerGroup(),
-            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch }),
+            this._systemRepo.getAllOffice(),
             this._catalogueRepo.getPartnerCharge(this.partner.id)
         ])
             .pipe(catchError(this.catchError))
@@ -306,7 +304,7 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.parentCustomers = customers;
                     this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
                     this.getPartnerGroupActive(this.partnerType);
-                    this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
+                    this.formPartnerComponent.workPlaces = workPlaces.map(x => ({ "text": x.code + ' - ' + x.branchNameEn, "id": x.id }));
                     this.getParnerDetails();
 
                     // * Update other charge.
@@ -395,7 +393,7 @@ export class PartnerDetailComponent extends AppList {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -455,7 +453,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;AIRSHIPSUP;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {

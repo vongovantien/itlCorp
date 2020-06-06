@@ -36,32 +36,10 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item pointer" (click)="syncBuyingCharge()">Buying</a>
                                 <ng-container *ngIf="showSyncFreight">
-                                    <a class="dropdown-item pointer" (click)="syncFreightCharge()">Arrival Note</a>
+                                    <a class="dropdown-item pointer" (click)="syncFreightCharge()">Arrival Notice</a>
                                 </ng-container>
                             </div>
                         </div>
-                        <!-- <button type="button"
-                            class="btn btn-secondary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
-                            (click)="syncBuyingCharge()">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>
-                                    Sync Buying
-                                </span>
-                            </span>
-                        </button> -->
-                        <!-- <ng-container *ngIf="showSyncFreight && !!charges && !charges.length"> 
-                            <button type="button"
-                                class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase m--margin-right-20"
-                                (click)="syncFreightCharge()">
-                                <span>
-                                    <i class="la la-cloud-download"></i>
-                                    <span>
-                                        Sync Freight Charge
-                                    </span>
-                                </span>
-                            </button>
-                        </ng-container> -->
                         <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveSellingSurCharge()">
                         </app-default-button>
                     </ng-container>
@@ -104,8 +82,7 @@
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }"
-                                    (clickOutside)="handleClickOutSideComboGrid(i,'partner')">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <input type="text" class="dropdown-toggle form-control" readonly
                                         [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
                                         [disabled]="isShowLoadingPartner ? 'disabled': null"
@@ -125,10 +102,6 @@
                                                 [title]="type.displayName"
                                                 (click)="selectPartnerType(type, charge)">{{type.displayName}}</a>
                                         </div>
-                                        <!-- <app-combo-grid [headers]="headerPartner" [data]="listPartner"
-                                                [fields]="['taxCode','partnerNameEn']" [active]="charge.paymentObjectId"
-                                                (onClick)="onSelectPartner($event, charge)">
-                                            </app-combo-grid> -->
                                         <ng-template #container></ng-template>
                                     </div>
                                 </div>

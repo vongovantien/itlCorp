@@ -1,27 +1,27 @@
 import { Directive, ElementRef, HostListener, Renderer2, Input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { SystemConstants } from '@constants';
 
 @Directive({
     selector: '[autoFormatCurrency]',
 })
 export class AutoFormatCurrencyDirective {
-    @Input() digits: number = 3;
-    @Input() set decimals(number: number) {
-        this.setRegex(number);
-        this.digitNumber = '.0-' + this.digits;
-    }
+    @Input() set digits(d: number) { this._digitNumber = ('.0-' + d); }
+    @Input() set decimals(number: number) { this.setRegex(number); }
+    @Input() set currency(c: string) { this._currency = c; }
+    get currency() { return this._currency; }
 
-    currencyCode: string = '';
-    digitNumber = '.0-';
+    _currency: string = '';
+    _digitNumber = '.0-3';
 
     private el: HTMLInputElement;
-    private digitRegex: RegExp = new RegExp(this.regexString(), 'g');
-
     private lastValid = '';
     private specialKeys: string[] = [
         "Delete", "Backspace", "Tab", "Escape", "Enter", "Home", "End", 'ArrowLeft', 'ArrowRight'
     ];
+
     isReadyClear = false;
+    digitRegex: RegExp = new RegExp(this.regexString(), 'g');
 
     constructor(
         private currencyPipe: CurrencyPipe,
@@ -31,9 +31,12 @@ export class AutoFormatCurrencyDirective {
     ) {
         this.el = this._elementRef.nativeElement;
     }
+
     private setRegex(maxDigits?: number) {
         if (maxDigits <= 0) {
-            this.digitRegex = new RegExp(/^\d+$/);
+            // this.digitRegex = new RegExp(/^\d+$/);
+            this.digitRegex = new RegExp(SystemConstants.CPATTERN.NUMBER);
+
         } else {
             this.digitRegex = new RegExp(this.regexString(maxDigits), 'g');
         }
@@ -49,7 +52,7 @@ export class AutoFormatCurrencyDirective {
         }
 
         setTimeout(() => {
-            this.el.value = this.currencyPipe.transform(this.el.value, this.currencyCode, '', this.digitNumber);
+            this.el.value = this.currencyPipe.transform(this.el.value, this.currency, '', this._digitNumber);
         }, 1000);
     }
 
@@ -66,7 +69,7 @@ export class AutoFormatCurrencyDirective {
 
     @HostListener("blur", ["$event.target.value"])
     onBlur(value) {
-        this.el.value = this.currencyPipe.transform(value, this.currencyCode, '', this.digitNumber);
+        this.el.value = this.currencyPipe.transform(value, this.currency, '', this._digitNumber);
         this.isReadyClear = false;
     }
 

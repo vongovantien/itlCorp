@@ -78,6 +78,8 @@ export class CsTransaction extends BaseModel {
     dimensionDetails: DIM[] = [];
     issuedBy: string = null;
     route: string = null;
+    roundUpMethod: string = null;
+    applyDim: string = null;
 
     permission: PermissionShipment = new PermissionShipment();
 

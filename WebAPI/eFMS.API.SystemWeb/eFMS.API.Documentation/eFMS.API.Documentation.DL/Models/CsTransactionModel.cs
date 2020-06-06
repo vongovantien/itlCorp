@@ -33,6 +33,8 @@ namespace eFMS.API.Documentation.DL.Models
         public AgentData AgentData { get; set; }
         public OfficeData CreatorOffice { get; set; }
         public string GroupEmail { get; set; }
+        public string RoundUpMethod { get; set; }
+        public string ApplyDim { get; set; }
     }
 
     public class AgentData

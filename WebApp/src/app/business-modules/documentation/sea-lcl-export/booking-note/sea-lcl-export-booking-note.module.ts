@@ -28,7 +28,7 @@ const routing: Routes = [
 ];
 
 const config: LocaleConfig = {
-    format: 'MM/DD/YYYY',
+    format: 'DD/MM/YYYY',
 };
 
 @NgModule({

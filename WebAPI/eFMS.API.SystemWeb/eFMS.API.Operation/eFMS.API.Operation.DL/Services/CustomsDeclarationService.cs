@@ -43,35 +43,6 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
 
-        //public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository,
-        //    ICacheServiceBase<CustomsDeclaration> cacheService,
-        //    IMapper mapper,
-        //    IEcusConnectionService ecusCconnection
-        //    , ICatPartnerApiService catPartner
-        //    , ICatPlaceApiService catPlace
-        //    , ICatCountryApiService country
-        //    , ICatCommodityApiService commodity
-        //    , ICurrentUser user,
-        //    IStringLocalizer<LanguageSub> localizer,
-        //    IContextBase<CatCommodity> commodityRepo,
-        //    IContextBase<OpsTransaction> opsTransaction,
-        //    IContextBase<OpsStageAssigned> opsStageAssigned,
-        //    IContextBase<SysUser> userRepo
-        //    ) : base(repository, cacheService, mapper)
-        //{
-        //    ecusCconnectionService = ecusCconnection;
-        //    catPartnerApi = catPartner;
-        //    catPlaceApi = catPlace;
-        //    countryApi = country;
-        //    commodityApi = commodity;
-        //    currentUser = user;
-        //    stringLocalizer = localizer;
-        //    commodityRepository = commodityRepo;
-        //    opsTransactionRepo = opsTransaction;
-        //    opsStageAssignedRepo = opsStageAssigned;
-        //    userRepository = userRepo;
-        //}
-
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
             , ICatPartnerApiService catPartner
@@ -1260,7 +1231,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             //Get list custom có shipment operation chưa bị lock, list shipment đã được assign cho current user hoặc shipment có PIC là current user
             var userCurrent = currentUser.UserID;
-            var customs = DataContext.Get();
+            var customs = DataContext.Get(x => !string.IsNullOrEmpty(x.JobNo));
             var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var shipmentsOperation = from ops in shipments
                                      join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
@@ -1270,10 +1241,9 @@ namespace eFMS.API.Operation.DL.Services
 
             var shipmentMerge = shipmentsOperation.Union(shipmentPIC);
 
-            //Join theo số HBL
+            //Join theo số JobNo
             var query = from cus in customs
-                        join ope in shipmentMerge on cus.Hblid equals ope.Hwbno into ope2
-                        from ope in ope2
+                        join ope in shipmentMerge on cus.JobNo equals ope.JobNo
                         select cus;
 
             var data = mapper.Map<List<CustomsDeclarationModel>>(query);

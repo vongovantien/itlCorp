@@ -427,8 +427,11 @@ namespace eFMS.API.Documentation.DL.Services
                 CsTransactionModel result = mapper.Map<CsTransactionModel>(data);
                 if (result.ColoaderId != null)
                 {
-                    result.SupplierName = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.PartnerNameEn;
-                    result.ColoaderCode = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.ColoaderId)?.CoLoaderCode;
+                    CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
+                    result.SupplierName = coloaderPartner.PartnerNameEn;
+                    result.ColoaderCode = coloaderPartner.CoLoaderCode;
+                    result.RoundUpMethod = coloaderPartner.RoundUpMethod;
+                    result.ApplyDim = coloaderPartner.ApplyDim;
                 }
                 if (result.AgentId != null)
                 {
@@ -1674,7 +1677,7 @@ namespace eFMS.API.Documentation.DL.Services
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
             IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId == null);
-            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0)
+            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE")
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
 
             var transaction = GetDefaultJob(model);
