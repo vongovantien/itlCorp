@@ -7,14 +7,15 @@ import { AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAccountingManagementState, InitPartner } from '../../store';
 import { AccAccountingManagementModel } from '@models';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, SystemConstants } from '@constants';
 import { formatDate } from '@angular/common';
 
 import { AccountingManagementFormCreateVoucherComponent } from '../../components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementListChargeComponent } from '../../components/list-charge/list-charge-accouting-management.component';
 
 import _merge from 'lodash/merge';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-accounting-create-voucher',
@@ -51,12 +52,34 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
             return;
         }
 
-        const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-        modelAdd.type = AccountingConstants.ISSUE_TYPE.VOUCHER;
+        this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, SystemConstants.EMPTY_GUID)
+            .pipe(
+                tap((res: boolean) => {
+                    if (!res) {
+                        const modelAdd: AccAccountingManagementModel = this.onSubmitData();
+                        modelAdd.type = AccountingConstants.ISSUE_TYPE.VOUCHER;
+                        modelAdd.charges = [...this.listChargeComponent.charges];
+                        return switchMap(() => this._accountingRepo.addNewAcctMgnt(modelAdd));
+                    }
+                    return of(res);
+                })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult | boolean | any) => {
+                    if (!res) {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    } else {
+                        this._toastService.warning("Trùng VoucherID");
+                    }
+                    console.log(res);
+                }
+            );
 
-        modelAdd.charges = [...this.listChargeComponent.charges];
 
-        this.saveVoucher(modelAdd);
     }
 
     checkValidateForm() {

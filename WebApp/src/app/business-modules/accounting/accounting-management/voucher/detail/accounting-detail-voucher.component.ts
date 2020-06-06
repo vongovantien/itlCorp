@@ -10,10 +10,11 @@ import { AccAccountingManagementModel } from '@models';
 
 import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
 
-import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
+import { tap, switchMap, catchError, finalize, concatMap, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-accounting-detail-voucher',
@@ -95,22 +96,53 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             return;
         }
 
+        this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.voucherId)
+            .pipe(
+                switchMap(
+                    (res: boolean) => {
+                        if (res) {
+                            this.formCreateComponent.voucherId.setErrors({ existed: true });
+                            return of({ data: null, message: 'Voucher ID has been existed', status: false });
+                        } else {
+                            const modelAdd: AccAccountingManagementModel = this.onSubmitData();
+                            modelAdd.charges = [...this.listChargeComponent.charges];
 
-        const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-        modelAdd.charges = [...this.listChargeComponent.charges];
+                            //  * Update field
+                            modelAdd.id = this.voucherId;
+                            modelAdd.status = this.accountingManagement.status;
+                            modelAdd.type = this.accountingManagement.type;
+                            modelAdd.companyId = this.accountingManagement.companyId;
+                            modelAdd.officeId = this.accountingManagement.officeId;
+                            modelAdd.departmentId = this.accountingManagement.departmentId;
+                            modelAdd.groupId = this.accountingManagement.groupId;
+                            modelAdd.userCreated = this.accountingManagement.userCreated;
+                            modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
 
-        //  * Update field
-        modelAdd.id = this.voucherId;
-        modelAdd.status = this.accountingManagement.status;
-        modelAdd.type = this.accountingManagement.type;
-        modelAdd.companyId = this.accountingManagement.companyId;
-        modelAdd.officeId = this.accountingManagement.officeId;
-        modelAdd.departmentId = this.accountingManagement.departmentId;
-        modelAdd.groupId = this.accountingManagement.groupId;
-        modelAdd.userCreated = this.accountingManagement.userCreated;
-        modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
-
-        this.saveVoucher(modelAdd);
+                            this._progressRef.start();
+                            return this._accountingRepo.updateAcctMngt(modelAdd)
+                                .pipe(
+                                    catchError(this.catchError),
+                                    finalize(() => this._progressRef.complete()),
+                                    concatMap((data: CommonInterface.IResult) => {
+                                        if (data.status) {
+                                            this._toastService.success(data.message);
+                                            return this._accountingRepo.getDetailAcctMngt(this.voucherId);
+                                        }
+                                        return of({ data: null, message: 'Something getting error. Please check again!', status: false });
+                                    })
+                                );
+                        }
+                    }
+                ),
+            ).subscribe(
+                (res: CommonInterface.IResult | AccAccountingManagementModel | any) => {
+                    if (!!res && !res.status) {
+                        this._toastService.error(res.message);
+                    } else {
+                        this.updateFormVoucher((res as AccAccountingManagementModel));
+                    }
+                },
+            );
     }
 
     saveVoucher(body: AccAccountingManagementModel) {

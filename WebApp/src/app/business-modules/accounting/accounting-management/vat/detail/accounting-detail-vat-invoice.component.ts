@@ -94,49 +94,57 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
             return;
         }
 
-
-        const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-        modelAdd.charges = [...this.listChargeComponent.charges];
-
-        //  * Update field
-        modelAdd.id = this.vatInvoiceId;
-        modelAdd.status = this.accountingManagement.status;
-        modelAdd.type = this.accountingManagement.type;
-        modelAdd.companyId = this.accountingManagement.companyId;
-        modelAdd.officeId = this.accountingManagement.officeId;
-        modelAdd.departmentId = this.accountingManagement.departmentId;
-        modelAdd.groupId = this.accountingManagement.groupId;
-        modelAdd.userCreated = this.accountingManagement.userCreated;
-        modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
-
-        this.saveInvoice(modelAdd);
-    }
-
-    saveInvoice(body: AccAccountingManagementModel) {
-        this._progressRef.start();
-        this._accountingRepo.updateAcctMngt(body)
+        this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.vatInvoiceId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-                concatMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        return this._accountingRepo.getDetailAcctMngt(this.vatInvoiceId);
+                switchMap(
+                    (res: boolean) => {
+                        if (res) {
+                            this.formCreateComponent.voucherId.setErrors({ existed: true });
+                            return of({ data: null, message: 'Voucher ID has been existed', status: false });
+                        } else {
+                            const modelAdd: AccAccountingManagementModel = this.onSubmitData();
+                            modelAdd.charges = [...this.listChargeComponent.charges];
+
+                            //  * Update field
+                            modelAdd.id = this.vatInvoiceId;
+                            modelAdd.status = this.accountingManagement.status;
+                            modelAdd.type = this.accountingManagement.type;
+                            modelAdd.companyId = this.accountingManagement.companyId;
+                            modelAdd.officeId = this.accountingManagement.officeId;
+                            modelAdd.departmentId = this.accountingManagement.departmentId;
+                            modelAdd.groupId = this.accountingManagement.groupId;
+                            modelAdd.userCreated = this.accountingManagement.userCreated;
+                            modelAdd.datetimeCreated = this.accountingManagement.datetimeCreated;
+
+                            this._progressRef.start();
+                            return this._accountingRepo.updateAcctMngt(modelAdd)
+                                .pipe(
+                                    catchError(this.catchError),
+                                    finalize(() => this._progressRef.complete()),
+                                    concatMap((data: CommonInterface.IResult) => {
+                                        if (data.status) {
+                                            this._toastService.success(data.message);
+                                            return this._accountingRepo.getDetailAcctMngt(this.vatInvoiceId);
+                                        }
+                                        return of({ data: null, message: 'Something getting error. Please check again!', status: false });
+                                    })
+                                );
+                        }
                     }
-                    of(res);
-                })
-            )
-            .subscribe(
+                ),
+            ).subscribe(
                 (res: CommonInterface.IResult | AccAccountingManagementModel | any) => {
-                    if (!!res && res.status === false) {
+                    if (!!res && !res.status) {
                         this._toastService.error(res.message);
                     } else {
-                        this.updateFormInvoice(res);
+                        this.updateFormInvoice((res as AccAccountingManagementModel));
                     }
-                }
+                },
             );
-    }
 
+
+
+    }
 
     gotoList() {
         this._router.navigate(["home/accounting/management/vat-invoice"]);
