@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -21,6 +21,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -94,5 +95,23 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
 
     sortInvoice(sortField: string) {
         this.invoices = this._sortService.sort(this.invoices, sortField, this.order);
+    }
+
+    exportInvoice() {
+        this._progressRef.start();
+        this._exportRepo.exportAccountingManagement("Invoice")
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'INVOICE - eFMS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no data to export', '');
+                    }
+                },
+            );
     }
 }

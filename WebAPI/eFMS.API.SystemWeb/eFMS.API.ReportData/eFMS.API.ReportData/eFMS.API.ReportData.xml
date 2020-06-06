@@ -78,6 +78,13 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingManagement(System.String)">
+            <summary>
+            Export accounting management
+            </summary>
+            <param name="typeOfAcctMngt">Invoice Or Voucher</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.

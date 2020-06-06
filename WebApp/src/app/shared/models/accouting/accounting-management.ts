@@ -58,6 +58,7 @@ export class ChargeOfAccountingManagementModel {
     vatPartnerCode: string = null;
     vatPartnerName: string = null;
     vatPartnerAddress: string = null;
+    obhPartnerCode: string = null;
     obhPartner: string = null;
     invoiceNo: string = null;
     serie: string = null;

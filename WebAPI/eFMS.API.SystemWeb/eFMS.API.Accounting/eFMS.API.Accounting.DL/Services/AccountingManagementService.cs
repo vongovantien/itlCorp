@@ -267,6 +267,7 @@ namespace eFMS.API.Accounting.DL.Services
                                          VatPartnerCode = pat.TaxCode, //Tax code
                                          VatPartnerName = pat.PartnerNameVn,
                                          VatPartnerAddress = pat.AddressVn,
+                                         ObhPartnerCode = null,
                                          ObhPartner = null,
                                          InvoiceNo = sur.InvoiceNo,
                                          Serie = sur.SeriesNo,
@@ -315,6 +316,7 @@ namespace eFMS.API.Accounting.DL.Services
                                              VatPartnerCode = pat.TaxCode, //Tax code
                                              VatPartnerName = pat.PartnerNameVn,
                                              VatPartnerAddress = pat.AddressVn,
+                                             ObhPartnerCode = null,
                                              ObhPartner = null,
                                              InvoiceNo = sur.InvoiceNo,
                                              Serie = sur.SeriesNo,
@@ -465,6 +467,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             VatPartnerCode = pat.TaxCode, //Tax code
                                             VatPartnerName = pat.PartnerNameVn,
                                             VatPartnerAddress = pat.AddressVn,
+                                            ObhPartnerCode = null,
                                             ObhPartner = null,
                                             InvoiceNo = sur.InvoiceNo,
                                             Serie = sur.SeriesNo,
@@ -515,6 +518,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 VatPartnerCode = pat.TaxCode, //Tax code
                                                 VatPartnerName = pat.PartnerNameVn,
                                                 VatPartnerAddress = pat.AddressVn,
+                                                ObhPartnerCode = null,
                                                 ObhPartner = null,
                                                 InvoiceNo = sur.InvoiceNo,
                                                 Serie = sur.SeriesNo,
@@ -592,6 +596,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            VatPartnerCode = pat.TaxCode, //Tax code
                                            VatPartnerName = pat.PartnerNameVn,
                                            VatPartnerAddress = pat.AddressVn,
+                                           ObhPartnerCode = obhPat.TaxCode, //Tax code
                                            ObhPartner = obhPat.PartnerNameVn,
                                            InvoiceNo = sur.InvoiceNo,
                                            Serie = sur.SeriesNo,
@@ -644,6 +649,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                VatPartnerCode = pat.TaxCode, //Tax code
                                                VatPartnerName = pat.PartnerNameVn,
                                                VatPartnerAddress = pat.AddressVn,
+                                               ObhPartnerCode = obhPat.TaxCode, //Tax code
                                                ObhPartner = obhPat.PartnerNameVn,
                                                InvoiceNo = sur.InvoiceNo,
                                                Serie = sur.SeriesNo,
@@ -1048,6 +1054,14 @@ namespace eFMS.API.Accounting.DL.Services
                             _paymentMethod = "CK";
                         }
                     }
+                    string _statusInvoice = string.Empty;
+                    if(acct.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    {
+                        if (acct.Status != "New")
+                        {
+                            _statusInvoice = "Đã phát hành";
+                        }
+                    }
                     var vatPartner = partners.Where(x => x.Id == charge.VatPartnerId).FirstOrDefault();
                     var partnerAcct = partners.Where(x => x.Id == acct.PartnerId).FirstOrDefault();
                     var item = new AccountingManagementExport();
@@ -1063,7 +1077,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.DepartmentCode =  _deptCode;
                     item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);                   
                     item.PaymentMethod = _paymentMethod;
-                    item.StatusInvoice = string.Empty;
+                    item.StatusInvoice = _statusInvoice; //Tình trạng hóa đơn (Dùng cho Invoice)
                     item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
                     item.ReleaseDateEInvoice = null;
 
