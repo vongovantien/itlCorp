@@ -289,9 +289,9 @@ export class PartnerDetailComponent extends AppList {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),
             this._catalogueRepo.getProvinces(),
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER),
+            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.ALL),
             this._catalogueRepo.getPartnerGroup(),
-            this._catalogueRepo.getPlace({ placeType: PlaceTypeEnum.Branch }),
+            this._systemRepo.getAllOffice(),
             this._catalogueRepo.getPartnerCharge(this.partner.id)
         ])
             .pipe(catchError(this.catchError))
@@ -304,7 +304,7 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.parentCustomers = customers;
                     this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
                     this.getPartnerGroupActive(this.partnerType);
-                    this.formPartnerComponent.workPlaces = this.utility.prepareNg2SelectData(workPlaces || [], 'id', 'nameVn');
+                    this.formPartnerComponent.workPlaces = workPlaces.map(x => ({ "text": x.code + ' - ' + x.branchNameEn, "id": x.id }));
                     this.getParnerDetails();
 
                     // * Update other charge.
