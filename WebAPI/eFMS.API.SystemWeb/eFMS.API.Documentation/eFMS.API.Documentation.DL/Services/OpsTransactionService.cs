@@ -17,6 +17,7 @@ using System.Linq;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
 using eFMS.API.Common.Models;
+using eFMS.API.Common;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1065,16 +1066,29 @@ namespace eFMS.API.Documentation.DL.Services
             return code;
         }
 
-        public HandleState CheckAllowConvertJob(List<CustomsDeclarationModel> list)
+        public ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list)
         {
-            var result = new HandleState();
+            ResultHandle result = null;
+            string errorMessages = string.Empty;
+            foreach(var item in list)
+            {
+                var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
+                if (customer == null) errorMessages += item.PartnerTaxCode + ", ";
+            }
+            if(errorMessages.Length > 0)
+            {
+                errorMessages = errorMessages.Substring(0, errorMessages.Length - 2) + " Not found";
+                result = new ResultHandle { Status = false, Message = errorMessages, Data = 403 };
+                return result;
+            }
             var permissionDetailRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            result = GetPermissionDetailConvertClearances(list, permissionDetailRange);
-            if(result.Success == true)
+            var hs = GetPermissionDetailConvertClearances(list, permissionDetailRange);
+            if(hs.Success == true)
             {
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-                result = GetPermissionDetailConvertClearances(list, permissionRange);
+                hs = GetPermissionDetailConvertClearances(list, permissionRange);
             }
+            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = 401 };
             return result;
         }
 

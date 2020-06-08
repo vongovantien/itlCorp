@@ -205,9 +205,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckAllowConvertJob([FromBody]List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var hs = transactionService.CheckAllowConvertJob(list);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            var result = transactionService.CheckAllowConvertJob(list);
             return Ok(result);
         }
 
