@@ -6,6 +6,7 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-accounting-vat-invoice',
@@ -22,6 +23,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _exportRepo: ExportRepo,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
