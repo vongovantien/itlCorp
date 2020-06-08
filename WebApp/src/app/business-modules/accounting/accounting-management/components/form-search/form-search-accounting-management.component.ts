@@ -96,8 +96,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
             partnerId: this.partner.value,
             issuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             creatorId: this.creator.value,
-            type: this.filterType.value != null ? this.filterType.value[0].id : null,
-            status: this.filterStatus.value != null ? this.filterStatus.value[0].id : null
+            type: !!this.filterType.value && this.filterType.value.length > 0 ? this.filterType.value[0].id : null,
+            status: !!this.filterStatus.value && this.filterStatus.value.length > 0 ? this.filterStatus.value[0].id : null
         };
         this.onSearch.emit(body);
     }

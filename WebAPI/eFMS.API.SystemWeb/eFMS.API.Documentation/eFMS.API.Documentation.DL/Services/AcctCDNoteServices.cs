@@ -14,6 +14,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -1217,10 +1218,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
         {
-            var results = DataContext.Get(x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
+            Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                             && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
-                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
-                                            );
+                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
+
+            if (criteria.IssuedDate != null)
+            {
+                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+            }
+            var results = DataContext.Get(query);
+            if (results == null) return results;
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
@@ -1237,7 +1244,6 @@ namespace eFMS.API.Documentation.DL.Services
                 PartnerId = x.PartnerId,
                 Id = x.Id,
                 IssuedDate = x.DatetimeCreated,
-                Status = "New",
                 Creator = x.UserCreated,
                 JobId = x.JobId,
             })?.ToList();
@@ -1259,8 +1265,10 @@ namespace eFMS.API.Documentation.DL.Services
                     ReferenceNo = x.Key.ReferenceNo,
                     HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
                     Total = x.Sum(y => y.Total),
-                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued" : "New"
+                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued" : "New",
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId))? "Issued Voucher": "New"
                 });
+            cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
             
             rowsCount = cdNotesGroupByCurrency.Count();
             if (size > 0)
@@ -1273,6 +1281,23 @@ namespace eFMS.API.Documentation.DL.Services
                 results = GetCDNotes(cdNotes, cdNotesGroupByCurrency);
             }
             return results;
+        }
+
+        private IQueryable<CDNoteModel> GetByStatus(string status, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
+        {
+            switch (status)
+            {
+                case "Issued Invoice":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.IssuedStatus == "Issued Invoice");
+                    break;
+                case "Issued Voucher":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.IssuedStatus == "Issued Voucher");
+                    break;
+                case "New":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.Status == "New");
+                    break;
+            }
+            return cdNotesGroupByCurrency;
         }
 
         private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)

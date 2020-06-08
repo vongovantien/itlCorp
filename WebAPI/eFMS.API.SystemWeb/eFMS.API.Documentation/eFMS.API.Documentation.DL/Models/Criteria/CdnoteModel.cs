@@ -20,5 +20,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string Status { get; set; }
         public string InvoiceNo { get; set; }
         public string VoucherId { get; set; }
+        public string IssuedStatus { get; set; }
     }
 }
