@@ -13,6 +13,19 @@
                         <div class="m-portlet__body">
                             <div class="m-form m--margin-bottom-10">
                                 <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="dropdown m-dropdown m-dropdown--inline">
+                                            <button type="button" class="btn btn-success dropdown-toggle"
+                                                data-toggle="dropdown">
+                                                <i class="la la-download"></i>Issue<span class="caret"></span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item pointer" (click)="issueVatInvoice()">VAT
+                                                    Invoice</a>
+                                                <a class="dropdown-item pointer" (click)="issueVoucher()">Voucher</a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="table-wrapper">
@@ -24,14 +37,10 @@
                                     <tbody>
                                         <ng-container *ngIf="!!cdNotes">
                                             <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn">
-                                                <td class="table-actions-col">
-                                                    <div class="table-actions">
+                                                <td class="table-actions-col" ngi>
+                                                    <div class="table-actions" *ngIf="cdNote.status === 'New'">
                                                         <label class="m-checkbox">
-                                                            <input *ngIf="cdNote.status !== 'New'; else allowChecked"
-                                                                type="checkbox" disabled="disabled">
-                                                            <ng-template #allowChecked>
-                                                                <input type="checkbox" [(ngModel)]="cdNote.isSelected">
-                                                            </ng-template>
+                                                            <input type="checkbox" [(ngModel)]="cdNote.isSelected">
                                                             <span></span>
                                                         </label>
                                                     </div>
@@ -47,17 +56,26 @@
                                                 <td>
                                                     {{cdNote.partnerName}}
                                                 </td>
-                                                <td>{{ cdNote.total}}</td>
+                                                <td>{{ cdNote.total | number: '.0-3'}}</td>
                                                 <td>{{ cdNote.currency}}</td>
-                                                <td>{{ cdNote.issuedDate}}</td>
-                                                <td>{{ cdNote.creator}}</td>
-                                                <td>{{ cdNote.status}}</td>
+                                                <td>{{ cdNote.issuedDate | date: 'HH:mm dd/MM/yyyy'}}</td>
+                                                <td class="text-success">{{ cdNote.creator}}</td>
+                                                <td>
+                                                    <ng-container [ngSwitch]="cdNote.status">
+                                                        <ng-container *ngSwitchCase="'New'">
+                                                            <span class="text-danger">{{cdNote.status}}</span>
+                                                        </ng-container>
+                                                        <ng-container *ngSwitchCase="'Issued'">
+                                                            <span class="text-info">{{cdNote.status}}</span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !cdNotes.length"
                                             [colspan]="headers.length + 1">
                                         </tr>
-                                        <tr app-table-loading *ngIf="isLoading"></tr>
+                                        <tr app-table-row-loading *ngIf="isLoading"></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -95,4 +113,7 @@
         </div>
     </div>
 </div>
+
 <accounting-detail-cd-note></accounting-detail-cd-note>
+
+<select-partner-popup (onSelect)="onSelectPartner()"></select-partner-popup>

@@ -1,5 +1,11 @@
 <div class="vat-invoice-wrapper  m-animate-fade-in">
-    <app-sub-header> </app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
+                routerLink="/home/accounting/management/vat-invoice/new">
+            </app-default-button>
+        </div>
+    </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
@@ -52,7 +58,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
-                                                    <a>{{invoice.voucherId}}</a>
+                                                    <a [routerLink]="['./'+invoice.id]">{{invoice.voucherId}}</a>
                                                 </td>
                                                 <td>{{invoice.invoiceNoTempt}}</td>
                                                 <td>{{invoice.invoiceNoReal}}</td>
@@ -61,7 +67,7 @@
                                                 <td>{{invoice.currency}}</td>
                                                 <td>{{invoice.date | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{invoice.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
-                                                <td>{{invoice.creatorName}}</td>
+                                                <td class="text-success">{{invoice.creatorName}}</td>
                                                 <td
                                                     [ngClass]="invoice.status !== 'New' ? 'text-success' : 'text-danger'">
                                                     {{invoice.status}}</td>
@@ -70,7 +76,7 @@
                                         <tr app-table-none-record *ngIf="!isLoading && !invoices.length"
                                             [colspan]="headers.length + 1">
                                         </tr>
-                                        <tr app-table-loading *ngIf="isLoading"></tr>
+                                        <tr app-table-row-loading *ngIf="isLoading"></tr>
                                     </tbody>
                                 </table>
                             </div>

@@ -24,6 +24,7 @@ export * from './accouting/soa-search-charge';
 export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
 export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel } from './accouting/accounting-management';
+export * from './accouting/cdnoteview.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

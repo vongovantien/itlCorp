@@ -2,10 +2,11 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { Partner, User, Customer } from '@models';
+import { User, Customer } from '@models';
 import { Observable } from 'rxjs';
 import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
+import { JobConstants, AccountingConstants } from '@constants';
 
 @Component({
     selector: 'form-search-accounting-management',
@@ -15,24 +16,19 @@ import { formatDate } from '@angular/common';
 export class AccountingManagementFormSearchComponent extends AppForm implements OnInit {
     @Output() onSearch: EventEmitter<ISearchDataInvoiceCDNote> = new EventEmitter<ISearchDataInvoiceCDNote>();
     @Output() onReset: EventEmitter<ISearchDataInvoiceCDNote> = new EventEmitter<ISearchDataInvoiceCDNote>();
+
     partners: Observable<Customer[]>;
     creators: Observable<User[]>;
+
     filterTypes: CommonInterface.INg2Select[] =
         [
             { id: 'Debit', text: 'Debit Note' },
             { id: 'Credit', text: 'Credit Note' },
             { id: 'Invoice', text: 'Invoice' }
         ];
-    status: CommonInterface.INg2Select[] = [
-        { id: 'New', text: 'New' },
-        { id: 'Issued Invoice', text: 'Issued Invoice' },
-        { id: 'Issued Voucher', text: 'Issued Voucher' },
-    ];
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' }
-    ];
+    status: CommonInterface.INg2Select[] = AccountingConstants.STATUS_CD;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+
     displayFieldsCreator: CommonInterface.IComboGridDisplayField[] = [
         { field: 'username', label: 'User Name' },
         { field: 'employeeNameVn', label: 'Full Name' }
@@ -61,6 +57,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
         this.creators = this._systemRepo.getSystemUsers();
     }
+
     initForm() {
         this.formSearch = this._fb.group({
             searchText: [],
@@ -78,6 +75,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.issuedDate = this.formSearch.controls['issuedDate'];
         this.filterStatus = this.formSearch.controls['filterStatus'];
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -90,6 +88,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
                 break;
         }
     }
+
     searchInvoiceCDnote() {
         const s = (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         const body: ISearchDataInvoiceCDNote = {
@@ -102,6 +101,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         };
         this.onSearch.emit(body);
     }
+
     resetSearch() {
         this.resetKeywordSearchCombogrid();
         this.formSearch.reset();

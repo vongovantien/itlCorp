@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
 
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -19,11 +20,16 @@ import { AccountingManagementCreateVATInvoiceComponent } from './vat/create/acco
 import { AccountingManagementFormCreateVATInvoiceComponent } from './components/form-create-vat-invoice/form-create-vat-invoice.component';
 import { AccountingManagementInputRefNoPopupComponent } from './components/popup/input-ref-no/input-ref-no.popup';
 import { AccountingManagementSelectPartnerPopupComponent } from './components/popup/select-partner/select-partner.popup';
-import { StoreModule } from '@ngrx/store';
-import { reducer } from './store';
+import { AccountingManagementListChargeComponent } from './components/list-charge/list-charge-accouting-management.component';
 import { AccountingManagementFormSearchVatVoucherComponent } from './components/form-search/vat-voucher/form-search-vat-voucher.component';
+
+import { reducers } from './store';
+import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
 import { PaginationModule } from 'ngx-bootstrap';
 import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
+import { AccountingManagementCreateVoucherComponent } from './voucher/create/accounting-create-voucher.component';
+import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
+import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 
 const routing: Routes = [
     {
@@ -39,12 +45,26 @@ const routing: Routes = [
                 path: '', component: AccountingManagementVatInvoiceComponent, data: { name: '' }
             },
             {
-                path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: '' }
+                path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: 'New' }
+            },
+            {
+                path: ':vatInvoiceId', component: AccountingManagementDetailVatInvoiceComponent, data: { name: 'Edit' }
             }
         ]
     },
     {
-        path: 'voucher', component: AccountingManagementVoucherComponent, data: { name: 'Voucher' }
+        path: 'voucher', data: { name: 'Voucher' },
+        children: [
+            {
+                path: '', component: AccountingManagementVoucherComponent, data: { name: '' }
+            },
+            {
+                path: 'new', component: AccountingManagementCreateVoucherComponent, data: { name: 'New' }
+            },
+            {
+                path: ':voucherId', component: AccountingManagementDetailVoucherComponent, data: { name: 'Edit' }
+            }
+        ]
     },
 
 ];
@@ -61,7 +81,7 @@ const routing: Routes = [
         ReactiveFormsModule,
         ModalModule,
         FormsModule,
-        StoreModule.forFeature('accounting-management', reducer),
+        StoreModule.forFeature('accounting-management', reducers),
         PaginationModule.forRoot()
     ],
     declarations: [
@@ -74,7 +94,12 @@ const routing: Routes = [
         AccountingManagementFormCreateVATInvoiceComponent,
         AccountingManagementInputRefNoPopupComponent,
         AccountingManagementSelectPartnerPopupComponent,
-        AccountingDetailCdNoteComponent
+        AccountingManagementListChargeComponent,
+        AccountingManagementDetailVatInvoiceComponent,
+        AccountingDetailCdNoteComponent,
+        AccountingManagementCreateVoucherComponent,
+        AccountingManagementFormCreateVoucherComponent,
+        AccountingManagementDetailVoucherComponent
     ],
 
     exports: [],

@@ -29,13 +29,13 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <app-default-button [buttonSetting]="searchlButtonSetting" (click)="searchRef()">
+                <app-default-button [buttonSetting]="searchlButtonSetting" (onClick)="searchRef()">
                 </app-default-button>
-                <app-default-button [buttonSetting]="cancelButtonSetting">
+                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="hide()">
                 </app-default-button>
             </div>
         </div>
     </div>
 </div>
 
-<select-partner-popup (onSelect)="selectPartner($event)"></select-partner-popup>
+<select-partner-popup (onSelect)="hide()"></select-partner-popup>

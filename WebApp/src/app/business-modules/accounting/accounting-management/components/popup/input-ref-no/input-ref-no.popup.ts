@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 import { AccountingRepo } from '@repositories';
@@ -7,6 +7,8 @@ import { PartnerOfAcctManagementResult } from '@models';
 
 import { ToastrService } from 'ngx-toastr';
 import { AccountingManagementSelectPartnerPopupComponent } from '../select-partner/select-partner.popup';
+import { IAccountingManagementState, SelectPartner } from '../../../store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'input-ref-no-popup',
@@ -14,9 +16,8 @@ import { AccountingManagementSelectPartnerPopupComponent } from '../select-partn
 })
 
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
-    @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
 
-    @Output() onSearchInputRef: EventEmitter<PartnerOfAcctManagementResult> = new EventEmitter<PartnerOfAcctManagementResult>();
+    @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
 
     @Input() set type(t: string) {
         this._type = t;
@@ -30,6 +31,8 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                 { title: 'MBL', value: 'mbls' },
                 { title: 'Debit Note', value: 'cdNotes' },
             ];
+            this.selectedOpion = this.optionsType[5];
+
         }
     }
 
@@ -49,7 +52,8 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
 
     constructor(
         private _accountingRepo: AccountingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<IAccountingManagementState>
     ) {
         super();
     }
@@ -57,7 +61,10 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
     ngOnInit() { }
 
     searchRef() {
-        const body: ISearchInputRef = {
+        if (!this.selectedOpion) {
+            return;
+        }
+        const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
             cdNotes: null,
             soaNos: null,
             jobNos: null,
@@ -88,33 +95,51 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
             default:
                 break;
         }
-        this._accountingRepo.getChargeForVoucherByCriteria(body)
-            .subscribe(
-                (res: PartnerOfAcctManagementResult[]) => {
-                    if (!!res && !!res.length) {
-                        this.selectPartnerPopup.listPartners = res;
-                        this.selectPartnerPopup.selectedPartner = null;
+        if (this.type === 'invoice') {
+            this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this.hide();
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
 
-                        this.selectPartnerPopup.show();
-                    } else {
-                        this._toastService.warning("Not found data");
+                                this.selectPartnerPopup.show();
+                            }
+
+                        } else {
+                            this._toastService.warning("Not found data charge");
+                        }
                     }
-                }
-            );
-    }
+                );
+        } else {
+            this._accountingRepo.getChargeForVoucherByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this.hide();
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
 
-    selectPartner(data: PartnerOfAcctManagementResult) {
-        this.hide();
-        this.onSearchInputRef.emit(data);
-    }
+                                this.selectPartnerPopup.show();
+                            }
 
+                        } else {
+                            this._toastService.warning("Not found data charge");
+                        }
+                    }
+                );
+        }
+
+    }
 }
 
-interface ISearchInputRef {
-    cdNotes: string[];
-    soaNos: string[];
-    jobNos: string[];
-    hbls: string[];
-    mbls: string[];
-    settlementCodes: string[];
-}
+

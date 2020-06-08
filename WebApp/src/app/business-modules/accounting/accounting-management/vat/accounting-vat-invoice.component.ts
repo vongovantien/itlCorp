@@ -6,7 +6,6 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-accounting-vat-invoice',
@@ -14,13 +13,14 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class AccountingManagementVatInvoiceComponent extends AppList implements OnInit {
+
     invoices: AccAccountingManagementResult[] = [];
+
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
     ) {
         super();
@@ -63,30 +63,28 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
 
     getListInvoice() {
         this._progressRef.start();
+        this.isLoading = true;
         this._accountingRepo.getListAcctMngt(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
+                    this.isLoading = false;
                 }),
-                // tslint:disable-next-line: no-any
-                map((data: any) => {
+                map((data: CommonInterface.IResponsePaging) => {
                     return {
-                        // tslint:disable-next-line: no-any
-                        data: data.data.map((item: any) => new AccAccountingManagementResult(item)),
+                        data: (data.data || []).map((item: AccAccountingManagementResult) => new AccAccountingManagementResult(item)),
                         totalItems: data.totalItems,
                     };
                 })
             ).subscribe(
-                // tslint:disable-next-line: no-any
-                (res: any) => {
+                (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
                     this.invoices = res.data;
                 },
             );
     }
 
-    // tslint:disable-next-line: no-any
     onSearchInvoice($event: any) {
         this.page = 1;
         this.dataSearch = $event;

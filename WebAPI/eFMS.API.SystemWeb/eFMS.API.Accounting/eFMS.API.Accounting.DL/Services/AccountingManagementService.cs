@@ -995,6 +995,9 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     result.Charges = GetChargeForVoucher(expressionQuery);
                 }
+
+                result.UserNameCreated = userRepo.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.UserNameModified = userRepo.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
             }
             return result;
         }

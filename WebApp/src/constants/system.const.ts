@@ -125,4 +125,13 @@ export class SystemConstants {
         NUMERIC: /[^0-9.]+/g,
         LINE: /(?:\r\n|\r|\n|\\n|\\r)/g,
     };
+
+    public static HTTP_CODE = {
+        BAD_REQUEST: 400,
+        UNAUTHORIZED: 401,
+        FORBIDDEN: 403,
+        NOT_FOUND: 404,
+        EXISTED: 409,
+    };
+
 }
