@@ -309,7 +309,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             coloaderId: [null, Validators.required],
             warehouseId: [],
 
-        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
 
         this.mawb = this.formGroup.controls["mawb"];
 
