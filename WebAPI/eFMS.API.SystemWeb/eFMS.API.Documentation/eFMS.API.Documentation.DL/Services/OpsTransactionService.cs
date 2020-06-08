@@ -639,17 +639,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var transaction = mapper.Map<OpsTransaction>(opsTransaction);
                 DataContext.Add(transaction, false);
 
-                var clearance = mapper.Map<CustomsDeclaration>(model);
-                clearance.ConvertTime = DateTime.Now;
-                if (clearance.Id > 0)
+                if (model.Id > 0)
                 {
-                    clearance.DatetimeModified = DateTime.Now;
-                    clearance.UserModified = currentUser.UserID;
+                    var clearance = UpdateInfoConvertClearance(model.Id);
                     clearance.JobNo = opsTransaction.JobNo;
                     customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
                 }
                 else
                 {
+                    var clearance = mapper.Map<CustomsDeclaration>(model);
+                    clearance.ConvertTime = DateTime.Now;
                     clearance.DatetimeCreated = DateTime.Now;
                     clearance.DatetimeModified = DateTime.Now;
                     clearance.UserCreated = model.UserModified = currentUser.UserID;
@@ -786,7 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
                             opsTransaction.CommodityGroupId = commodity.CommodityGroupId;
                         }
                         int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                        opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+                        opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob + i);
                         var dayStatus = (int)(opsTransaction.ServiceDate.Value.Date - DateTime.Now.Date).TotalDays;
                         if (dayStatus > 0)
                         {
@@ -798,12 +797,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         var transaction = mapper.Map<OpsTransaction>(opsTransaction);
                         DataContext.Add(transaction, false);
-
-                        item.JobNo = opsTransaction.JobNo;
-                        item.UserModified = currentUser.UserID;
-                        item.DatetimeModified = DateTime.Now;
-                        item.ConvertTime = DateTime.Now;
-                        var clearance = mapper.Map<CustomsDeclaration>(item);
+                        CustomsDeclaration clearance = UpdateInfoConvertClearance(item.Id);
+                        clearance.JobNo = opsTransaction.JobNo;
                         customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                         i = i + 1;
                     }
@@ -816,6 +811,19 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
+        }
+
+        private CustomsDeclaration UpdateInfoConvertClearance(int id)
+        {
+            var clearance = customDeclarationRepository.Get(x => x.Id == id).First();
+            clearance.UserModified = currentUser.UserID;
+            clearance.DatetimeModified = DateTime.Now;
+            clearance.ConvertTime = DateTime.Now;
+            clearance.GroupId = currentUser.GroupId;
+            clearance.DepartmentId = currentUser.DepartmentId;
+            clearance.OfficeId = currentUser.OfficeID;
+            clearance.CompanyId = currentUser.CompanyID;
+            return clearance;
         }
 
         public HandleState SoftDeleteJob(Guid id)
