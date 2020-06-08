@@ -1,6 +1,6 @@
 
 import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
-import { IAccountingManagementPartnerState, accountingManagementPartnerReducer } from "./accounting-management-partner.reducer";
+import { IAccountingManagementPartnerState, reducer } from "./accounting-management-partner.reducer";
 
 export * from './accounting-management-partner.reducer';
 export interface IAccountingManagementState {
@@ -14,6 +14,6 @@ export const getAccoutingManagementPartnerState = createSelector(accountingManag
 export const getAccountingManagementPartnerChargeState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state.partner.charges);
 
 export const reducers: ActionReducerMap<IAccountingManagementState> = {
-    partner: accountingManagementPartnerReducer
+    partner: reducer
 };
 

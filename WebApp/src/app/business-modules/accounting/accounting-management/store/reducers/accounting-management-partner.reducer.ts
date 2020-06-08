@@ -1,4 +1,4 @@
-import { createReducer, on, Action } from '@ngrx/store';
+import { createReducer, on, Action, State } from '@ngrx/store';
 import * as accountingManagementActions from '../actions/accounting-management.action';
 import { ChargeOfAccountingManagementModel, PartnerOfAcctManagementResult } from '@models';
 
@@ -20,14 +20,17 @@ export const initialState: IAccountingManagementPartnerState = {
     charges: []
 };
 
-export const accountingManagementPartnerReducer = createReducer(initialState,
-    on(accountingManagementActions.SelectPartner,
-        (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
-            ...state, charges: payload.charges, ...payload
-        })),
-    on(accountingManagementActions.InitPartner,
-        () => ({
-            ...initialState,
-        })),
+const accountingManagementPartnerReducer = createReducer(
+    initialState,
+    on(accountingManagementActions.SelectPartner, (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
+        ...state, charges: payload.charges, ...payload
+    })),
+    on(accountingManagementActions.InitPartner, () => ({
+        ...initialState,
+    })),
 );
+
+export function reducer(state: any | undefined, action: Action) {
+    return accountingManagementPartnerReducer(state, action);
+}
 
