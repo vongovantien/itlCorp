@@ -127,17 +127,20 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
 
     issueVatInvoice() {
-        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected);
+        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
         if (!!cdNotes.length) {
-            this.searchRef(cdNotes.map(x => x.referenceNo));
+            this.searchRef(cdNotes.map(x => x.referenceNo), 'invoice');
         }
     }
 
     issueVoucher() {
-
+        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
+        if (!!cdNotes.length) {
+            this.searchRef(cdNotes.map(x => x.referenceNo), 'voucher');
+        }
     }
 
-    searchRef(cdNotes: string[]) {
+    searchRef(cdNotes: string[], type: string) {
         const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
             cdNotes: cdNotes,
             soaNos: null,
@@ -146,25 +149,48 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             mbls: null,
             settlementCodes: null
         };
-        this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
-            .subscribe(
-                (res: PartnerOfAcctManagementResult[]) => {
-                    if (!!res && !!res.length) {
-                        if (res.length === 1) {
-                            this._store.dispatch(SelectPartner(res[0]));
-                            this._router.navigate(["home/accounting/management/vat-invoice/new"]);
-                            return;
-                        } else {
-                            this.selectPartnerPopup.listPartners = res;
-                            this.selectPartnerPopup.selectedPartner = null;
+        if (type === 'invoice') {
+            this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this._router.navigate(["home/accounting/management/vat-invoice/new"]);
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
 
-                            this.selectPartnerPopup.show();
+                                this.selectPartnerPopup.show();
+                            }
+                        } else {
+                            this._toastService.warning("Not found data charge");
                         }
-                    } else {
-                        this._toastService.warning("Not found data charge");
                     }
-                }
-            );
+                );
+        } else {
+            this._accountingRepo.getChargeForVoucherByCriteria(body)
+                .subscribe(
+                    (res: PartnerOfAcctManagementResult[]) => {
+                        if (!!res && !!res.length) {
+                            if (res.length === 1) {
+                                this._store.dispatch(SelectPartner(res[0]));
+                                this._router.navigate(["home/accounting/management/voucher/new"]);
+                                return;
+                            } else {
+                                this.selectPartnerPopup.listPartners = res;
+                                this.selectPartnerPopup.selectedPartner = null;
+
+                                this.selectPartnerPopup.show();
+                            }
+                        } else {
+                            this._toastService.warning("Not found data charge");
+                        }
+                    }
+                );
+        }
+
     }
 
     onSelectPartner() {

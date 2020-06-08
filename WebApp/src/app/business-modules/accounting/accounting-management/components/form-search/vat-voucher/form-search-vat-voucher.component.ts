@@ -5,7 +5,7 @@ import { CommonEnum } from '@enums';
 import { Partner, User } from '@models';
 import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { JobConstants } from '@constants';
+import { JobConstants, AccountingConstants } from '@constants';
 import { AccAccountingManagementCriteria } from 'src/app/shared/models/accouting/accounting-management';
 import { formatDate } from '@angular/common';
 
@@ -15,8 +15,10 @@ import { formatDate } from '@angular/common';
 })
 
 export class AccountingManagementFormSearchVatVoucherComponent extends AppForm implements OnInit {
-    @Input() accountType: string = 'Invoice';
+
+    @Input() accountType: string = AccountingConstants.ISSUE_TYPE.INVOICE;
     @Output() onSearch: EventEmitter<AccAccountingManagementCriteria> = new EventEmitter<AccAccountingManagementCriteria>();
+
     partner: AbstractControl;
     creator: AbstractControl;
     referenceNo: AbstractControl;
@@ -40,11 +42,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         { id: 'Updated Invoice', text: 'Updated Invoice' }
     ];
 
-    voucherTypeList: CommonInterface.INg2Select[] = [
-        { id: 'Debt Voucher', text: 'Debt Voucher' },
-        { id: 'Bank', text: 'Bank' },
-        { id: 'Other', text: 'Orther' },
-    ];
+    voucherTypeList: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
 
     // tslint:disable-next-line: no-any
     invoiceStatusActive: any[] = [];

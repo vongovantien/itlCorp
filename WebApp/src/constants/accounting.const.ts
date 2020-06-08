@@ -15,4 +15,10 @@ export class AccountingConstants {
         VOUCHER: 'Voucher',
     }
 
+    public static STATUS_CD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
+        { id: 'New', text: 'New' },
+        { id: 'Issued Invoice', text: 'Issued Invoice' },
+        { id: 'Issued Voucher', text: 'Issued Voucher' },
+    ];
+
 }
