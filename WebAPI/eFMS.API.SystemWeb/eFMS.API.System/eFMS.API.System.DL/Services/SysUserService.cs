@@ -107,6 +107,7 @@ namespace eFMS.API.System.DL.Services
                               && (x.e.EmployeeNameEn ?? "").IndexOf(criteria.EmployeeNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                               && (x.e.EmployeeNameVn ?? "").IndexOf(criteria.EmployeeNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1
                               && (x.u.UserType ?? "").IndexOf(criteria.UserType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                              && (x.u.Active == criteria.Active || criteria.Active == null)
                               );
                 }
             }

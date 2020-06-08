@@ -101,6 +101,7 @@ namespace eFMS.API.Operation.Controllers
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
+        
         /// <summary>
         /// get and paging the list of custom declarations by conditions
         /// </summary>
@@ -136,14 +137,7 @@ namespace eFMS.API.Operation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
-            model.DatetimeCreated = DateTime.Now;
-            model.DatetimeModified = DateTime.Now;
-            model.UserCreated = model.UserModified = currentUser.UserID;
-            model.Source = OperationConstants.FromEFMS;
-            model.GroupId = currentUser.GroupId;
-            model.DepartmentId = currentUser.DepartmentId;
-            model.OfficeId = currentUser.OfficeID;
-            model.CompanyId = currentUser.CompanyID;
+            model = GetModelAdd(model);
             var hs = customsDeclarationService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -152,6 +146,19 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private CustomsDeclarationModel GetModelAdd(CustomsDeclarationModel model)
+        {
+            model.DatetimeCreated = DateTime.Now;
+            model.DatetimeModified = DateTime.Now;
+            model.UserCreated = model.UserModified = currentUser.UserID;
+            model.Source = OperationConstants.FromEFMS;
+            model.GroupId = currentUser.GroupId;
+            model.DepartmentId = currentUser.DepartmentId;
+            model.OfficeId = currentUser.OfficeID;
+            model.CompanyId = currentUser.CompanyID;
+            return model;
         }
 
         /// <summary>
