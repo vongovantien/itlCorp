@@ -91,7 +91,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     configHeader() {
         this.headers = [
             { title: 'Payee', field: 'receiverName', required: true, sortable: true, width: 150 },
-            { title: 'OBH Partner', field: 'payerName', required: true, sortable: true, width: 150 },
+            { title: 'OBH Partner', field: 'payerName', required: true, sortable: true, width: 200 },
             { title: 'Charge', field: 'chargeId', required: true, sortable: true, width: 250 },
             { title: 'Quantity', field: 'quantity', required: true, sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', required: true, sortable: true },
