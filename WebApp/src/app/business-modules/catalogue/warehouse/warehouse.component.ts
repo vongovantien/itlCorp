@@ -193,6 +193,15 @@ export class WarehouseComponent extends AppList implements OnInit {
         const curLanguage = localStorage.getItem(SystemConstants.CURRENT_CLIENT_LANGUAGE);
         if (event.field === "All") {
             this.criteria.all = event.searchString;
+            if (this.criteria.all.toLowerCase() === "active") {
+                this.criteria.all = "";
+                this.criteria.active = true;
+            } else if (this.criteria.all.toLowerCase() === "inactive") {
+                this.criteria.all = "";
+                this.criteria.active = false;
+            } else {
+                this.criteria.active = null;
+            }
         } else {
             this.criteria = {
                 placeType: CommonEnum.PlaceTypeEnum.Warehouse
@@ -208,6 +217,13 @@ export class WarehouseComponent extends AppList implements OnInit {
                 if (event.field === "districtName") {
                     this.criteria.districtNameEN = event.searchString;
                 }
+                if (event.field === "active") {
+                    if (event.searchString.toLowerCase() === "active") {
+                        this.criteria.active = true;
+                    } else if (event.searchString.toLowerCase() === "inactive") {
+                        this.criteria.active = false;
+                    }
+                }
             }
             if (curLanguage === SystemConstants.LANGUAGES.VIETNAM) {
                 if (event.field === "countryName") {
@@ -218,6 +234,13 @@ export class WarehouseComponent extends AppList implements OnInit {
                 }
                 if (event.field === "districtName") {
                     this.criteria.districtNameVN = event.searchString;
+                }
+                if (event.field === "active") {
+                    if (event.searchString.toLowerCase() === "active") {
+                        this.criteria.active = true;
+                    } else if (event.searchString.toLowerCase() === "inactive") {
+                        this.criteria.active = false;
+                    }
                 }
             }
         }
