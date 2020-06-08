@@ -121,12 +121,13 @@
                         <div class="col-lg-12 m--margin-top-20">
                             <div class="row">
                                 <div class="col-lg-6 w-100">
-                                    <button class="btn btn-danger  m-btn--uppercase w-100" type="button">
+                                    <button class="btn   m-btn--uppercase w-100" type="button" [ngClass]="!formGroup.controls['status'].value 
+                                    || formGroup.controls['status'].value === 'New' ? 'btn-danger' : 'btn-success'">
                                         <span>{{formGroup.controls["status"].value}}</span>
                                     </button>
                                 </div>
                                 <div class="col-lg-6 w-100">
-                                    <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase w-100"
+                                    <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase w-100"
                                         type="button" (click)="refNoPopup.show()">
                                         <span>
                                             <i class="la la-edit"></i>

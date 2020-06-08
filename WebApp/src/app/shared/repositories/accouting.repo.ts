@@ -495,6 +495,24 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    downLoadVatInvoiceImportTemplate() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/DownLoadVatInvoiceTemplate`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    uploadVatInvoiceImportFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/uploadVatInvoiceImportTemplate`, files, "uploadedFile");
+    }
+
+    importVatInvoice(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ImportVatInvoice`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
 
 

@@ -5,13 +5,20 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -26,16 +33,23 @@ namespace eFMS.API.Accounting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingService;
+        private readonly IHostingEnvironment _hostingEnvironment;
+
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
+        /// <param name="hostingEnvironment"></param>
         /// <param name="accService"></param>
-        public AccountingManagementController(IStringLocalizer<LanguageSub> localizer,
+        public AccountingManagementController(
+            IStringLocalizer<LanguageSub> localizer,
+             IHostingEnvironment hostingEnvironment,
             IAccountingManagementService accService)
         {
             stringLocalizer = localizer;
             accountingService = accService;
+            _hostingEnvironment = hostingEnvironment;
+
         }
 
         [Authorize]
@@ -262,5 +276,85 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountingService.GetDataAcctMngtExport(typeOfAcctMngt);
             return Ok(data);
         }
+
+        [HttpGet("DownLoadVatInvoiceTemplate")]
+        public async Task<ActionResult> DownLoadVatInvoiceTemplate()
+        {
+            var result = await new FileHelper().ExportExcel(_hostingEnvironment.ContentRootPath, "VatInvoiceImportTemplate.xlsx");
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        [HttpPost]
+        [Route("uploadVatInvoiceImportTemplate")]
+        public IActionResult uploadVatInvoiceImportTemplate(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                bool ValidDate = false;
+                DateTime temp;
+
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+
+                List<AcctMngtVatInvoiceImportModel> list = new List<AcctMngtVatInvoiceImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string date = worksheet.Cells[row, 3].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+
+                    if (date != null)
+                    {
+                        if (DateTime.TryParse(date, out temp))
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            dateToPase = DateTime.Parse(date, culture);
+                        }
+                        else
+                        {
+                            CultureInfo culture = new CultureInfo("es-ES");
+                            dateToPase = DateTime.Parse(date, culture);
+                        }
+                    }
+                   
+                    var acc = new AcctMngtVatInvoiceImportModel
+                    {
+                        IsValid = true,
+                        VoucherId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        RealInvoiceNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        InvoiceDate = !string.IsNullOrEmpty(date) ? dateToPase : (DateTime?)null,
+                        SerieNo = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    };
+                    list.Add(acc);
+                }
+                var data = accountingService.CheckVatInvoiceImport(list);
+
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        [HttpPut]
+        [Route("ImportVatInvoice")]
+        [Authorize]
+        public IActionResult ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var result = accountingService.ImportVatInvoice(model);
+            return Ok(result);
+        }
+
     }
 }

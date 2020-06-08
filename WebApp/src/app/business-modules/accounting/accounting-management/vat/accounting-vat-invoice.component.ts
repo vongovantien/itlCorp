@@ -124,10 +124,6 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
             );
     }
 
-    importInvoice() {
-
-    }
-
     prepareDeleteInvoice(invoice: AccAccountingManagementResult) {
         this._accountingRepo.checkAllowDeleteAcctMngt(invoice.id)
             .subscribe(

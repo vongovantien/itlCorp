@@ -2,6 +2,7 @@
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -24,5 +25,9 @@ namespace eFMS.API.Accounting.DL.IService
         AccAccountingManagementModel GetById(Guid id);
         string GenerateInvoiceNoTemp();
         List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt);
+        List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list);
+        ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list);
+
+
     }
 }

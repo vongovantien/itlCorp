@@ -119,5 +119,11 @@
   "EF_DISPLAYNAME_CODE": "Mã code",
   //------------end  : Commodity
 
-  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này"
+  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này",
+
+  "MSG_VOUCHER_ID_EMPTY": "VoucherId is not allow empty!",
+  "MSG_VOUCHER_ID_NOT_EXIST": "VoucherId {0} is not existed!",
+  "MSG_VOUCHER_ID_DUPLICATE": "VoucherId {0} has been duplicated!",
+  "MSG_INVOICE_DATE_NOT_EMPTY": "Invoice Date is not allow empty!"
+
 }

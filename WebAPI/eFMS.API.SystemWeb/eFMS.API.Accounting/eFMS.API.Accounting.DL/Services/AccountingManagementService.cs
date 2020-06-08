@@ -5,10 +5,12 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPlace> placeRepo;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         private readonly IContextBase<SysEmployee> employeeRepo;
+        private readonly IStringLocalizer stringLocalizer;
+
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
             ICurrentUser cUser,
@@ -53,6 +57,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUser> user,
             IContextBase<CatPlace> place,
             IContextBase<AcctSettlementPayment> settlementPayment,
+            IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<SysEmployee> employee) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -72,6 +77,7 @@ namespace eFMS.API.Accounting.DL.Services
             placeRepo = place;
             settlementPaymentRepo = settlementPayment;
             employeeRepo = employee;
+            stringLocalizer = localizer;
         }
 
         #region --- DELETE ---
@@ -1090,6 +1096,95 @@ namespace eFMS.API.Accounting.DL.Services
             
             return data;
         }
+
+
         #endregion --- EXPORT ---
+
+        public List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list)
+        {
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.VoucherId))
+                {
+                    item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_EMPTY];
+                    item.IsValid = false;
+                }
+                else
+                {
+                    if (!DataContext.Any(x => x.VoucherId == item.VoucherId && x.Type == "Invoice"))
+                    {
+                        item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_NOT_EXIST, item.VoucherId];
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.VoucherId?.ToLower() == item.VoucherId?.ToLower()) > 1)
+                    {
+                        item.VoucherId = string.Format(stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_DUPLICATE], item.VoucherId);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.RealInvoiceNo))
+                {
+                    item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_NO_EMPTY];
+                    item.IsValid = false;
+                }
+
+            });
+            return list;
+        }
+
+        public ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in list)
+                    {
+                        var vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
+                        vatInvoice.InvoiceNoTempt = vatInvoice.InvoiceNoReal = item.RealInvoiceNo;
+                        vatInvoice.Date = item.InvoiceDate;
+                        vatInvoice.Status = AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED;
+                        vatInvoice.UserModified = currentUser.UserID;
+                        vatInvoice.DatetimeModified = DateTime.Now;
+
+                        IQueryable<CsShipmentSurcharge> surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == vatInvoice.Id);
+
+                        if(surchargeOfAcctCurrent != null)
+                        {
+                            foreach (var surcharge in surchargeOfAcctCurrent)
+                            {
+
+                                surcharge.InvoiceNo = item.RealInvoiceNo;
+                                surcharge.InvoiceDate = item.InvoiceDate;
+                                surcharge.SeriesNo = item.SerieNo;
+
+                                surcharge.DatetimeModified = DateTime.Now;
+                                surcharge.UserModified = currentUser.UserID;
+
+                                surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+                        
+                        DataContext.Update(vatInvoice, x => x.VoucherId == item.VoucherId);
+
+                    }
+                    surchargeRepo.SubmitChanges();
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    return new ResultHandle { Status = true, Message = "Import Vat Invoice successfully" };
+
+                }
+                catch (Exception ex)
+                {
+                    var result = new HandleState(ex.Message);
+                    return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+               
+        }
     }
 }
