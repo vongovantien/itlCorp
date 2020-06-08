@@ -268,5 +268,12 @@ export class ExportRepo {
         );
     }
 
+    exportAccountingManagement(typeOfAcctMngt: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement?typeOfAcctMngt=${typeOfAcctMngt}`).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 }
 

@@ -293,7 +293,28 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export accounting management
+        /// </summary>
+        /// <param name="typeOfAcctMngt">Invoice Or Voucher</param>
+        /// <returns></returns>
+        [Route("ExportAccountingManagement")]
+        [HttpGet]
+        public async Task<IActionResult> ExportAccountingManagement(string typeOfAcctMngt)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.AccountingManagementExportUrl + "?typeOfAcctMngt=" + typeOfAcctMngt);
 
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
+
+            var stream = new AccountingHelper().GenerateAccountingManagementExcel(dataObjects.Result, typeOfAcctMngt);
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, (typeOfAcctMngt == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS.xlsx");
+
+            return fileContent;
+        }
 
     }
 }

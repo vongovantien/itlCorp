@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
@@ -21,6 +21,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -91,5 +92,23 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
 
     sortVoucher(sortField: string) {
         this.vouchers = this._sortService.sort(this.vouchers, sortField, this.order);
+    }
+
+    exportVoucher() {
+        this._progressRef.start();
+        this._exportRepo.exportAccountingManagement("Voucher")
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'VOUCHER - eFMS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no data to export', '');
+                    }
+                },
+            );
     }
 }
