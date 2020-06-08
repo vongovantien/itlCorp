@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 @Component({
     selector: 'app-accounting-voucher',
@@ -14,7 +15,14 @@ import { catchError, finalize, map } from 'rxjs/operators';
 })
 
 export class AccountingManagementVoucherComponent extends AppList implements OnInit {
+
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopupDelete: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) popup403: Permission403PopupComponent;
+
     vouchers: AccAccountingManagementResult[] = [];
+    confirmDeleteVoucherText: string;
+    selectedVoucher: AccAccountingManagementResult;
+
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -66,24 +74,20 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
                 finalize(() => {
                     this._progressRef.complete();
                 }),
-                // tslint:disable-next-line: no-any
-                map((data: any) => {
+                map((data: CommonInterface.IResponsePaging) => {
                     return {
-                        // tslint:disable-next-line: no-any
-                        data: data.data.map((item: any) => new AccAccountingManagementResult(item)),
+                        data: (data.data || []).map((item: AccAccountingManagementResult) => new AccAccountingManagementResult(item)),
                         totalItems: data.totalItems,
                     };
                 })
             ).subscribe(
-                // tslint:disable-next-line: no-any
-                (res: any) => {
+                (res: CommonInterface.IResponsePaging) => {
                     this.totalItems = res.totalItems || 0;
                     this.vouchers = res.data;
                 },
             );
     }
 
-    // tslint:disable-next-line: no-any
     onSearchVoucher($event: any) {
         this.page = 1;
         this.dataSearch = $event;
@@ -110,5 +114,40 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
                     }
                 },
             );
+    }
+
+    prepareDeleteVoucher(voucher: AccAccountingManagementResult) {
+        this._accountingRepo.checkAllowDeleteAcctMngt(voucher.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.popup403.show();
+                        return;
+                    }
+                    this.selectedVoucher = voucher;
+
+                    this.confirmDeleteVoucherText = '';
+                    const textConfirm: string = (this.confirmDeleteVoucherText + '').slice();
+                    this.confirmDeleteVoucherText = textConfirm + `Do you want to delete ${voucher.voucherId} ?`;
+                    this.confirmPopupDelete.show();
+                }
+            );
+    }
+
+    onDeleteVoucher() {
+        if (!!this.selectedVoucher) {
+            this._accountingRepo.deleteAcctMngt(this.selectedVoucher.id)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.message) {
+                            this._toastService.success(res.message);
+                            this.confirmPopupDelete.hide();
+                            this.onSearchVoucher(this.dataSearch);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
     }
 }

@@ -1,9 +1,7 @@
 <div class="vat-invoice-wrapper  m-animate-fade-in">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="addButtonSetting" [dataTarget]="addButtonSetting.dataTarget"
-                routerLink="/home/accounting/management/vat-invoice/new">
-            </app-default-button>
+
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -23,16 +21,14 @@
                                     <div class="col-lg-8 m--align-left">
                                         <div class="form-group">
                                             <div class="c-button-actions">
-                                                <button type="button"
-                                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                                                    (click)="exportInvoice()">
-                                                    <span>
-                                                        <i class="la la-download"></i>
-                                                        <span>
-                                                            Export
-                                                        </span>
-                                                    </span>
-                                                </button>
+                                                <app-permission-button type="add" title="Issue Invoice"
+                                                    routerLink="/home/accounting/management/vat-invoice/new">
+                                                </app-permission-button>
+                                                <app-permission-button type="import" title="Import Update"
+                                                    (onClick)="importInvoice()">
+                                                </app-permission-button>
+                                                <app-permission-button type="export" (onClick)="exportInvoice()">
+                                                </app-permission-button>
                                             </div>
                                         </div>
                                     </div>
@@ -51,10 +47,11 @@
                                             <tr *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <button type="button" title="Delete"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
+                                                        <ng-container *ngIf="invoice.status === 'New'">
+                                                            <app-permission-button
+                                                                (onClick)="prepareDeleteInvoice(invoice)" type="delete">
+                                                            </app-permission-button>
+                                                        </ng-container>
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
@@ -65,7 +62,7 @@
                                                 <td>{{invoice.partnerName}}</td>
                                                 <td>{{invoice.totalAmount | number: '.0-3'}}</td>
                                                 <td>{{invoice.currency}}</td>
-                                                <td>{{invoice.date | date: 'dd/MM/yyyy'}}</td>
+                                                <td>{{invoice.date | date: 'HH:mm dd/MM/yyyy'}}</td>
                                                 <td>{{invoice.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-success">{{invoice.creatorName}}</td>
                                                 <td
@@ -88,3 +85,7 @@
         </div>
     </div>
 </div>
+
+<confirm-popup [body]="confirmDeleteInvoiceText" (onSubmit)="onDeleteInvoice()"></confirm-popup>
+
+<permission-403-popup></permission-403-popup>

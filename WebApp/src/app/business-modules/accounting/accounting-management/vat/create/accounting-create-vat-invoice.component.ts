@@ -52,10 +52,9 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
         }
 
         const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-        modelAdd.type = AccountingConstants.ISSUE_TYPE.INVOICE;;
+        modelAdd.type = AccountingConstants.ISSUE_TYPE.INVOICE;
 
         modelAdd.charges = [...this.listChargeComponent.charges];
-        console.log(modelAdd);
 
         this.saveInvoice(modelAdd);
     }
