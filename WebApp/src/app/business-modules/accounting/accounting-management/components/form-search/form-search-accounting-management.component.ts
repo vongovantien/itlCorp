@@ -22,6 +22,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
 
     filterTypes: CommonInterface.INg2Select[] =
         [
+            { id: '', text: 'All' },
             { id: 'Debit', text: 'Debit Note' },
             { id: 'Credit', text: 'Credit Note' },
             { id: 'Invoice', text: 'Invoice' }
@@ -64,7 +65,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
             partner: [],
             issuedDate: [],
             creator: [],
-            filterType: [],
+            filterType: [[this.filterTypes[0]]],
             filterStatus: []
         });
 
@@ -74,6 +75,7 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.filterType = this.formSearch.controls['filterType'];
         this.issuedDate = this.formSearch.controls['issuedDate'];
         this.filterStatus = this.formSearch.controls['filterStatus'];
+
     }
 
     onSelectDataFormInfo(data: any, type: string) {

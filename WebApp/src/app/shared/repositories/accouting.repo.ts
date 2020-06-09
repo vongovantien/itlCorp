@@ -415,8 +415,8 @@ export class AccountingRepo {
         );
     }
 
-    checkAllowDeleteAcctMngt(soaNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckAllowDelete/${soaNo}`).pipe(
+    checkAllowDeleteAcctMngt(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckAllowDelete/`, { id: id }).pipe(
             map((data: any) => data)
         );
     }

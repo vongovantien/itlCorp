@@ -1,12 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
+import { AccAccountingManagementResult } from '@models';
+
+import { catchError, finalize, map } from 'rxjs/operators';
+import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+
 
 @Component({
     selector: 'app-accounting-vat-invoice',
@@ -14,8 +17,14 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class AccountingManagementVatInvoiceComponent extends AppList implements OnInit {
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopupDelete: ConfirmPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) popup403: Permission403PopupComponent;
+
 
     invoices: AccAccountingManagementResult[] = [];
+    selectedInvoice: AccAccountingManagementResult;
+
+    confirmDeleteInvoiceText: string = '';
 
     constructor(
         private _router: Router,
@@ -113,5 +122,44 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
                     }
                 },
             );
+    }
+
+    importInvoice() {
+
+    }
+
+    prepareDeleteInvoice(invoice: AccAccountingManagementResult) {
+        this._accountingRepo.checkAllowDeleteAcctMngt(invoice.id)
+            .subscribe(
+                (res: boolean) => {
+                    if (!res) {
+                        this.popup403.show();
+                        return;
+                    }
+                    this.selectedInvoice = invoice;
+
+                    this.confirmDeleteInvoiceText = '';
+                    const textConfirm: string = (this.confirmDeleteInvoiceText + '').slice();
+                    this.confirmDeleteInvoiceText = textConfirm + `Do you want to delete ${invoice.invoiceNoTempt} ?`;
+                    this.confirmPopupDelete.show();
+                }
+            );
+    }
+
+    onDeleteInvoice() {
+        if (!!this.selectedInvoice) {
+            this._accountingRepo.deleteAcctMngt(this.selectedInvoice.id)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.message) {
+                            this._toastService.success(res.message);
+                            this.confirmPopupDelete.hide();
+                            this.onSearchInvoice(this.dataSearch);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
     }
 }
