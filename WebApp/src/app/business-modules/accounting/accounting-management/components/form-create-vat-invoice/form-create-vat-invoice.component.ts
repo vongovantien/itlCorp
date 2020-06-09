@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -20,6 +20,14 @@ import { map, debounceTime, takeUntil } from 'rxjs/operators';
 })
 
 export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm implements OnInit {
+    @Input() set update(u: boolean) {
+        this._isUpdate = u;
+
+    }
+    get update() {
+        return this._isUpdate;
+    }
+    private _isUpdate: boolean = false;
 
     formGroup: FormGroup;
 
@@ -81,7 +89,10 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                     }
                 }
             );
-        this.generateVoucherId();
+
+        if (!this.update) {
+            this.generateVoucherId();
+        }
     }
 
     initForm() {
@@ -115,15 +126,17 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
 
-        this.invoiceNoTempt.valueChanges
-            .pipe(
-                debounceTime(400)
-            )
-            .subscribe(
-                (res) => {
-                    this.invoiceNoReal.setValue(res);
-                }
-            );
+        if (!this.update) {
+            this.invoiceNoTempt.valueChanges
+                .pipe(
+                    debounceTime(400)
+                )
+                .subscribe(
+                    (res) => {
+                        this.invoiceNoReal.setValue(res);
+                    }
+                );
+        }
     }
 
     onSelectDataFormInfo(data, type: string) {

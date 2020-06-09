@@ -9,11 +9,12 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccountingManagementService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService)">
             <summary>
             Contructor
             </summary>
             <param name="localizer"></param>
+            <param name="hostingEnvironment"></param>
             <param name="accService"></param>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeSellForInvoiceByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">

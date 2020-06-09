@@ -55,19 +55,18 @@
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate"><i class="la la-copy"></i>
                                         </button>
-                                        <button type="button" (click)="deleteCharge(charge, i, 'OBH')" appLoadingButton
-                                            [state]="
-                                !!charge.soano 
-                                || !!charge.creditNo
-                                || !!charge.debitNo
-                                || !!charge.settlementCode
-                                || !!charge.voucherId
-                                || !!charge.voucherIddate
-                                || !!charge.voucherIdre"
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove">
-                                            <i class="la la-trash"></i>
-                                        </button>
+                                        <ng-container *ngIf="!charge.soano
+                                        && !charge.creditNo
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate">
+                                            <button type="button" (click)="deleteCharge(charge, i, 'OBH')"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </ng-container>
                                     </div>
                                 </td>
                             </ng-container>
@@ -101,16 +100,31 @@
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
-                                    <input type="text" class="dropdown-toggle form-control" readonly
-                                        [(ngModel)]="charge.receiverName" placeholder="Partner Name"
-                                        [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                        (click)="loadDynamicComoGrid(charge,i)"
-                                        [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null"
-                                        [disabled]="!!charge.creditNo || !!charge.debitNo|| !charge.isFromShipment || (isLocked | async) === true">
-                                    <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                    <ng-container
+                                        *ngIf="!!charge.creditNo || !!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true; else partnerTemplate">
+                                        <input type="text" class="dropdown-toggle form-control" disabled
+                                            [(ngModel)]="charge.receiverName">
+                                    </ng-container>
+                                    <ng-template #partnerTemplate>
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.receiverName" placeholder="Partner Name"
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                            (click)="loadDynamicComoGrid(charge,i)"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
+                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
-                                        [showDelete]="!!charge.receiverName"></combo-grid-icon>
-                                    <div class="dropdown-partner__content"
+                                            [showDelete]="!!charge.receiverName 
+                                        && !charge.soano
+                                        && !charge.creditNo
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate">
+                                        </combo-grid-icon>
+                                    </ng-template>
+
+
+                                    <div class=" dropdown-partner__content"
                                         [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
                                         <div class="d-flex justify-content-end dropdown-partner__header">
                                             <a class="text-primary text-underline m--margin-right-20 pointer"

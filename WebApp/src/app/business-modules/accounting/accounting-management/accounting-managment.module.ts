@@ -30,6 +30,7 @@ import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-no
 import { AccountingManagementCreateVoucherComponent } from './voucher/create/accounting-create-voucher.component';
 import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
+import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
 
 const routing: Routes = [
     {
@@ -48,8 +49,12 @@ const routing: Routes = [
                 path: 'new', component: AccountingManagementCreateVATInvoiceComponent, data: { name: 'New' }
             },
             {
+                path: 'import', component: AccountingManagementImportVatInvoiceComponent, data: { name: "Import" }
+            },
+            {
                 path: ':vatInvoiceId', component: AccountingManagementDetailVatInvoiceComponent, data: { name: 'Edit' }
-            }
+            },
+
         ]
     },
     {
@@ -99,7 +104,8 @@ const routing: Routes = [
         AccountingDetailCdNoteComponent,
         AccountingManagementCreateVoucherComponent,
         AccountingManagementFormCreateVoucherComponent,
-        AccountingManagementDetailVoucherComponent
+        AccountingManagementDetailVoucherComponent,
+        AccountingManagementImportVatInvoiceComponent
     ],
 
     exports: [],

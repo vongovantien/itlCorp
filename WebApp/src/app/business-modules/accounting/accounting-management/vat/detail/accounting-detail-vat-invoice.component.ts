@@ -75,6 +75,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
 
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+        this.formCreateComponent.formGroup.controls['invoiceNoTempt'].disable();
     }
 
     updateChargeList(res: AccAccountingManagementModel) {

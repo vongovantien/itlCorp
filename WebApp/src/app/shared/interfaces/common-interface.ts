@@ -93,6 +93,11 @@ namespace CommonInterface {
         searchString?: string;
         [name: string]: any;
     }
+
+    export interface IResponseImport {
+        data: any;
+        totalValidRows: number;
+    }
 }
 
 
