@@ -92,7 +92,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res) => {
                     if (!!res) {
-                        console.log(res);
                         if (data != null) {
                             this.billSIComponent.shippingInstruction = data;
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
@@ -104,7 +103,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
                         this.billSIComponent.termTypes = this.termTypes;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
-                        console.log(this.billSIComponent.shippingInstruction);
                     }
                 }
             );
@@ -198,7 +196,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     save() {
         this.billSIComponent.isSubmitted = true;
-        if (!this.checkValidateForm()) {
+        if (!this.checkValidateForm() || this.billSIComponent.voyNo.value.trim().length === 0 || this.billSIComponent.shipper.value.trim().length === 0) {
             return;
         }
 
