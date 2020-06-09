@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AccountingRepo } from '@repositories';
@@ -62,7 +62,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                     this.accountingManagement = new AccAccountingManagementModel(res);
                     this.updateFormInvoice(res);
                     this.updateChargeList(res);
-
                 }
             );
     }
@@ -75,7 +74,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
 
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
-        this.formCreateComponent.formGroup.controls['invoiceNoTempt'].disable();
+        // this.formCreateComponent.formGroup.controls['invoiceNoTempt'].disable();
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
@@ -85,7 +84,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
 
     onSubmitSaveInvoice() {
         this.formCreateComponent.isSubmitted = true;
-
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
@@ -94,7 +92,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
             this._toastService.warning("VAT Invoice don't have any charge in this period, Please check it again!");
             return;
         }
-
         this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.vatInvoiceId)
             .pipe(
                 switchMap(
@@ -142,9 +139,6 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                     }
                 },
             );
-
-
-
     }
 
     gotoList() {

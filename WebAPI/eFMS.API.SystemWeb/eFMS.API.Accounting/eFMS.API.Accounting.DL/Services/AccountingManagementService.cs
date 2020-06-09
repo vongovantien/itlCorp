@@ -221,7 +221,8 @@ namespace eFMS.API.Accounting.DL.Services
                            Date = acc.Date, //Invoice Date or Voucher Date
                            DatetimeCreated = acc.DatetimeCreated, //Issue Date
                            CreatorName = user.Username,
-                           Status = acc.Status //Status Invoice
+                           Status = acc.Status, //Status Invoice,
+                           Serie = acc.Serie
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -974,7 +975,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string no = "0000001";
             int outNum = 0;
-            var invoiceNos = Get(x => int.TryParse(x.InvoiceNoTempt, out outNum)).OrderByDescending(o => o.InvoiceNoTempt).Select(s => s.InvoiceNoTempt);
+            // var invoiceNos = Get(x => int.TryParse(x.InvoiceNoTempt, out outNum)).OrderByDescending(o => o.InvoiceNoTempt).Select(s => s.InvoiceNoTempt);
+            var invoiceNos = Get(x => int.TryParse(x.InvoiceNoTempt, out outNum)).Select(s => s.InvoiceNoTempt.PadLeft(7, '0')).OrderByDescending(o => o);
             var invoiceNoNewest = invoiceNos.FirstOrDefault();
             if (!string.IsNullOrEmpty(invoiceNoNewest))
             {
@@ -1111,23 +1113,46 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    if (!DataContext.Any(x => x.VoucherId == item.VoucherId && x.Type == "Invoice"))
-                    {
-                        item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_NOT_EXIST, item.VoucherId];
-                        item.IsValid = false;
-                    }
+                    // Danh sách có 2 dòng Voucher ID giống nhau
                     if (list.Count(x => x.VoucherId?.ToLower() == item.VoucherId?.ToLower()) > 1)
                     {
                         item.VoucherId = string.Format(stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_DUPLICATE], item.VoucherId);
                         item.IsValid = false;
                     }
+                    else
+                    {
+                        // Không tìm thấy voucher ID
+                        if (!DataContext.Any(x => x.VoucherId == item.VoucherId && x.Type == "Invoice"))
+                        {
+                            item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_NOT_EXIST, item.VoucherId];
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrEmpty(item.RealInvoiceNo))
+                            {
+                                item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_NO_NOT_EMPTY];
+                                item.IsValid = false;
+                            }
+                            if (string.IsNullOrEmpty(item.SerieNo))
+                            {
+                                item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
+                                item.IsValid = false;
+                            }
+                            //else
+                            //{
+                            //    // Trùng Invoice, Serie, VoucherID #
+                            //    if (DataContext.Any(x => x.InvoiceNoReal == item.RealInvoiceNo && x.Serie == item.SerieNo))
+                            //    {
+                            //        item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_DUPLICATE];
+                            //        item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_DUPLICATE];
+                            //        item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_DUPLICATE];
+                            //        item.IsValid = false;
+                            //    }
+                            //}
+                        }
+                    }
                 }
-                if (string.IsNullOrEmpty(item.RealInvoiceNo))
-                {
-                    item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_NO_EMPTY];
-                    item.IsValid = false;
-                }
-
             });
             return list;
         }

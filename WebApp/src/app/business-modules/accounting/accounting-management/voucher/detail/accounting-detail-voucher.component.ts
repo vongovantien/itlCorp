@@ -10,11 +10,10 @@ import { AccAccountingManagementModel } from '@models';
 
 import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
 
-import { tap, switchMap, catchError, finalize, concatMap, map } from 'rxjs/operators';
+import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
-import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-accounting-detail-voucher',

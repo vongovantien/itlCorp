@@ -31,12 +31,10 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _pagingService: PagingService
-
-
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestList = this.pagingData;
+        this.requestList = this.onPaging;
     }
 
     ngOnInit(): void {
@@ -46,7 +44,6 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Serie', field: 'serieNo', sortable: true },
         ];
-
     }
 
     downloadSample() {
@@ -76,13 +73,27 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
 
                 this.page = 1;
                 this.totalItems = this.data.length;
+
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
+
+                this.pagingData(this.data.length, this.page);
             });
     }
 
-    pagingData() {
+    pagingData(totalItem: number, currentPage: number) {
+        const dataPaging: {
+            startIndex: number,
+            endIndex: number,
+            pageSize: number,
+            totalItems: number
+        } = this._pagingService.getPager(totalItem, currentPage, this.pageSize);
+        this.tempData = this.data.slice(dataPaging.startIndex, dataPaging.endIndex + 1);
+        this.totalItems = dataPaging.totalItems;
+    }
 
+    onPaging() {
+        this.pagingData(this.data.length, this.page);
     }
 
     hideInvalid() {
@@ -128,7 +139,6 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
                 }
             );
     }
-
 }
 
 interface IImportVatInvoice {

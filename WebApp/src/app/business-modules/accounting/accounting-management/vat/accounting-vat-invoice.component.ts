@@ -45,6 +45,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Invoice No (Temp)', field: 'invoiceNoTempt', sortable: true },
             { title: 'Real Invoice No', field: 'invoiceNoReal', sortable: true },
+            { title: 'Serie No', field: 'serie', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Total Amount', field: 'totalAmount', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },

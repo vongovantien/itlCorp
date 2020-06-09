@@ -15,6 +15,7 @@ import { AccountingManagementListChargeComponent } from '../../components/list-c
 
 import _merge from 'lodash/merge';
 import { catchError } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-accounting-create-voucher',
@@ -92,6 +93,11 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
                         this._toastService.success(res.message);
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (res: HttpErrorResponse) => {
+                    if (res.error.message === 'Voucher ID has been existed') {
+                        this.formCreateComponent.voucherId.setErrors({ existed: true });
                     }
                 }
             );

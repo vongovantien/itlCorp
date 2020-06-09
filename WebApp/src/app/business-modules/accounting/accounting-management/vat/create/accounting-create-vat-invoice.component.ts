@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AppForm } from 'src/app/app.form';
 import { ToastrService } from 'ngx-toastr';
 import { AccAccountingManagementModel } from '@models';
@@ -90,6 +91,11 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                         this._toastService.success(res.message);
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (res: HttpErrorResponse) => {
+                    if (res.error.message === 'Voucher ID has been existed') {
+                        this.formCreateComponent.voucherId.setErrors({ existed: true });
                     }
                 }
             );
