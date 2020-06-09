@@ -926,16 +926,28 @@ namespace eFMS.API.Documentation.DL.Services
         public ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list)
         {
             ResultHandle result = null;
-            string errorMessages = string.Empty;
+            string notFoundPartnerTaxCodeMessages = string.Empty;
+            string duplicateMessages = string.Empty;
             foreach(var item in list)
             {
                 var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
-                if (customer == null) errorMessages += item.PartnerTaxCode + ", ";
+                if (customer == null) notFoundPartnerTaxCodeMessages += item.PartnerTaxCode + ", ";
+                string dupMessage = CheckExist(item, item.Id);
+                if(dupMessage.Length > 0)
+                {
+                    duplicateMessages += dupMessage + ", ";
+                }
             }
-            if(errorMessages.Length > 0)
+            if(notFoundPartnerTaxCodeMessages.Length > 0)
             {
-                errorMessages = "Partner TaxCode '" + errorMessages.Substring(0, errorMessages.Length - 2) + "' Not found";
-                result = new ResultHandle { Status = false, Message = errorMessages, Data = 403 };
+                notFoundPartnerTaxCodeMessages = "Partner TaxCode '" + notFoundPartnerTaxCodeMessages.Substring(0, notFoundPartnerTaxCodeMessages.Length - 2) + "' Not found";
+                result = new ResultHandle { Status = false, Message = notFoundPartnerTaxCodeMessages, Data = 403 };
+                return result;
+            }
+            if(duplicateMessages.Length > 0)
+            {
+                duplicateMessages = duplicateMessages.Substring(0, duplicateMessages.Length - 2);
+                result = new ResultHandle { Status = false, Message = duplicateMessages, Data = 403 };
                 return result;
             }
             var permissionDetailRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
@@ -947,6 +959,25 @@ namespace eFMS.API.Documentation.DL.Services
             }
             result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = 401 };
             return result;
+        }
+        private string CheckExist(CustomsDeclarationModel model, decimal id)
+        {
+            string message = null;
+            if (id == 0)
+            {
+                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                {
+                    message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
+                }
+            }
+            else
+            {
+                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                {
+                    message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
+                }
+            }
+            return message;
         }
 
         private HandleState GetPermissionDetailConvertClearances(List<CustomsDeclarationModel> list, PermissionRange permissionDetailRange)
