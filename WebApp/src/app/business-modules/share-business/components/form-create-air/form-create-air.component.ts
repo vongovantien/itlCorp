@@ -19,6 +19,7 @@ import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import cloneDeep from 'lodash/cloneDeep';
+import { JobConstants } from '@constants';
 
 
 @Component({
@@ -50,19 +51,13 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     commodity: AbstractControl;
     packageType: AbstractControl;
 
-    shipmentTypes: CommonInterface.INg2Select[] = [
-        { id: 'Freehand', text: 'Freehand' },
-        { id: 'Nominated', text: 'Nominated' }
-    ];
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
     billTypes: CommonInterface.INg2Select[] = [
         { id: 'Copy', text: 'Copy' },
         { id: 'Original', text: 'Original' },
         { id: 'Surrendered', text: 'Surrendered' },
     ];
-    termTypes: CommonInterface.INg2Select[] = [
-        { id: 'Prepaid', text: 'Prepaid' },
-        { id: 'Collect', text: 'Collect' }
-    ];
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
     carries: Customer[];
     agents: Observable<Customer[]>;
@@ -74,17 +69,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     initWarehouses: Warehouse[];
     initCarriers: Customer[];
 
-    displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name Abbr' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
+    displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
     displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Code' },
@@ -177,6 +163,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                     if (!!res) {
                         this.shipmentDetail = new CsTransaction(res);
                         this.dimVolumePopup.jobId = this.shipmentDetail.id;
+                        this.dimVolumePopup.$roundUp.next(this.shipmentDetail.roundUpMethod);
+                        this.dimVolumePopup.$applyDIM.next(this.shipmentDetail.applyDim);
 
                         this._route.queryParams.subscribe((param: Params) => {
                             if (param.action === 'copy') {
@@ -277,9 +265,10 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
-                Validators.minLength(13),
-                Validators.maxLength(13),
-                FormValidators.validateMAWB
+                // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
+                Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                FormValidators.validateMAWB,
+
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([

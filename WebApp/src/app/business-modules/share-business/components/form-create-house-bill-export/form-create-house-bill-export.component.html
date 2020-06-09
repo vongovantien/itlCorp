@@ -54,8 +54,11 @@
                             [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(consignee)"
                             placeholder="Select consignee" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
-                            formControlName="consigneeDescription"></textarea>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && (type === 'SFE' && !consigneeDescription.value)}">
+                            <textarea rows="7" class="form-control m-input m-input--square"
+                                formControlName="consigneeDescription"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -82,14 +85,21 @@
                         [ngClass]="{'m-form__group has-danger':  (hbltype.dirty && !hbltype.valid) || (isSubmitted && !hbltype.valid)}">
                         <label required>HBL Type</label>
                         <ng-select #selectMBL [items]="ladingTypes" placeholder="Please Select"
-                            formControlName="hbltype" (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
+                            (selected)="onSelectHblType($event)" formControlName="hbltype"
+                            (opened)="closeOtherSelects(selectMBL)" [allowClear]="true">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Booking No</label>
-                        <input type="text" class="form-control" formControlName="bookingNo">
+                        <div class="pos-rel">
+                            <input type="text" class="form-control" formControlName="bookingNo">
+                            <ng-container *ngIf="type === 'SLE'">
+                                <combo-grid-icon (onDropdown)="showBookingNote()"> </combo-grid-icon>
+                                <ng-template inject></ng-template>
+                            </ng-container>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -177,16 +187,8 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
-                                formControlName="closingDate" />
-                            <span class="m-input-icon_clear" (click)="resetFormControl(closingDate)"
-                                *ngIf="!!closingDate.value && !!closingDate.value.startDate">
-                                <i class="la la-times"></i>
-                            </span>
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                formControlName="closingDate" (remove)="resetFormControl(closingDate)" calendar
+                                [allowRemove]="!!closingDate.value && !!closingDate.value.startDate" />
                         </div>
                     </div>
                 </div>
@@ -198,16 +200,8 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="sailingDate" name="daterange" placeholder="Select" readonly
-                                formControlName="sailingDate" />
-                            <span class="m-input-icon_clear" (click)="resetFormControl(sailingDate)"
-                                *ngIf="!!sailingDate.value && !!sailingDate.value.startDate">
-                                <i class="la la-times"></i>
-                            </span>
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                formControlName="sailingDate" (remove)="resetFormControl(sailingDate)" calendar
+                                [allowRemove]="!!sailingDate.value && !!sailingDate.value.startDate" />
                         </div>
                     </div>
                 </div>
@@ -263,16 +257,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
-                                        formControlName="issueHbldate" />
-                                    <span class="m-input-icon_clear" (click)="resetFormControl(issueHbldate)"
-                                        *ngIf="!!issueHbldate.value && !!issueHbldate.value.startDate">
-                                        <i class="la la-times"></i>
-                                    </span>
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        formControlName="issueHbldate" (remove)="resetFormControl(issueHbldate)"
+                                        calendar
+                                        [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate" />
                                 </div>
                             </div>
                         </div>

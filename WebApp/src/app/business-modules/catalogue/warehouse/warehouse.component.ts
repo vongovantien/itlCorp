@@ -50,6 +50,7 @@ export class WarehouseComponent extends AppList implements OnInit {
             { title: 'Code', field: 'code', sortable: true },
             { title: 'Name(EN)', field: 'nameEn', sortable: true },
             { title: 'Name(Local)', field: 'nameVn', sortable: true },
+            { title: 'Name(ABBR)', field: 'displayName', sortable: true },
             { title: 'Country', field: 'countryName', sortable: true },
             { title: 'City/Province', field: 'provinceName', sortable: true },
             { title: 'District', field: 'districtName', sortable: true },

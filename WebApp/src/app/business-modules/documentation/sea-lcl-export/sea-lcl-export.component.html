@@ -1,6 +1,11 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <app-permission-button title="create new job" (onClick)="gotoCreateJob()"></app-permission-button>
+        <app-permission-button class="info" icon="la la-sticky-note-o" title="ITL Booking note"
+            (onClick)="gotoCreateBookingNote()">
+        </app-permission-button>
+
+        <app-permission-button type="add" title="Create new job" (onClick)="gotoCreateJob()"></app-permission-button>
+
     </div>
 </app-sub-header>
 

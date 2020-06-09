@@ -22,9 +22,17 @@ import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
-        path: '', component: SeaLCLExportComponent, data: {
-            name: "", title: 'eFMS Sea LCL Export'
-        },
+        path: '', data: { name: "", title: 'eFMS Sea LCL Export' }, children: [
+            {
+                path: '', component: SeaLCLExportComponent
+            },
+            {
+                path: 'booking-note', loadChildren: () => import('./booking-note/sea-lcl-export-booking-note.module').then(m => m.SeaLCLExportBookingNoteModule),
+                data: {
+                    name: "Booking Note",
+                },
+            }
+        ]
     },
     {
         path: 'new', component: SeaLCLExportCreateJobComponent,
@@ -59,6 +67,7 @@ const routing: Routes = [
             },
         ]
     },
+
 
 ];
 

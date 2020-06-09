@@ -48,6 +48,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        [Authorize]
+        public IActionResult Get(Guid id)
+        {
+            var data = csBookingNoteService.GetDetails(id);
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("addNew")]
         [Authorize]
@@ -60,13 +68,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var hs = csBookingNoteService.AddCsBookingNote(model);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-            return Ok(result);
+            return Ok(hs);
         }
 
         [HttpPut]
@@ -111,19 +113,28 @@ namespace eFMS.API.Documentation.Controllers
             string message = string.Empty;
             if(id != Guid.Empty)
             {
-                if(csBookingNoteService.Any(x => x.BookingNo == bookingNo && x.Id != id))
+                if(csBookingNoteService.Any(x => x.BookingNo != null && x.BookingNo == bookingNo && x.Id != id))
                 {
                     message = "Booking No is existed !";
                 }
             }
             else
             {
-                if(csBookingNoteService.Any(x=>x.BookingNo == bookingNo))
+                if(csBookingNoteService.Any(x=> x.BookingNo != null && x.BookingNo == bookingNo))
                 {
                     message = "Booking No is existed !";
                 }
             }
             return message;
+        }
+
+        [HttpGet]
+        [Route("PreviewHBSeaBookingNote")]
+        [Authorize]
+        public IActionResult PreviewHBSeaBookingNote(Guid id)
+        {
+            var result = csBookingNoteService.PreviewHBSeaBookingNote(id);
+            return Ok(result);
         }
 
     }

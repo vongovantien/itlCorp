@@ -11,9 +11,23 @@ import { Observable } from 'rxjs';
 })
 export class AppPermissionButtonComponent extends AppForm implements OnInit {
     @Input() title: string;
-    @Input() type: string;
+    @Input() set type(type: string) { this._type = type; }
+
+    @Input() set class(c: string) { this._class = c; }
+
+    @Input() set icon(i: string) { this._icon = i; }
+
+    get type() { return this._type; }
+
+    get class() { return this._class; }
+
+    get icon() { return this._icon; }
+
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
 
+    private _type: string;
+    private _class: string = 'success';
+    private _icon: string = 'la la-plus';
 
     menuPermission: Observable<SystemInterface.IUserPermission>;
 

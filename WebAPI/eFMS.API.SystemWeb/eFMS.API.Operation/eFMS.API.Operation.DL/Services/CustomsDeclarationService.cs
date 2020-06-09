@@ -152,7 +152,7 @@ namespace eFMS.API.Operation.DL.Services
                 PortCodeNn = clearance.MA_CANGNN,
                 ExportCountryCode = clearance.NUOC_XK,
                 ImportCountryCode = clearance.NUOC_NK,
-                Pcs = clearance.SO_KIEN != null ? (int?)clearance.SO_KIEN : null,
+                Pcs = (int?)clearance.SO_KIEN ?? null,
                 UnitCode = clearance.DVT_KIEN,
                 QtyCont = clearance.SO_CONTAINER == null ? (int?)clearance.SO_CONTAINER : null,
                 GrossWeight = clearance.TR_LUONG,
@@ -160,11 +160,15 @@ namespace eFMS.API.Operation.DL.Services
                 Type = type,
                 CargoType = cargoType,
                 ServiceType = serviceType,
+                Shipper = clearance.DV_DT,
+                Consignee = clearance._Ten_DV_L1,
                 UserCreated = currentUser.UserID,
                 DatetimeCreated = DateTime.Now,
                 DatetimeModified = DateTime.Now,
-                Shipper = clearance.DV_DT,
-                Consignee = clearance._Ten_DV_L1
+                GroupId = currentUser.GroupId,
+                DepartmentId = currentUser.DepartmentId,
+                OfficeId = currentUser.OfficeID,
+                CompanyId = currentUser.CompanyID
             };
             return newItem;
         }
@@ -411,7 +415,14 @@ namespace eFMS.API.Operation.DL.Services
             {
                 foreach (var item in clearances)
                 {
-                    var clearance = mapper.Map<CustomsDeclaration>(item);
+                    var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
+                    if(clearance != null)
+                    {
+                        clearance.JobNo = item.JobNo;
+                        clearance.ConvertTime = item.ConvertTime;
+                        clearance.DatetimeModified = DateTime.Now;
+                        clearance.UserModified = currentUser.UserID;
+                    }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 DataContext.SubmitChanges();

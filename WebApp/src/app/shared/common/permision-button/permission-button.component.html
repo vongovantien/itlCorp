@@ -73,10 +73,10 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchDefault>
-        <button type="button" NoDbClick class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-{{class}} m-btn--square m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
             <span>
-                <i class="la la-plus"></i>
+                <i class="{{icon}}"></i>
                 <span>
                     {{title}}
                 </span>

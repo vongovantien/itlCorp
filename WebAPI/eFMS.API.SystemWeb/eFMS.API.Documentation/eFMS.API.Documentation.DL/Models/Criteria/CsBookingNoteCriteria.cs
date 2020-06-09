@@ -13,6 +13,8 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string POLName { get; set; }
         public string PODName { get; set; }
         public string CreatorName { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
 
     }
 }

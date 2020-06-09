@@ -37,6 +37,7 @@ export * from './document/container.model';
 export * from './document/arrival-freight-charge';
 export * from './document/csOtherCharge';
 export * from './document/airway-bill';
+export * from './document/csBookingnote';
 
 export * from './tool-setting/tariff';
 export * from './tool-setting/ecus-connection';

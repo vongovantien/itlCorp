@@ -230,10 +230,10 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<SOAOPSModel>();
 
             var stream = new AccountingHelper().GenerateSOAOPSExcel(dataObjects.Result);
-            if (dataObjects.Result.exportSOAOPs.Count == 0)
-            {
-                return Ok();
-            }
+            //if (dataObjects.Result.exportSOAOPs.Count == 0)
+            //{
+            //    return Ok();
+            //}
             if (stream == null)
             {
                 return null;

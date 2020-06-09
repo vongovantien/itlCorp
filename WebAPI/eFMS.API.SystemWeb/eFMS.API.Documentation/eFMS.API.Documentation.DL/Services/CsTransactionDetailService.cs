@@ -94,7 +94,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.OfficeId = _currentUser.OfficeID;
             model.CompanyId = _currentUser.CompanyID;
             model.UserCreated = _currentUser.UserID;
-            model.UserModified = model.UserCreated = currentUser.UserID;
+            model.UserModified = model.UserCreated = _currentUser.UserID;
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
 
@@ -1541,7 +1541,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (dataPOD != null)
                 {
                     var podCountry = countryRepository.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    housebill.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    housebill.LastDestination = dataPOD?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
                     housebill.LastDestination = housebill.LastDestination?.ToUpper();
                 }
                 housebill.FlightNo = data.FlightNo?.ToUpper(); //Flight No
@@ -1896,11 +1896,11 @@ namespace eFMS.API.Documentation.DL.Services
 
         public string GenerateHBLNoSeaExport(string podCode)
         {
-            if(string.IsNullOrEmpty(podCode))
+            if(string.IsNullOrEmpty(podCode) || podCode == "null")
             {
                 return null;
             }
-            string keyword = podCode + DateTime.Now.ToString("yyMM");
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode)  + DateTime.Now.ToString("yyMM");
             string hbl = "ITL" + keyword;
 
             var codes = DataContext.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno);
@@ -1911,7 +1911,7 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var code in codes)
                 {
                     // Lấy 3 ký tự cuối
-                    if (code.Length > 7)
+                    if (code.Length > 7 && isNumeric(code.Substring(code.Length - 3)))
                     {
                         oders.Add(int.Parse(code.Substring(code.Length - 3)));
                     }
@@ -1934,6 +1934,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return hbl;
+        }
+
+        private bool isNumeric(string n)
+        {
+           return int.TryParse(n, out int _);
         }
 
         public HandleState UpdateInputBKNote(BookingNoteCriteria criteria)
