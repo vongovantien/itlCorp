@@ -139,6 +139,8 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
+                    // Set value Flex Id when create CD Note
+                    this.setValueFlexId(data);
                     return data.map((item: any) => new ChargeCdNote(item));
                 })
             ).subscribe(
@@ -161,6 +163,18 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                     this.calculatorAmount(this.listChargePartner);
                 },
             );
+    }
+
+    setValueFlexId(data: any) {
+        if (this.action === 'create') {
+            let _flexId = '';
+            data.forEach(element => {
+                if (element.listCharges.length > 0 && element.flexId) {
+                    _flexId += element.flexId + '; ';
+                }
+            });
+            this.flexId.setValue(_flexId);
+        }
     }
 
     onSelectDataFormInfo(data: any) {

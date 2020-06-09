@@ -191,7 +191,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         fe.Hwbno = houseBill.Hwbno;
                     });
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges };
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges, FlexId = houseBill.FlexId };
 
                     returnList.Add(returnObj);
                 }
@@ -225,7 +225,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     fe.Hwbno = houseBill.Hwbno;
                 });
-                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges };
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges, FlexId = null };
 
                 returnList.Add(returnObj);
             }

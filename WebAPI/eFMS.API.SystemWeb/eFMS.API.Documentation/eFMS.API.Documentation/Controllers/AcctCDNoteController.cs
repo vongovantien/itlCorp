@@ -87,13 +87,18 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid cdNoteId)
         {
             var hs = cdNoteServices.DeleteCDNote(cdNoteId);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
+                result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 return BadRequest(result);
             }
-            return Ok(result);
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
         }
 
         [HttpGet]
