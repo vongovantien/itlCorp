@@ -228,7 +228,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.gotoList();
+                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl/${res.data}`]);
                     } else {
                     }
                 }
