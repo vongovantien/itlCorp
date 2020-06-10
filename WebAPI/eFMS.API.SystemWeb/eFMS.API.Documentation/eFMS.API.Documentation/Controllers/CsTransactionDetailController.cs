@@ -223,20 +223,40 @@ namespace eFMS.API.Documentation.Controllers
             {
                 var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
                 //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
+                var masterBillIds = csTransactionService.Get(x=>x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Select(x=>x.Id).ToList();
+                var houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId));
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
                 {
                     if (model.Id == Guid.Empty)
                     {
-                        if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower()))
                         {
                             message = "Housebill of Lading No is existed !";
                         }
                     }
                     else
                     {
-                        if (csTransactionDetailService.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
+                        if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.Id != model.Id))
                         {
                             message = "Housebill of Lading No is existed !";
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(shipmentTransactionType) && !string.IsNullOrEmpty(model.Mawb))
+                {
+                    if(model.Id == Guid.Empty)
+                    {
+
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId   ))
+                        {
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
+                        }
+                    }
+                    else
+                    {
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.Id != model.Id))
+                        {
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
                     }
                 }

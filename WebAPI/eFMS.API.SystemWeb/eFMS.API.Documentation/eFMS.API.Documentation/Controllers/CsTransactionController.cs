@@ -429,11 +429,11 @@ namespace eFMS.API.Documentation.Controllers
             //    message = "Not found type transaction";
             if (id == Guid.Empty)
             {
-                //Check trùng theo từng service
+                //Check trùng theo từng service --> change to check theo nhóm service
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                    && x.TransactionType == model.TransactionType
+                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1))
                     && x.CurrentStatus != TermData.Canceled))
                     {
                         message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
@@ -442,11 +442,11 @@ namespace eFMS.API.Documentation.Controllers
             }
             else
             {
-                //Check trùng theo từng service
+                //Check trùng theo từng service --> change to check theo nhóm service
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                        && x.TransactionType == model.TransactionType
+                        && x.TransactionType.Contains(model.TransactionType.Substring(0, 1))
                         && x.Id != id
                         && x.CurrentStatus != TermData.Canceled))
                     {
