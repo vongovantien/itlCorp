@@ -77,4 +77,10 @@ export abstract class AppList extends AppPage {
         this.requestSearch($event);
     }
 
+    updatePagingData(e: { page: number, pageSize: number, data: any }) {
+        this.page = e.page;
+        this.pageSize = e.pageSize;
+        this.requestList(e.data);
+    }
+
 }

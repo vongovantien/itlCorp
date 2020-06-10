@@ -50,12 +50,12 @@ export class PermissionComponent extends AppList {
     searchPermission(dataSearch?: any) {
         this._progressRef.start();
 
-        this._systemRepo.getListPermissionGeneral(dataSearch)
+        this._systemRepo.getListPermissionGeneral(this.page, this.pageSize, Object.assign({}, dataSearch))
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
-                (res: any) => {
-                    this.permissions = (res || []).map(p => new Permission(p));
-                    console.log(this.permissions);
+                (res: CommonInterface.IResponsePaging) => {
+                    this.permissions = (res.data || []).map(p => new Permission(p));
+                    this.totalItems = res.totalItems;
                 }
             );
     }
