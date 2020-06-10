@@ -1003,7 +1003,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("TAXPP")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Total).HasMaxLength(50);
 
                 entity.Property(e => e.TotalCll)
                     .HasColumnName("TotalCLL")
