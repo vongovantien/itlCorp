@@ -9,3 +9,4 @@ FirstDest	String	255
 SecondDest	String	255	
 ThirdDest	String	50	
 Notify	String	255	
+AirFreight	String	255

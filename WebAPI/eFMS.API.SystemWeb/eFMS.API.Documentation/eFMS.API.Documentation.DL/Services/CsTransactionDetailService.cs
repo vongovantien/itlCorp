@@ -714,7 +714,14 @@ namespace eFMS.API.Documentation.DL.Services
                           ShipmentEta = tran.Eta,
                           ShipmentEtd = tran.Etd,
                           ShipmentMawb = tran.Mawb,
-                          UserCreated = detail.UserCreated
+                          UserCreated = detail.UserCreated,
+                          FirstCarrierBy = detail.FirstCarrierBy,
+                          FirstCarrierTo = detail.FirstCarrierTo,
+                          TransitPlaceBy1 = detail.TransitPlaceBy1,
+                          TransitPlaceTo1 = detail.TransitPlaceTo1,
+                          TransitPlaceBy2 = detail.TransitPlaceBy2,
+                          TransitPlaceTo2 = detail.TransitPlaceTo2,
+                          Total = detail.Total
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();

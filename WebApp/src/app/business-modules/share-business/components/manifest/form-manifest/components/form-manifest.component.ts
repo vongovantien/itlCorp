@@ -159,7 +159,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             referenceNo: [],
             supplier: [null, Validators.required],
             attention: [],
-            marksOfNationality: [null, Validators.required],
+            marksOfNationality: [null],
             vesselNo: [null, Validators.required],
             date: [null, Validators.required],
             freightCharge: [null, Validators.required],

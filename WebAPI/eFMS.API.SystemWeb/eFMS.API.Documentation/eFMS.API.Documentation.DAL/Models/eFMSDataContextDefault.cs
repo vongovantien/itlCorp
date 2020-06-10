@@ -133,6 +133,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.StatementDate).HasColumnType("datetime");
 
+                entity.Property(e => e.Status).HasMaxLength(50);
+
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TrackingTransportBill)
@@ -1223,7 +1225,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ConsigneeId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Contact).HasMaxLength(250);
@@ -1289,7 +1291,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ShipperDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ShipperId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SpecialRequest).HasMaxLength(250);
@@ -1515,6 +1517,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.AcctManagementId).HasColumnName("AcctManagementID");
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
@@ -2631,19 +2635,27 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.Description).HasMaxLength(200);
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(250);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.Services)
                     .IsRequired()

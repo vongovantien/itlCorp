@@ -322,7 +322,17 @@ namespace eFMS.API.Documentation.DL.Services
             string agentName = string.Empty;
             var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
             var agent = transaction.AgentId != null ? partnerRepository.Get(x => x.Id == transaction.AgentId)?.FirstOrDefault() : null;
-            if(agent != null) { agentName = agent.PartnerNameEn + agent.AddressEn ?? "+\n" + agent.AddressEn + agent.Tel ?? "\n" + agent.AddressEn; }
+            if(agent != null) {
+                agentName = agent.PartnerNameEn;
+                if (!string.IsNullOrEmpty(agent.AddressEn))
+                {
+                    agentName += "\n" + agent.AddressEn;
+                }
+                if (!string.IsNullOrEmpty(agent.Tel))
+                {
+                    agentName += "\n" + agent.Tel;
+                }
+            }
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
             model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
@@ -335,14 +345,15 @@ namespace eFMS.API.Documentation.DL.Services
                         Billype = "H",
                         HWBNO = item.Hwbno?.ToUpper(),
                         Pieces = item.PackageQty?.ToString(),
-                        GrossWeight = item.GrossWeight ?? 0,
+                        GrossWeight = item.GW ?? 0,
                         ShipperName = item.ShipperDescription?.ToUpper(),
                         Consignees = item.ConsigneeDescription?.ToUpper(),
                         Description = item.DesOfGoods,
                         FirstDest = item.FirstCarrierBy?.ToUpper(),
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
-                        Notify = item.NotifyPartyDescription?.ToUpper()
+                        Notify = item.NotifyPartyDescription?.ToUpper(),
+                        AirFreight = item.FreightPayment
                     };
                     manifests.Add(manifest);
                 }
