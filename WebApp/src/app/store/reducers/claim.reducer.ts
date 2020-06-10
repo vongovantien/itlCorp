@@ -28,6 +28,8 @@ const initialState: IClaimUserState = {
     userName: null,
     departmentId: null,
     groupId: null,
+    nameEn: null,
+    nameVn: null
 };
 
 export function claimUserReducer(state = initialState, action: ClaimUserActions): IClaimUserState {
