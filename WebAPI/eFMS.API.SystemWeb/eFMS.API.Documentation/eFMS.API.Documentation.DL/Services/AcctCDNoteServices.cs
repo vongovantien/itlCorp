@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -597,19 +598,15 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = DataContext.Where(x => x.Id == idSoA).FirstOrDefault();
                 if (cdNote == null)
                 {
-                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND].Value);
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND]);
                 }
                 else
                 {
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    var isOtherSOA = false;
-                    foreach (var item in charges)
-                    {
-                        isOtherSOA |= (item.Soano != null || item.Soano != string.Empty || item.PaySoano != null || item.PaySoano != string.Empty);
-                    }
+                    var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
                     if (isOtherSOA == true)
                     {
-                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA].Value);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);                        
                     }
                     else
                     {
@@ -617,28 +614,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (hs.Success)
                         {
                             foreach (var item in charges)
-                            {
-                                //-to contiue
-                                //item.Cdno = null;
-                                //if(item.Type == "BUY")
-                                //{
-                                //    item.CreditNo = null;
-                                //}
-                                //else if(item.Type == "BUY")
-                                //{
-                                //    item.DebitNo = null;
-                                //}
-                                //else
-                                //{
-                                //    if(item.DebitNo == cdNote.Code)
-                                //    {
-                                //        item.DebitNo = null;
-                                //    }
-                                //    if(item.CreditNo == cdNote.Code)
-                                //    {
-                                //        item.CreditNo = null;
-                                //    }
-                                //}
+                            {                            
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
@@ -688,7 +664,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                hs = new HandleState(ex.Message);
+                hs = new HandleState((object)ex.Message);
             }
             return hs;
         }
