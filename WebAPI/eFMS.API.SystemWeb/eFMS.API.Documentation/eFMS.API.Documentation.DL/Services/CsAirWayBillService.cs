@@ -190,7 +190,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.Gw = masterbill.GrossWeight;
             result.Cw = masterbill.ChargeWeight;
             result.RateCharge = masterbill.RateCharge;
-            result.Total = masterbill.Total?.ToString();
+            result.Total = masterbill.Total;
             result.DesOfGood = masterbill.DesOfGoods;
             result.VolumeField = masterbill.VolumeField;
 
@@ -203,7 +203,16 @@ namespace eFMS.API.Documentation.DL.Services
             result.PrepaidDueToCarrier = masterbill.DueCarrierPp;
             result.CollectDueToCarrier = masterbill.DueCarrierCll;
 
-            result.OtherCharges = masterbill.OtherCharges;
+            // result.OtherCharges = masterbill.OtherCharges;
+            List<string> otherCharges = masterbill.OtherCharge?.Split('\n').Where(x => x.ToString() != string.Empty).ToList() ?? new List<string>();
+            var _otherCharges = new List<CsShipmentOtherChargeModel>();
+            foreach(var otherCharge in otherCharges)
+            {
+                var _otherCharge = new CsShipmentOtherChargeModel();
+                _otherCharge.ChargeName = otherCharge;
+                _otherCharges.Add(_otherCharge);
+            }
+            result.OtherCharges = _otherCharges;
 
             result.PrepaidTotal = masterbill.TotalPp;
             result.CollectTotal = masterbill.TotalCll;

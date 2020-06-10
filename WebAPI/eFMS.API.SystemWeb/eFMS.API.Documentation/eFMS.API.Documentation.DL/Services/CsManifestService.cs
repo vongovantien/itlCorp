@@ -26,6 +26,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatUnit> unitRepository;
         readonly ICurrentUser currentUser;
         readonly ICsTransactionDetailService transactionDetailService;
+        readonly IContextBase<CatPartner> partnerRepository;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -35,7 +36,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
-            ICsTransactionDetailService transDetailService) : base(repository, mapper)
+            ICsTransactionDetailService transDetailService,
+            IContextBase<CatPartner> partnerRepo) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -45,6 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             currentUser = currUser;
             transactionDetailService = transDetailService;
+            partnerRepository = partnerRepo;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -316,7 +319,20 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             Crystal result = new Crystal();
+            string agentName = string.Empty;
             var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
+            var agent = transaction.AgentId != null ? partnerRepository.Get(x => x.Id == transaction.AgentId)?.FirstOrDefault() : null;
+            if(agent != null) {
+                agentName = agent.PartnerNameEn;
+                if (!string.IsNullOrEmpty(agent.AddressEn))
+                {
+                    agentName += "\n" + agent.AddressEn;
+                }
+                if (!string.IsNullOrEmpty(agent.Tel))
+                {
+                    agentName += "\n" + agent.Tel;
+                }
+            }
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
             model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
@@ -329,14 +345,15 @@ namespace eFMS.API.Documentation.DL.Services
                         Billype = "H",
                         HWBNO = item.Hwbno?.ToUpper(),
                         Pieces = item.PackageQty?.ToString(),
-                        GrossWeight = item.GrossWeight ?? 0,
+                        GrossWeight = item.GW ?? 0,
                         ShipperName = item.ShipperDescription?.ToUpper(),
                         Consignees = item.ConsigneeDescription?.ToUpper(),
                         Description = item.DesOfGoods,
                         FirstDest = item.FirstCarrierBy?.ToUpper(),
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
-                        Notify = item.NotifyPartyDescription?.ToUpper()
+                        Notify = item.NotifyPartyDescription?.ToUpper(),
+                        AirFreight = item.FreightPayment
                     };
                     manifests.Add(manifest);
                 }
@@ -353,7 +370,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
                 Shipper = DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
-                Consignee = transaction.AgentName?.ToUpper() ?? string.Empty,
+                Consignee = agentName,
                 Contact = currentUser.UserName
             };
             result = new Crystal

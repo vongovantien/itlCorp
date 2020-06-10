@@ -13,6 +13,7 @@
         public string SecondDest { get; set; }
         public string ThirdDest { get; set; }
         public string Notify { get; set; }
+        public string AirFreight { get; set; }
     }
     public class AirCargoManifestReportParameter
     {
