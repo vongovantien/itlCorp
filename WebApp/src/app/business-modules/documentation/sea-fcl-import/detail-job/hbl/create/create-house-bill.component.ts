@@ -228,13 +228,16 @@ export class CreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}/hbl/${res.data}`]);
+
                         return forkJoin([arrival, delivery]);
                     }),
+
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
-                ).subscribe(result => {
+                ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
-                    this.combackToHBLList();
                 }
                 );
         }

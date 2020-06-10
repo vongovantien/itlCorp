@@ -222,7 +222,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var airlineId = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault()?.ColoaderId;
                 awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName; // Name ABBR
-                awb.MAWB = data.Mblno1 + data.Mblno2 + data.Mblno3;
+                awb.MAWB = data.Mblno1 + "-" + data.Mblno3;
                 awb.MBLNO1 = data.Mblno1;
                 awb.MBLNO2 = data.Mblno2;
                 awb.MBLNO3 = data.Mblno3;
@@ -232,7 +232,8 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.AgentIATACode = "37-3 0118/0000"; //Set Default Value
                 if (dataPOL != null)
                 {
-                    awb.DepartureAirport = dataPOL?.NameEn?.ToUpper(); //POL
+                    awb.LastDestination = dataPOL?.NameEn;
+                    awb.DepartureAirport = dataPOL?.NameEn?.ToUpper(); 
                 }
                 awb.FirstDestination = data.FirstCarrierTo;
                 awb.FirstCarrier = data.FirstCarrierBy;
@@ -250,8 +251,7 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
                 if (dataPOD != null)
                 {
-                    var podCountry = countryRepo.Get(x => x.Id == dataPOD.CountryId).FirstOrDefault()?.NameEn;
-                    awb.LastDestination = dataPOL?.NameEn + (!string.IsNullOrEmpty(podCountry) ? ", " + podCountry : string.Empty); //AOD - DestinationAirport
+                    awb.LastDestination = dataPOD?.NameEn;
                     awb.LastDestination = awb.LastDestination?.ToUpper();
                 }
                 awb.FlightNo = data.FlightNo;

@@ -368,6 +368,12 @@
     <Content Include="Reports\Monthly Sale Report.ttx" />
     <Content Include="Reports\SalesReportByQuater.rpt" />
     <Content Include="Reports\SaleReportByQuater.ttx" />
+    <Content Include="Reports\MAWBITLFrame.rpt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\AirwayBillL.ttx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

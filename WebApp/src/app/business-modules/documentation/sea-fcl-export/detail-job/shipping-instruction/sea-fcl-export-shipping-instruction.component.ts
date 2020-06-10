@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';

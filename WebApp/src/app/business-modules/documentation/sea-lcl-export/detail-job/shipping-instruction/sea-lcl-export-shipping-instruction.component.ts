@@ -7,7 +7,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import { ToastrService } from 'ngx-toastr';
 import * as fromShare from '../../../../share-business/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CsTransaction } from 'src/app/shared/models';
@@ -32,8 +32,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
-        private _dataService: DataService,
-        private _router: Router) {
+        private _dataService: DataService) {
         super();
     }
 
@@ -93,7 +92,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res) => {
                     if (!!res) {
-                        console.log(res);
                         if (data != null) {
                             this.billSIComponent.shippingInstruction = data;
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
@@ -105,7 +103,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
                         this.billSIComponent.termTypes = this.termTypes;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
-                        console.log(this.billSIComponent.shippingInstruction);
                     }
                 }
             );
@@ -199,7 +196,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
     save() {
         this.billSIComponent.isSubmitted = true;
-        if (!this.checkValidateForm()) {
+        if (!this.checkValidateForm() || this.billSIComponent.voyNo.value.trim().length === 0 || this.billSIComponent.shipper.value.trim().length === 0) {
             return;
         }
 
@@ -216,7 +213,6 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
-                        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
