@@ -318,9 +318,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 report = new MonthlySaleReportResult();
                 var conts = containers.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
-                report.Cont40HC = (decimal)conts.Where(x => x.Code == "Cont40HC").Sum(x => x.x.Quantity);
-                report.Qty20 = (decimal)conts.Where(x => x.Code == "Cont20DC").Sum(x => x.x.Quantity);
-                report.Qty40 = (decimal)conts.Where(x => x.Code == "Cont40DC").Sum(x => x.x.Quantity);
+                report.Cont40HC = (decimal)conts.Where(x => x.Code == "HQ").Sum(x => x.x.Quantity);
+                report.Qty20 = (decimal)conts.Where(x => x.Code.Contains("20") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                report.Qty40 = (decimal)conts.Where(x => x.Code.Contains("40") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
             }
             return report;
         }
