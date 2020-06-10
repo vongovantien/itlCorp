@@ -38,24 +38,20 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (marksOfNationality.dirty && !marksOfNationality.valid) || (isSubmitted && !marksOfNationality.valid)}">
+                        <div class="form-group">
                             <label class="form-control-label" for="">
-                                Marks of Nationality & Registration <span class="m--font-danger">(*)</span>
+                                Marks of Nationality & Registration
                             </label>
                             <input type="text" class="form-control m-input m-input--square"
                                 formControlName="marksOfNationality">
-                            <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (marksOfNationality.errors | equalError: 'required') && marksOfNationality.dirty">
-                                Marks of Nationality & Registration is required!
-                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (vesselNo.dirty && !vesselNo.valid) || (isSubmitted && !vesselNo.valid)}">
                             <label class="form-control-label" for="">
-                                Vessel No <span class="m--font-danger">(*)</span>
+                                <span *ngIf="!isAir">Vessel No </span><span *ngIf="isAir">Flight No </span><span
+                                    class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" formControlName="vesselNo">
                             <div class="form-control-feedback"

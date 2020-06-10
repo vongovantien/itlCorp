@@ -1005,7 +1005,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("TAXPP")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Total).HasMaxLength(50);
 
                 entity.Property(e => e.TotalCll)
                     .HasColumnName("TotalCLL")
@@ -1225,7 +1225,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ConsigneeDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ConsigneeId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Contact).HasMaxLength(250);
@@ -1291,7 +1291,7 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.ShipperDescription).HasMaxLength(500);
 
                 entity.Property(e => e.ShipperId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SpecialRequest).HasMaxLength(250);
