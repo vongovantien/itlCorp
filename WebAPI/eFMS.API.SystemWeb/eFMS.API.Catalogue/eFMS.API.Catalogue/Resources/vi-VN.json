@@ -136,5 +136,6 @@
   "MSG_CHART_NAME_LOCAL_EMPTY": "Account Name Local is not allow empty!|wrong",
   "MSG_CHART_NAME_EN_EMPTY": "Account Name En is not allow empty!|wrong",
   "MSG_CHART_STATUS_NOT_VALID" "Status {0} not valid",
-  "MSG_CHART_CODE_EXISTED": "Account Code {0} has been existed!"
+  "MSG_CHART_CODE_EXISTED": "Account Code {0} has been existed!",
+  "MSG_CHART_CODE_DUPLICATE": "Account Code {0} has been duplicate | wrong "
 }

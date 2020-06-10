@@ -185,6 +185,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.AccountCodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_CODE_EMPTY];
                     item.IsValid = false;
                 }
+                else if (list.Count(x => (x.AccountCode ?? "").ToLower() == item.AccountCode.ToLower()) > 1)
+                {
+                    item.AccountCodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHART_CODE_DUPLICATE, item.AccountCode];
+                    item.IsValid = false;
+                }
                 else
                 {
                     if (DataContext.Any(x => x.AccountCode == item.AccountCode))

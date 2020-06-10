@@ -53,5 +53,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string JobNo { get; set; }
         public string Mblno { get; set; }
         public string Hblno { get; set; }
+        public Guid? AcctManagementId { get; set; }
     }
 }
