@@ -682,6 +682,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A30:E30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["A30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             workSheet.Cells["A30"].Value = airwayBillExport.Pieces;
+            workSheet.Cells["A30"].Style.Numberformat.Format = numberFormat;
             workSheet.Cells["B30:C30"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["B30:C30"].Merge = true;
             workSheet.Cells["B30"].Value = airwayBillExport.Gw;
@@ -698,8 +699,16 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["I30:J30"].Merge = true;
-            workSheet.Cells["I30"].Value = airwayBillExport.Total;
-            workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+            decimal _totalDefault = 0;
+            if (decimal.TryParse(airwayBillExport.Total, out _totalDefault))
+            {
+                workSheet.Cells["I30"].Value = _totalDefault;
+                workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["I30"].Value = airwayBillExport.Total;
+            }                        
 
             workSheet.Cells["A31"].Value = "PCS"; //Default
             workSheet.Cells["L31:N39"].Merge = true;
@@ -709,42 +718,138 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["A40"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
             workSheet.Cells["A40"].Value = airwayBillExport.Pieces;
+            workSheet.Cells["A40"].Style.Numberformat.Format = numberFormat;
             workSheet.Cells["B40"].Value = airwayBillExport.Gw;
             workSheet.Cells["B40"].Style.Numberformat.Format = numberFormatKgs;
 
             workSheet.Cells["A44:B44"].Merge = true;
             workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A44"].Value = airwayBillExport.PrepaidWt?.ToUpper();
-            //workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
-            workSheet.Cells["D44"].Value = airwayBillExport.CollectWt?.ToUpper();
+            
+            decimal _prepaidWtDefault = 0;
+            if (decimal.TryParse(airwayBillExport.PrepaidWt, out _prepaidWtDefault))
+            {
+                workSheet.Cells["A44"].Value = _prepaidWtDefault;
+                workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["A44"].Value = airwayBillExport.PrepaidWt?.ToUpper();
+            }
+
+            decimal _collectWtDefault = 0;
+            if (decimal.TryParse(airwayBillExport.CollectWt, out _collectWtDefault))
+            {
+                workSheet.Cells["D44"].Value = _collectWtDefault;
+                workSheet.Cells["D44"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["D44"].Value = airwayBillExport.CollectWt?.ToUpper();
+            }
 
             workSheet.Cells["A46:B46"].Merge = true;
             workSheet.Cells["A46:B46"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A46"].Value = airwayBillExport.PrepaidVal?.ToUpper();
-            workSheet.Cells["D46"].Value = airwayBillExport.CollectVal?.ToUpper();
+            decimal _prepaidValDefault = 0;
+            if (decimal.TryParse(airwayBillExport.PrepaidVal, out _prepaidValDefault))
+            {
+                workSheet.Cells["A46"].Value = _prepaidValDefault;
+                workSheet.Cells["A46"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["A46"].Value = airwayBillExport.PrepaidVal?.ToUpper();
+            }
+
+            decimal _collectValDefault = 0;
+            if (decimal.TryParse(airwayBillExport.CollectVal, out _collectValDefault))
+            {
+                workSheet.Cells["D46"].Value = _collectValDefault;
+                workSheet.Cells["D46"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["D46"].Value = airwayBillExport.CollectVal?.ToUpper();
+            }
 
             workSheet.Cells["A48:B48"].Merge = true;
             workSheet.Cells["A48:B48"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A48"].Value = airwayBillExport.PrepaidTax?.ToUpper();
-            workSheet.Cells["D48"].Value = airwayBillExport.CollectTax?.ToUpper();
+            decimal _prepaidTaxDefault = 0;
+            if (decimal.TryParse(airwayBillExport.PrepaidTax, out _prepaidTaxDefault))
+            {
+                workSheet.Cells["A48"].Value = _prepaidTaxDefault;
+                workSheet.Cells["A48"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["A48"].Value = airwayBillExport.PrepaidTax?.ToUpper();
+            }
+            decimal _collectTaxDefault = 0;
+            if (decimal.TryParse(airwayBillExport.CollectTax, out _collectTaxDefault))
+            {
+                workSheet.Cells["D48"].Value = _collectTaxDefault;
+                workSheet.Cells["D48"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["D48"].Value = airwayBillExport.CollectTax?.ToUpper();
+            }
+            
 
             workSheet.Cells["A51:B51"].Merge = true;
             workSheet.Cells["A51:B51"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A51"].Value = airwayBillExport.PrepaidDueToCarrier?.ToUpper();
-            workSheet.Cells["D51"].Value = airwayBillExport.CollectDueToCarrier?.ToUpper();
+            decimal _prepaidDueToCarrierDefault = 0;
+            if (decimal.TryParse(airwayBillExport.PrepaidDueToCarrier, out _prepaidDueToCarrierDefault))
+            {
+                workSheet.Cells["A51"].Value = _prepaidDueToCarrierDefault;
+                workSheet.Cells["A51"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["A51"].Value = airwayBillExport.PrepaidDueToCarrier?.ToUpper();
+            }
 
+            decimal _collectDueToCarrierDefault = 0;
+            if (decimal.TryParse(airwayBillExport.CollectDueToCarrier, out _collectDueToCarrierDefault))
+            {
+                workSheet.Cells["D51"].Value = _collectDueToCarrierDefault;
+                workSheet.Cells["D51"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["D51"].Value = airwayBillExport.CollectDueToCarrier?.ToUpper();
+            }
+            
             workSheet.Cells["A55:B55"].Merge = true;
-            workSheet.Cells["A55"].Value = airwayBillExport.PrepaidTotal?.ToUpper();
             workSheet.Cells["A55"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["D55"].Value = airwayBillExport.CollectTotal?.ToUpper();
+            decimal _prepaidTotalDefault = 0;
+            if (decimal.TryParse(airwayBillExport.PrepaidTotal, out _prepaidTotalDefault))
+            {
+                workSheet.Cells["A55"].Value = _prepaidTotalDefault;
+                workSheet.Cells["A55"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["A55"].Value = airwayBillExport.PrepaidTotal?.ToUpper();
+            }
 
+            decimal _collectTotalDefault = 0;
+            if (decimal.TryParse(airwayBillExport.CollectTotal, out _collectTotalDefault))
+            {
+                workSheet.Cells["D55"].Value = _collectTotalDefault;
+                workSheet.Cells["D55"].Style.Numberformat.Format = numberFormat;
+            }
+            else
+            {
+                workSheet.Cells["D55"].Value = airwayBillExport.CollectTotal?.ToUpper();
+            }
+            
             //Other Charges
             int k = 44;
             for (var i = 0; i < airwayBillExport.OtherCharges.Count; i++)
             {
                 workSheet.Cells["H" + k].Value = airwayBillExport.OtherCharges[i].ChargeName?.ToUpper();
-                workSheet.Cells["J" + k].Value = airwayBillExport.OtherCharges[i].Amount;
-                workSheet.Cells["J" + k].Style.Numberformat.Format = numberFormat;
+                // workSheet.Cells["J" + k].Value = airwayBillExport.OtherCharges[i].Amount;
+                // workSheet.Cells["J" + k].Style.Numberformat.Format = numberFormat;
                 k = k + 1;
             }
 
@@ -907,14 +1012,15 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["I30"].Style.Font.Color.SetColor(Color.Red);
             workSheet.Cells["I30:J30"].Merge = true;
-            if (airwayBillExport.Total == null || airwayBillExport.Total == 0)
+            decimal _totalDefault = 0;
+            if (decimal.TryParse(airwayBillExport.Total, out _totalDefault))
             {
-                workSheet.Cells["I30"].Value = "AS AGREED";
+                workSheet.Cells["I30"].Value = _totalDefault;
+                workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
             }
             else
             {
-                workSheet.Cells["I30"].Value = airwayBillExport.Total;
-                workSheet.Cells["I30"].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells["I30"].Value = "AS AGREED";
             }
 
             workSheet.Cells["A31"].Value = "PCS"; //Default
