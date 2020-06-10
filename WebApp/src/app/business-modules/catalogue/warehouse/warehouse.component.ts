@@ -218,6 +218,9 @@ export class WarehouseComponent extends AppList implements OnInit {
                 if (event.field === "districtName") {
                     this.criteria.districtNameEN = event.searchString;
                 }
+                if (event.field === "displayName") {
+                    this.criteria.displayName = event.searchString;
+                }
                 if (event.field === "active") {
                     if (event.searchString.toLowerCase() === "active") {
                         this.criteria.active = true;
@@ -235,6 +238,9 @@ export class WarehouseComponent extends AppList implements OnInit {
                 }
                 if (event.field === "districtName") {
                     this.criteria.districtNameVN = event.searchString;
+                }
+                if (event.field === "displayName") {
+                    this.criteria.displayName = event.searchString;
                 }
                 if (event.field === "active") {
                     if (event.searchString.toLowerCase() === "active") {
