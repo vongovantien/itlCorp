@@ -12,6 +12,8 @@ export interface IClaimUserState extends SystemInterface.IClaimUser {
     userName: string;
     departmentId: number;
     groupId: number;
+    nameEn: string;
+    nameVn: string;
 }
 
 const initialState: IClaimUserState = {
