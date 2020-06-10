@@ -102,14 +102,9 @@ export class ShareBusinessFormManifestComponent extends AppForm {
                                 this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
                             }
                         }
-                        if (this.isAir) {
-                            this.vesselNo.setValue(res.flightVesselName);
-                        } else {
-                            this.vesselNo.setValue(res.voyNo);
+                        if (this.vesselNo.value === null) {
+                            this.vesselNo.setValue(this.defaultVoyNo);
                         }
-                        // if (this.vesselNo.value === null) {
-                        //     this.vesselNo.setValue(this.defaultVoyNo);
-                        // }
                         if (!this.isImport) {
                             this.date.setValue({ startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) });
                         } else {

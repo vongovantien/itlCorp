@@ -55,8 +55,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': (vesselNo.dirty && !vesselNo.valid) || (isSubmitted && !vesselNo.valid)}">
                             <label class="form-control-label" for="">
-                                <span *ngIf="!isAir">Vessel No </span><span *ngIf="isAir">Flight No </span><span
-                                    class="m--font-danger">(*)</span>
+                                Vessel No <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" formControlName="vesselNo">
                             <div class="form-control-feedback"

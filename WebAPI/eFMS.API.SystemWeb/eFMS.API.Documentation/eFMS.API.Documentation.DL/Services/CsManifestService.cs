@@ -26,7 +26,6 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatUnit> unitRepository;
         readonly ICurrentUser currentUser;
         readonly ICsTransactionDetailService transactionDetailService;
-        readonly IContextBase<CatPartner> partnerRepository;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -36,8 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> transactionRepo,
             IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
-            ICsTransactionDetailService transDetailService,
-            IContextBase<CatPartner> partnerRepo) : base(repository, mapper)
+            ICsTransactionDetailService transDetailService) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -47,7 +45,6 @@ namespace eFMS.API.Documentation.DL.Services
             unitRepository = unitRepo;
             currentUser = currUser;
             transactionDetailService = transDetailService;
-            partnerRepository = partnerRepo;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -319,10 +316,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             Crystal result = new Crystal();
-            string agentName = string.Empty;
             var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
-            var agent = transaction.AgentId != null ? partnerRepository.Get(x => x.Id == transaction.AgentId)?.FirstOrDefault() : null;
-            if(agent != null) { agentName = agent.PartnerNameEn + agent.AddressEn ?? "+\n" + agent.AddressEn + agent.Tel ?? "\n" + agent.AddressEn; }
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
             model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
@@ -359,7 +353,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
                 Shipper = DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
-                Consignee = agentName,
+                Consignee = transaction.AgentName?.ToUpper() ?? string.Empty,
                 Contact = currentUser.UserName
             };
             result = new Crystal
