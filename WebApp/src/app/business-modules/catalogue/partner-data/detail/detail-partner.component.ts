@@ -113,6 +113,7 @@ export class PartnerDetailComponent extends AppList {
                 (res: any) => {
                     if (!!res) {
                         this.partner = res;
+                        this.formPartnerComponent.groups = this.partner.partnerGroup;
                         // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         this.formPartnerComponent.setFormData(this.partner);
                     }
