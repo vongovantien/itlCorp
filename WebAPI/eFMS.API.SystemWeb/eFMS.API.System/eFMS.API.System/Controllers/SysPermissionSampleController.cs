@@ -65,6 +65,15 @@ namespace eFMS.API.System.Controllers
             return Ok(results);
         }
 
+        [HttpPost]
+        [Route("Paging")]
+        public IActionResult Paging(SysPermissionGeneralCriteria criteria, int page, int size)
+        {
+            var data = permissionGeneralService.Paging(criteria, page, size, out int rowCount);
+            var result = new { data, totalItems = rowCount, page, size };
+            return Ok(result);
+        }
+
       
         /// <summary>
         /// get data combobox

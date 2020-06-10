@@ -394,7 +394,15 @@ export class SystemRepo {
         );
     }
 
-    getListPermissionGeneral(body: any = {}) {
+    getListPermissionGeneral(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                map((data: any) => data)
+            );
+        }
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysPermissionGeneral/Query`, body)
             .pipe(
                 map((data: any) => data)

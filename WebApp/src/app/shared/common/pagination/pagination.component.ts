@@ -1,47 +1,65 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { PagerSetting } from '../../models/layout/pager-setting.model';
-import { PagingService } from '../../services/paging-service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { AppList } from 'src/app/app.list';
+
 
 @Component({
-  selector: 'app-pagination',
-  templateUrl: './pagination.component.html'
+    selector: 'app-pagination',
+    templateUrl: './pagination.component.html'
 })
-export class AppPaginationComponent implements OnInit {
-  @Input() config: PagerSetting = {};
-  @Output() pagerObject = new EventEmitter<any[]>();
-  count = 0;
+export class AppPaginationComponent extends AppList implements OnInit {
 
-  selectPageSize() {
-    this.pager.totalItems = 0;
-    this.pager.setPage(1);
-    this.pagerObject.emit(this.pager);
-  }
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
 
-  constructor(private pagerService: PagingService, private cdRef: ChangeDetectorRef) { }
-
-  // pager object
-  pager: any = {};
-  ngOnInit() {
-    //this.setPage(1);
-    this.getPages(1);
-  }
-
-  sendBackData() {
-    this.count += 1;
-  }
-
-  getPages(page: number) {
-    if (page < 1 || page > this.pager.totalPages) {
-      return;
+    @Input() set data(data: any) {
+        this._data = data;
     }
-    this.pager = this.pagerService.getPager(this.config.totalItems, page, this.config.pageSize, this.config.totalPageBtn);
-  }
-  setPage(page: number) {
-    // if (page < 1 || page > this.pager.totalPages) {
-    //   return;
-    // }
-    // this.pager = this.pagerService.getPager(this.config.totalItems, page, this.config.pageSize,this.config.totalPageBtn);
-    this.getPages(page);
-    this.pagerObject.emit(this.pager);
-  }
+
+    @Input() set total(total: number) {
+        this._totalItems = total;
+    }
+
+    @Input() set itemPerPage(size: number) {
+        this._pageSize = size;
+    }
+    @Input() set pageNum(currenctPage: number) {
+        this._page = currenctPage;
+    }
+
+    get pageNum() { return this._page; }
+    get itemPerPage() { return this._pageSize; }
+    get total() { return this._totalItems; }
+    get data() { return this._data; }
+
+
+    private _page: number = this.page;
+    private _pageSize: number = this.pageSize;
+    private _totalItems: number = this.totalItems;
+    private _data: any = this.dataSearch;
+
+    constructor() {
+        super();
+        this.requestList = this.onChangePaging;
+    }
+
+    pageChanged(event: any): void {
+        if (this.pageNum !== event.page || this.itemPerPage !== event.itemsPerPage) {
+            this.pageNum = event.page;
+            this.itemPerPage = event.itemsPerPage;
+
+            this.requestList();
+        }
+    }
+
+    itemPerPageChanged(pageSize: number, data?: any) {
+        this.itemPerPage = pageSize;
+        this.pageNum = 1;  // TODO reset page to initial
+        // this.total = 0;
+
+        this.requestList(data);
+    }
+
+    onChangePaging() {
+        this.onChange.emit({ page: this.pageNum, pageSize: this.itemPerPage, data: this.data });
+    }
+
 }

@@ -60,18 +60,21 @@ export class GroupComponent extends AppList implements OnInit {
                 })
             ).subscribe(
                 (res: any) => {
-                    this.totalItems = res.totalItems || 0;
+                    this.totalItems = res.totalItems;
                     this.groups = res.data;
                 },
             );
     }
+
     sortGroups(sort: string): void {
         this.groups = this._sortService.sort(this.groups, sort, this.order);
     }
+
     onDeleteGroup() {
         this.confirmDeletePopup.hide();
         this.deleteGroup(this.selectedGroup.id);
     }
+
     deleteGroup(id: any) {
         this._progressRef.start();
         this._systemRepo.deleteGroup(id)
@@ -89,48 +92,50 @@ export class GroupComponent extends AppList implements OnInit {
                 },
             );
     }
+
     onSearchGroup(dataSearch: any) {
         this.dataSearch = {};
         this.page = 1;
-        if (dataSearch.type === 'All') {
-            this.dataSearch.all = dataSearch.keyword;
-        } else {
-            this.dataSearch.all = null;
-            if (dataSearch.type === 'id') {
-                this.dataSearch.id = dataSearch.keyword;
+        if (!!dataSearch) {
+            if (dataSearch.type === 'All') {
+                this.dataSearch.all = dataSearch.keyword;
+            } else {
+                this.dataSearch.all = null;
+                if (dataSearch.type === 'id') {
+                    this.dataSearch.id = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'code') {
+                    this.dataSearch.code = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'nameEn') {
+                    this.dataSearch.nameEN = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'nameVn') {
+                    this.dataSearch.nameVN = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'shortName') {
+                    this.dataSearch.shortName = dataSearch.keyword;
+                }
+                if (dataSearch.type === 'departmentName') {
+                    this.dataSearch.departmentName = dataSearch.keyword;
+                }
             }
-            if (dataSearch.type === 'code') {
-                this.dataSearch.code = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'nameEn') {
-                this.dataSearch.nameEN = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'nameVn') {
-                this.dataSearch.nameVN = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'shortName') {
-                this.dataSearch.shortName = dataSearch.keyword;
-            }
-            if (dataSearch.type === 'departmentName') {
-                this.dataSearch.departmentName = dataSearch.keyword;
-            }
+            this.searchGroup(this.dataSearch);
         }
-        // this.dataSearch = dataSearch;
-        this.searchGroup(this.dataSearch);
+
     }
+
     confirmDelete(group) {
         this.selectedGroup = group;
         this.confirmDeletePopup.show();
     }
+
     export() {
         this._exportRepo.exportGroup(this.dataSearch)
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'Goup.xlsx');
                 },
-                (errors: any) => {
-                },
-                () => { }
             );
     }
 }
