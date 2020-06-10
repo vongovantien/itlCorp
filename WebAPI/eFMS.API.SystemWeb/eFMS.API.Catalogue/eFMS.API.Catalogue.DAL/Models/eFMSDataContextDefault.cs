@@ -241,13 +241,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.AccountCode).HasMaxLength(250);
 
-                entity.Property(e => e.AccountNameEn)
-                    .HasMaxLength(250)
-                    .IsUnicode(false);
+                entity.Property(e => e.AccountNameEn).HasMaxLength(250);
 
-                entity.Property(e => e.AccountNameLocal)
-                    .HasMaxLength(250)
-                    .IsUnicode(false);
+                entity.Property(e => e.AccountNameLocal).HasMaxLength(250);
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
@@ -1261,6 +1257,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.AcctManagementId).HasColumnName("AcctManagementID");
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 

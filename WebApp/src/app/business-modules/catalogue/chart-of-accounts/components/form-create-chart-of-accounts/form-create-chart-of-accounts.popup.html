@@ -43,18 +43,18 @@
                                     name="accountNameEn" formControlName="accountNameEn">
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-control-label"> Active </label>
-                                <div class="col-lg-8">
-                                    <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)">
-                                    </app-switch>
+                        <ng-container *ngIf="isUpdate">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label"> Active </label>
+                                    <div class="col-lg-8">
+                                        <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)">
+                                        </app-switch>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </ng-container>
                     </div>
-
-
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

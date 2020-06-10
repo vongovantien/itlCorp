@@ -116,6 +116,8 @@
         public static readonly string MSG_CHART_NAME_EN_EMPTY = "MSG_CHART_NAME_EN_EMPTY";
         public static readonly string MSG_CHART_STATUS_NOT_VALID = "MSG_CHART_STATUS_NOT_VALID";
         public static readonly string MSG_CHART_CODE_EXISTED = "MSG_CHART_CODE_EXISTED";
+        public static readonly string MSG_CHART_CODE_DUPLICATE = "MSG_CHART_CODE_DUPLICATE";
+
 
 
 
