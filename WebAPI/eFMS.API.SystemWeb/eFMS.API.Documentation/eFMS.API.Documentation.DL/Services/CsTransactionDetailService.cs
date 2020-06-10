@@ -17,6 +17,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -1525,17 +1526,17 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
                 housebill.FirstDestination = data.FirstCarrierTo?.ToUpper();
-                housebill.FirstCarrier = data.FirstCarrierBy?.ToUpper();
+                housebill.FirstCarrier = data.FirstCarrierBy?.Substring(0,2).ToUpper(); //2 ký tự đầu
                 housebill.SecondDestination = data.TransitPlaceTo1?.ToUpper();
                 housebill.SecondCarrier = data.TransitPlaceBy1?.ToUpper();
                 housebill.ThirdDestination = data.TransitPlaceTo2?.ToUpper();
                 housebill.ThirdCarrier = data.TransitPlaceBy2?.ToUpper();
                 housebill.Currency = data.CurrencyId?.ToUpper(); //Currency
-                housebill.CHGSCode = data.Chgs?.ToUpper(); //CHGS
-                housebill.WTPP = data.WtorValpayment?.ToUpper(); //WT/VAL là PP
-                housebill.WTCLL = data.WtorValpayment?.ToUpper(); //WT/VAL là CLL
-                housebill.ORPP = data.OtherPayment?.ToUpper(); //Other Là PP
-                housebill.ORCLL = data.OtherPayment?.ToUpper(); //Other Là CLL
+                housebill.CHGSCode = data.Chgs?.Trim().ToUpper() ?? string.Empty; //CHGS
+                housebill.WTPP = data.WtorValpayment == "PP" ? "PP" : string.Empty; //WT/VAL là PP
+                housebill.WTCLL = data.WtorValpayment == "CLL" ? "CLL" : string.Empty; //WT/VAL là CLL
+                housebill.ORPP = data.OtherPayment == "PP" ? "PP" : string.Empty; //Other Là PP
+                housebill.ORCLL = data.OtherPayment == "CLL" ? "CLL" : string.Empty; //Other Là CLL
                 housebill.DlvCarriage = data.Dclrca?.ToUpper(); //DCLR-CA
                 housebill.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
                 if (dataPOD != null)
@@ -1555,13 +1556,13 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
                 housebill.GrwDecimal = 2; //NOT USE
-                housebill.Wlbs = data.KgIb?.ToUpper(); //KgIb
-                housebill.RateClass = string.Empty; //NOT USE
+                housebill.Wlbs = data.KgIb?.ToUpper() ?? string.Empty; //KgIb
+                housebill.RateClass = data.Rclass; //R.Class
                 housebill.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight ?? 0; //CW
                 housebill.ChWDecimal = 2; //NOT USE
-                housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
-                housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
+                housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : ( data.RateCharge?.ToString() ?? string.Empty); //RateCharge
+                housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
                 housebill.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
                 housebill.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
