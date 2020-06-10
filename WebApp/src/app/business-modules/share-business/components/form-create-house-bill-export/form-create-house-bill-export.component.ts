@@ -9,8 +9,8 @@ import { AppForm } from 'src/app/app.form';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from 'src/app/shared/validators';
 
-import { Observable, of } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap, mergeMap } from 'rxjs/operators';
+import { Observable, of, forkJoin } from 'rxjs';
+import { catchError, takeUntil, skip, finalize, tap, mergeMap, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
@@ -104,9 +104,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.initForm();
         this.getSaleMans();
 
-        if (this.type === ChargeConstants.SLE_CODE) {
-            this.getCSBookingNotes();
-        }
+        // if (this.type === ChargeConstants.SLE_CODE) {
+        //     this.getCSBookingNotes();
+        // }
 
         this.isLoadingCustomer = true;
         this.isLoadingShipper = true;
@@ -173,11 +173,13 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                             forwardingAgentDescription: !!this.shipmmentDetail.creatorOffice ? this.shipmmentDetail.creatorOffice.nameEn : null,
                             goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
                             moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
-                            originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail)
+                            originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail),
+                            placeDelivery: this.shipmmentDetail.podName,
+                            placeReceipt: this.shipmmentDetail.polName
                         });
                     }
                 }),
-                mergeMap((res: CsTransaction) => {
+                concatMap((res: CsTransaction) => {
                     if (!!res.podCode) {
                         return this._documentRepo.generateHBLSeaExport(res.podCode);
                     } else { return of(""); }
@@ -187,26 +189,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             }))
             .subscribe(
                 (hblNo: any) => {
-                    this.ports.subscribe(
-                        ((ports: PortIndex[]) => {
-                            if (!!this.shipmmentDetail.pol) {
-                                const placeDelivery: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pod);
-                                if (!!placeDelivery) {
-                                    this.formCreate.patchValue({
-                                        placeDelivery: placeDelivery.nameEn,
-                                    });
-                                }
-                            }
-                            if (!!this.shipmmentDetail.pol) {
-                                const placeReceipt: PortIndex = ports.find(p => p.id === this.shipmmentDetail.pol);
-                                if (!!placeReceipt) {
-                                    this.formCreate.patchValue({
-                                        placeReceipt: placeReceipt.nameEn,
-                                    });
-                                }
-                            }
-                        })
-                    );
+
                 }
             );
     }
@@ -520,18 +503,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
             // * Listen Event.
             this.subscription = ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).onClick.subscribe(
                 (bookingNote: csBookingNote) => {
-                    const formData: IBookingNoteSyncFormHBL = {
-                        bookingNo: bookingNote.bookingNo,
-                        shipper: bookingNote.shipperId,
-                        consignee: bookingNote.consigneeId,
-                        placeDelivery: bookingNote.placeOfDelivery,
-                        shipperDescription: bookingNote.shipperDescription,
-                        consigneeDescription: bookingNote.consigneeDescription
-                    };
-                    this.formCreate.patchValue(formData);
-
-                    // this._dataService.$data.next({ cbm: bookingNote.cbm, gw: bookingNote.gw, commodity: bookingNote.commodity });
-
+                    this.updateDataFromBookingNo(bookingNote);
                     this.subscription.unsubscribe();
                     this.bookingNoteContainerRef.viewContainerRef.clear();
                 });
@@ -544,6 +516,19 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                     }
                 );
         }
+    }
+
+    updateDataFromBookingNo(bookingNote: csBookingNote) {
+        const formData: IBookingNoteSyncFormHBL = {
+            bookingNo: bookingNote.bookingNo,
+            shipper: bookingNote.shipperId,
+            consignee: bookingNote.consigneeId,
+            placeDelivery: bookingNote.placeOfDelivery,
+            shipperDescription: bookingNote.shipperDescription,
+            consigneeDescription: bookingNote.consigneeDescription
+        };
+        this.formCreate.patchValue(formData);
+
     }
 }
 

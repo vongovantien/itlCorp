@@ -11,6 +11,8 @@ namespace SystemInterface {
         officeId: string;
         departmentId: number;
         groupId: number;
+        nameEn: string;
+        nameVn: string;
     }
 
     export interface IDepartmentGroup {

@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
 import { JobConstants } from '@constants';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-booking-note-lcl-export',
@@ -61,7 +62,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
         const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.formGroup = this._fb.group({
-            from: [userLogged.preferred_username, Validators.required], // * Default english name
+            from: [userLogged.nameEn, Validators.required], // * Default english name
             telFrom: [],
             to: [null, Validators.required],
             telTo: [],
@@ -100,7 +101,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
             eta: [],
 
             paymentTerm: [],
-        });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.shipperId = this.formGroup.controls['shipperId'];
         this.consigneeId = this.formGroup.controls['consigneeId'];

@@ -261,12 +261,16 @@ namespace eFMS.IdentityServer.DL.Services
 
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysUserLevel levelOffice, PermissionInfo permissionInfo)
         {
-            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
-            var userInfo = new LoginReturnModel();
+            SysEmployee employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
+            LoginReturnModel userInfo = new LoginReturnModel();
+
             userInfo.userName = user.Username;
             userInfo.email = employee?.Email;
             userInfo.idUser = user.Id;
             userInfo.status = true;
+            userInfo.NameEn = employee.EmployeeNameEn;
+            userInfo.NameVn = employee.EmployeeNameVn;
+
             userInfo.message = "Login successfull !";
 
             if (permissionInfo == null)
