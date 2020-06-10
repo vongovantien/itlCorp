@@ -20,6 +20,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import cloneDeep from 'lodash/cloneDeep';
 import { JobConstants } from '@constants';
+import { GetDimensionAction } from './../../store/index';
 
 
 @Component({
@@ -59,7 +60,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     ];
     termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
 
-    carries: Customer[];
+    carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     units: CommonInterface.INg2Select[];
@@ -138,6 +139,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             takeUntil(this.ngUnsubscribe)
         );
 
+        this.carries = this._store.select(getCatalogueCarrierState)
+
         this.listUsers = this._systemRepo.getSystemUsers();
         this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
         this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
@@ -151,7 +154,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
         this.getUserLogged();
         this.initForm();
-        this.getCarriers();
+        // this.getCarriers();
         this.getAgents();
         this.getUnits();
         this.getCommodities();
@@ -161,8 +164,12 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
+                        this._store.dispatch(new GetDimensionAction(res.id));
+
                         this.shipmentDetail = new CsTransaction(res);
                         this.dimVolumePopup.jobId = this.shipmentDetail.id;
+
+                        // * Update RoundUp,Apply
                         this.dimVolumePopup.$roundUp.next(this.shipmentDetail.roundUpMethod);
                         this.dimVolumePopup.$applyDIM.next(this.shipmentDetail.applyDim);
 
@@ -366,16 +373,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-    }
-
-    getCarriers() {
-        this._store.select(getCatalogueCarrierState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (result) => {
-                this.carries = result;
-                this.initCarriers = cloneDeep(result);
-            });
     }
 
     getAgents() {

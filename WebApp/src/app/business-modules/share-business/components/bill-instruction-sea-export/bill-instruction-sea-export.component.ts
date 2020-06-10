@@ -4,7 +4,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
 import { AppForm } from 'src/app/app.form';
@@ -134,9 +134,9 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             issuedUser: [null, Validators.required],
             supplier: [null, Validators.required],
             invoiceNoticeRecevier: [],
-            shipper: ['', Validators.required],
+            shipper: [null, Validators.required],
             consignee: [null, Validators.required],
-            consigneeDescription: ['', Validators.required],
+            consigneeDescription: [null, Validators.required],
             cargoNoticeRecevier: [],
             realShipper: [],
             actualShipperDescription: [],
@@ -147,7 +147,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
             pol: [null, Validators.required],
             pod: [null, Validators.required],
             poDelivery: [],
-            voyNo: ['', Validators.required],
+            voyNo: [null, Validators.required],
             loadingDate: [null, Validators.required],
             contSealNo: [],
             desOfGoods: [],

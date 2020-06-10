@@ -237,7 +237,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.gotoList();
+
+                        this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl/${res.data}`]);
                     }
                 }
             );
