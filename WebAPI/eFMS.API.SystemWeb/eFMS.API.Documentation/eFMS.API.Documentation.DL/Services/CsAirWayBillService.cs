@@ -203,7 +203,16 @@ namespace eFMS.API.Documentation.DL.Services
             result.PrepaidDueToCarrier = masterbill.DueCarrierPp;
             result.CollectDueToCarrier = masterbill.DueCarrierCll;
 
-            result.OtherCharges = masterbill.OtherCharges;
+            // result.OtherCharges = masterbill.OtherCharges;
+            string[] otherCharges = masterbill.OtherCharge.Split('\n').Where(x => x.ToString() != string.Empty).ToArray();
+            var _otherCharges = new List<CsShipmentOtherChargeModel>();
+            foreach(var otherCharge in otherCharges)
+            {
+                var _otherCharge = new CsShipmentOtherChargeModel();
+                _otherCharge.ChargeName = otherCharge;
+                _otherCharges.Add(_otherCharge);
+            }
+            result.OtherCharges = _otherCharges;
 
             result.PrepaidTotal = masterbill.TotalPp;
             result.CollectTotal = masterbill.TotalCll;

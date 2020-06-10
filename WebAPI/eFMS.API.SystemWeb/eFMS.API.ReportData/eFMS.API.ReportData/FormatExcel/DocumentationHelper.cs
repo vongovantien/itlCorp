@@ -715,7 +715,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A44:B44"].Merge = true;
             workSheet.Cells["A44:B44"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A44"].Value = airwayBillExport.PrepaidWt?.ToUpper();
-            //workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A44"].Style.Numberformat.Format = numberFormat;
             workSheet.Cells["D44"].Value = airwayBillExport.CollectWt?.ToUpper();
 
             workSheet.Cells["A46:B46"].Merge = true;
@@ -743,8 +743,8 @@ namespace eFMS.API.ReportData.FormatExcel
             for (var i = 0; i < airwayBillExport.OtherCharges.Count; i++)
             {
                 workSheet.Cells["H" + k].Value = airwayBillExport.OtherCharges[i].ChargeName?.ToUpper();
-                workSheet.Cells["J" + k].Value = airwayBillExport.OtherCharges[i].Amount;
-                workSheet.Cells["J" + k].Style.Numberformat.Format = numberFormat;
+                // workSheet.Cells["J" + k].Value = airwayBillExport.OtherCharges[i].Amount;
+                // workSheet.Cells["J" + k].Style.Numberformat.Format = numberFormat;
                 k = k + 1;
             }
 
