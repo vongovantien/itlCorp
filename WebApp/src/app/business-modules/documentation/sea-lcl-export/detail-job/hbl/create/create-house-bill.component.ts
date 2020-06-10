@@ -23,6 +23,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { csBookingNote } from '@models';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -88,6 +89,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                     this.permissionShipments = this._store.select(getTransactionPermission);
+
+                    this.getBookingNotes();
                 } else {
                     this.gotoList();
                 }
@@ -96,11 +99,17 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
-        this.formCreateHBLComponent.type = ChargeConstants.SLE_CODE;
-
-        const currenctUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS))["officeId"];
-        this.getDetailOffice(currenctUser);
         this._cd.detectChanges();
+    }
+
+    getBookingNotes() {
+        this._documentationRepo.getBookingNoteSeaLCLExport().subscribe(
+            (res: csBookingNote[]) => {
+                if (!!this.formCreateHBLComponent) {
+                    this.formCreateHBLComponent.csBookingNotes = res || [];
+                }
+            }
+        );
     }
 
     showCreatepoup() {
@@ -244,19 +253,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             );
     }
 
-    getDetailOffice(id: string) {
-        this._systemRepo.getLocationOfficeById(id)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this.formCreateHBLComponent.issueHblplace.setValue(res.data);
-                    }
-                },
-            );
-    }
 
     gotoList() {
         this._router.navigate([`home/documentation/sea-lcl-export/${this.jobId}/hbl`]);
