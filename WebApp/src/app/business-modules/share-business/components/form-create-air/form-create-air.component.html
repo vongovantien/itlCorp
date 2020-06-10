@@ -52,7 +52,7 @@
                             <label required>Airline/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
-                                [selectedDisplayFields]="['shortName']" [dataSources]="carries"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
                                 [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
                             </app-combo-grid-virtual-scroll>

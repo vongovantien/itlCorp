@@ -227,7 +227,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
-                    mergeMap((res: any) => {
+                    mergeMap((res: CommonInterface.IResult) => {
                         const dateNotice = {
                             arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -239,13 +239,15 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}/hbl/${res.data}`]);
+
                         return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(result => {
                     this._toastService.success(result[0].message, '');
-                    this.combackToHBLList();
                 }
                 );
         }

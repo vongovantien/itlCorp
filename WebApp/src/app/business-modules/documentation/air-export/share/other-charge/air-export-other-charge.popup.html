@@ -28,15 +28,17 @@
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !item.quantity}">
-                                    <input numeric [decimals]="2" class="form-control" [(ngModel)]="item.quantity"
-                                        (ngModelChange)="updateTotalAmount(item)">
+                                    <input numeric [decimals]="digitDecimal" class="form-control"
+                                        [(ngModel)]="item.quantity" (ngModelChange)="updateTotalAmount(item)"
+                                        autoFormatCurrency [digits]="2">
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !item.rate}">
-                                    <input numeric [decimals]="2" class="form-control" [(ngModel)]="item.rate"
-                                        (ngModelChange)="updateTotalAmount(item)">
+                                    <input numeric [decimals]="digitDecimal" class="form-control"
+                                        [(ngModel)]="item.rate" (ngModelChange)="updateTotalAmount(item)"
+                                        autoFormatCurrency [digits]="2">
                                 </div>
                             </div>
                             <div class="col-md-2">

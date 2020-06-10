@@ -66,7 +66,7 @@
                                     [displayFields]="configPartner.displayFields" (remove)="resetFormControl(shipper)"
                                     placeholder="Select Shipper">
                                 </app-combo-grid-virtual-scroll>
-                                <textarea rows="3" class="form-control m-input m-input--square"
+                                <textarea rows="5" class="form-control m-input m-input--square"
                                     formControlName="shipperDescription"></textarea>
                             </div>
 
@@ -86,7 +86,7 @@
                                     [displayFields]="configPartner.displayFields" (remove)="resetFormControl(consignee)"
                                     placeholder="Select Consginee">
                                 </app-combo-grid-virtual-scroll>
-                                <textarea rows="3" class="form-control m-input m-input--square"
+                                <textarea rows="5" class="form-control m-input m-input--square"
                                     formControlName="consigneeDescription"></textarea>
                                 <div class="form-control-feedback" *ngIf="isSubmited && !consignee.value ">
                                     Consignee is required!
@@ -107,7 +107,7 @@
                                     [displayFields]="configPartner.displayFields"
                                     (remove)="resetFormControl(notifyParty)" placeholder="Select Notify Party">
                                 </app-combo-grid-virtual-scroll>
-                                <textarea rows="3" class="form-control m-input m-input--square"
+                                <textarea rows="5" class="form-control m-input m-input--square"
                                     formControlName="notifyPartyDescription"></textarea>
                             </div>
                         </div>
@@ -126,7 +126,7 @@
                                     [displayFields]="configPartner.displayFields"
                                     (remove)="resetFormControl(alsoNotifyParty)" placeholder="Select Also Notify Party">
                                 </app-combo-grid-virtual-scroll>
-                                <textarea rows="3" class="form-control m-input m-input--square"
+                                <textarea rows="5" class="form-control m-input m-input--square"
                                     formControlName="alsonotifyPartyDescription"></textarea>
                             </div>
                         </div>
