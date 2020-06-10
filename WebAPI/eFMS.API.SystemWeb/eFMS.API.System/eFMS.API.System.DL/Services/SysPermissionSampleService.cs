@@ -91,6 +91,27 @@ namespace eFMS.API.System.DL.Services
             return results;
         }
 
+        public IQueryable<SysPermissionSampleModel> Paging(SysPermissionGeneralCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<SysPermissionSampleModel> results = null;
+            var list = Query(criteria);
+            if (list == null)
+            {
+                rowsCount = 0;
+                return null;
+            }
+            rowsCount = list.Count();
+            if (size > 1)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                results = list.Skip((page - 1) * size).Take(size).ToList();
+            }
+            return results.AsQueryable();
+        }
+
         public override HandleState Add(SysPermissionSampleModel entity)
         {
             var permision = mapper.Map<SysPermissionSample>(entity);
