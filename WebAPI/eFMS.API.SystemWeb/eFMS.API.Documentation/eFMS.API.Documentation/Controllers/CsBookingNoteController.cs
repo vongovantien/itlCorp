@@ -82,7 +82,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
-            var hs = csBookingNoteService.UpdateCsBookingNote(model);
+           var hs = csBookingNoteService.UpdateCsBookingNote(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
