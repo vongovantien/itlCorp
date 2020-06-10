@@ -32,7 +32,6 @@ namespace eFMS.IdentityServer
 
             string officeId = _contextAccessor.HttpContext.Request.Headers["officeId"];
             string deptId = _contextAccessor.HttpContext.Request.Headers["departmentId"];
-            string grpId = _contextAccessor.HttpContext.Request.Headers["groupId"];
 
             if (!string.IsNullOrEmpty(officeId))
             {
@@ -102,6 +101,9 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));
                 list_Claim.Add(new Claim("departmentId", (modelReturn.departmentId ?? 0).ToString()));
                 list_Claim.Add(new Claim("groupId", modelReturn.groupId.ToString()));
+                list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
+                list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
+
 
                 context.Result = new GrantValidationResult(
                     subject: modelReturn.idUser,

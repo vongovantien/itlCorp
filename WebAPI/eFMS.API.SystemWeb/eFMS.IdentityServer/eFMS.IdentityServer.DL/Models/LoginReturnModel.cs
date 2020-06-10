@@ -16,7 +16,9 @@ namespace eFMS.API.System.DL.Models
         public string email { get; set; }
         public string token { get; set; }
         public bool status { get; set; }
-        public string message { get; set; }        
+        public string message { get; set; }
+        public string NameEn { get; set; }
+        public string NameVn { get; set; }
 
     }
 }
