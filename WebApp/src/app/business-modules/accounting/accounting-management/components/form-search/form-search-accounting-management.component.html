@@ -16,7 +16,7 @@
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{ field: 'id', value: partner.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                                    [selectedDisplayFields]="['partnerNameEn']" [dataSources]="partners | async"
+                                    [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                                     [displayFields]="displayFieldsPartner" [height]="150"
                                     (remove)="resetFormControl(partner)" placeholder="Select Customer">
                                 </app-combo-grid-virtual-scroll>
