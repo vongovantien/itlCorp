@@ -55,15 +55,18 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var manifest = mapper.Map<CsManifest>(model);
-                manifest.CreatedDate = DateTime.Now;
                 var hs = new HandleState();
                 manifest.RefNo = GetManifestNo(model.JobId);
                 if (DataContext.Any(x => x.JobId == model.JobId))
                 {
+                    manifest.ModifiedDate = DateTime.Now;
+                    manifest.UserModified = currentUser.UserID;
                     hs = DataContext.Update(manifest, x => x.JobId == model.JobId);
                 }
                 else
                 {
+                    manifest.CreatedDate = DateTime.Now;
+                    manifest.UserCreated = currentUser.UserID;
                     hs = DataContext.Add(manifest);
                 }
                 if (hs.Success)
@@ -78,9 +81,10 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.ManifestRefNo = manifest.RefNo;
                         }
-                        item.DatetimeModified = DateTime.Now;
-                        item.UserModified = manifest.UserCreated;
-                        var tranDetail = mapper.Map<CsTransactionDetail>(item);
+                        var tranDetail = transactionDetailRepository.Get(x => x.Id == item.Id).FirstOrDefault();
+                        tranDetail.ManifestRefNo = item.ManifestRefNo;
+                        tranDetail.DatetimeModified = DateTime.Now;
+                        tranDetail.UserModified = currentUser.UserID;
                         var s = transactionDetailRepository.Update(tranDetail, x => x.Id == tranDetail.Id);
                     }
                     transactionDetailRepository.SubmitChanges();
