@@ -1510,7 +1510,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.MAWB = data.Mawb; //NOT USE
                 housebill.HWBNO = data.Hwbno?.ToUpper(); //Housebill No
                 housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
-                housebill.ISSUED = data.IssuedBy?.ToUpper(); //NOT USE
+                housebill.ISSUED = data.IssuedBy?.ToUpper();
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
                 housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
@@ -1586,7 +1586,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
                 var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s => string.Format("{0:n}", s.Length) + "*" + string.Format("{0:n}", s.Width) + "*" + string.Format("{0:n}", s.Height) + "*" + string.Format("{0:n0}", s.Package)));
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng
