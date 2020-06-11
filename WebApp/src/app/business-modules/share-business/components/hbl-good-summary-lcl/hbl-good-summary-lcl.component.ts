@@ -27,6 +27,9 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     packageQty: number = null;
 
+    packageQtyInword: number = null;
+
+
     containerDescription: string = '';
 
     packages: Unit[] = [];
@@ -110,6 +113,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         this.isSave = true;
         this.containers = containers;
         this.updateData(containers);
+    }
+
+    onChangeQty() {
+        if (this.containers.length === 0) {
+            console.log('change');
+            this.packageQtyInword = this.packageQty;
+            console.log(this.packageQtyInword);
+        }
     }
 
     updateData(containers: Container[] | any) {

@@ -50,8 +50,8 @@
                             <label required>Package Qty: </label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="number" class="form-control" [(ngModel)]="packageQty" min="0" integer
-                                        autoFormatCurrency>
+                                    <input type="number" class="form-control" [(ngModel)]="packageQty"
+                                        (ngModelChange)="onChangeQty()" min="0" integer autoFormatCurrency>
                                 </div>
                                 <div class="col-md-6">
                                     <select class="form-control" [(ngModel)]="selectedPackage" name="selectedPackage">

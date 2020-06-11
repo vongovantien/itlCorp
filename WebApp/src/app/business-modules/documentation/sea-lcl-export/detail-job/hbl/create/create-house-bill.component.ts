@@ -263,13 +263,14 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     updateInwordField(containers: Container[]) {
+        console.log(containers);
         if (!containers.length) {
             return null;
         }
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
-            package: container.description,
+            package: container.packageTypeName,
             quantity: container.packageQuantity,
         }));
 
@@ -281,13 +282,22 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             });
         }
         for (const item of contData) {
+
             containerDetail += this.handleStringPackage(item);
+            if (contData.length > 1) {
+                containerDetail += " AND ";
+            }
         }
+
+        if (contData.length > 1) {
+            containerDetail = containerDetail.substring(0, containerDetail.length - 5);
+        }
+
         return containerDetail;
     }
 
     handleStringPackage(contOb: { package: string, quantity: number }) {
-        return `${this.utility.convertNumberToWords(contOb.quantity)}${contOb.package} ONLY \n`;
+        return `${this.utility.convertNumberToWords(contOb.quantity)}${contOb.package}`;
     }
 
 
