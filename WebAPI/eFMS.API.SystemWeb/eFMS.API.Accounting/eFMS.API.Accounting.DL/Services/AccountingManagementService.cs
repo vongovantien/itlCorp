@@ -343,7 +343,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -545,7 +545,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -676,7 +676,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat > 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -770,12 +770,12 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
                 {
                     _inputRefNoHadFoundCharge = string.Join(", ", fe.Charges.Where(x => criteria.SettlementCodes.Contains(x.SettlementCode)).Select(s => s.SettlementCode).Distinct());
+                    var userIdRequester = settlementPaymentRepo.Get(x => x.SettlementNo == fe.Charges[0].SettlementCode).FirstOrDefault()?.Requester;
+                    var employeeIdRequester = userRepo.Get(x => x.Id == userIdRequester).FirstOrDefault()?.EmployeeId;
+                    fe.SettlementRequester = employeeRepo.Get(x => x.Id == employeeIdRequester).FirstOrDefault()?.EmployeeNameVn;
                 }
 
-                fe.InputRefNo = _inputRefNoHadFoundCharge;
-                var userIdRequester = settlementPaymentRepo.Get(x => x.SettlementNo == fe.Charges[0].SettlementCode).FirstOrDefault()?.Requester;
-                var employeeIdRequester = userRepo.Get(x => x.Id == userIdRequester).FirstOrDefault()?.EmployeeId;
-                fe.SettlementRequester = employeeRepo.Get(x => x.Id == employeeIdRequester).FirstOrDefault()?.EmployeeNameVn;
+                fe.InputRefNo = _inputRefNoHadFoundCharge;               
             });
             return chargeGroupByPartner;
         }

@@ -32,7 +32,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         private _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
     ) {
-        super(_toastService, _accountingRepo, _store);
+        super(_toastService, _accountingRepo, _store, _router);
         this._progressRef = this._ngProgressService.ref();
     }
 
