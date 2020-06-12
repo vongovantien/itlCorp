@@ -31,6 +31,7 @@ import { AccountingManagementCreateVoucherComponent } from './voucher/create/acc
 import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
+import { ShareAccountingModule } from '../share-accouting.module';
 
 const routing: Routes = [
     {
@@ -87,7 +88,8 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducers),
-        PaginationModule.forRoot()
+        PaginationModule.forRoot(),
+        ShareAccountingModule
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,

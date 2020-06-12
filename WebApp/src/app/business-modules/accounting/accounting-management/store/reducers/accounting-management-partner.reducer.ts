@@ -6,6 +6,7 @@ export interface IAccountingManagementPartnerState {
     partnerId: string;
     partnerName: string;
     partnerAddress: string;
+    settlementRequesterId: string;
     settlementRequester: string;
     inputRefNo: string;
     charges: ChargeOfAccountingManagementModel[];
@@ -15,6 +16,7 @@ export const initialState: IAccountingManagementPartnerState = {
     partnerId: null,
     partnerName: null,
     partnerAddress: null,
+    settlementRequesterId: null,
     settlementRequester: null,
     inputRefNo: null,
     charges: []
@@ -27,6 +29,9 @@ const accountingManagementPartnerReducer = createReducer(
     })),
     on(accountingManagementActions.InitPartner, () => ({
         ...initialState,
+    })),
+    on(accountingManagementActions.SelectRequester, (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
+        ...state, charges: payload.charges, ...payload
     })),
 );
 

@@ -286,7 +286,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          Mbl = ops.Mblno,
                                          SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : string.Empty,
                                          SettlementCode = null,
-                                         AcctManagementId = sur.AcctManagementId
+                                         AcctManagementId = sur.AcctManagementId,
+                                         RequesterId = null
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -335,7 +336,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              Mbl = cst.Mawb,
                                              SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : string.Empty,
                                              SettlementCode = null,
-                                             AcctManagementId = sur.AcctManagementId
+                                             AcctManagementId = sur.AcctManagementId,
+                                             RequesterId = null
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -343,7 +345,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -486,7 +488,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             Mbl = ops.Mblno,
                                             SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                             SettlementCode = sett.SettlementNo,
-                                            AcctManagementId = sur.AcctManagementId
+                                            AcctManagementId = sur.AcctManagementId,
+                                            RequesterId = sett.Requester
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -537,7 +540,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 Mbl = cst.Mawb,
                                                 SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                                 SettlementCode = sett.SettlementNo,
-                                                AcctManagementId = sur.AcctManagementId
+                                                AcctManagementId = sur.AcctManagementId,
+                                                RequesterId = sett.Requester
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -545,7 +549,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -615,7 +619,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            Mbl = ops.Mblno,
                                            SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                            SettlementCode = sett.SettlementNo,
-                                           AcctManagementId = sur.AcctManagementId
+                                           AcctManagementId = sur.AcctManagementId,
+                                           RequesterId = sett.Requester
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -668,7 +673,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                Mbl = cst.Mawb,
                                                SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                                SettlementCode = sett.SettlementNo,
-                                               AcctManagementId = sur.AcctManagementId
+                                               AcctManagementId = sur.AcctManagementId,
+                                               RequesterId = sett.Requester
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -676,7 +682,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0));
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -731,18 +737,40 @@ namespace eFMS.API.Accounting.DL.Services
 
             var charges = GetChargeForVoucher(query);
 
-            // Group by theo Partner
-            var chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
-                new PartnerOfAcctManagementResult
-                {
-                    PartnerId = s.Key.PartnerId,
-                    PartnerName = s.FirstOrDefault()?.VatPartnerName,
-                    PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
-                    SettlementRequester = null, //Tính toán bên dưới
-                    InputRefNo = string.Empty, //Tính toán bên dưới
-                    Charges = s.ToList()
-                }
-                ).ToList();
+            var chargeGroupByPartner = new List<PartnerOfAcctManagementResult>();
+
+            if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
+            {
+                // Group by theo RequesterId
+                chargeGroupByPartner = charges.GroupBy(g => new { SettlementRequesterId = g.RequesterId }).Select(s =>
+                    new PartnerOfAcctManagementResult
+                    {
+                        PartnerId = null,
+                        PartnerName = null,
+                        PartnerAddress = null,
+                        SettlementRequesterId = s.Key.SettlementRequesterId,
+                        SettlementRequester = null, //Tính toán bên dưới
+                        InputRefNo = string.Empty, //Tính toán bên dưới
+                        Charges = s.ToList()
+                    }
+                    ).ToList();
+            }
+            else
+            {
+                // Group by theo Partner
+                chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
+                    new PartnerOfAcctManagementResult
+                    {
+                        PartnerId = s.Key.PartnerId,
+                        PartnerName = s.FirstOrDefault()?.VatPartnerName,
+                        PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
+                        SettlementRequesterId = null,
+                        SettlementRequester = null,
+                        InputRefNo = string.Empty, //Tính toán bên dưới
+                        Charges = s.ToList()
+                    }
+                    ).ToList();
+            }
 
             string _inputRefNoHadFoundCharge = string.Empty;
             chargeGroupByPartner.ForEach(fe =>
@@ -770,8 +798,8 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.SettlementCodes != null && criteria.SettlementCodes.Count > 0)
                 {
                     _inputRefNoHadFoundCharge = string.Join(", ", fe.Charges.Where(x => criteria.SettlementCodes.Contains(x.SettlementCode)).Select(s => s.SettlementCode).Distinct());
-                    var userIdRequester = settlementPaymentRepo.Get(x => x.SettlementNo == fe.Charges[0].SettlementCode).FirstOrDefault()?.Requester;
-                    var employeeIdRequester = userRepo.Get(x => x.Id == userIdRequester).FirstOrDefault()?.EmployeeId;
+
+                    var employeeIdRequester = userRepo.Get(x => x.Id == fe.SettlementRequesterId).FirstOrDefault()?.EmployeeId;
                     fe.SettlementRequester = employeeRepo.Get(x => x.Id == employeeIdRequester).FirstOrDefault()?.EmployeeNameVn;
                 }
 

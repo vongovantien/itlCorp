@@ -74,6 +74,7 @@ export class ChargeOfAccountingManagementModel {
     soaNo: string = null;
     settlementCode: string = null;
     acctManagementId: string = SystemConstants.EMPTY_GUID;
+    requesterId: string = null;
     // * Custom
     isSelected: boolean = false;
     constructor(object?: any) {
@@ -106,6 +107,7 @@ export class PartnerOfAcctManagementResult {
     partnerId: string = null;
     partnerName: string = null;
     partnerAddress: string = null;
+    settlementRequesterId: string = null;
     settlementRequester: string = null;
     inputRefNo: string = null;
     charges: ChargeOfAccountingManagementModel[] = new Array<ChargeOfAccountingManagementModel>();
