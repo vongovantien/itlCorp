@@ -16,6 +16,7 @@ import { AccountingManagementListChargeComponent } from '../../components/list-c
 import _merge from 'lodash/merge';
 import { catchError } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-accounting-create-voucher',
@@ -30,8 +31,8 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
     constructor(
         protected _toastService: ToastrService,
         protected _accountingRepo: AccountingRepo,
-        protected _store: Store<IAccountingManagementState>
-
+        protected _store: Store<IAccountingManagementState>,
+        protected _router: Router,
     ) {
         super();
     }
@@ -91,6 +92,7 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._router.navigate([`home/accounting/management/voucher/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }

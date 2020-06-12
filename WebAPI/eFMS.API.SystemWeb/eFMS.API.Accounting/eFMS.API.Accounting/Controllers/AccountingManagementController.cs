@@ -142,10 +142,13 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
             }
 
-            var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
-            if (isExistedInvoiceNoTempSerie)
+            if (model.Type == AccountingConstants.ADVANCE_TYPE_INVOICE)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
+                if (isExistedInvoiceNoTempSerie)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                }
             }
 
             if (model.Charges.Count == 0)
@@ -183,10 +186,13 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
             }
 
-            var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
-            if (isExistedInvoiceNoTempSerie)
+            if (model.Type == AccountingConstants.ADVANCE_TYPE_INVOICE)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
+                if (isExistedInvoiceNoTempSerie)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                }
             }
 
             if (model.Charges.Count == 0)
@@ -261,11 +267,11 @@ namespace eFMS.API.Accounting.Controllers
             var isExited = false;
             if (acctId == Guid.Empty || acctId == null)
             {
-                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie).Any();
+                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
             }
             else
             {
-                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.Id != acctId).Any();
+                isExited = accountingService.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.Id != acctId && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
             }
             return isExited;
         }

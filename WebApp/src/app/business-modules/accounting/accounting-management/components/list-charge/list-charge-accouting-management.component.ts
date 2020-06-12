@@ -38,6 +38,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 { title: 'Invoice No', field: 'invoiceNo', sortable: true },
                 { title: 'Serie', field: 'serie', sortable: true },
                 { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+                { title: 'OBH Partner', field: 'obhPartner', sortable: true },
                 { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
                 { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
                 { title: 'Debit Note', field: 'CdNoteNo', sortable: true },

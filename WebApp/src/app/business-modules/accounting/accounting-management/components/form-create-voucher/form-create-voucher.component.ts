@@ -70,7 +70,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
                     if (!!res.partnerId) {
                         if (!this.formGroup.controls['partnerId'].value) {
                             this.formGroup.controls['partnerId'].setValue(res.partnerId);
-                            this.formGroup.controls['personalName'].setValue(res.partnerName);
+                            this.formGroup.controls['personalName'].setValue(res.settlementRequester ? res.settlementRequester : res.partnerName);
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
                             this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
