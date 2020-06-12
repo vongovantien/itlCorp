@@ -19,6 +19,7 @@ import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogue
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 import { NINE } from '@angular/cdk/keycodes';
+import { formatCurrency } from '@angular/common';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -703,7 +704,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.isUpdateOtherCharge = true;
         let text: string = '';
         data.charges.forEach((i: CsOtherCharge) => {
-            text += `${i.chargeName}: ${i.amount} \n`;
+            text += `${i.chargeName}: ${formatCurrency(i.amount, 'en', '')} \n`;
         });
 
         this.formCreate.controls["otherCharge"].setValue(text);

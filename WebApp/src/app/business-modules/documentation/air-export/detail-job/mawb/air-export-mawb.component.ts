@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
-import { formatDate } from '@angular/common';
+import { formatDate, formatCurrency } from '@angular/common';
 import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -819,7 +819,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         // * UPDATE OTHER CHARGE TEXTAREAR.
         let text: string = '';
         this.otherChargedata.charges.forEach((i: CsOtherCharge) => {
-            text += `${i.chargeName}: ${i.amount} \n`;
+            text += `${i.chargeName}: ${formatCurrency(i.amount, 'en', '')} \n`;
         });
 
         this.formMAWB.controls["otherCharge"].setValue(text);
