@@ -72,8 +72,13 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                             });
                         }
 
-                        // * Update field inword with container data.
-                        if (!this.formCreateHBLComponent.isUpdate) {
+                        if (this.containers.length === 0) {
+                            const packageName = this.goodSummaryComponent.packages.find(x => x.id == this.goodSummaryComponent.selectedPackage).code;
+                            const data = { 'package': packageName, 'quantity': this.goodSummaryComponent.packageQty };
+                            this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.handleStringPackage(data));
+                        }
+                        if (this.containers.length > 0) {
+                            // * Update field inword with container data.
                             this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                         }
                     }
@@ -92,6 +97,11 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
                     this.gotoList();
                 }
             });
+    }
+
+    selectedPackage($event: any) {
+        const data = $event;
+        this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.handleStringPackage(data));
     }
 
     ngAfterViewInit() {
