@@ -10,6 +10,7 @@ namespace eFMS.API.System.Infrastructure.Common
     /// </summary>
     public enum CacheEntity
     {
-        SysMenu
+        SysMenu,
+        sysAuthorize
     }
 }
