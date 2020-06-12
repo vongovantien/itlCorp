@@ -67,8 +67,8 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            model.DatetimeCreated = DateTime.Now;
-            model.UserCreated = currentUser.UserID;
+            model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+            model.UserCreated = model.UserModified = currentUser.UserID;
             model.GroupId = currentUser.GroupId;
             model.DepartmentId = currentUser.DepartmentId;
             model.OfficeId = currentUser.OfficeID;

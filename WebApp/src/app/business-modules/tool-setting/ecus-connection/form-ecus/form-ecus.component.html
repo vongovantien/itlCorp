@@ -61,8 +61,8 @@
                                 <div class="form-group">
                                     <label>Status</label>
                                     <div class="form-group">
-                                        <app-switch [toggle]="formGroup.controls['active'].value"
-                                            (toggleChange)="formGroup.controls['active'].setValue($event)"></app-switch>
+                                        <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)">
+                                        </app-switch>
                                     </div>
                                 </div>
                             </div>

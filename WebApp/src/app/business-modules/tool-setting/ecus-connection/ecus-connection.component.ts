@@ -88,6 +88,7 @@ export class EcusConnectionComponent extends AppList implements OnInit {
         this.formEcus.datetimeModified = null;
         this.formEcus.isShowUpdate = false;
         this.formEcus.isAllowUpdate = true;
+        this.formEcus.active.setValue(false);
         this.formEcus.show();
     }
 
