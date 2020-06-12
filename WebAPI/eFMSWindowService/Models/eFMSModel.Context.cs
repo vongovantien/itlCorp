@@ -27,6 +27,8 @@ namespace eFMSWindowService.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<csTransaction> csTransactions { get; set; }
+        public virtual DbSet<catDepartment> catDepartments { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_QueryAndUpdateCurrentStatusOfJob()
         {

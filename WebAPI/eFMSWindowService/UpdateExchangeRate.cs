@@ -48,50 +48,6 @@ namespace eFMSWindowService
         private void _aTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             WriteToFile("Service update exchange rate is recall at " + DateTime.Now);
-            //eFMSTestEntities db = new eFMSTestEntities();
-            //var newestExchanges = db.vw_catCurrencyExchangeNewest;
-
-            //var exchangeToday = db.catCurrencyExchanges.Where(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date);
-            ////var isExistsExchangeToday = exchangeToday.Select(s => s.ID).Any();
-            //var isExistsExchangeToday = db.catCurrencyExchanges.Any(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date);
-            //foreach (var item in newestExchanges)
-            //{
-            //    if (item.DatetimeCreated.Value.Date < DateTime.Now.Date)
-            //    {
-            //        if (!isExistsExchangeToday)
-            //        {
-            //            //Insert Exchange
-            //            var exchange = new catCurrencyExchange
-            //            {
-            //                CurrencyFromID = item.CurrencyFromID,
-            //                DatetimeCreated = DateTime.Now.Date,
-            //                DatetimeModified = DateTime.Now.Date,
-            //                UserCreated = "system",
-            //                UserModified = "system",
-            //                Rate = item.Rate,
-            //                Active = true,
-            //                CurrencyToID = item.CurrencyToID
-            //            };
-            //            db.catCurrencyExchanges.Add(exchange);
-            //        }
-            //        else
-            //        {
-            //            //Update Exchange
-            //            exchangeToday.ToList().ForEach(fe =>
-            //            {
-            //                fe.CurrencyFromID = item.CurrencyFromID;
-            //                fe.DatetimeModified = DateTime.Now.Date;
-            //                fe.UserModified = "system";
-            //                fe.Rate = item.Rate;
-            //                fe.Active = true;
-            //                fe.CurrencyToID = item.CurrencyToID;
-            //                db.Entry(fe).State = EntityState.Modified;
-            //            });
-
-            //        }
-            //    }
-            //}
-            //db.SaveChanges();
             using (eFMSTestEntities db = new eFMSTestEntities())
             {
                 var result = db.Database.SqlQuery<int>("[dbo].[sp_AutoUpdateExchangeRate]").FirstOrDefault();

@@ -85,6 +85,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="Models\catDepartment.cs">
+      <DependentUpon>eFMSModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\csTransaction.cs">
+      <DependentUpon>eFMSModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\eFMSModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -105,6 +112,12 @@
     </Compile>
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SendMailToARDepartmentService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SendMailToARDepartmentService.Designer.cs">
+      <DependentUpon>SendMailToARDepartmentService.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdateCurrentStatusOfJobService.cs">
       <SubType>Component</SubType>
@@ -175,5 +188,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -4,10 +4,91 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="eFMSTestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="eFMSTestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="catDepartment">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="varchar" MaxLength="50" />
+          <Property Name="DeptName" Type="nvarchar" MaxLength="1600" />
+          <Property Name="DeptNameEn" Type="nvarchar(max)" />
+          <Property Name="DeptNameAbbr" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar" MaxLength="4000" />
+          <Property Name="BranchID" Type="uniqueidentifier" />
+          <Property Name="DeptType" Type="nvarchar" MaxLength="50" />
+          <Property Name="Email" Type="nvarchar" MaxLength="150" />
+          <Property Name="UserCreated" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeCreated" Type="datetime" />
+          <Property Name="UserModified" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeModified" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="InactiveOn" Type="datetime" />
+        </EntityType>
+        <EntityType Name="csTransaction">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="BranchID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="JobNo" Type="varchar" MaxLength="50" />
+          <Property Name="MAWB" Type="nvarchar" MaxLength="800" />
+          <Property Name="TypeOfService" Type="varchar" MaxLength="50" />
+          <Property Name="ETD" Type="datetime" />
+          <Property Name="ETA" Type="datetime" />
+          <Property Name="ServiceDate" Type="datetime" />
+          <Property Name="MBLType" Type="varchar" MaxLength="50" />
+          <Property Name="ColoaderID" Type="varchar" MaxLength="50" />
+          <Property Name="SubColoader" Type="nvarchar" MaxLength="800" />
+          <Property Name="BookingNo" Type="nvarchar" MaxLength="800" />
+          <Property Name="AgentID" Type="varchar" MaxLength="50" />
+          <Property Name="POL" Type="uniqueidentifier" />
+          <Property Name="POD" Type="uniqueidentifier" />
+          <Property Name="WarehouseID" Type="uniqueidentifier" />
+          <Property Name="DeliveryPlace" Type="uniqueidentifier" />
+          <Property Name="PaymentTerm" Type="nvarchar" MaxLength="1600" />
+          <Property Name="FlightVesselName" Type="nvarchar" MaxLength="4000" />
+          <Property Name="VoyNo" Type="nvarchar" MaxLength="1600" />
+          <Property Name="ShipmentType" Type="varchar" MaxLength="50" />
+          <Property Name="Commodity" Type="nvarchar" MaxLength="1600" />
+          <Property Name="DesOfGoods" Type="nvarchar(max)" />
+          <Property Name="PackageContainer" Type="nvarchar" MaxLength="1600" />
+          <Property Name="PONo" Type="nvarchar" MaxLength="1600" />
+          <Property Name="PersonIncharge" Type="varchar" MaxLength="50" />
+          <Property Name="NetWeight" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="GrossWeight" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="ChargeWeight" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="CBM" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="HW" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="PackageQty" Type="int" />
+          <Property Name="PackageType" Type="nvarchar(max)" />
+          <Property Name="Notes" Type="nvarchar(max)" />
+          <Property Name="TransactionType" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CurrentStatus" Type="varchar" MaxLength="50" />
+          <Property Name="LockedDate" Type="datetime" />
+          <Property Name="LockedLog" Type="nvarchar(max)" />
+          <Property Name="IsLocked" Type="bit" />
+          <Property Name="FlightDate" Type="datetime" />
+          <Property Name="HWConstant" Type="decimal" Precision="18" Scale="4" />
+          <Property Name="Route" Type="nvarchar" MaxLength="100" />
+          <Property Name="UserCreated" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeCreated" Type="datetime" />
+          <Property Name="UserModified" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeModified" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="InactiveOn" Type="datetime" />
+          <Property Name="IssuedBy" Type="nvarchar" MaxLength="50" />
+          <Property Name="GroupID" Type="smallint" />
+          <Property Name="DepartmentID" Type="int" />
+          <Property Name="OfficeID" Type="uniqueidentifier" />
+          <Property Name="CompanyID" Type="uniqueidentifier" />
+        </EntityType>
         <Function Name="sp_AutoUpdateExchangeRate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_QueryAndUpdateCurrentStatusOfJob" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <EntityContainer Name="eFMSTestModelStoreContainer" />
+        <EntityContainer Name="eFMSTestModelStoreContainer">
+          <EntitySet Name="catDepartment" EntityType="Self.catDepartment" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="csTransaction" EntityType="Self.csTransaction" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -15,7 +96,87 @@
         <EntityContainer Name="eFMSTestEntities" annotation:LazyLoadingEnabled="true">
           <FunctionImport Name="sp_QueryAndUpdateCurrentStatusOfJob" ReturnType="Collection(Int32)" />
           <FunctionImport Name="sp_AutoUpdateExchangeRate" />
+          <EntitySet Name="csTransactions" EntityType="eFMSTestModel.csTransaction" />
+          <EntitySet Name="catDepartments" EntityType="eFMSTestModel.catDepartment" />
         </EntityContainer>
+        <EntityType Name="csTransaction">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Guid" Nullable="false" />
+          <Property Name="BranchID" Type="Guid" Nullable="false" />
+          <Property Name="JobNo" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MAWB" Type="String" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="TypeOfService" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ETD" Type="DateTime" Precision="3" />
+          <Property Name="ETA" Type="DateTime" Precision="3" />
+          <Property Name="ServiceDate" Type="DateTime" Precision="3" />
+          <Property Name="MBLType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ColoaderID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SubColoader" Type="String" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="BookingNo" Type="String" MaxLength="800" FixedLength="false" Unicode="true" />
+          <Property Name="AgentID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="POL" Type="Guid" />
+          <Property Name="POD" Type="Guid" />
+          <Property Name="WarehouseID" Type="Guid" />
+          <Property Name="DeliveryPlace" Type="Guid" />
+          <Property Name="PaymentTerm" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="FlightVesselName" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="VoyNo" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="ShipmentType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Commodity" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="DesOfGoods" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PackageContainer" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="PONo" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="PersonIncharge" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NetWeight" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="GrossWeight" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="ChargeWeight" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="CBM" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="HW" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="PackageQty" Type="Int32" />
+          <Property Name="PackageType" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Notes" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TransactionType" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CurrentStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LockedDate" Type="DateTime" Precision="3" />
+          <Property Name="LockedLog" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="IsLocked" Type="Boolean" />
+          <Property Name="FlightDate" Type="DateTime" Precision="3" />
+          <Property Name="HWConstant" Type="Decimal" Precision="18" Scale="4" />
+          <Property Name="Route" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
+          <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="InactiveOn" Type="DateTime" Precision="3" />
+          <Property Name="IssuedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GroupID" Type="Int16" />
+          <Property Name="DepartmentID" Type="Int32" />
+          <Property Name="OfficeID" Type="Guid" />
+          <Property Name="CompanyID" Type="Guid" />
+        </EntityType>
+        <EntityType Name="catDepartment">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeptName" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="DeptNameEn" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DeptNameAbbr" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="BranchID" Type="Guid" />
+          <Property Name="DeptType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
+          <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="InactiveOn" Type="DateTime" Precision="3" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -24,6 +185,86 @@
         <EntityContainerMapping StorageEntityContainer="eFMSTestModelStoreContainer" CdmEntityContainer="eFMSTestEntities">
           <FunctionImportMapping FunctionImportName="sp_QueryAndUpdateCurrentStatusOfJob" FunctionName="eFMSTestModel.Store.sp_QueryAndUpdateCurrentStatusOfJob" />
           <FunctionImportMapping FunctionImportName="sp_AutoUpdateExchangeRate" FunctionName="eFMSTestModel.Store.sp_AutoUpdateExchangeRate" />
+          <EntitySetMapping Name="csTransactions">
+            <EntityTypeMapping TypeName="eFMSTestModel.csTransaction">
+              <MappingFragment StoreEntitySet="csTransaction">
+                <ScalarProperty Name="CompanyID" ColumnName="CompanyID" />
+                <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+                <ScalarProperty Name="GroupID" ColumnName="GroupID" />
+                <ScalarProperty Name="IssuedBy" ColumnName="IssuedBy" />
+                <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
+                <ScalarProperty Name="UserModified" ColumnName="UserModified" />
+                <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
+                <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
+                <ScalarProperty Name="Route" ColumnName="Route" />
+                <ScalarProperty Name="HWConstant" ColumnName="HWConstant" />
+                <ScalarProperty Name="FlightDate" ColumnName="FlightDate" />
+                <ScalarProperty Name="IsLocked" ColumnName="IsLocked" />
+                <ScalarProperty Name="LockedLog" ColumnName="LockedLog" />
+                <ScalarProperty Name="LockedDate" ColumnName="LockedDate" />
+                <ScalarProperty Name="CurrentStatus" ColumnName="CurrentStatus" />
+                <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
+                <ScalarProperty Name="Notes" ColumnName="Notes" />
+                <ScalarProperty Name="PackageType" ColumnName="PackageType" />
+                <ScalarProperty Name="PackageQty" ColumnName="PackageQty" />
+                <ScalarProperty Name="HW" ColumnName="HW" />
+                <ScalarProperty Name="CBM" ColumnName="CBM" />
+                <ScalarProperty Name="ChargeWeight" ColumnName="ChargeWeight" />
+                <ScalarProperty Name="GrossWeight" ColumnName="GrossWeight" />
+                <ScalarProperty Name="NetWeight" ColumnName="NetWeight" />
+                <ScalarProperty Name="PersonIncharge" ColumnName="PersonIncharge" />
+                <ScalarProperty Name="PONo" ColumnName="PONo" />
+                <ScalarProperty Name="PackageContainer" ColumnName="PackageContainer" />
+                <ScalarProperty Name="DesOfGoods" ColumnName="DesOfGoods" />
+                <ScalarProperty Name="Commodity" ColumnName="Commodity" />
+                <ScalarProperty Name="ShipmentType" ColumnName="ShipmentType" />
+                <ScalarProperty Name="VoyNo" ColumnName="VoyNo" />
+                <ScalarProperty Name="FlightVesselName" ColumnName="FlightVesselName" />
+                <ScalarProperty Name="PaymentTerm" ColumnName="PaymentTerm" />
+                <ScalarProperty Name="DeliveryPlace" ColumnName="DeliveryPlace" />
+                <ScalarProperty Name="WarehouseID" ColumnName="WarehouseID" />
+                <ScalarProperty Name="POD" ColumnName="POD" />
+                <ScalarProperty Name="POL" ColumnName="POL" />
+                <ScalarProperty Name="AgentID" ColumnName="AgentID" />
+                <ScalarProperty Name="BookingNo" ColumnName="BookingNo" />
+                <ScalarProperty Name="SubColoader" ColumnName="SubColoader" />
+                <ScalarProperty Name="ColoaderID" ColumnName="ColoaderID" />
+                <ScalarProperty Name="MBLType" ColumnName="MBLType" />
+                <ScalarProperty Name="ServiceDate" ColumnName="ServiceDate" />
+                <ScalarProperty Name="ETA" ColumnName="ETA" />
+                <ScalarProperty Name="ETD" ColumnName="ETD" />
+                <ScalarProperty Name="TypeOfService" ColumnName="TypeOfService" />
+                <ScalarProperty Name="MAWB" ColumnName="MAWB" />
+                <ScalarProperty Name="JobNo" ColumnName="JobNo" />
+                <ScalarProperty Name="BranchID" ColumnName="BranchID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="catDepartments">
+            <EntityTypeMapping TypeName="eFMSTestModel.catDepartment">
+              <MappingFragment StoreEntitySet="catDepartment">
+                <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
+                <ScalarProperty Name="UserModified" ColumnName="UserModified" />
+                <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
+                <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="DeptType" ColumnName="DeptType" />
+                <ScalarProperty Name="BranchID" ColumnName="BranchID" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="DeptNameAbbr" ColumnName="DeptNameAbbr" />
+                <ScalarProperty Name="DeptNameEn" ColumnName="DeptNameEn" />
+                <ScalarProperty Name="DeptName" ColumnName="DeptName" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
