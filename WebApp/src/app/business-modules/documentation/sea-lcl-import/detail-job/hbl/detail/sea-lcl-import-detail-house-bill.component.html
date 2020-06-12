@@ -63,7 +63,7 @@
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                     <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                        <hbl-arrival-note-sea></hbl-arrival-note-sea>
+                        <hbl-arrival-note-sea type="SLI"></hbl-arrival-note-sea>
                     </ng-container>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
