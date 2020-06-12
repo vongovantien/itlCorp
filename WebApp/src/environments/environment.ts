@@ -6,8 +6,8 @@ export const environment = {
                 WEB_URL: "test.api-efms.itlvn.com",
                 ACCOUNTING: "test.api-efms.itlvn.com/Accounting",
                 // ACCOUNTING: "localhost:44368",
-                // DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
-                DOCUMENTATION: "localhost:44366",
+                DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
+                // DOCUMENTATION: "localhost:44366",
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
                 // CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",
@@ -28,5 +28,5 @@ export const environment = {
         AUTHORIZATION:
         {
                 requireHttps: false
-        }
+        },
 };
