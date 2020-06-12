@@ -15,13 +15,13 @@
 <div class="m-content">
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
-            <tab heading="HAWB Detail">
+            <tab heading="HAWB Detail" [active]="activeTab === 'hawb'">
                 <air-import-hbl-form-create></air-import-hbl-form-create>
             </tab>
-            <tab heading="Arrival Notice">
+            <tab heading="Arrival Notice" [active]="activeTab === 'arrival'">
                 <arrival-note-air></arrival-note-air>
             </tab>
-            <tab heading="Authorize Letter" (selectTab)="onSelectTabAL()">
+            <tab heading="Authorize Letter" (selectTab)="onSelectTabAL()" [active]="activeTab === 'authorize'">
                 <ng-container>
                     <hbl-delivery-order [isAir]="true">
                     </hbl-delivery-order>
