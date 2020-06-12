@@ -268,7 +268,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
+        containerDetail += " Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
     }
 

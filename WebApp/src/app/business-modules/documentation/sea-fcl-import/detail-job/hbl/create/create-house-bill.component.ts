@@ -323,7 +323,7 @@ export class CreateHouseBillComponent extends AppForm {
             containerDetail += this.handleStringCont(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Onlys." + "\n" + "THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+        containerDetail += " Onlys." + "\n" + "THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
 
         return containerDetail || '';
     }
