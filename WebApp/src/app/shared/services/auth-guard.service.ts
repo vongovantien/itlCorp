@@ -10,7 +10,7 @@ export class AuthGuardService implements CanActivate {
 
     canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
         if (!this.checkLoginSession()) {
-            this._router.navigate(['/login',]);
+            this._router.navigate(['/login', { url: state.url, isEndSession: true }]);
             return false;
         } else {
             return true;
