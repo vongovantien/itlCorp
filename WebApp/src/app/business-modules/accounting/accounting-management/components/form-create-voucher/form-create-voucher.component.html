@@ -90,9 +90,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Total Amount</label>
-                                <input type="text" class="form-control" placeholder="Total"
-                                    formControlName="totalAmount"
-                                    [value]="formGroup.controls['totalAmount'].value | number: '.0-3'">
+                                <input type="text" class="form-control" placeholder="Total" currencyMask
+                                    formControlName="totalAmount">
                             </div>
                         </div>
                         <div class="col-lg-6">

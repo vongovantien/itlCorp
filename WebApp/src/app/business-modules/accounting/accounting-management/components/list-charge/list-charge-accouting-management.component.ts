@@ -12,7 +12,6 @@ import { IAccountingManagementState, getAccountingManagementPartnerChargeState }
 
 import { takeUntil } from 'rxjs/operators';
 
-
 @Component({
     selector: 'list-charge-accounting-management',
     templateUrl: './list-charge-accounting-management.component.html',
@@ -91,6 +90,8 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         { title: 'MBL', field: 'mbl', sortable: true },
     ];
 
+    isReadOnly: boolean = false;
+
     constructor(
         private _sortService: SortService,
         private _store: Store<IAccountingManagementState>,
@@ -101,8 +102,6 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     }
 
     ngOnInit(): void {
-
-
         this._store.select(getAccountingManagementPartnerChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

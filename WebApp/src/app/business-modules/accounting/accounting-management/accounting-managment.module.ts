@@ -31,6 +31,7 @@ import { AccountingManagementCreateVoucherComponent } from './voucher/create/acc
 import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementDetailVoucherComponent } from './voucher/detail/accounting-detail-voucher.component';
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 const routing: Routes = [
     {
@@ -87,7 +88,18 @@ const routing: Routes = [
         ModalModule,
         FormsModule,
         StoreModule.forFeature('accounting-management', reducers),
-        PaginationModule.forRoot()
+        PaginationModule.forRoot(),
+        NgxCurrencyModule.forRoot({
+            align: "right",
+            allowNegative: false,
+            allowZero: true,
+            decimal: ".",
+            precision: 3,
+            prefix: "",
+            suffix: "",
+            thousands: ",",
+            nullable: true
+        }),
     ],
     declarations: [
         AccountingManagementDebitCreditInvoiceComponent,

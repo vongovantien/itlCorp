@@ -2,14 +2,17 @@
     <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet">
-            <div class="m-portlet__body">
+            <div class="m-portlet__body"
+                [ngStyle]="{'font-style': (accountingManagement.status !== 'New' ? 'italic' : '')}">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>Edit Invoice</h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSubmitSaveInvoice()">
-                            </app-default-button>
-
+                            <ng-container *ngIf="accountingManagement.status === 'New'">
+                                <app-default-button [buttonSetting]="saveButtonSetting"
+                                    (onClick)="onSubmitSaveInvoice()">
+                                </app-default-button>
+                            </ng-container>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                             </app-default-button>
                         </div>

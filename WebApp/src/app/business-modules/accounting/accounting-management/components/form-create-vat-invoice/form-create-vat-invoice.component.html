@@ -126,7 +126,7 @@
                                         <span>{{formGroup.controls["status"].value}}</span>
                                     </button>
                                 </div>
-                                <div class="col-lg-6 w-100">
+                                <div class="col-lg-6 w-100" *ngIf="!isReadonly">
                                     <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase w-100"
                                         type="button" (click)="refNoPopup.show()">
                                         <span>

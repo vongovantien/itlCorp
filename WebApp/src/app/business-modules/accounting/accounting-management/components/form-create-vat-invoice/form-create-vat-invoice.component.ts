@@ -57,6 +57,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     listCurrency: Observable<CommonInterface.INg2Select[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,

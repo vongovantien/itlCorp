@@ -74,12 +74,18 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
 
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
-        // this.formCreateComponent.formGroup.controls['invoiceNoTempt'].disable();
+        if (this.accountingManagement.status !== 'New') {
+            this.formCreateComponent.isReadonly = true;
+        }
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
         this.listChargeComponent.charges = res.charges;
         this.listChargeComponent.updateTotalAmount();
+
+        if (this.accountingManagement.status !== 'New') {
+            this.listChargeComponent.isReadOnly = true;
+        }
     }
 
     onSubmitSaveInvoice() {
