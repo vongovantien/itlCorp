@@ -126,6 +126,7 @@ class OfficeData {
     addressEn: string;
     tel: string;
     fax: string;
+    email: string;
 }
 class WarehouseData {
     nameEn: string;

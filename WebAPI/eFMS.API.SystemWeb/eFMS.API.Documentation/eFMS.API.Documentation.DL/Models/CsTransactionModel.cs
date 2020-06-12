@@ -53,6 +53,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string AddressEn { get; set; }
         public string Tel { get; set; }
         public string Fax { get; set; }
+        public string Email { get; set; }
+
     }
 
     public class WarehouseData

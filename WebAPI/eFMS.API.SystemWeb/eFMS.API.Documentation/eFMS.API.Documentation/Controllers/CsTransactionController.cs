@@ -416,6 +416,16 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("SyncShipmentByAirWayBill/{id}")]
+        public IActionResult SyncShipmentByAirWayBill(Guid id, csTransactionSyncAirWayBill model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var result = csTransactionService.SyncShipmentByAirWayBill(id, model);
+            return Ok(result);
+        }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

@@ -906,4 +906,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    syncShipmentByAirWayBill(jobId: string, body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/SyncShipmentByAirWayBill/${jobId}`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }

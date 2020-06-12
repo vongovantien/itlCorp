@@ -28,6 +28,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<object> GetListTotalHB(Guid JobId);
         Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency);
         ResultHandle SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
+        HandleState SyncShipmentByAirWayBill(Guid JobId, csTransactionSyncAirWayBill model);
         int CheckDeletePermission(Guid id);
     }
 }
