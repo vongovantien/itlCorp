@@ -175,6 +175,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
+        [Authorize]
         public IActionResult Paging(CDNoteCriteria criteria, int page, int size)
         {
             var data = cdNoteServices.Paging(criteria, page, size, out int rowsCount);

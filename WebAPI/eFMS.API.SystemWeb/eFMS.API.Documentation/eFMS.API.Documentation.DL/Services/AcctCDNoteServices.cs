@@ -7,6 +7,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -1194,13 +1195,45 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
         {
+            Expression<Func<AcctCdnote, bool>> perQuery = null;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            switch (rangeSearch)
+            {
+                case PermissionRange.None:
+                    return null;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    perQuery = x => x.UserCreated == _user.UserID;
+                    break;
+                case PermissionRange.Group:
+                    perQuery = x => (x.GroupId == _user.GroupId && x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+                                                || x.UserCreated == _user.UserID;
+                    break;
+                case PermissionRange.Department:
+                    perQuery = x => (x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+                                                || x.UserCreated == _user.UserID;
+                    break;
+                case PermissionRange.Office:
+                    perQuery = x => (x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+                case PermissionRange.Company:
+                    perQuery = x => x.CompanyId == _user.CompanyID
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+            }
             Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                             && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
                                             && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
-
             if (criteria.IssuedDate != null)
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+            }
+            if(perQuery != null)
+            {
+                query = query.And(perQuery);
             }
             var results = DataContext.Get(query);
             if (results == null) return results;
@@ -1214,6 +1247,8 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<CDNoteModel> results = null;
+            var data = Query(criteria);
+            if(data == null) { rowsCount = 0; return results; }
             var cdNotes = Query(criteria)?.Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
@@ -1223,6 +1258,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Creator = x.UserCreated,
                 JobId = x.JobId,
             })?.ToList();
+
             if (cdNotes == null)
             {
                 rowsCount = 0;
