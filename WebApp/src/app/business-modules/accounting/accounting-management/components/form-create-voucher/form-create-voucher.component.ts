@@ -33,7 +33,11 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     currency: AbstractControl;
     voucherType: AbstractControl;
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameVn', label: 'Name Local' },
+        { field: 'taxCode', label: 'Tax Code' },
+    ];
     paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
     voucherTypes: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
 

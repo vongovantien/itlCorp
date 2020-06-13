@@ -29,7 +29,7 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                 { title: 'Job ID', value: 'jobNos' },
                 { title: 'HBL', value: 'hbls' },
                 { title: 'MBL', value: 'mbls' },
-                { title: 'Debit Note', value: 'cdNotes' },
+                { title: 'C/D Note', value: 'cdNotes' },
             ];
             this.selectedOpion = this.optionsType[5];
 

@@ -29,8 +29,12 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <app-default-button [buttonSetting]="searchlButtonSetting" (onClick)="searchRef()">
-                </app-default-button>
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="searchRef()">
+                    <span>
+                        <i class="la la-search"></i>
+                        <span> Apply </span>
+                    </span>
+                </button>
                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="hide()">
                 </app-default-button>
             </div>

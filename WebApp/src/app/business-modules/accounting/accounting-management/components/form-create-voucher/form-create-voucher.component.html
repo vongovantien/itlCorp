@@ -10,7 +10,7 @@
                                 <label required>Partner Name</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                     [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                                    [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async"
                                     [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(partnerId)"
                                     placeholder="Please select partner">
                                 </app-combo-grid-virtual-scroll>
