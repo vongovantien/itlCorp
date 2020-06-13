@@ -85,6 +85,7 @@ export class AuthorizationComponent extends AppList {
     onSelectTabAuthorize(tabname: AUTHORIZE_TAB) {
         this.selectedTab = tabname;
         if (this.selectedTab === 'Authorized Approval') {
+            this.pageSize = 15;
             this.searchAuthorizedApproval();
         }
     }
