@@ -23,6 +23,7 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     dbusername: AbstractControl;
     dbpassword: AbstractControl;
     note: AbstractControl;
+    active: AbstractControl;
 
     Users: CommonInterface.INg2Select[] = [];
 
@@ -81,7 +82,7 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
                 Validators.maxLength(100)
             ])],
             note: [],
-            active: [true],
+            active: [],
 
         });
 
@@ -93,6 +94,7 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
         this.dbusername = this.formGroup.controls['dbusername'];
         this.dbpassword = this.formGroup.controls['dbpassword'];
         this.note = this.formGroup.controls['note'];
+        this.active = this.formGroup.controls['active'];
     }
 
     getListUsers() {

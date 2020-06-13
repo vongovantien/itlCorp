@@ -77,10 +77,10 @@ export class CreateHouseBillComponent extends AppForm {
                                 c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
-                        if (!this.formHouseBill.isDetail) {
-                            // * Update field inword with container data.
-                            this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
-                        }
+
+                        // * Update field inword with container data.
+                        this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
+
                     }
                 });
     }
@@ -323,7 +323,7 @@ export class CreateHouseBillComponent extends AppForm {
             containerDetail += this.handleStringCont(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+        containerDetail += " Onlys." + "\n" + "THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
 
         return containerDetail || '';
     }
