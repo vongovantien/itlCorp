@@ -84,6 +84,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
@@ -99,15 +101,21 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
                 entity.Property(e => e.ExportedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FlexId).HasColumnName("FlexID");
 
                 entity.Property(e => e.FreightPrice).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
                 entity.Property(e => e.InvoiceNo).HasMaxLength(100);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidBehalfPrice).HasColumnType("decimal(18, 4)");
 
