@@ -1229,19 +1229,20 @@ namespace eFMS.API.Documentation.DL.Services
                 return results;
             }
             var cdNotesGroupByCurrency = surchargeRepository.Get(x => cdNotes.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
-                .Select(x => new CDNoteModel
+                .Select(x => new 
                 {
                     ReferenceNo = string.IsNullOrEmpty(x.DebitNo) ? x.CreditNo : x.DebitNo,
                     HBLNo = x.Hblno,
                     Currency = x.CurrencyId,
-                    Total = x.Total,
-                    VoucherId = x.VoucherId,
-                    InvoiceNo = x.InvoiceNo
+                    x.Total,
+                    x.VoucherId,
+                    x.InvoiceNo,
+                    x.Type
                 }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency,
                     ReferenceNo = x.Key.ReferenceNo,
                     HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
                     Total = x.Sum(y => y.Total),
-                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued" : "New",
+                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
                     IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId))? "Issued Voucher": "New"
                 });
             cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);

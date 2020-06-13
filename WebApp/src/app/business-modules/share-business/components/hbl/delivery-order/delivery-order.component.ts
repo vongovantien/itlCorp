@@ -57,12 +57,11 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             )
             .subscribe(
                 (res: any) => {
-                    console.log(res);
                     if (!!res && res.hblid !== SystemConstants.EMPTY_GUID) {
                         this.deliveryOrder = new DeliveryOrder(res);
                         this.deliveryOrder.deliveryOrderPrintedDate = {
-                            startDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
-                            endDate: new Date(this.deliveryOrder.deliveryOrderPrintedDate),
+                            startDate: !!this.deliveryOrder.deliveryOrderPrintedDate ? new Date(this.deliveryOrder.deliveryOrderPrintedDate) : null,
+                            endDate: !!this.deliveryOrder.deliveryOrderPrintedDate ? new Date(this.deliveryOrder.deliveryOrderPrintedDate) : null,
                         };
 
                         this.deliveryOrder.userDefault = this.userLogged.id;

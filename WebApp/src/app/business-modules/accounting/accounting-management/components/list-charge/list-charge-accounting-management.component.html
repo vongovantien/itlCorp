@@ -1,13 +1,16 @@
 <div class="row m--margin-top-20">
     <div class="col-lg-6">
         <div class="d-flex justify-content-between">
-            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" type="button"
-                (click)="removeCharge()">
-                <span>
-                    <i class="la la-trash-o"></i>
-                    <span>Remove</span>
-                </span>
-            </button>
+            <ng-container *ngIf="!isReadOnly">
+                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                    (click)="removeCharge()">
+                    <span>
+                        <i class="la la-trash-o"></i>
+                        <span>Remove</span>
+                    </span>
+                </button>
+            </ng-container>
+
             <div class="m-input-icon m-input-icon--right" style="width: 70%">
                 <input type="text" class="form-control m-input m-input--square" placeholder="Search"
                     [(ngModel)]="keyword" name="keyword">

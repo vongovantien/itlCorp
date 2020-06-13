@@ -45,7 +45,11 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     currency: AbstractControl;
     status: AbstractControl;
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameVn', label: 'Name Local' },
+        { field: 'taxCode', label: 'Tax Code' },
+    ];
     paymentMethods: CommonInterface.INg2Select[] = AccountingConstants.PAYMENT_METHOD;
 
     displayFieldsChartAccount: CommonInterface.IComboGridDisplayField[] = [
@@ -56,6 +60,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     partners: Observable<Partner[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
+
 
     constructor(
         private _fb: FormBuilder,

@@ -47,11 +47,9 @@
                                             <tr *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <ng-container *ngIf="invoice.status === 'New'">
-                                                            <app-permission-button
-                                                                (onClick)="prepareDeleteInvoice(invoice)" type="delete">
-                                                            </app-permission-button>
-                                                        </ng-container>
+                                                        <app-permission-button (onClick)="prepareDeleteInvoice(invoice)"
+                                                            type="delete">
+                                                        </app-permission-button>
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">

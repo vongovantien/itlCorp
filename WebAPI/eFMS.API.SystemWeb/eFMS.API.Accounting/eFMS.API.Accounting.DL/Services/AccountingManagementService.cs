@@ -222,7 +222,8 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeCreated = acc.DatetimeCreated, //Issue Date
                            CreatorName = user.Username,
                            Status = acc.Status, //Status Invoice,
-                           Serie = acc.Serie
+                           Serie = acc.Serie,
+                           DatetimeModified = acc.DatetimeModified
                        };
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -803,7 +804,7 @@ namespace eFMS.API.Accounting.DL.Services
                     fe.SettlementRequester = employeeRepo.Get(x => x.Id == employeeIdRequester).FirstOrDefault()?.EmployeeNameVn;
                 }
 
-                fe.InputRefNo = _inputRefNoHadFoundCharge;               
+                fe.InputRefNo = _inputRefNoHadFoundCharge;
             });
             return chargeGroupByPartner;
         }
@@ -971,7 +972,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.Charges.ForEach(fe =>
                 {
                     var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
-                    total += exchangeRate * fe.OrgVatAmount ?? 0;
+                    total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
                 });
             }
             return total;
@@ -1048,10 +1049,10 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt)
         {
-            var accountings = DataContext.Get(x => x.Type == typeOfAcctMngt);            
+            var accountings = DataContext.Get(x => x.Type == typeOfAcctMngt);
             var partners = partnerRepo.Get();
             var data = new List<AccountingManagementExport>();
-            foreach(var acct in accountings)
+            foreach (var acct in accountings)
             {
                 Expression<Func<ChargeOfAccountingManagementModel, bool>> expressionQuery = chg => chg.AcctManagementId == acct.Id;
                 var charges = new List<ChargeOfAccountingManagementModel>();
@@ -1063,7 +1064,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     charges = GetChargeForVoucher(expressionQuery); ;
                 }
-                foreach(var charge in charges)
+                foreach (var charge in charges)
                 {
                     string _deptCode = string.Empty;
                     if (!string.IsNullOrEmpty(charge.JobNo))
@@ -1094,7 +1095,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     string _statusInvoice = string.Empty;
-                    if(acct.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    if (acct.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         if (acct.Status != "New")
                         {
@@ -1113,8 +1114,8 @@ namespace eFMS.API.Accounting.DL.Services
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
                     item.PaymentTerm = 0; //Default is 0                    
-                    item.DepartmentCode =  _deptCode;
-                    item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);                   
+                    item.DepartmentCode = _deptCode;
+                    item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);
                     item.PaymentMethod = _paymentMethod;
                     item.StatusInvoice = _statusInvoice; //Tình trạng hóa đơn (Dùng cho Invoice)
                     item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
@@ -1123,7 +1124,7 @@ namespace eFMS.API.Accounting.DL.Services
                     data.Add(item);
                 }
             }
-            
+
             return data;
         }
 
@@ -1202,7 +1203,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         IQueryable<CsShipmentSurcharge> surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == vatInvoice.Id);
 
-                        if(surchargeOfAcctCurrent != null)
+                        if (surchargeOfAcctCurrent != null)
                         {
                             foreach (var surcharge in surchargeOfAcctCurrent)
                             {
@@ -1217,7 +1218,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
                             }
                         }
-                        
+
                         DataContext.Update(vatInvoice, x => x.VoucherId == item.VoucherId);
 
                     }
@@ -1237,7 +1238,7 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
-               
+
         }
     }
 }

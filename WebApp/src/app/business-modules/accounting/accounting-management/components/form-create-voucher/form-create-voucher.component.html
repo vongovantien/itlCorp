@@ -10,7 +10,7 @@
                                 <label required>Partner Name</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                     [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                                    [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async"
                                     [displayFields]="displayFieldsCustomer" (remove)="resetFormControl(partnerId)"
                                     placeholder="Please select partner">
                                 </app-combo-grid-virtual-scroll>
@@ -90,9 +90,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Total Amount</label>
-                                <input type="text" class="form-control" placeholder="Total"
-                                    formControlName="totalAmount"
-                                    [value]="formGroup.controls['totalAmount'].value | number: '.0-3'">
+                                <input type="text" class="form-control" placeholder="Total" currencyMask
+                                    formControlName="totalAmount">
                             </div>
                         </div>
                         <div class="col-lg-6">

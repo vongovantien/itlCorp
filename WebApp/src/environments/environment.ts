@@ -28,5 +28,5 @@ export const environment = {
         AUTHORIZATION:
         {
                 requireHttps: false
-        }
+        },
 };
