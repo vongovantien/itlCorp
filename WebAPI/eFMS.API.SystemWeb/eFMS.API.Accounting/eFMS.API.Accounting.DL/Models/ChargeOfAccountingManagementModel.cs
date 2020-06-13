@@ -38,5 +38,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string SoaNo { get; set; }
         public string SettlementCode { get; set; }
         public Guid? AcctManagementId { get; set; }
+        public string RequesterId { get; set; }
     }
 }

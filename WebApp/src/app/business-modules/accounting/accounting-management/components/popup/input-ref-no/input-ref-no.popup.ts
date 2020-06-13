@@ -7,8 +7,9 @@ import { PartnerOfAcctManagementResult } from '@models';
 
 import { ToastrService } from 'ngx-toastr';
 import { AccountingManagementSelectPartnerPopupComponent } from '../select-partner/select-partner.popup';
-import { IAccountingManagementState, SelectPartner } from '../../../store';
+import { IAccountingManagementState, SelectPartner, SelectRequester } from '../../../store';
 import { Store } from '@ngrx/store';
+import { ShareAccountingManagementSelectRequesterPopupComponent } from 'src/app/business-modules/accounting/components/select-requester/select-requester.popup';
 
 @Component({
     selector: 'input-ref-no-popup',
@@ -18,6 +19,7 @@ import { Store } from '@ngrx/store';
 export class AccountingManagementInputRefNoPopupComponent extends PopupBase implements OnInit {
 
     @ViewChild(AccountingManagementSelectPartnerPopupComponent, { static: false }) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
+    @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
 
     @Input() set type(t: string) {
         this._type = t;
@@ -122,19 +124,29 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                     (res: PartnerOfAcctManagementResult[]) => {
                         if (!!res && !!res.length) {
                             if (res.length === 1) {
-                                this._store.dispatch(SelectPartner(res[0]));
-                                this.hide();
+                                if (this.selectedOpion.value === 'settlementCodes') {
+                                    this._store.dispatch(SelectRequester(res[0]));
+                                    this.hide();
+                                } else {
+                                    this._store.dispatch(SelectPartner(res[0]));
+                                    this.hide();
+                                }
                                 return;
                             } else {
-                                this.selectPartnerPopup.listPartners = res;
-                                this.selectPartnerPopup.selectedPartner = null;
-
-                                this.selectPartnerPopup.show();
+                                if (this.selectedOpion.value === 'settlementCodes') {
+                                    this.selectRequesterPopup.listRequesters = res;
+                                    this.selectRequesterPopup.selectedRequester = null;
+                                    this.selectRequesterPopup.show();
+                                } else {
+                                    this.selectPartnerPopup.listPartners = res;
+                                    this.selectPartnerPopup.selectedPartner = null;
+                                    this.selectPartnerPopup.show();
+                                }
                             }
-
                         } else {
                             this._toastService.warning("Not found data charge");
                         }
+
                     }
                 );
         }
