@@ -4,6 +4,7 @@ import { ShareAccountingInputShipmentPopupComponent } from './components/input-s
 import { CommonModule } from '@angular/common';
 import { ModalModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { ShareAccountingManagementSelectRequesterPopupComponent } from './components/select-requester/select-requester.popup';
 
 
 @NgModule({
@@ -14,8 +15,8 @@ import { FormsModule } from '@angular/forms';
         ModalModule.forRoot(),
 
     ],
-    exports: [ShareAccountingInputShipmentPopupComponent],
-    declarations: [ShareAccountingInputShipmentPopupComponent],
+    exports: [ShareAccountingInputShipmentPopupComponent, ShareAccountingManagementSelectRequesterPopupComponent],
+    declarations: [ShareAccountingInputShipmentPopupComponent, ShareAccountingManagementSelectRequesterPopupComponent],
     providers: [],
 })
 export class ShareAccountingModule { }
