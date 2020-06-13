@@ -27,7 +27,7 @@
         <div class="m-portlet__body">
             <form-create-house-bill-export [isUpdate]="true" type="SLE"></form-create-house-bill-export>
 
-            <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
+            <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary </hbl-goods-summary-lcl>
         </div>
     </div>
 </div>
