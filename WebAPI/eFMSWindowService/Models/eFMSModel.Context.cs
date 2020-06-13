@@ -27,6 +27,7 @@ namespace eFMSWindowService.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<catDepartment> catDepartments { get; set; }
     
         public virtual ObjectResult<Nullable<int>> sp_QueryAndUpdateCurrentStatusOfJob()
         {
@@ -36,6 +37,11 @@ namespace eFMSWindowService.Models
         public virtual int sp_AutoUpdateExchangeRate()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("sp_AutoUpdateExchangeRate");
+        }
+    
+        public virtual ObjectResult<sp_GetShipmentInThreeDayToSendARDept_Result> sp_GetShipmentInThreeDayToSendARDept()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<sp_GetShipmentInThreeDayToSendARDept_Result>("sp_GetShipmentInThreeDayToSendARDept");
         }
     }
 }
