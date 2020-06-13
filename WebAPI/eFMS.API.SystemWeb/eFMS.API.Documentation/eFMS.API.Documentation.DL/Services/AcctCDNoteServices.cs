@@ -546,7 +546,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var countries = countryRepository.Get().ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
-            soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
+            soaDetails.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
             soaDetails.PartnerTel = partner?.Tel;
             soaDetails.PartnerTaxcode = partner?.TaxCode;
             soaDetails.PartnerId = partner?.Id;
