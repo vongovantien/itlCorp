@@ -19,9 +19,10 @@ import { SystemConstants } from 'src/constants/system.const';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/clone';
 import { Observable, throwError } from 'rxjs';
-import { map, tap, takeUntil, catchError, finalize, skip, switchMap } from 'rxjs/operators';
+import { map, tap, takeUntil, catchError, finalize, skip, switchMap, concatMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import * as fromShareBussiness from '../../../../share-business/store';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -72,52 +73,25 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
     totalPp: AbstractControl;
     totalCll: AbstractControl;
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
-
-    displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Code' },
-        { field: 'nameEn', label: 'Name EN' },
-    ];
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
+    displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
 
     termTypes: CommonInterface.INg2Select[] = [
-        { id: 'Prepaid', text: 'Prepaid' },
-        { id: 'Collect', text: 'Collect' },
+        ...JobConstants.COMMON_DATA.FREIGHTTERMS,
         { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
     ];
 
-    wts: CommonInterface.INg2Select[] = [
-        { id: 'PP', text: 'PP' },
-        { id: 'CLL', text: 'CLL' }
-    ];
-
-    numberOBLs: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'Zero (0)' },
-        { id: 1, text: 'One (1)' },
-        { id: 2, text: 'Two (2)' },
-        { id: 3, text: 'Three (3)' }
-    ];
-    rClasses: CommonInterface.INg2Select[] = [
-        { id: 'M', text: 'M' },
-        { id: 'N', text: 'N' },
-        { id: 'Q', text: 'Q' }
-    ];
+    wts: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.WT;
+    numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
+    rClasses: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.RCLASS;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     currencies: Observable<CommonInterface.INg2Select[]>;
-    warehouses: Warehouse[];
+    warehouses: Observable<Warehouse[]>;
 
     dimensionDetails: DIM[] = [];
     otherCharges: CsOtherCharge[] = [];
@@ -145,7 +119,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         totalAmountAgent: null,
         totalAmountCarrier: null
     };
-
+    $transactionDetail: Observable<CsTransaction>;
 
     constructor(
         private _store: Store<IAppState>,
@@ -169,9 +143,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this.initForm();
 
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
-        this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER]);
+        this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
         this.agents = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE, CommonEnum.PartnerGroupEnum.AGENT]);
         this.ports = this._store.select(getCataloguePortState);
+        this.warehouses = this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse });
 
         this.currencies = this._catalogueRepo.getCurrencyBy({ active: true }).pipe(
             map((currencies: Currency[]) => this.utility.prepareNg2SelectData(currencies, 'id', 'id')),
@@ -181,23 +156,15 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             })
         );
 
-        this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
-            (res: Warehouse[]) => {
-                if (!!res) {
-                    this.warehouses = (res || []).map(w => new Warehouse(w));
-                }
-            }
-        );
-        this._store.select(getTransactionDetailCsTransactionState).subscribe(
-            (shipment: CsTransaction) => {
-                this.shipmentDetail = shipment;
-            });
+
+        this.$transactionDetail = this._store.select(getTransactionDetailCsTransactionState);
 
         this._activedRoute.params
             .pipe(
                 switchMap((params) => {
                     if (params.jobId && isUUID(params.jobId)) {
                         this.jobId = params.jobId;
+                        this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                         return this._documentationRepo.getAirwayBill(this.jobId);
                     } else {
                         return throwError("Not found jobId");
@@ -207,8 +174,6 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: AirwayBill) => {
                     console.log(res);
-                    this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-
                     if (!!res) {
                         console.log("Update airwaybill");
                         this.airwaybillId = res.id;
@@ -232,10 +197,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 });
     }
     updateDefaultValue() {
-        this._store.select(getTransactionDetailCsTransactionState)
+        this.$transactionDetail
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
             .subscribe(
                 (shipment: CsTransaction) => {
+                    this.shipmentDetail = shipment;
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
 
                         this.formMAWB.patchValue({
@@ -251,12 +217,40 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             issuedBy: shipment.issuedBy,
                             mblno1: shipment.coloaderCode,
                             mblno2: shipment.polCode,
-                            mblno3: !!shipment.mawb ? shipment.mawb.slice(-7) : null,
-                            rclass: [this.rClasses.find(sm => sm.id === 'Q')]
+                            mblno3: !!shipment.mawb ? shipment.mawb.slice(-9) : null,
+                            rclass: [this.rClasses.find(sm => sm.id === 'Q')],
+                            consigneeId: shipment.agentId,
+                            consigneeDescription: this.setDefaultAgentData(shipment),
+                            shipperDescription: this.setDefaultShipperWithOffice(shipment),
+                            firstCarrierBy: shipment.supplierName,
+                            wtorValpayment: this.setDefaultWTVal(shipment)
                         });
                     }
                 });
+    }
 
+    setDefaultShipperWithOffice(shipment: CsTransaction) {
+        if (!!shipment.creatorOffice) {
+            return this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax, shipment.creatorOffice.email);
+        }
+        return null;
+    }
+
+    setDefaultWTVal(shipment: CsTransaction) {
+        if (shipment.paymentTerm) {
+            if (shipment.paymentTerm === 'Prepaid') {
+                return [this.wts[0]];
+            }
+            return [this.wts[1]];
+        }
+        return null;
+    }
+
+    setDefaultAgentData(shipment: CsTransaction) {
+        if (!!shipment.agentData) {
+            return this.getDescription(shipment.agentData.nameEn, shipment.agentData.address, shipment.agentData.tel, shipment.agentData.fax);
+        }
+        return null;
     }
 
     updateFormValue(data: AirwayBill) {
@@ -492,12 +486,12 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete()),
+                concatMap(() => this._documentationRepo.syncShipmentByAirWayBill(this.jobId, this.getSyncMAWBShipmentModel()))
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.updateShipment(Object.assign({}, this.shipmentDetail, { issuedBy: body.issuedBy }));
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -505,21 +499,32 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             );
     }
 
-    updateShipment(shipmentDetail: CsTransaction) {
-        const csTransaction: CsTransaction = new CsTransaction(Object.assign(shipmentDetail));
-        csTransaction.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;
-        this._documentationRepo.updateCSTransaction(csTransaction)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                    } else {
-                    }
-                }
-            );
+    getSyncMAWBShipmentModel() {
+        const airwaybill: AirwayBill = this.getDataForm();
+
+        // * Update mblId;
+        airwaybill.dimensionDetails = this.dimensionDetails;
+
+        airwaybill.dimensionDetails.forEach((d: DIM) => {
+            d.airWayBillId = SystemConstants.EMPTY_GUID;
+            d.mblId = this.jobId;
+        });
+
+        return <ISyncMAWBShipment>{
+            pol: airwaybill.pol,
+            pod: airwaybill.pod,
+            etd: airwaybill.etd,
+            eta: airwaybill.eta,
+            flightDate: airwaybill.flightDate,
+            flightNo: airwaybill.flightNo,
+            warehouseId: airwaybill.warehouseId,
+            chargeWeight: airwaybill.chargeWeight,
+            grossWeight: airwaybill.grossWeight,
+            dimensionDetails: airwaybill.dimensionDetails,
+            issuedBy: airwaybill.issuedBy,
+            hw: airwaybill.hw,
+            mawb: (airwaybill.mblno1 as string).substring(0, 3) + '-' + airwaybill.mblno3
+        };
     }
 
     createMAWB(body: AirwayBill) {
@@ -529,13 +534,13 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         this._documentationRepo.createAirwayBill(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                finalize(() => this._progressRef.complete()),
+                concatMap(() => this._documentationRepo.syncShipmentByAirWayBill(this.jobId, this.getSyncMAWBShipmentModel()))
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.updateShipment(Object.assign({}, this.shipmentDetail, { issuedBy: body.issuedBy }));
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -571,7 +576,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         }
     }
 
-    getDescription(fullName: string, address: string, tel: string, fax: string) {
+    getDescription(fullName: string, address: string, tel: string, fax: string, email?: string) {
         let strDescription: string = '';
         if (!!fullName) {
             strDescription += fullName;
@@ -584,6 +589,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         }
         if (!!fax) {
             strDescription = strDescription + "\nFax No:" + fax;
+        }
+        if (!!email) {
+            strDescription = strDescription + "\nEmail:" + email;
         }
         return strDescription;
     }
@@ -905,4 +913,21 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 },
             );
     }
+}
+interface ISyncMAWBShipment {
+    mawb: string;
+    etd: string;
+    eta: string;
+    flightNo: string;
+    flightDate: string;
+    warehouseId: string;
+    pol: string;
+    pod: string;
+    issuedBy: string;
+
+    hw: number;
+    chargeWeight: number;
+    grossWeight: number;
+
+    dimensionDetails: DIM[];
 }
