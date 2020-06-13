@@ -15,7 +15,7 @@
 <div class="m-content">
     <form-create-house-bill-export type="SLE"></form-create-house-bill-export>
 
-    <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
+    <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary </hbl-goods-summary-lcl>
 </div>
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="8">
 </import-house-bill-detail>

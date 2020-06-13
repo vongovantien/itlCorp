@@ -73,9 +73,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                         console.log(this.containers);
                         // * Update field inword with container data.
-                        if (!this.formCreateHBLComponent.isUpdate) {
-                            this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
-                        }
+                        this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
                 });
     }
@@ -270,7 +268,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Only. SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
+        containerDetail += " Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
     }
 
