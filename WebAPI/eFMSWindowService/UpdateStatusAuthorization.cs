@@ -1,4 +1,5 @@
-﻿using eFMSWindowService.Models;
+﻿using eFMSWindowService.Helpers;
+using eFMSWindowService.Models;
 using System;
 using System.Configuration;
 using System.IO;
@@ -30,55 +31,30 @@ namespace eFMSWindowService
         //Custom method to Stop the timer
         public new void Stop()
         {
-            WriteToFile("Service update status authorization is stopped at " + DateTime.Now);
+            FileHelper.WriteToFile("ServiceLog_UpdateStatusAuthorization", "Service update status authorization is stopped at " + DateTime.Now);
             _aTimer.Stop();
             _aTimer.Dispose();
         }
 
         private void _aTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            WriteToFile("Service update status authorization is recall at " + DateTime.Now);
+            FileHelper.WriteToFile("ServiceLog_UpdateStatusAuthorization", "Service update status authorization is recall at " + DateTime.Now);
             using (eFMSTestEntities db = new eFMSTestEntities())
             {
                 var result = db.Database.SqlQuery<int>("[dbo].[sp_UpdateInactiveStatusAuthorization]").FirstOrDefault();
-                WriteToFile(DateTime.Now + " - Total number of affected rows: " + result);
+                FileHelper.WriteToFile("ServiceLog_UpdateStatusAuthorization", DateTime.Now + " - Total number of affected rows: " + result);
             }
         }
 
         protected override void OnStart(string[] args)
         {
-            WriteToFile("Service update status authorization is started at " + DateTime.Now);
+            FileHelper.WriteToFile("ServiceLog_UpdateStatusAuthorization", "Service update status authorization is started at " + DateTime.Now);
             this.Start();
         }
 
         protected override void OnStop()
         {
             this.Stop();
-        }
-
-        public void WriteToFile(string Message)
-        {
-            string path = AppDomain.CurrentDomain.BaseDirectory + "\\Logs";
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            string filepath = AppDomain.CurrentDomain.BaseDirectory + "\\Logs\\ServiceLog_UpdateStatusAuthorization" + DateTime.Now.Date.ToShortDateString().Replace('/', '_') + ".txt";
-            if (!File.Exists(filepath))
-            {
-                // Create a file to write to.   
-                using (StreamWriter sw = File.CreateText(filepath))
-                {
-                    sw.WriteLine(Message);
-                }
-            }
-            else
-            {
-                using (StreamWriter sw = File.AppendText(filepath))
-                {
-                    sw.WriteLine(Message);
-                }
-            }
         }
     }
 }
