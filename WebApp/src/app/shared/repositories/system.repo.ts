@@ -435,6 +435,15 @@ export class SystemRepo {
         );
     }
 
+    getAuthorizedApproval(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     queryUserLevels(body: any = {}) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/vi/SysUserLevel/Query`, body).pipe(
             catchError((error) => throwError(error)),

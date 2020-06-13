@@ -177,10 +177,6 @@ namespace eFMS.API.System.DL.Services
                     query = query.Or(x => x.Active == criteria.Active);
                 }
 
-                if (criteria.Active != null)
-                {
-                    query = query.Or(x => x.Active == criteria.Active);
-                }
             }
             else
             {
@@ -190,22 +186,18 @@ namespace eFMS.API.System.DL.Services
                      && x.Commissioner.IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
                 if (criteria.EffectiveDate != null)
                 {
-                    query = query.Or(x => x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date);
+                    query = query.And(x => x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date);
                 }
                 if (criteria.ExpirationDate != null)
                 {
-                    query = query.Or(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
+                    query = query.And(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
                 }
               
                 if (criteria.Active != null)
                 {
-                    query = query.Or(x => x.Active == criteria.Active);
+                    query = query.And(x => x.Active == criteria.Active);
                 }
 
-                if (criteria.Active != null)
-                {
-                    query = query.Or(x => x.Active == criteria.Active);
-                }
             }
             var authorizeds = DataContext.Get(query);
             var users = userRepository.Get();
@@ -218,6 +210,8 @@ namespace eFMS.API.System.DL.Services
                        {
                            Id = author.Id,
                            AuthorizerName = userAutho.Username, 
+                           Authorizer = author.Authorizer,
+                           Commissioner = author.Commissioner,
                            CommissionerName = userCom.Username, 
                            Type = author.Type, 
                            EffectiveDate = author.EffectiveDate, 
