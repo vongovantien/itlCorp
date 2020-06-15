@@ -506,6 +506,35 @@ export class SystemRepo {
         );
     }
 
+    addNewAuthorizedApproval(body: any) {
+        return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowGetDetailAuthorizedApproval(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateAuthorizedApproval(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteAuthorizedApproval(id: string) {
+        return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkDeleteAuthorizedApproval(id: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorizedApproval/CheckDeletePermission/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
     addNewAuthorization(body: any) {
         return this._api.post(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysAuthorization/Add`, body).pipe(

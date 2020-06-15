@@ -5,8 +5,7 @@
                 <div class="col-4">
                     <div class="row">
                         <div class="col-12">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':isSubmitted && !authorizer.value}">
+                            <div class="form-group">
                                 <label required>Authorizer</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
                                     [currentActiveItemId]="{ field: 'id', value: authorizer.value}"

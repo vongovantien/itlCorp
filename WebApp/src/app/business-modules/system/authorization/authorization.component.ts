@@ -10,6 +10,8 @@ import { AuthorizationAddPopupComponent } from "./components/popup/add-authoriza
 import { User, Authorization } from "@models";
 import { SystemConstants } from "src/constants/system.const";
 import { AuthorizedApproval } from "src/app/shared/models/system/authorizedApproval";
+import { AuthorizedApprovalListComponent } from "./components/list-authorized-approval/list-authorized-approval";
+import { AuthorizedApprovalPopupComponent } from "./components/popup/add-authorized-approval/add-authorized-approval.popup";
 type AUTHORIZE_TAB = 'Authorize Shipment' | 'Authorized Approval';
 enum authorizedTab {
     SHIPMENT = 'Authorize Shipment',
@@ -23,6 +25,10 @@ export class AuthorizationComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(AuthorizationAddPopupComponent, { static: false }) authorizationAddPopupComponent: AuthorizationAddPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(AuthorizedApprovalListComponent, { static: false }) authorizedApprovalList: AuthorizedApprovalListComponent;
+    @ViewChild(AuthorizedApprovalPopupComponent, { static: false }) authorizedApprovalPopupComponent: AuthorizedApprovalPopupComponent;
+
+
     headers: CommonInterface.IHeaderTable[];
     headersAuthorized: CommonInterface.IHeaderTable[];
 
@@ -77,50 +83,23 @@ export class AuthorizationComponent extends AppList {
     }
 
     onSearchAuthorizedApproval(data: any) {
-        this.page = 1; // reset page.
-        this.dataSearch = data;
-        this.searchAuthorizedApproval();
+        this.authorizedApprovalList.page = 1; // reset page.
+        this.authorizedApprovalList.dataSearch = data;
+        this.authorizedApprovalList.searchAuthorizedApproval();
     }
 
     onSelectTabAuthorize(tabname: AUTHORIZE_TAB) {
         this.selectedTab = tabname;
         if (this.selectedTab === 'Authorized Approval') {
+
+
+        } else {
+            this.page = 1;
             this.pageSize = 15;
-            this.searchAuthorizedApproval();
+            this.searchAuthorization();
         }
     }
 
-    searchAuthorizedApproval() {
-        this._progressRef.start();
-        this._systemRepo.getAuthorizedApproval(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                }),
-                map((data: any) => {
-                    if (data.data !== null) {
-                        return {
-                            data: data.data.map((item: any) => new AuthorizedApproval(item)),
-                            totalItems: data.totalItems,
-                        };
-                    }
-
-                })
-            ).subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.totalItems = res.totalItems || 0;
-                        this.authorizedApprovals = res.data || [];
-                        console.log(this.authorizedApprovals);
-                    } else {
-                        this.authorizedApprovals = [];
-                    }
-
-
-                },
-            );
-    }
 
     searchAuthorization() {
         this._progressRef.start();
@@ -173,23 +152,33 @@ export class AuthorizationComponent extends AppList {
 
     openPopupAddAuthorization() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        if (this.selectedTab === 'Authorized Approval') {
+            this.authorizedApprovalPopupComponent.status.setValue(true);
+            this.authorizedApprovalPopupComponent.minDateEffective = this.authorizedApprovalPopupComponent.minDateExpired = this.minDate;
+            this.authorizedApprovalPopupComponent.show();
+        } else {
+            this.authorizationAddPopupComponent.action = 'create';
+            this.authorizationAddPopupComponent.authorizationActive.setValue(true);
+            this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;
 
+            // this.authorizationAddPopupComponent.getUsers();
+            const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
+            if (indexPIC > -1) {
+                this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
+            }
 
-        this.authorizationAddPopupComponent.action = 'create';
-        this.authorizationAddPopupComponent.authorizationActive.setValue(true);
-        this.authorizationAddPopupComponent.minDateEffective = this.authorizationAddPopupComponent.minDateExpired = this.minDate;
-
-        // this.authorizationAddPopupComponent.getUsers();
-        const indexPIC = this.authorizationAddPopupComponent.personInChargeList.findIndex(x => x.id == this.userLogged.id);
-        if (indexPIC > -1) {
-            this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
+            this.authorizationAddPopupComponent.show();
         }
 
-        this.authorizationAddPopupComponent.show();
+
     }
 
     onRequestAuthorization() {
         this.searchAuthorization();
+    }
+
+    onRequestAuthorizedApproval() {
+        this.authorizedApprovalList.searchAuthorizedApproval();
     }
 
     viewDetail(authorization: Authorization): void {

@@ -64,10 +64,46 @@ namespace eFMS.API.System.Controllers
         public IActionResult Add(SysAuthorizedApprovalModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            if(model.Commissioner == model.Authorizer && model.EffectiveDate == model.ExpirationDate)
+            {
+                return Ok(new ResultHandle { Status = false, Message ="Not allow create authorize, commissioner at the same time" });
+            }
             var hs = authorService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
+        }
+
+        /// <summary>
+        /// check permission of user to view a authorize
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckDetailPermission(Guid id)
+        {
+            var result = authorService.CheckDetailPermission(id);
+            if (result == false) return Ok(result);
+            return Ok(true);
+        }
+
+
+        /// <summary>
+        /// Check delete permission
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckDeletePermission/{id}")]
+        [Authorize]
+        public IActionResult CheckDeletePermission(Guid id)
+        {
+            var result = authorService.CheckDeletePermission(id);
+            if (result == false)
+            {
+                return Ok(false);
+            }
+            return Ok(true);
         }
 
         [HttpPut]
@@ -75,6 +111,10 @@ namespace eFMS.API.System.Controllers
         [Authorize]
         public IActionResult Update(SysAuthorizedApprovalModel model)
         {
+            if (model.Commissioner == model.Authorizer && model.EffectiveDate == model.ExpirationDate)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "Not allow create authorize, commissioner at the same time" });
+            }
             var hs = authorService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -26,7 +26,7 @@ namespace eFMS.API.System.DL.Services
 
 
         public SysAuthorizedApprovalService(IContextBase<SysAuthorizedApproval> repository, IMapper mapper, ICurrentUser user,
-            IContextBase<SysUser> userRepo, ICacheServiceBase<SysAuthorizedApproval> cacheService) : base(repository,cacheService, mapper)
+            IContextBase<SysUser> userRepo, ICacheServiceBase<SysAuthorizedApproval> cacheService) : base(repository, cacheService, mapper)
         {
             currentUser = user;
             userRepository = userRepo;
@@ -171,7 +171,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     query = query.Or(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
                 }
-              
+
                 if (criteria.Active != null)
                 {
                     query = query.Or(x => x.Active == criteria.Active);
@@ -192,7 +192,7 @@ namespace eFMS.API.System.DL.Services
                 {
                     query = query.And(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
                 }
-              
+
                 if (criteria.Active != null)
                 {
                     query = query.And(x => x.Active == criteria.Active);
@@ -209,16 +209,25 @@ namespace eFMS.API.System.DL.Services
                        select new SysAuthorizedApprovalModel
                        {
                            Id = author.Id,
-                           AuthorizerName = userAutho.Username, 
+                           AuthorizerName = userAutho.Username,
                            Authorizer = author.Authorizer,
                            Commissioner = author.Commissioner,
-                           CommissionerName = userCom.Username, 
-                           Type = author.Type, 
-                           EffectiveDate = author.EffectiveDate, 
+                           CommissionerName = userCom.Username,
+                           Type = author.Type,
+                           EffectiveDate = author.EffectiveDate,
                            ExpirationDate = author.ExpirationDate,
-                           Active = author.Active
+                           Active = author.Active,
+                           UserCreated = author.UserCreated,
+                           UserModified = author.UserModified,
+                           DatetimeCreated = author.DatetimeCreated,
+                           DatetimeModified = author.DatetimeModified,
+                           Description = author.Description
+
                        };
-            var result = data.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
+            var dataFor = data.ToList();
+
+            dataFor.ForEach(x => { x.NameUserCreated = userRepository.Get(t => t.Id == x.UserCreated).FirstOrDefault()?.Username; x.NameUserModified = userRepository.Get(t => t.Id == x.UserModified).FirstOrDefault()?.Username; });
+            var result = dataFor.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
             return result;
         }
 

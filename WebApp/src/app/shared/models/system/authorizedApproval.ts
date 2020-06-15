@@ -20,6 +20,9 @@ export class AuthorizedApproval {
     departmentId: number = 0;
     officeId: string = '';
     companyId: string = '';
+    nameUserCreated: string = '';
+    nameUserModified: string = '';
+    description: string = '';
     permission: PermissionShipment = new PermissionShipment();
     constructor(object?: any) {
         const self = this;

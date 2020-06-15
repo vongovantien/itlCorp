@@ -175,6 +175,20 @@
             Controller Authorized Approval
             </summary>
         </member>
+        <member name="M:eFMS.API.System.Controllers.SysAuthorizedApprovalController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a authorize
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysAuthorizedApprovalController.CheckDeletePermission(System.Guid)">
+            <summary>
+            Check delete permission
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysCompanyController">
             <summary>
             

@@ -122,7 +122,7 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
             all: '',
             authorizer: !!this.authorizer.value ? this.authorizer.value : null,
             commissioner: !!this.commissioner.value ? this.commissioner.value : null,
-            type: this.type.value ? (this.type.value[0].id) : null,
+            type: !!this.type.value && this.type.value.length > 0 ? (this.type.value[0].id) : null,
             effectiveDate: this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             expirationDate: this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
             active: this.status.value ? (this.status.value[0].id === 'active' ? true : false) : null,

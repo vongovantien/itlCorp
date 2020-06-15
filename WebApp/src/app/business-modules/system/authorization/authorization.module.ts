@@ -11,6 +11,8 @@ import { AuthorizationComponent } from './authorization.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AuthorizationAddPopupComponent } from './components/popup/add-authorization/add-authorization.popup';
 import { AuthorizedApprovalFormSearchComponent } from './components/form-search-authorized-approval/form-search-authorized-approval.component';
+import { AuthorizedApprovalListComponent } from './components/list-authorized-approval/list-authorized-approval';
+import { AuthorizedApprovalPopupComponent } from './components/popup/add-authorized-approval/add-authorized-approval.popup';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -47,7 +49,9 @@ const routing: Routes = [
         AuthorizationComponent,
         AuthorizationFormSearchComponent,
         AuthorizationAddPopupComponent,
-        AuthorizedApprovalFormSearchComponent
+        AuthorizedApprovalFormSearchComponent,
+        AuthorizedApprovalListComponent,
+        AuthorizedApprovalPopupComponent
     ],
     providers: [],
 })
