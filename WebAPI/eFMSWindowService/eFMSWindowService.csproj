@@ -85,6 +85,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoLockShipmentService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AutoLockShipmentService.Designer.cs">
+      <DependentUpon>AutoLockShipmentService.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\FileHelper.cs" />
     <Compile Include="Helpers\SendMailHelper.cs" />
     <Compile Include="Models\catDepartment.cs">
