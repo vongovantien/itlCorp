@@ -33,6 +33,7 @@
             this.serviceInstaller2 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstaller3 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstaller4 = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstallerAutoLockShipment = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller1
             // 
@@ -68,6 +69,13 @@
             this.serviceInstaller4.ServiceName = "SendMailToARDepartmentService";
             this.serviceInstaller4.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
+            // serviceInstallerAutoLockShipment
+            // 
+            this.serviceInstallerAutoLockShipment.Description = "AutoLockShipmentService";
+            this.serviceInstallerAutoLockShipment.DisplayName = "eFMSWindowService.AutoLockShipmentService";
+            this.serviceInstallerAutoLockShipment.ServiceName = "AutoLockShipmentService";
+            this.serviceInstallerAutoLockShipment.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
@@ -75,7 +83,8 @@
             this.serviceInstaller1,
             this.serviceInstaller2,
             this.serviceInstaller3,
-            this.serviceInstaller4});
+            this.serviceInstaller4,
+            this.serviceInstallerAutoLockShipment});
 
         }
 
@@ -86,5 +95,6 @@
         private System.ServiceProcess.ServiceInstaller serviceInstaller2;
         private System.ServiceProcess.ServiceInstaller serviceInstaller3;
         private System.ServiceProcess.ServiceInstaller serviceInstaller4;
+        private System.ServiceProcess.ServiceInstaller serviceInstallerAutoLockShipment;
     }
 }

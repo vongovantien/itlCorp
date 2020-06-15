@@ -48,13 +48,12 @@ namespace eFMSWindowService
         /// <param name="e"></param>
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-           FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail is recall at " + DateTime.Now);
             try
             {
 
+                FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail to AR department is recall at " + DateTime.Now);
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
-                    FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail is recall at ddddd" + DateTime.Now);
                     //var data = db.sp_GetShipmentInThreeDayToSendARDept();
                     var data = db.Database.SqlQuery<sp_GetShipmentInThreeDayToSendARDept_Result>("[dbo].[sp_GetShipmentInThreeDayToSendARDept]").ToList();
                     var departments = db.catDepartments.Where(x => x.Active == true && x.DeptType =="AR").ToList();
@@ -115,7 +114,7 @@ namespace eFMSWindowService
 
         public new void Stop()
         {
-            FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail is stopped at " + DateTime.Now);
+            FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail to AR department is stopped at " + DateTime.Now);
             _timer.Stop();
             _timer.Dispose();
         }
