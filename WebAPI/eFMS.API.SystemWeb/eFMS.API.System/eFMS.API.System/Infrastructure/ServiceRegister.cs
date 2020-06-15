@@ -52,10 +52,16 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysUserPermissionService, SysUserPermissionService>();
             services.AddTransient<ISysUserPermissionGeneralService, SysUserPermissionGeneralService>();
             services.AddTransient<ISysUserPermissionSpecialService, SysUserPermissionSpecialService>();
+            services.AddTransient<ISysAuthorizedApprovalService, SysAuthorizedApprovalService>();
+
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
             new CacheServiceBase<SysMenu>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.SysMenu)));
+
+            services.AddSingleton<ICacheServiceBase<SysAuthorizedApproval>>(x =>
+            new CacheServiceBase<SysAuthorizedApproval>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.sysAuthorize)));
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

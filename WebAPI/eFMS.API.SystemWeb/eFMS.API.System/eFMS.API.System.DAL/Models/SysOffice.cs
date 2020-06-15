@@ -4,7 +4,12 @@ using System.Collections.Generic;
 namespace eFMS.API.System.Service.Models
 {
     public partial class SysOffice
-    {        
+    {
+        public SysOffice()
+        {
+            CatDepartment = new HashSet<CatDepartment>();
+        }
+
         public Guid Id { get; set; }
         public string BranchNameVn { get; set; }
         public string BranchNameEn { get; set; }
@@ -36,6 +41,9 @@ namespace eFMS.API.System.Service.Models
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
-        public DateTime? DatetimeModified { get; set; }        
+        public DateTime? DatetimeModified { get; set; }
+
+        public virtual SysCompany Bu { get; set; }
+        public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }
