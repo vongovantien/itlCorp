@@ -67,7 +67,18 @@
                             [userCreated]="shipmentDetail.userNameCreated"
                             [timeModified]="shipmentDetail.datetimeModified"
                             [userModified]="shipmentDetail.userNameModified">
+                            <ng-container *ngIf="!shipmentDetail.isLocked">
+                                <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">
+                                    <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                                        type="button" (click)="confirmSyncHBL.show()">
+                                        <span><i class="la la-refresh"></i>
+                                            <span> Sync to HBL </span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </ng-container>
                         </date-time-modified>
+
                     </ng-container>
                 </form-create-sea-export>
 
@@ -123,5 +134,10 @@
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
     (onSubmit)="gotoList()"></confirm-popup>
 
+<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()" [body]="confirmSyncHBLText"
+    title="Sync HAWB" [labelConfirm]="'Yes'">
+</confirm-popup>
+
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+
 <permission-403-popup></permission-403-popup>

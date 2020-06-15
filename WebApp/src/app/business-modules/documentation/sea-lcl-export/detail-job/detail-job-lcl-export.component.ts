@@ -291,20 +291,58 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     onLockShipment() {
         this.confirmLockPopup.hide();
 
+        this._progressRef.start();
+        this._documentRepo.lockShipment(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
+    }
+
+    onSyncHBL() {
+        this.formCreateComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers;
 
-        //  * Update field
-        modelAdd.csMawbcontainers = this.containers;
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.isLocked = true;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+        const bodySyncData: DocumentationInterface.IDataSyncHBL = {
+            flightVesselName: modelAdd.flightVesselName,
+            etd: modelAdd.etd,
+            eta: modelAdd.eta,
+            pol: modelAdd.pol,
+            pod: modelAdd.pod,
+            bookingNo: modelAdd.bookingNo,
+            voyNo: modelAdd.voyNo
+        };
 
-        this.saveJob(modelAdd);
+        this._progressRef.start();
+        this._documentRepo.syncHBL(this.jobId, bodySyncData)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 }
