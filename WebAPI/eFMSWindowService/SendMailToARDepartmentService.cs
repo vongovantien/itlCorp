@@ -57,7 +57,7 @@ namespace eFMSWindowService
                     FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail is recall at ddddd" + DateTime.Now);
                     //var data = db.sp_GetShipmentInThreeDayToSendARDept();
                     var data = db.Database.SqlQuery<sp_GetShipmentInThreeDayToSendARDept_Result>("[dbo].[sp_GetShipmentInThreeDayToSendARDept]").ToList();
-                    var departments = db.catDepartments.Where(x => x.Active == true).ToList();
+                    var departments = db.catDepartments.Where(x => x.Active == true && x.DeptType =="AR").ToList();
                     if (data != null)
                     {
                         string date = DateTime.Today.AddDays(3).ToShortDateString();
