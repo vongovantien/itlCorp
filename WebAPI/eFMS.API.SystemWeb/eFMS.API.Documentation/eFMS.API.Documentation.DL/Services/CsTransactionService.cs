@@ -2301,38 +2301,70 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                if (shipment.TransactionType != DocumentConstants.AE_SHIPMENT && shipment.TransactionType != DocumentConstants.AI_SHIPMENT)
-                    return null;
-                // Lấy ds HBL
-                var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
+                List<CsTransactionDetail> housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
 
-                if (housebills.Count() == 0)
+                if (shipment.TransactionType == DocumentConstants.AE_SHIPMENT || shipment.TransactionType == DocumentConstants.AI_SHIPMENT)
                 {
-                    return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
+                    if (housebills.Count() == 0)
+                    {
+                        return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
+                    }
+                    else
+                    {
+                        foreach (var hbl in housebills)
+                        {
+                            hbl.UserModified = currentUser.UserID;
+                            hbl.DatetimeModified = DateTime.Now;
+
+                            hbl.FlightNo = model.FlightVesselName;
+                            hbl.Eta = model.Eta;
+                            hbl.Etd = model.Etd;
+                            hbl.Pod = model.Pod;
+                            hbl.Pol = model.Pol;
+                            hbl.IssuedBy = model.IssuedBy;
+                            hbl.FlightDate = model.FlightDate;
+                            hbl.ForwardingAgentId = model.AgentId;
+                            hbl.WarehouseNotice = model.WarehouseId;
+                            hbl.Route = model.Route;
+
+                            string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
+                            hbl.ForwardingAgentDescription = agentDescription;
+
+                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
+                        }
+                        csTransactionDetailRepo.SubmitChanges();
+
+                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    }
                 }
                 else
                 {
-                    foreach (var hbl in housebills)
+                    if (housebills.Count() == 0)
                     {
-                        hbl.FlightNo = model.FlightVesselName;
-                        hbl.UserModified = currentUser.UserID;
-                        hbl.Eta = model.Eta;
-                        hbl.Etd = model.Etd;
-                        hbl.Pod = model.Pod;
-                        hbl.Pol = model.Pol;
-                        hbl.IssuedBy = model.IssuedBy;
-                        hbl.FlightDate = model.FlightDate;
-                        hbl.ForwardingAgentId = model.AgentId;
-                        hbl.WarehouseNotice = model.WarehouseId;
-                        hbl.Route = model.Route;
-
-                        string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
-                        hbl.ForwardingAgentDescription = agentDescription;
-
-                        csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
+                        return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
                     }
+                    else
+                    {
+                        foreach (var hbl in housebills)
+                        {
+                            hbl.UserModified = currentUser.UserID;
+                            hbl.DatetimeModified = DateTime.Now;
 
-                    return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                            hbl.Eta = model.Eta;
+                            hbl.Etd = model.Etd;
+                            hbl.Pod = model.Pod;
+                            hbl.Pol = model.Pol;
+
+                            hbl.CustomsBookingNo = model.BookingNo;
+                            hbl.Mawb = model.MblNo;
+                            hbl.OceanVoyNo = model.FlightVesselName + " - " + model.VoyNo;
+
+                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id,false);
+                        }
+                        csTransactionDetailRepo.SubmitChanges();
+
+                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    }
                 }
             }
             catch (Exception ex)
@@ -2384,6 +2416,47 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     trans.Commit();
                     return hsTrans;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        public HandleState LockCsTransaction(Guid jobId)
+        {
+            CsTransaction job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+            if (job == null)
+            {
+              return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+
+            }
+            if (job.IsLocked == true)
+            {
+                return new HandleState("Shipment has been locked !");
+            }
+            HandleState hs = new HandleState();
+
+            job.UserModified = currentUser.UserID;
+            job.DatetimeModified = DateTime.Now;
+            job.IsLocked = true;
+            job.LockedDate = DateTime.Now;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    hs = DataContext.Update(job, x => x.Id == jobId);
+                    
+                    trans.Commit();
+                    return hs;
+
                 }
                 catch (Exception ex)
                 {

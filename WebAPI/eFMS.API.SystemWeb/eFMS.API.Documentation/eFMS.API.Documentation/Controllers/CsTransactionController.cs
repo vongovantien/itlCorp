@@ -11,6 +11,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -423,6 +424,22 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var result = csTransactionService.SyncShipmentByAirWayBill(id, model);
+            return Ok(result);
+        }
+
+        [HttpPut("LockShipment/{id}")]
+        [Authorize]
+        public IActionResult LockShipment(Guid id)
+        {
+            HandleState hs = csTransactionService.LockCsTransaction(id);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
 
