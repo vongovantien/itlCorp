@@ -302,20 +302,23 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     onLockShipment() {
         this.confirmLockPopup.hide();
 
-        const modelAdd = this.onSubmitData();
-
-        //  * Update field
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.isLocked = true;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
-
-
-        this.saveJob(modelAdd);
+        this._progressRef.start();
+        this._documenRepo.LockCsTransaction(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 
     onSyncHBL() {

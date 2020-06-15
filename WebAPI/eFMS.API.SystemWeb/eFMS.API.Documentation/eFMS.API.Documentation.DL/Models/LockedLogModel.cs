@@ -9,7 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid Id { get; set; }
         public string AdvanceNo { get; set; }
         public string SettlementNo { get; set; }
-        public string LockedLog { get; set; }
+        public string UnLockedLog { get; set; }
         public string OPSShipmentNo { get; set; }
         public string CSShipmentNo { get; set; }
         public bool? IsLocked { get; set; }

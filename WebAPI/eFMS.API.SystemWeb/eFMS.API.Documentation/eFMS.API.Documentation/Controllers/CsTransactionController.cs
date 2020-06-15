@@ -427,9 +427,9 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpPut("LockShipment/{id}")]
+        [HttpPut("LockCsTransaction/{id}")]
         [Authorize]
-        public IActionResult LockShipment(Guid id)
+        public IActionResult LockCsTransaction(Guid id)
         {
             HandleState hs = csTransactionService.LockCsTransaction(id);
 

@@ -914,8 +914,15 @@ export class DocumentationRepo {
         );
     }
 
-    lockShipment(jobId: string) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockShipment/${jobId}`, {}).pipe(
+    LockCsTransaction(jobId: string) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockCsTransaction/${jobId}`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    lockOpsTransaction(jobId: string) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockOpsTransaction/${jobId}`, {}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

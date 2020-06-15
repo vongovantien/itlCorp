@@ -1027,6 +1027,47 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             return result;
-        }        
+        }
+
+        public HandleState LockCsTransaction(Guid jobId)
+        {
+            OpsTransaction job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+            if (job == null)
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+
+            }
+            if (job.IsLocked == true)
+            {
+                return new HandleState("Shipment has been locked !");
+            }
+            HandleState hs = new HandleState();
+
+            job.UserModified = currentUser.UserID;
+            job.DatetimeModified = DateTime.Now;
+            job.IsLocked = true;
+            job.LockedDate = DateTime.Now;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    hs = DataContext.Update(job, x => x.Id == jobId);
+
+                    trans.Commit();
+                    return hs;
+
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
     }
 }

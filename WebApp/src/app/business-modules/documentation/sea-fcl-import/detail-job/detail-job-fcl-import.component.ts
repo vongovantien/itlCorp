@@ -280,7 +280,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
         this.confirmLockShipmentPopup.hide();
 
         this._progressRef.start();
-        this._documenRepo.lockShipment(this.jobId)
+        this._documenRepo.LockCsTransaction(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
