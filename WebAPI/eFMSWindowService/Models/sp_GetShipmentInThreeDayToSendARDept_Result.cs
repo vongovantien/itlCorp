@@ -21,8 +21,8 @@ namespace eFMSWindowService.Models
         public Nullable<System.DateTime> ETD { get; set; }
         public Nullable<System.DateTime> ETA { get; set; }
         public string CustomerID { get; set; }
+        public string HWBNo1 { get; set; }
         public string FreightPayment { get; set; }
         public Nullable<System.Guid> OfficeID { get; set; }
-        public string OfficeName { get; set; }
     }
 }
