@@ -24,5 +24,6 @@ namespace eFMSWindowService.Models
         public string HWBNo1 { get; set; }
         public string FreightPayment { get; set; }
         public Nullable<System.Guid> OfficeID { get; set; }
+        public string OfficeName { get; set; }
     }
 }

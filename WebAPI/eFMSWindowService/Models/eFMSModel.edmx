@@ -27,6 +27,7 @@
         </EntityType>
         <Function Name="sp_AutoUpdateExchangeRate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_GetShipmentInThreeDayToSendARDept" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="sp_GetShipmentToAutoLock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_QueryAndUpdateCurrentStatusOfJob" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="eFMSTestModelStoreContainer">
           <EntitySet Name="catDepartment" EntityType="Self.catDepartment" Schema="dbo" store:Type="Tables" />
@@ -40,6 +41,7 @@
           <FunctionImport Name="sp_AutoUpdateExchangeRate" />
           <EntitySet Name="catDepartments" EntityType="eFMSTestModel.catDepartment" />
           <FunctionImport Name="sp_GetShipmentInThreeDayToSendARDept" ReturnType="Collection(eFMSTestModel.sp_GetShipmentInThreeDayToSendARDept_Result)" />
+          <FunctionImport Name="sp_GetShipmentToAutoLock" ReturnType="Collection(eFMSTestModel.sp_GetShipmentToAutoLock_Result)" />
         </EntityContainer>
         <EntityType Name="catDepartment">
           <Key>
@@ -73,6 +75,12 @@
           <Property Type="String" Name="HWBNo1" Nullable="true" MaxLength="200" />
           <Property Type="String" Name="FreightPayment" Nullable="true" MaxLength="20" />
           <Property Type="Guid" Name="OfficeID" Nullable="true" />
+          <Property Type="String" Name="OfficeName" Nullable="true" MaxLength="50" />
+        </ComplexType>
+        <ComplexType Name="sp_GetShipmentToAutoLock_Result">
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="JobNo" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="TransactionType" Nullable="false" MaxLength="50" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -114,9 +122,18 @@
                 <ScalarProperty Name="ETD" ColumnName="ETD" />
                 <ScalarProperty Name="ETA" ColumnName="ETA" />
                 <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
-                <ScalarProperty Name="HWBNo1" ColumnName="HWBNo1" />
                 <ScalarProperty Name="FreightPayment" ColumnName="FreightPayment" />
                 <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+                <ScalarProperty Name="OfficeName" ColumnName="OfficeName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="sp_GetShipmentToAutoLock" FunctionName="eFMSTestModel.Store.sp_GetShipmentToAutoLock">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="eFMSTestModel.sp_GetShipmentToAutoLock_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="JobNo" ColumnName="JobNo" />
+                <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
