@@ -6,7 +6,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label required>Authorizer</label>
+                                <label>Authorizer</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
                                     [currentActiveItemId]="{ field: 'id', value: authorizer.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="users"
@@ -38,7 +38,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label required>Commissioner</label>
+                                <label>Commissioner</label>
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event,'commissioner')"
                                     [currentActiveItemId]="{ field: 'id', value: commissioner.value}"
