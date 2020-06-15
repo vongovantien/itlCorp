@@ -16,6 +16,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
 import { FormValidators } from '@validators';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'form-create-sea-import',
@@ -24,31 +25,19 @@ import { FormValidators } from '@validators';
 })
 export class ShareBussinessFormCreateSeaImportComponent extends AppForm implements OnInit {
 
-    @Input() service: string = 'fcl';
+    @Input() set service(s: string) {
+        this._service = s;
+    }
 
-    ladingTypes: CommonInterface.INg2Select[] = [
-        { id: 'Copy', text: 'Copy' },
-        { id: 'Original', text: 'Original' },
-        { id: 'Sea Waybill', text: 'Sea Waybill' },
-        { id: 'Surrendered', text: 'Surrendered' },
-    ];
-    shipmentTypes: CommonInterface.INg2Select[] = [
-        { id: 'Freehand', text: 'Freehand' },
-        { id: 'Nominated', text: 'Nominated' }
-    ];
-    serviceTypes: CommonInterface.INg2Select[];
+    get service() { return this._service; }
 
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name Abbr' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
+    private _service: string = 'fcl';
 
-    displayFieldsPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
+    ladingTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICETYPES;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
     carries: Observable<Customer[]>;
     agents: Observable<Customer[]>;
@@ -72,8 +61,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
     deliveryPlace: AbstractControl;
 
     userLogged: User;
-
-
     fclImportDetail: any; // TODO model;
 
     commonData: any;
@@ -103,7 +90,6 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
         this.initForm();
         this.getUserLogged();
-        this.getServices();
 
         // * Subscribe state to update form.
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
@@ -198,7 +184,14 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
         this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
 
 
+        // * Set default 
         this.shipmentType.setValue([this.shipmentTypes[0]]);
+
+        if (this.service === 'fcl') {
+            this.typeOfService.setValue([this.serviceTypes[0] || []]);
+        } else {
+            this.typeOfService.setValue([this.serviceTypes[1] || []]);
+        }
 
         // * Handle etd, eta change.
         this.formCreate.controls['etd'].valueChanges

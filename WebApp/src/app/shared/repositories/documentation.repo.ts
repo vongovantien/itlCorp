@@ -913,4 +913,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    lockShipment(jobId: string) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockShipment/${jobId}`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
