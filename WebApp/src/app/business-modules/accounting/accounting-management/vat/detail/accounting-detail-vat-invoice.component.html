@@ -13,7 +13,8 @@
                                     (onClick)="onSubmitSaveInvoice()">
                                 </app-default-button>
                             </ng-container>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            <app-default-button [buttonSetting]="cancelButtonSetting"
+                                (onClick)="confirmCancelPopup.show()">
                             </app-default-button>
                         </div>
                     </div>
@@ -42,3 +43,5 @@
 </div>
 
 <info-popup [body]="invalidFormText"></info-popup>
+
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="back()"></confirm-popup>
