@@ -7,9 +7,10 @@
                     <h3>Create Invoice</h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSubmitSaveInvoice()">
-                            </app-default-button>
-
+                            <!-- <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSubmitSaveInvoice()">
+                            </app-default-button> -->
+                            <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveInvoice()">
+                            </app-permission-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                             </app-default-button>
                         </div>

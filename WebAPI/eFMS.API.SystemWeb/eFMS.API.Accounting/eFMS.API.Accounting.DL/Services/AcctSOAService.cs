@@ -1544,8 +1544,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AcctSOAResult> QueryDataPermission(AcctSOACriteria criteria)
         {
-            var settlements = GetSoasPermission();
-            return GetDatas(criteria, settlements);
+            var soas = GetSoasPermission();
+            return GetDatas(criteria, soas);
         }
 
         public IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria)

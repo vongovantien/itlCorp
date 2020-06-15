@@ -8,6 +8,9 @@ import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 @Component({
     selector: 'app-accounting-voucher',
@@ -22,6 +25,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     vouchers: AccAccountingManagementResult[] = [];
     confirmDeleteVoucherText: string;
     selectedVoucher: AccAccountingManagementResult;
+    menuSpecialPermission: Observable<any[]>;
 
     constructor(
         private _router: Router,
@@ -30,6 +34,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -38,6 +43,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Voucher ID', field: 'VoucherId', sortable: true },
             { title: 'Partner Name', field: 'PartnerName', sortable: true },
@@ -149,5 +155,16 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
                     }
                 );
         }
+    }
+
+    viewDetail(voucher: AccAccountingManagementResult): void {
+        this._accountingRepo.checkDetailAcctMngtPermission(voucher.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`home/accounting/management/voucher/${voucher.id}`]);
+                } else {
+                    this.popup403.show();
+                }
+            });
     }
 }

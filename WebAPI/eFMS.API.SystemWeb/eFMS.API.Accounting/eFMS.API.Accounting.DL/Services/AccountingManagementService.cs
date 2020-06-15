@@ -6,6 +6,9 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -129,7 +132,11 @@ namespace eFMS.API.Accounting.DL.Services
 
         public int CheckDeletePermission(Guid id)
         {
-            return 1;
+            var detail = GetById(id);
+            ICurrentUser _currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            int code = GetPermissionToAction(detail, permissionRangeDelete, _currentUser);
+            return code;
         }
         #endregion --- DELETE ---
 
@@ -198,12 +205,51 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
+        private IQueryable<AccAccountingManagement> GetAcctMngtPermission()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
+
+            IQueryable<AccAccountingManagement> acctMngts = null;
+            switch (_permissionRange)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    acctMngts = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    acctMngts = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    break;
+                case PermissionRange.Group:
+                    acctMngts = DataContext.Get(x => x.GroupId == _user.GroupId
+                                            && x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    acctMngts = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    acctMngts = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    acctMngts = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    break;
+            }
+            return acctMngts;
+        }
+
         private IQueryable<AccAccountingManagementResult> GetData(AccAccountingManagementCriteria criteria)
         {
             var query = ExpressionQuery(criteria);
             var partners = partnerRepo.Get();
             var users = userRepo.Get();
-            var acct = DataContext.Get(query);
+            var acct = GetAcctMngtPermission().Where(query);//DataContext.Get(query);
             var data = from acc in acct
                        join pat in partners on acc.PartnerId equals pat.Id into pat2
                        from pat in pat2.DefaultIfEmpty()
@@ -1034,10 +1080,36 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 result.UserNameCreated = userRepo.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
-                result.UserNameModified = userRepo.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.UserNameModified = userRepo.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
             }
             return result;
         }
+
+        public AccAccountingManagementModel GetAcctMngtById(Guid id)
+        {
+            var detail = GetById(id);
+            if (detail == null) return null;
+            ICurrentUser _currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+
+            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
+            detail.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = GetPermissionToAction(detail, permissionRangeWrite, _currentUser) != 403 ? true : false,
+                AllowDelete = GetPermissionToAction(detail, permissionRangeDelete, _currentUser) != 403 ? true : false
+            };
+            return detail;
+        }
+
+        public int CheckDetailPermission(Guid id)
+        {
+            var detail = GetById(id);
+            ICurrentUser _currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            var permissionRangeDetail = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Detail);
+            int code = GetPermissionToAction(detail, permissionRangeDetail, _currentUser);
+            return code;
+        }
+
         #endregion --- DETAIL ---
 
         #region --- EXPORT ---
@@ -1240,5 +1312,54 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
         }
+
+        private int GetPermissionToAction(AccAccountingManagementModel model, PermissionRange permissionRange, ICurrentUser currentUser)
+        {
+            int code = 403;
+            switch (permissionRange)
+            {
+                case PermissionRange.All:
+                    code = 200;
+                    break;
+                case PermissionRange.Owner:
+                    if (model.UserCreated == currentUser.UserID)
+                    {
+                        code = 200;
+                    }
+                    break;
+                case PermissionRange.Group:
+                    if (model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                    {
+                        code = 200;
+                    }
+                    break;
+                case PermissionRange.Department:
+                    if (model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                    {
+                        code = 200;
+                    }
+                    break;
+                case PermissionRange.Office:
+                    if (model.OfficeId == currentUser.OfficeID
+                        && model.CompanyId == currentUser.CompanyID)
+                    {
+                        code = 200;
+                    }
+                    break;
+                case PermissionRange.Company:
+                    if (model.CompanyId == currentUser.CompanyID)
+                    {
+                        code = 200;
+                    }
+                    break;
+            }
+            return code;
+        }
+       
     }
 }

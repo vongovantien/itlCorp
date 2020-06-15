@@ -54,6 +54,13 @@
             <param name="model">object to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDetailPermission(System.Guid)">
+            <summary>
+            check permission of user to view a accounting management
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

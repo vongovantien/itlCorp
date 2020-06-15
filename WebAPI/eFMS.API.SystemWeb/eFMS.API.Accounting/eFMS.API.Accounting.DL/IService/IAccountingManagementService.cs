@@ -23,11 +23,12 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateAcctMngt(AccAccountingManagementModel model);
         string GenerateVoucherId();
         AccAccountingManagementModel GetById(Guid id);
+        AccAccountingManagementModel GetAcctMngtById(Guid id);
         string GenerateInvoiceNoTemp();
         List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt);
         List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list);
         ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list);
-
+        int CheckDetailPermission(Guid id);
 
     }
 }

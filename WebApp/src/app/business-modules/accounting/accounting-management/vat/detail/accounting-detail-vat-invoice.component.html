@@ -9,9 +9,11 @@
                     <div>
                         <div class="c-button-actions">
                             <ng-container *ngIf="accountingManagement.status === 'New'">
-                                <app-default-button [buttonSetting]="saveButtonSetting"
+                                <!-- <app-default-button [buttonSetting]="saveButtonSetting"
                                     (onClick)="onSubmitSaveInvoice()">
-                                </app-default-button>
+                                </app-default-button> -->
+                                <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveInvoice()">
+                                </app-permission-button>
                             </ng-container>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                             </app-default-button>

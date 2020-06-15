@@ -15,6 +15,8 @@ import { AccountingManagementSelectPartnerPopupComponent } from '../components/p
 import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-note/detail-cd-note.component';
 
 import { catchError, finalize, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { getMenuUserPermissionState, IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';
@@ -31,6 +33,8 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     selectedTab: TAB = 'CDI';
     cdNotes: CDNoteViewModel[] = [];
 
+    menuSpecialPermission: Observable<any[]>;
+
     constructor(
         private _router: Router,
         private _documentationRepo: DocumentationRepo,
@@ -38,7 +42,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         private _ngProgressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
-        private _store: Store<IAccountingManagementPartnerState>
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -47,6 +51,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Invoice No', field: 'referenceNo', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },

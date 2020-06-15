@@ -513,6 +513,13 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+
+    checkDetailAcctMngtPermission(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 
