@@ -10,8 +10,7 @@ namespace eFMS.API.Operation.Infrastructure
         public  MappingProfile()
         {
             // Add as many of these lines as you need to map your objects
-            //CreateMap<SysUserGroup, SysUserGroupModel>();
-            //CreateMap<SysUserGroupModel, SysUserGroup>();
+            //map entity to view model
             CreateMap<OpsStageAssigned, OpsStageAssignedModel>();
             CreateMap<OpsStageAssignedEditModel, OpsStageAssigned>();
             CreateMap<OpsStageAssignedEditModel, OpsStageAssignedModel>();
@@ -20,6 +19,10 @@ namespace eFMS.API.Operation.Infrastructure
             CreateMap<CustomsDeclarationModel, CustomsDeclaration>();
             CreateMap<sp_GetCustomDeclaration, CustomsDeclarationModel>();
             CreateMap<OpsTransaction, OpsTransactionModel>();
+
+            // map to entity model
+            CreateMap<CustomsDeclarationModel, CustomsDeclaration>();
+            CreateMap<SetEcusConnectionModel, SetEcusconnection>();
         }
     }
 }

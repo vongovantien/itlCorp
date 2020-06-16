@@ -12,25 +12,26 @@ namespace eFMS.API.Accounting.Infrastructure
         {
             // Add as many of these lines as you need to map your objects
             CreateMap<AcctSoa, AcctSoaModel>();
-            CreateMap<AcctSoaModel, AcctSoa>();
-            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
 
             CreateMap<AcctAdvancePayment, AcctAdvancePaymentModel>();
             CreateMap<AcctAdvancePaymentModel, AcctAdvancePayment>();
-
             CreateMap<AcctApproveAdvance, AcctApproveAdvanceModel>();
-
             CreateMap<ShipmentChargeSettlement, CsShipmentSurcharge>();
             CreateMap<AcctSettlementPayment, AcctSettlementPaymentModel>();
-            CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
             CreateMap<AcctApproveSettlement, AcctApproveSettlementModel>();
-
             CreateMap<AcctAdvanceRequest, AcctAdvanceRequestModel>();
             CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
-
             CreateMap<AccAccountingManagement, AccAccountingManagementModel>();
-            CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
             CreateMap<ChargeOfAccountingManagementModel, AccountingManagementExport>();
+
+            // Map to entity model
+            CreateMap<AcctSoaModel, AcctSoa>();
+            CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
+            CreateMap<AcctAdvanceRequestModel, AcctAdvanceRequest>();
+            CreateMap<AcctApproveAdvanceModel, AcctApproveAdvance>();
+            CreateMap<AcctApproveSettlementModel, AcctApproveSettlement>();
+            CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
+            CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
         }
     }
 }

@@ -11,8 +11,7 @@ namespace eFMS.API.Catalogue.Infrastructure
         public  MappingProfile()
         {
             // Add as many of these lines as you need to map your objects
-            //CreateMap<SysUserGroup, SysUserGroupModel>();
-            //CreateMap<SysUserGroupModel, SysUserGroup>();
+            // map to view model
             CreateMap<CatPlace, CatPlaceModel>();
             CreateMap<CatStage, CatStageModel>();
             CreateMap<CatPartnerGroup, CatPartnerGroupModel>();
@@ -28,16 +27,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPlace, CatPlaceViewModel>();
             CreateMap<CatCommodity, CatCommodityModel>();
             CreateMap<CatUnit, CatUnitModel>();
-
-            CreateMap<CatCurrencyModel, CatCurrency>();
             CreateMap<CatCommodityGroupModel, CatCommodityGroup>();
-            CreateMap<CatUnitModel, CatUnit>();
-            CreateMap<CatCountryModel, CatCountry>();
-            CreateMap<CatCommodityModel, CatCommodity>();
-            CreateMap<CatPlaceModel, CatPlace>();
-            CreateMap<CatPartnerImportModel, CatPartner>();
-            CreateMap<CatStageModel, CatStage>();
-            CreateMap<CatPartnerModel, CatPartner>();
             CreateMap<CatSaleman, CatSaleManModel>();
             CreateMap<CatSaleman, CatSaleManViewModel>();
 
@@ -45,6 +35,17 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatChartOfAccounts, CatChartOfAccountsModel>();
             CreateMap<CatChartOfAccountsImportModel, CatChartOfAccounts>();
 
+            //map to entity model
+            CreateMap<CatPartnerChargeModel, CatPartnerCharge>();
+            CreateMap<CatSaleManModel, CatSaleman>();
+            CreateMap<CatCurrencyModel, CatCurrency>();
+            CreateMap<CatUnitModel, CatUnit>();
+            CreateMap<CatCountryModel, CatCountry>();
+            CreateMap<CatCommodityModel, CatCommodity>();
+            CreateMap<CatPlaceModel, CatPlace>();
+            CreateMap<CatPartnerImportModel, CatPartner>();
+            CreateMap<CatStageModel, CatStage>();
+            CreateMap<CatPartnerModel, CatPartner>();
 
 
         }
