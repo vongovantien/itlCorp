@@ -1872,6 +1872,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
+
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Mawb)
@@ -2561,6 +2563,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.JobNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
+
+                entity.Property(e => e.LockedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNO")
