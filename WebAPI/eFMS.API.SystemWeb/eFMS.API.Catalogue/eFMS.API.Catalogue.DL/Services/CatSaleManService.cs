@@ -23,12 +23,25 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<CatPartner> catPartnerRepository;
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
+        private readonly IContextBase<SysCompany> sysCompanyRepository;
 
-        public CatSalemanService(IContextBase<CatSaleman> repository, IMapper mapper, IStringLocalizer<CatalogueLanguageSub> localizer, ICurrentUser user, IContextBase<SysUser> sysUserRepo, IContextBase<CatPartner> partnerRepo, ICacheServiceBase<CatSaleman> cacheService) : base(repository, cacheService, mapper)
+        public CatSalemanService(
+            IContextBase<CatSaleman> repository, 
+            IMapper mapper, 
+            IStringLocalizer<CatalogueLanguageSub> localizer, 
+            ICurrentUser user, 
+            IContextBase<SysUser> sysUserRepo, 
+            IContextBase<CatPartner> partnerRepo, 
+            IContextBase<SysOffice> sysOfficeRepo,
+            IContextBase<SysCompany> sysCompanyRepo,
+            ICacheServiceBase<CatSaleman> cacheService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
             sysUserRepository = sysUserRepo;
+            sysOfficeRepository = sysOfficeRepo;
+            sysCompanyRepository = sysCompanyRepo;
             catPartnerRepository = partnerRepo;
         }
 
@@ -39,8 +52,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatSaleManModel> GetBy(string partnerId)
         {
-            var data = DataContext.Get().Where(x => x.PartnerId.Trim() == partnerId);
-            var sysUser = sysUserRepository.Get();
+            IQueryable<CatSaleman> data = DataContext.Get().Where(x => x.PartnerId.Trim() == partnerId);
+            IQueryable<SysUser> sysUser = sysUserRepository.Get();
             var query = from sale in data
                         join user in sysUser on sale.SaleManId equals user.Id
                         select new { sale, user };
@@ -51,8 +64,23 @@ namespace eFMS.API.Catalogue.DL.Services
 
             foreach (var item in query)
             {
+                CatSaleManModel saleman = mapper.Map<CatSaleManModel>(item.sale);
+                SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.Company)?.FirstOrDefault();
+                SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.Office)?.FirstOrDefault();
+                if (company != null)
+                {
+                    saleman.CompanyNameAbbr = company.BunameAbbr;
+                    saleman.CompanyNameEn = company.BunameEn;
+                    saleman.CompanyNameVn = company.BunameVn;
+                }
 
-                var saleman = mapper.Map<CatSaleManModel>(item.sale);
+                if(office != null)
+                {
+                    saleman.OfficeNameEn = office.BranchNameEn;
+                    saleman.OfficeNameAbbr = office.ShortName;
+                    saleman.OfficeNameVn = office.BranchNameVn;
+                }
+
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
             }

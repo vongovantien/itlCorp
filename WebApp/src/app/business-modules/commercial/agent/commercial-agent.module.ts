@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { CommercialAgentComponent } from './commercial-agent.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 const routing: Routes = [
     {
@@ -21,7 +22,8 @@ const routing: Routes = [
     ],
     imports: [
         CommonModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        SharedModule
     ],
     exports: [],
     providers: [],

@@ -43,6 +43,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
+        public virtual SysCompany Bu { get; set; }
         public virtual ICollection<CatDepartment> CatDepartment { get; set; }
     }
 }
