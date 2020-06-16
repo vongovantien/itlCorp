@@ -52,5 +52,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string Shipper { get; set; }
         public string Consignee { get; set; }
+        public string LockedUser { get; set; }
     }
 }

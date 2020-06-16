@@ -1876,6 +1876,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
 
+                entity.Property(e => e.LockedUser).HasMaxLength(50);
+
                 entity.Property(e => e.Mawb)
                     .HasColumnName("MAWB")
                     .HasMaxLength(800);
@@ -2567,6 +2569,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
 
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LockedUser).HasMaxLength(50);
 
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNO")

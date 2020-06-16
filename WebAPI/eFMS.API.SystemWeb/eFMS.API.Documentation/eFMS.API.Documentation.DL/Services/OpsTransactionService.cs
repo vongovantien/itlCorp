@@ -341,7 +341,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (data == null)
                 return null;
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
-            IQueryable<OpsTransaction> datajoin = data;
+            IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
             if (criteria.ClearanceNo != null)
             {
                 var listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
@@ -1047,6 +1047,7 @@ namespace eFMS.API.Documentation.DL.Services
             job.DatetimeModified = DateTime.Now;
             job.IsLocked = true;
             job.LockedDate = DateTime.Now;
+            job.LockedUser = currentUser.UserName;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
