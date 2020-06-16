@@ -31,6 +31,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SyncShipmentByAirWayBill(Guid JobId, csTransactionSyncAirWayBill model);
         int CheckDeletePermission(Guid id);
         HandleState LockCsTransaction(Guid jobId);
+        Crystal PreviewShipmentCoverPage(Guid id);
 
     }
 }

@@ -531,6 +531,12 @@ export class DocumentationRepo {
         );
     }
 
+    previewShipmentCoverPage(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/PreviewShipmentCoverPage`, { id: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     previewSeaImportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaImportManifest`, body).pipe(
             map((data: any) => data)
