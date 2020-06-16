@@ -1,0 +1,24 @@
+<div class="create-booking-note-page">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Customer</h3>
+                    <div>
+                        <div class="c-button-actions">
+
+                        </div>
+                    </div>
+                </div>
+                <hr />
+
+                <form-create-commercial></form-create-commercial>
+
+                <commercial-contract-list></commercial-contract-list>
+            </div>
+        </div>
+    </div>
+</div>
+
+<info-popup [body]="invalidFormText"></info-popup>
