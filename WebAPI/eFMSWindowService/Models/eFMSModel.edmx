@@ -41,7 +41,6 @@
           <FunctionImport Name="sp_AutoUpdateExchangeRate" />
           <EntitySet Name="catDepartments" EntityType="eFMSTestModel.catDepartment" />
           <FunctionImport Name="sp_GetShipmentInThreeDayToSendARDept" ReturnType="Collection(eFMSTestModel.sp_GetShipmentInThreeDayToSendARDept_Result)" />
-          <FunctionImport Name="sp_GetShipmentToAutoLock" ReturnType="Collection(eFMSTestModel.sp_GetShipmentToAutoLock_Result)" />
         </EntityContainer>
         <EntityType Name="catDepartment">
           <Key>
@@ -72,15 +71,9 @@
           <Property Type="DateTime" Name="ETD" Nullable="true" Precision="23" />
           <Property Type="DateTime" Name="ETA" Nullable="true" Precision="23" />
           <Property Type="String" Name="CustomerID" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="HWBNo1" Nullable="true" MaxLength="200" />
           <Property Type="String" Name="FreightPayment" Nullable="true" MaxLength="20" />
           <Property Type="Guid" Name="OfficeID" Nullable="true" />
           <Property Type="String" Name="OfficeName" Nullable="true" MaxLength="50" />
-        </ComplexType>
-        <ComplexType Name="sp_GetShipmentToAutoLock_Result">
-          <Property Type="Guid" Name="ID" Nullable="false" />
-          <Property Type="String" Name="JobNo" Nullable="true" MaxLength="50" />
-          <Property Type="String" Name="TransactionType" Nullable="false" MaxLength="50" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -125,15 +118,6 @@
                 <ScalarProperty Name="FreightPayment" ColumnName="FreightPayment" />
                 <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
                 <ScalarProperty Name="OfficeName" ColumnName="OfficeName" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="sp_GetShipmentToAutoLock" FunctionName="eFMSTestModel.Store.sp_GetShipmentToAutoLock">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="eFMSTestModel.sp_GetShipmentToAutoLock_Result">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="JobNo" ColumnName="JobNo" />
-                <ScalarProperty Name="TransactionType" ColumnName="TransactionType" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

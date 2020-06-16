@@ -1,14 +1,8 @@
 ﻿using eFMSWindowService.Helpers;
 using eFMSWindowService.Models;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace eFMSWindowService
@@ -27,7 +21,8 @@ namespace eFMSWindowService
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
-            _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            //_timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            _timer.Interval = 30000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer
