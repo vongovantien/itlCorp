@@ -22,10 +22,10 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         if (this._type !== 'invoice') {
             this.headers = [
                 { title: 'Code', field: 'chargeCode', sortable: true, },
-                { title: 'Charge Name', field: 'chargeName', },
+                { title: 'Charge Name', field: 'chargeName', sortable: true, },
                 { title: 'Job No', field: 'jobNo', sortable: true },
                 { title: 'HBL', field: 'hbl', sortable: true },
-                { title: 'Countra Account', field: 'countraAccount', sortable: true },
+                { title: 'Contra Account', field: 'contraAccount', sortable: true },
                 { title: 'Org Amount', field: 'orgAmount', sortable: true },
                 { title: 'VAT', field: 'vat', sortable: true },
                 { title: 'Org VAT Amount', field: 'orgVatAmount', sortable: true },
@@ -40,8 +40,9 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 { title: 'OBH Partner', field: 'obhPartner', sortable: true },
                 { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
                 { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
-                { title: 'Debit Note', field: 'CdNoteNo', sortable: true },
+                { title: 'Debit Note', field: 'cdNoteNo', sortable: true },
                 { title: 'SOA No', field: 'soaNo', sortable: true },
+                { title: 'Settlement No', field: 'settlementCode', sortable: true },
                 { title: 'Qty', field: 'qty', sortable: true },
                 { title: 'Unit', field: 'unitName', sortable: true },
                 { title: 'Unit Price', field: 'unitPrice', sortable: true },
@@ -68,10 +69,10 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     headers = [
         { title: 'Code', field: 'chargeCode', sortable: true, },
-        { title: 'Charge Name', field: 'chargeName', },
+        { title: 'Charge Name', field: 'chargeName', sortable: true, },
         { title: 'Job No', field: 'jobNo', sortable: true },
         { title: 'HBL', field: 'hbl', sortable: true },
-        { title: 'Countra Account', field: 'countraAccount', sortable: true },
+        { title: 'Contra Account', field: 'contraAccount', sortable: true },
         { title: 'Org Amount', field: 'orgAmount', sortable: true },
         { title: 'VAT', field: 'vat', sortable: true },
         { title: 'Org VAT Amount', field: 'orgVatAmount', sortable: true },
@@ -82,7 +83,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
         { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
         { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
-        { title: 'Debit Note', field: 'CdNoteNo', sortable: true },
+        { title: 'Debit Note', field: 'cdNoteNo', sortable: true },
         { title: 'SOA No', field: 'soaNo', sortable: true },
         { title: 'Qty', field: 'qty', sortable: true },
         { title: 'Unit', field: 'unitName', sortable: true },
@@ -154,8 +155,59 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         }
     }
 
-    onChangeCheckBoxCharge(e: Event) {
+    onChangeCheckBoxCharge(e: any, selectedCharge: ChargeOfAccountingManagementModel) {
         this.isCheckAll = this.charges.every((item: ChargeOfAccountingManagementModel) => item.isSelected);
+        if (this.type === 'invoice') {
+            if (e.target.checked) {
+                if (!!selectedCharge.soaNo) {
+                    this.updateChargeOfAcc('soaNo', selectedCharge.soaNo);
+                } else {
+                    if (!!selectedCharge.cdNoteNo) {
+                        this.updateChargeOfAcc('cdNoteNo', selectedCharge.cdNoteNo);
+                    }
+                }
+            } else {
+                if (!!selectedCharge.soaNo) {
+                    this.updateChargeOfAcc('soaNo', selectedCharge.soaNo, false);
+                } else {
+                    if (!!selectedCharge.cdNoteNo) {
+                        this.updateChargeOfAcc('cdNoteNo', selectedCharge.cdNoteNo, false);
+                    }
+                }
+            }
+        } else {
+            if (e.target.checked) {
+                if (!!selectedCharge.settlementCode) {
+                    this.updateChargeOfAcc('settlementCode', selectedCharge.settlementCode);
+
+                } else if (!!selectedCharge.soaNo) {
+                    this.updateChargeOfAcc('soaNo', selectedCharge.soaNo);
+                } else {
+                    if (!!selectedCharge.cdNoteNo) {
+                        this.updateChargeOfAcc('cdNoteNo', selectedCharge.cdNoteNo);
+                    }
+                }
+            } else {
+                if (!!selectedCharge.settlementCode) {
+                    this.updateChargeOfAcc('settlementCode', selectedCharge.settlementCode, false);
+
+                } else if (!!selectedCharge.soaNo) {
+                    this.updateChargeOfAcc('soaNo', selectedCharge.soaNo, false);
+                } else {
+                    if (!!selectedCharge.cdNoteNo) {
+                        this.updateChargeOfAcc('cdNoteNo', selectedCharge.cdNoteNo, false);
+                    }
+                }
+            }
+        }
+    }
+
+    updateChargeOfAcc(key: string, value: string, isCheck: boolean = true) {
+        this.charges.forEach(c => {
+            if (c[key] === value) {
+                c.isSelected = isCheck;
+            }
+        });
     }
 
     @timeoutD(500)

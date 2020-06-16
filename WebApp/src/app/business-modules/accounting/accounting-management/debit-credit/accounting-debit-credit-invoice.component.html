@@ -107,8 +107,12 @@
                         </div>
                     </div>
                 </tab>
-                <tab heading="VAT Invoice" (selectTab)="onSelectTab('vat')" [active]="selectedTab === 'VAT'"> </tab>
-                <tab heading="Voucher" (selectTab)="onSelectTab('voucher')" [active]="selectedTab === 'VOUCHER'"> </tab>
+                <ng-container *ngIf="!!(menuSpecialPermission | async)">
+                    <tab *ngIf="(menuSpecialPermission| async)[1].isAllow" heading="VAT Invoice"
+                        (selectTab)="onSelectTab('vat')" [active]="selectedTab === 'VAT'"> </tab>
+                    <tab *ngIf="(menuSpecialPermission| async)[0].isAllow" heading="Voucher"
+                        (selectTab)="onSelectTab('voucher')" [active]="selectedTab === 'VOUCHER'"> </tab>
+                </ng-container>
             </tabset>
         </div>
     </div>

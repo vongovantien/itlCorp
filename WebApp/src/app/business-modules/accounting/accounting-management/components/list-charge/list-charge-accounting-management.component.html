@@ -50,7 +50,7 @@
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
-                                        <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
+                                        <input type="checkbox" (change)="onChangeCheckBoxCharge($event,charge)"
                                             [value]="charge" [(ngModel)]="charge.isSelected" [name]="i">
                                         <span></span>
                                     </label>
@@ -80,8 +80,11 @@
                             </ng-container>
                             <td>{{charge.vatPartnerId}}</td>
                             <td>{{charge.vatPartnerName}}</td>
-                            <td>{{charge.cdNoteNo}}</td>
-                            <td>{{charge.soaNo}}</td>
+                            <td class="text-primary">{{charge.cdNoteNo}}</td>
+                            <td class="text-primary">{{charge.soaNo}}</td>
+                            <ng-container *ngIf="type !== 'invoice'">
+                                <td class="text-primary">{{charge.settlementCode}}</td>
+                            </ng-container>
                             <td>{{charge.qty}}</td>
                             <td>{{charge.unitName}}</td>
                             <td>{{charge.unitPrice | number: '.0-3'}}</td>

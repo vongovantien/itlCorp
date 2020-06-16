@@ -5,8 +5,10 @@
             <tabset class="custom-class-tab">
                 <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
                 </tab>
-                <tab heading="VAT Invoice" (selectTab)="onSelectTab('vat')"> </tab>
-                <tab heading="Voucher" [active]="true">
+                <tab *ngIf="!!(menuSpecialPermission | async) ? (menuSpecialPermission| async)[1].isAllow : false"
+                    heading="VAT Invoice" (selectTab)="onSelectTab('vat')"> </tab>
+                <tab *ngIf="!!(menuSpecialPermission | async) ? (menuSpecialPermission| async)[0].isAllow :false"
+                    heading="Voucher" [active]="true">
 
                     <form-search-vat-voucher [accountType]="'Voucher'" (onSearch)="onSearchVoucher($event)">
                     </form-search-vat-voucher>
@@ -45,7 +47,8 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
-                                                    <a [routerLink]="['./'+voucher.id]">{{voucher.voucherId}}</a>
+                                                    <!-- <a [routerLink]="['./'+invoice.id]">{{invoice.voucherId}}</a> -->
+                                                    <a (click)="viewDetail(voucher)">{{voucher.voucherId}}</a>
                                                 </td>
                                                 <td>{{voucher.partnerName}}</td>
                                                 <td>{{voucher.totalAmount | number: '.0-3'}}</td>

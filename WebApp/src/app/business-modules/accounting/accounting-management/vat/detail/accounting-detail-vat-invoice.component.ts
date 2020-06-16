@@ -141,6 +141,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                     if (!!res && !res.status) {
                         this._toastService.error(res.message);
                     } else {
+                        this.accountingManagement = new AccAccountingManagementModel(res);
                         this.updateFormInvoice((res as AccAccountingManagementModel));
                     }
                 },

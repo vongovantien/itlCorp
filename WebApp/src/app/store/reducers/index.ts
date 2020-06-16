@@ -109,4 +109,10 @@ export const isSpinnerShowing = createSelector(spinnerReducer, (state: ISpinnerS
 // * Menu
 export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);
 export const getMenuUserPermissionState = createSelector(menuState, (state: IMenuState) => state && state.permission);
-
+export const getMenuUserSpecialPermissionState = createSelector(menuState, (state: IMenuState) => {
+    if (!!state && !!state.permission) {
+        if (!!state.permission.specialActions) {
+            return state.permission.specialActions;
+        }
+    }
+});

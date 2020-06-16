@@ -241,10 +241,29 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(new { VoucherId = voucherId });
         }
 
+        /// <summary>
+        /// check permission of user to view a accounting management
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("CheckPermission/{id}")]
+        [Authorize]
+        public IActionResult CheckDetailPermission(Guid id)
+        {
+            var result = accountingService.CheckDetailPermission(id);
+            if (result == 403) return Ok(false);
+            return Ok(true);
+        }
+
         [HttpGet("GetById")]
         public IActionResult GetDetailById(Guid id)
         {
-            var detail = accountingService.GetById(id);
+            var statusCode = accountingService.CheckDetailPermission(id);
+            if (statusCode == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+            var detail = accountingService.GetAcctMngtById(id);
             return Ok(detail);
         }
 

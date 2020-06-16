@@ -1,4 +1,5 @@
 import { SystemConstants } from "@constants";
+import { PermissionShipment } from "../document/permissionShipment";
 // tslint:disable: no-any
 
 export class AccAccountingManagement {
@@ -92,6 +93,7 @@ export class AccAccountingManagementModel extends AccAccountingManagement {
 
     userNameCreated: string = null;
     userNameModified: string = null;
+    permission: PermissionShipment = new PermissionShipment();
     constructor(object?: any) {
         super();
         const self = this;

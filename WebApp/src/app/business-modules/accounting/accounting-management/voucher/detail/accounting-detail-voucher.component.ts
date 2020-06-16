@@ -83,7 +83,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         this.listChargeComponent.updateTotalAmount();
     }
 
-    onSubmitSaveInvoice() {
+    onSubmitSaveVoucher() {
         this.formCreateComponent.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
@@ -138,6 +138,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     if (!!res && !res.status) {
                         this._toastService.error(res.message);
                     } else {
+                        this.accountingManagement = new AccAccountingManagementModel(res);
                         this.updateFormVoucher((res as AccAccountingManagementModel));
                     }
                 },
