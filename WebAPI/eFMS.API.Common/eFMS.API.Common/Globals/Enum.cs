@@ -173,6 +173,7 @@
         tcon2,
         tool2,
         catChartOfAccounts,
-        accManagement
+        accManagement,
+        settingUnlockRequest
     }
 }
