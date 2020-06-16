@@ -100,6 +100,13 @@ const routes: Routes = [
                     name: "Design Zone",
                 }
             },
+            {
+                path: 'commercial',
+                loadChildren: () => import('./business-modules/commercial/commercial.module').then(m => m.CommercialModule),
+                data: {
+                    name: "Commercial",
+                }
+            },
 
         ],
         runGuardsAndResolvers: "always"
