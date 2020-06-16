@@ -1029,7 +1029,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public HandleState LockCsTransaction(Guid jobId)
+        public HandleState LockOpsTransaction(Guid jobId)
         {
             OpsTransaction job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
             if (job == null)

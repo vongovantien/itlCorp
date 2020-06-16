@@ -29,7 +29,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState Update(OpsTransactionModel model);
         IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
-        HandleState LockCsTransaction(Guid jobId);
+        HandleState LockOpsTransaction(Guid jobId);
 
     }
 }
