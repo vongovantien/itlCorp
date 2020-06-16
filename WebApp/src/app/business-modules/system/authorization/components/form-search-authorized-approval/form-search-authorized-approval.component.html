@@ -7,7 +7,7 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label>Authorizer</label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, null)"
                                     [currentActiveItemId]="{ field: 'id', value: authorizer.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="users"
                                     [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
