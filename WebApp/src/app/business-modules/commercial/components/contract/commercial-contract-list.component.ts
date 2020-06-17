@@ -6,6 +6,10 @@ import { AppList } from 'src/app/app.list';
     templateUrl: './commercial-contract-list.component.html',
 })
 export class CommercialContractListComponent extends AppList implements OnInit {
+
+    contracts: any[] = []; // TODO: implement model.
+    selectecContract: any; // TODO: implement model.
+
     constructor() {
         super();
     }
@@ -18,8 +22,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Service', field: 'username', sortable: true },
             { title: 'Effective Date', field: 'username', sortable: true },
             { title: 'Expired Date', field: 'username', sortable: true },
-            { title: 'Status', field: 'username', sortable: true },
-            { title: 'Office', field: 'username', sortable: true },
+            { title: 'Status', field: 'status', sortable: true },
+            { title: 'Office', field: 'officeName', sortable: true },
+            { title: 'Company', field: 'companyName', sortable: true },
         ];
 
     }

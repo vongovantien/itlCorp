@@ -5,6 +5,7 @@ import { CommercialCustomerComponent } from './commercial-customer.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareCommercialModule } from '../share-commercial.module';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
+import { CommercialDetailComponent } from '../detail/detail-commercial.component';
 
 const routing: Routes = [
     {
@@ -15,6 +16,9 @@ const routing: Routes = [
             {
                 path: 'new', component: CommercialCreateComponent, data: { name: 'New' }
             },
+            {
+                path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Customer' }
+            },
 
         ]
     }
@@ -23,7 +27,7 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        CommercialCustomerComponent
+        CommercialCustomerComponent,
     ],
     imports: [
         CommonModule,

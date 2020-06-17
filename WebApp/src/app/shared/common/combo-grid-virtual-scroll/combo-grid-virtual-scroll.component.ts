@@ -74,6 +74,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.loading = false;
                 }
                 this.setDataSource(changes.dataSources.currentValue);
+            } else {
+                this.loading = false;
             }
         }
         if (!!changes.displayFields && !!changes.displayFields.currentValue) {

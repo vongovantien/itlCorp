@@ -1,0 +1,36 @@
+<div class="create-commercial-page">
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>
+                        {{partner?.partnerNameEn}}
+                        <ng-container *ngIf="!!partner">
+                            <ng-container *ngIf="partner.active else inactive">
+                                <span class="m-badge m-badge--success m-badge--wide">Active</span>
+                            </ng-container>
+                            <ng-template #inactive>
+                                <span class="m-badge m-badge--danger m-badge--wide">Inactive</span>
+                            </ng-template>
+                        </ng-container>
+                    </h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
+                            </app-default-button>
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+                <form-create-commercial></form-create-commercial>
+            </div>
+        </div>
+        <commercial-contract-list></commercial-contract-list>
+    </div>
+</div>
+
+<info-popup [body]="invalidFormText"></info-popup>

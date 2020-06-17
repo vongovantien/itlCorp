@@ -1,4 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+
 import { AppList } from 'src/app/app.list';
 
 import { NgProgress } from '@ngx-progressbar/core';
@@ -34,6 +36,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
+        private _router: Router,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo) {
         super();
@@ -166,6 +169,23 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                                     }
                                 }
                             );
+                    }
+                },
+            );
+    }
+
+    showDetail(customer: Customer) {
+        this.selectedCustomer = customer;
+        this._catalogueRepo.checkViewDetailPartnerPermission(this.selectedCustomer.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this._router.navigate([`/home/commercial/customer/${this.selectedCustomer.id}`]);
+                    } else {
+                        this.info403Popup.show();
                     }
                 },
             );
