@@ -88,7 +88,7 @@ const routing: Routes = [
         ReactiveFormsModule,
         ModalModule,
         FormsModule,
-        StoreModule.forFeature('accounting-management', reducers),
+        // StoreModule.forFeature('accounting-management', reducers), // * Dua ra shaeAccounting
         PaginationModule.forRoot(),
         NgxCurrencyModule.forRoot({
             align: "right",

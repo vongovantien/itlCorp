@@ -6,10 +6,14 @@ import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, } from 'rxjs/operators';
-import { User, SettlementPayment } from 'src/app/shared/models';
+import { User, SettlementPayment, PartnerOfAcctManagementResult } from 'src/app/shared/models';
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { SystemConstants } from 'src/constants/system.const';
+import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
+import { IAppState } from '@store';
+import { Store } from '@ngrx/store';
+import { SelectPartner, SelectRequester } from '../accounting-management/store';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -20,6 +24,7 @@ export class SettlementPaymentComponent extends AppList {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ShareAccountingManagementSelectRequesterPopupComponent, { static: false }) selectRequesterPopup: ShareAccountingManagementSelectRequesterPopupComponent;
 
     headers: CommonInterface.IHeaderTable[];
     settlements: SettlementPayment[] = [];
@@ -39,7 +44,8 @@ export class SettlementPaymentComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _router: Router,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -218,6 +224,47 @@ export class SettlementPaymentComponent extends AppList {
                     this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'settlement-payment.xlsx');
                 }
             );
+    }
+
+
+    issueVoucher() {
+        const settlementCodes = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
+        if (!!settlementCodes.length) {
+            this.searchRef(settlementCodes.map(x => x.settlementNo));
+        }
+    }
+
+    searchRef(settlementCodes: string[]) {
+        const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
+            cdNotes: null,
+            soaNos: null,
+            jobNos: null,
+            hbls: null,
+            mbls: null,
+            settlementCodes: settlementCodes
+        };
+
+        this._accoutingRepo.getChargeForVoucherByCriteria(body)
+            .subscribe(
+                (res: PartnerOfAcctManagementResult[]) => {
+                    if (!!res && !!res.length) {
+                        if (res.length === 1) {
+                            this._store.dispatch(SelectRequester(res[0]));
+                            this._router.navigate(["home/accounting/management/voucher/new"]);
+                        } else {
+                            this.selectRequesterPopup.listRequesters = res;
+                            this.selectRequesterPopup.selectedRequester = null;
+                            this.selectRequesterPopup.show();
+                        }
+                    } else {
+                        this._toastService.warning("Not found data charge");
+                    }
+                }
+            );
+    }
+
+    hidePopupRequester() {
+        this.selectRequesterPopup.hide();
     }
 
 }
