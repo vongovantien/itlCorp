@@ -1,0 +1,79 @@
+<div class="m-portlet__head alert-block__heading">
+    <div class="m-portlet__head-caption">
+        <div class="m-portlet__head-title w-100">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="m-portlet__head-text collapse-toggle pointer" data-toggle="collapse"
+                        data-target="#approval-process">
+                        <i class="la la-angle-up m--margin-right-5"></i>Approval Process
+                    </h3>
+                </div>
+                <div class="col-lg-6 m--align-right">
+                    <a class="text-underline pointer" (click)="showInfoDenied()">Denied Comments: 2</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="collapse list-progress-wp collapsed show m--margin-top-20 m--margin-bottom-20" id="approval-process">
+    <div class="col-12">
+        <ul class="list-unstyled list-progress d-flex justify-content-around">
+            <li>
+                <div class="progress-content text-center">
+                    <div class="font-weight-bolder">Leader</div>
+                    <div class="icon-check">
+                        <i class="la la-check-circle-o"></i>
+                    </div>
+                    <div class="font-weight-bold">Ngô Thanh Hóa</div>
+                    <div class="font-weight-bold">
+                        17/06/2020 15:00
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="progress-content text-center">
+                    <div class="font-weight-bolder">Manager</div>
+                    <div class="icon-check">
+                        <i class="la la-check-circle-o"></i>
+                    </div>
+                    <div class="font-weight-bold">
+                        Thái Ngọc Phương
+                    </div>
+                    <div class="font-weight-bold">
+                        17/06/2020 15:30
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="progress-content text-center">
+                    <div class="font-weight-bolder">Accountant</div>
+                    <div class="icon-check">
+                        <i class="la la-check-circle-o"></i>
+                    </div>
+                    <div class="font-weight-bold">
+                        Lê Thị Tuyết Hạnh
+                    </div>
+                    <div class="font-weight-bold">
+                        17/06/2020 16:00
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="progress-content text-center">
+                    <div class="font-weight-bolder">BU HEAD</div>
+                    <div class="icon-check">
+                        <i class="la la-check-circle-o"></i>
+                    </div>
+                    <div class="font-weight-bold">
+                        BU HEAD
+                    </div>
+                    <div class="font-weight-bold">
+                        17/06/2020 16:00
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<info-denied-comment-popup></info-denied-comment-popup>
