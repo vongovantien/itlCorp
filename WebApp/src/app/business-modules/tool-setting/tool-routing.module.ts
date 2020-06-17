@@ -30,6 +30,10 @@ const routes: Routes = [
         data: { name: 'Unlock' }
     },
     {
+        path: 'unlock-request', loadChildren: () => import('./unlock-request/unlock-request.module').then(m => m.UnlockRequestModule),
+        data: { name: 'Unlock Request' }
+    },
+    {
         path: 'log-viewer',
         component: LogViewerComponent,
         data: {
