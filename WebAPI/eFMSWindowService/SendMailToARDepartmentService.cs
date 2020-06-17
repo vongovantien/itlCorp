@@ -85,7 +85,7 @@ namespace eFMSWindowService
                                     i = i + 1;
                                     content.Append(@"<tr><td style=""border: 1px solid black;border-collapse: collapse;"">" + i + "</td>");
                                     content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.OfficeName + "</td>");
-                                    content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.PartnerName + "</td>");
+                                    content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.JobNo + "</td>");
                                     content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.MAWB + " / " + shipment.HWBNo + "</td>");
                                     content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.ETD?.ToShortDateString() + "</td>");
                                     content.Append(@"<td style=""border: 1px solid black;border-collapse: collapse;"">" + shipment.ETA?.ToShortDateString() + "</td>");

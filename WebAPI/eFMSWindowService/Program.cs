@@ -25,7 +25,7 @@ namespace eFMSWindowService
             //Thread.Sleep(60000);
             ////Call the Stop method-this will stop the Timer.
             //myService.Stop();
-//#else
+            ////#else
             //The following is the default code - You may fine tune
             //the code to create one instance of the service on the top
             //and use the instance variable in both debug and release mode
@@ -33,14 +33,14 @@ namespace eFMSWindowService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new UpdateExchangeRate(),
-                new UpdateCurrentStatusOfJobService(),
-                new UpdateStatusAuthorization(),
-                new SendMailToARDepartmentService(),
-                new AutoLockShipmentService()
+                            new UpdateExchangeRate(),
+                            new UpdateCurrentStatusOfJobService(),
+                            new UpdateStatusAuthorization(),
+                            new SendMailToARDepartmentService(),
+                            new AutoLockShipmentService()
             };
             ServiceBase.Run(ServicesToRun);
-//#endif
+            ////#endif
 
         }
     }
