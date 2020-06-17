@@ -385,7 +385,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new LockedLogResultModel();
             if (shipments == null) return result;
-            result.LockedLogs = shipments.Where(x => x.IsLocked == true);
+            result.LockedLogs = shipments;
             result.Logs = new List<string>();
             foreach (var item in shipments)
             {
@@ -411,15 +411,13 @@ namespace eFMS.API.Documentation.DL.Services
                             var opsShipment = opsRepository.Get(x => x.Id == item.Id)?.FirstOrDefault();
                             if (opsShipment != null)
                             {
-                                if (opsShipment.IsLocked == true)
-                                {
-                                    opsShipment.IsLocked = false;
-                                    opsShipment.DatetimeModified = DateTime.Now;
-                                    opsShipment.UserModified = currentUser.UserID;
-                                    string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
-                                    opsShipment.UnLockedLog = opsShipment.UnLockedLog + log;
-                                    var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
-                                }
+                                opsShipment.IsLocked = false;
+                                opsShipment.DatetimeModified = DateTime.Now;
+                                opsShipment.UserModified = currentUser.UserID;
+                                opsShipment.LastDateUnLocked = DateTime.Now;
+                                string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
+                                opsShipment.UnLockedLog = opsShipment.UnLockedLog + log;
+                                var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
                             }
                         }
                         else
@@ -432,6 +430,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     csShipment.IsLocked = false;
                                     csShipment.DatetimeModified = DateTime.Now;
                                     csShipment.UserModified = currentUser.UserID;
+                                    csShipment.LastDateUnLocked = DateTime.Now;
                                     string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
                                     csShipment.UnLockedLog = csShipment.UnLockedLog + log;
                                     var isSuccessLockCs = DataContext.Update(csShipment, x => x.Id == csShipment.Id);
