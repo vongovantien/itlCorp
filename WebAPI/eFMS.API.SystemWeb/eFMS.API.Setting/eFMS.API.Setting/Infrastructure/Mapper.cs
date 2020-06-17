@@ -9,15 +9,15 @@ namespace eFMS.API.Setting.Infrastructure
         public  MappingProfile()
         {
             // Add as many of these lines as you need to map your objects
-            //CreateMap<SysUserGroup, SysUserGroupModel>();
-            //CreateMap<SysUserGroupModel, SysUserGroup>();
-            //CreateMap<SysUserGroupEditModel, SysUserGroupModel>();
+            // map entity to view model
             CreateMap<SetTariff, SetTariffModel>();
             CreateMap<SetTariffDetail, SetTariffDetailModel>();
             CreateMap<SetTariff, TariffViewModel>();
+            CreateMap<SetTariffModel, TariffViewModel>();
+
+            // map to entity model
             CreateMap<SetTariffModel, SetTariff>();
             CreateMap<SetTariffDetailModel, SetTariffDetail>();
-            CreateMap<SetTariffModel, TariffViewModel>();
 
         }
     }

@@ -2974,22 +2974,19 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (var item in settlePayments)
                     {
                         var settle = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        if (settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
+                        settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
+                        settle.UserModified = currentUser.UserName;
+                        settle.DatetimeModified = DateTime.Now;
+                        var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                        settle.LockedLog = item.LockedLog + log + ";";
+                        var hs = DataContext.Update(settle, x => x.Id == item.Id);
+                        var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
+                        foreach (var approve in approveSettles)
                         {
-                            settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
-                            settle.UserModified = currentUser.UserName;
-                            settle.DatetimeModified = DateTime.Now;
-                            var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-                            settle.LockedLog = item.LockedLog + log + ";";
-                            var hs = DataContext.Update(settle, x => x.Id == item.Id);
-                            var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
-                            foreach (var approve in approveSettles)
-                            {
-                                approve.IsDeputy = true;
-                                approve.UserModified = currentUser.UserID;
-                                approve.DateModified = DateTime.Now;
-                                acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
-                            }
+                            approve.IsDeputy = true;
+                            approve.UserModified = currentUser.UserID;
+                            approve.DateModified = DateTime.Now;
+                            acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
                         }
                     }
                     trans.Commit();

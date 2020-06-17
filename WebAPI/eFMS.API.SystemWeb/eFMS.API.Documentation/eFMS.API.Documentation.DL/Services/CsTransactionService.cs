@@ -2447,6 +2447,7 @@ namespace eFMS.API.Documentation.DL.Services
             job.DatetimeModified = DateTime.Now;
             job.IsLocked = true;
             job.LockedDate = DateTime.Now;
+            job.LockedUser = currentUser.UserName;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
