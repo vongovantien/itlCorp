@@ -20,7 +20,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                                     [displayFields]="displayFieldsPartner" [height]="150"
-                                    (remove)="resetFormControl(partner)">
+                                    (remove)="resetFormControl(partner)" placeholder="Select customer">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -45,7 +45,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'creator')"
                                     [selectedDisplayFields]="['username']" [dataSources]="creators | async"
                                     [displayFields]="displayFieldsCreator" [height]="150"
-                                    (remove)="resetFormControl(creator)">
+                                    (remove)="resetFormControl(creator)" placeholder="Select creator">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -55,7 +55,8 @@
                                     <div class="form-group">
                                         <label class="form-control-label" for="">Type</label>
                                         <ng-select formControlName="voucherType" [allowClear]="true"
-                                            [items]="voucherTypeList" [active]="voucherTypeActive">
+                                            [items]="voucherTypeList" [active]="voucherTypeActive"
+                                            placeholder="Select type">
                                         </ng-select>
                                     </div>
                                 </div>
@@ -63,7 +64,8 @@
                                     <div class="form-group">
                                         <label class="form-control-label" for="">Status</label>
                                         <ng-select formControlName="invoiceStatus" [allowClear]="true"
-                                            [items]="invoiceStatusList" [active]="invoiceStatusActive">
+                                            [items]="invoiceStatusList" [active]="invoiceStatusActive"
+                                            placeholder="Select status">
                                         </ng-select>
                                     </div>
                                 </div>

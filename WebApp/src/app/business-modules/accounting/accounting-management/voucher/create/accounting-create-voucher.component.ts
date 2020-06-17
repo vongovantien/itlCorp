@@ -105,6 +105,10 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
             );
     }
 
+    gotoList() {
+        this._router.navigate([`home/accounting/management/voucher`]);
+    }
+
     ngOnDestroy() {
         this._store.dispatch(InitPartner());
     }

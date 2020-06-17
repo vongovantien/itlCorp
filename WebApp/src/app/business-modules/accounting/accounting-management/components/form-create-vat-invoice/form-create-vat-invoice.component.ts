@@ -130,6 +130,8 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.paymentMethod = this.formGroup.controls['paymentMethod'];
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
+        this.status = this.formGroup.controls['status'];
+
 
         if (!this.update) {
             this.invoiceNoTempt.valueChanges
