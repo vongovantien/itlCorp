@@ -138,8 +138,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatSaleManViewModel> Query(CatSalemanCriteria criteria)
         {
-            var salesMan = DataContext.Get().Where(x => x.PartnerId == criteria.PartnerId);
-            var sysUser = sysUserRepository.Get();
+            IQueryable<CatSaleman> salesMan = DataContext.Get().Where(x => x.PartnerId == criteria.PartnerId);
+            IQueryable <SysUser> sysUser = sysUserRepository.Get();
+
             var query = from saleman in salesMan
                         join users in sysUser on saleman.SaleManId equals users.Id
                         select new { saleman, users };
@@ -165,8 +166,18 @@ namespace eFMS.API.Catalogue.DL.Services
             foreach (var item in query)
             {
 
-                var saleman = mapper.Map<CatSaleManViewModel>(item.saleman);
+                CatSaleManViewModel saleman = mapper.Map<CatSaleManViewModel>(item.saleman);
                 saleman.Username = item.users.Username;
+
+                if(saleman.Office != null) {
+                    SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.Office)?.FirstOrDefault();
+                    saleman.OfficeName = office.ShortName;
+                }
+                if (saleman.Company != null)
+                {
+                    SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.Company)?.FirstOrDefault();
+                    saleman.CompanyName = company.BunameEn;
+                }
                 results.Add(saleman);
             }
             return results?.OrderBy(x=>x.CreateDate).AsQueryable();

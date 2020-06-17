@@ -6,8 +6,10 @@ namespace eFMS.API.Catalogue.DL.ViewModels
     {
         public string Id { get; set; }
         public string SaleManId { get; set; }
-        public string Office { get; set; }
-        public string Company { get; set; }
+        public Guid? Office { get; set; }
+        public string OfficeName { get; set; }
+        public Guid? Company { get; set; }
+        public string CompanyName { get; set; }
         public bool? Status { get; set; }
         public string PartnerId { get; set; }
         public string Service { get; set; }
