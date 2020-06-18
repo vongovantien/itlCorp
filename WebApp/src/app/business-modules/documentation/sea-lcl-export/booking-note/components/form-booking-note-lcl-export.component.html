@@ -41,10 +41,18 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-lg-2">
-                            <label>Tel</label>
+                            <label>Booking Date</label>
                         </div>
                         <div class="col-lg-10">
-                            <input type="text" class="form-control" formControlName="telTo">
+                            <!-- <input type="text" class="form-control" formControlName="telTo"> -->
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select date" readonly
+                                    formControlName="bookingDate" calendar
+                                    [allowRemove]="!!bookingDate.value && !!bookingDate.value.startDate"
+                                    (remove)="resetFormControl(bookingDate)" />
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row "
