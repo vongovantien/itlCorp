@@ -130,6 +130,8 @@
   "MSG_INVOICE_DUPLICATE": "Invoice No {0} has been duplicated!",
   "MSG_SERIE_NO_DUPLICATE": "Serie No {0} has been duplicated!",
   "MSG_VOUCHER_ID_DUPLICATE_ROW": "VoucherId {0} has been duplicated row!",
+  "MSG_SERIE_NO_EXISTED": "Serie No {0} has been existed in another voucher!",
+  "MSG_INVOICE_NO_EXISTED": "Invoice No {0} has been existed in another voucher!",
   //------------end  : VOUCHER
 
   "DO_NOT_HAVE_PERMISSION": "Do not have permission"
