@@ -7,6 +7,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
+using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
@@ -81,6 +82,13 @@ namespace eFMS.API.Setting.Controllers
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             return Ok(result);
+        }
+
+        [HttpPost("GetJobToUnlockRequest")]
+        public IActionResult GetJobToUnlockRequest(UnlockJobCriteria criteria)
+        {
+            var data = unlockRequestService.GetJobToUnlockRequest(criteria);
+            return Ok(data);
         }
     }
 }
