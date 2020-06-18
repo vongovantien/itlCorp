@@ -362,9 +362,9 @@ namespace eFMS.API.Accounting.Controllers
                     };
                     list.Add(acc);
                 }
-                var data = accountingService.CheckVatInvoiceImport(list);
+                List<AcctMngtVatInvoiceImportModel> data = accountingService.CheckVatInvoiceImport(list);
 
-                var totalValidRows = data.Count(x => x.IsValid == true);
+                int totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);
             }

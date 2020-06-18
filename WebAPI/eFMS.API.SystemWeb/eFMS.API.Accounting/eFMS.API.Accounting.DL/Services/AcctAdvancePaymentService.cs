@@ -2661,6 +2661,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var advance = DataContext.Get(x => x.Id == new Guid( id)).FirstOrDefault();
                         advance.VoucherNo = model.VoucherNo;
                         advance.VoucherDate = model.VoucherDate;
+                        advance.DeadlinePayment = model.VoucherDate.Value.AddDays(14);
                         hs = DataContext.Update(advance, x => x.Id == advance.Id);
                     }
                     trans.Commit();
@@ -2696,6 +2697,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach(var item in lstAdvance)
                         {
+                            item.DeadlinePayment = item.VoucherDate.Value.AddDays(14);
                             DataContext.Update(item , x=>x.Id == item.Id);
                         }
                         trans.Commit();

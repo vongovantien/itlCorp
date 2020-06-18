@@ -1240,17 +1240,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
                                 item.IsValid = false;
                             }
-                            //else
-                            //{
-                            //    // Trùng Invoice, Serie, VoucherID #
-                            //    if (DataContext.Any(x => x.InvoiceNoReal == item.RealInvoiceNo && x.Serie == item.SerieNo))
-                            //    {
-                            //        item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_DUPLICATE];
-                            //        item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_DUPLICATE];
-                            //        item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_DUPLICATE];
-                            //        item.IsValid = false;
-                            //    }
-                            //}
+                            else
+                            {
+                                // Trùng Invoice, Serie #
+                                if (CheckExistedInvoiceNoTempSerie(item.RealInvoiceNo,item.SerieNo,item.VoucherId))
+                                {
+                                    item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_NO_EXISTED, item.RealInvoiceNo];
+                                    item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_EXISTED, item.SerieNo];
+                                    item.IsValid = false;
+                                }
+                            }
                         }
                     }
                 }
@@ -1362,6 +1361,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return code;
         }
-       
+
+        private bool CheckExistedInvoiceNoTempSerie(string invoiceNoTemp, string serie, string voucherId)
+        {
+            bool isExited = false;
+
+            isExited = DataContext.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.VoucherId != voucherId && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
+
+            return isExited;
+        }
     }
 }
