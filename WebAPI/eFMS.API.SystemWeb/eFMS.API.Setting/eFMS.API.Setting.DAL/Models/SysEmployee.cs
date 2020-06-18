@@ -33,7 +33,5 @@ namespace eFMS.API.Setting.Service.Models
         public byte[] Signature { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual CatSaleResource SaleResourceNavigation { get; set; }
     }
 }
