@@ -4,6 +4,18 @@ using System.ComponentModel;
 
 namespace eFMS.API.Accounting.DL.Common
 {
+    public enum PaymentType {
+        Invoice,
+        OBH
+    }
+    public enum OverDueDate
+    {
+        All,
+        Between1_15,
+        Between16_30,
+        Between31_60,
+        Between61_90
+    }
     public enum TransactionTypeEnum
     {
         InlandTrucking = 1,

@@ -8,5 +8,6 @@ namespace eFMS.API.Accounting.DL.Models
     public class AccAccountingPaymentModel: AccAccountingPayment
     {
         public string UserModifiedName { get; set; }
+        public string RefNo { get; set; }
     }
 }

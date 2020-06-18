@@ -61,6 +61,18 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String)">
+            <summary>
+            get list payment by refNo
+            </summary>
+            <param name="refNo"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

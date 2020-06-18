@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,12 @@ namespace eFMS.API.Accounting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccAccountingPaymentService accountingPaymentService;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="paymentService"></param>
         public AccountingPaymentController(IStringLocalizer<LanguageSub> localizer,
             IAccAccountingPaymentService paymentService)
         {
@@ -30,6 +37,20 @@ namespace eFMS.API.Accounting.Controllers
             accountingPaymentService = paymentService;
         }
         
+        /// <summary>
+        /// query and paging VAT invoice / SOA
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [HttpPost("Paging")]
+        public IActionResult PagingPayment(PaymentCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = accountingPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
+        }
         /// <summary>
         /// get list payment by refNo
         /// </summary>

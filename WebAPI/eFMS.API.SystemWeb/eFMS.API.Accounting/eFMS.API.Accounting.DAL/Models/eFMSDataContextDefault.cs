@@ -96,7 +96,15 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentDatetimeUpdated).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
+
                 entity.Property(e => e.PaymentMethod).HasMaxLength(50);
+
+                entity.Property(e => e.PaymentNote).HasMaxLength(500);
+
+                entity.Property(e => e.PaymentStatus).HasMaxLength(50);
 
                 entity.Property(e => e.Status).HasMaxLength(50);
 
@@ -123,9 +131,11 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                    .HasDefaultValueSql("(newid())");
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
@@ -135,6 +145,12 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidDate).HasColumnType("datetime");
 
@@ -629,6 +645,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.PaymentDatetimeUpdated).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentNote).HasMaxLength(500);
+
+                entity.Property(e => e.PaymentStatus).HasMaxLength(50);
+
                 entity.Property(e => e.ServiceTypeId)
                     .HasMaxLength(250)
                     .IsUnicode(false);
@@ -1070,6 +1094,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.BankAccountNo)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingEmail)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingPhone)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.CoLoaderCode)
