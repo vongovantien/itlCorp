@@ -13,6 +13,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string TelTo { get; set; }
         public string Revision { get; set; }
         public string BookingNo { get; set; }
+        public DateTime? BookingDate { get; set; }
         public string ShipperId { get; set; }
         public string ShipperDescription { get; set; }
         public string ConsigneeId { get; set; }
