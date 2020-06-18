@@ -132,6 +132,13 @@ export namespace CommonEnum {
         TOTAL = 'Total',
         SINGLE = 'Single'
     }
+
+    export enum unlockTypeEnum {
+        SHIPMENT = 'Shipment',
+        ADVANCE = 'Advance',
+        SETTEMENT = 'Settlement',
+        SERVICEDATE = 'Change Service Date',
+    }
 }
 
 

@@ -2,7 +2,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Denied Comment</h5>
+                <h5 class="modal-title">Add {{unlockType === "Settlement" ? 'Settlement' : 'Advance'}}</h5>
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
@@ -10,8 +10,8 @@
                         <div class="row align-items-center">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <textarea class="form-control m-input m-input--square" [(ngModel)]="comment"
-                                        rows="6"></textarea>
+                                    <textarea class="form-control m-input m-input--square"
+                                        [(ngModel)]="settlementAdvanceSearch" rows="6"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -19,11 +19,11 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="ok()">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="add()">
                     <span>
                         <i class="la la-check-square"></i>
                         <span>
-                            Ok
+                            Add
                         </span>
                     </span>
                 </button>

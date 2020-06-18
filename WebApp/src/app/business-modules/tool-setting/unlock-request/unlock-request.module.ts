@@ -12,6 +12,11 @@ import { UnlockRequestAddNewComponent } from "./add/add-unlock-request.component
 import { UnlockRequestDetailComponent } from "./detail/detail-unlock-request.component";
 import { FroalaEditorModule } from "angular-froala-wysiwyg";
 import { UnlockRequestListJobComponent } from "./components/list-job-unlock-request/list-job-unlock-request.component";
+import { UnlockRequestInfoDeniedCommentPopupComponent } from "./components/popup/info-denied-comment/info-denied-comment.popup";
+import { UnlockRequestInputDeniedCommentPopupComponent } from "./components/popup/input-denied-comment/input-denied-comment.popup";
+import { UnlockRequestInputSearchJobPopupComponent } from "./components/popup/input-search-job/input-search-job.popup";
+import { UnlockRequestInputSearchSettlementAdvancePopupComponent } from "./components/popup/input-search-settlement-advance/input-search-settlement-advance.popup";
+import { UnlockRequestProcessApproveComponent } from "./components/process-approve-unlock-request/process-approve-unlock-request.component";
 
 const routing: Route[] = [
     {
@@ -51,7 +56,12 @@ const routing: Route[] = [
         UnlockRequestFormSearchComponent,
         UnlockRequestAddNewComponent,
         UnlockRequestDetailComponent,
-        UnlockRequestListJobComponent
+        UnlockRequestListJobComponent,
+        UnlockRequestInfoDeniedCommentPopupComponent,
+        UnlockRequestInputDeniedCommentPopupComponent,
+        UnlockRequestInputSearchJobPopupComponent,
+        UnlockRequestInputSearchSettlementAdvancePopupComponent,
+        UnlockRequestProcessApproveComponent
     ],
     providers: [],
 })
