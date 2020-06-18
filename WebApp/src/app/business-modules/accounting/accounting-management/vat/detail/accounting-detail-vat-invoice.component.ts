@@ -13,6 +13,8 @@ import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators'
 import { of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
+import { SystemConstants } from '@constants';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-accounting-detail-vat-invoice',
@@ -59,9 +61,12 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
         this._accountingRepo.getDetailAcctMngt(id)
             .subscribe(
                 (res: AccAccountingManagementModel) => {
-                    this.accountingManagement = new AccAccountingManagementModel(res);
-                    this.updateFormInvoice(res);
-                    this.updateChargeList(res);
+                    if (!!res) {
+                        this.accountingManagement = new AccAccountingManagementModel(res);
+                        this.updateFormInvoice(res);
+                        this.updateChargeList(res);
+                    }
+
                 }
             );
     }
@@ -74,6 +79,7 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
 
         };
         this.formCreateComponent.formGroup.patchValue(Object.assign(_merge(res, formData)));
+
         if (this.accountingManagement.status !== 'New') {
             this.formCreateComponent.isReadonly = true;
         }
@@ -145,6 +151,12 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                         this.updateFormInvoice((res as AccAccountingManagementModel));
                     }
                 },
+                (error: HttpErrorResponse) => {
+                    if ((error.error as CommonInterface.IResult).data === SystemConstants.HTTP_CODE.EXISTED) {
+                        this.formCreateComponent.serie.setErrors({ existed: true });
+                        this.formCreateComponent.invoiceNoTempt.setErrors({ existed: true });
+                    }
+                }
             );
     }
 

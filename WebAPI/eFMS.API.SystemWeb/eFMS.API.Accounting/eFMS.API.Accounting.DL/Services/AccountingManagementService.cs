@@ -1237,7 +1237,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (string.IsNullOrEmpty(item.SerieNo))
                             {
-                                item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
+                                item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
                                 item.IsValid = false;
                             }
                             //else
@@ -1266,8 +1266,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     foreach (var item in list)
                     {
-                        var vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
+                        AccAccountingManagement vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
+
                         vatInvoice.InvoiceNoTempt = vatInvoice.InvoiceNoReal = item.RealInvoiceNo;
+                        vatInvoice.Serie =  item.SerieNo;
                         vatInvoice.Date = item.InvoiceDate;
                         vatInvoice.Status = AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED;
                         vatInvoice.UserModified = currentUser.UserID;
@@ -1279,7 +1281,6 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var surcharge in surchargeOfAcctCurrent)
                             {
-
                                 surcharge.InvoiceNo = item.RealInvoiceNo;
                                 surcharge.InvoiceDate = item.InvoiceDate;
                                 surcharge.SeriesNo = item.SerieNo;
@@ -1297,12 +1298,13 @@ namespace eFMS.API.Accounting.DL.Services
                     surchargeRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
                     return new ResultHandle { Status = true, Message = "Import Vat Invoice successfully" };
 
                 }
                 catch (Exception ex)
                 {
-                    var result = new HandleState(ex.Message);
+                    HandleState result = new HandleState(ex.Message);
                     return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
                 }
                 finally

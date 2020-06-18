@@ -90,7 +90,7 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`home/accounting/management/invoice/${res.data.id}`]);
+                        this._router.navigate([`home/accounting/management/vat-invoice/${res.data.id}`]);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -101,6 +101,10 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                     }
                 }
             );
+    }
+
+    gotoList() {
+        this._router.navigate([`home/accounting/management/vat-invoice`]);
     }
 
     ngOnDestroy() {
