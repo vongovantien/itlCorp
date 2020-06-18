@@ -19,7 +19,8 @@
         <tabset class="custom-class-tab">
             <tab heading="HBL Detail">
                 <form-create-house-bill-import> </form-create-house-bill-import>
-                <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
+                <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
+                </hbl-goods-summary-lcl>
             </tab>
             <tab heading="Arrival Notice">
                 <hbl-arrival-note-sea type="SLI"></hbl-arrival-note-sea>

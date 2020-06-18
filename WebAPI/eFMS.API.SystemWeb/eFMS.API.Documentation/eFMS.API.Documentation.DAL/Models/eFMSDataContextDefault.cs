@@ -527,6 +527,14 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BillingEmail)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingPhone)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CoLoaderCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1218,6 +1226,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.BookingDate).HasColumnType("datetime");
+
                 entity.Property(e => e.BookingNo)
                     .HasMaxLength(30)
                     .IsUnicode(false);
@@ -1875,6 +1885,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
 
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LockedUser).HasMaxLength(50);
 
                 entity.Property(e => e.Mawb)
                     .HasColumnName("MAWB")
@@ -2567,6 +2579,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
 
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LockedUser).HasMaxLength(50);
 
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNO")

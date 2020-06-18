@@ -50,11 +50,12 @@
                             <label required>Package Qty: </label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <input type="number" class="form-control" [(ngModel)]="packageQty" min="0" integer
-                                        autoFormatCurrency>
+                                    <input type="number" class="form-control" [(ngModel)]="packageQty"
+                                        (ngModelChange)="onChangePackge()" min="0" integer autoFormatCurrency>
                                 </div>
                                 <div class="col-md-6">
-                                    <select class="form-control" [(ngModel)]="selectedPackage" name="selectedPackage">
+                                    <select class="form-control" [(ngModel)]="selectedPackage"
+                                        (ngModelChange)="onChangePackge()" name="selectedPackage">
                                         <option *ngFor="let unit of packages" [value]="unit.id">
                                             {{unit.code}}</option>
                                     </select>
@@ -89,7 +90,7 @@
     </div>
 </div>
 
-<goods-list-popup (onChange)="onChangeContainer($event)"></goods-list-popup>>
+<goods-list-popup (onChange)="onChangeContainer($event)"></goods-list-popup>
 
 <confirm-popup [body]="'All manually entered data will be refresh, are you sure you want to perform this action ?'"
     [labelConfirm]="'Yes'" [labelConfirm]="'No'" (onSubmit)="onRefresh()" [title]="'Alert'"
