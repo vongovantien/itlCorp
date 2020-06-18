@@ -9,8 +9,8 @@
             <tabset class="custom-class-tab">
                 <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
                 </tab>
-                <tab *ngIf="!!(menuSpecialPermission | async) ? (menuSpecialPermission| async)[1].isAllow : false"
-                    heading="VAT Invoice" (selectTab)="onSelectTab('vat')" [active]="true">
+                <tab *ngIf="menuSpecialPermission | async | specialPermission:'Invoice'" heading="VAT Invoice"
+                    (selectTab)="onSelectTab('vat')" [active]="true">
 
                     <form-search-vat-voucher [accountType]="'Invoice'" (onSearch)="onSearchInvoice($event)">
                     </form-search-vat-voucher>
@@ -106,8 +106,8 @@
                         </div>
                     </div>
                 </tab>
-                <tab *ngIf="!!(menuSpecialPermission | async) ? (menuSpecialPermission| async)[0].isAllow :false"
-                    heading="Voucher" (selectTab)="onSelectTab('voucher')"> </tab>
+                <tab *ngIf="menuSpecialPermission | async | specialPermission:'Voucher'" heading="Voucher"
+                    (selectTab)="onSelectTab('voucher')"> </tab>
             </tabset>
         </div>
     </div>

@@ -5,5 +5,6 @@ export * from './equal-error.pipe';
 export * from './abs.pipe';
 export * from './remove-trim.pipe';
 export * from './highlight.pipe';
+export * from './special-permission.pipe';
 
 
