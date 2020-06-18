@@ -14,6 +14,14 @@ export class Saleman {
     serviceName: string = '';
     username: string = '';
     freightPayment: any = '';
+
+    companyNameEn: string = null;
+    companyNameVn: string = null;
+    companyNameAbbr: string = null;
+    officeNameEn: string = null;
+    officeNameVn: string = null;
+    officeNameAbbr: string = null;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

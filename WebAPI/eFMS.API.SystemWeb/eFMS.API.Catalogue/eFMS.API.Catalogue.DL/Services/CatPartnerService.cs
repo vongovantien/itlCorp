@@ -22,6 +22,7 @@ using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using System.Text;
 using System.Text.RegularExpressions;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -37,6 +38,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IOptions<WebUrl> webUrl;
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+        private readonly IContextBase<CatCountry> catCountryRepository;
 
 
         public CatPartnerService(IContextBase<CatPartner> repository,
@@ -49,6 +51,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ICatCountryService country,
             IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
+            IContextBase<CatCountry> catCountryRepo,
             IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -60,6 +63,8 @@ namespace eFMS.API.Catalogue.DL.Services
             webUrl = url;
             officeRepository = officeRepo;
             sysEmployeeRepository = sysEmployeeRepo;
+            catCountryRepository = catCountryRepo;
+
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -569,11 +574,16 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public CatPartnerModel GetDetail(string id)
         {
-            var queryDetail = Get(x => x.Id == id).FirstOrDefault();
-            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            CatPartnerModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
+            if(queryDetail == null)
+            {
+                return null;
+            }
+            List<CatSaleman> salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
-            var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            var permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            PermissionRange permissionRangeDelete = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int checkDelete = GetPermissionToDelete(new ModelUpdate { GroupId = queryDetail.GroupId, OfficeId = queryDetail.OfficeId, CompanyId = queryDetail.CompanyId, UserCreator = queryDetail.UserCreated, Salemans = salemans, PartnerGroup = queryDetail.PartnerGroup }, permissionRangeDelete);
 
             queryDetail.Permission = new PermissionAllowBase
@@ -581,6 +591,28 @@ namespace eFMS.API.Catalogue.DL.Services
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, salemans, queryDetail),
                 AllowDelete = checkDelete == 403 ? false : true
             };
+
+            if(queryDetail.CountryId != null)
+            {
+                CatCountry country = catCountryRepository.Get(x => x.Id == queryDetail.CountryId)?.FirstOrDefault();
+                queryDetail.CountryName = country.NameEn;
+            }
+            if (queryDetail.CountryShippingId != null)
+            {
+                CatCountry country = catCountryRepository.Get(x => x.Id == queryDetail.CountryShippingId)?.FirstOrDefault();
+                queryDetail.CountryShippingName = country.NameEn;
+            }
+
+            if (queryDetail.ProvinceId != null)
+            {
+                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
+                queryDetail.ProvinceName = province.NameEn;
+            }
+            if (queryDetail.ProvinceShippingId != null)
+            {
+                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province) )?.FirstOrDefault();
+                queryDetail.ProvinceShippingName = province.NameEn;
+            }
             return queryDetail;
         }
 
