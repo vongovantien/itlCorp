@@ -28,16 +28,16 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatCommodity, CatCommodityModel>();
             CreateMap<CatUnit, CatUnitModel>();
             CreateMap<CatCommodityGroupModel, CatCommodityGroup>();
-            CreateMap<CatSaleman, CatSaleManModel>();
-            CreateMap<CatSaleman, CatSaleManViewModel>();
+            CreateMap<CatContract, CatContractModel>();
+            CreateMap<CatContract, CatContractViewModel>();
 
-            CreateMap<CatSaleManEditModel, CatSaleManModel>();
+            CreateMap<CatContractEditModel, CatContractModel>();
             CreateMap<CatChartOfAccounts, CatChartOfAccountsModel>();
             CreateMap<CatChartOfAccountsImportModel, CatChartOfAccounts>();
 
             //map to entity model
             CreateMap<CatPartnerChargeModel, CatPartnerCharge>();
-            CreateMap<CatSaleManModel, CatSaleman>();
+            CreateMap<CatContractModel, CatSaleman>();
             CreateMap<CatCurrencyModel, CatCurrency>();
             CreateMap<CatUnitModel, CatUnit>();
             CreateMap<CatCountryModel, CatCountry>();

@@ -8,6 +8,7 @@ import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
+import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { PipeModule } from 'src/app/shared/pipes/pipe.module';
         CommonComponentModule,
         DirectiveModule,
         ReactiveFormsModule,
-        PipeModule
+        PipeModule,
+        ShareCommercialCatalogueModule
     ],
     exports: [
         CommercialCreateComponent,

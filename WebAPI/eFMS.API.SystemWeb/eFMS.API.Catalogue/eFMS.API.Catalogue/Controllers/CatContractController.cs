@@ -20,18 +20,18 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatSaleManController : ControllerBase
+    public class CatContractController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatSaleManService catSaleManService;
+        private readonly ICatContractService catContractService;
         private readonly ICatPartnerService partnerService;
 
 
         private readonly IMapper mapper;
-        public CatSaleManController(IStringLocalizer<LanguageSub> localizer, ICatSaleManService service, ICatPartnerService partnerSv, IMapper iMapper)
+        public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper)
         {
             stringLocalizer = localizer;
-            catSaleManService = service;
+            catContractService = service;
             mapper = iMapper;
             partnerService = partnerSv;
         }
@@ -43,7 +43,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var results = catSaleManService.GetSaleMan();
+            var results = catContractService.GetContracts();
             return Ok(results);
         }
 
@@ -56,9 +56,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Query")]
-        public IActionResult Get(CatSalemanCriteria criteria)
+        public IActionResult Get(CatContractCriteria criteria)
         {
-            var results = catSaleManService.Query(criteria);
+            var results = catContractService.Query(criteria);
             return Ok(results);
         }
 
@@ -72,9 +72,9 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("Paging")]
         [AuthorizeEx(Menu.catPartnerdata, UserPermission.AllowAccess)]
-        public IActionResult Get(CatSalemanCriteria criteria, int page, int size)
+        public IActionResult Get(CatContractCriteria criteria, int page, int size)
         {
-            var data = catSaleManService.Paging(criteria, page, size, out int rowCount);
+            var data = catContractService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
@@ -87,7 +87,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("GetBy")]
         public IActionResult GetBy(string partnerId)
         {
-            var results = catSaleManService.GetBy(partnerId.Trim());
+            var results = catContractService.GetBy(partnerId.Trim());
             return Ok(results);
         }
 
@@ -100,7 +100,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("GetSalemanIdByPartnerId/{partnerId}")]
         public IActionResult GetSalemanIdByPartnerId(string partnerId)
         {
-            Guid? id = catSaleManService.GetSalemanIdByPartnerId(partnerId);
+            Guid? id = catContractService.GetContractIdByPartnerId(partnerId);
             return Ok(id);
         }
 
@@ -111,18 +111,18 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post(CatSaleManEditModel model)
+        public IActionResult Post(CatContractEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service  && x.Office == model.Office && x.PartnerId == model.PartnerId);
+            bool checkExist = catContractService.Any(x => x.SaleService == model.Service  && x.OfficeId == model.Office && x.PartnerId == model.PartnerId);
             if (checkExist)
             {
                 messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
             }
-            var saleman = mapper.Map<CatSaleManModel>(model);
-            var hs = catSaleManService.Add(saleman);
+            var saleman = mapper.Map<CatContractModel>(model);
+            var hs = catContractService.Add(saleman);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -139,11 +139,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CheckExisted")]
-        public IActionResult CheckExisted(CatSaleManEditModel model)
+        public IActionResult CheckExisted(CatContractEditModel model)
         {
       
             string messageDuplicate = string.Empty;
-            bool checkExist = catSaleManService.Any(x => x.Service == model.Service && x.Office == model.Office && x.PartnerId == model.PartnerId && x.SaleManId == model.SaleManId);
+            bool checkExist = catContractService.Any(x => x.SaleService == model.Service && x.OfficeId == model.Office && x.PartnerId == model.PartnerId && x.SaleManId == model.SaleManId);
             if (checkExist)
             {
                 //messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
@@ -163,11 +163,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public IActionResult Put(string id, CatSaleManEditModel model)
+        public IActionResult Put(string id, CatContractEditModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var saleman = mapper.Map<CatSaleManModel>(model);
-            var hs = catSaleManService.Update(saleman);
+            var saleman = mapper.Map<CatContractModel>(model);
+            var hs = catContractService.Update(saleman);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -187,13 +187,13 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(Guid id, string partnerId)
         {
-            var hs = catSaleManService.Delete(id);
+            var hs = catContractService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (hs.Success)
             {
                 var objPartner = partnerService.Get(x => x.Id == partnerId).FirstOrDefault();
-                objPartner.SalePersonId = catSaleManService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.CreateDate).FirstOrDefault().SaleManId.ToString();
+                objPartner.SalePersonId = catContractService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.DatetimeCreated).FirstOrDefault().SaleManId.ToString();
                 var hsPartner = partnerService.Update(objPartner, x=>x.Id == partnerId);
                 if (!hsPartner.Success)
                 {

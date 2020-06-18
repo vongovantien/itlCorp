@@ -32,7 +32,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
 
-        private readonly IContextBase<CatSaleman> salemanRepository;
+        private readonly IContextBase<CatContract> salemanRepository;
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
         private readonly IOptions<WebUrl> webUrl;
@@ -49,7 +49,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             ICatPlaceService place,
             ICatCountryService country,
-            IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url,
+            IContextBase<CatContract> salemanRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
             IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
@@ -96,12 +96,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (entity.SaleMans.Count > 0)
                 {
-                    var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
+                    var salemans = mapper.Map<List<CatContract>>(entity.SaleMans);
                     salemans.ForEach(x =>
                     {
                         x.Id = Guid.NewGuid();
                         x.PartnerId = partner.Id;
-                        x.CreateDate = DateTime.Now;
+                        x.DatetimeCreated = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
                     });
                     partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
@@ -186,7 +186,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 var hsoldman = salemanRepository.Delete(x => x.PartnerId == model.Id && !model.SaleMans.Any(sale => sale.Id == x.Id));
-                var salemans = mapper.Map<List<CatSaleman>>(model.SaleMans);
+                var salemans = mapper.Map<List<CatContract>>(model.SaleMans);
 
                 foreach (var item in model.SaleMans)
                 {
@@ -194,13 +194,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         item.Id = Guid.NewGuid();
                         item.PartnerId = entity.Id;
-                        item.CreateDate = DateTime.Now;
+                        item.DatetimeCreated = DateTime.Now;
                         item.UserCreated = currentUser.UserID;
                         salemanRepository.Add(item);
                     }
                     else
                     {
-                        item.ModifiedDate = DateTime.Now;
+                        item.DatetimeCreated = DateTime.Now;
                         item.UserModified = currentUser.UserID;
                         salemanRepository.Update(item, x => x.Id == item.Id);
                     }
@@ -579,7 +579,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            List<CatSaleman> salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            List<CatContract> salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -616,7 +616,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return queryDetail;
         }
 
-        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<CatSaleman> salemans, CatPartnerModel detail)
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<CatContract> salemans, CatPartnerModel detail)
         {
             bool result = false;
             switch (permissionRangeWrite)
@@ -688,7 +688,7 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 var partners = new List<CatPartner>();
-                var salesmans = new List<CatSaleman>();
+                var salesmans = new List<CatContract>();
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
@@ -705,21 +705,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
-                    var salesman = new CatSaleman
+                    var salesman = new CatContract
                     {
                         Id = Guid.NewGuid(),
-                        Office = item.OfficeId,
-                        Company = item.CompanyId,
+                        OfficeId = item.OfficeId,
+                        CompanyId = item.CompanyId,
                         SaleManId = item.SalePersonId,
-                        FreightPayment = item.PaymentTerm,
-                        EffectDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
+                        PaymentMethod = item.PaymentTerm,
+                        EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
                         Status = true,
                         PartnerId = partner.Id,
-                        CreateDate = DateTime.Now,
-                        ModifiedDate = DateTime.Now,
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
-                        Service = item.ServiceId
+                        SaleService = item.ServiceId
                     };
                     partners.Add(partner);
                     salesmans.Add(salesman);

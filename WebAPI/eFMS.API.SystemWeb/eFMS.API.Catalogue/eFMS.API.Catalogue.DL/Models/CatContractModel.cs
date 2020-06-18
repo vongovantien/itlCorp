@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class CatSaleManModel : CatSaleman
+    public class CatContractModel : CatContract
     {
         public string Username { get; set; }
         public string OfficeNameEn { get; set; }

@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Catalogue.DL.ViewModels
 {
-    public class CatSaleManViewModel
+    public class CatContractViewModel
     {
         public string Id { get; set; }
         public string SaleManId { get; set; }
