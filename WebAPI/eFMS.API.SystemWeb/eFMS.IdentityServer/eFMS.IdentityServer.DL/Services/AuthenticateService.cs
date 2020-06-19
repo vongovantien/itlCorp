@@ -105,7 +105,7 @@ namespace eFMS.IdentityServer.DL.Services
                         info = new PermissionInfo
                         {
                             OfficeID = userLevel.OfficeId,
-                            DepartmentID = (Int16)userLevel.DepartmentId,
+                            DepartmentID = userLevel.DepartmentId != null ? (Int16)userLevel.DepartmentId : (Int16)0,
                             GroupID = userLevel.GroupId,
                             CompanyID = userLevel.CompanyId
                         };
@@ -146,7 +146,7 @@ namespace eFMS.IdentityServer.DL.Services
                         info = new PermissionInfo
                         {
                             OfficeID = userLevel.OfficeId,
-                            DepartmentID = (Int16)userLevel.DepartmentId,
+                            DepartmentID = userLevel.DepartmentId != null ? (Int16)userLevel.DepartmentId : (Int16)0,
                             GroupID = userLevel.GroupId,
                             CompanyID = userLevel.CompanyId
                         };
@@ -184,7 +184,7 @@ namespace eFMS.IdentityServer.DL.Services
                     info = new PermissionInfo
                     {
                         OfficeID = userLevel.OfficeId,
-                        DepartmentID = (Int16)userLevel.DepartmentId,
+                        DepartmentID = userLevel.DepartmentId!= null?(Int16)userLevel.DepartmentId: (Int16)0,
                         GroupID = userLevel.GroupId,
                         CompanyID = userLevel.CompanyId
                     };
