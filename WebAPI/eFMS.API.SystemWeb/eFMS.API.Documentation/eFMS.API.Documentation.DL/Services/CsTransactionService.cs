@@ -2359,7 +2359,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.Mawb = model.MblNo;
                             hbl.OceanVoyNo = model.FlightVesselName + " - " + model.VoyNo;
 
-                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id,false);
+                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         csTransactionDetailRepo.SubmitChanges();
 
@@ -2434,7 +2434,7 @@ namespace eFMS.API.Documentation.DL.Services
             CsTransaction job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
             if (job == null)
             {
-              return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
 
             }
             if (job.IsLocked == true)
@@ -2454,7 +2454,7 @@ namespace eFMS.API.Documentation.DL.Services
                 try
                 {
                     hs = DataContext.Update(job, x => x.Id == jobId);
-                    
+
                     trans.Commit();
                     return hs;
 
@@ -2470,7 +2470,111 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
         }
+        #region preview
+        public Crystal PreviewShipmentCoverPage(Guid Id)
+        {
+            var dataShipment = DataContext.Get(x => x.Id == Id).FirstOrDefault();
+            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id);
+            var listShipment = new List<ShimentConverPageSeaReport>();
+            Crystal result = null;
+            //var _currentUser = currentUser.UserName;
+            if (dataShipment != null)
+            {
+                var obj = new ShimentConverPageSeaReport();
+                obj.TransID = dataShipment.JobNo;
+                obj.TransDate = dataShipment.ServiceDate;
+                var _containerNoList = string.Empty;
+                CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = dataShipment.Id };
+                var _shipmentType = GetShipmentTypeForPreviewPL(dataShipment.TransactionType);
+                if (!string.IsNullOrEmpty(dataShipment.AgentId))
+                {
+                    obj.Agent = obj.NominationParty = catPartnerRepo.Get(x => x.Id == dataShipment.AgentId).Select(x => x.PartnerNameEn).FirstOrDefault()?.ToUpper();
+                }
+                obj.ShipmentSource = dataShipment.ShipmentType;
+                obj.Vessel = dataShipment.FlightVesselName;
+                if (!string.IsNullOrEmpty(dataShipment.ColoaderId))
+                {
+                    obj.Carrier = catPartnerRepo.Get(x => x.Id == dataShipment.ColoaderId).Select(x => x.PartnerNameEn).FirstOrDefault()?.ToUpper();
+                }
+                if (dataShipment.Pol != Guid.Empty)
+                {
+                    obj.POL = catPlaceRepo.Get(x => x.Id == dataShipment.Pol).Select(x => x.NameEn)?.FirstOrDefault();
+                }
+                obj.POD = catPlaceRepo.Get(x => x.Id == dataShipment.Pod).Select(x => x.NameEn)?.FirstOrDefault();
+                obj.ETA = dataShipment.Eta;
+                obj.ETD = dataShipment.Etd;
+                obj.MAWB = dataShipment.Mawb;
+                obj.ContainerNo = dataShipment.PackageContainer;
+                obj.ShipmentType = _shipmentType;
+                string salesmanName = string.Empty;
+                if (dataHouseBills.Any())
+                {
+                    foreach (var item in dataHouseBills)
+                    {
+                        var objInHbl = new ShimentConverPageSeaReport();
+                        var shipper = catPartnerRepo.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn.ToUpper();
+                        var consignee = catPartnerRepo.Get(x => x.Id == item.ConsigneeId).FirstOrDefault()?.PartnerNameEn.ToUpper();
+                        objInHbl.HWBNO = item.Hwbno;
+                        objInHbl.ATTN = shipper?.ToUpper();
+                        objInHbl.Consignee = consignee?.ToUpper();
+                        objInHbl.FreightTerm = item.FreightPayment;
+                        objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
+                        objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
+                        objInHbl.CW = item.ChargeWeight == null ? 0 : item.ChargeWeight;
+                        objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
+                        objInHbl.TransID = obj.TransID;
+                        objInHbl.TransDate = obj.TransDate;
+                        objInHbl.Agent = obj.Agent;
+                        objInHbl.ShipmentSource = obj.ShipmentSource;
+                        objInHbl.Vessel = obj.Vessel;
+                        objInHbl.Carrier = obj.Carrier;
+                        objInHbl.POL = obj.POL;
+                        objInHbl.POD = obj.POD;
+                        objInHbl.ETA = obj.ETA;
+                        objInHbl.ETD = obj.ETD;
+                        objInHbl.MAWB = obj.MAWB;
+                        objInHbl.ContainerNo = obj.ContainerNo;
+                        objInHbl.ShipmentType = obj.ShipmentType;
+                        salesmanName += sysUserRepo.Get(x => x.Id == item.SaleManId).Select(t => t.Username)?.FirstOrDefault() + ",";
+                        listShipment.Add(objInHbl);
+                    }
+                    
+                }
+                else
+                {
+                    listShipment.Add(obj);
+                }
+                if(salesmanName.Length > 0)
+                {
+                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1));
+                }
+            }
+
+            var parameter = new ShimentConverPageSeaReportParams();
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.Contact = string.Empty;//Get user name login
+            parameter.DecimalNo = 0; // set 0  temporary
+            parameter.HBLList = string.Empty;
+
+            result = new Crystal
+            {
+                ReportName = "ShipmentCoverPage.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listShipment);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+
+        }
     }
+    #endregion
+
 }
 
 

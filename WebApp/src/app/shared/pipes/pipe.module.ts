@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe, HighlightPipe } from '.';
+import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe, HighlightPipe, ServiceNamePipe, SpecialPermissionPipe } from '.';
 
 const APP_PIPES = [
     SearchStage,
@@ -8,7 +8,9 @@ const APP_PIPES = [
     EqualErrorPipe,
     AbsPipe,
     RemoveTrimPipe,
-    HighlightPipe
+    HighlightPipe,
+    ServiceNamePipe,
+    SpecialPermissionPipe
 ];
 
 @NgModule({

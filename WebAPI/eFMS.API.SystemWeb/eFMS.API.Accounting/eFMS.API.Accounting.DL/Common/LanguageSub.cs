@@ -154,6 +154,10 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string MSG_INVOICE_DUPLICATE = "MSG_INVOICE_DUPLICATE";
         public static readonly string MSG_VOUCHER_ID_DUPLICATE_ROW = "MSG_VOUCHER_ID_DUPLICATE_ROW";
 
+        public static readonly string MSG_INVOICE_NO_EXISTED = "MSG_INVOICE_NO_EXISTED";
+        public static readonly string MSG_SERIE_NO_EXISTED = "MSG_SERIE_NO_EXISTED";
+
+
 
 
 

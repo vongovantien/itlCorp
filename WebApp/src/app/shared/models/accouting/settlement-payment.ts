@@ -18,7 +18,7 @@ export class SettlementPayment {
     userModified: string = '';
     userNameCreated: string = '';
     userNameModified: string = '';
-
+    isSelected: boolean = false;
     settleRequests: SettleRequestsPayment[] = [];
 
     constructor(object?: any) {

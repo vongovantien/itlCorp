@@ -3,7 +3,7 @@ import { AppPage } from './app.base';
 export abstract class AppList extends AppPage {
 
     page: number = 1;
-    totalItems: number = 10;
+    totalItems: number = 0;
     numberToShow: number[] = [3, 15, 30, 50];
     pageSize: number = this.numberToShow[1];
     maxSize: number = 5;

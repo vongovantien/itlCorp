@@ -12,6 +12,9 @@ import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { formatDate } from '@angular/common';
+import { Observable } from 'rxjs';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-advance-payment',
@@ -42,6 +45,8 @@ export class AdvancePaymentComponent extends AppList {
 
     advancePaymentIds: string[] = [];
 
+    menuSpecialPermission: Observable<any[]>;
+
 
     checkAll = false;
     paymentHasStatusDone = false;
@@ -57,7 +62,8 @@ export class AdvancePaymentComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
-        private _router: Router
+        private _router: Router,
+        private _store: Store<IAppState>
     ) {
         super();
         this.requestList = this.getListAdvancePayment;
@@ -66,6 +72,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },

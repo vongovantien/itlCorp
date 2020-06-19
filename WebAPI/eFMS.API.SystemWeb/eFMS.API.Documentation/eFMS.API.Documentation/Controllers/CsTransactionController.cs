@@ -443,6 +443,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// preview air document release
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PreviewShipmentCoverPage")]
+        public IActionResult PreviewShipmentCoverPage(Guid id)
+        {
+            var result = csTransactionService.PreviewShipmentCoverPage(id);
+            return Ok(result);
+        }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

@@ -1,0 +1,101 @@
+<div class="unlock-request-page">
+    <app-sub-header>
+        <div class="c-button-actions">
+            <!-- <app-permission-button title="Create Request" (onClick)="openPopupAddAuthorization()" type="add">
+            </app-permission-button> -->
+            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/tool/unlock-request/new'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        Create Request
+                    </span>
+                </span>
+            </button>
+            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                [routerLink]="'/home/tool/unlock-request/123'">
+                <span>
+                    <i class="la la-plus"></i>
+                    <span>
+                        Detail
+                    </span>
+                </span>
+            </button> -->
+        </div>
+    </app-sub-header>
+    <div class="m-content">
+        <form-search-unlock-request (onSearch)="onSearchUnlockRequest($event)"></form-search-unlock-request>
+        <div class="m-portlet">
+            <div class="m-form">
+                <div class="m-portlet__body">
+                    <div class="table-wrapper table-scrollabler" id="department-list-table">
+                        <table class="table table-striped table-brand table-hover dataTable">
+                            <thead app-table-header [headers]="headers"
+                                (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                <th class="m--w-50 first table-actions-col">
+                                    Action
+                                </th>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <ng-container *ngIf="!!unlockRequests.length">
+                                    <tr *ngFor="let unlockRequest of unlockRequests; let i = index; trackBy: trackByFn">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <!-- <app-permission-button
+                                                    (onClick)="prepareDeleteAuthorization(authorization)" type="delete">
+                                                </app-permission-button> -->
+                                                <button type="button" title="Delete"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
+                                                    <i class="la la-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>{{unlockRequest.subject}}</td>
+                                        <td>{{unlockRequest.requestDate | date: 'dd/MM/yyyy HH:mm tt'}}</td>
+                                        <td class="text-info">{{unlockRequest.requester}}</td>
+                                        <td>{{unlockRequest.unlockType}}</td>
+                                        <td>{{unlockRequest.unlockStatus | date: 'dd/MM/yyyy'}}</td>
+                                        <td>{{unlockRequest.datetimeCreated | date: 'dd/MM/yyyy HH:mm tt'}}</td>
+                                    </tr>
+                                </ng-container>
+                                <tr *ngIf="!unlockRequests.length" app-table-none-record [colspan]="headers.length + 1">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="pagination-nav ">
+                        <div class="row">
+                            <div *ngIf="!!unlockRequests.length" class="col-sm-6">
+                                <div class="tatable__pager-size">
+                                    <div class="select-box">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                <option [ngValue]="item">{{item}} line / screen</option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                <div class="float-right">
+                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                        [(ngModel)]="page">
+                                    </pagination>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <app-pagination [total]="totalItems" [itemPerPage]="pageSize" (onChange)="updatePagingData($event)"
+                        [pageNum]="page"></app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <confirm-popup [body]="'Are you sure you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteAuthorization()">
+</confirm-popup>
+<permission-403-popup></permission-403-popup> -->

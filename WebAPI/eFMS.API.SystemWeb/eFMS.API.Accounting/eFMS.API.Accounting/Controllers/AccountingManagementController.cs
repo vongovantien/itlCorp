@@ -147,7 +147,7 @@ namespace eFMS.API.Accounting.Controllers
                 var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
                 if (isExistedInvoiceNoTempSerie)
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed", Data = 409 });
                 }
             }
 
@@ -191,7 +191,7 @@ namespace eFMS.API.Accounting.Controllers
                 var isExistedInvoiceNoTempSerie = CheckExistedInvoiceNoTempSerie(model.InvoiceNoTempt, model.Serie, model.Id);
                 if (isExistedInvoiceNoTempSerie)
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed" });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Invoice No (Tempt) - Seri has been existed", Data = 409 });
                 }
             }
 
@@ -362,9 +362,9 @@ namespace eFMS.API.Accounting.Controllers
                     };
                     list.Add(acc);
                 }
-                var data = accountingService.CheckVatInvoiceImport(list);
+                List<AcctMngtVatInvoiceImportModel> data = accountingService.CheckVatInvoiceImport(list);
 
-                var totalValidRows = data.Count(x => x.IsValid == true);
+                int totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);
             }

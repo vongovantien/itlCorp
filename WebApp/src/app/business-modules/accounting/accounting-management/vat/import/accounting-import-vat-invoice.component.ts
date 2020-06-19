@@ -97,7 +97,7 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
     }
 
     hideInvalid() {
-        if (!this.tempData.length) { return; }
+        if (!this.data.length) { return; }
         this.isShowInvalid = !this.isShowInvalid;
 
         if (this.isShowInvalid) {
@@ -113,6 +113,10 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
     }
 
     importVatInvoice() {
+        if (!this.data.length) {
+            this.invaliDataAlert.show();
+            return;
+        }
         if (this.totalRows - this.totalValidRows > 0) {
             this.invaliDataAlert.show();
             return;

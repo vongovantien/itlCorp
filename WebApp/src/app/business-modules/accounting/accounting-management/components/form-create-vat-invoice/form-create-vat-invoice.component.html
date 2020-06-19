@@ -79,7 +79,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || serie.dirty) && !serie.valid }">
                                 <label required>Series</label>
-                                <input type="text" class="form-control" placeholder="Series No" formControlName="serie">
+                                <input type="text" class="form-control" placeholder="Please input"
+                                    formControlName="serie">
                             </div>
 
                         </div>
@@ -87,7 +88,8 @@
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <ng-select #pm [items]="paymentMethods" [allowClear]="true"
-                                    (opened)="closeOtherSelects(pm)" formControlName="paymentMethod" placeholder="Cash">
+                                    (opened)="closeOtherSelects(pm)" formControlName="paymentMethod"
+                                    placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
@@ -98,7 +100,7 @@
                                     [currentActiveItemId]="{ field: 'accountCode', value: accountNo.value}"
                                     [selectedDisplayFields]="['accountCode','accountNameLocal']"
                                     [dataSources]="chartOfAccounts | async" [displayFields]="displayFieldsChartAccount"
-                                    (remove)="resetFormControl(accountNo)" placeholder="Charts of account">
+                                    (remove)="resetFormControl(accountNo)" placeholder="Please select">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -120,11 +122,11 @@
                         </div>
                         <div class="col-lg-12 m--margin-top-20">
                             <div class="row">
-                                <div class="col-lg-6 w-100">
-                                    <button class="btn   m-btn--uppercase w-100" type="button" [ngClass]="!formGroup.controls['status'].value 
-                                    || formGroup.controls['status'].value === 'New' ? 'btn-danger' : 'btn-success'">
-                                        <span>{{formGroup.controls["status"].value}}</span>
-                                    </button>
+                                <div class="col-lg-6" style="height: 33px">
+                                    <div class="h-100 d-flex align-items-center justify-content-center text-white"
+                                        [class.bg-danger]="status.value === 'New'"
+                                        [class.bg-success]="status.value === 'Updated Invoice'">
+                                        {{status.value}}</div>
                                 </div>
                                 <div class="col-lg-6 w-100" *ngIf="!isReadonly">
                                     <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase w-100"

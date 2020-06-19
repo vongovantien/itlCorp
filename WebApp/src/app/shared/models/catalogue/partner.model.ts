@@ -65,7 +65,8 @@ export class Partner {
 
     permission: PermissionPartner = new PermissionPartner();
 
-
+    countryShippingName: string = null;
+    countryName: string = null;
 
     constructor(data?: any) {
         const self = this;

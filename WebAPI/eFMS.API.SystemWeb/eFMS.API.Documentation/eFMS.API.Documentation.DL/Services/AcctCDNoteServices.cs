@@ -161,6 +161,10 @@ namespace eFMS.API.Documentation.DL.Services
                 model.UserCreated = currentUser.UserID;
                 model.DatetimeCreated = DateTime.Now;
                 model.Status = TermData.CD_NOTE_NEW;
+                model.GroupId = currentUser.GroupId;
+                model.OfficeId = currentUser.OfficeID;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.CompanyId = currentUser.CompanyID;
                 var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
@@ -221,8 +225,12 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
-                cdNote = mapper.Map<AcctCdnote>(model);
-                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
+                var entity = mapper.Map<AcctCdnote>(model);
+                entity.GroupId = model.GroupId;
+                entity.DepartmentId = model.DepartmentId;
+                entity.OfficeId = model.OfficeId;
+                entity.CompanyId = model.CompanyId;
+                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {
                     var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
@@ -1255,7 +1263,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CDNoteModel> results = null;
             var data = Query(criteria);
             if(data == null) { rowsCount = 0; return results; }
-            var cdNotes = Query(criteria)?.Select(x => new CDNoteModel
+            var cdNotes = Query(criteria)?.OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
                 PartnerId = x.PartnerId,
@@ -1265,9 +1273,9 @@ namespace eFMS.API.Documentation.DL.Services
                 JobId = x.JobId,
             })?.ToList();
 
-            if (cdNotes == null)
+            rowsCount = cdNotes.Count;
+            if (rowsCount == 0)
             {
-                rowsCount = 0;
                 return results;
             }
             var cdNotesGroupByCurrency = surchargeRepository.Get(x => cdNotes.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))

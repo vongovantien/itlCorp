@@ -1238,20 +1238,19 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (string.IsNullOrEmpty(item.SerieNo))
                             {
-                                item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
+                                item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
                                 item.IsValid = false;
                             }
-                            //else
-                            //{
-                            //    // Trùng Invoice, Serie, VoucherID #
-                            //    if (DataContext.Any(x => x.InvoiceNoReal == item.RealInvoiceNo && x.Serie == item.SerieNo))
-                            //    {
-                            //        item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_DUPLICATE];
-                            //        item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_DUPLICATE];
-                            //        item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_DUPLICATE];
-                            //        item.IsValid = false;
-                            //    }
-                            //}
+                            else
+                            {
+                                // Trùng Invoice, Serie #
+                                if (CheckExistedInvoiceNoTempSerie(item.RealInvoiceNo,item.SerieNo,item.VoucherId))
+                                {
+                                    item.RealInvoiceNo = stringLocalizer[AccountingLanguageSub.MSG_INVOICE_NO_EXISTED, item.RealInvoiceNo];
+                                    item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_EXISTED, item.SerieNo];
+                                    item.IsValid = false;
+                                }
+                            }
                         }
                     }
                 }
@@ -1267,8 +1266,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     foreach (var item in list)
                     {
-                        var vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
+                        AccAccountingManagement vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
+
                         vatInvoice.InvoiceNoTempt = vatInvoice.InvoiceNoReal = item.RealInvoiceNo;
+                        vatInvoice.Serie =  item.SerieNo;
                         vatInvoice.Date = item.InvoiceDate;
                         vatInvoice.Status = AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED;
                         vatInvoice.UserModified = currentUser.UserID;
@@ -1280,7 +1281,6 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var surcharge in surchargeOfAcctCurrent)
                             {
-
                                 surcharge.InvoiceNo = item.RealInvoiceNo;
                                 surcharge.InvoiceDate = item.InvoiceDate;
                                 surcharge.SeriesNo = item.SerieNo;
@@ -1298,12 +1298,13 @@ namespace eFMS.API.Accounting.DL.Services
                     surchargeRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
+
                     return new ResultHandle { Status = true, Message = "Import Vat Invoice successfully" };
 
                 }
                 catch (Exception ex)
                 {
-                    var result = new HandleState(ex.Message);
+                    HandleState result = new HandleState(ex.Message);
                     return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
                 }
                 finally
@@ -1361,6 +1362,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return code;
         }
-       
+
+        private bool CheckExistedInvoiceNoTempSerie(string invoiceNoTemp, string serie, string voucherId)
+        {
+            bool isExited = false;
+
+            isExited = DataContext.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.VoucherId != voucherId && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
+
+            return isExited;
+        }
     }
 }

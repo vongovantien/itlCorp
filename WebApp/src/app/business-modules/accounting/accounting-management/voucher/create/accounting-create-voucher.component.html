@@ -7,8 +7,6 @@
                     <h3>Create Voucher</h3>
                     <div>
                         <div class="c-button-actions">
-                            <!-- <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSubmitSaveVoucher()">
-                            </app-default-button> -->
                             <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveVoucher()">
                             </app-permission-button>
 
@@ -32,4 +30,4 @@
 
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="back()"></confirm-popup>
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
