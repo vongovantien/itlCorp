@@ -13,6 +13,7 @@ namespace eFMS.API.Setting.Service.Models
         public string GeneralReason { get; set; }
         public DateTime? RequestDate { get; set; }
         public string RequestUser { get; set; }
+        public string StatusApproval { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

@@ -53,5 +53,25 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    getJobToUnlockRequest(criteria: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GetJobToUnlockRequest`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    addNewUnlockRequest(body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateUnlockRequest(body: any = {}) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Update`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
 

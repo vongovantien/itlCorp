@@ -53,7 +53,7 @@ namespace eFMS.API.Setting.DL.Services
         }
         
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
-        public List<SetUnlockRequestJobModel> GetAdvance(UnlockJobCriteria criteria)
+        private List<SetUnlockRequestJobModel> GetAdvance(UnlockJobCriteria criteria)
         {
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.Advances == null || criteria.Advances.Count == 0) return result;
@@ -66,7 +66,7 @@ namespace eFMS.API.Setting.DL.Services
             return data.ToList();
         }
 
-        public List<SetUnlockRequestJobModel> GetSettlement(UnlockJobCriteria criteria)
+        private List<SetUnlockRequestJobModel> GetSettlement(UnlockJobCriteria criteria)
         {
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.Settlements == null || criteria.Settlements.Count == 0) return result;
@@ -79,7 +79,7 @@ namespace eFMS.API.Setting.DL.Services
             return data.ToList();
         }
 
-        public List<SetUnlockRequestJobModel> GetJobNo(UnlockJobCriteria criteria)
+        private List<SetUnlockRequestJobModel> GetJobNo(UnlockJobCriteria criteria)
         {
             string _unlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum);
             var result = new List<SetUnlockRequestJobModel>();
@@ -158,17 +158,20 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         #endregion --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
+
+        #region --- CRUD ---
         public HandleState AddUnlockRequest(SetUnlockRequestModel model)
         {
             try
             {
                 model.Id = Guid.NewGuid();
-                model.UserCreated = model.UserModified = currentUser.UserID;
+                model.Requester = model.UserCreated = model.UserModified = currentUser.UserID;
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.GroupId = currentUser.GroupId;
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
+                model.StatusApproval = "New";
                 var unlockRequest = mapper.Map<SetUnlockRequest>(model);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -289,5 +292,14 @@ namespace eFMS.API.Setting.DL.Services
             }
 
         }
+        #endregion --- CRUD ---
+
+        #region --- LIST & PAGING ---
+        public IQueryable<SetUnlockRequestModel> Query(UnlockRequestCriteria criteria)
+        {
+            return null;
+        }
+
+        #endregion --- LIST & PAGING ---
     }
 }

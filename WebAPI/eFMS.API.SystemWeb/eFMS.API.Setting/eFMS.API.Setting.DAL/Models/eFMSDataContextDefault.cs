@@ -1712,6 +1712,8 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.StatusApproval).HasMaxLength(50);
+
                 entity.Property(e => e.UnlockType).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
