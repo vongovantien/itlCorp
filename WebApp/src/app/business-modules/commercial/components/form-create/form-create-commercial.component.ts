@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from '@repositories';
-import { CountryModel, ProviceModel, Partner } from '@models';
+import { CountryModel, ProviceModel, Partner, Customer } from '@models';
 import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
 import { Observable } from 'rxjs';
 import { shareReplay } from 'rxjs/operators';
-import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'form-create-commercial',
@@ -17,6 +17,10 @@ import { CommonEnum } from '@enums';
 export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     formGroup: FormGroup;
+    partnerNameEn: AbstractControl;
+    shortName: AbstractControl;
+    partnerNameVn: AbstractControl;
+    taxCode: AbstractControl;
     shippingCountry: AbstractControl;
     countryId: AbstractControl; // * Billing country
     countryName: AbstractControl;
@@ -26,11 +30,19 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     countryShippingName: AbstractControl;
     provinceShippingName: AbstractControl;
     provinceName: AbstractControl;
+    addressShippingEn: AbstractControl;
+    addressShippingVn: AbstractControl;
+    addressEn: AbstractControl;
+    addressVn: AbstractControl;
 
     countries: Observable<CountryModel[]>;
     cities: Observable<ProviceModel[]>;
     acRefCustomers: Observable<Partner[]>;
 
+    shippingProvinces: ProviceModel[];
+    initShippingProvinces: ProviceModel[];
+    billingProvinces: ProviceModel[];
+    initbillingProvinces: ProviceModel[];
 
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
@@ -45,24 +57,37 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     ngOnInit(): void {
         this.countries = this._catalogueRepo.getCountry().pipe(shareReplay());
-        this.cities = this._catalogueRepo.getProvinces().pipe(shareReplay());
+
         this.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.getProvinces();
 
         this.initForm();
+    }
+
+    getProvinces() {
+        this._catalogueRepo.getProvinces()
+            .subscribe(
+                (provinces: ProviceModel[]) => {
+                    this.billingProvinces = this.shippingProvinces = this.initShippingProvinces = this.initbillingProvinces = provinces;
+                }
+            );
     }
 
     initForm() {
         this.formGroup = this._fb.group({
             accountNo: [{ value: null, disabled: true }],
-            partnerNameEn: [],
-            partnerNameVn: [],
-            shortName: [],
-            taxCode: [],
+            partnerNameEn: [null, Validators.required],
+            partnerNameVn: [null, Validators.required],
+            shortName: [null, Validators.required],
+            taxCode: [null, Validators.compose([
+                Validators.maxLength(10),
+                Validators.minLength(8)
+            ])],
             internalReferenceNo: [],
-            addressShippingEn: [],
-            addressShippingVn: [],
-            addressVn: [],
-            addressEn: [],
+            addressShippingEn: [null, Validators.required],
+            addressShippingVn: [null, Validators.required],
+            addressVn: [null, Validators.required],
+            addressEn: [null, Validators.required],
             zipCode: [],
             zipCodeShipping: [],
             contactPerson: [],
@@ -84,6 +109,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             parentId: [],
         });
 
+        this.partnerNameEn = this.formGroup.controls["partnerNameEn"];
+        this.partnerNameVn = this.formGroup.controls["partnerNameVn"];
+        this.shortName = this.formGroup.controls["shortName"];
+        this.taxCode = this.formGroup.controls["taxCode"];
         this.shippingCountry = this.formGroup.controls["shippingCountry"];
         this.provinceShippingId = this.formGroup.controls["provinceShippingId"];
         this.countryId = this.formGroup.controls["countryId"];
@@ -91,15 +120,63 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.countryShippingName = this.formGroup.controls["countryShippingName"];
         this.provinceShippingName = this.formGroup.controls["provinceShippingName"];
         this.provinceName = this.formGroup.controls["provinceName"];
-
         this.provinceId = this.formGroup.controls["provinceId"];
         this.parentId = this.formGroup.controls["parentId"];
+        this.addressShippingEn = this.formGroup.controls["addressShippingEn"];
+        this.addressShippingVn = this.formGroup.controls["addressShippingVn"];
+        this.addressEn = this.formGroup.controls["addressEn"];
+        this.addressVn = this.formGroup.controls["addressVn"];
     }
-
-
 
     onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'acRef':
+                this.parentId.setValue((data as Customer).id);
+                break;
+            case 'shippping-country':
+                this.shippingCountry.setValue((data as Customer).id);
+                this.provinceShippingId.setValue(null);
+                this.provinceShippingName.setValue(null);
 
+                this.shippingProvinces = [...this.initShippingProvinces.filter(x => x.countryID === data.id)];
+                if (this.shippingProvinces.length === 1) {
+                    this.provinceShippingId.setValue(this.shippingProvinces[0].id);
+                }
+                break;
+            case 'shippping-city':
+                this.provinceShippingId.setValue((data as Customer).id);
+                break;
+            case 'billing-country':
+                this.countryId.setValue((data as Customer).id);
+                this.getBillingProvince(data.id);
+
+                break;
+            case 'billing-city':
+                this.provinceId.setValue((data as Customer).id);
+                break;
+            default:
+                break;
+        }
     }
 
+    getBillingProvince(countryId: number) {
+        this.provinceId.setValue(null);
+        this.provinceName.setValue(null);
+
+        this.billingProvinces = [...this.initbillingProvinces.filter(x => x.countryID === countryId)];
+        if (this.billingProvinces.length === 1) {
+            this.provinceId.setValue(this.billingProvinces[0].id);
+        }
+    }
+
+    copyInfoShipping() {
+        this.countryId.setValue(this.shippingCountry.value);
+        this.getBillingProvince(this.shippingCountry.value);
+
+        this.provinceId.setValue(this.provinceShippingId.value);
+
+        this.formGroup.controls['zipCode'].setValue(this.formGroup.controls['zipCodeShipping'].value);
+        this.formGroup.controls['addressVn'].setValue(this.formGroup.controls['addressShippingVn'].value);
+        this.formGroup.controls['addressEn'].setValue(this.formGroup.controls['addressShippingEn'].value);
+    }
 }
