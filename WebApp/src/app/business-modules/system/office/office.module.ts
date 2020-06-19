@@ -13,6 +13,7 @@ import { OfficeFormAddComponent } from './components/form-add-office/form-add-of
 import { PaginationModule, TabsModule } from 'ngx-bootstrap';
 import { ShareSystemModule } from 'src/app/business-modules/share-system/share-system.module';
 import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
+import { OfficeFormApproveSettingComponent } from './components/form-approve-setting/form-approve-setting-office.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -48,7 +49,14 @@ const routing: Routes = [
         RouterModule.forChild(routing)
     ],
     exports: [],
-    declarations: [OfficeComponent, OfficeAddNewComponent, OfficeDetailsComponent, OfficeFormSearchComponent, OfficeFormAddComponent],
+    declarations: [
+        OfficeComponent,
+        OfficeAddNewComponent,
+        OfficeDetailsComponent,
+        OfficeFormSearchComponent,
+        OfficeFormAddComponent,
+        OfficeFormApproveSettingComponent
+    ],
     providers: [],
 })
 export class OfficeModule { }
