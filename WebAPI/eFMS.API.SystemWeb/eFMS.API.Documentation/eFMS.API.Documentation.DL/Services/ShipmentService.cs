@@ -330,7 +330,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = x.Id,
                     OPSShipmentNo = x.JobNo,
-                    LockedLog = x.LockedLog,
+                    LockedLog = x.UnLockedLog,
                     IsLocked = x.IsLocked
                 });
             if (criteria.TransactionType == TransactionTypeEnum.CustomLogistic)
@@ -359,7 +359,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = x.Id,
                     CSShipmentNo = x.JobNo,
-                    LockedLog = x.LockedLog,
+                    LockedLog = x.UnLockedLog,
                     IsLocked = x.IsLocked
                 });
 
@@ -417,7 +417,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     opsShipment.DatetimeModified = DateTime.Now;
                                     opsShipment.UserModified = currentUser.UserID;
                                     string log = opsShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
-                                    opsShipment.LockedLog = opsShipment.LockedLog + log;
+                                    opsShipment.UnLockedLog = opsShipment.UnLockedLog + log;
                                     var isSuccessLockOps = opsRepository.Update(opsShipment, x => x.Id == opsShipment.Id);
                                 }
                             }
@@ -433,7 +433,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     csShipment.DatetimeModified = DateTime.Now;
                                     csShipment.UserModified = currentUser.UserID;
                                     string log = csShipment.JobNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + currentUser.UserName + ";";
-                                    csShipment.LockedLog = csShipment.LockedLog + log;
+                                    csShipment.UnLockedLog = csShipment.UnLockedLog + log;
                                     var isSuccessLockCs = DataContext.Update(csShipment, x => x.Id == csShipment.Id);
                                 }
                             }
