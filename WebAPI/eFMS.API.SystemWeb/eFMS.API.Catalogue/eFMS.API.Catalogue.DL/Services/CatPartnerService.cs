@@ -713,7 +713,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         SaleManId = item.SalePersonId,
                         PaymentMethod = item.PaymentTerm,
                         EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
-                        Status = true,
+                        Active = true,
                         PartnerId = partner.Id,
                         DatetimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,

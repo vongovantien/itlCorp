@@ -12,9 +12,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public string SaleService { get; set; }
         public string PartnerId { get; set; }
         public DateTime? EffectiveDate { get; set; }
-        public DateTime? ExperiedDate { get; set; }
+        public DateTime? ExpiredDate { get; set; }
         public string Description { get; set; }
-        public bool? Status { get; set; }
+        public bool? Active { get; set; }
         public string PaymentMethod { get; set; }
         public string ContractNo { get; set; }
         public string ContractType { get; set; }

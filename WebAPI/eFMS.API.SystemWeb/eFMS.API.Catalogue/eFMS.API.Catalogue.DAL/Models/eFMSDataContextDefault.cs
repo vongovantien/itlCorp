@@ -46,6 +46,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
+        public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
 
@@ -430,7 +431,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ExperiedDate).HasColumnType("datetime");
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
@@ -2394,6 +2395,30 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysImage>(entity =>
+            {
+                entity.ToTable("sysImage");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Folder).HasMaxLength(50);
+
+                entity.Property(e => e.ObjectId)
+                    .HasColumnName("ObjectID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
             });
 
             modelBuilder.Entity<SysOffice>(entity =>

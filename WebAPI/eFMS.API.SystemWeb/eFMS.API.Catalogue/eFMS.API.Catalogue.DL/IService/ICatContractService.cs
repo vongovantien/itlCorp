@@ -2,11 +2,13 @@
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -20,6 +22,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Update(CatContractModel model);
         List<CatContractModel> GetBy(string partnerId);
         Guid? GetContractIdByPartnerId(string partnerId);
+        Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
 
 
 

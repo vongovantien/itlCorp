@@ -1,18 +1,21 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { FormContractPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract.popup';
 import { throwIfEmpty } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { FormContractComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract.component';
+import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 
 @Component({
     selector: 'commercial-contract-list',
     templateUrl: './commercial-contract-list.component.html',
 })
 export class CommercialContractListComponent extends AppList implements OnInit {
-    @ViewChild(FormContractPopupComponent, { static: false }) popupContract: FormContractPopupComponent;
-    contracts: any[] = []; // TODO: implement model.
+    @ViewChild(FormContractComponent, { static: false }) formContract: FormContractComponent;
+    @Input() partnerId: string;
+    contracts: Contract[] = [];
     selectecContract: any; // TODO: implement model.
 
-    constructor() {
+    constructor(private _router: Router) {
         super();
     }
 
@@ -31,7 +34,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     }
 
-    openPopupContract() {
-        this.popupContract.show();
+    gotoCreateContract() {
+        this._router.navigate([`home/commercial/customer//${this.partnerId}/contract/new`]);
     }
+
+
+
 }

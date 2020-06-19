@@ -108,7 +108,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     }
 
     showSaleman(customerId: string) {
-        this._catalogueRepo.getListSaleman(customerId)
+        this._catalogueRepo.getListContract(customerId)
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {

@@ -14,7 +14,7 @@ const routes: Routes = [
     {
         path: 'customer', loadChildren: () => import('./customer/commercial-customer.module').then(m => m.CommercialCustomerModule),
         data: { name: 'Customer' }
-    },
+    }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);

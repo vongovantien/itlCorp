@@ -293,12 +293,19 @@ export class CatalogueRepo {
 
     }
 
-    getListSaleman(partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
+    getListContract(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetBy`, { partnerId: partnerId })
             .pipe(
                 map((data: any) => data)
             );
     }
+
+    uploadFileContract(partnerId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}`, body, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
 
     deleteSaleman(id: string, partnerId: string) {
         return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}/${partnerId}`).pipe(
@@ -520,6 +527,12 @@ export class CatalogueRepo {
         );
     }
 
+    createContract(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkExistedSaleman(body: any = {}) {
         // const body = { service: service, office: office };
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
@@ -546,13 +559,13 @@ export class CatalogueRepo {
 
     getListSaleManDetail(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/Query`, body).pipe(
                 map((res: any) => {
                     return res;
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract`).pipe(
                 map((data: any) => data)
             );
         }

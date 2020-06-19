@@ -52,6 +52,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         ).subscribe(
             (partnerId: string) => {
                 if (partnerId) {
+                    this.contractList.partnerId = partnerId;
                     this.getDetailCustomer(partnerId);
                     this.getListContract(partnerId);
                 } else {
@@ -73,7 +74,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     getListContract(partneId: string) {
         this.contractList.isLoading = true;
-        this._catalogueRepo.getListSaleManDetail({ partnerId: partneId })
+        this._catalogueRepo.getListContract(partneId)
             .pipe(
                 finalize(() => this.contractList.isLoading = false)
             )

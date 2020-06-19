@@ -1,19 +1,30 @@
-<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
+<!--begin:: subheader-->
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+    </div>
+</div>
+<div class="m-content">
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <div class="row">
                 <div class="col-lg-11">
-                    <h5 class="modal-title">{{!isUpdate ? 'Create Contract Info' : 'Customer - Contract Info'}}</h5>
-
+                    <div class="d-flex align-items-center justify-content-between p-1">
+                        <h3>
+                            Create Contract Info
+                        </h3>
+                    </div>
                 </div>
-
-                <div class="col-lg-1" style="height: 33px">
+                <div class="col-lg-1" style="height: 30px">
                     <div class="h-100 d-flex align-items-center justify-content-center text-white"
                         [class.bg-danger]="true">
                         Inactive</div>
                 </div>
             </div>
-            <div class="modal-body">
+            <hr />
+            <div class="m-animate-fade-in mt-3">
                 <form class="m-form m-form--state" [formGroup]="formContract">
                     <div class="row">
                         <div class="col-lg-4">
@@ -46,7 +57,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label required>Office</label>
+                                <label>Office</label>
                                 <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{ field: 'id', value: officeId.value}"
                                     (itemSelected)="onSelectedDataFormInfo($event,'office')"
@@ -60,18 +71,21 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.value[0]?.id === 'Official'}">
                                 <label>Contract No</label>
                                 <input type="text" class="form-control" formControlName="contractNo">
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !effectiveDate.value}">
                                 <label required for="">Effective Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly />
+                                        name="daterange" [autoApply]="true" formControlName="effectiveDate" readonly
+                                        [minDate]="minDateEffective" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -82,11 +96,11 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <label required for="">Expired Date</label>
+                                <label>Expired Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="expiriedDate" readonly />
+                                        name="daterange" [autoApply]="true" formControlName="expiredDate" readonly />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -98,8 +112,9 @@
                     </div>
                     <div class="row">
                         <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Contract Type</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
+                                <label required>Contract Type</label>
                                 <ng-select #ct [items]="contractTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(ct)" formControlName="contractType"
                                     placeholder="Please select">
@@ -107,7 +122,8 @@
                             </div>
                         </div>
                         <div class="col-lg-8">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && saleService.invalid}">
                                 <label required>Sale Service</label>
                                 <ng-select #sv [items]="serviceTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(sv)" formControlName="saleService"
@@ -145,109 +161,118 @@
                         </div>
                     </div>
                     <div class="row collapse show" id="data-form-contact">
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Trial Credit Limit
-                                </label>
-                                <input type="number" class="form-control" formControlName="trialCreditLimit">
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Trial Credit Days
-                                </label>
-                                <input type="number" class="form-control" formControlName="trialCreditDays">
-                            </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Trial Effect Date
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="trialEffectDate"
-                                        readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                        <ng-container *ngIf="contractType.value[0]?.id !== 'Official'">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Trial Credit Limit
+                                    </label>
+                                    <input type="number" class="form-control" formControlName="trialCreditLimit">
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Trial Expired Date
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="trialExpiredDate"
-                                        readonly />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Trial Credit Days
+                                    </label>
+                                    <input type="number" class="form-control" formControlName="trialCreditDays">
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Payment Term</label>
-                                <input type="number" class="form-control" formControlName="paymentTerm">
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>Trial Effect Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input (change)="onChangeTrialDate()" type="text"
+                                            class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                            formControlName="trialEffectDate" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Credit Limit</label>
-                                <input type="number" class="form-control" formControlName="creditLimit">
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>Trial Expired Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                            formControlName="trialExpiredDate" readonly />
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Credit Limit Rate</label>
-                                <input type="number" class="form-control" formControlName="creditLimitRate">
+                        </ng-container>
+                        <ng-container *ngIf="contractType.value[0]?.id === 'Official'">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Payment Term</label>
+                                    <input type="number" min="0" class="form-control" formControlName="paymentTerm">
+                                </div>
                             </div>
-                        </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Credit Limit</label>
+                                    <input type="number" class="form-control" formControlName="creditLimit">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Credit Limited Rate</label>
+                                    <input type="number" class="form-control" formControlName="creditLimitRate">
+                                </div>
+                            </div>
+                        </ng-container>
 
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Credit Amount</label>
-                                <input type="number" class="form-control" formControlName="creditAmount">
+
+                        <ng-container *ngIf="contractType.value[0]?.id !== 'Official'">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Credit Amount</label>
+                                    <input type="number" disabled class="form-control" formControlName="creditAmount">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Billing Amount</label>
-                                <input type="number" class="form-control" formControlName="billingAmount">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Billing Amount</label>
+                                    <input type="number" disabled class="form-control" formControlName="billingAmount">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Paid Amount</label>
-                                <input type="number" class="form-control" formControlName="paidAmount">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Paid Amount</label>
+                                    <input type="number" disabled class="form-control" formControlName="paidAmount">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>UnPaid Amount</label>
-                                <input type="number" class="form-control" formControlName="unpaidAmount">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>UnPaid Amount</label>
+                                    <input type="number" disabled class="form-control" formControlName="unpaidAmount">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Customer Advance Amount</label>
-                                <input type="number" class="form-control" formControlName="customerAmount">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Customer Advance Amount</label>
+                                    <input type="number" class="form-control" formControlName="customerAmount">
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Credit Rate</label>
-                                <input type="number" class="form-control" formControlName="creditRate">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Credit Rate</label>
+                                    <input type="number" class="form-control" formControlName="creditRate">
+                                </div>
                             </div>
-                        </div>
+                        </ng-container>
+
 
                     </div>
                     <div class="row">
@@ -261,27 +286,36 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Contract File</label>
-                                <button class="btn btn-success" type="button">Attach File</button>
+                                <input class="form-control" type="file" multiple (change)="handleFileInput($event)"
+                                    [accept]="accepctFilesUpload" title="Attach files" />
                             </div>
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span> Save </span>
-                    </span>
-                </button>
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
-                    <span>
-                        <i class="la la-send"></i>
-                        <span> Request Approval </span>
-                    </span>
-                </button>
-                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="hide()"></app-default-button>
+
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="text-center">
+            <button (click)="onSubmit()"
+                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                <span>
+                    <i class="la la-save"></i>
+                    <span> Save </span>
+                </span>
+            </button>
+            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                <span>
+                    <i class="la la-send"></i>
+                    <span> Request Approval </span>
+                </span>
+            </button>
+            <app-default-button [buttonSetting]="cancelButtonSetting" (click)="gotoList()"></app-default-button>
+        </div>
+
     </div>
 </div>

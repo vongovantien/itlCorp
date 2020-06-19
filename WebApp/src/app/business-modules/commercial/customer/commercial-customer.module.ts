@@ -6,6 +6,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareCommercialModule } from '../share-commercial.module';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 import { CommercialDetailComponent } from '../detail/detail-commercial.component';
+import { FormContractComponent } from '../../share-commercial-catalogue/components/form-contract.component';
 
 const routing: Routes = [
     {
@@ -18,6 +19,9 @@ const routing: Routes = [
             },
             {
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Customer' }
+            },
+            {
+                path: ':partnerId/contract/new', component: FormContractComponent, data: { name: 'Create Contract Info' }
             },
 
         ]

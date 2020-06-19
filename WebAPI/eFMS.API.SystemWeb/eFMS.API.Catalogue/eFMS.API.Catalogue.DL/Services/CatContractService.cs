@@ -5,15 +5,19 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
+using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -25,17 +29,20 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         private readonly IContextBase<SysCompany> sysCompanyRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
+        private readonly IOptions<WebUrl> webUrl;
 
         public CatContractService(
-            IContextBase<CatContract> repository, 
-            IMapper mapper, 
-            IStringLocalizer<CatalogueLanguageSub> localizer, 
-            ICurrentUser user, 
-            IContextBase<SysUser> sysUserRepo, 
-            IContextBase<CatPartner> partnerRepo, 
+            IContextBase<CatContract> repository,
+            IMapper mapper,
+            IStringLocalizer<CatalogueLanguageSub> localizer,
+            ICurrentUser user,
+            IContextBase<SysUser> sysUserRepo,
+            IContextBase<CatPartner> partnerRepo,
             IContextBase<SysOffice> sysOfficeRepo,
             IContextBase<SysCompany> sysCompanyRepo,
-            ICacheServiceBase<CatContract> cacheService) : base(repository, cacheService, mapper)
+             IContextBase<SysImage> sysImageRepo,
+            ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -43,6 +50,8 @@ namespace eFMS.API.Catalogue.DL.Services
             sysOfficeRepository = sysOfficeRepo;
             sysCompanyRepository = sysCompanyRepo;
             catPartnerRepository = partnerRepo;
+            webUrl = url;
+            sysImageRepository = sysImageRepo;
         }
 
         public IQueryable<CatContract> GetContracts()
@@ -74,7 +83,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.CompanyNameVn = company.BunameVn;
                 }
 
-                if(office != null)
+                if (office != null)
                 {
                     saleman.OfficeNameEn = office.BranchNameEn;
                     saleman.OfficeNameAbbr = office.ShortName;
@@ -89,7 +98,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public Guid? GetContractIdByPartnerId(string partnerId)
         {
-            var data = DataContext.Get().Where(x => x.PartnerId == partnerId).OrderBy(x=>x.DatetimeCreated).Select(x=>x.SaleManId).FirstOrDefault();
+            var data = DataContext.Get().Where(x => x.PartnerId == partnerId).OrderBy(x => x.DatetimeCreated).Select(x => x.SaleManId).FirstOrDefault();
             if (data == null) return null;
             Guid? salemanId = new Guid(data);
             return salemanId;
@@ -99,11 +108,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatContractModel entity)
         {
             entity.Id = Guid.NewGuid();
-            var saleMan = mapper.Map<CatContract>(entity);
-            saleMan.DatetimeCreated = DateTime.Now;
-            saleMan.UserCreated = currentUser.UserID;
-
-            var hs = DataContext.Add(saleMan);
+            var contract = mapper.Map<CatContract>(entity);
+            contract.DatetimeCreated = DateTime.Now;
+            contract.UserCreated = contract.UserModified = currentUser.UserID;
+            contract.Active = false;
+            var hs = DataContext.Add(contract);
             if (hs.Success)
             {
                 ClearCache();
@@ -139,7 +148,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatContractViewModel> Query(CatContractCriteria criteria)
         {
             IQueryable<CatContract> catContracts = DataContext.Get().Where(x => x.PartnerId == criteria.PartnerId);
-            IQueryable <SysUser> sysUser = sysUserRepository.Get();
+            IQueryable<SysUser> sysUser = sysUserRepository.Get();
 
             var query = from contract in catContracts
                         join users in sysUser on contract.SaleManId equals users.Id
@@ -149,7 +158,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.Where(x =>
                            (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
                            && (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
-                           && (x.contract.Status == criteria.Status || criteria.Status == null)
+                           && (x.contract.Active == criteria.Status || criteria.Status == null)
                            );
             }
             else
@@ -157,7 +166,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.Where(x =>
                             (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
                             || (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
-                            || (x.contract.Status == criteria.Status || criteria.Status == null)
+                            || (x.contract.Active == criteria.Status || criteria.Status == null)
                             || (x.contract.PartnerId == criteria.PartnerId)
                             );
             }
@@ -169,7 +178,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 CatContractViewModel saleman = mapper.Map<CatContractViewModel>(item.contract);
                 saleman.Username = item.users.Username;
 
-                if(saleman.Office != null) {
+                if (saleman.Office != null)
+                {
                     SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.Office)?.FirstOrDefault();
                     saleman.OfficeName = office.ShortName;
                 }
@@ -180,7 +190,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 results.Add(saleman);
             }
-            return results?.OrderBy(x=>x.CreateDate).AsQueryable();
+            return results?.OrderBy(x => x.CreateDate).AsQueryable();
         }
 
         public List<CatContractViewModel> Paging(CatContractCriteria criteria, int page, int size, out int rowsCount)
@@ -204,5 +214,61 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+
+        public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
+        {
+            return await WriteFile(model);
+        }
+
+        private async Task<ResultHandle> WriteFile(ContractFileUploadModel model)
+        {
+            string fileName = "";
+            //string folderName = "images";
+            string path = this.webUrl.Value.Url;
+            try
+            {
+                var list = new List<SysImage>();
+                /* Kiểm tra các thư mục có tồn tại */
+                var hs = new HandleState();
+                ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
+                List<SysImage> resultUrls = new List<SysImage>();
+                foreach (var file in model.Files)
+                {
+                    fileName = file.FileName;
+                    string objectId = model.PartnerId;
+                    await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
+                    string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                    var sysImage = new SysImage
+                    {
+                        Id = Guid.NewGuid(),
+                        Url = urlImage,
+                        Name = fileName,
+                        Folder = model.FolderName ?? "Partner",
+                        ObjectId = model.PartnerId.ToString(),
+                        UserCreated = currentUser.UserName, //admin.
+                        UserModified = currentUser.UserName,
+                        DateTimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now
+                    };
+                    resultUrls.Add(sysImage);
+                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage))
+                    {
+                        list.Add(sysImage);
+                    }
+                }
+                if (list.Count > 0)
+                {
+                    list.ForEach(x => x.IsTemp = model.IsTemp);
+                    hs = await sysImageRepository.AddAsync(list);
+                }
+                return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultHandle { Data = null, Status = false, Message = ex.Message };
+            }
+
+        }
     }
 }

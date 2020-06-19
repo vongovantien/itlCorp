@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.Authorize;
 using eFMS.API.Catalogue.DL.IService;
@@ -11,9 +14,9 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-
 namespace eFMS.API.Catalogue.Controllers
 {
     [ApiController]
@@ -25,8 +28,6 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatContractService catContractService;
         private readonly ICatPartnerService partnerService;
-
-
         private readonly IMapper mapper;
         public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper)
         {
@@ -49,7 +50,7 @@ namespace eFMS.API.Catalogue.Controllers
 
 
  
-        /// <summary>
+        /// <summary
         /// get the list of sale man
         /// </summary>
         /// <param name="criteria">search conditions</param>
@@ -111,18 +112,17 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post(CatContractEditModel model)
+        public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageDuplicate = string.Empty;
-            bool checkExist = catContractService.Any(x => x.SaleService == model.Service  && x.OfficeId == model.Office && x.PartnerId == model.PartnerId);
+            bool checkExist = catContractService.Any(x => x.SaleService == model.SaleService  && x.OfficeId == model.OfficeId && x.PartnerId == model.PartnerId);
             if (checkExist)
             {
                 messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                 return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
             }
-            var saleman = mapper.Map<CatContractModel>(model);
-            var hs = catContractService.Add(saleman);
+            var hs = catContractService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -206,6 +206,29 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// attach multi files to shipment
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="partnerId"></param>
+        /// <returns></returns>
+        [HttpPut("UploadFile/{PartnerId}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFileContract(List<IFormFile> files, [Required]string partnerId)
+        {
+            string folderName = Request.Headers["Module"];
+            ContractFileUploadModel model = new ContractFileUploadModel
+            {
+                Files = files,
+                FolderName = folderName,
+                PartnerId = partnerId,
+            };
+
+            var result = await catContractService.UploadContractFile(model);
+            return Ok(result);
+        }
+
 
 
     }
