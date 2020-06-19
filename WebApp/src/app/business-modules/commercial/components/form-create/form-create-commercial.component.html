@@ -9,25 +9,29 @@
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameEn.dirty) && !partnerNameEn.valid }">
                         <label required>English Name</label>
                         <input type="text" class="form-control" formControlName="partnerNameEn">
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || shortName.dirty) && !shortName.valid }">
                         <label required>ABBR Name</label>
                         <input type="text" class="form-control" formControlName="shortName">
                     </div>
                 </div>
                 <div class="col-lg-8">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameVn.dirty) && !partnerNameVn.valid }">
                         <label required>Local Name</label>
                         <input type="text" class="form-control" formControlName="partnerNameVn">
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                         <label>Tax Code</label>
                         <input type="text" class="form-control" formControlName="taxCode">
                     </div>
@@ -59,13 +63,15 @@
                     <div class="alert-block__heading font-weight-bold">Shipping Address</div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || addressShippingEn.dirty) && !addressShippingEn.valid }">
                                 <label required>En Address</label>
                                 <textarea rows="5" class="form-control" formControlName="addressShippingEn"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || addressShippingVn.dirty) && !addressShippingVn.valid }">
                                 <label required>Local Address</label>
                                 <textarea rows="5" class="form-control" formControlName="addressShippingVn"></textarea>
 
@@ -89,7 +95,7 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event, 'shippping-city')"
                                     [currentActiveItemId]="{ field: 'id', value: provinceShippingId.value, hardValue: provinceShippingName.value}"
-                                    [selectedDisplayFields]="['name_EN']" [dataSources]="cities | async"
+                                    [selectedDisplayFields]="['name_EN']" [dataSources]="shippingProvinces"
                                     [displayFields]="displayFieldCity" placeholder="Select country"
                                     (remove)="resetFormControl(provinceShippingId)" [size]="15">
                                 </app-combo-grid-virtual-scroll>
@@ -105,28 +111,21 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="alert-block__heading font-weight-bold d-flex align-items-center justify-content-between"
-                        style="padding: 0 10px;">
+                        style="padding: 6 10px;">
                         Billing Address
-                        <button type="button"
-                            class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
-                            <span>
-                                <i class="la la-download"></i>
-                                <span>
-                                    Copy Shipping
-                                </span>
-                            </span>
-                        </button>
+                        <i class="la la-copy pointer" (click)="copyInfoShipping()"></i>
                     </div>
                     <div class="row ">
                         <div class=" col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || addressEn.dirty) && !addressEn.valid }">
                                 <label required>En Address</label>
                                 <textarea rows="5" class="form-control" formControlName="addressEn"></textarea>
-
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || addressVn.dirty) && !addressVn.valid }">
                                 <label required>Local Address</label>
                                 <textarea rows="5" class="form-control" formControlName="addressVn"></textarea>
 
@@ -150,9 +149,9 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event, 'billing-city')"
                                     [currentActiveItemId]="{ field: 'id', value: provinceId.value, hardValue: provinceName.value}"
-                                    [selectedDisplayFields]="['name_EN']" [dataSources]="cities | async"
+                                    [selectedDisplayFields]="['name_EN']" [dataSources]="billingProvinces"
                                     [displayFields]="displayFieldCity" placeholder="Select country"
-                                    (remove)="resetFormControl()" [size]="15">
+                                    (remove)="resetFormControl(provinceId)" [size]="15">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

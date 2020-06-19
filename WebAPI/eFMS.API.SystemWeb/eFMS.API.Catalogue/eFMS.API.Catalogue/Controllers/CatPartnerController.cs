@@ -167,7 +167,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("CheckTaxCode")]
-        public IActionResult CheckTaxCode(CatPartnerEditModel model)
+        public IActionResult CheckTaxCode(CatPartnerValidateTaxCodeModel model)
         {
             string refNo = model.InternalReferenceNo == null ? "" : model.InternalReferenceNo.Trim().ToLower();
             if (string.IsNullOrEmpty(model.Id))
@@ -312,6 +312,8 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
+
+       
 
         /// <summary>
         /// import list partner
