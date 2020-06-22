@@ -1,18 +1,11 @@
 import { NgModule } from '@angular/core';
-import { routing } from './accounting-routing.module';
-import { AccountReceivablePayableComponent } from './account-receivable-payable/account-receivable-payable.component';
-
-const PAGES = [
-  AccountReceivablePayableComponent,
-];
+import { AccountingRouting } from './accounting-routing.module';
 
 @NgModule({
   imports: [
-    routing,
+    AccountingRouting
   ],
-  declarations: [
-    ...PAGES
-  ],
+  declarations: [],
   bootstrap: [],
   providers: [
   ],
