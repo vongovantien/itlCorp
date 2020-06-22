@@ -53,6 +53,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysUserPermissionGeneralService, SysUserPermissionGeneralService>();
             services.AddTransient<ISysUserPermissionSpecialService, SysUserPermissionSpecialService>();
             services.AddTransient<ISysAuthorizedApprovalService, SysAuthorizedApprovalService>();
+            services.AddTransient<ISysSettingFlowService, SysSettingFlowService>();
 
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
