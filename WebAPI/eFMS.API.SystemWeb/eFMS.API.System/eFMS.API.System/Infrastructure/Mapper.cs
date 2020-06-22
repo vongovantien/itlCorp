@@ -31,7 +31,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysUserPermissionGeneral, SysUserPermissionGeneralModel>();
             CreateMap<SysCompany, SysCompanyModel>();
             CreateMap<SysUser, SysUserModel>();
-
+            CreateMap<SysSettingFlow, SysSettingFlowModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
@@ -51,6 +51,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysUserLevelModel, SysUserLevel>();
             CreateMap<SysUserModel, SysUser>();
             CreateMap<SysUserPermissionGeneralModel, SysUserPermissionGeneral>();
+            CreateMap<SysSettingFlowModel,SysSettingFlow >();
 
         }
     }

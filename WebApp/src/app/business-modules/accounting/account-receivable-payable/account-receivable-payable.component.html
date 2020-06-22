@@ -1,3 +1,17 @@
-<p>
-  account-receivable-payable works!
-</p>
+<div class="acc-receive-payable-wrapper  m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <form-search-account-receivable-payable></form-search-account-receivable-payable>
+
+            <tabset class="custom-class-tab">
+                <tab heading="Invoice Payment">
+                    <list-invoice-account-receivable-payable></list-invoice-account-receivable-payable>
+                </tab>
+                <tab heading="OBH Payment">
+                    <list-obh-account-receivable-payable></list-obh-account-receivable-payable>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>
