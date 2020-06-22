@@ -321,5 +321,17 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
         }
+
+        public async Task<HandleState> DeleteFileContract(Guid id)
+        {
+            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+            if (item == null) return new HandleState("Not found data");
+            var result = sysImageRepository.Delete(x => x.Id == id);
+            if (result.Success)
+            {
+                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+            }
+            return result;
+        }
     }
 }

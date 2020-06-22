@@ -27,6 +27,7 @@ namespace eFMS.API.Catalogue.DL.IService
         SysImage GetFileContract(string partnerId, string contractId);
 
         HandleState UpdateFileToContract(List<SysImage> files);
+        Task<HandleState> DeleteFileContract(Guid id);
 
 
 

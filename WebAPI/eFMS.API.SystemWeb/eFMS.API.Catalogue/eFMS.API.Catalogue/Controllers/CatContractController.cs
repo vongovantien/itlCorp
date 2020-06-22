@@ -262,6 +262,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
+        [Authorize]
+        [HttpDelete("DeleteContractAttachedFile/{id}")]
+        public IActionResult DeleteAttachedFile([Required]Guid id)
+        {
+            var result = catContractService.DeleteFileContract(id);
+            return Ok(result);
+        }
+
 
 
     }
