@@ -61,6 +61,8 @@ export * from './system/department';
 export * from './system/userlevel';
 export * from './system/userGroup.model';
 export * from './system/group';
+export * from './system/lock-shipment-setting';
+export * from './system/flow-setting';
 
 export * from './report/crystal.model';
 
