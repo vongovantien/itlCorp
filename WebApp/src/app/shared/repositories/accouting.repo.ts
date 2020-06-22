@@ -520,6 +520,10 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    upLoadInvoicePaymentFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UploadInvoicePaymentFile`, files, "uploadedFile");
+    }
 }
 
 

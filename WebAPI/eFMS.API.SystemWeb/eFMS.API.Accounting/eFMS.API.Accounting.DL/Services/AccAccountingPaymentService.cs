@@ -350,11 +350,27 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
             var partners = partnerRepository.Get().ToList();
-            var invoices = accountingManaRepository.Get(x => x.PaymentStatus == "Paid").ToList();
+            var invoices = accountingManaRepository.Get(x => x.PaymentStatus != "Paid").ToList();
             list.ForEach(item =>
             {
+                var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
+                if(partner == null)
+                {
+                    item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
+                    item.IsValid = false;
+                }
+                var accountManagement = invoices.FirstOrDefault(x => x.Serie == item.SerieNo && x.InvoiceNoReal == item.InvoiceNo && x.PartnerId == partner.Id);
+                if (accountManagement == null)
+                {
+                    item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
+                    item.IsValid = false;
+                }
+                else
+                {
+                    item.PartnerId = partner.Id;
+                }
             });
-            return null; 
+            return list; 
         }
     }
 }

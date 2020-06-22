@@ -202,7 +202,11 @@ namespace eFMS.API.Accounting.Controllers
                     list.Add(payment);
                 }
                 var data = accountingPaymentService.CheckValidImportInvoicePayment(list);
-                var totalValidRows = data.Count(x => x.IsValid == true);
+                int totalValidRows = 0;
+                if (data != null)
+                {
+                    totalValidRows = data.Count(x => x.IsValid == true);
+                }
                 var results = new { data, totalValidRows };
                 return Ok(results);
 

@@ -15,7 +15,8 @@ import { AccountReceivablePayableListInvoicePaymentComponent } from './component
 import { AccountReceivablePayableListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-receivable-payable.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AccountReceivablePayableUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
-
+import { PaymentImportComponent } from './components/payment-import/payment-import.component';
+import { PaginationModule } from 'ngx-bootstrap';
 const routing: Routes = [
     {
         path: "",
@@ -23,6 +24,9 @@ const routing: Routes = [
         children: [
             {
                 path: '', component: AccountReceivablePayableComponent
+            },
+            {
+                path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
             },
         ]
     }
@@ -35,7 +39,8 @@ const routing: Routes = [
         AccountReceivablePayableComponent,
         AccountReceivablePayableListInvoicePaymentComponent,
         AccountReceivablePayableListOBHPaymentComponent,
-        AccountReceivablePayableUpdateExtendDayPopupComponent
+        AccountReceivablePayableUpdateExtendDayPopupComponent,
+        PaymentImportComponent
     ],
     imports: [
         CommonModule,
@@ -45,6 +50,7 @@ const routing: Routes = [
         FormsModule,
         TabsModule.forRoot(),
         ModalModule.forRoot(),
+        PaginationModule.forRoot(),
         NgxDaterangepickerMd,
         SelectModule
     ],

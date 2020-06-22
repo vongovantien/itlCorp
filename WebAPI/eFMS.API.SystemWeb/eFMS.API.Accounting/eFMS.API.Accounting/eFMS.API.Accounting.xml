@@ -66,7 +66,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
             <summary>
             constructor
             </summary>
@@ -87,6 +87,12 @@
             get list payment by refNo
             </summary>
             <param name="refNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadExcel">
+            <summary>
+            download file excel from server
+            </summary>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
