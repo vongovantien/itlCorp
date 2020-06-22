@@ -66,11 +66,48 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAccAccountingPaymentService)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="paymentService"></param>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.PagingPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria,System.Int32,System.Int32)">
+            <summary>
+            query and paging VAT invoice / SOA
+            </summary>
+            <param name="criteria"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String)">
             <summary>
             get list payment by refNo
             </summary>
             <param name="refNo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UploadFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            read commodities data from file excel
+            </summary>
+            <param name="uploadedFile">file to read data</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UpdateExtendDate(eFMS.API.Accounting.DL.Models.AccountingPayment.ExtendDateUpdatedModel)">
+            <summary>
+            update extend date
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.Delete(System.Guid)">
+            <summary>
+            Delete a payment
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">

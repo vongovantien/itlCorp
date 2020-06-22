@@ -18,7 +18,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public DateTime? DueDate { get; set; }
         public int OverdueDays { get; set; }
         public string Status { get; set; }
-        public short? ExtendDays { get; set; }
+        public int? ExtendDays { get; set; }
         public string ExtendNote { get; set; }
     }
 }

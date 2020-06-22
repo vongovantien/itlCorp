@@ -164,6 +164,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Type)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);

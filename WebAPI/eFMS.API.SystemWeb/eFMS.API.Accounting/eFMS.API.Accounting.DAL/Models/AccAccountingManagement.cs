@@ -33,7 +33,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public DateTime? PaymentDueDate { get; set; }
         public string PaymentStatus { get; set; }
-        public short? PaymentExtendDays { get; set; }
+        public int? PaymentExtendDays { get; set; }
         public string PaymentNote { get; set; }
         public DateTime? PaymentDatetimeUpdated { get; set; }
     }

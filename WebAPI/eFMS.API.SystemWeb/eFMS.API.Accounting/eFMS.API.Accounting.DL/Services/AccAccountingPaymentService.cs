@@ -4,6 +4,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.AccountingPayment;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -22,6 +23,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
+        private readonly ICurrentUser currentUser;
 
         public AccAccountingPaymentService(IContextBase<AccAccountingPayment> repository, 
             IMapper mapper, 
@@ -29,13 +31,15 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AccAccountingManagement> accountingManaRepo,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<AcctSoa> soaRepo,
-            IContextBase<CsShipmentSurcharge> surchargeRepo) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surchargeRepo,
+            ICurrentUser currUser) : base(repository, mapper)
         {
             userRepository = userRepo;
             accountingManaRepository = accountingManaRepo;
             partnerRepository = partnerRepo;
             soaRepository = soaRepo;
             surchargeRepository = surchargeRepo;
+            currentUser = currUser;
         }
 
         public IQueryable<AccAccountingPaymentModel> GetBy(string refId)
@@ -268,6 +272,89 @@ namespace eFMS.API.Accounting.DL.Services
                 ExtendNote = x.PaymentNote
             });
             return results;
+        }
+
+        public HandleState UpdateExtendDate(ExtendDateUpdatedModel model)
+        {
+            HandleState result = new HandleState();
+            switch (model.PaymentType)
+            {
+                case Common.PaymentType.Invoice:
+                    result = UpdateExtendDateVATInvoice(model);
+                    break;
+                case Common.PaymentType.OBH:
+                    result = UpdateExtendDateOBH(model);
+                    break;
+            }
+            return result;
+        }
+
+        private HandleState UpdateExtendDateOBH(ExtendDateUpdatedModel model)
+        {
+            int id = Convert.ToInt32(model.RefId);
+            var soa = soaRepository.Get(x => x.Id == id).FirstOrDefault();
+            soa.PaymentExtendDays = (short)model.NumberDaysExtend;
+            soa.PaymentNote = model.Note;
+            soa.PaymentDueDate = soa.PaymentDueDate.Value.AddDays(model.NumberDaysExtend);
+            soa.PaymentDatetimeUpdated = DateTime.Now;
+            soa.UserModified = currentUser.UserID;
+            soa.DatetimeModified = DateTime.Now;
+            var result = soaRepository.Update(soa, x => x.Id == id);
+            return result;
+        }
+
+        private HandleState UpdateExtendDateVATInvoice(ExtendDateUpdatedModel model)
+        {
+            Guid id = new Guid(model.RefId);
+            var vatInvoice = accountingManaRepository.Get(x => x.Id == id).FirstOrDefault();
+            vatInvoice.PaymentExtendDays = (short)model.NumberDaysExtend;
+            vatInvoice.PaymentNote = model.Note;
+            vatInvoice.PaymentDueDate = vatInvoice.PaymentDueDate.Value.AddDays(model.NumberDaysExtend);
+            vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
+            vatInvoice.UserModified = currentUser.UserID;
+            vatInvoice.DatetimeModified = DateTime.Now;
+            var result = accountingManaRepository.Update(vatInvoice, x => x.Id == id);
+            return result;
+        }
+
+        public HandleState Delete(Guid id)
+        {
+            var item = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            var hs = DataContext.Delete(x => x.Id == id, false);
+            if (hs.Success)
+            {
+                if(item.Type == "INVOICE")
+                {
+                    var s = UpdateVATPaymentStatus(item);
+                }
+                else
+                {
+                    var s = UpdateSOAPaymentStatus(item);
+                }
+            }
+            return hs;
+        }
+
+        private HandleState UpdateVATPaymentStatus(AccAccountingPayment item)
+        {
+            var invoice = accountingManaRepository.Get(x => x.Id == new Guid(item.RefId)).FirstOrDefault();
+            var remainPayments = DataContext.Get(x => x.RefId == item.RefId && x.Id != item.Id).Sum(x => x.PaymentAmount);
+            return null;
+        }
+
+        private HandleState UpdateSOAPaymentStatus(AccAccountingPayment item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
+        {
+            var partners = partnerRepository.Get().ToList();
+            var invoices = accountingManaRepository.Get(x => x.PaymentStatus == "Paid").ToList();
+            list.ForEach(item =>
+            {
+            });
+            return null; 
         }
     }
 }

@@ -2,7 +2,10 @@
 using eFMS.API.Accounting.DL.Models.AccountingPayment;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace eFMS.API.Accounting.DL.IService
@@ -11,5 +14,8 @@ namespace eFMS.API.Accounting.DL.IService
     {
         IQueryable<AccAccountingPaymentModel> GetBy(string refNo);
         IQueryable<AccountingPaymentModel> Paging(PaymentCriteria criteria, int page, int size, out int rowsCount);
+        HandleState UpdateExtendDate(ExtendDateUpdatedModel model);
+        HandleState Delete(Guid id);
+        List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list);
     }
 }

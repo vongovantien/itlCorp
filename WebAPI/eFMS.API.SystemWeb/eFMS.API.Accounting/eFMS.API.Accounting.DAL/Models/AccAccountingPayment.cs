@@ -13,6 +13,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string CurrencyId { get; set; }
         public DateTime? PaidDate { get; set; }
         public string PaymentType { get; set; }
+        public string Type { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
