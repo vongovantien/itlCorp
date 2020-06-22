@@ -436,7 +436,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
                 var _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
                 var _shipperName = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
-                var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                //var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                 var _agentName = partnerRepositoty.Get(x => x.Id == houseBill.ForwardingAgentId).FirstOrDefault()?.PartnerNameEn;
 
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
@@ -449,7 +449,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = new AirImptArrivalReport();
                         charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                         charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
-                        charge.Consignee = _consigneeName?.ToUpper();  //Consignee
+                        charge.Consignee = houseBill.ConsigneeDescription?.ToUpper();//_consigneeName?.ToUpper();  //Consignee
                         charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                         charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
@@ -492,7 +492,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var charge = new AirImptArrivalReport();
                     charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                     charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
-                    charge.Consignee = _consigneeName?.ToUpper(); //Consignee
+                    charge.Consignee = houseBill.ConsigneeDescription?.ToUpper();//_consigneeName?.ToUpper(); //Consignee
                     charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                     charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                     charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
