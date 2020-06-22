@@ -18,7 +18,7 @@ namespace eFMSWindowService
             ////#if DEBUG
             ////If the mode is in debugging
             ////create a new service instance
-            //AutoLockShipmentService myService = new AutoLockShipmentService();
+            //SendMailToARDepartmentService myService = new SendMailToARDepartmentService();
             ////call the start method - this will start the Timer.
             //myService.Start();
             ////Set the Thread to sleep
@@ -40,7 +40,7 @@ namespace eFMSWindowService
                             new AutoLockShipmentService()
             };
             ServiceBase.Run(ServicesToRun);
-            ////#endif
+            //#endif
 
         }
     }

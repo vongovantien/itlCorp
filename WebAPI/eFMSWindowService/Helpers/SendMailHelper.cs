@@ -13,7 +13,7 @@ namespace eFMSWindowService.Helpers
     public static class SendMailHelper
     {
 
-        public static bool Send(string subject, string body, string email)
+        public static bool Send(string subject, string body, List<string> toEmails)
         {
             string description = "";
             bool result = true;
@@ -22,7 +22,16 @@ namespace eFMSWindowService.Helpers
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
-            message.To.Add(email);
+            string receivers = "";
+            if (toEmails != null && toEmails.Count() > 0)
+            {
+                foreach (string ToEmail in toEmails)
+                {
+                    MailAddress EmailTo = new MailAddress(ToEmail);
+                    receivers += ToEmail + ", ";
+                    message.To.Add(EmailTo);
+                }
+            }
 
             message.IsBodyHtml = true;
             message.Subject = subject;
