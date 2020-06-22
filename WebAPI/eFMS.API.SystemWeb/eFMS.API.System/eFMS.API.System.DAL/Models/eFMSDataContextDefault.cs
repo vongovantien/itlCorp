@@ -16,6 +16,7 @@ namespace eFMS.API.System.Service.Models
         }
 
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
+        public virtual DbSet<SetLockingDateShipment> SetLockingDateShipment { get; set; }
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
         public virtual DbSet<SysAuthorizedApproval> SysAuthorizedApproval { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
@@ -99,6 +100,33 @@ namespace eFMS.API.System.Service.Models
                     .WithMany(p => p.CatDepartment)
                     .HasForeignKey(d => d.BranchId)
                     .HasConstraintName("FK_catDepartment_sysBranch");
+            });
+
+            modelBuilder.Entity<SetLockingDateShipment>(entity =>
+            {
+                entity.ToTable("setLockingDateShipment");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.IsApply).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.ServiceType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysAuthorization>(entity =>

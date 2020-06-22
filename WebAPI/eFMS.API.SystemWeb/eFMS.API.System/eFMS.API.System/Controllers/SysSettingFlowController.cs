@@ -46,18 +46,17 @@ namespace eFMS.API.System.Controllers
             return Ok(sysSettingFlowService.GetByOfficeId(officeId));
         }
 
-        [HttpPost]
-        [Route("Add")]
+        [HttpPut]
         [Authorize]
-        public IActionResult Post(SysSettingFlowEditModel model)
+        public IActionResult Put(SysSettingFlowEditModel model)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            HandleState hs = sysSettingFlowService.UpdateSettingFlow(model.settings,model.OfficeId);
+            HandleState hs = sysSettingFlowService.UpdateSettingFlow(model);
 
-            string message = HandleError.GetMessage(hs, Crud.Insert);
+            string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
             if (!hs.Success)
             {
