@@ -302,29 +302,15 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeModified = DateTime.Now
                     };
                     resultUrls.Add(sysImage);
-           
-                    list.Add(sysImage);
-                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.ChildId == model.ChildId))
+                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
                     {
                         list.Add(sysImage);
                     }
                 }
                 if (list.Count > 0)
                 {
-                    bool isUpdate = false;
                     list.ForEach(x => x.IsTemp = model.IsTemp);
-                    foreach(var item in list)
-                    {
-                        if(sysImageRepository.Any(x=>x.ObjectId == item.ObjectId && x.ChildId == item.ChildId))
-                        {
-                            isUpdate = true;
-                            hs = await sysImageRepository.UpdateAsync(item,x=>x.ChildId == item.ChildId);
-                        }
-                    }
-                    if (!isUpdate)
-                    {
-                        hs = await sysImageRepository.AddAsync(list);
-                    }
+                    hs = await sysImageRepository.AddAsync(list);
                 }
                 return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
 
