@@ -288,7 +288,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.BookingID = data.BookingNo?.ToUpper();
             bookingNote.TransID = data.Id.ToString();
             bookingNote.LotNo = string.Empty; //NOT USE
-            bookingNote.DateMaking = null; //NOT USE
+            bookingNote.DateMaking = data.BookingDate; //Booking Date
             bookingNote.Revision = data.Revision?.ToUpper();
             bookingNote.Attn = data.To?.ToUpper();
             bookingNote.PartnerID = string.Empty; //NOT USE
