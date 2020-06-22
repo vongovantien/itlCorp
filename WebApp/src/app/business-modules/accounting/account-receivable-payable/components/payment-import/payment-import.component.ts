@@ -4,8 +4,9 @@ import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PagingService, SortService } from '@services';
 import { SystemConstants } from '@constants';
-import { finalize } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { AccountingRepo } from '@repositories';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'payment-import',
@@ -24,8 +25,10 @@ export class PaymentImportComponent extends AppPage implements OnInit {
 
     constructor(private pagingService: PagingService,
         private sortService: SortService,
-        private accoutingRepo: AccountingRepo) {
+        private accoutingRepo: AccountingRepo,
+        private _progressService: NgProgress) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -81,7 +84,7 @@ export class PaymentImportComponent extends AppPage implements OnInit {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
-        this.accoutingRepo.upLoadVoucherAdvanceFile(file.target['files'])
+        this.accoutingRepo.upLoadInvoicePaymentFile(file.target['files'])
             .pipe(
                 finalize(() => {
                     this._progressRef.complete();
@@ -98,4 +101,14 @@ export class PaymentImportComponent extends AppPage implements OnInit {
             }, () => {
             });
     }
+    downloadSample() {
+        this.accoutingRepo.downloadInvoicePaymentFile()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, "application/ms-excel", "downloadInvoicePaymentFile.xlsx");
+                },
+            );
+    }
+    import(element) { }
 }

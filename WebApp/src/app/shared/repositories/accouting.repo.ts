@@ -524,6 +524,12 @@ export class AccountingRepo {
     upLoadInvoicePaymentFile(files: any) {
         return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UploadInvoicePaymentFile`, files, "uploadedFile");
     }
+    downloadInvoicePaymentFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 

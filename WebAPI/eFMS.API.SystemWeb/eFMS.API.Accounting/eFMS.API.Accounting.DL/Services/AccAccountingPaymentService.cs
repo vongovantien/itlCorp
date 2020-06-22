@@ -368,6 +368,7 @@ namespace eFMS.API.Accounting.DL.Services
                 else
                 {
                     item.PartnerId = partner.Id;
+                    item.RefId = accountManagement.Id.ToString();
                 }
             });
             return list; 

@@ -22,5 +22,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string PaymentTypeError { get; set; }
         public string Note { get; set; }
         public string PartnerId { get; set; }
+        public string RefId { get; set; }
     }
 }

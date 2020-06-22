@@ -84,20 +84,45 @@
                                 <span>No.</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'advanceNo'), 'sorting_desc': (!isDesc && sortKey == 'advanceNo') }"
-                                (click)="sort('advanceNo')">
-                                <span>Advance No</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
+                                (click)="sort('invoiceNo')">
+                                <span>Invoice No</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'voucherNo'), 'sorting_desc': (!isDesc && sortKey == 'voucherNo') }"
-                                (click)="sort('voucherNo')">
-                                <span>Voucher No</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serieNo'), 'sorting_desc': (!isDesc && sortKey == 'serieNo') }"
+                                (click)="sort('serieNo')">
+                                <span>Serie No</span>
                             </th>
-
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'voucherDate'), 'sorting_desc': (!isDesc && sortKey == 'voucherDate') }"
                                 (click)="sort('voucherDate')">
-                                <span>Voucher Date</span>
+                                <span>Partner ID</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerName'), 'sorting_desc': (!isDesc && sortKey == 'partnerName') }"
+                                (click)="sort('partnerName')">
+                                <span>Partner Name</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentAmount'), 'sorting_desc': (!isDesc && sortKey == 'paymentAmount') }"
+                                (click)="sort('paymentAmount')">
+                                <span>Payment Amount</span>
+                            </th>
+
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paidDate'), 'sorting_desc': (!isDesc && sortKey == 'paidDate') }"
+                                (click)="sort('paidDate')">
+                                <span>Paid Date</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentType'), 'sorting_desc': (!isDesc && sortKey == 'paymentType') }"
+                                (click)="sort('paymentType')">
+                                <span>Payment Type</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Note</span>
                             </th>
                         </tr>
                     </thead>
@@ -108,20 +133,41 @@
                                     <span>{{ (i + this.pager.startIndex + 1) }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.advanceNoError === null">{{ item.advanceNo }}</span>
+                                    <span *ngIf="item.invoiceNoError === null">{{ item.invoiceNo }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.advanceNoError !== null">{{item.advanceNoError }}</span>
+                                        *ngIf="item.invoiceNoError !== null">{{item.invoiceNoError }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.voucherNoError === null">{{ item.voucherNo }}</span>
-                                    <span class="m--font-danger" *ngIf="item.voucherNoError !== null">{{
-                                        item.voucherNoError }}</span>
+                                    <span *ngIf="item.serieNoError === null">{{ item.serieNo }}</span>
+                                    <span class="m--font-danger" *ngIf="item.serieNoError !== null">{{
+                                        item.serieNoError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.partnerAccountError === null">{{ item.partnerAccount }}</span>
+                                    <span class="m--font-danger" *ngIf="item.partnerAccountError !== null">{{
+                                        item.partnerAccountError }}</span>
+                                </td>
+                                <td class="">
+                                    <span>{{ item.partnerName }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.paymentAmountError === null">{{ item.paymentAmount }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paymentAmountError !== null">{{
+                                        item.paymentAmountError }}</span>
                                 </td>
                                 <td class="">
                                     <span
-                                        *ngIf="item.voucherDateError === null">{{ item.voucherDate | date: 'dd/MM/yyyy'  }}</span>
-                                    <span class="m--font-danger" *ngIf="item.voucherDateError !== null">{{
-                                        item.voucherDateError }}</span>
+                                        *ngIf="item.paidDateError === null">{{ item.paidDate | date: 'dd/MM/yyyy'  }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paidDateError !== null">{{
+                                        item.paidDateError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.paymentTypeError === null">{{ item.paymentType }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paymentTypeError !== null">{{
+                                        item.paymentTypeError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.note === null">{{ item.note }}</span>
                                 </td>
                             </tr>
                         </ng-container>
