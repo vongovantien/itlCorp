@@ -2,7 +2,7 @@ import { SystemConstants } from "@constants";
 import { PermissionShipment } from "../document/permissionShipment";
 import { CommonEnum } from "@enums";
 
-export class SetUnlockRequestModel {
+export class SetUnlockRequest {
     id: string = SystemConstants.EMPTY_GUID;
     subject: string = null;
     requester: string = null;
@@ -20,8 +20,19 @@ export class SetUnlockRequestModel {
     departmentId: number = 0;
     officeId: string = SystemConstants.EMPTY_GUID;
     companyId: string = SystemConstants.EMPTY_GUID;
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+export class SetUnlockRequestModel extends SetUnlockRequest {
     jobs: SetUnlockRequestJobModel[] = new Array<SetUnlockRequestJobModel>();
     constructor(object?: any) {
+        super();
         const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
@@ -62,9 +73,22 @@ export class UnlockJobCriteria {
 }
 
 export class UnlockRequestCriteria {
-    refenceNos: string[] = [];
+    referenceNos: string[] = [];
     unlockTypeNum: CommonEnum.UnlockTypeEnum;
     requester: string = null;
     createdDate: string = null;
     statusApproval: string = null;
+}
+
+export class UnlockRequestResult extends SetUnlockRequest {
+    requesterName: string = null;
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
 }

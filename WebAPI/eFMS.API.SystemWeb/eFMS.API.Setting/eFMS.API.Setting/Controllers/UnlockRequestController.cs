@@ -65,9 +65,19 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult Delete(Guid id)
         {
             var hs = unlockRequestService.DeleteUnlockRequest(id);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            return Ok(result);
+            
+            ResultHandle result = new ResultHandle();
+            if (!hs.Success)
+            {
+                result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+                return BadRequest(result);
+            }
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
         }
 
         [HttpPut]
@@ -89,6 +99,16 @@ namespace eFMS.API.Setting.Controllers
         {
             var data = unlockRequestService.GetJobToUnlockRequest(criteria);
             return Ok(data);
+        }
+
+        [HttpPost]
+        [Route("Paging")]
+        [Authorize]
+        public IActionResult Paging(UnlockRequestCriteria criteria, int pageNumber, int pageSize)
+        {
+            var data = unlockRequestService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var result = new { data, totalItems, pageNumber, pageSize };
+            return Ok(result);
         }
     }
 }

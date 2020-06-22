@@ -7,7 +7,7 @@ namespace eFMS.API.Setting.DL.Models.Criteria
 {
     public class UnlockRequestCriteria
     {
-        public List<string> RefenceNos { get; set; }
+        public List<string> ReferenceNos { get; set; }
         public UnlockTypeEnum UnlockTypeNum { get; set; }
         public string Requester { get; set; }
         public DateTime? CreatedDate { get; set; }

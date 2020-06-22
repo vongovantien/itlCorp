@@ -73,5 +73,20 @@ export class SettingRepo {
                 map((data: any) => data)
             );
     }
+
+    getListUnlockRequest(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteUnlockRequest(id: string) {
+        return this._api.delete(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

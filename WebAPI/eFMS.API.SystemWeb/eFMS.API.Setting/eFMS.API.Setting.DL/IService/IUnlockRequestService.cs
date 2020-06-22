@@ -15,7 +15,7 @@ namespace eFMS.API.Setting.DL.IService
         HandleState DeleteUnlockRequest(Guid id);
         HandleState UpdateUnlockRequest(SetUnlockRequestModel model);
         List<SetUnlockRequestJobModel> GetJobToUnlockRequest(UnlockJobCriteria criteria);
-
+        List<UnlockRequestResult> Paging(UnlockRequestCriteria criteria, int page, int size, out int rowsCount);
 
     }
 }
