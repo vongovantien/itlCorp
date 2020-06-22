@@ -11,6 +11,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Url { get; set; }
         public string Folder { get; set; }
         public string ObjectId { get; set; }
+        public string ChildId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DateTimeCreated { get; set; }
         public string UserModified { get; set; }

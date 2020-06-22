@@ -11,5 +11,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string CompanyNameEn { get; set; }
         public string CompanyNameVn { get; set; }
         public string CompanyNameAbbr{ get; set; }
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
     }
 }

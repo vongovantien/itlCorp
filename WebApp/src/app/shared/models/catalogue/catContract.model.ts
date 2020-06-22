@@ -16,7 +16,7 @@ export class Contract {
     contractNo: string = '';
     contractType: string = '';
     vas: string = '';
-    trialCreditLimit: number = null;
+    trialCreditLimited: number = null;
     trialCreditDays: number = null;
     trialEffectDate: string = '';
     trialExpiredDate: string = '';
@@ -33,7 +33,10 @@ export class Contract {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    active: boolean = true;
+    active: boolean = false;
+    userModifiedName: string = '';
+    userCreatedName: string = '';
+
 
     constructor(data?: any) {
         const self = this;

@@ -7,9 +7,9 @@ import { SelectModule } from "ng2-select";
 import { TabsModule, CollapseModule, ModalModule } from "ngx-bootstrap";
 import { CommonComponentModule } from "src/app/shared/common/common.module";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
-import { FormContractComponent } from "./components/form-contract.component";
+import { FormContractCommercialCatalogueComponent } from "./components/form-contract-commerical-catalogue.component";
 const COMPONENTS = [
-    FormContractComponent
+    FormContractCommercialCatalogueComponent
 ]
 @NgModule({
     declarations: [

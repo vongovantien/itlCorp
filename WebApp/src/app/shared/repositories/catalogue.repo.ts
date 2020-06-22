@@ -300,16 +300,22 @@ export class CatalogueRepo {
             );
     }
 
-    uploadFileContract(partnerId: string, body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}`, body, 'files').pipe(
+    uploadFileContract(partnerId: string, contractId, body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
             map((data: any) => data)
         );
     }
 
 
-    deleteSaleman(id: string, partnerId: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}/${partnerId}`).pipe(
+    deleteContract(id: string, partnerId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/${id}/${partnerId}`).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getContractFilesAttach(partnerId: string, contractId) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
             map((data: any) => data)
         );
     }
@@ -493,6 +499,13 @@ export class CatalogueRepo {
         );
     }
 
+    getDetailContract(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetById/`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     createPartner(body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
             map((data: any) => data)
@@ -529,6 +542,12 @@ export class CatalogueRepo {
 
     createContract(body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateContract(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/update`, body).pipe(
             map((data: any) => data)
         );
     }

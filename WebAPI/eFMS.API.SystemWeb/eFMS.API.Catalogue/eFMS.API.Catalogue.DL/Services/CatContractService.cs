@@ -107,7 +107,6 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatContractModel entity)
         {
-            entity.Id = Guid.NewGuid();
             var contract = mapper.Map<CatContract>(entity);
             contract.DatetimeCreated = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
@@ -124,7 +123,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatContractModel model)
         {
             var entity = mapper.Map<CatContract>(model);
-            entity.UserModified = currentUser.UserID;
+            entity.UserModified  = currentUser.UserID;
+            entity.DatetimeModified = DateTime.Now;
+            var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            entity.DatetimeCreated = currentContract.DatetimeCreated;
+            entity.UserCreated = currentContract.UserCreated;
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
@@ -214,6 +217,53 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
+        public CatContractModel GetById(Guid id)
+        {
+            var result = DataContext.First(x => x.Id == id);
+            CatContractModel data = mapper.Map<CatContractModel>(result);
+            if (data != null)
+            {
+                data.UserCreatedName = sysUserRepository.Get(x => x.Id == result.UserCreated).Select(t => t.Username).FirstOrDefault();
+                data.UserModifiedName = sysUserRepository.Get(x => x.Id == result.UserModified).Select(t => t.Username).FirstOrDefault();
+            }
+            return data;
+        }
+
+        public SysImage GetFileContract(string partnerId,string contractId)
+        {
+            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x=>x.DateTimeCreated).FirstOrDefault();
+            return result;
+        }
+
+        public HandleState UpdateFileToContract(List<SysImage> files)
+        {
+
+            var isUpdateDone = new HandleState();
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var item in files)
+                    {
+                        item.IsTemp = null;
+                        item.DateTimeCreated = item.DatetimeModified = DateTime.Now;
+                        isUpdateDone = sysImageRepository.Update(item, x => x.Id == item.Id);
+                    }
+                    trans.Commit();
+                    return isUpdateDone;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
 
         public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
         {
@@ -245,21 +295,36 @@ namespace eFMS.API.Catalogue.DL.Services
                         Name = fileName,
                         Folder = model.FolderName ?? "Partner",
                         ObjectId = model.PartnerId.ToString(),
+                        ChildId = model.ChildId.ToString(),
                         UserCreated = currentUser.UserName, //admin.
                         UserModified = currentUser.UserName,
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };
                     resultUrls.Add(sysImage);
-                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage))
+           
+                    list.Add(sysImage);
+                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.ChildId == model.ChildId))
                     {
                         list.Add(sysImage);
                     }
                 }
                 if (list.Count > 0)
                 {
+                    bool isUpdate = false;
                     list.ForEach(x => x.IsTemp = model.IsTemp);
-                    hs = await sysImageRepository.AddAsync(list);
+                    foreach(var item in list)
+                    {
+                        if(sysImageRepository.Any(x=>x.ObjectId == item.ObjectId && x.ChildId == item.ChildId))
+                        {
+                            isUpdate = true;
+                            hs = await sysImageRepository.UpdateAsync(item,x=>x.ChildId == item.ChildId);
+                        }
+                    }
+                    if (!isUpdate)
+                    {
+                        hs = await sysImageRepository.AddAsync(list);
+                    }
                 }
                 return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
 

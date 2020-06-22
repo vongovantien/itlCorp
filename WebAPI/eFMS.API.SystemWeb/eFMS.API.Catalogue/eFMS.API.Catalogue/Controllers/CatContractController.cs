@@ -10,6 +10,7 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -28,6 +29,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatContractService catContractService;
         private readonly ICatPartnerService partnerService;
+
         private readonly IMapper mapper;
         public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper)
         {
@@ -115,6 +117,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            model.Id = Guid.NewGuid();
             string messageDuplicate = string.Empty;
             bool checkExist = catContractService.Any(x => x.SaleService == model.SaleService  && x.OfficeId == model.OfficeId && x.PartnerId == model.PartnerId);
             if (checkExist)
@@ -124,7 +127,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             var hs = catContractService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -161,9 +164,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to update</param>
         /// <param name="model">object to update</param>
         /// <returns></returns>
-        [HttpPut("{id}")]
+        [Route("Update")]
         [Authorize]
-        public IActionResult Put(string id, CatContractEditModel model)
+        public IActionResult Put(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             var saleman = mapper.Map<CatContractModel>(model);
@@ -212,10 +215,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <param name="files"></param>
         /// <param name="partnerId"></param>
+        /// <param name="contractId"></param>
+        /// 
         /// <returns></returns>
-        [HttpPut("UploadFile/{PartnerId}")]
+        [HttpPut("UploadFile/{PartnerId}/{contractId}")]
         [Authorize]
-        public async Task<IActionResult> UploadFileContract(List<IFormFile> files, [Required]string partnerId)
+        public async Task<IActionResult> UploadFileContract(List<IFormFile> files, [Required]string partnerId, [Required]string contractId)
         {
             string folderName = Request.Headers["Module"];
             ContractFileUploadModel model = new ContractFileUploadModel
@@ -223,10 +228,38 @@ namespace eFMS.API.Catalogue.Controllers
                 Files = files,
                 FolderName = folderName,
                 PartnerId = partnerId,
+                ChildId = contractId
             };
 
             var result = await catContractService.UploadContractFile(model);
             return Ok(result);
+        }
+
+
+        [HttpGet("GetById")]
+        public IActionResult GetById(Guid Id)
+        {
+            var results = catContractService.GetById(Id);
+            return Ok(results);
+        }
+
+        [Authorize]
+        [HttpPut("UpdateFileToContract")]
+        public IActionResult UpdateFilesToContract([FromBody]List<SysImage> files)
+        {
+            var result = catContractService.UpdateFileToContract(files);
+            return Ok(result);
+        }
+
+        /// get file contract of partner
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetFileAttachsContract")]
+        public IActionResult GetFileAttachsContract(string partnerId, string contractId)
+        {
+            var results = catContractService.GetFileContract(partnerId, contractId);
+            return Ok(results);
         }
 
 

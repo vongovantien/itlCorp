@@ -44,6 +44,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     ngOnInit(): void { }
 
     ngAfterViewInit() {
+
         this._activedRoute.params.pipe(
             tap((param: Params) => {
                 this.partnerId = !!param.partnerId ? param.partnerId : '';
@@ -54,12 +55,13 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 if (partnerId) {
                     this.contractList.partnerId = partnerId;
                     this.getDetailCustomer(partnerId);
-                    this.getListContract(partnerId);
+                    this.contractList.getListContract(partnerId);
                 } else {
                     this.gotoList();
                 }
             }
         );
+        this._cd.detectChanges();
     }
 
     getDetailCustomer(partnerId: string) {
@@ -72,19 +74,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
-    getListContract(partneId: string) {
-        this.contractList.isLoading = true;
-        this._catalogueRepo.getListContract(partneId)
-            .pipe(
-                finalize(() => this.contractList.isLoading = false)
-            )
-            .subscribe(
-                (res: any[]) => {
-                    this.contractList.contracts = res || [];
-                    console.log(this.contractList);
-                }
-            );
-    }
 
     onSave() {
 

@@ -26,9 +26,20 @@
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!contracts.length">
-                            <tr *ngFor="let item of contracts">
+                            <tr *ngFor="let item of contracts ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
+                                        <ng-container *ngIf="!item.active">
+                                            <button (click)="showConfirmDelete(item,i)"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </ng-container>
+                                        <button (click)="showDetail(item)"
+                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                            title="Edit">
+                                            <i class="la la-edit"></i>
+                                        </button>
                                     </div>
                                 </td>
                                 <td>{{item.username}}</td>
@@ -43,13 +54,13 @@
                                 <td>{{item.companyNameEn}}</td>
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!isLoading && !contracts.length">
-                        </tr>
-                        <tr app-table-row-loading *ngIf="isLoading">
-                        </tr>
+                        <tr app-table-none-record *ngIf="!(isLoading) && !contracts.length"></tr>
+                        <tr app-table-row-loading *ngIf="isLoading "></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>

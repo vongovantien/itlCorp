@@ -1,11 +1,4 @@
 <!--begin:: subheader-->
-<div class="m-subheader">
-    <div class="d-flex align-items-center">
-        <div class="mr-auto">
-            <app-breadcrumb></app-breadcrumb>
-        </div>
-    </div>
-</div>
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-portlet__body">
@@ -13,19 +6,21 @@
                 <div class="col-lg-11">
                     <div class="d-flex align-items-center justify-content-between p-1">
                         <h3>
-                            Create Contract Info
+                            {{isUpdate == false ? 'Create Contract Info' : 'Customer - Contract Info'}}
                         </h3>
                     </div>
                 </div>
                 <div class="col-lg-1" style="height: 30px">
                     <div class="h-100 d-flex align-items-center justify-content-center text-white"
-                        [class.bg-danger]="true">
-                        Inactive</div>
+                        [class.bg-danger]="!isUpdate || (!!this.selectedContract && !this.selectedContract.active) "
+                        [class.bg-success]=" !!this.selectedContract && this.selectedContract.active">
+                        {{!!this.selectedContract && this.selectedContract.active === true? 'Active' : 'Inactive'}}
+                    </div>
                 </div>
             </div>
             <hr />
             <div class="m-animate-fade-in mt-3">
-                <form class="m-form m-form--state" [formGroup]="formContract">
+                <form class="m-form m-form--state" [formGroup]="formGroup">
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
@@ -37,7 +32,7 @@
                                     [selectedDisplayFields]="['username']" [dataSources]="users"
                                     [displayFields]="[{field: 'username', label: 'User Name'}, { field: 'employeeNameVn', label: 'Full Name' }]"
                                     placeholder="Select Salesman" [height]="200" size="15"
-                                    (remove)="resetFormControl('salesman')">
+                                    (remove)="resetFormControl('salesmanId')">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -181,9 +176,8 @@
                                     <label>Trial Effect Date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input (change)="onChangeTrialDate()" type="text"
-                                            class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="daterange" [autoApply]="true"
                                             formControlName="trialEffectDate" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -272,9 +266,9 @@
                                 </div>
                             </div>
                         </ng-container>
-
-
                     </div>
+
+
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="form-group">
@@ -286,36 +280,50 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Contract File</label>
-                                <input class="form-control" type="file" multiple (change)="handleFileInput($event)"
-                                    [accept]="accepctFilesUpload" title="Attach files" />
+                                <input style="display:none" type="file" #file (change)="handleFileInput($event)">
+                                <div class="form-group ">
+                                    <button (click)="file.click()" type="button"
+                                        class=" btn btn-success m-btn--square m-btn--icon m-btn--uppercase margin-right-10">
+                                        <span>
+                                            <i class="la la-plus"></i>
+                                            <span>
+                                                Attach Files
+                                            </span>
+                                        </span>
+                                    </button>
+                                    <ng-container *ngIf="!!fileList && !isUpdate">
+                                        <span class="text-underline text-primary">
+                                            {{ !!fileList.length ? fileList[0].name : null}}
+                                        </span>
+                                    </ng-container>
+                                    <ng-container *ngIf="!isLoading && !!files && isUpdate">
+                                        <a [href]="files.url" target="_blank" [title]="files.name"
+                                            download>{{files.name}}</a>
+                                    </ng-container>
+
+                                </div>
+
+
+
                             </div>
                         </div>
                     </div>
+                    <ng-container *ngIf="isUpdate">
+                        <div class="row">
+                            <div class="col-6">
+                                Created by: <span class="text-success">{{selectedContract.userCreatedName}}</span>
+                                {{selectedContract.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                            </div>
+                            <div class="col-6">
+                                Modified by: <span class="text-success">{{selectedContract.userModifiedName}}</span>
+                                {{selectedContract.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                            </div>
+                        </div>
+                    </ng-container>
+
                 </form>
 
             </div>
         </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="text-center">
-            <button (click)="onSubmit()"
-                class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                <span>
-                    <i class="la la-save"></i>
-                    <span> Save </span>
-                </span>
-            </button>
-            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                <span>
-                    <i class="la la-send"></i>
-                    <span> Request Approval </span>
-                </span>
-            </button>
-            <app-default-button [buttonSetting]="cancelButtonSetting" (click)="gotoList()"></app-default-button>
-        </div>
-
     </div>
 </div>
