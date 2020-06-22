@@ -1593,7 +1593,14 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
                 var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s => string.Format("{0:n}", s.Length) + "*" + string.Format("{0:n}", s.Width) + "*" + string.Format("{0:n}", s.Height) + "*" + string.Format("{0:n0}", s.Package)));
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s =>
+                        (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
+                        + "*"
+                        + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
+                        + "*"
+                        + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
+                        + "*"
+                        + string.Format("{0:n0}", s.Package)));
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng

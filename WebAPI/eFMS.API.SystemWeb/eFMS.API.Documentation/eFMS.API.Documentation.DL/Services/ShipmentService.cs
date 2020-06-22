@@ -359,7 +359,11 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = x.Id,
                     CSShipmentNo = x.JobNo,
+<<<<<<< HEAD
                     UnLockedLog = x.UnLockedLog,
+=======
+                    LockedLog = x.UnLockedLog,
+>>>>>>> uat/05-06-2020-sprint15
                     IsLocked = x.IsLocked
                 });
 
