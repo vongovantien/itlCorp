@@ -57,7 +57,7 @@ namespace eFMSWindowService
                 {
                     var data = db.Database.SqlQuery<sp_GetShipmentInThreeDayToSendARDept_Result>("[dbo].[sp_GetShipmentInThreeDayToSendARDept]").ToList();
                     var departments = db.catDepartments.Where(x => x.Active == true && x.DeptType =="AR").ToList();
-                    if (data.Count == 0)
+                    if (data.Count >0)
                     {
                         string date = DateTime.Today.AddDays(3).ToShortDateString();
                         string subject = "Thông báo danh sách Khách hàng có đơn hàng Local charge cần thu đến ngày <" + date + ">";
