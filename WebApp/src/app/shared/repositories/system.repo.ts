@@ -619,5 +619,19 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+
+    getSettingFlowByOffice(officeId: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysSettingFlow/GetSettingFlowByOffice`, { officeId: officeId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateSettingFlow(body: any) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysSettingFlow`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 }
 
