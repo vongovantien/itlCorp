@@ -89,7 +89,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.formCreateSurcharge.form.setValue({
                         settlementNo: this.settlementPayment.settlement.settlementNo,
                         requester: this.settlementPayment.settlement.requester,
-                        requestDate: new Date(this.settlementPayment.settlement.requestDate),
+                        requestDate: { startDate: new Date(this.settlementPayment.settlement.requestDate), endDate: new Date(this.settlementPayment.settlement.requestDate) },
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
                         amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
