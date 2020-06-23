@@ -38,7 +38,9 @@ namespace eFMS.API.Setting.Service.Models
         public short? PackageTypeId { get; set; }
         public string CurrentStatus { get; set; }
         public short? CommodityGroupId { get; set; }
-        public string LockedLog { get; set; }
+        public string UnLockedLog { get; set; }
+        public DateTime? LastDateUnLocked { get; set; }
+        public DateTime? LockedDate { get; set; }
         public bool? IsLocked { get; set; }
         public short? GroupId { get; set; }
         public int? DepartmentId { get; set; }
@@ -50,5 +52,6 @@ namespace eFMS.API.Setting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string Shipper { get; set; }
         public string Consignee { get; set; }
+        public string LockedUser { get; set; }
     }
 }

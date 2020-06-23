@@ -35,7 +35,7 @@
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </ng-container>
-                                        <button (click)="showDetail(item)"
+                                        <button (click)="getDetailContract(item.id)"
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                             title="Edit">
                                             <i class="la la-edit"></i>
@@ -64,3 +64,5 @@
 </div>
 
 <confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
+<popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
+</popup-form-contract-commercial-catalogue>

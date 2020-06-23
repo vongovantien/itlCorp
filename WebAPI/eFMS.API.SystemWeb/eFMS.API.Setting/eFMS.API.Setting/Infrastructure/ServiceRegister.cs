@@ -36,11 +36,10 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
-            services.AddTransient<ICategoryLogService, CategoryLogService>();
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<ITariffService, TariffService>();
-
+            services.AddTransient<IUnlockRequestService, UnlockRequestService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

@@ -20,8 +20,9 @@ namespace eFMSWindowService
         {
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
-            // Execute mỗi ngày vào lúc 0h sang
+            // Execute mỗi ngày vào lúc 0h sáng
             _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            // _timer.Interval = 30000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer

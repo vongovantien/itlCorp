@@ -527,6 +527,14 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BillingEmail)
+                    .HasMaxLength(150)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingPhone)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CoLoaderCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1217,6 +1225,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.BookingDate).HasColumnType("datetime");
 
                 entity.Property(e => e.BookingNo)
                     .HasMaxLength(30)

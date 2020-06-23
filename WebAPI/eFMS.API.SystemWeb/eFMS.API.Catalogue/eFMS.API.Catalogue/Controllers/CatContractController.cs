@@ -164,7 +164,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [Route("Update")]
         [Authorize]
-        [HttpPost]
+        [HttpPut]
         public IActionResult Put(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();

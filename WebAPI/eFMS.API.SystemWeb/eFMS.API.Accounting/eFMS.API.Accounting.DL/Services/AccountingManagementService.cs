@@ -706,7 +706,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                VatAmountVnd = 0, //Tính toán bên dưới
                                                VatPartnerId = sur.PayerId,
                                                VatPartnerCode = pat.TaxCode, //Tax code
-                                               VatPartnerName = pat.PartnerNameVn,
+                                               VatPartnerName = pat.ShortName,
                                                VatPartnerAddress = pat.AddressVn,
                                                ObhPartnerCode = obhPat.TaxCode, //Tax code
                                                ObhPartner = obhPat.PartnerNameVn,
@@ -871,6 +871,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
+                model.PaymentDueDate = model.Date?? model.Date.Value.AddDays(30);
                 var accounting = mapper.Map<AccAccountingManagement>(model);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())

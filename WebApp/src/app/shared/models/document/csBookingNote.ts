@@ -39,6 +39,7 @@ export class csBookingNote {
     dropoffAt: string = null;
     note: string = null;
 
+    bookingDate: string = null;
     userCreated: string = null;
     createdDate: string = null;
     userModified: string = null;

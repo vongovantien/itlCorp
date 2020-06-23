@@ -31,6 +31,7 @@ namespace eFMSWindowService
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
             _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
+            // _timer.Interval = 30000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer
@@ -54,10 +55,9 @@ namespace eFMSWindowService
                 FileHelper.WriteToFile("SendMailToARDepartment", "Service send mail to AR department is recall at " + DateTime.Now);
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
-                    //var data = db.sp_GetShipmentInThreeDayToSendARDept();
                     var data = db.Database.SqlQuery<sp_GetShipmentInThreeDayToSendARDept_Result>("[dbo].[sp_GetShipmentInThreeDayToSendARDept]").ToList();
                     var departments = db.catDepartments.Where(x => x.Active == true && x.DeptType =="AR").ToList();
-                    if (data != null)
+                    if (data.Count >0)
                     {
                         string date = DateTime.Today.AddDays(3).ToShortDateString();
                         string subject = "Thông báo danh sách Khách hàng có đơn hàng Local charge cần thu đến ngày <" + date + ">";
@@ -95,10 +95,14 @@ namespace eFMSWindowService
                                 tableBody = tableBody.Replace("[content]", content.ToString());
                                 string body = headerBody + tableBody + footerBody;
                                 var jobs = data.Where(x => x.OfficeID == item.BranchID);
-                                var s = SendMailHelper.Send(subject, body, item.Email);
+                                List<string> toEmails = item.Email.Split(';').Where(x => x != null).ToList();
+                                if(toEmails.Count > 0)
+                                {
+                                    var s = SendMailHelper.Send(subject, body, toEmails);
                             }
                         }
                     }
+                }
                 }
                 if (_timer.Interval != 24 * 60 * 60 * 1000)
                 {

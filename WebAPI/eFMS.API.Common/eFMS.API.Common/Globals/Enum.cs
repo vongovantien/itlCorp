@@ -176,4 +176,11 @@
         accManagement,
         settingUnlockRequest
     }
+    public enum UnlockTypeEnum
+    {
+        SHIPMENT = 1,
+        ADVANCE = 2,
+        SETTLEMENT = 3,
+        CHANGESERVICEDATE = 4
+    }
 }

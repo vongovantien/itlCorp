@@ -1,6 +1,6 @@
 
 export class Contract {
-    id: "00000000-0000-0000-0000-000000000000";
+    id: string = "00000000-0000-0000-0000-000000000000";
     saleManId: string = '';
     officeId: string = '';
     companyId: string = '';

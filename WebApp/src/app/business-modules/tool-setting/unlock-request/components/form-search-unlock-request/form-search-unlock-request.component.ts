@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { SystemRepo } from "@repositories";
 import { catchError } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+import { UnlockRequestCriteria } from "@models";
+import { CommonEnum } from "@enums";
 
 @Component({
     selector: 'form-search-unlock-request',
@@ -11,7 +13,7 @@ import { formatDate } from "@angular/common";
 })
 
 export class UnlockRequestFormSearchComponent extends AppForm implements OnInit {
-    @Output() onSearch: EventEmitter<ISearchUnlockRequest> = new EventEmitter<ISearchUnlockRequest>();
+    @Output() onSearch: EventEmitter<UnlockRequestCriteria> = new EventEmitter<UnlockRequestCriteria>();
 
     formSearch: FormGroup;
     referenceNo: AbstractControl;
@@ -83,12 +85,30 @@ export class UnlockRequestFormSearchComponent extends AppForm implements OnInit 
     }
 
     onSubmit() {
-        const body: ISearchUnlockRequest = {
+        let _unlockTypeEnum = 0;
+        const unlockType = this.unlockType.value ? (this.unlockType.value.length > 0 ? this.unlockType.value[0].id : null) : null
+        switch (unlockType) {
+            case "Shipment":
+                _unlockTypeEnum = CommonEnum.UnlockTypeEnum.SHIPMENT;
+                break;
+            case "Advance":
+                _unlockTypeEnum = CommonEnum.UnlockTypeEnum.ADVANCE;
+                break;
+            case "Settlement":
+                _unlockTypeEnum = CommonEnum.UnlockTypeEnum.SETTEMENT;
+                break;
+            case "Change Service Date":
+                _unlockTypeEnum = CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE;
+                break;
+            default:
+                break;
+        }
+        const body: UnlockRequestCriteria = {
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
-            unlockType: this.unlockType.value ? (this.unlockType.value.length > 0 ? this.unlockType.value[0].id : null) : null,
+            unlockTypeNum: _unlockTypeEnum,
             requester: this.requester.value ? (this.requester.value.length > 0 ? this.requester.value[0].id : '') : null,
             createdDate: this.createdDate.value ? (this.createdDate.value.startDate !== null ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-            unlockStatus: this.unlockStatus.value ? (this.unlockStatus.value.length > 0 ? this.unlockStatus.value[0].id : null) : null,
+            statusApproval: this.unlockStatus.value ? (this.unlockStatus.value.length > 0 ? this.unlockStatus.value[0].id : null) : null,
         };
         this.onSearch.emit(body);
     }
@@ -102,12 +122,4 @@ export class UnlockRequestFormSearchComponent extends AppForm implements OnInit 
         // tslint:disable-next-line: no-any
         this.onSearch.emit(<any>{});
     }
-}
-
-interface ISearchUnlockRequest {
-    referenceNos: string[];
-    unlockType: string;
-    requester: string;
-    createdDate: string;
-    unlockStatus: string;
 }

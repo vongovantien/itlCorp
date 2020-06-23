@@ -9,17 +9,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
-import { CommercialCreateContractComponent } from './components/contract/components/create-contract/create-contract.component';
-import { CommercialDetailContractComponent } from './components/contract/components/detail-contract/detail-contract.component';
 
 @NgModule({
     declarations: [
         CommercialCreateComponent,
         CommercialFormCreateComponent,
         CommercialContractListComponent,
-        CommercialDetailComponent,
-        CommercialCreateContractComponent,
-        CommercialDetailContractComponent
+        CommercialDetailComponent
     ],
     imports: [
         CommonModule,

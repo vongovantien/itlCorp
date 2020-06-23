@@ -2696,6 +2696,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach(var item in lstAdvance)
                         {
+                            item.DeadlinePayment = item.VoucherDate.Value.AddDays(14);
                             DataContext.Update(item , x=>x.Id == item.Id);
                         }
                         trans.Commit();

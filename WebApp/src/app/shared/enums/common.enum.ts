@@ -133,11 +133,18 @@ export namespace CommonEnum {
         SINGLE = 'Single'
     }
 
-    export enum unlockTypeEnum {
-        SHIPMENT = 'Shipment',
-        ADVANCE = 'Advance',
-        SETTEMENT = 'Settlement',
-        SERVICEDATE = 'Change Service Date',
+    // export enum UnlockTypeEnum {
+    //     SHIPMENT = 'Shipment',
+    //     ADVANCE = 'Advance',
+    //     SETTEMENT = 'Settlement',
+    //     CHANGESERVICEDATE = 'Change Service Date',
+    // }
+
+    export enum UnlockTypeEnum {
+        SHIPMENT = 1,
+        ADVANCE = 2,
+        SETTEMENT = 3,
+        CHANGESERVICEDATE = 4,
     }
 }
 

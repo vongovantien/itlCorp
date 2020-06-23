@@ -12,15 +12,6 @@
                     </span>
                 </span>
             </button>
-            <!-- <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [routerLink]="'/home/tool/unlock-request/123'">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        Detail
-                    </span>
-                </span>
-            </button> -->
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -45,17 +36,30 @@
                                                     (onClick)="prepareDeleteAuthorization(authorization)" type="delete">
                                                 </app-permission-button> -->
                                                 <button type="button" title="Delete"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer">
+                                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
+                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                    (click)="deleteUnlockRequest(unlockRequest.id)">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </div>
                                         </td>
-                                        <td>{{unlockRequest.subject}}</td>
-                                        <td>{{unlockRequest.requestDate | date: 'dd/MM/yyyy HH:mm tt'}}</td>
-                                        <td class="text-info">{{unlockRequest.requester}}</td>
+                                        <td><a (click)="viewDetail(unlockRequest)"
+                                                class="text-underline pointer">{{unlockRequest.subject}}</a></td>
+                                        <td>{{unlockRequest.requestDate | date: 'dd/MM/yyyy HH:mm a'}}</td>
+                                        <td class="text-info">{{unlockRequest.requesterName}}</td>
                                         <td>{{unlockRequest.unlockType}}</td>
-                                        <td>{{unlockRequest.unlockStatus | date: 'dd/MM/yyyy'}}</td>
-                                        <td>{{unlockRequest.datetimeCreated | date: 'dd/MM/yyyy HH:mm tt'}}</td>
+                                        <td [ngSwitch]="unlockRequest.statusApproval">
+                                            <div *ngSwitchCase="'New'" class="text-danger">
+                                                {{unlockRequest.statusApproval}}</div>
+                                            <div *ngSwitchCase="'Done'" class="text-success">
+                                                {{unlockRequest.statusApproval}}</div>
+                                            <div *ngSwitchCase="'Denied'" class="text-danger">
+                                                {{unlockRequest.statusApproval}}</div>
+                                            <div *ngSwitchDefault class="text-primary">
+                                                {{unlockRequest.statusApproval}}
+                                            </div>
+                                        </td>
+                                        <td>{{unlockRequest.datetimeCreated | date: 'dd/MM/yyyy hh:mm a'}}</td>
                                     </tr>
                                 </ng-container>
                                 <tr *ngIf="!unlockRequests.length" app-table-none-record [colspan]="headers.length + 1">
@@ -63,31 +67,6 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- <div class="pagination-nav ">
-                        <div class="row">
-                            <div *ngIf="!!unlockRequests.length" class="col-sm-6">
-                                <div class="tatable__pager-size">
-                                    <div class="select-box">
-                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                            <ng-container
-                                                *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                <option [ngValue]="item">{{item}} line / screen</option>
-                                            </ng-container>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                <div class="float-right">
-                                    <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                        [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                        [(ngModel)]="page">
-                                    </pagination>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                     <app-pagination [total]="totalItems" [itemPerPage]="pageSize" (onChange)="updatePagingData($event)"
                         [pageNum]="page"></app-pagination>
                 </div>

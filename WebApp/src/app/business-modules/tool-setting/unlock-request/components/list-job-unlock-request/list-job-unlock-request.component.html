@@ -8,7 +8,8 @@
                     <span>Add Detail</span>
                 </span>
             </button>
-            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" type="button">
+            <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                (click)="removeJob()">
                 <span>
                     <i class="la la-trash-o"></i>
                     <span>Remove</span>
@@ -23,35 +24,37 @@
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                     <th class="first table-actions-col">
                         <label class="m-checkbox">
-                            <input type="checkbox">
+                            <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllCharge()">
                             <span></span>
                         </label>
                     </th>
                 </thead>
                 <tbody>
-                    <!-- <ng-container *ngIf="!!charges.length"> -->
-                    <tr>
-                        <td class="table-actions-col">
-                            <div class="table-actions">
-                                <label class="m-checkbox">
-                                    <input type="checkbox">
-                                    <span></span>
-                                </label>
-                            </div>
-                        </td>
-                        <td></td>
-                        <td>
-                            <input type="text" class="form-control">
-                        </td>
+                    <ng-container *ngIf="!!dataJobs.length">
+                        <tr *ngFor="let job of dataJobs; let i = index; trackBy: trackByFn">
+                            <td class="table-actions-col">
+                                <div class="table-actions">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" (change)="onChangeCheckBoxCharge()" [value]="job"
+                                            [(ngModel)]="job.isSelected" [name]="i">
+                                        <span></span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>{{job.unlockName}}</td>
+                            <td>
+                                <input type="text" class="form-control" [(ngModel)]="job.reason">
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <tr app-table-none-record *ngIf="!isLoading && !dataJobs.length" [colspan]="headers.length + 1">
                     </tr>
-                    <!-- </ng-container> -->
-                    <!-- <tr app-table-none-record *ngIf="!isLoading && !charges.length" [colspan]="headers.length + 1">
-                    </tr>
-                    <tr app-table-row-loading *ngIf="isLoading"></tr> -->
+                    <tr app-table-row-loading *ngIf="isLoading"></tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
-<input-search-job-popup></input-search-job-popup>
-<input-search-settlement-advance-popup></input-search-settlement-advance-popup>
+<input-search-job-popup [unlockType]="unlockType" (onInputJob)="onAddDetail($event)"></input-search-job-popup>
+<input-search-settlement-advance-popup [unlockType]="unlockType" (onInputAdvanceOrSettlement)="onAddDetail($event)">
+</input-search-settlement-advance-popup>

@@ -19,6 +19,8 @@ namespace eFMS.API.Setting.Infrastructure
             CreateMap<SetTariffModel, SetTariff>();
             CreateMap<SetTariffDetailModel, SetTariffDetail>();
 
+            CreateMap<SetUnlockRequest, SetUnlockRequestModel>();
+            CreateMap<SetUnlockRequestJob, SetUnlockRequestJobModel>();
         }
     }
 }

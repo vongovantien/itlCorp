@@ -30,7 +30,11 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset #staticTabs *ngIf="isDetail" class="custom-class-tab">
-                <tab heading="Department">
+                <tab>
+                    <ng-template tabHeading>
+                        <span>Department</span>
+                        <i class="la la-building-o"></i>
+                    </ng-template>
                     <div class="m-portlet">
                         <div class="m-form">
                             <div class="m-portlet__body">
@@ -74,10 +78,21 @@
                         </div>
                     </div>
                 </tab>
-                <tab heading="Management Group">
+                <tab>
+                    <ng-template tabHeading>
+                        <span>Management Group</span>
+                        <i class="la la-group"></i>
+                    </ng-template>
                     <ng-container>
                         <form-user-level [object]="selectedOffice" [type]="'office'"></form-user-level>
                     </ng-container>
+                </tab>
+                <tab>
+                    <ng-template tabHeading>
+                        <span>Approval Flow and Setting</span>
+                        <i class="la la-cogs"></i>
+                    </ng-template>
+                    <form-approve-setting-office></form-approve-setting-office>
                 </tab>
             </tabset>
         </div>

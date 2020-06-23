@@ -108,7 +108,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatContractModel entity)
         {
             var contract = mapper.Map<CatContract>(entity);
-            contract.DatetimeCreated = DateTime.Now;
+            contract.DatetimeCreated  = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
             var hs = DataContext.Add(contract);

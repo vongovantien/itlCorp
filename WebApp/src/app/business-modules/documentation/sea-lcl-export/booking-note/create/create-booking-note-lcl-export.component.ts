@@ -62,6 +62,7 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
             etd: !!form.etd && !!form.etd.startDate ? formatDate(form.etd.startDate, 'yyyy-MM-dd', 'en') : null,
             closingTime: !!form.closingTime && !!form.closingTime.startDate ? formatDate(form.closingTime.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
             dateOfStuffing: !!form.dateOfStuffing && !!form.dateOfStuffing.startDate ? formatDate(form.dateOfStuffing.startDate, 'yyyy-MM-dd', 'en') : null,
+            bookingDate: !!form.bookingDate && !!form.bookingDate.startDate ? formatDate(form.bookingDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
 
