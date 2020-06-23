@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+  <PackageReference Include="ExcelDataReader" Version="3.6.0" />
   <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
   <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
   <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />   
@@ -52,6 +53,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="4.0.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -102,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="eFMS.API.Accounting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\VoucherImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

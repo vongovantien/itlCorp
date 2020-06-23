@@ -72,6 +72,7 @@
             </summary>
             <param name="localizer"></param>
             <param name="paymentService"></param>
+            <param name="hostingEnvironment"></param>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.PagingPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria,System.Int32,System.Int32)">
             <summary>
