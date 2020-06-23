@@ -56,7 +56,7 @@
                                                 </td>
                                                 <td>{{ cdNote.total | number: '.0-3'}}</td>
                                                 <td>{{ cdNote.currency}}</td>
-                                                <td>{{ cdNote.issuedDate | date: 'HH:mm dd/MM/yyyy'}}</td>
+                                                <td>{{ cdNote.issuedDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-success">{{ cdNote.creator}}</td>
                                                 <td>
                                                     <ng-container [ngSwitch]="cdNote.status">
