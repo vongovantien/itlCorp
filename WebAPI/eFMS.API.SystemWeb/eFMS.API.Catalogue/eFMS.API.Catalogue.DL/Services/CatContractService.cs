@@ -229,6 +229,18 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
+        public HandleState ActiveInActiveContract(Guid id)
+        {
+            var isUpdateDone = new HandleState();
+            var objUpdate = DataContext.First(x => x.Id == id);
+            if(objUpdate != null)
+            {
+                objUpdate.Active = objUpdate.Active == true ? false : true;
+                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id);
+            }
+            return isUpdateDone;
+        }
+
         public SysImage GetFileContract(string partnerId,string contractId)
         {
             var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x=>x.DateTimeCreated).FirstOrDefault();

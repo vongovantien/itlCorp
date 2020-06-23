@@ -161,22 +161,28 @@
                                 <div class="form-group">
                                     <label>Trial Credit Limit
                                     </label>
-                                    <input type="number" class="form-control" formControlName="trialCreditLimit">
+                                    <input type="number"
+                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                        class="form-control" formControlName="trialCreditLimit">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Trial Credit Days
                                     </label>
-                                    <input type="number" class="form-control" formControlName="trialCreditDays">
+                                    <input type="number"
+                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                        class="form-control" formControlName="trialCreditDays">
                                 </div>
                             </div>
                             <div class="col-lg-2">
                                 <div class="form-group">
-                                    <label>Trial Effect Date
+                                    <label>Trial Effective Date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
+                                        <input
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="daterange" [autoApply]="true"
                                             formControlName="trialEffectDate" readonly />
@@ -193,7 +199,9 @@
                                     <label>Trial Expired Date
                                     </label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
+                                        <input
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="daterange" [autoApply]="true"
                                             formControlName="trialExpiredDate" readonly />
@@ -222,7 +230,9 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Credit Limited Rate</label>
-                                    <input type="number" class="form-control" formControlName="creditLimitRate">
+                                    <input
+                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                        type="number" class="form-control" formControlName="creditLimitRate">
                                 </div>
                             </div>
                         </ng-container>
@@ -256,7 +266,9 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Customer Advance Amount</label>
-                                    <input type="number" class="form-control" formControlName="customerAmount">
+                                    <input
+                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                        type="number" class="form-control" formControlName="customerAmount">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -267,8 +279,6 @@
                             </div>
                         </ng-container>
                     </div>
-
-
                     <div class="row">
                         <div class="col-lg-8">
                             <div class="form-group">
@@ -300,11 +310,7 @@
                                         <a [href]="files.url" target="_blank" [title]="files.name"
                                             download>{{files.name}}</a>
                                     </ng-container>
-
                                 </div>
-
-
-
                             </div>
                         </div>
                     </div>

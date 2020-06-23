@@ -9,6 +9,9 @@ import { AppForm } from 'src/app/app.form';
 import { Router, } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { Observable } from 'rxjs';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -52,6 +55,8 @@ export class FormContractCommercialCatalogueComponent extends AppForm {
 
     files: any = {};
 
+    menuSpecialPermission: Observable<any[]>;
+
     contractTypes: CommonInterface.INg2Select[] = [
         { id: "Trial", text: "Trial" },
         { id: "Official", text: "Official" },
@@ -86,6 +91,7 @@ export class FormContractCommercialCatalogueComponent extends AppForm {
         protected _router: Router,
         protected _toastService: ToastrService,
         private _ngProgressService: NgProgress,
+        private _store: Store<IAppState>
 
     ) {
         super();
@@ -93,7 +99,7 @@ export class FormContractCommercialCatalogueComponent extends AppForm {
     }
 
     ngOnInit() {
-
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.initForm();
         this.initDataForm();
         if (!this.isUpdate) {
@@ -204,7 +210,11 @@ export class FormContractCommercialCatalogueComponent extends AppForm {
         this.fileList = event.target['files'];
         console.log(this.fileList);
         if (this.isUpdate) {
-            this.uploadFileContract(this.selectedContract.id);
+            if (!!this.files && !!this.files.id) {
+                this.deleteFileContract();
+            } else {
+                this.uploadFileContract(this.selectedContract.id);
+            }
         }
     }
 
@@ -238,8 +248,23 @@ export class FormContractCommercialCatalogueComponent extends AppForm {
             );
     }
 
-
-
+    deleteFileContract() {
+        this._progressRef.start();
+        this._catalogueRepo.deleteContractFilesAttach(this.files.id)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.result.success) {
+                        this.uploadFileContract(this.selectedContract.id);
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
+    }
 
 }
 interface IContractAttachFile {

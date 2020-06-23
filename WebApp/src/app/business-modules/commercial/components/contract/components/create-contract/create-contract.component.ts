@@ -85,8 +85,6 @@ export class CommercialCreateContractComponent extends AppForm implements OnInit
         }
     }
 
-
-
     asignValueToModel() {
         this.contract.saleManId = this.formContract.salesmanId.value;
         this.contract.companyId = this.formContract.companyId.value;

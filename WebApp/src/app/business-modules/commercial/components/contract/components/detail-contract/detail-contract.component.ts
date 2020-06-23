@@ -7,6 +7,9 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormContractCommercialCatalogueComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commerical-catalogue.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'commercial-detail-contract',
@@ -18,21 +21,26 @@ export class CommercialDetailContractComponent extends CommercialCreateContractC
     @ViewChild(FormContractCommercialCatalogueComponent, { static: false }) formContract: FormContractCommercialCatalogueComponent;
 
     contract: Contract = new Contract();
+
+    menuSpecialPermission: Observable<any[]>;
+
     constructor(protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
         protected _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
-        protected _router: Router,) {
+        protected _router: Router,
+        private _store: Store<IAppState>
+    ) {
         super(_catalogueRepo, _toastService, _activedRoute, _router)
         this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._activedRoute.params.subscribe((params: Params) => {
             if (params.partnerId) {
                 this.partnerId = params.partnerId;
                 this.contract.id = params.contractId;
-
             }
 
         });
@@ -48,7 +56,7 @@ export class CommercialDetailContractComponent extends CommercialCreateContractC
         this._catalogueRepo.getDetailContract(id)
             .subscribe(
                 (res: Contract) => {
-                    // this.contract = res;
+                    this.contract = res;
                     this.formContract.selectedContract = res;
                     this.formContract.formGroup.patchValue({
                         salesmanId: this.formContract.selectedContract.saleManId,
@@ -93,6 +101,22 @@ export class CommercialDetailContractComponent extends CommercialCreateContractC
                     this.formContract.files = res;
                     // this.files.forEach(f => f.extension = f.name.split("/").pop().split('.').pop());
                     console.log(this.formContract.files);
+                }
+            );
+    }
+
+    activeInactiveContract(id: string) {
+        this._catalogueRepo.activeInactiveContract(id)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.formContract.selectedContract.active = !this.formContract.selectedContract.active;
+                        this._toastService.success(res.message);
+
+                    } else {
+                        this._toastService.error(res.message);
+                    }
                 }
             );
     }

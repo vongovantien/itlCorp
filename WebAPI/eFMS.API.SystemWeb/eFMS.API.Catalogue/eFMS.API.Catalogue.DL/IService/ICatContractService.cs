@@ -20,6 +20,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatContractViewModel> Paging(CatContractCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(Guid id);
         HandleState Update(CatContractModel model);
+
         List<CatContractModel> GetBy(string partnerId);
         Guid? GetContractIdByPartnerId(string partnerId);
         Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
@@ -28,7 +29,7 @@ namespace eFMS.API.Catalogue.DL.IService
 
         HandleState UpdateFileToContract(List<SysImage> files);
         Task<HandleState> DeleteFileContract(Guid id);
-
+        HandleState ActiveInActiveContract(Guid id);
 
 
     }

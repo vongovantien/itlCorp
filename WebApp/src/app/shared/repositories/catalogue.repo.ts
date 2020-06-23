@@ -320,6 +320,12 @@ export class CatalogueRepo {
         );
     }
 
+    deleteContractFilesAttach(fileId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkViewDetailPartnerPermission(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/CheckPermission/${id}`).pipe(
             catchError((error) => throwError(error)),
@@ -551,6 +557,13 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    activeInactiveContract(id: string) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 
     checkExistedSaleman(body: any = {}) {
         // const body = { service: service, office: office };

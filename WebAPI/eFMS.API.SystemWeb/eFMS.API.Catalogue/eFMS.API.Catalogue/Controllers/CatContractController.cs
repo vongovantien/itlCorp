@@ -50,8 +50,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(results);
         }
 
-
- 
         /// <summary
         /// get the list of sale man
         /// </summary>
@@ -166,6 +164,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [Route("Update")]
         [Authorize]
+        [HttpPost]
         public IActionResult Put(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -270,7 +269,18 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-
-
+        [Authorize]
+        [HttpPut("ActiveInactiveContract/{id}")]
+        public IActionResult ActiveInactiveContract(Guid id)
+        {
+            var hs = catContractService.ActiveInActiveContract(id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
