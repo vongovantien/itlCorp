@@ -327,9 +327,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     );
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
-                this.selectedContract.officeNameEn = this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn;
+                this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
-                this.onRequest.emit(this.selectedContract);
+                this.onRequest.emit(new Contract(this.selectedContract));
                 this.hide();
             }
 

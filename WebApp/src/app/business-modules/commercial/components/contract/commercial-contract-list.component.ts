@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from '@common';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { NgProgress } from '@ngx-progressbar/core';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -18,7 +19,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     contracts: Contract[] = [];
-    selectecContract: Contract;
+    selectecContract: Contract = new Contract();
     indexToRemove: number = 0;
 
     constructor(private _router: Router,
@@ -77,46 +78,57 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.show();
     }
 
-    getDetailContract(id: string) {
+    getDetailContract(id: string, index: number) {
         this.formContractPopup.isUpdate = true;
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
-        this.formContractPopup.getFileContract();
-        this._catalogueRepo.getDetailContract(id)
-            .subscribe(
-                (res: Contract) => {
-                    this.selectecContract = res;
+        if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID) {
+            this.formContractPopup.getFileContract();
+            this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
+                .subscribe(
+                    (res: Contract) => {
+                        this.selectecContract = res;
+                        this.formContractPopup.selectedContract = res;
+                        this.pachValueToFormContract();
+                        this.formContractPopup.show();
+                    }
+                );
+        } else {
+            if (this.contracts.length > 0) {
+                this.formContractPopup.selectedContract = this.contracts[index];
+            }
+            this.pachValueToFormContract();
+            this.formContractPopup.show();
+        }
+    }
 
-                    this.formContractPopup.selectedContract = res;
-                    this.formContractPopup.formGroup.patchValue({
-                        salesmanId: this.formContractPopup.selectedContract.saleManId,
-                        companyId: this.formContractPopup.selectedContract.companyId,
-                        officeId: this.formContractPopup.selectedContract.officeId,
-                        contractNo: this.formContractPopup.selectedContract.contractNo,
-                        effectiveDate: !!this.formContractPopup.selectedContract.effectiveDate ? { startDate: new Date(this.formContractPopup.selectedContract.effectiveDate), endDate: new Date(this.formContractPopup.selectedContract.effectiveDate) } : null,
-                        expiredDate: !!this.formContractPopup.selectedContract.expiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.expiredDate), endDate: new Date(this.formContractPopup.selectedContract.expiredDate) } : null,
-                        contractType: [this.formContractPopup.contractTypes.find(type => type.id === this.formContractPopup.selectedContract.contractType)],
-                        saleService: [this.formContractPopup.serviceTypes.find(type => type.id === this.formContractPopup.selectedContract.saleService)],
-                        vas: [this.formContractPopup.vaslst.find(type => type.id === this.formContractPopup.selectedContract.vas)],
-                        paymentTerm: this.formContractPopup.selectedContract.paymentTerm,
-                        creditLimit: this.formContractPopup.selectedContract.creditLimit,
-                        creditLimitRate: this.formContractPopup.selectedContract.creditLimitRate,
-                        trialCreditLimit: this.formContractPopup.selectedContract.trialCreditLimited,
-                        trialCreditDays: this.formContractPopup.selectedContract.trialCreditDays,
-                        trialEffectDate: !!this.formContractPopup.selectedContract.trialEffectDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialEffectDate), endDate: new Date(this.formContractPopup.selectedContract.trialEffectDate) } : null,
-                        trialExpiredDate: !!this.formContractPopup.selectedContract.trialExpiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate), endDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate) } : null,
-                        creditAmount: this.formContractPopup.selectedContract.creditAmount,
-                        billingAmount: this.formContractPopup.selectedContract.billingAmount,
-                        paidAmount: this.formContractPopup.selectedContract.paidAmount,
-                        unpaidAmount: this.formContractPopup.selectedContract.unpaidAmount,
-                        customerAmount: this.formContractPopup.selectedContract.customerAdvanceAmount,
-                        creditRate: this.formContractPopup.selectedContract.creditRate,
-                        description: this.formContractPopup.selectedContract.description,
-                        paymentMethod: [this.formContractPopup.paymentMethods.find(type => type.id === this.formContractPopup.selectedContract.paymentMethod)]
-                    });
-                    this.formContractPopup.show();
-                }
-            );
+    pachValueToFormContract() {
+        this.formContractPopup.formGroup.patchValue({
+            salesmanId: !!this.formContractPopup.selectedContract.saleManId ? this.formContractPopup.selectedContract.saleManId : null,
+            companyId: !!this.formContractPopup.selectedContract.companyId ? this.formContractPopup.selectedContract.companyId : null,
+            officeId: !!this.formContractPopup.selectedContract.officeId ? this.formContractPopup.selectedContract.officeId : null,
+            contractNo: this.formContractPopup.selectedContract.contractNo,
+            effectiveDate: !!this.formContractPopup.selectedContract.effectiveDate ? { startDate: new Date(this.formContractPopup.selectedContract.effectiveDate), endDate: new Date(this.formContractPopup.selectedContract.effectiveDate) } : null,
+            expiredDate: !!this.formContractPopup.selectedContract.expiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.expiredDate), endDate: new Date(this.formContractPopup.selectedContract.expiredDate) } : null,
+            contractType: !!this.formContractPopup.selectedContract.contractType ? [this.formContractPopup.contractTypes.find(type => type.id === this.formContractPopup.selectedContract.contractType)] : null,
+            saleService: !!this.formContractPopup.selectedContract.saleService ? [this.formContractPopup.serviceTypes.find(type => type.id === this.formContractPopup.selectedContract.saleService)] : null,
+            vas: !!this.formContractPopup.selectedContract.vas ? [this.formContractPopup.vaslst.find(type => type.id === this.formContractPopup.selectedContract.vas)] : null,
+            paymentTerm: this.formContractPopup.selectedContract.paymentTerm,
+            creditLimit: this.formContractPopup.selectedContract.creditLimit,
+            creditLimitRate: this.formContractPopup.selectedContract.creditLimitRate,
+            trialCreditLimit: this.formContractPopup.selectedContract.trialCreditLimited,
+            trialCreditDays: this.formContractPopup.selectedContract.trialCreditDays,
+            trialEffectDate: !!this.formContractPopup.selectedContract.trialEffectDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialEffectDate), endDate: new Date(this.formContractPopup.selectedContract.trialEffectDate) } : null,
+            trialExpiredDate: !!this.formContractPopup.selectedContract.trialExpiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate), endDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate) } : null,
+            creditAmount: this.formContractPopup.selectedContract.creditAmount,
+            billingAmount: this.formContractPopup.selectedContract.billingAmount,
+            paidAmount: this.formContractPopup.selectedContract.paidAmount,
+            unpaidAmount: this.formContractPopup.selectedContract.unpaidAmount,
+            customerAmount: this.formContractPopup.selectedContract.customerAdvanceAmount,
+            creditRate: this.formContractPopup.selectedContract.creditRate,
+            description: this.formContractPopup.selectedContract.description,
+            paymentMethod: !!this.formContractPopup.selectedContract.paymentMethod ? [this.formContractPopup.paymentMethods.find(type => type.id === this.formContractPopup.selectedContract.paymentMethod)] : null
+        });
     }
 
     getFileContract() {
@@ -176,10 +188,11 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     onRequestContract($event: any) {
         console.log($event);
+        this.selectecContract = new Contract($event);
         if (!!$event && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(this.partnerId);
         } else {
-            this.contracts.push($event);
+            this.contracts.push(this.selectecContract);
         }
     }
 
