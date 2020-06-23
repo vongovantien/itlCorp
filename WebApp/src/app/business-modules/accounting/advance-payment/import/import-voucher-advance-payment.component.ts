@@ -29,7 +29,6 @@ export class ImportVoucherAdvancePaymentComponent extends AppPage implements OnI
     sortKey: string = 'code';
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
         private pagingService: PagingService,
         private sortService: SortService,
         private _progressService: NgProgress,

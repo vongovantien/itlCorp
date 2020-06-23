@@ -31,5 +31,10 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public DateTime? PaymentDueDate { get; set; }
+        public string PaymentStatus { get; set; }
+        public int? PaymentExtendDays { get; set; }
+        public string PaymentNote { get; set; }
+        public DateTime? PaymentDatetimeUpdated { get; set; }
     }
 }

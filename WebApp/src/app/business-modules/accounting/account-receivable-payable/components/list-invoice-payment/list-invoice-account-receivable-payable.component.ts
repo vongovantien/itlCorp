@@ -1,16 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
     templateUrl: './list-invoice-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
-
-    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: true }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
-
-    constructor() {
+    constructor(
+        private _router: Router, ) {
         super();
     }
 
@@ -33,8 +31,11 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     }
 
     ngAfterViewInit() {
-        this.updateExtendDayPopup.show();
+        // this.updateExtendDayPopup.show();
 
+    }
+    import() {
+        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'Invoice' } });
     }
 }
 

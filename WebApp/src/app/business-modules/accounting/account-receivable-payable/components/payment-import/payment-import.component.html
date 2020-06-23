@@ -1,0 +1,205 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+    </div>
+</div>
+
+
+<div class="m-content">
+    <div class="m-portlet">
+        <div class="m-portlet__body">
+            <div class="m-form m-form--state">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <input type="file" #inputFile id="inputFile" class="form-control m-input m-input--square"
+                            placeholder="" (change)="chooseFile($event)" onclick="this.value=null;" accept=".xlsx">
+                        <span class="m-form__help">
+                            <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download sample</a>
+                        </span>
+                    </div>
+                    <div class="col-lg-7 offset-lg-1">
+                        <div class="row">
+                            <div class="col-sm-4 m--margin-top-10 text-right">
+                                <span class="m--font-brand m--font-bolder">
+                                    Total rows: {{totalRows}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4 m--margin-top-10 text-right">
+                                <span class="m--font-success m--font-bolder">
+                                    Valid rows: {{totalValidRows}}
+                                </span>
+                            </div>
+                            <div class="col-sm-4 m--margin-top-10 text-right">
+                                <span class="m--font-danger  m--font-bolder">
+                                    Invalid rows: {{(totalRows - totalValidRows)}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions m--margin-top-5 m--align-right">
+                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="hideInvalid()">
+                        <span>
+                            <span *ngIf="isShowInvalid">
+                                Show invalid rows
+                            </span>
+                            <span *ngIf="isShowInvalid == false">
+                                Show All
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="import(inputFile)">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span>
+                                save
+                            </span>
+                        </span>
+                    </button>
+                    <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                        routerLink="/home/accounting/account-receivable-payable">
+                        <span>
+                            <i class="la la-ban"></i>
+                            <span>
+                                close
+                            </span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="m-portlet" style="position: relative">
+        <div class="m-portlet__body">
+            <div class="table-wrapper" id="">
+                <table class="table table-striped table-brand dataTable">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span>No.</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
+                                (click)="sort('invoiceNo')">
+                                <span>Invoice No</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serieNo'), 'sorting_desc': (!isDesc && sortKey == 'serieNo') }"
+                                (click)="sort('serieNo')">
+                                <span>Serie No</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'voucherDate'), 'sorting_desc': (!isDesc && sortKey == 'voucherDate') }"
+                                (click)="sort('voucherDate')">
+                                <span>Partner ID</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerName'), 'sorting_desc': (!isDesc && sortKey == 'partnerName') }"
+                                (click)="sort('partnerName')">
+                                <span>Partner Name</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentAmount'), 'sorting_desc': (!isDesc && sortKey == 'paymentAmount') }"
+                                (click)="sort('paymentAmount')">
+                                <span>Payment Amount</span>
+                            </th>
+
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paidDate'), 'sorting_desc': (!isDesc && sortKey == 'paidDate') }"
+                                (click)="sort('paidDate')">
+                                <span>Paid Date</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentType'), 'sorting_desc': (!isDesc && sortKey == 'paymentType') }"
+                                (click)="sort('paymentType')">
+                                <span>Payment Type</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
+                                (click)="sort('note')">
+                                <span>Note</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="data">
+                        <ng-container *ngFor="let item of pagedItems; let i = index">
+                            <tr [ngClass]="{ 'invalid-row': !item.isValid }">
+                                <td class="">
+                                    <span>{{ (i + this.pager.startIndex + 1) }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.invoiceNoError === null">{{ item.invoiceNo }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.invoiceNoError !== null">{{item.invoiceNoError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.serieNoError === null">{{ item.serieNo }}</span>
+                                    <span class="m--font-danger" *ngIf="item.serieNoError !== null">{{
+                                        item.serieNoError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.partnerAccountError === null">{{ item.partnerAccount }}</span>
+                                    <span class="m--font-danger" *ngIf="item.partnerAccountError !== null">{{
+                                        item.partnerAccountError }}</span>
+                                </td>
+                                <td class="">
+                                    <span>{{ item.partnerName }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.paymentAmountError === null">{{ item.paymentAmount }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paymentAmountError !== null">{{
+                                        item.paymentAmountError }}</span>
+                                </td>
+                                <td class="">
+                                    <span
+                                        *ngIf="item.paidDateError === null">{{ item.paidDate | date: 'dd/MM/yyyy'  }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paidDateError !== null">{{
+                                        item.paidDateError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.paymentTypeError === null">{{ item.paymentType }}</span>
+                                    <span class="m--font-danger" *ngIf="item.paymentTypeError !== null">{{
+                                        item.paymentTypeError }}</span>
+                                </td>
+                                <td class="">
+                                    <span *ngIf="item.note === null">{{ item.note }}</span>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination-nav">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="select-box" style="max-width: 190px">
+                            <select class="form-control" id="" aria-label="" [(ngModel)]="pager.pageSize"
+                                (change)="selectPageSize()" name="pagesize">
+                                <ng-container *ngFor="let item of pager.numberToShow; index as i; first as isFirst">
+                                    <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page</option>
+                                </ng-container>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" *ngIf="pager.totalItems > pager.pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="pager.totalItems"
+                                [maxSize]="pager.numberPageDisplay" [itemsPerPage]="pager.pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="pager.currentPage">
+                            </pagination>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<info-popup [body]="'There are invalid data. Please check Import!'" [title]="'Notification'" [label]="'Ok'">
+</info-popup>

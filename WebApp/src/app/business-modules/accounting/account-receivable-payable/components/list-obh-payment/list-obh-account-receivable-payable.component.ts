@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
@@ -7,7 +8,7 @@ import { AppList } from 'src/app/app.list';
 })
 export class AccountReceivablePayableListOBHPaymentComponent extends AppList implements OnInit {
 
-    constructor() {
+    constructor(private _router: Router) {
         super();
     }
 
@@ -26,6 +27,10 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
             { title: 'Extend days', field: 'referenceNo', sortable: true },
             { title: 'Notes', field: 'referenceNo', sortable: true },
         ];
+    }
+
+    import() {
+        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'OBH' } });
     }
 }
 

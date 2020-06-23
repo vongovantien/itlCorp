@@ -87,5 +87,9 @@ namespace eFMS.API.Accounting.DL.Common
         {
             public static string ExelImportFileName = "Voucher";
         }
+        public struct AccountingPayment
+        {
+            public static string ExelImportFileName = "InvoicePayment";
+        }
     }
 }
