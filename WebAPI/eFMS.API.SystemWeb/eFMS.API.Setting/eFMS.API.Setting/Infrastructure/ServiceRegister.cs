@@ -40,6 +40,8 @@ namespace eFMS.API.Setting.Infrastructure
             services.AddTransient<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<ITariffService, TariffService>();
             services.AddTransient<IUnlockRequestService, UnlockRequestService>();
+            services.AddTransient<IUnlockRequestApproveService, UnlockRequestApproveService>();
+            services.AddTransient<IUserBaseService, UserBaseService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

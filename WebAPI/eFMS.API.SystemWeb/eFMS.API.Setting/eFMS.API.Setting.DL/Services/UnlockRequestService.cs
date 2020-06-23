@@ -29,6 +29,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CsTransactionDetail> transDetailRepo;
         private readonly IContextBase<CustomsDeclaration> customsRepo;
         private readonly IContextBase<SysUser> userRepo;
+        private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -42,7 +43,8 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CsTransaction> trans,
             IContextBase<CsTransactionDetail> transDetail,
             IContextBase<CustomsDeclaration> customs,
-            IContextBase<SysUser> sysUser) : base(repository, mapper)
+            IContextBase<SysUser> sysUser,
+            IContextBase<CsShipmentSurcharge> surcharge) : base(repository, mapper)
         {
             currentUser = user;
             setUnlockRequestJobRepo = setUnlockRequestJob;
@@ -54,6 +56,7 @@ namespace eFMS.API.Setting.DL.Services
             transDetailRepo = transDetail;
             customsRepo = customs;
             userRepo = sysUser;
+            surchargeRepo = surcharge;
         }
         
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -159,6 +162,37 @@ namespace eFMS.API.Setting.DL.Services
                     break;
             }                          
             return result;
+        }
+
+        public HandleState CheckExistVoucherNoOfAdvance(UnlockJobCriteria criteria)
+        {
+            var hs = new HandleState();
+            if (criteria.Advances == null || criteria.Advances.Count == 0) return hs;
+            foreach(var adv in criteria.Advances)
+            {
+                var advance = advancePaymentRepo.Get(x =>  x.AdvanceNo == adv && !string.IsNullOrEmpty(x.VoucherNo)).FirstOrDefault();
+                if (advance != null)
+                {
+                    object message = "You cant's unlock " + advance.AdvanceNo + ", because it has  existed in " + advance.VoucherNo + ", please recheck!";
+                    return new HandleState(message);                   
+                }
+            }           
+            return hs;
+        }
+        public HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria)
+        {
+            var hs = new HandleState();
+            if (criteria.Settlements == null || criteria.Settlements.Count == 0) return hs;
+            foreach (var settle in criteria.Settlements)
+            {
+                var charge = surchargeRepo.Get(x => x.SettlementCode == settle && (!string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId) )).FirstOrDefault();
+                if (charge != null)
+                {
+                    object message = "You cant's unlock " + settle + ", because it has  existed in " + charge.InvoiceNo + " " + charge.VoucherId + ", please recheck!";
+                    return new HandleState(message);
+                }
+            }
+            return hs;
         }
 
         #endregion --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -296,6 +330,11 @@ namespace eFMS.API.Setting.DL.Services
                             var jobs = mapper.Map<List<SetUnlockRequestJob>>(model.Jobs);
                             if (jobs != null && jobs.Count > 0)
                             {
+                                var listJobNeedDelete = setUnlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Where(x => !jobs.Select(s => s.Id).Contains(x.Id));
+                                foreach (var job in listJobNeedDelete)
+                                {
+                                    var hsDeleteJob = setUnlockRequestJobRepo.Delete(x => x.Id == job.Id, false);
+                                }
                                 foreach (var job in jobs)
                                 {
                                     if (job.Id == Guid.Empty)
@@ -309,18 +348,10 @@ namespace eFMS.API.Setting.DL.Services
                                     }
                                     else
                                     {
-                                        var isExist = setUnlockRequestJobRepo.Get(x => x.Id == job.Id).Any();
-                                        if (isExist)
-                                        {
-                                            var hsUpdateJob = setUnlockRequestJobRepo.Update(job, x => x.Id == job.Id, false);
-                                        }
-                                        else
-                                        {
-                                            var hsDeleteJob = setUnlockRequestJobRepo.Delete(x => x.Id == job.Id, false);
-                                        }
-
+                                        var hsUpdateJob = setUnlockRequestJobRepo.Update(job, x => x.Id == job.Id, false);
                                     }
                                 }
+
                                 setUnlockRequestJobRepo.SubmitChanges();
                             }
                         }
@@ -430,5 +461,23 @@ namespace eFMS.API.Setting.DL.Services
             return data.ToList();
         }
         #endregion --- LIST & PAGING ---
+
+        #region --- DETAIL ---
+        public SetUnlockRequestModel GetDetailUnlockRequest(Guid id)
+        {
+            var detail = new SetUnlockRequestModel();
+            var unlockRequest = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            detail = mapper.Map<SetUnlockRequestModel>(unlockRequest);
+            if (unlockRequest != null)
+            {
+                var unlockJob = setUnlockRequestJobRepo.Get(x => x.UnlockRequestId == id).ToList();
+                detail.Jobs = mapper.Map<List<SetUnlockRequestJobModel>>(unlockJob);
+                detail.RequesterName = userRepo.Where(x => x.Id == unlockRequest.Requester).FirstOrDefault()?.Username;
+                detail.UserNameCreated = userRepo.Where(x => x.Id == unlockRequest.UserCreated).FirstOrDefault()?.Username;
+                detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
+            }
+            return detail;
+        }
+        #endregion --- DETAIL ---
     }
 }

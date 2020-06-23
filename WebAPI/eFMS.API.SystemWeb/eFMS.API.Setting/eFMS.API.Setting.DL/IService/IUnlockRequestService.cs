@@ -16,6 +16,8 @@ namespace eFMS.API.Setting.DL.IService
         HandleState UpdateUnlockRequest(SetUnlockRequestModel model);
         List<SetUnlockRequestJobModel> GetJobToUnlockRequest(UnlockJobCriteria criteria);
         List<UnlockRequestResult> Paging(UnlockRequestCriteria criteria, int page, int size, out int rowsCount);
-
+        SetUnlockRequestModel GetDetailUnlockRequest(Guid id);
+        HandleState CheckExistVoucherNoOfAdvance(UnlockJobCriteria criteria);
+        HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria);
     }
 }

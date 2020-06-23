@@ -49,7 +49,7 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <ng-container *ngIf="unlockType.value[0].id === 'Change Service Date'">
+                        <ng-container *ngIf="unlockTypeEnum === 4">
                             <div class="col-4">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">New Service Date</label>
@@ -98,7 +98,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                                 </app-default-button>
                             </div>
                         </div>
@@ -108,3 +108,7 @@
         </div>
     </div>
 </div>
+
+<confirm-popup #confirmCancelPopup [body]="'Do you want to exit without saving?'" [labelConfirm]="'Yes'"
+    (onSubmit)="onCancelUnlock()">
+</confirm-popup>
