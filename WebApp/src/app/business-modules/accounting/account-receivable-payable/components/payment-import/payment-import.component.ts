@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
@@ -7,12 +7,15 @@ import { SystemConstants } from '@constants';
 import { finalize, catchError } from 'rxjs/operators';
 import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
+import { InfoPopupComponent } from '@common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'payment-import',
     templateUrl: './payment-import.component.html'
 })
 export class PaymentImportComponent extends AppPage implements OnInit {
+    @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
     pager: PagerSetting = PAGINGSETTING;
     isShowInvalid: boolean = true;
     inValidItems: any[] = [];
@@ -26,7 +29,8 @@ export class PaymentImportComponent extends AppPage implements OnInit {
     constructor(private pagingService: PagingService,
         private sortService: SortService,
         private accoutingRepo: AccountingRepo,
-        private _progressService: NgProgress) {
+        private _progressService: NgProgress,
+        private _toastService: ToastrService) {
         super();
         this._progressRef = this._progressService.ref();
     }
@@ -110,5 +114,37 @@ export class PaymentImportComponent extends AppPage implements OnInit {
                 },
             );
     }
-    import(element) { }
+    import(element) {
+        if (this.data == null) { return; }
+        if (this.totalRows - this.totalValidRows > 0) {
+            this.invaliDataAlert.show();
+            this._progressRef.complete();
+        } else {
+            const data = this.data.filter(x => x.isValid);
+            this._progressRef.start();
+            this.accoutingRepo.importInvoicePayment(data)
+                .pipe(
+                    finalize(() => {
+                        this._progressRef.complete();
+                    })
+                )
+                .subscribe(
+                    (res) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.pager.totalItems = 0;
+                            this.reset(element);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
+    }
+    reset(element) {
+        this.data = null;
+        this.pagedItems = null;
+        element.value = "";
+        this.pager.totalItems = 0;
+    }
 }

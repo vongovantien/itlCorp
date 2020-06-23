@@ -17,5 +17,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateExtendDate(ExtendDateUpdatedModel model);
         HandleState Delete(Guid id);
         List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list);
+        HandleState Import(List<AccountingPaymentImportModel> list);
     }
 }

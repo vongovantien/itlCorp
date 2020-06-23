@@ -131,6 +131,16 @@
   "MSG_SERIE_NO_DUPLICATE": "Serie No {0} has been duplicated!",
   "MSG_VOUCHER_ID_DUPLICATE_ROW": "VoucherId {0} has been duplicated row!",
   "MSG_SERIE_NO_EXISTED": "Serie No {0} has been existed in another voucher!",
-  "MSG_INVOICE_NO_EXISTED": "Invoice No {0} has been existed in another voucher!"
+  "MSG_INVOICE_NO_EXISTED": "Invoice No {0} has been existed in another voucher!",
 
+  // ------------start: INVOICE PAYMENT
+  "MSG_INVOICENO_ACCOUNTING_PAYMENT_EMPTY": "Invoice No không được để trống",
+  "MSG_SERIENO_ACCOUNTING_PAYMENT_EMPTY": "Serie No không được để trống",
+  "MSG_PARTNER_ACCOUNTING_PAYMENT_EMPTY": "Partner ID không được để trống",
+  "MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY": "Payment Amount không được để trống",
+  "MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_MUST_BE_NUMBER": "Payment Amount phải là kiểu số",
+  "MSG_PAIDDATE_ACCOUNTING_PAYMENT_EMPTY": "Paid Date không được để trống",
+  "MSG_PAIDDATE_ACCOUNTING_PAYMENT_INVALID": "Paid Date không hợp lệ",
+  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY": "Payment Type không được để trống",
+  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type không hợp lệ"
 }

@@ -12,6 +12,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,7 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="paymentService"></param>
+        /// <param name="hostingEnvironment"></param>
         public AccountingPaymentController(IStringLocalizer<LanguageSub> localizer,
             IAccAccountingPaymentService paymentService,
             IHostingEnvironment hostingEnvironment)
@@ -110,97 +112,8 @@ namespace eFMS.API.Accounting.Controllers
                 int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
                 List<AccountingPaymentImportModel> list = new List<AccountingPaymentImportModel>();
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    string invoiceNo = worksheet.Cells[row, 1].Value?.ToString();
-                    var payment = new AccountingPaymentImportModel
-                    {
-                        IsValid = true,
-                        PartnerName = worksheet.Cells[row, 4].Value?.ToString(),
-                        Note = worksheet.Cells[row, 8].Value?.ToString()
-                    };
-                    if(worksheet.Cells[row, 1].Value == null)
-                    {
-                        payment.InvoiceNoError = "Invoice No không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        payment.InvoiceNo = worksheet.Cells[row, 1].Value.ToString();
-                    }
-                    if(worksheet.Cells[row, 2].Value == null)
-                    {
-                        payment.SerieNoError = "Serie No không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        payment.SerieNo = worksheet.Cells[row, 2].Value.ToString();
-                    }
-                    if(worksheet.Cells[row, 3].Value == null)
-                    {
-                        payment.PartnerAccountError = "ParnerId không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        payment.PartnerAccount = worksheet.Cells[row, 3].Value.ToString();
-                    }
-                    if(worksheet.Cells[row, 5].Value == null)
-                    {
-                        payment.PaymentAmountError = "Payment Amount không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        var checkPaymentAmount = decimal.TryParse(worksheet.Cells[row, 5].Value.ToString(), out decimal paymentAmount);
-                        if(checkPaymentAmount == false)
-                        {
-                            payment.PaymentAmountError = "Payment Amount phải là kiểu số";
-                            payment.IsValid = false;
-                        }
-                        else
-                        {
-                            payment.PaymentAmount = paymentAmount;
-                        }
-                    }
-                    if(worksheet.Cells[row, 6].Value == null)
-                    {
-                        payment.PaidDateError = "Paid Date không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        if (DateTime.TryParse(worksheet.Cells[row, 6].Value.ToString(), out DateTime dDate))
-                        {
-                            payment.PaidDate = dDate;
-                        }
-                        else
-                        {
-                            payment.PaidDateError = "Paid Date không hợp lệ";
-                            payment.IsValid = false;
-                        }
-                    }
-                    if(worksheet.Cells[row, 7].Value == null)
-                    {
-                        payment.PaymentTypeError = "Payment Type không được để trống";
-                        payment.IsValid = false;
-                    }
-                    else
-                    {
-                        string paymentType = worksheet.Cells[row, 7].Value.ToString();
-                        if(paymentType == "Net Off" || paymentType == "Normal")
-                        {
-                            payment.PaymentType = worksheet.Cells[row, 7].Value.ToString();
-                        }
-                        else
-                        {
-                            payment.PaymentTypeError = "Payment Type không hợp lệ";
-                            payment.IsValid = false;
-                        }
-                    }
-                    list.Add(payment);
-                }
+                list = ReadInvoicePaymentData(worksheet, rowCount);
+                
                 var data = accountingPaymentService.CheckValidImportInvoicePayment(list);
                 int totalValidRows = 0;
                 if (data != null)
@@ -214,10 +127,119 @@ namespace eFMS.API.Accounting.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
-        // POST api/<controller>
-        [HttpPost]
-        public void Import([FromBody]List<AccountingPaymentImportModel> list)
+        private List<AccountingPaymentImportModel> ReadInvoicePaymentData(ExcelWorksheet worksheet, int rowCount)
         {
+            List<AccountingPaymentImportModel> list = new List<AccountingPaymentImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                string invoiceNo = worksheet.Cells[row, 1].Value?.ToString();
+                var payment = new AccountingPaymentImportModel
+                {
+                    IsValid = true,
+                    PartnerName = worksheet.Cells[row, 4].Value?.ToString(),
+                    Note = worksheet.Cells[row, 8].Value?.ToString()
+                };
+                if (worksheet.Cells[row, 1].Value == null)
+                {
+                    payment.InvoiceNoError = stringLocalizer[AccountingLanguageSub.MSG_INVOICENO_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    payment.InvoiceNo = worksheet.Cells[row, 1].Value.ToString();
+                }
+                if (worksheet.Cells[row, 2].Value == null)
+                {
+                    payment.SerieNoError = stringLocalizer[AccountingLanguageSub.MSG_SERIENO_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    payment.SerieNo = worksheet.Cells[row, 2].Value.ToString();
+                }
+                if (worksheet.Cells[row, 3].Value == null)
+                {
+                    payment.PartnerAccountError = stringLocalizer[AccountingLanguageSub.MSG_PARTNER_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    payment.PartnerAccount = worksheet.Cells[row, 3].Value.ToString();
+                }
+                if (worksheet.Cells[row, 5].Value == null)
+                {
+                    payment.PaymentAmountError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    var checkPaymentAmount = decimal.TryParse(worksheet.Cells[row, 5].Value.ToString(), out decimal paymentAmount);
+                    if (checkPaymentAmount == false)
+                    {
+                        payment.PaymentAmountError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY].Value;
+                        payment.IsValid = false;
+                    }
+                    else
+                    {
+                        payment.PaymentAmount = paymentAmount;
+                    }
+                }
+                if (worksheet.Cells[row, 6].Value == null)
+                {
+                    payment.PaidDateError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    if (DateTime.TryParse(worksheet.Cells[row, 6].Value.ToString(), out DateTime dDate))
+                    {
+                        payment.PaidDate = dDate;
+                    }
+                    else
+                    {
+                        payment.PaidDateError = stringLocalizer[AccountingLanguageSub.MSG_PAIDDATE_ACCOUNTING_PAYMENT_INVALID].Value;
+                        payment.IsValid = false;
+                    }
+                }
+                if (worksheet.Cells[row, 7].Value == null)
+                {
+                    payment.PaymentTypeError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    string paymentType = worksheet.Cells[row, 7].Value.ToString();
+                    if (paymentType == "Net Off" || paymentType == "Normal")
+                    {
+                        payment.PaymentType = worksheet.Cells[row, 7].Value.ToString();
+                    }
+                    else
+                    {
+                        payment.PaymentTypeError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID].Value;
+                        payment.IsValid = false;
+                    }
+                }
+                list.Add(payment);
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// import payments for invoice
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("ImportInvoicePayment")]
+        public IActionResult ImportInvoicePayment([FromBody]List<AccountingPaymentImportModel> list)
+        {
+            var hs = accountingPaymentService.Import(list);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
         }
         
         /// <summary>

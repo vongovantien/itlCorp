@@ -1,6 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,9 +7,6 @@ import { Router } from '@angular/router';
     templateUrl: './list-invoice-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
-
-    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: true }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
-
     constructor(
         private _router: Router, ) {
         super();
@@ -38,9 +34,8 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         // this.updateExtendDayPopup.show();
 
     }
-    selectedTab = "Invoice";
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: this.selectedTab } });
+        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'Invoice' } });
     }
 }
 

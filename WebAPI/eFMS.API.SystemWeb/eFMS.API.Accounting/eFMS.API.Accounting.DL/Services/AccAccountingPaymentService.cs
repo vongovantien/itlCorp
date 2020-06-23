@@ -350,7 +350,7 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
             var partners = partnerRepository.Get().ToList();
-            var invoices = accountingManaRepository.Get(x => x.PaymentStatus != "Paid").ToList();
+            var invoices = accountingManaRepository.Get().ToList();
             list.ForEach(item =>
             {
                 var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
@@ -359,19 +359,124 @@ namespace eFMS.API.Accounting.DL.Services
                     item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
                     item.IsValid = false;
                 }
-                var accountManagement = invoices.FirstOrDefault(x => x.Serie == item.SerieNo && x.InvoiceNoReal == item.InvoiceNo && x.PartnerId == partner.Id);
-                if (accountManagement == null)
-                {
-                    item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
-                    item.IsValid = false;
-                }
                 else
                 {
-                    item.PartnerId = partner.Id;
-                    item.RefId = accountManagement.Id.ToString();
+                    var accountManagement = invoices.FirstOrDefault(x => x.Serie == item.SerieNo && x.InvoiceNoReal == item.InvoiceNo && x.PartnerId == partner.Id);
+                    if (accountManagement == null)
+                    {
+                        item.PartnerAccountError = "Not found " + item.SerieNo + " and " + item.InvoiceNo + " of " + item.PartnerAccount;
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        if(accountManagement.PaymentStatus == "Paid")
+                        {
+                            item.InvoiceNoError = "This invoice has been paid";
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            item.PartnerId = partner.Id;
+                            item.RefId = accountManagement.Id.ToString();
+                            var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
+                            if (lastItem != null)
+                            {
+                                if (item.PaidDate < lastItem.PaidDate)
+                                {
+                                    item.PaidDateError = item.PaidDate + " invalid";
+                                }
+                            }
+                        }
+                    }
                 }
             });
             return list; 
+        }
+
+        public HandleState Import(List<AccountingPaymentImportModel> list)
+        {
+            List<AccAccountingPayment> results = new List<AccAccountingPayment>();
+            List<AccAccountingManagement> managements = new List<AccAccountingManagement>();
+            var groups = list.GroupBy(x => x.RefId);
+            foreach(var group in groups)
+            {
+                var refPayment = accountingManaRepository.Get(x => x.Id == new Guid(group.Key)).FirstOrDefault();
+                var existedPayments = DataContext.Get(x => x.RefId == refPayment.Id.ToString());
+                decimal? totalExistedPayment = 0;
+                if (group.Any())
+                {
+                    totalExistedPayment = existedPayments.Sum(x => x.PaymentAmount);
+                    var ItemInGroups = group.OrderBy(x => x.PaidDate).ToList();
+                    int i = 0;
+                    bool isPaid = false;
+                    foreach (var item in ItemInGroups)
+                    {
+                        i = i + 1;
+                        int paymentNo = existedPayments.Count() + i;
+                        totalExistedPayment = totalExistedPayment + item.PaymentAmount;
+                        decimal? balance = refPayment.TotalAmount - totalExistedPayment;
+                        if(balance <= 0)
+                        {
+                            isPaid = true;
+                        }
+                        var payment = new AccAccountingPayment
+                        {
+                            Id = Guid.NewGuid(),
+                            RefId = item.RefId,
+                            PaymentNo = item.InvoiceNo + "_" + string.Format("{0:00}", paymentNo),
+                            PaymentAmount = item.PaymentAmount,
+                            Balance = balance,
+                            CurrencyId = refPayment.Currency,
+                            PaidDate = item.PaidDate,
+                            PaymentType = item.PaymentType,
+                            Type = "INVOICE",
+                            UserCreated = currentUser.UserID,
+                            UserModified = currentUser.UserID,
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            GroupId = currentUser.GroupId,
+                            DepartmentId = currentUser.DepartmentId,
+                            OfficeId = currentUser.OfficeID,
+                            CompanyId = currentUser.CompanyID
+                        };
+                        results.Add(payment);
+                    }
+                    if(isPaid == true)
+                    {
+                        refPayment.PaymentStatus = "Paid";
+                    }
+                    else
+                    {
+                        refPayment.PaymentStatus = "Paid A Part";
+                    }
+                    managements.Add(refPayment);
+                }
+            }
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var hs = DataContext.Add(results);
+                    if (hs.Success)
+                    {
+                        foreach(var item in managements)
+                        {
+                            var s = accountingManaRepository.Update(item, x => x.Id == item.Id);
+                        }
+                        trans.Commit();
+                    }
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
         }
     }
 }

@@ -102,6 +102,13 @@
             <param name="uploadedFile">file to read data</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportInvoicePayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentImportModel})">
+            <summary>
+            import payments for invoice
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UpdateExtendDate(eFMS.API.Accounting.DL.Models.AccountingPayment.ExtendDateUpdatedModel)">
             <summary>
             update extend date
