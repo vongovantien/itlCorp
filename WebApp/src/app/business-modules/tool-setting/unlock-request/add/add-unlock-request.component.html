@@ -16,7 +16,8 @@
                 <form [formGroup]="formAdd">
                     <div class="row">
                         <div class="col-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (subject.dirty && !subject.valid) || (isSubmited && !subject.valid) }">
                                 <label class="form-control-label">
                                     Subject
                                     <span class="text-danger">*</span>
@@ -28,7 +29,8 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (requester.dirty && !requester.valid) || (isSubmited && !requester.valid) }">
                                 <label class="form-control-label" for="form-control-label">
                                     Requester
                                     <span class="text-danger">*</span>
@@ -43,7 +45,7 @@
                                     Unlock Type
                                 </label>
                                 <ng-select formControlName="unlockType" [allowClear]="false" [items]="unlockTypeList"
-                                    [active]="unlockTypeActive" (selected)="selectedUnlockType()">
+                                    (selected)="selectedUnlockType($event)">
                                 </ng-select>
                             </div>
                         </div>
@@ -62,7 +64,7 @@
                             </div>
                         </ng-container>
                     </div>
-                    <list-job-unlock-request [unlockType]="unlockType.value[0].id"></list-job-unlock-request>
+                    <list-job-unlock-request [unlockType]="unlockTypeEnum"></list-job-unlock-request>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
