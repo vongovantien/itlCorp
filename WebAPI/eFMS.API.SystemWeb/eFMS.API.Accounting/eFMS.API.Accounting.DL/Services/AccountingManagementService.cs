@@ -706,7 +706,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                VatAmountVnd = 0, //Tính toán bên dưới
                                                VatPartnerId = sur.PayerId,
                                                VatPartnerCode = pat.TaxCode, //Tax code
-                                               VatPartnerName = pat.PartnerNameVn,
+                                               VatPartnerName = pat.ShortName,
                                                VatPartnerAddress = pat.AddressVn,
                                                ObhPartnerCode = obhPat.TaxCode, //Tax code
                                                ObhPartner = obhPat.PartnerNameVn,
