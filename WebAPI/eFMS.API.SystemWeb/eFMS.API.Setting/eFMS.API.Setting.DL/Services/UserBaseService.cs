@@ -62,7 +62,7 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId)
         {
-            var leaders = sysUserLevelRepo.Get(x => x.Position == SettingContansts.PositionManager
+            var leaders = sysUserLevelRepo.Get(x => x.Position == SettingConstants.PositionManager
                                                     && x.GroupId == groupId
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
@@ -73,8 +73,8 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId)
         {
-            var managers = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var managers = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
                                                     && x.OfficeId == officeId
@@ -84,9 +84,9 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetAccoutantManager(Guid? companyId, Guid? officeId)
         {
-            var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == SettingContansts.DeptTypeAccountant).Select(s => s.Id).ToList();
-            var accountants = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == SettingConstants.DeptTypeAccountant).Select(s => s.Id).ToList();
+            var accountants = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
                                                     && x.OfficeId == officeId
                                                     && x.DepartmentId != null
                                                     && x.CompanyId == companyId)
@@ -97,8 +97,9 @@ namespace eFMS.API.Setting.DL.Services
         
         public List<string> GetBUHead(Guid? companyId, Guid? officeId)
         {
-            var buHeads = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var buHeads = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
+                                                    && x.DepartmentId == null
                                                     && x.OfficeId == officeId
                                                     && x.CompanyId == companyId).Select(s => s.UserId).ToList();
             return buHeads;
@@ -127,7 +128,7 @@ namespace eFMS.API.Setting.DL.Services
         //Kiểm tra department có phải là department accountant hay không
         public bool CheckIsAccountantDept(int? deptId)
         {
-            var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingContansts.DeptTypeAccountant && x.Id == deptId).Any();
+            var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
         }
 
@@ -149,7 +150,7 @@ namespace eFMS.API.Setting.DL.Services
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
             var deptTypeOfDept = GetInfoDeptOfUser(departmentId)?.DeptType;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == SettingContansts.DeptTypeAccountant)
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == SettingConstants.DeptTypeAccountant)
             {
                 result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
             }
@@ -174,7 +175,7 @@ namespace eFMS.API.Setting.DL.Services
                 case "Manager":
                     role = GetSettingFlowUnlock(type, officeId)?.Manager;
                     break;
-                case "Accounting":
+                case "Accountant":
                     role = GetSettingFlowUnlock(type, officeId)?.Accountant;
                     break;
                 case "BOD":

@@ -113,5 +113,13 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    sendRequestUnlock(body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/SaveAndSendRequest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
+
+
 

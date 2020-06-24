@@ -195,7 +195,53 @@ export class UnlockRequestDetailComponent extends AppForm {
     }
 
     sendRequest() {
-
+        this.isSubmited = true;
+        console.log(this.listJobComponent.dataJobs);
+        if (this.formDetail.valid) {
+            if (!this.listJobComponent.dataJobs.length) {
+                this._toastService.warning("Unlock request don't have any job/advance/settlement in this period, Please check it again!");
+                return;
+            }
+            const _unlockRequest: SetUnlockRequestModel = {
+                id: this.unlockRequest.id,
+                subject: this.subject.value,
+                requester: this.unlockRequest.requester,
+                unlockType: this.unlockType.value[0].id,
+                newServiceDate: this.unlockTypeEnum === CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+                generalReason: this.generalReason.value,
+                requestDate: this.unlockRequest.requestDate,
+                requestUser: this.unlockRequest.requestUser,
+                statusApproval: this.unlockRequest.statusApproval,
+                userCreated: this.unlockRequest.userCreated,
+                datetimeCreated: this.unlockRequest.datetimeCreated,
+                userModified: this.unlockRequest.userModified,
+                datetimeModified: this.unlockRequest.datetimeModified,
+                groupId: this.unlockRequest.groupId,
+                departmentId: this.unlockRequest.departmentId,
+                officeId: this.unlockRequest.officeId,
+                companyId: this.unlockRequest.companyId,
+                jobs: this.listJobComponent.dataJobs,
+                requesterName: null,
+                userNameCreated: null,
+                userNameModified: null
+            };
+            console.log(_unlockRequest);
+            this._progressRef.start();
+            this._settingRepo.sendRequestUnlock(_unlockRequest)
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this._progressRef.complete();
+                }))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(`'Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                            this.getDetail(res.data.id);
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
     }
 
     cancelRequest() {

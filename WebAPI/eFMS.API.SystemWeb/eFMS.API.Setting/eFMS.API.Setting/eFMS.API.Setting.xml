@@ -83,7 +83,7 @@
             <param name="service"></param>
             <param name="currUser"></param>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.IUnlockRequestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.IUnlockRequestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Setting.DL.IService.IUnlockRequestApproveService)">
             <summary>
             Contructor
             </summary>

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Common
 {
-    public static class SettingContansts
+    public static class SettingConstants
     {
         #region -- STATUS APPROVAL --
         public static readonly string STATUS_APPROVAL_NEW = "New";
