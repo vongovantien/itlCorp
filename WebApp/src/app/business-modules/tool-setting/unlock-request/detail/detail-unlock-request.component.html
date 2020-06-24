@@ -16,7 +16,8 @@
                 <form [formGroup]="formDetail">
                     <div class="row">
                         <div class="col-12">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (subject.dirty && !subject.valid) || (isSubmited && !subject.valid) }">
                                 <label class="form-control-label">
                                     Subject
                                     <span class="text-danger">*</span>
@@ -28,7 +29,8 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': (requester.dirty && !requester.valid) || (isSubmited && !requester.valid) }">
                                 <label class="form-control-label" for="form-control-label">
                                     Requester
                                     <span class="text-danger">*</span>
@@ -43,26 +45,23 @@
                                     Unlock Type
                                 </label>
                                 <ng-select formControlName="unlockType" [allowClear]="false" [items]="unlockTypeList"
-                                    [active]="unlockTypeActive" (selected)="selectedUnlockType()">
+                                    (selected)="selectedUnlockType($event)">
                                 </ng-select>
                             </div>
                         </div>
-                        <ng-container *ngIf="unlockType.value[0].id === 'Change Service Date'">
-                            <div class="col-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="">New Service Date</label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [autoApply]="true"
-                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
-                                            formControlName="serviceDate" placeholder="   /   /   " readonly calendar />
-                                    </div>
+                        <div class="col-4" *ngIf="unlockTypeEnum === 4">
+                            <div class="form-group">
+                                <label class="form-control-label" for="">New Service Date</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                        formControlName="serviceDate" placeholder="   /   /   " readonly calendar />
                                 </div>
                             </div>
-                        </ng-container>
+                        </div>
                     </div>
-                    <list-job-unlock-request [unlockType]="unlockType.value[0].id"></list-job-unlock-request>
+                    <list-job-unlock-request [unlockType]="unlockTypeEnum"></list-job-unlock-request>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group">
@@ -75,22 +74,29 @@
                     <div class="row">
                         <div class="col-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="form-control-label">
-                                    Created By: Admin 17/06/2020 14:00
+                                <label>
+                                    Created By: <span *ngIf="!!unlockRequest"
+                                        class="text-success">{{unlockRequest.userNameCreated}}</span>&nbsp;
+                                    <span
+                                        *ngIf="!!unlockRequest">{{unlockRequest.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}</span>
                                 </label>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="form-control-label">
-                                    Modified By: Andy.Hoa 17/06/2020 17:00
+                                <label>
+                                    Modified By: <span *ngIf="!!unlockRequest"
+                                        class="text-success">{{unlockRequest.userNameModified}}</span>&nbsp;
+                                    <span
+                                        *ngIf="!!unlockRequest">{{unlockRequest.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}</span>
                                 </label>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="form-group">
-                                <label class="form-control-label" for="form-control-label">
-                                    Request Date: 17/06/2020 15:00
+                                <label>
+                                    Request Date: <span
+                                        *ngIf="!!unlockRequest">{{unlockRequest.requestDate | date: 'dd/MM/yyyy HH:mm'}}</span>
                                 </label>
                             </div>
                         </div>
@@ -103,6 +109,7 @@
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
                                 <button title="Save" type="button"
+                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
                                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
                                     <span>
                                         <i class="la la-save"></i>
@@ -112,6 +119,7 @@
                                     </span>
                                 </button>
                                 <button title="Send Request" type="button"
+                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
                                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="sendRequest()">
                                     <span>
@@ -122,6 +130,7 @@
                                     </span>
                                 </button>
                                 <button title="Cancel Request" type="button"
+                                    *ngIf="unlockRequest.statusApproval === 'Request Approval'"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="cancelRequest()">
                                     <span>
@@ -132,6 +141,7 @@
                                     </span>
                                 </button>
                                 <button title="Confirm" type="button"
+                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done'"
                                     class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="confirmRequest()">
                                     <span>
@@ -142,6 +152,7 @@
                                     </span>
                                 </button>
                                 <button title="Deny" type="button"
+                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done'"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="denyRequest()">
                                     <span>
@@ -151,7 +162,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                                 </app-default-button>
                             </div>
                         </div>
@@ -162,3 +173,6 @@
     </div>
 </div>
 <input-denied-comment-popup></input-denied-comment-popup>
+<confirm-popup #confirmCancelPopup [body]="'Do you want to exit without saving?'" [labelConfirm]="'Yes'"
+    (onSubmit)="onCancelUnlock()">
+</confirm-popup>

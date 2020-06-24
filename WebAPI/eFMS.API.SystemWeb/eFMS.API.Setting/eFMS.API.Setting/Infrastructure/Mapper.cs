@@ -21,6 +21,7 @@ namespace eFMS.API.Setting.Infrastructure
 
             CreateMap<SetUnlockRequest, SetUnlockRequestModel>();
             CreateMap<SetUnlockRequestJob, SetUnlockRequestJobModel>();
+            CreateMap<SetUnlockRequestApprove, SetUnlockRequestApproveModel>();
         }
     }
 }

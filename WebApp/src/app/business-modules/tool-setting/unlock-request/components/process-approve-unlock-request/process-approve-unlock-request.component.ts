@@ -19,6 +19,8 @@ export class UnlockRequestProcessApproveComponent extends AppForm implements OnI
     }
 
     showInfoDenied() {
+        this.infoDeniedPopup.getDeniedComment("45514284-3D9A-4947-B289-3840FA79529C");
         this.infoDeniedPopup.show();
+
     }
 }

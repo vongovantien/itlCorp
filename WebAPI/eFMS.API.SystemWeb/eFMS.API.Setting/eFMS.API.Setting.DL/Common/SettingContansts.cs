@@ -15,5 +15,9 @@ namespace eFMS.API.Setting.DL.Common
         public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "Accountant Approved";
         public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "Request Approval";
         #endregion -- STATUS APPROVAL --
+
+        public static readonly short SpecialGroup = 11;
+        public static readonly string PositionManager = "Manager-Leader";
+        public static readonly string DeptTypeAccountant = "ACCOUNTANT";
     }
 }

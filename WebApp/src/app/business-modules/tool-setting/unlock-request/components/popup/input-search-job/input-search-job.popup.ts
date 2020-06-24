@@ -52,7 +52,7 @@ export class UnlockRequestInputSearchJobPopupComponent extends PopupBase {
                     if (!!res && !!res.length) {
                         this.dataJobs = res;
                         this.onInputJob.emit(res);
-                        this.hide();
+                        // this.hide();
                     } else {
                         this._toastService.warning("Not found data");
                     }

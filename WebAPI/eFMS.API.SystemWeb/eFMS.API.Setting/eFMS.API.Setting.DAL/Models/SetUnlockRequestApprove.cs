@@ -25,5 +25,6 @@ namespace eFMS.API.Setting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string Comment { get; set; }
         public bool? IsDeny { get; set; }
+        public string LevelApprove { get; set; }
     }
 }

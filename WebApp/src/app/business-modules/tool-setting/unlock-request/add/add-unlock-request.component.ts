@@ -10,8 +10,9 @@ import { User, SetUnlockRequestModel } from "@models";
 import { SystemConstants } from "@constants";
 import { CommonEnum } from "@enums";
 import { SelectItem } from "ng2-select";
-import { catchError } from "rxjs/operators";
+import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+import { ConfirmPopupComponent } from "@common";
 
 @Component({
     selector: 'app-unlock-request-add',
@@ -20,6 +21,7 @@ import { formatDate } from "@angular/common";
 
 export class UnlockRequestAddNewComponent extends AppForm {
     @ViewChild(UnlockRequestListJobComponent, { static: false }) listJobComponent: UnlockRequestListJobComponent;
+    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
     formAdd: FormGroup;
     subject: AbstractControl;
     requester: AbstractControl;
@@ -85,11 +87,10 @@ export class UnlockRequestAddNewComponent extends AppForm {
         this.requester.setValue(this.userLogged.preferred_username);
     }
 
-    selectedUnlockType(e: SelectItem) {
-        switch (e.id) {
+    getUnlockTypeEnum(type: string) {
+        switch (type) {
             case "Shipment":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.SHIPMENT;
-                this.generalReason.setValue(this.tableDefault);
                 break;
             case "Advance":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.ADVANCE;
@@ -105,6 +106,11 @@ export class UnlockRequestAddNewComponent extends AppForm {
         }
     }
 
+    selectedUnlockType(e: SelectItem) {
+        this.getUnlockTypeEnum(e.id);
+        this.listJobComponent.dataJobs = [];
+    }
+
     save() {
         this.isSubmited = true;
         console.log(this.listJobComponent.dataJobs);
@@ -118,7 +124,7 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 subject: this.subject.value,
                 requester: null,
                 unlockType: this.unlockType.value[0].id,
-                newServiceDate: this.serviceDate.value && this.unlockType.value[0].id === 'Change Service Date' ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+                newServiceDate: this.unlockTypeEnum === CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 generalReason: this.generalReason.value,
                 requestDate: null,
                 requestUser: null,
@@ -131,11 +137,17 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 departmentId: 0,
                 officeId: SystemConstants.EMPTY_GUID,
                 companyId: SystemConstants.EMPTY_GUID,
-                jobs: this.listJobComponent.dataJobs
+                jobs: this.listJobComponent.dataJobs,
+                requesterName: null,
+                userNameCreated: null,
+                userNameModified: null
             };
             console.log(_unlockRequest);
+            this._progressRef.start();
             this._settingRepo.addNewUnlockRequest(_unlockRequest)
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this._progressRef.complete();
+                }))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -151,5 +163,14 @@ export class UnlockRequestAddNewComponent extends AppForm {
 
     sendRequest() {
 
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.show();
+    }
+
+    onCancelUnlock() {
+        this.confirmCancelPopup.hide();
+        this._router.navigate([`home/tool/unlock-request`]);
     }
 }
