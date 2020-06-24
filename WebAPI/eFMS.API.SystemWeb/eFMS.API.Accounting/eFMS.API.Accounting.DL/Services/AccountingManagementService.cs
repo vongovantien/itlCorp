@@ -655,7 +655,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            VatPartnerName = pat.ShortName,
                                            VatPartnerAddress = pat.AddressVn,
                                            ObhPartnerCode = obhPat.TaxCode, //Tax code
-                                           ObhPartner = obhPat.PartnerNameVn,
+                                           ObhPartner = obhPat.ShortName, //Abbr
                                            InvoiceNo = sur.InvoiceNo,
                                            Serie = sur.SeriesNo,
                                            InvoiceDate = sur.InvoiceDate,
@@ -709,7 +709,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                VatPartnerName = pat.ShortName,
                                                VatPartnerAddress = pat.AddressVn,
                                                ObhPartnerCode = obhPat.TaxCode, //Tax code
-                                               ObhPartner = obhPat.PartnerNameVn,
+                                               ObhPartner = obhPat.ShortName, //Abbr
                                                InvoiceNo = sur.InvoiceNo,
                                                Serie = sur.SeriesNo,
                                                InvoiceDate = sur.InvoiceDate,
