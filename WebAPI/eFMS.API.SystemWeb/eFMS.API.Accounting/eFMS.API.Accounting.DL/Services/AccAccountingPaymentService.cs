@@ -412,8 +412,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
-            var partners = partnerRepository.Get().ToList();
-            var invoices = accountingManaRepository.Get().ToList();
+            var partners = partnerRepository.Get();
+            var invoices = accountingManaRepository.Get();
             list.ForEach(item =>
             {
                 var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
@@ -653,6 +653,52 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> list)
+        {
+            var partners = partnerRepository.Get();
+            var soas = soaRepository.Get();
+            list.ForEach(item =>
+            {
+                var partner = partners.Where(x => x.AccountNo == item.PartnerId)?.FirstOrDefault();
+                if (partner == null)
+                {
+                    item.PartnerAccountError = "'" + item.PartnerId + "' Not found";
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var soa = soas.FirstOrDefault(x => x.Soano == item.SoaNo && x.Customer == partner.Id);
+                    if (soa == null)
+                    {
+                        item.SoaNoError = "Not found SOA No '" + item.SoaNo + "' of '" + item.PartnerId + "'";
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        if (soa.PaymentStatus == "Paid")
+                        {
+                            item.SoaNoError = "This SOA has been paid";
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            item.PartnerId = partner.Id;
+                            item.RefId = soa.Id.ToString();
+                            var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
+                            if (lastItem != null)
+                            {
+                                if (item.PaidDate < lastItem.PaidDate)
+                                {
+                                    item.PaidDateError = item.PaidDate + " invalid";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            return list;
         }
     }
 }

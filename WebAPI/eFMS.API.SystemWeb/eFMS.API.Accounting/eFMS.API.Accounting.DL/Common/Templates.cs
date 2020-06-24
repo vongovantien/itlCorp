@@ -89,7 +89,8 @@ namespace eFMS.API.Accounting.DL.Common
         }
         public struct AccountingPayment
         {
-            public static string ExelImportFileName = "InvoicePayment";
+            public static string ExelInvoicePaymentImportFileName = "InvoicePayment";
+            public static string ExelOBHPaymentImportFileName = "OBHPayment";
         }
     }
 }

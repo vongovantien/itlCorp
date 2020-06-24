@@ -49,7 +49,7 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'OBH' } });
+        this._router.navigate(["home/accounting/account-receivable-payable/import-obh"]);
     }
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)

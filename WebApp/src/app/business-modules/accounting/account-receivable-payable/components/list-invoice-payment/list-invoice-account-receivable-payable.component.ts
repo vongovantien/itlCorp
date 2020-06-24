@@ -57,7 +57,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
 
     }
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'Invoice' } });
+        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
     }
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)

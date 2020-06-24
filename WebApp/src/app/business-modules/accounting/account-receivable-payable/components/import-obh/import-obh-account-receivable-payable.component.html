@@ -16,7 +16,7 @@
                             <input type="file" #inputFile id="inputFile" class="form-control m-input m-input--square"
                                 placeholder="" (change)="changeFile($event)" onclick="this.value=null;" accept=".xlsx">
                             <span class="m-form__help">
-                                <a class="btn-link" href="javascript:void(0)">Download
+                                <a class="btn-link" href="javascript:void(0)" (click)="downloadSample()">Download
                                     sample</a>
                             </span>
                         </div>
@@ -52,7 +52,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            (click)="import(inputFile)">
                             <span>
                                 <i class="la la-save"></i>
                                 <span>
@@ -60,7 +61,8 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase"
+                            routerLink="/home/accounting/account-receivable-payable">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>
@@ -84,15 +86,20 @@
                                 <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                     <span> {{ (i + this.pager.startIndex + 1) }}</span>
                                     <td>
-                                        <span class="ng-star-inserted" *ngIf="item.soaNo !== null">{{item.soaNo}}</span>
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.soaNo !== null && item.soaNoError === null">{{item.soaNo}}</span>
                                         <span class="m--font-danger" *ngIf="item.soaNo === null">Soa No is
                                             required</span>
+                                        <span class="m--font-danger" *ngIf="item.soaNoError !== null">{{
+                                                item.soaNoError }}</span>
                                     </td>
                                     <td>
                                         <span class="ng-star-inserted"
-                                            *ngIf="item.partnerId !== null">{{item.partnerId}}</span>
+                                            *ngIf="item.partnerAccountError === null && item.partnerId !== null">{{item.partnerId}}</span>
                                         <span class="m--font-danger" *ngIf="item.partnerId === null">Partner Id is
                                             required</span>
+                                        <span class="m--font-danger" *ngIf="item.partnerAccountError !== null">{{
+                                                item.partnerAccountError }}</span>
 
                                     </td>
                                     <td>
@@ -105,7 +112,7 @@
                                     </td>
                                     <td>
                                         <span class="ng-star-inserted"
-                                            *ngIf="item.paymentAmount !== null">{{item.paymentAmount}}</span>
+                                            *ngIf="item.paymentAmount !== null">{{item.paymentAmount| number: '.0-3'}}</span>
                                         <span class="m--font-danger" *ngIf="item.paymentAmount === null">Payment Amount
                                             is required</span>
 
@@ -161,3 +168,6 @@
         </div>
     </div>
 </div>
+
+<info-popup [body]="'There are invalid data. Please check Import!'" [title]="'Notification'" [label]="'Ok'">
+</info-popup>

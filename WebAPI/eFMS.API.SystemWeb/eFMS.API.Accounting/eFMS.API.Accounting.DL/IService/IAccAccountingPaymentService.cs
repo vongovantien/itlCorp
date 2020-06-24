@@ -21,5 +21,6 @@ namespace eFMS.API.Accounting.DL.IService
         ExtendDateUpdatedModel GetInvoiceExtendedDate(string id);
         ExtendDateUpdatedModel GetOBHSOAExtendedDate(string id);
         HandleState ImportOBHPayment(List<AccountingPaymentImportModel> list);
+        List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> dataList);
     }
 }
