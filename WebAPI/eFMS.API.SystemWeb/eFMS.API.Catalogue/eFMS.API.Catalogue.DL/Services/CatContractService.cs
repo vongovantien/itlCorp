@@ -108,7 +108,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatContractModel entity)
         {
             var contract = mapper.Map<CatContract>(entity);
-            contract.DatetimeCreated  = contract.DatetimeModified = DateTime.Now;
+            contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
             var hs = DataContext.Add(contract);
@@ -123,7 +123,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Update(CatContractModel model)
         {
             var entity = mapper.Map<CatContract>(model);
-            entity.UserModified  = currentUser.UserID;
+            entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             entity.DatetimeCreated = currentContract.DatetimeCreated;
@@ -233,7 +233,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
-            if(objUpdate != null)
+            if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id);
@@ -241,9 +241,9 @@ namespace eFMS.API.Catalogue.DL.Services
             return isUpdateDone;
         }
 
-        public SysImage GetFileContract(string partnerId,string contractId)
+        public SysImage GetFileContract(string partnerId, string contractId)
         {
-            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x=>x.DateTimeCreated).FirstOrDefault();
+            var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
             return result;
         }
 
@@ -294,31 +294,29 @@ namespace eFMS.API.Catalogue.DL.Services
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
                 List<SysImage> resultUrls = new List<SysImage>();
-                foreach (var file in model.Files)
+                fileName = model.Files.FileName;
+                string objectId = model.PartnerId;
+                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+                string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                var sysImage = new SysImage
                 {
-                    fileName = file.FileName;
-                    string objectId = model.PartnerId;
-                    await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
-                    string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
-                    var sysImage = new SysImage
-                    {
-                        Id = Guid.NewGuid(),
-                        Url = urlImage,
-                        Name = fileName,
-                        Folder = model.FolderName ?? "Partner",
-                        ObjectId = model.PartnerId.ToString(),
-                        ChildId = model.ChildId.ToString(),
-                        UserCreated = currentUser.UserName, //admin.
-                        UserModified = currentUser.UserName,
-                        DateTimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now
-                    };
-                    resultUrls.Add(sysImage);
-                    if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
-                    {
-                        list.Add(sysImage);
-                    }
+                    Id = Guid.NewGuid(),
+                    Url = urlImage,
+                    Name = fileName,
+                    Folder = model.FolderName ?? "Partner",
+                    ObjectId = model.PartnerId.ToString(),
+                    ChildId = model.ChildId.ToString(),
+                    UserCreated = currentUser.UserName, //admin.
+                    UserModified = currentUser.UserName,
+                    DateTimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now
+                };
+                resultUrls.Add(sysImage);
+                if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
+                {
+                    list.Add(sysImage);
                 }
+
                 if (list.Count > 0)
                 {
                     list.ForEach(x => x.IsTemp = model.IsTemp);

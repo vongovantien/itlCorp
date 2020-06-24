@@ -8,7 +8,7 @@ import { InfoPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
 import { Partner } from '@models';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-create-commercial',
@@ -23,6 +23,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
 
     invalidTaxCode: string;
+
+    fileList: any[] = [];
 
     constructor(
         protected _router: Router,
@@ -50,11 +52,17 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
             return;
         }
-
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
+        modelAdd.contracts = [...this.contractList.contracts];
+        // modelAdd.contracts.forEach(element => {
+        //     const test = {
+        //         name: element.fileList[0].name, lastModified: element.fileList[0].lastmodified,
+        //         lastModifiedDate: element.fileList[0].lastModifiedDate,
+        //         size: element.fileList[0].size, type: element.fileList[0].type, webkitRelativePath: ""
+        //     };
 
-        //modelAdd.saleMans = [...this.contractList.contracts];
-
+        //     element.fileList = [JSON.stringify(test)];
+        // });
         this.saveCustomerCommercial(modelAdd);
     }
 
@@ -66,11 +74,35 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate(["/home/commercial/customer"]);
+                        // this._router.navigate(["/home/commercial/customer"]);
+                        if (res.data) {
+                            console.log(res.data);
+                            this.contractList.contracts.forEach(element => {
+                                this.fileList.push(element.fileList);
+                            });
+
+                        }
                     }
                 }, err => {
                 });
     }
+
+    // uploadFileContract(id: string,partnerId: string) {
+    //     this._catalogueRepo.uploadFileContract(partnerId, id, this.popup.fileList)
+    //         .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+    //         .subscribe(
+    //             (res: CommonInterface.IResult) => {
+    //                 if (res.status) {
+    //                     this.fileList = [];
+    //                     this._toastService.success("Upload file successfully!");
+    //                     if (this.isUpdate) {
+    //                         this.getFileContract();
+    //                     }
+    //                 }
+    //             }
+    //         );
+    // }
+
 }
 
 export interface IValidateTaxCode {

@@ -53,11 +53,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     selectedContract: Contract = new Contract();
 
+    idContract: string = '';
+
+
     indexDetailContract: number = null;
 
 
     fileToUpload: File = null;
-    fileList: any[] = null;
+    fileList: any = null;
 
     files: any = {};
 
@@ -230,7 +233,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this.fileList = [];
+                        this.fileList = null;
                         this._toastService.success("Upload file successfully!");
                         if (this.isUpdate) {
                             this.getFileContract();
@@ -353,6 +356,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     asignValueToModel() {
         this.selectedContract = new Contract();
+        if (this.isUpdate) {
+            this.selectedContract.id = this.idContract;
+        }
         this.selectedContract.saleManId = this.salesmanId.value;
         this.selectedContract.companyId = this.companyId.value;
         this.selectedContract.officeId = this.officeId.value;

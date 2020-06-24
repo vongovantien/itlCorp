@@ -246,7 +246,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("UploadFile/{PartnerId}/{contractId}")]
         [Authorize]
-        public async Task<IActionResult> UploadFileContract(List<IFormFile> files, [Required]string partnerId, [Required]string contractId)
+        public async Task<IActionResult> UploadFileContract(IFormFile files, [Required]string partnerId, [Required]string contractId)
         {
             string folderName = Request.Headers["Module"];
             ContractFileUploadModel model = new ContractFileUploadModel
@@ -258,6 +258,35 @@ namespace eFMS.API.Catalogue.Controllers
             };
 
             var result = await catContractService.UploadContractFile(model);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// attach multi files to shipment
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="partnerId"></param>
+        /// <param name="contractIds"></param>
+        /// 
+        /// <returns></returns>
+        [HttpPut("UploadFileMoreContract/{PartnerId}/{contractId}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFileMoreContract( IFormFile files, [Required]string partnerId, List<string> contractIds)
+        {
+            string folderName = Request.Headers["Module"];
+            ResultHandle result = new ResultHandle();
+            foreach(var item in contractIds)
+            {
+                ContractFileUploadModel model = new ContractFileUploadModel
+                {
+                    Files = files,
+                    FolderName = folderName,
+                    PartnerId = partnerId,
+                    ChildId = item
+                };
+                
+                
+            }
             return Ok(result);
         }
 

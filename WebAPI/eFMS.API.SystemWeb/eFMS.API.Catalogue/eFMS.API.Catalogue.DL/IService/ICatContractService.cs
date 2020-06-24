@@ -24,6 +24,8 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatContractModel> GetBy(string partnerId);
         Guid? GetContractIdByPartnerId(string partnerId);
         Task<ResultHandle> UploadContractFile(ContractFileUploadModel model);
+        Task<ResultHandle> UploadMoreContractFile(UploadFileMoreContractModel model);
+
         CatContractModel GetById(Guid Id);
         SysImage GetFileContract(string partnerId, string contractId);
 

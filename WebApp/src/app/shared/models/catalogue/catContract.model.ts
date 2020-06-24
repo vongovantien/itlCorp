@@ -37,7 +37,7 @@ export class Contract {
     userModifiedName: string = '';
     userCreatedName: string = '';
     index: number = null;
-    fileList: any[] = null;
+    fileList: any = null;
 
     constructor(data?: any) {
         const self = this;

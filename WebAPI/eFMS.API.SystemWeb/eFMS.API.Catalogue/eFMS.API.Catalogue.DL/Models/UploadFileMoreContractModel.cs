@@ -1,13 +1,13 @@
-﻿
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
-    public class ContractFileUploadModel
+    public class UploadFileMoreContractModel
     {
-        public IFormFile Files { get; set; }
+        public List<IFormFile> Files { get; set; }
         public string FolderName { get; set; }
         public string PartnerId { get; set; }
         public string ChildId { get; set; }

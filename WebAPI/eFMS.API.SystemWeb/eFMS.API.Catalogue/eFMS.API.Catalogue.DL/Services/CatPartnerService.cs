@@ -39,6 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
 
 
         public CatPartnerService(IContextBase<CatPartner> repository,
@@ -52,7 +53,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatContract> contractRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
-            IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysImage> sysImageRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -64,6 +66,7 @@ namespace eFMS.API.Catalogue.DL.Services
             officeRepository = officeRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             catCountryRepository = catCountryRepo;
+            sysImageRepository = sysImageRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -85,7 +88,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
-        public override HandleState Add(CatPartnerModel entity)
+        public HandleState Add(CatPartnerModel entity)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -99,15 +102,25 @@ namespace eFMS.API.Catalogue.DL.Services
                     var contracts = mapper.Map<List<CatContract>>(entity.contracts);
                     contracts.ForEach(x =>
                     {
-                        x.Id = Guid.NewGuid();
+                        //x.Id = Guid.NewGuid();
                         x.PartnerId = partner.Id;
                         x.DatetimeCreated = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
                     });
                     partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
-                    DataContext.Update(partner, x => x.Id == partner.Id);
+                    DataContext.Add(partner);
                     contractRepository.Add(contracts);
+
+                    //foreach (var item in entity.contracts)
+                    //{
+                    //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
+                    //    modeUploadContract.ChildId = item.Id.ToString();
+                    //    modeUploadContract.PartnerId = partner.Id;
+                    //    modeUploadContract.Files = item.fileList.ToList();
+                    //    UploadFileContract(modeUploadContract);
+                    //}
                 }
+           
                 DataContext.SubmitChanges();
                 contractRepository.SubmitChanges();
                 ClearCache();
@@ -149,25 +162,65 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private void SendMailCreatedSuccess(CatPartner partner)
         {
-                string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-                string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
-                string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
-                string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
-                string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
-                string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
-                    "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" + 
-                    "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
-                    "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
-                    "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
-                    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                    "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
-                    "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn +"</br>" + linkVn + "</br> </br>" +
-                    "<i> Thanks and Regards </i>" + "</br> </br>" +
-                    "eFMS System </div>") ;
-                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com","alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
-            }
+            string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
+            string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
+            string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
+                "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" +
+                "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+                "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+                "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+                "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
+                "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
+                "<i> Thanks and Regards </i>" + "</br> </br>" +
+                "eFMS System </div>");
+            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
+        }
+        //private async void UploadFileContract(ContractFileUploadModel model)
+        //{
+        //    string fileName = "";
+        //    string path = this.webUrl.Value.Url;
+        //    var list = new List<SysImage>();
+        //    /* Kiểm tra các thư mục có tồn tại */
+        //    var hs = new HandleState();
+        //    ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
+        //    List<SysImage> resultUrls = new List<SysImage>();
+        //    foreach (var file in model.Files)
+        //    {
+        //        fileName = file.FileName;
+        //        string objectId = model.PartnerId;
+        //        await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
+        //        string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+        //        var sysImage = new SysImage
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            Url = urlImage,
+        //            Name = fileName,
+        //            Folder = model.FolderName ?? "Partner",
+        //            ObjectId = model.PartnerId.ToString(),
+        //            ChildId = model.ChildId.ToString(),
+        //            UserCreated = currentUser.UserName, //admin.
+        //            UserModified = currentUser.UserName,
+        //            DateTimeCreated = DateTime.Now,
+        //            DatetimeModified = DateTime.Now
+        //        };
+        //        resultUrls.Add(sysImage);
+        //        if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
+        //        {
+        //            list.Add(sysImage);
+        //        }
+        //    }
+        //    if (list.Count > 0)
+        //    {
+        //        list.ForEach(x => x.IsTemp = model.IsTemp);
+        //        hs = await sysImageRepository.AddAsync(list);
+        //    }
 
+        //}
         public HandleState Update(CatPartnerModel model)
         {
             var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
@@ -575,7 +628,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatPartnerModel GetDetail(string id)
         {
             CatPartnerModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
-            if(queryDetail == null)
+            if (queryDetail == null)
             {
                 return null;
             }
@@ -592,7 +645,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 AllowDelete = checkDelete == 403 ? false : true
             };
 
-            if(queryDetail.CountryId != null)
+            if (queryDetail.CountryId != null)
             {
                 CatCountry country = catCountryRepository.Get(x => x.Id == queryDetail.CountryId)?.FirstOrDefault();
                 queryDetail.CountryName = country.NameEn;
@@ -610,7 +663,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (queryDetail.ProvinceShippingId != null)
             {
-                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province) )?.FirstOrDefault();
+                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
                 queryDetail.ProvinceShippingName = province.NameEn;
             }
             return queryDetail;

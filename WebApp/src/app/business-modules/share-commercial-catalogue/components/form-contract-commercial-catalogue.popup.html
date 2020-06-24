@@ -306,7 +306,7 @@
                                     <ng-container
                                         *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
                                         <span class="text-underline text-primary">
-                                            {{ !!fileList.length ? fileList[0].name : null}}
+                                            {{ !!fileList ? fileList[0].name : null}}
                                         </span>
                                     </ng-container>
                                     <ng-container *ngIf="!isLoading && !!files && isUpdate">

@@ -92,6 +92,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 .subscribe(
                     (res: Contract) => {
                         this.selectedContract = res;
+                        this.formContractPopup.idContract = this.selectedContract.id;
                         this.formContractPopup.selectedContract = res;
                         this.pachValueToFormContract();
                         this.formContractPopup.show();

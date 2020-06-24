@@ -300,7 +300,7 @@ export class CatalogueRepo {
             );
     }
 
-    uploadFileContract(partnerId: string, contractId, body: any) {
+    uploadFileContract(partnerId: string, contractId: string, body: any) {
         return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
             map((data: any) => data)
         );

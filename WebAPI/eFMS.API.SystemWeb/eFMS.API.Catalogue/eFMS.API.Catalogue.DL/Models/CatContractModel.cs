@@ -1,4 +1,6 @@
 ﻿using eFMS.API.Catalogue.Service.Models;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
@@ -13,5 +15,8 @@ namespace eFMS.API.Catalogue.DL.Models
         public string CompanyNameAbbr{ get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
+        //public string FolderName { get; set; }
+        //public string ChildId { get; set; }
+        //public ICollection<IFormFile> fileList { get; set; }
     }
 }
