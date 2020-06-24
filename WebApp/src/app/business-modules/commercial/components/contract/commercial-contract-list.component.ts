@@ -19,8 +19,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     contracts: Contract[] = [];
-    selectecContract: Contract = new Contract();
+    selectedContract: Contract = new Contract();
     indexToRemove: number = 0;
+    indexlstContract: number = null;
+    contract: Contract = new Contract();
 
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
@@ -72,6 +74,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.fileList = null;
         this.formContractPopup.isUpdate = false;
         this.formContractPopup.isSubmitted = false;
+        this.indexlstContract = null;
         if (!this.partnerId) {
             this.formContractPopup.isCreateNewCommercial = true;
         }
@@ -82,12 +85,13 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.isUpdate = true;
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
+        this.indexlstContract = index;
         if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID) {
             this.formContractPopup.getFileContract();
             this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
                 .subscribe(
                     (res: Contract) => {
-                        this.selectecContract = res;
+                        this.selectedContract = res;
                         this.formContractPopup.selectedContract = res;
                         this.pachValueToFormContract();
                         this.formContractPopup.show();
@@ -95,7 +99,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 );
         } else {
             if (this.contracts.length > 0) {
-                this.formContractPopup.selectedContract = this.contracts[index];
+                this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
+                this.formContractPopup.indexDetailContract = this.indexlstContract;
+                this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
             }
             this.pachValueToFormContract();
             this.formContractPopup.show();
@@ -147,14 +153,18 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     showConfirmDelete(contract: Contract, index: number) {
-        this.selectecContract = contract;
+        this.selectedContract = contract;
         this.indexToRemove = index;
-        this.confirmDeletePopup.show();
+        if (this.selectedContract.id === SystemConstants.EMPTY_GUID) {
+            this.contracts = [...this.contracts.slice(0, index), ...this.contracts.slice(index + 1)];
+        } else {
+            this.confirmDeletePopup.show();
+        }
     }
 
     onDelete() {
         this.confirmDeletePopup.hide();
-        this._catalogueRepo.deleteContract(this.selectecContract.id, this.partnerId)
+        this._catalogueRepo.deleteContract(this.selectedContract.id, this.partnerId)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -169,8 +179,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     showDetail(contract: Contract) {
-        this.selectecContract = contract;
-        this._router.navigate([`/home/commercial/customer/${this.partnerId}/contract/${this.selectecContract.id}`]);
+        this.selectedContract = contract;
+        this._router.navigate([`/home/commercial/customer/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
 
     getListContract(partneId: string) {
@@ -187,13 +197,27 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     onRequestContract($event: any) {
-        console.log($event);
-        this.selectecContract = new Contract($event);
-        if (!!$event && !this.formContractPopup.isCreateNewCommercial) {
+        this.contract = $event;
+        this.selectedContract = new Contract(this.contract);
+        if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(this.partnerId);
         } else {
-            this.contracts.push(this.selectecContract);
+            console.log(this.selectedContract);
+            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
+            if (this.indexlstContract !== null) {
+                this.contracts[this.indexlstContract] = this.selectedContract;
+                this.formContractPopup.hide();
+            } else {
+                if (objCheckContract && objCheckContract != null) {
+                    this.formContractPopup.isDuplicateContract = true;
+                    this._toastService.error('Contract no has been existed!');
+                } else {
+                    this.formContractPopup.isDuplicateContract = false;
+                    this.contracts.push(this.selectedContract);
+                }
+            }
         }
+        this.formContractPopup.contracts = this.contracts;
     }
 
 

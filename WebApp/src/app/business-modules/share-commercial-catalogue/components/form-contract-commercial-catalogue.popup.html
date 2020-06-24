@@ -303,7 +303,8 @@
                                             </span>
                                         </span>
                                     </button>
-                                    <ng-container *ngIf="!!fileList && !isUpdate">
+                                    <ng-container
+                                        *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
                                         <span class="text-underline text-primary">
                                             {{ !!fileList.length ? fileList[0].name : null}}
                                         </span>

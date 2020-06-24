@@ -32,7 +32,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
 
-        private readonly IContextBase<CatContract> salemanRepository;
+        private readonly IContextBase<CatContract> contractRepository;
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
         private readonly IOptions<WebUrl> webUrl;
@@ -49,7 +49,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             ICatPlaceService place,
             ICatCountryService country,
-            IContextBase<CatContract> salemanRepo, IOptions<WebUrl> url,
+            IContextBase<CatContract> contractRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
             IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
@@ -57,7 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
             stringLocalizer = localizer;
             currentUser = user;
             placeService = place;
-            salemanRepository = salemanRepo;
+            contractRepository = contractRepo;
             sysUserRepository = sysUserRepo;
             countryService = country;
             webUrl = url;
@@ -94,22 +94,22 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(partner);
             if (hs.Success)
             {
-                if (entity.SaleMans.Count > 0)
+                if (entity.contracts.Count > 0)
                 {
-                    var salemans = mapper.Map<List<CatContract>>(entity.SaleMans);
-                    salemans.ForEach(x =>
+                    var contracts = mapper.Map<List<CatContract>>(entity.contracts);
+                    contracts.ForEach(x =>
                     {
                         x.Id = Guid.NewGuid();
                         x.PartnerId = partner.Id;
                         x.DatetimeCreated = DateTime.Now;
                         x.UserCreated = currentUser.UserID;
                     });
-                    partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
+                    partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
                     DataContext.Update(partner, x => x.Id == partner.Id);
-                    salemanRepository.Add(salemans);
+                    contractRepository.Add(contracts);
                 }
                 DataContext.SubmitChanges();
-                salemanRepository.SubmitChanges();
+                contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
                 SendMailCreatedSuccess(partner);
@@ -170,7 +170,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Update(CatPartnerModel model)
         {
-            var listSalemans = salemanRepository.Get(x => x.PartnerId == model.Id).ToList();
+            var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
 
@@ -178,34 +178,34 @@ namespace eFMS.API.Catalogue.DL.Services
             if (code == 403) return new HandleState(403, "");
 
             var entity = GetModelToUpdate(model);
-            if (model.SaleMans.Count > 0)
+            if (model.contracts.Count > 0)
             {
-                entity.SalePersonId = model.SaleMans.FirstOrDefault().SaleManId.ToString();
+                entity.SalePersonId = model.contracts.FirstOrDefault().SaleManId.ToString();
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                var hsoldman = salemanRepository.Delete(x => x.PartnerId == model.Id && !model.SaleMans.Any(sale => sale.Id == x.Id));
-                var salemans = mapper.Map<List<CatContract>>(model.SaleMans);
+                //var hsoldman = contractRepository.Delete(x => x.PartnerId == model.Id && !model.contracts.Any(sale => sale.Id == x.Id));
+                //var salemans = mapper.Map<List<CatContract>>(model.contracts);
 
-                foreach (var item in model.SaleMans)
-                {
-                    if (item.Id == Guid.Empty)
-                    {
-                        item.Id = Guid.NewGuid();
-                        item.PartnerId = entity.Id;
-                        item.DatetimeCreated = DateTime.Now;
-                        item.UserCreated = currentUser.UserID;
-                        salemanRepository.Add(item);
-                    }
-                    else
-                    {
-                        item.DatetimeCreated = DateTime.Now;
-                        item.UserModified = currentUser.UserID;
-                        salemanRepository.Update(item, x => x.Id == item.Id);
-                    }
-                }
-                salemanRepository.SubmitChanges();
+                //foreach (var item in model.contracts)
+                //{
+                //    if (item.Id == Guid.Empty)
+                //    {
+                //        item.Id = Guid.NewGuid();
+                //        item.PartnerId = entity.Id;
+                //        item.DatetimeCreated = DateTime.Now;
+                //        item.UserCreated = currentUser.UserID;
+                //        contractRepository.Add(item);
+                //    }
+                //    else
+                //    {
+                //        item.DatetimeCreated = DateTime.Now;
+                //        item.UserModified = currentUser.UserID;
+                //        contractRepository.Update(item, x => x.Id == item.Id);
+                //    }
+                //}
+                //contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -249,8 +249,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                var s = salemanRepository.Delete(x => x.PartnerId == id);
-                salemanRepository.SubmitChanges();
+                var s = contractRepository.Delete(x => x.PartnerId == id);
+                contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -265,7 +265,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            var salemans = salemanRepository.Get().ToList();
+            var salemans = contractRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
@@ -363,7 +363,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            var salemans = salemanRepository.Get().ToList();
+            var salemans = contractRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
@@ -465,7 +465,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public int CheckDetailPermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
-            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
@@ -475,7 +475,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public int CheckDeletePermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
-            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int code = GetPermissionToDelete(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
@@ -579,7 +579,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            List<CatContract> salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            List<CatContract> salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -731,7 +731,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         var hs = DataContext.Add(partners);
                         if (hs.Success)
                         {
-                            hs = salemanRepository.Add(salesmans);
+                            hs = contractRepository.Add(salesmans);
                             if (hs.Success)
                             {
                                 trans.Commit();

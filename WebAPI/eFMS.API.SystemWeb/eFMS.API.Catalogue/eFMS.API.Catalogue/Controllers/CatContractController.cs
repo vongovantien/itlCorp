@@ -116,12 +116,10 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             model.Id = Guid.NewGuid();
-            string messageDuplicate = string.Empty;
-            bool checkExist = catContractService.Any(x => x.SaleService == model.SaleService  && x.OfficeId == model.OfficeId && x.PartnerId == model.PartnerId);
-            if (checkExist)
+            string messageExisted = CheckExistedContract(model);
+            if (!string.IsNullOrEmpty(messageExisted))
             {
-                messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
-                return BadRequest(new ResultHandle { Status = false, Message = messageDuplicate });
+                return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
             }
             var hs = catContractService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -133,28 +131,52 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// check existed office and service
-        /// </summary>
-        /// <param name="model">object to check</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("CheckExisted")]
-        public IActionResult CheckExisted(CatContractEditModel model)
-        {
+        ///// <summary>
+        ///// check existed office and service
+        ///// </summary>
+        ///// <param name="model">object to check</param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("CheckExisted")]
+        //public IActionResult CheckExisted(CatContractModel model)
+        //{
       
+        //    string messageDuplicate = string.Empty;
+        //    bool existed = false;
+        //    if(model.Id != Guid.Empty)
+        //    {
+        //        existed = catContractService.Any(x => x.ContractNo == model.ContractNo);
+        //    }
+        //    else
+        //    {
+
+        //    }
+        //    if (existed)
+        //    {
+        //        return BadRequest(new ResultHandle { Status = false, Message = "Contract no has been existed!" });
+        //    }
+        //    ResultHandle result = new ResultHandle { Data = existed };
+        //    return Ok(result);
+        //}
+
+        private string CheckExistedContract(CatContractModel model)
+        {
             string messageDuplicate = string.Empty;
-            bool checkExist = catContractService.Any(x => x.SaleService == model.Service && x.OfficeId == model.Office && x.PartnerId == model.PartnerId && x.SaleManId == model.SaleManId);
-            if (checkExist)
+            bool existed = false;
+            if (model.Id != Guid.Empty)
             {
-                //messageDuplicate = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
-                return BadRequest(new ResultHandle { Status = false, Message = "Duplicate service, office with sale man!" });
+                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id))
+                {
+                    existed = true;
+                }
             }
-            ResultHandle result = new ResultHandle { Data = checkExist };
-            return Ok(result);
+            else
+            {
+                existed = catContractService.Any(x => x.ContractNo == model.ContractNo);
+            }
+            messageDuplicate = existed == true ? "Contract no has been existed!" : string.Empty;
+            return messageDuplicate;
         }
-
-
 
         /// <summary>
         /// update an existed item
@@ -169,6 +191,11 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var saleman = mapper.Map<CatContractModel>(model);
+            string messageExisted = CheckExistedContract(model);
+            if (!string.IsNullOrEmpty(messageExisted))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
+            }
             var hs = catContractService.Update(saleman);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

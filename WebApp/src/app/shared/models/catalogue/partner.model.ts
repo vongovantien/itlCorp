@@ -1,4 +1,5 @@
 import { PermissionPartner } from "./permissionPartner";
+import { Contract } from "./catContract.model";
 
 export class Partner {
     id: string = '';
@@ -62,6 +63,8 @@ export class Partner {
 
     saleManRequests: SaleManRequest[] = [];
     saleMans: SaleManRequest[] = [];
+    contracts: Contract[] = [];
+
 
     permission: PermissionPartner = new PermissionPartner();
 

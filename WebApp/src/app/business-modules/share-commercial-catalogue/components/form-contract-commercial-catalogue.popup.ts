@@ -27,6 +27,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     isRequiredContractNo: boolean = false;
     isCreateNewCommercial: boolean = false;
+    isDuplicateContract: boolean = false;
 
     salesmanId: AbstractControl;
     companyId: AbstractControl;
@@ -48,8 +49,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     users: User[] = [];
     companies: Company[] = [];
     offices: Office[] = [];
+    contracts: Contract[] = [];
 
     selectedContract: Contract = new Contract();
+
+    indexDetailContract: number = null;
+
 
     fileToUpload: File = null;
     fileList: any[] = null;
@@ -283,6 +288,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
         this.isSubmitted = true;
+        this.selectedContract.index = this.indexDetailContract;
         if (!!this.contractType.value && this.contractType.value.length > 0) {
             if (this.contractType.value[0].id === this.contractTypes[1].id) {
                 this.isRequiredContractNo = true;
@@ -329,17 +335,28 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
                 this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
-                this.onRequest.emit(new Contract(this.selectedContract));
-                this.hide();
+                this.selectedContract.fileList = this.fileList;
+                const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
+                if (!objCheckContract) {
+                    this.onRequest.emit(new Contract(this.selectedContract));
+                } else {
+                    this.isDuplicateContract = true;
+                    this._toastService.error('Contract no has been existed!');
+                }
+                if (!this.isDuplicateContract) {
+                    this.hide();
+                }
             }
 
         }
     }
 
     asignValueToModel() {
+        this.selectedContract = new Contract();
         this.selectedContract.saleManId = this.salesmanId.value;
         this.selectedContract.companyId = this.companyId.value;
         this.selectedContract.officeId = this.officeId.value;
+        this.selectedContract.index = this.indexDetailContract;
         this.selectedContract.contractNo = this.formGroup.controls['contractNo'].value;
         this.selectedContract.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.selectedContract.expiredDate = !!this.expiredDate.value && !!this.expiredDate.value.startDate ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
