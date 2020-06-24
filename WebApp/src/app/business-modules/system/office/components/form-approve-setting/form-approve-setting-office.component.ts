@@ -52,12 +52,9 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.officeId = param.id;
-
                 this.getSetting(this.officeId);
-
             }
         });
-
     }
 
     initUnlockShipmentSetting() {
@@ -102,9 +99,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
                         this.initUnlockShipmentSetting();
                     } else {
                         this.unlockShipments = res.unlocks;
-
                     }
-
                 }
             );
     }
@@ -148,7 +143,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
 
 interface ISettingFlowEditModel {
     officeId: string;
-    approvePayments: FlowSetting[],
-    unlockShipments: FlowSetting[],
+    approvePayments: FlowSetting[];
+    unlockShipments: FlowSetting[];
     lockShipmentDate: LockShipmentSetting[];
 }
