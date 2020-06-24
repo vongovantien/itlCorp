@@ -1,11 +1,11 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ElementRef, ComponentRef } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, Customer } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -13,8 +13,8 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { Observable, from } from 'rxjs';
-import { catchError, takeUntil, finalize, share, take, skip, map, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { catchError, takeUntil, finalize, share, skip, map } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -987,6 +987,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     updatePayer(charge: CsShipmentSurcharge, partner: Partner) {
         charge.paymentObjectId = !!partner ? partner.id : null;
         charge.partnerShortName = !!partner ? partner.shortName : '';
+        charge.partnerName = !!partner ? partner.partnerNameEn : '';
+
         return charge;
     }
 

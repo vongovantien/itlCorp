@@ -79,26 +79,39 @@
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
-                                    <ng-container *ngIf="isShowLoadingPartner">
-                                        <div class="on-loading text-center">
-                                            <div class="m-loader m-loader--brand">
-                                            </div><span>Loading</span>
-                                        </div>
-                                    </ng-container>
-                                    <ng-container *ngIf="!isShowLoadingPartner">
+                                    <ng-container
+                                        *ngIf="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" readonly
-                                            [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
-                                            (click)="loadDynamicComoGrid(charge,i)"
-                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
-                                            [disabled]="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true">
-                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
-                                                charge.partnerShortName = null"
-                                            (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName && !charge.soano 
-                                            && !charge.creditNo
-                                            && !charge.settlementCode
-                                            && !charge.voucherId
-                                            && !charge.voucherIddate"></combo-grid-icon>
+                                            [(ngModel)]="charge.partnerShortName"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     </ng-container>
+                                    <ng-template #partnerTemplate>
+                                        <ng-container *ngIf="isShowLoadingPartner">
+                                            <div class="on-loading text-center">
+                                                <div class="m-loader m-loader--brand">
+                                                </div><span>Loading</span>
+                                            </div>
+                                        </ng-container>
+
+                                        <ng-container *ngIf="!isShowLoadingPartner">
+                                            <input type="text" class="dropdown-toggle form-control" readonly
+                                                [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
+                                                (click)="loadDynamicComoGrid(charge,i)"
+                                                [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
+                                                [attr.readonly]="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true">
+                                            <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                                    charge.partnerShortName = null"
+                                                (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName && !charge.soano 
+                                                && !charge.creditNo
+                                                && !charge.settlementCode
+                                                && !charge.voucherId
+                                                && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName && !charge.soano 
+                                                && !charge.creditNo
+                                                && !charge.settlementCode
+                                                && !charge.voucherId
+                                                && !charge.voucherIddate"> </combo-grid-icon>
+                                        </ng-container>
+                                    </ng-template>
                                     <div class="dropdown-partner__content">
                                         <div class="d-flex justify-content-end dropdown-partner__header"
                                             [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
@@ -109,6 +122,7 @@
                                         </div>
                                         <ng-template #container></ng-template>
                                     </div>
+
                                 </div>
                             </td>
                             <td>
@@ -120,7 +134,11 @@
                                         [disabled]="!!charge.creditNo || !charge.isFromShipment || (isLocked | async) === true">
                                     <combo-grid-icon (onDelete)="charge.chargeId = null; 
                                             charge.chargeNameEn = null"
-                                        (onDropdown)="loadDynamicComboGridCharge(charge,i)" [showDelete]="!!charge.chargeId && charge.soano 
+                                        (onDropdown)="loadDynamicComboGridCharge(charge,i)" [showDelete]="!!charge.chargeId && !charge.soano 
+                                            && !charge.creditNo
+                                            && !charge.settlementCode
+                                            && !charge.voucherId
+                                            && !charge.voucherIddate" [showDropdown]="!!charge.chargeId && !charge.soano 
                                             && !charge.creditNo
                                             && !charge.settlementCode
                                             && !charge.voucherId
