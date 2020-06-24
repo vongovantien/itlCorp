@@ -70,7 +70,7 @@
                             <div class="form-group">
                                 <label for="">Payment Status</label>
                                 <ng-select #status (opened)="closeOtherSelects(status)" [items]="payments"
-                                    [allowClear]="false" formControlName="paymentStatus">
+                                    [allowClear]="false" formControlName="paymentStatus" [multiple]="true">
                                 </ng-select>
                             </div>
                         </div>

@@ -68,12 +68,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// get list payment by refNo
         /// </summary>
-        /// <param name="refNo"></param>
+        /// <param name="refId"></param>
         /// <returns></returns>
-        [HttpGet]
-        public IActionResult GetBy(string refNo)
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(string refId)
         {
-            var results = accountingPaymentService.GetBy(refNo);
+            var results = accountingPaymentService.GetBy(refId);
             return Ok(results);
         }
         /// <summary>
@@ -186,7 +186,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 if (worksheet.Cells[row, 6].Value == null)
                 {
-                    payment.PaidDateError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.PaidDateError = stringLocalizer[AccountingLanguageSub.MSG_PAIDDATE_ACCOUNTING_PAYMENT_EMPTY].Value;
                     payment.IsValid = false;
                 }
                 else

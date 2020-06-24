@@ -44,12 +44,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<AccAccountingPaymentModel> GetBy(string refId)
         {
-            var data = Get(x => x.RefId == refId);
+            var data = DataContext.Get(x => x.RefId == refId).OrderBy(x => x.PaidDate);
             var users = userRepository.Get();
             var results = data.Join(users, x => x.UserModified, y => y.Id, (x, y) => new AccAccountingPaymentModel
             {
                 Id = x.Id,
-                RefNo = x.RefNo,
+                RefNo = x.RefId,
                 PaymentNo = x.PaymentNo,
                 PaymentAmount = x.PaymentAmount,
                 Balance = x.Balance,
@@ -93,12 +93,14 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var partners = partnerRepository.Get();
             var results = (from invoice in data
-                           join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
-                           from part in grpPartners.DefaultIfEmpty()
-                           join payment in DataContext.Get() on invoice.RefId equals payment.RefId into grpPayments
-                           from detail in grpPayments.DefaultIfEmpty()
-                           select new { invoice, part.ShortName, detail.Balance, detail.PaymentAmount })
-                         .GroupBy(x => new AccountingPaymentModel {
+                                join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
+                                from part in grpPartners.DefaultIfEmpty()
+                                    join payment in DataContext.Get() on invoice.RefId equals payment.RefId into grpPayments
+                                    from detail in grpPayments.DefaultIfEmpty()
+                                select new { invoice, part.ShortName, 
+                                    Balance = detail != null? detail.Balance: 0,
+                                    PaymentAmount = detail != null? detail.PaymentAmount: 0 })
+                            .GroupBy(x => new AccountingPaymentModel {
                              RefId = x.invoice.RefId,
                              PartnerId = x.invoice.PartnerId,
                              InvoiceNoReal = x.invoice.InvoiceNoReal,
@@ -112,8 +114,7 @@ namespace eFMS.API.Accounting.DL.Services
                              Status = x.invoice.Status,
                              ExtendDays = x.invoice.ExtendDays,
                              ExtendNote = x.invoice.ExtendNote
-                         })
-                         .Select(x => new AccountingPaymentModel {
+                         }).Select(x => new AccountingPaymentModel {
                              RefId = x.Key.RefId,
                              PartnerId = x.Key.PartnerId,
                              InvoiceNoReal = x.Key.InvoiceNoReal,
@@ -151,21 +152,20 @@ namespace eFMS.API.Accounting.DL.Services
         // get charges that have type OBH and SOANo
         private IQueryable<AccountingPaymentModel> QueryOBHPayment(PaymentCriteria criteria)
         {
-            List<string> refNos = GetRefNo(criteria.RefNos);
             Expression<Func<AcctSoa, bool>> query = x => (x.Customer == criteria.PartnerId || criteria.PartnerId == null)
-                                                      && (refNos.Contains(x.Soano) || refNos.Count == 0)
+                                                      && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null)
                                                       && (x.PaymentStatus == criteria.PaymentStatus || string.IsNullOrEmpty(x.PaymentStatus) || string.IsNullOrEmpty(criteria.PaymentStatus));
-            if (criteria.IssuedDate != null)
+            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
-                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromIssuedDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if (criteria.DueDate != null)
+            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
             {
-                query = query.And(x => x.PaymentDueDate.Value.Date == criteria.DueDate.Value.Date);
+                query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
             }
-            if (criteria.UpdatedDate != null)
+            if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date == criteria.UpdatedDate.Value.Date);
+                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
             }
             var data = soaRepository.Get(query);
             if (data == null) return null;
@@ -188,8 +188,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (data == null) return null;
             var surcharges = surchargeRepository.Get(x => x.Type == "OBH" 
                                                         && !string.IsNullOrEmpty(x.Soano)
-                                                        && (refNos.Contains(x.Mblno) || refNos.Count == 0)
-                                                        && (refNos.Contains(x.Hblno) || refNos.Count == 0));
+                                                        && (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos.Count == 0)
+                                                        && (criteria.ReferenceNos.Contains(x.Hblno) || criteria.ReferenceNos.Count == 0));
             var dataJoin = (from soa in data
                            join charge in surcharges on soa.Soano equals charge.Soano
                            select new { soa, TotalOBH = charge.Total });
@@ -210,55 +210,29 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
         }
 
-        private List<string> GetRefNo(string refNos)
-        {
-            List<string> results = null;
-            if (!string.IsNullOrEmpty(refNos))
-            {
-                results = refNos.Split('\n').Select(x => x.Trim()).Where(x => x != null).ToList();
-            }
-            return results;
-        }
-
         private IQueryable<AccountingPaymentModel> QueryInvoicePayment(PaymentCriteria criteria)
         {
-            List<string> refNos = GetRefNo(criteria.RefNos);
+            var status = criteria.PaymentStatus.Split();
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && x.Status != "New"
                                                                       && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
-                                                                      && (refNos.Contains(x.InvoiceNoReal) || refNos.Count == 0)
-                                                                      && (x.PaymentStatus == criteria.PaymentStatus || string.IsNullOrEmpty(x.PaymentStatus) || string.IsNullOrEmpty(criteria.PaymentStatus));
-            if (criteria.IssuedDate != null) {
-                query = query.And(x => x.Date.Value.Date == criteria.IssuedDate.Value.Date);
+                                                                      && (criteria.ReferenceNos.Contains(x.InvoiceNoReal) || criteria.ReferenceNos == null)
+                                                                      && (criteria.PaymentStatus.Contains(x.PaymentStatus) || string.IsNullOrEmpty(x.PaymentStatus) || string.IsNullOrEmpty(criteria.PaymentStatus));
+            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null) {
+                query = query.And(x => x.Date.Value.Date >= criteria.FromIssuedDate.Value.Date && x.Date.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if(criteria.DueDate != null)
+            if(criteria.FromDueDate != null && criteria.ToDueDate != null)
             {
-                query = query.And(x => x.PaymentDueDate.Value.Date == criteria.DueDate.Value.Date);
+                query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
             }
-            if(criteria.UpdatedDate != null)
+            if(criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date == criteria.UpdatedDate.Value.Date);
+                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
             }
 
             var data = accountingManaRepository.Get(query);
             if (data == null) return null;
-            switch (criteria.OverDueDays)
-            {
-                case Common.OverDueDate.Between1_15:
-                    data = data.Where(x => x.PaymentDueDate.HasValue && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 16 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 0);
-                    break;
-                case Common.OverDueDate.Between16_30:
-                    data = data.Where(x => x.PaymentDueDate.HasValue && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 31 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15);
-                    break;
-                case Common.OverDueDate.Between31_60:
-                    data = data.Where(x => x.PaymentDueDate.HasValue && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 61 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 30);
-                    break;
-                case Common.OverDueDate.Between61_90:
-                    data = data.Where(x => x.PaymentDueDate.HasValue && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 90 && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 60);
-                    break;
-            }
-            if (data == null) return null;
             var results = data.OrderByDescending(x => x.PaymentDatetimeUpdated).Select(x => new AccountingPaymentModel {
-                RefId = x.VoucherId,
+                RefId = x.Id.ToString(),
                 InvoiceNoReal = x.InvoiceNoReal,
                 PartnerId = x.PartnerId,
                 Amount = x.TotalAmount,
@@ -271,6 +245,22 @@ namespace eFMS.API.Accounting.DL.Services
                 ExtendDays = x.PaymentExtendDays,
                 ExtendNote = x.PaymentNote
             });
+            if (results == null) return null;
+            switch (criteria.OverDueDays)
+            {
+                case Common.OverDueDate.Between1_15:
+                    results = results.ToList().Where(x => x.OverdueDays < 16 && x.OverdueDays > 0).AsQueryable();
+                    break;
+                case Common.OverDueDate.Between16_30:
+                    results = results.ToList().Where(x => x.OverdueDays < 31 && x.OverdueDays > 15).AsQueryable();
+                    break;
+                case Common.OverDueDate.Between31_60:
+                    results = results.ToList().Where(x => x.OverdueDays < 61 && x.OverdueDays > 30).AsQueryable();
+                    break;
+                case Common.OverDueDate.Between61_90:
+                    results = results.ToList().Where(x => x.OverdueDays < 91 && x.OverdueDays > 60).AsQueryable();
+                    break;
+            }
             return results;
         }
 
@@ -444,10 +434,12 @@ namespace eFMS.API.Accounting.DL.Services
                     if(isPaid == true)
                     {
                         refPayment.PaymentStatus = "Paid";
+                        refPayment.PaymentDatetimeUpdated = DateTime.Now;
                     }
                     else
                     {
                         refPayment.PaymentStatus = "Paid A Part";
+                        refPayment.PaymentDatetimeUpdated = DateTime.Now;
                     }
                     managements.Add(refPayment);
                 }

@@ -37,15 +37,15 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
     payments: CommonInterface.INg2Select[] = [
         { id: '', text: 'All' },
         { id: 'Unpaid', text: 'UnPaid' },
-        { id: 'Part A Part', text: 'Part A Part' },
+        { id: 'Paid A Part', text: 'Paid A Part' },
         { id: 'Paid', text: 'Paid' },
     ];
     overDueDays: CommonInterface.INg2Select[] = [
-        { id: '', text: 'All' },
-        { id: '1-15', text: '01-15 days' },
-        { id: '16-30', text: '16-30 days' },
-        { id: '31-60', text: '31-60 days' },
-        { id: '60-90', text: '60-90 days' },
+        { id: 0, text: 'All' },
+        { id: 1, text: '01-15 days' },
+        { id: 2, text: '16-30 days' },
+        { id: 3, text: '31-60 days' },
+        { id: 4, text: '60-90 days' },
     ];
 
     constructor(
@@ -54,7 +54,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
     ) {
         super();
         this.requestSearch = this.submitSearch;
-        this.requestReset = this.resetSearrch;
+        this.requestReset = this.resetSearch;
     }
 
     ngOnInit(): void {
@@ -98,18 +98,21 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         const body: ISearchAccReceivePayble = {
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
-            issuedDate: (!!dataForm.issuedDate && !!dataForm.issuedDate.startDate) ? formatDate(dataForm.issuedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            updatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            dueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            status: dataForm.paymentStatus[0].id,
-            overdueDate: dataForm.overdueDate[0].id
+            paymentStatus: !!dataForm.paymentStatus ? dataForm.paymentStatus : null,
+            overDueDays: !!dataForm.overdueDate ? dataForm.overdueDate[0].id : null,
+            fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            toUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.endDate) ? formatDate(dataForm.updatedDate.endDate, 'yyyy-MM-dd', 'en') : null,
+            fromDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            toDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.endDate) ? formatDate(dataForm.dueDate.endDate, 'yyyy-MM-dd', 'en') : null
         };
         console.log(body);
 
         this.onSearch.emit(body);
     }
 
-    resetSearrch() {
+    resetSearch() {
         this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
         this.onSearch.emit({});
@@ -119,10 +122,13 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
 interface ISearchAccReceivePayble {
     referenceNos: string;
     partnerId: string;
-    issuedDate: string;
-    status: string;
-    dueDate: string;
-    overdueDate: string;
-    updatedDate: string;
+    paymentStatus: string;
+    overDueDays: number;
+    fromIssuedDate: string;
+    toIssuedDate: string;
+    fromUpdatedDate: string;
+    toUpdatedDate: string;
+    fromDueDate: string;
+    toDueDate: string;
 }
 

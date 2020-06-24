@@ -536,6 +536,19 @@ export class AccountingRepo {
         );
     }
 
+    paymentPaging(page: number, size: number, body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getPaymentByrefId(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

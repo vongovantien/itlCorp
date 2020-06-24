@@ -40,14 +40,16 @@ export class PaymentImportComponent extends AppPage implements OnInit {
 
     selectPageSize() {
         this.pager.currentPage = 1;
-        if (this.isShowInvalid) {
-            this.pager.totalItems = this.data.length;
-            this.pagingData(this.data);
+        if (!!this.data) {
+            if (this.isShowInvalid) {
+                this.pager.totalItems = this.data.length;
+                this.pagingData(this.data);
 
-        } else {
-            this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pagingData(this.inValidItems);
-            this.pager.totalItems = this.inValidItems.length;
+            } else {
+                this.inValidItems = this.data.filter(x => !x.isValid);
+                this.pagingData(this.inValidItems);
+                this.pager.totalItems = this.inValidItems.length;
+            }
         }
     }
 
