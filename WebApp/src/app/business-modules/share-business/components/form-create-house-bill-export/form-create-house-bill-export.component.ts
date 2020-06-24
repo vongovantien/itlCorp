@@ -1,23 +1,23 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, Shipment, csBookingNote } from '@models';
-import { AppForm } from 'src/app/app.form';
-import { SystemConstants } from 'src/constants/system.const';
-import { FormValidators } from 'src/app/shared/validators';
-
-import { Observable, of, forkJoin } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap, mergeMap, concatMap } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../../share-business/store';
-import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
-import { formatDate } from '@angular/common';
-import { JobConstants, ChargeConstants } from '@constants';
+import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote } from '@models';
+import { JobConstants, ChargeConstants, SystemConstants } from '@constants';
 import { AppComboGridComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState } from '@store';
+import { FormValidators } from '@validators';
+
+import { AppForm } from 'src/app/app.form';
+import * as fromShareBussiness from './../../../share-business/store';
+
+import { Observable, of } from 'rxjs';
+import { catchError, takeUntil, skip, finalize, tap, concatMap } from 'rxjs/operators';
+
 
 @Component({
     selector: 'form-create-house-bill-export',
@@ -28,7 +28,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
     @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
 
     @Input() isUpdate: boolean = false;
-    @Input() set type(t: string) { console.log(t); this._type = t; }
+    @Input() set type(t: string) { this._type = t; }
 
     get type() { return this._type; }
 
@@ -104,9 +104,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.initForm();
         this.getSaleMans();
 
-        // if (this.type === ChargeConstants.SLE_CODE) {
-        //     this.getCSBookingNotes();
-        // }
+        if (this.type === ChargeConstants.SLE_CODE) {
+            this.getCSBookingNotes();
+        }
 
         this.isLoadingCustomer = true;
         this.isLoadingShipper = true;
@@ -177,6 +177,18 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                             placeDelivery: this.shipmmentDetail.podName,
                             placeReceipt: this.shipmmentDetail.polName
                         });
+
+                        if (!!this.shipmmentDetail.bookingNo) {
+                            if (!!this.csBookingNotes.length) {
+                                const currentBookingNo: csBookingNote = this.csBookingNotes.find(b => b.bookingNo === this.shipmmentDetail.bookingNo);
+                                if (currentBookingNo) {
+                                    this.shipper.setValue(currentBookingNo.shipperId);
+                                    this.shipperDescription.setValue(currentBookingNo.shipperDescription);
+                                    this.consignee.setValue(currentBookingNo.consigneeId);
+                                    this.consigneeDescription.setValue(currentBookingNo.consigneeDescription);
+                                }
+                            }
+                        }
                     }
                 }),
                 concatMap((res: CsTransaction) => {
@@ -188,9 +200,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                 this.hwbno.setValue(hblNo);
             }))
             .subscribe(
-                (hblNo: any) => {
-
-                }
+                (hblNo: any) => { }
             );
     }
 
