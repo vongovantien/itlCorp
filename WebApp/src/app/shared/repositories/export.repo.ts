@@ -3,9 +3,8 @@ import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { HttpHeaders } from '@angular/common/http';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ExportRepo {
     constructor(private _api: ApiService) {
     }

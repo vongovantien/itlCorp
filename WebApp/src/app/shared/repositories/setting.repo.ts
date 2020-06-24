@@ -3,7 +3,7 @@ import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SettingRepo {
     private VERSION: string = 'v1';
     constructor(private _api: ApiService) {
