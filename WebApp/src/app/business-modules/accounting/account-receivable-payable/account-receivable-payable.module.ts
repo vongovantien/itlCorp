@@ -17,6 +17,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { AccountReceivablePayableUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
 import { PaymentImportComponent } from './components/payment-import/payment-import.component';
 import { PaginationModule } from 'ngx-bootstrap';
+import { AccountReceivablePayableImportOBHPaymentComponent } from './components/import-obh/import-obh-account-receivable-payable.component';
 const routing: Routes = [
     {
         path: "",
@@ -27,6 +28,9 @@ const routing: Routes = [
             },
             {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
+            },
+            {
+                path: 'import-obh', component: AccountReceivablePayableImportOBHPaymentComponent, data: { name: "Import OBH" }
             },
         ]
     }
@@ -40,7 +44,8 @@ const routing: Routes = [
         AccountReceivablePayableListInvoicePaymentComponent,
         AccountReceivablePayableListOBHPaymentComponent,
         AccountReceivablePayableUpdateExtendDayPopupComponent,
-        PaymentImportComponent
+        PaymentImportComponent,
+        AccountReceivablePayableImportOBHPaymentComponent
     ],
     imports: [
         CommonModule,

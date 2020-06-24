@@ -524,14 +524,22 @@ export class AccountingRepo {
     upLoadInvoicePaymentFile(files: any) {
         return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UploadInvoicePaymentFile`, files, "uploadedFile");
     }
+
     downloadInvoicePaymentFile() {
         return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/DownloadInvoicePaymentExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
+
     importInvoicePayment(body: any) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getOBHPaymentImport(body: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/UploadExcelFile`, body, 'file').pipe(
             map((data: any) => data)
         );
     }

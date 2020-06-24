@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
@@ -12,6 +14,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using ExcelDataReader;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -35,6 +38,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccAccountingPaymentService accountingPaymentService;
         private readonly IHostingEnvironment _hostingEnvironment;
+        
 
         /// <summary>
         /// constructor
@@ -49,6 +53,7 @@ namespace eFMS.API.Accounting.Controllers
             stringLocalizer = localizer;
             accountingPaymentService = paymentService;
             _hostingEnvironment = hostingEnvironment;
+            
         }
         
         /// <summary>
@@ -287,5 +292,65 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
+        [HttpPost("UploadExcelFile")]
+        public IActionResult UploadExcelFile(IFormFile file)
+        {
+            //read data
+           
+            var dataList = new List<AccountingPaymentOBHImportTemplateModel>();
+            int totalRows = 0;
+            using (ExcelPackage package = new ExcelPackage(file.OpenReadStream()))
+            {
+                ExcelWorksheet workSheet = package.Workbook.Worksheets[1];
+                totalRows = workSheet.Dimension.Rows;
+                
+                for (int i = 2; i <= totalRows; i++)
+                {
+                    var data = new AccountingPaymentOBHImportTemplateModel();
+                    // gán true trước sau đó lỗi gán lại false
+                    data.isValid = true;
+                    //
+                    if (
+                        (workSheet.Cells[i, 1].Value == null || workSheet.Cells[i, 1].Value.ToString().Trim() == "") ||
+                        (workSheet.Cells[i, 2].Value == null || workSheet.Cells[i, 2].Value.ToString().Trim() == "") ||
+                        (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" || !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
+                        (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "" || !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDateCheck)) ||
+                        (workSheet.Cells[i, 6].Value == null || workSheet.Cells[i, 6].Value.ToString().Trim() == ""))
+                    {
+                        data.isValid = false;
+                    }
+                    data.SoaNo = workSheet.Cells[i, 1].Value == null ||                 // NULL
+                        workSheet.Cells[i, 1].Value.ToString().Trim() == "" ?           // White space
+                        null : workSheet.Cells[i, 1].Value.ToString();
+
+                    data.PartnerId = workSheet.Cells[i, 2].Value == null || 
+                        workSheet.Cells[i, 2].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 2].Value.ToString().Trim();
+
+                    data.PartnerName = workSheet.Cells[i, 3].Value == null ||
+                        workSheet.Cells[i, 3].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 3].Value.ToString().Trim();
+
+                    data.PaymentAmount = workSheet.Cells[i, 4].Value == null ||
+                        workSheet.Cells[i, 4].Value.ToString().Trim() == "" ||
+                        !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultInt) ? // Type field invalid
+                        (int?)null : int.Parse(workSheet.Cells[i, 4].Value.ToString().Trim());
+
+                    data.PaidDate = workSheet.Cells[i, 5].Value == null ||
+                        workSheet.Cells[i, 5].Value.ToString().Trim() == "" || 
+                        !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
+                        (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 5].Value.ToString().Trim());
+
+                    data.PaymentType = workSheet.Cells[i, 6].Value == null ||
+                        workSheet.Cells[i, 6].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 6].Value.ToString().Trim();
+
+                    dataList.Add(data);
+                }
+            }
+            int validCount = dataList.Where(cdn => cdn.isValid).Count();
+            return Ok(new { totalValidRows = validCount, data = dataList});
+        }
     }
+    
 }
