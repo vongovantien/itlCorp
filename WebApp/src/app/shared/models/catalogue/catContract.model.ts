@@ -36,7 +36,7 @@ export class Contract {
     active: boolean = false;
     userModifiedName: string = '';
     userCreatedName: string = '';
-
+    fileList: any[] = null;
 
     constructor(data?: any) {
         const self = this;

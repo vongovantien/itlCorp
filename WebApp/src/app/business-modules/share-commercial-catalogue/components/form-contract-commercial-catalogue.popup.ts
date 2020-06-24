@@ -210,7 +210,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     handleFileInput(event: any) {
         this.fileList = event.target['files'];
         console.log(this.fileList);
-        if (this.isUpdate) {
+        if (this.isUpdate && !this.isCreateNewCommercial) {
             if (!!this.files && !!this.files.id) {
                 this.deleteFileContract();
             } else {
