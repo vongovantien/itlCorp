@@ -36,6 +36,16 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
             { title: 'Extend days', field: 'referenceNo', sortable: true },
             { title: 'Notes', field: 'referenceNo', sortable: true },
         ];
+        this.paymentHeaders = [
+            { title: 'Payment No', field: 'paymentNo', sortable: true },
+            { title: 'Payment Amount', field: 'paymentAmount', sortable: true },
+            { title: 'Balance', field: 'balance', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Paid Date', field: 'paidDate', sortable: true },
+            { title: 'Payment Type', field: 'paymentType', sortable: true },
+            { title: 'Update Person', field: 'userModifiedName', sortable: true },
+            { title: 'Update Date', field: 'datetimeModified', sortable: true }
+        ];
     }
 
     import() {
