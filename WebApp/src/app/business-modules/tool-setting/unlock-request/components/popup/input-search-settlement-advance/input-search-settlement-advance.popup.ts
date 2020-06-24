@@ -33,17 +33,27 @@ export class UnlockRequestInputSearchSettlementAdvancePopupComponent extends Pop
             settlements: this.unlockType === CommonEnum.UnlockTypeEnum.SETTEMENT ? keyword : null,
             unlockTypeNum: this.unlockType
         };
-        this._settingRepo.getJobToUnlockRequest(body)
-            .subscribe(
-                (res: SetUnlockRequestJobModel[]) => {
-                    if (!!res && !!res.length) {
-                        this.onInputAdvanceOrSettlement.emit(res);
-                        this.hide();
-                    } else {
-                        this._toastService.warning("Not found data");
-                    }
+        this._settingRepo.checkExistVoucherInvoiceOfSettlementAdvance(body).subscribe(
+            (result: any) => {
+                console.log(result);
+                if (!result.success) {
+                    this._toastService.warning(result.message);
+                } else {
+                    this._settingRepo.getJobToUnlockRequest(body)
+                        .subscribe(
+                            (res: SetUnlockRequestJobModel[]) => {
+                                if (!!res && !!res.length) {
+                                    this.onInputAdvanceOrSettlement.emit(res);
+                                    // this.hide();
+                                } else {
+                                    this._toastService.warning("Not found data");
+                                }
+                            }
+                        );
                 }
-            );
+            }
+        );
+
     }
 
     closePopup() {

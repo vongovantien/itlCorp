@@ -15,7 +15,7 @@
                                 <ng-container *ngIf="!!infoDenieds.length">
                                     <tr *ngFor="let infoDenied of infoDenieds; let i = index; trackBy: trackByFn">
                                         <td>{{infoDenied.no}}</td>
-                                        <td>{{infoDenied.name}}</td>
+                                        <td>{{infoDenied.nameAndTimeDeny}}</td>
                                         <td>{{infoDenied.levelApprove}}</td>
                                         <td>{{infoDenied.comment}}</td>
                                     </tr>
