@@ -14,6 +14,7 @@ import { SelectItem } from "ng2-select";
 import { SystemConstants } from "@constants";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
+import { UnlockRequestProcessApproveComponent } from "../components/process-approve-unlock-request/process-approve-unlock-request.component";
 
 @Component({
     selector: 'app-unlock-request-detail',
@@ -24,6 +25,7 @@ export class UnlockRequestDetailComponent extends AppForm {
     @ViewChild(UnlockRequestListJobComponent, { static: false }) listJobComponent: UnlockRequestListJobComponent;
     @ViewChild(UnlockRequestInputDeniedCommentPopupComponent, { static: false }) inputDeniedCommentPopup: UnlockRequestInputDeniedCommentPopupComponent;
     @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(UnlockRequestProcessApproveComponent, { static: false }) processApprovalComponent: UnlockRequestProcessApproveComponent;
     formDetail: FormGroup;
     subject: AbstractControl;
     requester: AbstractControl;
@@ -107,7 +109,7 @@ export class UnlockRequestDetailComponent extends AppForm {
                         });
                         this.listJobComponent.dataJobs = this.unlockRequest.jobs;
                         this.getUnlockTypeEnum(this.unlockRequest.unlockType);
-
+                        this.processApprovalComponent.getInfoProcessApprove(this.unlockRequest.id);
                     } else {
                         // Reset 
                         this.formDetail.reset();

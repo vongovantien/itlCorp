@@ -17,6 +17,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly ICurrentUser currentUser;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SetUnlockRequest> unlockRequestRepo;
+
         public UnlockRequestApproveService(
             IContextBase<SetUnlockRequestApprove> repository,
             IMapper mapper,
@@ -28,12 +29,17 @@ namespace eFMS.API.Setting.DL.Services
             userBaseService = userBase;
             unlockRequestRepo = unlockRequest;
         }
-
+        
         public SetUnlockRequestApproveModel GetInfoApproveUnlockRequest(Guid id)
         {
             var userCurrent = currentUser.UserID;
             var unlockApprove = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == false).FirstOrDefault();
-            
+            var unlockRequest = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault();
+            if (unlockRequest != null)
+            {
+                unlockRequest.UnlockType = unlockRequest.UnlockType == "Change Service Date" ? "Shipment" : unlockRequest.UnlockType;
+            }
+
             var unlockApproveModel = new SetUnlockRequestApproveModel();
 
             if (unlockApprove != null)
@@ -47,6 +53,10 @@ namespace eFMS.API.Setting.DL.Services
                 unlockApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Buhead)?.EmployeeNameVn;
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
                 unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                unlockApproveModel.IsShowLeader = userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowManager = userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowAccountant = userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowBuHead = userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
             }
             else
             {
@@ -72,5 +82,7 @@ namespace eFMS.API.Setting.DL.Services
             }
             return data;
         }
+
+
     }
 }

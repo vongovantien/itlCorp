@@ -21,5 +21,7 @@ namespace eFMS.API.Setting.DL.IService
         List<string> GetListUserDeputyByDept(string dept);
         bool CheckDeputyManagerByUser(int? departmentId, string userId);
         bool CheckDeputyAccountantByUser(int? departmentId, string userId);
+        SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId);
+        string GetRoleByLevel(string level, string type, Guid? officeId);
     }
 }

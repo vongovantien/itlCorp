@@ -70,6 +70,11 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Setting.Controllers.UnlockRequestApproveController">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:eFMS.API.Setting.Controllers.UnlockRequestApproveController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.IUnlockRequestApproveService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor
