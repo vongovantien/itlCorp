@@ -4,7 +4,7 @@ import { environment } from "src/environments/environment";
 import { catchError, map } from "rxjs/operators";
 import { throwError, Observable } from "rxjs";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AccountingRepo {
 
     private VERSION: string = 'v1';

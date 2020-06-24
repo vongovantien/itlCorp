@@ -4,13 +4,13 @@ import { API_MENU } from 'src/constants/api-menu.const';
 
 @NgModule({
     providers: [
-        SystemRepo,
-        AccountingRepo,
-        OperationRepo,
-        CatalogueRepo,
-        DocumentationRepo,
-        ExportRepo,
-        SettingRepo,
+        // SystemRepo,
+        // AccountingRepo,
+        // OperationRepo,
+        // CatalogueRepo,
+        // DocumentationRepo,
+        // ExportRepo,
+        // SettingRepo,
         API_MENU
     ],
 })

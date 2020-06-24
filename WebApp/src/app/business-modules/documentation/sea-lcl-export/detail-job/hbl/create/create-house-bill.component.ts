@@ -95,7 +95,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
 
                     this.permissionShipments = this._store.select(getTransactionPermission);
 
-                    this.getBookingNotes();
+                    // this.getBookingNotes();
                 } else {
                     this.gotoList();
                 }
