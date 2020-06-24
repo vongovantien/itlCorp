@@ -78,28 +78,51 @@
                         <thead app-table-header [headers]="headers">
                             <th class="first table-actions-col">No.</th>
                         </thead>
-                        <tbody>
-                            <ng-container *ngFor="let item of data; let i = index;">
-                                <tr>
-                                    <span>{{ i + 1 }}</span>
+                        <tbody *ngIf="data">
+                            <ng-container *ngFor="let item of pagedItems; let i = index;">
+                                <tr [ngClass]="{ 'invalid-row': !item.isValid }">
+                                    <span> {{ (i + this.pager.startIndex + 1) }}</span>
                                     <td>
-                                        {{item.soaNo}}
+                                        <span class="ng-star-inserted" *ngIf="item.soaNo !== null">{{item.soaNo}}</span>
+                                        <span class="m--font-danger" *ngIf="item.soaNo === null">Soa No is
+                                            required</span>
                                     </td>
                                     <td>
-                                        {{item.partnerId}}
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.partnerId !== null">{{item.partnerId}}</span>
+                                        <span class="m--font-danger" *ngIf="item.partnerId === null">Partner Id is
+                                            required</span>
+
                                     </td>
                                     <td>
-                                        {{item.partnerName}}
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.partnerId !== null">{{item.partnerId}}</span>
+                                        <span class="m--font-danger" *ngIf="item.partnerId === null">Not found Partner
+                                            Name
+                                        </span>
+
                                     </td>
                                     <td>
-                                        {{item.paymentAmount}}
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.paymentAmount !== null">{{item.paymentAmount}}</span>
+                                        <span class="m--font-danger" *ngIf="item.paymentAmount === null">Payment Amount
+                                            is required</span>
+
                                     </td>
                                     <td>
-                                        {{item.paidDate | date:'dd/MM/yyyy'}}
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.paidDate !== null">{{item.paidDate | date:'dd/MM/yyyy'}}</span>
+                                        <span class="m--font-danger" *ngIf="item.paidDate === null">Paid Date is
+                                            required</span>
+
                                     </td>
                                     <td>
-                                        {{item.paymentType}}
+                                        <span class="ng-star-inserted"
+                                            *ngIf="item.paymentType !== null">{{item.paymentType}}</span>
+                                        <span class="m--font-danger" *ngIf="item.paymentType === null">Payment Type is
+                                            required</span>
                                     </td>
+
                                 </tr>
                             </ng-container>
                             <tr app-table-none-record *ngIf="data.length === 0"></tr>
@@ -107,7 +130,32 @@
                         </tbody>
                     </table>
                 </div>
+                <!--pagination-->
+                <div class="pagination-nav">
+                    <div class="row">
+                        <div class="col-sm-6">
 
+                            <div class="select-box" style="max-width: 190px">
+                                <select class="form-control" id="" aria-label="" [(ngModel)]="pager.pageSize"
+                                    (change)="selectPageSize()" name="pagesize">
+                                    <ng-container
+                                        *ngFor="let item of pager.numberToShow; let i = index; first as isFirst">
+                                        <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page</option>
+                                    </ng-container>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6" *ngIf="pager.totalItems > pager.pageSize">
+                            <div class="float-right">
+                                <pagination [boundaryLinks]="true" [totalItems]="pager.totalItems"
+                                    [itemsPerPage]="pager.pageSize" (pageChanged)="pageChanged($event)"
+                                    [(ngModel)]="pager.currentPage" [maxSize]="pager.numberPageDisplay">
+                                </pagination>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

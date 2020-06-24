@@ -303,32 +303,47 @@ namespace eFMS.API.Accounting.Controllers
             {
                 ExcelWorksheet workSheet = package.Workbook.Worksheets[1];
                 totalRows = workSheet.Dimension.Rows;
+                
                 for (int i = 2; i <= totalRows; i++)
                 {
                     var data = new AccountingPaymentOBHImportTemplateModel();
-                    //
+                    // gán true trước sau đó lỗi gán lại false
                     data.isValid = true;
                     //
-                    if (workSheet.Cells[i, 1].Value == null ||
-                        workSheet.Cells[i, 2].Value == null ||
-                        workSheet.Cells[i, 4].Value == null ||
-                        workSheet.Cells[i, 5].Value == null ||
-                        workSheet.Cells[i, 6].Value == null)
+                    if (
+                        (workSheet.Cells[i, 1].Value == null || workSheet.Cells[i, 1].Value.ToString().Trim() == "") ||
+                        (workSheet.Cells[i, 2].Value == null || workSheet.Cells[i, 2].Value.ToString().Trim() == "") ||
+                        (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" || !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
+                        (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "" || !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDateCheck)) ||
+                        (workSheet.Cells[i, 6].Value == null || workSheet.Cells[i, 6].Value.ToString().Trim() == ""))
                     {
                         data.isValid = false;
                     }
-                    data.SoaNo = workSheet.Cells[i, 1].Value != null ?
-                         workSheet.Cells[i, 1].Value.ToString() : "Not Found SOA No";
-                    data.PartnerId = workSheet.Cells[i, 2].Value != null ? 
-                        workSheet.Cells[i, 2].Value.ToString() : "Not Found Partner ID";
-                    data.PartnerName = workSheet.Cells[i, 3].Value != null ?
-                        workSheet.Cells[i, 3].Value.ToString() : "Empty Partner Name";
-                    data.PaymentAmount = workSheet.Cells[i, 4].Value != null ? 
-                        int.Parse(workSheet.Cells[i, 4].Value.ToString()) : 0;
-                    data.PaidDate = workSheet.Cells[i, 5].Value != null ?
-                        DateTime.Parse(workSheet.Cells[i, 5].Value.ToString()) : (DateTime?)null;
-                    data.PaymentType = workSheet.Cells[i, 6].Value != null ?
-                        workSheet.Cells[i, 6].Value.ToString() : "Not Found Payment Type";
+                    data.SoaNo = workSheet.Cells[i, 1].Value == null ||                 // NULL
+                        workSheet.Cells[i, 1].Value.ToString().Trim() == "" ?           // White space
+                        null : workSheet.Cells[i, 1].Value.ToString();
+
+                    data.PartnerId = workSheet.Cells[i, 2].Value == null || 
+                        workSheet.Cells[i, 2].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 2].Value.ToString().Trim();
+
+                    data.PartnerName = workSheet.Cells[i, 3].Value == null ||
+                        workSheet.Cells[i, 3].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 3].Value.ToString().Trim();
+
+                    data.PaymentAmount = workSheet.Cells[i, 4].Value == null ||
+                        workSheet.Cells[i, 4].Value.ToString().Trim() == "" ||
+                        !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultInt) ? // Type field invalid
+                        (int?)null : int.Parse(workSheet.Cells[i, 4].Value.ToString().Trim());
+
+                    data.PaidDate = workSheet.Cells[i, 5].Value == null ||
+                        workSheet.Cells[i, 5].Value.ToString().Trim() == "" || 
+                        !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
+                        (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 5].Value.ToString().Trim());
+
+                    data.PaymentType = workSheet.Cells[i, 6].Value == null ||
+                        workSheet.Cells[i, 6].Value.ToString().Trim() == "" ?
+                        null : workSheet.Cells[i, 6].Value.ToString().Trim();
 
                     dataList.Add(data);
                 }
