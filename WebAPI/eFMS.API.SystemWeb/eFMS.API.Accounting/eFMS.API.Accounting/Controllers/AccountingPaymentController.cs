@@ -233,7 +233,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("ImportInvoicePayment")]
         public IActionResult ImportInvoicePayment([FromBody]List<AccountingPaymentImportModel> list)
         {
-            var hs = accountingPaymentService.Import(list);
+            var hs = accountingPaymentService.ImportInvoicePayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
             if (!hs.Success)
             {
@@ -241,7 +241,24 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
-        
+        /// <summary>
+        /// import payments for SOA(type charge is OBH)
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("ImportSOAOBHPayment")]
+        public IActionResult ImportSOAOBHPayment([FromBody]List<AccountingPaymentImportModel> list)
+        {
+            var hs = accountingPaymentService.ImportOBHPayment(list);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+
         /// <summary>
         /// update extend date
         /// </summary>
@@ -285,6 +302,31 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+        
+        /// <summary>
+        /// get extended date of an invoice
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetInvoiceExtendedDate")]
+        public IActionResult GetInvoiceExtendedDate(string id)
+        {
+            var result = accountingPaymentService.GetInvoiceExtendedDate(id);
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// get extended date of an SOA(charge type = OBH)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("GetOBHSOAExtendedDate")]
+        public IActionResult GetOBHSOAExtendedDate(string id)
+        {
+            var result = accountingPaymentService.GetOBHSOAExtendedDate(id);
             return Ok(result);
         }
     }

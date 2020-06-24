@@ -46,11 +46,14 @@
                                             <td>{{ item.partnerName }}</td>
                                             <td>{{ item.amount | number: '.0-3'}}</td>
                                             <td>{{ item.currency }}</td>
-                                            <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}</td>
+                                            <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}
+                                            </td>
                                             <td>{{ item.serie }}</td>
                                             <td>{{ item.paidAmount | number: '.0-3'}}</td>
                                             <td>{{ item.unpaidAmount | number: '.0-3'}}</td>
-                                            <td>{{ item.dueDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td><a href="javascript:void(0)"
+                                                    (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
+                                            </td>
                                             <td>{{ item.overdueDays }}</td>
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
@@ -94,7 +97,7 @@
                                         </td>
                                         <td>{{ payment.paymentNo }}</td>
                                         <td>{{ payment.paymentAmount| number: '.0-3'  }}</td>
-                                        <td>{{ payment.balance }}</td>
+                                        <td>{{ payment.balance| number: '.0-3' }}</td>
                                         <td>{{ payment.currencyId }}</td>
                                         <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}</td>
                                         <td>{{ payment.paymentType }}</td>

@@ -110,6 +110,13 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportSOAOBHPayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentImportModel})">
+            <summary>
+            import payments for SOA(type charge is OBH)
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UpdateExtendDate(eFMS.API.Accounting.DL.Models.AccountingPayment.ExtendDateUpdatedModel)">
             <summary>
             update extend date
@@ -120,6 +127,20 @@
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.Delete(System.Guid)">
             <summary>
             Delete a payment
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetInvoiceExtendedDate(System.String)">
+            <summary>
+            get extended date of an invoice
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetOBHSOAExtendedDate(System.String)">
+            <summary>
+            get extended date of an SOA(charge type = OBH)
             </summary>
             <param name="id"></param>
             <returns></returns>

@@ -15,7 +15,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public DateTime? FromDueDate { get; set; }
         public DateTime? ToDueDate { get; set; }
         public OverDueDate OverDueDays { get; set; }
-        public string PaymentStatus { get; set; }
+        public List<string> PaymentStatus { get; set; }
         public PaymentType PaymentType { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
     {
         public bool IsValid { get; set; }
         public string InvoiceNo { get; set; }
+        public string SOANo { get; set; }
         public string InvoiceNoError { get; set; }
         public string SerieNo { get; set; }
         public string SerieNoError { get; set; }

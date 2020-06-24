@@ -1,14 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
+import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
+import { AccountingRepo } from '@repositories';
+import { catchError } from 'rxjs/operators';
+import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
+import { SortService } from '@services';
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
     templateUrl: './list-obh-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListOBHPaymentComponent extends AppList implements OnInit {
-
-    constructor(private _router: Router) {
+    refPaymens: AccountingPaymentModel[] = [];
+    payments: PaymentModel[] = [];
+    paymentHeaders: CommonInterface.IHeaderTable[];
+    constructor(private _router: Router,
+        private _accountingRepo: AccountingRepo,
+        private _sortService: SortService) {
         super();
     }
 
@@ -31,6 +40,25 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
 
     import() {
         this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'OBH' } });
+    }
+    getPayments(refId: string) {
+        this._accountingRepo.getPaymentByrefId(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: []) => {
+                    this.payments = res;
+                    console.log(this.payments);
+                },
+            );
+    }
+
+    sortPayment(sortField: string, order: boolean) {
+        this.payments = this._sortService.sort(this.payments, sortField, order);
+    }
+    showConfirmDelete(item) { }
+    showExtendDateModel(refId: string) {
+
     }
 }
 

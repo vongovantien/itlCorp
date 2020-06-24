@@ -4,6 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { AccountReceivablePayableListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-receivable-payable.component';
+import { AccountReceivablePayableListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-receivable-payable.component';
 
 @Component({
     selector: 'app-account-receivable-payable',
@@ -11,6 +12,7 @@ import { AccountReceivablePayableListInvoicePaymentComponent } from './component
 })
 export class AccountReceivablePayableComponent extends AppList implements OnInit {
     @ViewChild(AccountReceivablePayableListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountReceivablePayableListInvoicePaymentComponent;
+    @ViewChild(AccountReceivablePayableListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountReceivablePayableListOBHPaymentComponent;
     selectedTab: string = "INVOICE";
 
     constructor(private _ngProgessSerice: NgProgress,
@@ -20,10 +22,18 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     }
 
     ngOnInit() {
+        this.dataSearch.paymentStatus = [];
+        this.dataSearch.paymentType = 0;
         this.requestSearchShipment();
     }
     onSelectTabLocation(tabname) {
         this.selectedTab = tabname;
+        if (tabname === "INVOICE") {
+            this.dataSearch.paymentType = 0;
+        } else {
+            this.dataSearch.paymentType = 1;
+        }
+        this.requestSearchShipment();
     }
     onSearchPayment(event) {
         this.dataSearch = event;
@@ -42,7 +52,9 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                     this.totalItems = res.totalItems || 0;
                     if (this.selectedTab === "INVOICE") {
                         this.invoiceListComponent.refPaymens = res.data;
-                        console.log(this.invoiceListComponent.refPaymens);
+                    } else {
+                        this.obhSOAListComponent.refPaymens = res.data;
+                        console.log(this.obhSOAListComponent.refPaymens);
                     }
                 },
             );

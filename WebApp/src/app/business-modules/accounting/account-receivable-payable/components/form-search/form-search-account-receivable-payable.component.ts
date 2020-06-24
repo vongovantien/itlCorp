@@ -94,11 +94,11 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
 
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
-
+        const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
         const body: ISearchAccReceivePayble = {
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
-            paymentStatus: !!dataForm.paymentStatus ? dataForm.paymentStatus : null,
+            paymentStatus: status,
             overDueDays: !!dataForm.overdueDate ? dataForm.overdueDate[0].id : null,
             fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
@@ -111,18 +111,32 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
 
         this.onSearch.emit(body);
     }
+    getSearchStatus(paymentStatus: []) {
+        let strStatus = null;
+        if (!!paymentStatus) {
+            strStatus = [];
+
+            paymentStatus.forEach(element => {
+                if (element['id'] !== '') {
+                    strStatus.push(element['id']);
+                }
+            });
+        }
+        return strStatus;
+    }
 
     resetSearch() {
         this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
-        this.onSearch.emit({});
+        this.formSearch.controls["paymentStatus"].setValue([this.payments[0]]);
+        this.onSearch.emit({ paymentStatus: [] });
     }
 }
 
 interface ISearchAccReceivePayble {
     referenceNos: string;
     partnerId: string;
-    paymentStatus: string;
+    paymentStatus: string[];
     overDueDays: number;
     fromIssuedDate: string;
     toIssuedDate: string;

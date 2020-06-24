@@ -77,5 +77,8 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
     showConfirmDelete(item) { }
+    showExtendDateModel(refId: string) {
+
+    }
 }
 
