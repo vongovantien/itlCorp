@@ -1,4 +1,3 @@
-<!--begin:: subheader-->
 <div class="m-subheader">
     <div class="d-flex align-items-center">
         <div class="mr-auto">
@@ -6,26 +5,14 @@
         </div>
     </div>
 </div>
-<!--end:: subheader-->
-<form-add-office>
+<form-add-office></form-add-office>
 
-</form-add-office>
 <div class="row">
     <div class="col-12">
-        <div class="text-center">
-            <button (click)="create()" type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                <span>
-                    <i class="la la-save"></i>
-                    <span> Save </span>
-                </span>
-            </button>
-            <button routerLink="/home/system/office" type="button"
-                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-left-20">
-                <span>
-                    <i class="la la-ban"></i>
-                    <span> Cancel </span>
-                </span>
-            </button>
+        <div class="text-center c-button-actions">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="create()"></app-default-button>
+            <app-default-button [buttonSetting]="cancelButtonSetting" routerLink="/home/system/office">
+            </app-default-button>
         </div>
     </div>
 </div>
