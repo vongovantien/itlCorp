@@ -14,7 +14,9 @@ import { Router } from '@angular/router';
     templateUrl: './office.addnew.component.html'
 })
 export class OfficeAddNewComponent extends AppPage {
+
     @ViewChild(OfficeFormAddComponent, { static: false }) formAdd: OfficeFormAddComponent;
+
     constructor(private _progressService: NgProgress,
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
@@ -99,6 +101,6 @@ interface IOfficeAdd {
     shortName: string;
     active: boolean;
     location: string;
-    bankNameEn:string;
-    bankNameLocal:string;
+    bankNameEn: string;
+    bankNameLocal: string;
 }

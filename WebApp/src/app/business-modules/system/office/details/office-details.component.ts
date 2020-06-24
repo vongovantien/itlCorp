@@ -1,18 +1,20 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Department, Office } from '@models';
-
-import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-office/form-add-office.component';
-import { AppPage } from 'src/app/app.base';
-import { SystemRepo } from '@repositories';
-import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
-import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel } from 'src/app/business-modules/share-system/store';
 import { Store } from '@ngrx/store';
-import { PreviousRouteService } from 'src/app/shared/services/previous-route';
-import { SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
+
+import { SystemRepo } from '@repositories';
+import { Department, Office } from '@models';
+import { SortService, PreviousRouteService } from '@services';
+
 import { AppList } from 'src/app/app.list';
+import { SystemLoadUserLevelAction, IShareSystemState } from 'src/app/business-modules/share-system/store';
+import { IFormAddOffice, OfficeFormAddComponent } from '../components/form-add-office/form-add-office.component';
+
+
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-office-details',
