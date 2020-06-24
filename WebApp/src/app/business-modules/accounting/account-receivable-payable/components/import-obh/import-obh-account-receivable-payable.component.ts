@@ -35,6 +35,7 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
 
     ngOnInit(): void {
         this.data = [];
+
         this.headers = [
             { title: 'Soa No', field: 'soaNo', sortable: true },
             { title: 'Partner Id', field: 'partnerId', sortable: true },
@@ -43,6 +44,19 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
             { title: 'Paid Date', field: 'paidDate', sortable: true },
             { title: 'Payment Type', field: 'paymentType', sortable: true }
         ];
+    }
+
+    hideInvalid() {
+        if (this.data == null) { return; }
+        this.isShowInvalid = !this.isShowInvalid;
+        if (this.isShowInvalid) {
+            this.pager.totalItems = this.data.length;
+            this.pagingData(this.data);
+        } else {
+            this.inValidItems = this.data.filter(x => !x.isValid);
+            this.pagingData(this.inValidItems);
+            this.pager.totalItems = this.inValidItems.length;
+        }
     }
 
     pagingData(data: any[]) {
