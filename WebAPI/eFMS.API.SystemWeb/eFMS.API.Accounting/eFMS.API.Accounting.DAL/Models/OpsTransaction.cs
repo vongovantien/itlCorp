@@ -38,7 +38,7 @@ namespace eFMS.API.Accounting.Service.Models
         public short? PackageTypeId { get; set; }
         public string CurrentStatus { get; set; }
         public short? CommodityGroupId { get; set; }
-        public string LockedLog { get; set; }
+        //public string LockedLog { get; set; }
         public bool? IsLocked { get; set; }
         public short? GroupId { get; set; }
         public int? DepartmentId { get; set; }
