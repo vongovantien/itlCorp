@@ -48,6 +48,8 @@ export class UnlockRequestListJobComponent extends AppList implements OnInit {
         console.log(jobs);
         if (!this.detectDuplicateCharge([...this.dataJobs, ...jobs])) {
             this.dataJobs = [...this.dataJobs, ...jobs];
+            this.inputSearchSettlementAdvancePopup.hide();
+            this.inputSearchJobPopup.hide();
         } else {
             this._toastService.warning("Job/Advance/Settlement has existed in list");
             return;

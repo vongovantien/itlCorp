@@ -10,6 +10,7 @@ using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -110,5 +111,31 @@ namespace eFMS.API.Setting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
+
+        [HttpGet("GetById")]
+        public IActionResult GetDetailById(Guid id)
+        {            
+            var detail = unlockRequestService.GetDetailUnlockRequest(id);
+            if (detail == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value });
+            }
+            return Ok(detail);
+        }
+
+        [HttpPost("CheckExistVoucherInvoiceOfSettlementAdvance")]
+        public IActionResult CheckExistVoucherInvoiceOfSettlementAdvance(UnlockJobCriteria criteria)
+        {
+            if (criteria.UnlockTypeNum == UnlockTypeEnum.ADVANCE)
+            {
+                return Ok(unlockRequestService.CheckExistVoucherNoOfAdvance(criteria));
+            }
+            else if (criteria.UnlockTypeNum == UnlockTypeEnum.SETTLEMENT)
+            {
+                return Ok(unlockRequestService.CheckExistInvoiceNoOfSettlement(criteria));
+            }
+            return Ok(new HandleState());
+        }
+        
     }
 }

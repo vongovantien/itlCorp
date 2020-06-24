@@ -88,5 +88,30 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    getDetailUnlockRequest(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GetById`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkExistVoucherInvoiceOfSettlementAdvance(criteria: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/CheckExistVoucherInvoiceOfSettlementAdvance`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getInfoApproveUnlockRequest(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/GetInfoApproveUnlockRequest`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHistoryDenied(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/GetHistoryDenied`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 

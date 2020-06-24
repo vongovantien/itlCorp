@@ -31,6 +31,9 @@ export class SetUnlockRequest {
 }
 export class SetUnlockRequestModel extends SetUnlockRequest {
     jobs: SetUnlockRequestJobModel[] = new Array<SetUnlockRequestJobModel>();
+    requesterName: string = null;
+    userNameCreated: string = null;
+    userNameModified: string = null;
     constructor(object?: any) {
         super();
         const self = this;
@@ -84,6 +87,72 @@ export class UnlockRequestResult extends SetUnlockRequest {
     requesterName: string = null;
     constructor(object?: any) {
         super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class SetUnlockRequestApprove {
+    id: string = SystemConstants.EMPTY_GUID;
+    unlockRequestId: string = SystemConstants.EMPTY_GUID;
+    leader: string = null;
+    leaderApr: string = null;
+    leaderAprDate: string = null;
+    manager: string = null;
+    managerApr: string = null;
+    managerAprDate: string = null;
+    accountant: string = null;
+    accountantApr: string = null;
+    accountantAprDate: string = null;
+    buhead: string = null;
+    BuheadApr: string = null;
+    BuheadAprDate: string = null;
+    userCreated: string = null;
+    datetimeCreated: string = null;
+    userModified: string = null;
+    datetimeModified: string = null;
+    comment: string = null;
+    isDeny: boolean = false;
+    levelApprove: string = null;
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class SetUnlockRequestApproveModel extends SetUnlockRequestApprove {
+    leaderName: string = null;
+    managerName: string = null;
+    accountantName: string = null;
+    buHeadName: string = null;
+    isApproved: boolean = false;
+    statusApproval: string = null;
+    NumOfDeny: Number = 0;
+    constructor(object?: any) {
+        super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class DeniedUnlockRequestResult {
+    no: string = null;
+    nameAndTimeDeny: string = null;
+    levelApprove: string = null;
+    comment: string = null;
+    constructor(object?: any) {
         const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {

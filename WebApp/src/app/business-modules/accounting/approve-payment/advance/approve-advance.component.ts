@@ -67,9 +67,6 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                     if (!!res) {
                         this.advancePayment = new AdvancePayment(res);
 
-                        this.formCreateComponent.formCreate.disable();
-                        this.formCreateComponent.isDisabled = true;
-
                         // * wait to currecy list api
                         this.formCreateComponent.formCreate.setValue({
                             advanceNo: this.advancePayment.advanceNo,
@@ -81,6 +78,9 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                             note: this.advancePayment.advanceNote,
                             currency: this.advancePayment.advanceCurrency
                         });
+
+                        this.formCreateComponent.formCreate.disable();
+                        this.formCreateComponent.isDisabled = true;
 
                         this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                         this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);

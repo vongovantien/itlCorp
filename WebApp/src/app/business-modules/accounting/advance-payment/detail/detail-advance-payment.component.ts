@@ -86,7 +86,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                             break;
                     }
                     // * wait to currecy list api
-                    this.formCreateComponent.formCreate.setValue({
+                    this.formCreateComponent.formCreate.patchValue({
                         advanceNo: this.advancePayment.advanceNo,
                         requester: this.advancePayment.requester,
                         requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
