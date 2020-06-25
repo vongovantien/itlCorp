@@ -19,6 +19,8 @@ import _cloneDeep from 'lodash/cloneDeep';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
 import { timeoutD } from '@decorators';
+import { DocumentationRepo } from '@repositories';
+import { ReportPreviewComponent } from '@common';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -34,6 +36,7 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementFormCopyPopupComponent, { static: false }) copyChargePopup: SettlementFormCopyPopupComponent;
     @ViewChild(SettlementTableListChargePopupComponent, { static: true }) tableListChargePopup: SettlementTableListChargePopupComponent;
     @ViewChild(SettlementChargeFromShipmentPopupComponent, { static: false }) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
@@ -59,6 +62,7 @@ export class SettlementListChargeComponent extends AppList {
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _documenRepo: DocumentationRepo,
     ) {
         super();
     }
@@ -362,6 +366,74 @@ export class SettlementListChargeComponent extends AppList {
         this.surcharges.length = 0;
         this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment];
         console.log(this.surcharges);
+
+    }
+
+    previewPLsheet(data: any, currency: string) {
+        if (data.type === 'DOC') {
+            this._documenRepo.previewSIFPLsheet(data.shipmentId, data.hblId, currency)
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    },
+                );
+        }
+        if (data.type === "OPS") {
+            this._documenRepo.previewPL(data.shipmentId, currency)
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    },
+                );
+        }
+
+        if (data.typeService === "OPS") {
+            this._documenRepo.previewPL(data.shipmentId, currency)
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    },
+                );
+        } else {
+            this._documenRepo.previewSIFPLsheet(data.shipmentId, data.hblid, currency)
+                .subscribe(
+                    (res: any) => {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    },
+                );
+        }
 
     }
 }

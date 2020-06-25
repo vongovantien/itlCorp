@@ -1,5 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+import { DocumentationRepo } from '@repositories';
+import { ReportPreviewComponent } from '@common';
 
 @Component({
     selector: 'shipment-item',
@@ -7,14 +9,21 @@ import { AppList } from 'src/app/app.list';
 })
 
 export class SettlementShipmentItemComponent extends AppList {
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onPrintPlVND: EventEmitter<any> = new EventEmitter<any>();
+
     @Input() data: any = null;
+
     headers: CommonInterface.IHeaderTable[];
 
     initCheckbox: boolean = false;
+
     constructor(
+        private _documenRepo: DocumentationRepo
     ) {
         super();
     }
@@ -39,7 +48,7 @@ export class SettlementShipmentItemComponent extends AppList {
     }
 
     showPaymentManagement($event: Event, data: any): any {
-        this.onClick.emit({event: $event, data: data});
+        this.onClick.emit({ event: $event, data: data });
     }
 
     checkUncheckAllRequest($event: Event) {
@@ -55,6 +64,16 @@ export class SettlementShipmentItemComponent extends AppList {
 
         return false;
 
+    }
+
+    previewPLsheet($event, currency: string) {
+        $event.stopPropagation();
+        $event.preventDefault();
+        if (currency === 'VND') {
+            this.onPrintPlVND.emit(this.data);
+            return;
+        }
+        this.onPrintPlUSD.emit(this.data);
     }
 
 }

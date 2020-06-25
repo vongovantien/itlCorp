@@ -44,5 +44,8 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string PaySoano { get; set; }
         public string TypeOfFee { get; set; }
         public string AdvanceNo { get; set; }
+        public string TypeService { get; set; } // OPS | DOC
+        public Guid ShipmentId { get; set; }
+
     }
 }
