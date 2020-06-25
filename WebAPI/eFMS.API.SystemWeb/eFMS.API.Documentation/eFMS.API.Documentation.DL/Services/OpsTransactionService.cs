@@ -933,7 +933,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
                 if (customer == null) notFoundPartnerTaxCodeMessages += item.PartnerTaxCode + ", ";
                 string dupMessage = CheckExist(item, item.Id);
-                if(dupMessage.Length > 0)
+                if(dupMessage != null)
                 {
                     duplicateMessages += dupMessage + ", ";
                 }
