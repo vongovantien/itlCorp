@@ -658,7 +658,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("UpdatePaymentVoucher")]
         public IActionResult UpdatePaymentVoucher(AcctAdvancePaymentModel model)
         {
-            var updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(model);
+            HandleState updatePayment = acctAdvancePaymentService.UpdatePaymentVoucher(model);
             ResultHandle result;
             if (!updatePayment.Success)
             {
@@ -667,7 +667,8 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
-                result = new ResultHandle { Status = updatePayment.Success };
+                string message = HandleError.GetMessage(updatePayment, Crud.Update);
+                result = new ResultHandle { Status = updatePayment.Success, Message = stringLocalizer[message].Value };
                 return Ok(result);
             }
         }

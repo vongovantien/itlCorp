@@ -99,14 +99,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charges = chargeRepository.Get();
                 var units = unitRepository.Get();
-                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code })
+                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code, ChargeName = y.ChargeNameEn })
                     .Join(units, x => x.ArrivalFrieghtCharge.UnitId, y => y.Id, (x, y) => new { CsArrivalFrieghtCharge = x, UnitName = y.Code });
                 foreach (var item in tempdata)
                 {
                     var charge = item.CsArrivalFrieghtCharge.ArrivalFrieghtCharge;
                     charge.CurrencyName = charge.CurrencyId;
-                    charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeCode;
+                    charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeName;
                     charge.UnitName = item.UnitName;
+                    charge.ChargeCode = item.CsArrivalFrieghtCharge.ChargeCode;
                     result.Add(charge);
                 }
             }

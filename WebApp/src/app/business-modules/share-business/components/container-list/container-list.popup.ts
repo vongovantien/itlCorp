@@ -125,7 +125,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.selectedIndexContainer = index;
 
         if (container.id === SystemConstants.EMPTY_GUID) {
-            this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+            // this._store.dispatch(new fromStore.DeleteContainerAction(index)); // * DISPATCH DELETE ACTION
+            this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
+
         } else {
             this.confirmDeleteContainerPopup.show();
         }
@@ -138,7 +140,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.confirmDeleteContainerPopup.hide();
         if (this.selectedIndexContainer > -1) {
             this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
-            this._store.dispatch(new fromStore.DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
+            // this._store.dispatch(new fromStore.DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
         }
     }
 
