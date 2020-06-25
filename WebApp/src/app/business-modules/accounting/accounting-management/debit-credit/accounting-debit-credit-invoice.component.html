@@ -12,17 +12,22 @@
                             <div class="m-form m--margin-bottom-10">
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <div class="dropdown m-dropdown m-dropdown--inline">
-                                            <button type="button" class="btn btn-success dropdown-toggle"
-                                                data-toggle="dropdown">
-                                                <i class="la la-download"></i>Issue<span class="caret"></span>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item pointer" (click)="issueVatInvoice()">VAT
-                                                    Invoice</a>
-                                                <a class="dropdown-item pointer" (click)="issueVoucher()">Voucher</a>
+                                        <ng-container
+                                            *ngIf="(menuSpecialPermission | async | specialPermission:'Voucher') || (menuSpecialPermission | async | specialPermission:'Invoice')">
+                                            <div class="dropdown m-dropdown m-dropdown--inline">
+                                                <button type="button" class="btn btn-success dropdown-toggle"
+                                                    data-toggle="dropdown">
+                                                    <i class="la la-download"></i>Issue<span class="caret"></span>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item pointer" (click)="issueVatInvoice()"
+                                                        *ngIf="menuSpecialPermission | async | specialPermission:'Invoice'">VAT
+                                                        Invoice</a>
+                                                    <a class="dropdown-item pointer" (click)="issueVoucher()"
+                                                        *ngIf="menuSpecialPermission | async | specialPermission:'Voucher'">Voucher</a>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ng-container>
                                     </div>
                                 </div>
                             </div>

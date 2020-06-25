@@ -135,7 +135,11 @@ export class SetUnlockRequestApproveModel extends SetUnlockRequestApprove {
     buHeadName: string = null;
     isApproved: boolean = false;
     statusApproval: string = null;
-    NumOfDeny: Number = 0;
+    numOfDeny: Number = 0;
+    isShowLeader: boolean = false;
+    isShowManager: boolean = false;
+    isShowAccountant: boolean = false;
+    isShowBuHead: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

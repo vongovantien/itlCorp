@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { AppForm } from "src/app/app.form";
 import { UnlockRequestInfoDeniedCommentPopupComponent } from "../popup/info-denied-comment/info-denied-comment.popup";
+import { SettingRepo } from "@repositories";
+import { catchError, finalize } from "rxjs/operators";
+import { SetUnlockRequestApproveModel } from "@models";
 
 @Component({
     selector: 'process-approve-unlock-request',
@@ -10,7 +13,10 @@ import { UnlockRequestInfoDeniedCommentPopupComponent } from "../popup/info-deni
 
 export class UnlockRequestProcessApproveComponent extends AppForm implements OnInit {
     @ViewChild(UnlockRequestInfoDeniedCommentPopupComponent, { static: false }) infoDeniedPopup: UnlockRequestInfoDeniedCommentPopupComponent;
+    idUnlockRequest: string = '';
+    processApprove: SetUnlockRequestApproveModel;
     constructor(
+        private _settingRepo: SettingRepo,
     ) {
         super();
     }
@@ -19,8 +25,23 @@ export class UnlockRequestProcessApproveComponent extends AppForm implements OnI
     }
 
     showInfoDenied() {
-        this.infoDeniedPopup.getDeniedComment("45514284-3D9A-4947-B289-3840FA79529C");
+        this.infoDeniedPopup.getDeniedComment(this.idUnlockRequest);
         this.infoDeniedPopup.show();
+    }
 
+    getInfoProcessApprove(id: string) {
+        this.idUnlockRequest = id;
+        this._settingRepo.getInfoApproveUnlockRequest(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    // this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.processApprove = res;
+                },
+            );
     }
 }

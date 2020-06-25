@@ -112,7 +112,7 @@ export class PaymentImportComponent extends AppPage implements OnInit {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "downloadInvoicePaymentFile.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "InvoicePaymentImportFile.xlsx");
                 },
             );
     }

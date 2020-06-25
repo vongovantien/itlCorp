@@ -29,15 +29,16 @@
                                 </th>
                             </thead>
                             <tbody>
-                                <ng-container *ngIf="!!refPaymens.length">
+                                <ng-container *ngIf="!!refPaymens">
                                     <ng-container *ngFor="let item of refPaymens; let i = index; trackBy: trackByFn">
                                         <tr class="collapse-toggle-row">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 100px">
                                                     <button type="button"
                                                         class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
-                                                        data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
-                                                        title="Collapse" (click)="getPayments(item.refId)">
+                                                        data-toggle="collapse"
+                                                        [attr.data-target]="'#id-00' + (item.refId)" title="Collapse"
+                                                        (click)="getPayments(item.refId)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
                                                 </div>
@@ -73,7 +74,7 @@
                                         </tr>
                                         <tr class="collapse-panel-row">
                                             <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="id-00{{(i+1)}}"
+                                                <div class="detail-panel-block collapse" id="id-00{{(item.refId)}}"
                                                     data-parent="#payment-table">
                                                     <div class="table-inside-block">
                                                         <perfect-scrollbar style="max-height: 180px">
@@ -136,3 +137,12 @@
 </div>
 
 <update-extend-day-popup (onUpdateExtendDate)="handleUpdateExtendDate($event)"></update-extend-day-popup>
+<!-- <update-extend-day-popup></update-extend-day-popup> -->
+
+
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePayment()">
+</confirm-popup>
+
+<info-popup [body]="'You can only delete the last payment. Please check again!'" [title]="'Notification'"
+    [label]="'Ok'">
+</info-popup>

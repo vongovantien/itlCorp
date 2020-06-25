@@ -141,7 +141,7 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         this.confirmDeleteContainerPopup.hide();
         if (this.selectedIndexContainer > -1) {
             this.initContainers = [...this.initContainers.slice(0, this.selectedIndexContainer), ...this.initContainers.slice(this.selectedIndexContainer + 1)];
-            this._store.dispatch(new DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
+            // this._store.dispatch(new DeleteContainerAction(this.selectedIndexContainer)); // * DISPATCH DELETE ACTION
         }
     }
 

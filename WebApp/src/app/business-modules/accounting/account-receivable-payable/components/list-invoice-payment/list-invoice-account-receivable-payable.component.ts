@@ -11,6 +11,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
@@ -18,21 +19,26 @@ import { NgProgress } from '@ngx-progressbar/core';
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
     @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
+
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
+
 
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
 
+    selectedPayment: PaymentModel;
 
     constructor(
-        private _progressService: NgProgress,
-        private _toastService: ToastrService,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
-        private _sortService: SortService) {
+        private _sortService: SortService,
+        private _toastService: ToastrService,
+        private _progressService: NgProgress) {
         super();
-        // this.requestList = this.requestSearchShipment;
+        this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
         this._progressRef = this._progressService.ref();
     }
@@ -70,7 +76,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
 
     }
     import() {
-        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"], { queryParams: { type: 'Invoice' } });
+        this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
     }
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)
@@ -78,7 +84,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                 catchError(this.catchError)
             ).subscribe(
                 (res: []) => {
-                    this.payments = res;
+                    this.payments = res || [];
                     console.log(this.payments);
                 },
             );
@@ -89,7 +95,15 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
-    showConfirmDelete(item) { }
+
+    showConfirmDelete(item, index) {
+        if (index !== this.payments.length - 1) {
+            this.infoNotAllowDelete.show();
+        } else {
+            this.selectedPayment = item;
+            this.confirmDeletePopup.show();
+        }
+    }
 
     showExtendDateModel(refId: string) {
         //console.log(refId);
@@ -107,6 +121,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             })
 
     }
+
     handleUpdateExtendDate($event: any) {
         console.log("result: ", $event);
         this._progressRef.start();
@@ -130,5 +145,25 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                     this._toastService.error(res.message);
                 }
             });
+    }
+
+    onDeletePayment() {
+        this.isLoading = true;
+        this._accountingRepo.deletePayment(this.selectedPayment.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.confirmDeletePopup.hide();
+                }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getPayments(this.selectedPayment.refId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 }

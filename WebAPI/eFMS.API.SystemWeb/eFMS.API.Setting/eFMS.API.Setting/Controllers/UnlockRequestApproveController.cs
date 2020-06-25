@@ -46,7 +46,7 @@ namespace eFMS.API.Setting.Controllers
 
         [HttpGet]
         [Route("GetInfoApproveUnlockRequest")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetInfoApproveUnlockRequest(Guid id)
         {
             var data = unlockRequestApproveService.GetInfoApproveUnlockRequest(id);

@@ -36,6 +36,11 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.requestSearchShipment();
     }
     onSearchPayment(event) {
+        if (this.selectedTab === "INVOICE") {
+            this.dataSearch.paymentType = 0;
+        } else {
+            this.dataSearch.paymentType = 1;
+        }
         this.dataSearch = event;
         this.requestSearchShipment();
     }
@@ -51,9 +56,9 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
                     if (this.selectedTab === "INVOICE") {
-                        this.invoiceListComponent.refPaymens = res.data;
+                        this.invoiceListComponent.refPaymens = res.data || [];
                     } else {
-                        this.obhSOAListComponent.refPaymens = res.data;
+                        this.obhSOAListComponent.refPaymens = res.data || [];
                         console.log(this.obhSOAListComponent.refPaymens);
                     }
                 },
