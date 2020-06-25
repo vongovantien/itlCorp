@@ -138,3 +138,10 @@
         </div>
     </div>
 </div>
+
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePayment()">
+</confirm-popup>
+
+<info-popup [body]="'You can only delete the last payment. Please check again!'" [title]="'Notification'"
+    [label]="'Ok'">
+</info-popup>

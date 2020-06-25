@@ -5,6 +5,8 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.AccountingPayment;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -217,6 +219,10 @@ namespace eFMS.API.Accounting.DL.Services
         // get charges that have type OBH and SOANo
         private IQueryable<AccountingPaymentModel> QueryOBHPayment(PaymentCriteria criteria)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AcctSoa, bool>> perQuery = GetQueryOBHPermission(rangeSearch, _user);
             Expression<Func<AcctSoa, bool>> query = x => (x.Customer == criteria.PartnerId || criteria.PartnerId == null)
                                                       && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null);
             //&& (criteria.PaymentStatus.Contains(x.PaymentStatus) || string.IsNullOrEmpty(x.PaymentStatus) || criteria.PaymentStatus == null);
@@ -236,6 +242,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.FromUpdatedDate != null)
             {
                 query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            }
+
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
             }
             var data = soaRepository.Get(query);
             if (data == null) return null;
@@ -273,15 +284,49 @@ namespace eFMS.API.Accounting.DL.Services
                 IssuedDate = x.soa.DatetimeCreated,
                 DueDate = x.soa.PaymentDueDate,
                 OverdueDays = (DateTime.Today > x.soa.PaymentDueDate.Value.Date) ? (DateTime.Today - x.soa.PaymentDueDate.Value.Date).Days : 0,
-                Status = x.soa.PaymentStatus,
+                Status = x.soa.PaymentStatus?? "Unpaid",
                 ExtendDays = x.soa.PaymentExtendDays,
                 ExtendNote = x.soa.PaymentNote
             });
             return results;
         }
 
+        private Expression<Func<AcctSoa, bool>> GetQueryOBHPermission(PermissionRange rangeSearch, ICurrentUser user)
+        {
+            Expression<Func<AcctSoa, bool>> perQuery = null;
+            switch (rangeSearch)
+            {
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    perQuery = x => x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Group:
+                    perQuery = x => (x.GroupId == user.GroupId && x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Department:
+                    perQuery = x => (x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Office:
+                    perQuery = x => (x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+                case PermissionRange.Company:
+                    perQuery = x => x.CompanyId == user.CompanyID
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+            }
+            return perQuery;
+        }
+
         private IQueryable<AccountingPaymentModel> QueryInvoicePayment(PaymentCriteria criteria)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AccAccountingManagement, bool>> perQuery = GetQueryInvoicePermission(rangeSearch, _user);
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && x.Status != "New"
                                                                       && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                                                       && (criteria.ReferenceNos.Contains(x.InvoiceNoReal) || criteria.ReferenceNos == null);
@@ -301,7 +346,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
             }
-
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
             var data = accountingManaRepository.Get(query);
             if (data == null) return null;
             var results = data.OrderByDescending(x => x.PaymentDatetimeUpdated).Select(x => new AccountingPaymentModel {
@@ -314,7 +362,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Serie = x.Serie,
                 DueDate = x.PaymentDueDate,
                 OverdueDays = (DateTime.Today > x.PaymentDueDate.Value.Date)? (DateTime.Today - x.PaymentDueDate.Value.Date).Days: 0,
-                Status = x.PaymentStatus,
+                Status = x.PaymentStatus ?? "Unpaid",
                 ExtendDays = x.PaymentExtendDays,
                 ExtendNote = x.PaymentNote
             });
@@ -335,6 +383,36 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
             }
             return results;
+        }
+
+        private Expression<Func<AccAccountingManagement, bool>> GetQueryInvoicePermission(PermissionRange rangeSearch, ICurrentUser user)
+        {
+            Expression<Func<AccAccountingManagement, bool>> perQuery = null;
+            switch (rangeSearch)
+            {
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    perQuery = x => x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Group:
+                    perQuery = x => (x.GroupId == user.GroupId && x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Department:
+                    perQuery = x => (x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Office:
+                    perQuery = x => (x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+                case PermissionRange.Company:
+                    perQuery = x => x.CompanyId == user.CompanyID
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+            }
+            return perQuery;
         }
 
         public HandleState UpdateExtendDate(ExtendDateUpdatedModel model)
@@ -382,38 +460,87 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState Delete(Guid id)
         {
+            HandleState result = new HandleState();
             var item = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var hs = DataContext.Delete(x => x.Id == id, false);
-            if (hs.Success)
+            AccAccountingManagement vatInvoice = null;
+            AcctSoa soa = null;
+            if (item.Type == "INVOICE")
             {
-                if(item.Type == "INVOICE")
-                {
-                    var s = UpdateVATPaymentStatus(item);
-                }
-                else
-                {
-                    var s = UpdateSOAPaymentStatus(item);
-                }
+                vatInvoice = UpdateVATPaymentStatus(item);
             }
-            return hs;
+            else
+            {
+                soa = UpdateSOAPaymentStatus(item);
+            }
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    result = DataContext.Delete(x => x.Id == id);
+                    if (result.Success)
+                    {
+                        if(vatInvoice != null)
+                        {
+                            var hsVAT = accountingManaRepository.Update(vatInvoice, x => x.Id == vatInvoice.Id);
+                        }
+                        else if(soa != null)
+                        {
+                            var hsSOA = soaRepository.Update(soa, x => x.Id == soa.Id);
+                        }
+                        DataContext.SubmitChanges();
+                        accountingManaRepository.SubmitChanges();
+                        soaRepository.SubmitChanges();
+                        trans.Commit();
+                        return result;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    result = new HandleState(ex.Message);
+                }
+                finally{
+                    trans.Dispose();
+                }
+                return result;
+            }
         }
 
-        private HandleState UpdateVATPaymentStatus(AccAccountingPayment item)
+        private AccAccountingManagement UpdateVATPaymentStatus(AccAccountingPayment item)
         {
             var invoice = accountingManaRepository.Get(x => x.Id == new Guid(item.RefId)).FirstOrDefault();
-            var remainPayments = DataContext.Get(x => x.RefId == item.RefId && x.Id != item.Id).Sum(x => x.PaymentAmount);
-            return null;
+            var totalPaid = DataContext.Get(x => x.RefId == item.RefId && x.Id != item.Id).Sum(x => x.PaymentAmount);
+            if(totalPaid == 0)
+            {
+                invoice.PaymentStatus = "Unpaid";
+            }
+            else
+            {
+                invoice.PaymentStatus = "Paid A Part";
+            }
+            return invoice;
         }
 
-        private HandleState UpdateSOAPaymentStatus(AccAccountingPayment item)
+        private AcctSoa UpdateSOAPaymentStatus(AccAccountingPayment item)
         {
-            throw new NotImplementedException();
+            var soa = soaRepository.Get(x => x.Id == Convert.ToInt32(item.RefId)).FirstOrDefault();
+            var totalPaid = DataContext.Get(x => x.RefId == item.RefId && x.Id != item.Id).Sum(x => x.PaymentAmount);
+            if (totalPaid == 0)
+            {
+                soa.PaymentStatus = "Unpaid";
+            }
+            else
+            {
+                soa.PaymentStatus = "Paid A Part";
+            }
+            return soa;
+
         }
 
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
-            var partners = partnerRepository.Get().ToList();
-            var invoices = accountingManaRepository.Get().ToList();
+            var partners = partnerRepository.Get();
+            var invoices = accountingManaRepository.Get();
             list.ForEach(item =>
             {
                 var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
@@ -566,7 +693,7 @@ namespace eFMS.API.Accounting.DL.Services
             };
         }
 
-        public HandleState ImportOBHPayment(List<AccountingPaymentImportModel> list)
+        public HandleState ImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> list)
         {
             List<AccAccountingPayment> results = new List<AccAccountingPayment>();
             List<AcctSoa> soas = new List<AcctSoa>();
@@ -597,7 +724,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             Id = Guid.NewGuid(),
                             RefId = item.RefId,
-                            PaymentNo = item.SOANo + "_" + string.Format("{0:00}", paymentNo),
+                            PaymentNo = item.SoaNo + "_" + string.Format("{0:00}", paymentNo),
                             PaymentAmount = item.PaymentAmount,
                             Balance = balance,
                             CurrencyId = refSOA.Currency,
@@ -653,6 +780,52 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> list)
+        {
+            var partners = partnerRepository.Get();
+            var soas = soaRepository.Get();
+            list.ForEach(item =>
+            {
+                var partner = partners.Where(x => x.AccountNo == item.PartnerId)?.FirstOrDefault();
+                if (partner == null)
+                {
+                    item.PartnerAccountError = "'" + item.PartnerId + "' Not found";
+                    item.IsValid = false;
+                }
+                else
+                {
+                    var soa = soas.FirstOrDefault(x => x.Soano == item.SoaNo && x.Customer == partner.Id);
+                    if (soa == null)
+                    {
+                        item.SoaNoError = "Not found SOA No '" + item.SoaNo + "' of '" + item.PartnerId + "'";
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        if (soa.PaymentStatus == "Paid")
+                        {
+                            item.SoaNoError = "This SOA has been paid";
+                            item.IsValid = false;
+                        }
+                        else
+                        {
+                            item.PartnerId = partner.Id;
+                            item.RefId = soa.Id.ToString();
+                            var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
+                            if (lastItem != null)
+                            {
+                                if (item.PaidDate < lastItem.PaidDate)
+                                {
+                                    item.PaidDateError = item.PaidDate + " invalid";
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            return list;
         }
     }
 }
