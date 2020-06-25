@@ -64,6 +64,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [Authorize]
         public IActionResult PagingPayment(PaymentCriteria criteria, int pageNumber, int pageSize)
         {
             var data = accountingPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -86,19 +87,33 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("DownloadInvoicePaymentExcel")]
-        public async Task<ActionResult> DownloadExcel()
+        public async Task<ActionResult> DownloadInvoicePaymentExcel()
         {
-            string fileName = Templates.AccountingPayment.ExelImportFileName + Templates.ExelImportEx;
+            string fileName = Templates.AccountingPayment.ExelInvoicePaymentImportFileName + Templates.ExelImportEx;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
             {
                 return result;
             }
-            else
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadOBHPaymentExcel")]
+        public async Task<ActionResult> DownloadOBHPaymentExcel()
+        {
+            string fileName = Templates.AccountingPayment.ExelOBHPaymentImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+                return result;
             }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
         /// <summary>
         /// read commodities data from file excel
@@ -253,7 +268,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("ImportSOAOBHPayment")]
-        public IActionResult ImportSOAOBHPayment([FromBody]List<AccountingPaymentImportModel> list)
+        public IActionResult ImportSOAOBHPayment([FromBody]List<AccountingPaymentOBHImportTemplateModel> list)
         {
             var hs = accountingPaymentService.ImportOBHPayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
@@ -334,64 +349,82 @@ namespace eFMS.API.Accounting.Controllers
             var result = accountingPaymentService.GetOBHSOAExtendedDate(id);
             return Ok(result);
         }
-        [HttpPost("UploadExcelFile")]
-        public IActionResult UploadExcelFile(IFormFile file)
+
+        /// <summary>
+        /// upload OBH payment template
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost("UploadOBHPaymentFile")]
+        public IActionResult UploadOBHPaymentFile(IFormFile file)
         {
             //read data
-           
-            var dataList = new List<AccountingPaymentOBHImportTemplateModel>();
+            List<AccountingPaymentOBHImportTemplateModel> dataList = null;
             int totalRows = 0;
             using (ExcelPackage package = new ExcelPackage(file.OpenReadStream()))
             {
                 ExcelWorksheet workSheet = package.Workbook.Worksheets[1];
                 totalRows = workSheet.Dimension.Rows;
-                
-                for (int i = 2; i <= totalRows; i++)
-                {
-                    var data = new AccountingPaymentOBHImportTemplateModel();
-                    // gán true trước sau đó lỗi gán lại false
-                    data.isValid = true;
-                    //
-                    if (
-                        (workSheet.Cells[i, 1].Value == null || workSheet.Cells[i, 1].Value.ToString().Trim() == "") ||
-                        (workSheet.Cells[i, 2].Value == null || workSheet.Cells[i, 2].Value.ToString().Trim() == "") ||
-                        (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" || !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
-                        (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "" || !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDateCheck)) ||
-                        (workSheet.Cells[i, 6].Value == null || workSheet.Cells[i, 6].Value.ToString().Trim() == ""))
-                    {
-                        data.isValid = false;
-                    }
-                    data.SoaNo = workSheet.Cells[i, 1].Value == null ||                 // NULL
-                        workSheet.Cells[i, 1].Value.ToString().Trim() == "" ?           // White space
-                        null : workSheet.Cells[i, 1].Value.ToString();
-
-                    data.PartnerId = workSheet.Cells[i, 2].Value == null || 
-                        workSheet.Cells[i, 2].Value.ToString().Trim() == "" ?
-                        null : workSheet.Cells[i, 2].Value.ToString().Trim();
-
-                    data.PartnerName = workSheet.Cells[i, 3].Value == null ||
-                        workSheet.Cells[i, 3].Value.ToString().Trim() == "" ?
-                        null : workSheet.Cells[i, 3].Value.ToString().Trim();
-
-                    data.PaymentAmount = workSheet.Cells[i, 4].Value == null ||
-                        workSheet.Cells[i, 4].Value.ToString().Trim() == "" ||
-                        !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultInt) ? // Type field invalid
-                        (int?)null : int.Parse(workSheet.Cells[i, 4].Value.ToString().Trim());
-
-                    data.PaidDate = workSheet.Cells[i, 5].Value == null ||
-                        workSheet.Cells[i, 5].Value.ToString().Trim() == "" || 
-                        !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
-                        (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 5].Value.ToString().Trim());
-
-                    data.PaymentType = workSheet.Cells[i, 6].Value == null ||
-                        workSheet.Cells[i, 6].Value.ToString().Trim() == "" ?
-                        null : workSheet.Cells[i, 6].Value.ToString().Trim();
-
-                    dataList.Add(data);
-                }
+                dataList = ReadOBHPaymentFile(workSheet, totalRows);
             }
-            int validCount = dataList.Where(cdn => cdn.isValid).Count();
+            var data = accountingPaymentService.CheckValidImportOBHPayment(dataList);
+            int totalValidRows = 0;
+            if (data != null)
+            {
+                totalValidRows = data.Count(x => x.IsValid == true);
+            }
+            var results = new { data, totalValidRows };
+            int validCount = dataList.Count(cdn => cdn.IsValid);
             return Ok(new { totalValidRows = validCount, data = dataList});
+        }
+
+        private List<AccountingPaymentOBHImportTemplateModel> ReadOBHPaymentFile(ExcelWorksheet workSheet, int totalRows)
+        {
+            var dataList = new List<AccountingPaymentOBHImportTemplateModel>();
+            for (int i = 2; i <= totalRows; i++)
+            {
+                var data = new AccountingPaymentOBHImportTemplateModel();
+                // gán true trước sau đó lỗi gán lại false
+                data.IsValid = true;
+                //
+                if (
+                    (workSheet.Cells[i, 1].Value == null || workSheet.Cells[i, 1].Value.ToString().Trim() == "") ||
+                    (workSheet.Cells[i, 2].Value == null || workSheet.Cells[i, 2].Value.ToString().Trim() == "") ||
+                    (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" || !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
+                    (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "" || !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDateCheck)) ||
+                    (workSheet.Cells[i, 6].Value == null || workSheet.Cells[i, 6].Value.ToString().Trim() == ""))
+                {
+                    data.IsValid = false;
+                }
+                data.SoaNo = workSheet.Cells[i, 1].Value == null ||                 // NULL
+                    workSheet.Cells[i, 1].Value.ToString().Trim() == "" ?           // White space
+                    null : workSheet.Cells[i, 1].Value.ToString();
+
+                data.PartnerId = workSheet.Cells[i, 2].Value == null ||
+                    workSheet.Cells[i, 2].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 2].Value.ToString().Trim();
+
+                data.PartnerName = workSheet.Cells[i, 3].Value == null ||
+                    workSheet.Cells[i, 3].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 3].Value.ToString().Trim();
+
+                data.PaymentAmount = workSheet.Cells[i, 4].Value == null ||
+                    workSheet.Cells[i, 4].Value.ToString().Trim() == "" ||
+                    !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultInt) ? // Type field invalid
+                    (int?)null : int.Parse(workSheet.Cells[i, 4].Value.ToString().Trim());
+
+                data.PaidDate = workSheet.Cells[i, 5].Value == null ||
+                    workSheet.Cells[i, 5].Value.ToString().Trim() == "" ||
+                    !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
+                    (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 5].Value.ToString().Trim());
+
+                data.PaymentType = workSheet.Cells[i, 6].Value == null ||
+                    workSheet.Cells[i, 6].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 6].Value.ToString().Trim();
+
+                dataList.Add(data);
+            }
+            return dataList;
         }
     }
 }

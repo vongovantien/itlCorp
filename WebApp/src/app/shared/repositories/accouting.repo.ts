@@ -526,20 +526,31 @@ export class AccountingRepo {
     }
 
     downloadInvoicePaymentFile() {
-        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/DownloadInvoicePaymentExcel`).pipe(
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/DownloadInvoicePaymentExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    downloadOBHPaymentFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/DownloadOBHPaymentExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
 
     importInvoicePayment(body: any) {
-        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    importOBHPayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportSOAOBHPayment`, body).pipe(
             map((data: any) => data)
         );
     }
 
     getOBHPaymentImport(body: any) {
-        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/UploadExcelFile`, body, 'file').pipe(
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/UploadOBHPaymentFile`, body, 'file').pipe(
             map((data: any) => data)
         );
     }
@@ -556,6 +567,12 @@ export class AccountingRepo {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
             map((data: any) => data)
         );
+    }
+    deletePayment(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
     }
 }
 
