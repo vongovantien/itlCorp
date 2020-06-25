@@ -78,11 +78,11 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingManagement(System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingManagement(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteria)">
             <summary>
             Export accounting management
             </summary>
-            <param name="typeOfAcctMngt">Invoice Or Voucher</param>
+            <param name="criteria">List Voucher or Invoices</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">

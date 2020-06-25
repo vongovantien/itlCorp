@@ -25,7 +25,7 @@ namespace eFMS.API.Accounting.DL.IService
         AccAccountingManagementModel GetById(Guid id);
         AccAccountingManagementModel GetAcctMngtById(Guid id);
         string GenerateInvoiceNoTemp();
-        List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt);
+        List<AccountingManagementExport> GetDataAcctMngtExport(AccAccountingManagementCriteria criteria);
         List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list);
         ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list);
         int CheckDetailPermission(Guid id);

@@ -106,7 +106,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
 
     exportVoucher() {
         this._progressRef.start();
-        this._exportRepo.exportAccountingManagement("Voucher")
+        this._exportRepo.exportAccountingManagement(this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
