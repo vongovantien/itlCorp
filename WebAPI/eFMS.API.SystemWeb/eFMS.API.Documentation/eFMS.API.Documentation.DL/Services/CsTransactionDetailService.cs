@@ -1399,7 +1399,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.strDesLandCC = string.Empty; //NOT USE
                 housebill.FreightPayAt = data.PlaceFreightPay?.ToUpper(); //Freight Payable at
                 housebill.ExecutedAt = data.IssueHblplace?.ToUpper(); //Place of Issue HBL
-                housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Created Date
+                housebill.ExecutedOn = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Date of Issue HBL
                 housebill.NoofOriginBL = data.OriginBlnumber != null ? API.Common.Globals.CustomData.NumberOfOriginBls.Where(x => x.Key == data.OriginBlnumber).Select(s => s.Value).FirstOrDefault() : string.Empty; //Number of Origin B/L
                 housebill.ForCarrier = string.Empty; //Để trống
                 housebill.SeaLCL = false; //NOT USE
