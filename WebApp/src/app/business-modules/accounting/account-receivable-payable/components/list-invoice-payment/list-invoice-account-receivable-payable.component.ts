@@ -106,7 +106,6 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     }
 
     showExtendDateModel(refId: string) {
-        //console.log(refId);
         this._accountingRepo.getInvoiceExtendedDate(refId)
             .pipe(
                 catchError(this.catchError)

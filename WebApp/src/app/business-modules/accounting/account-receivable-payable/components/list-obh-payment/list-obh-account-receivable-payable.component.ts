@@ -85,7 +85,6 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
     showExtendDateModel(refId: string) {
         console.log(refId);
-        //this.updateExtendDayPopup.show();
         this._accountingRepo.getOBHSOAExtendedDate(refId)
             .pipe(
                 catchError(this.catchError)
