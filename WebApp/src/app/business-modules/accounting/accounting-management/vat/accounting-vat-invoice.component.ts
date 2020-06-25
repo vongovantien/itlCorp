@@ -115,7 +115,7 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
 
     exportInvoice() {
         this._progressRef.start();
-        this._exportRepo.exportAccountingManagement("Invoice")
+        this._exportRepo.exportAccountingManagement(this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
