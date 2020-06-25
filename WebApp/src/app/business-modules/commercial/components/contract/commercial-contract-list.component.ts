@@ -86,7 +86,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
         this.indexlstContract = index;
-        if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID) {
+        if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
             this.formContractPopup.getFileContract();
             this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
                 .subscribe(

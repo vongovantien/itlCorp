@@ -54,15 +54,11 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         }
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
         modelAdd.contracts = [...this.contractList.contracts];
-        // modelAdd.contracts.forEach(element => {
-        //     const test = {
-        //         name: element.fileList[0].name, lastModified: element.fileList[0].lastmodified,
-        //         lastModifiedDate: element.fileList[0].lastModifiedDate,
-        //         size: element.fileList[0].size, type: element.fileList[0].type, webkitRelativePath: ""
-        //     };
-
-        //     element.fileList = [JSON.stringify(test)];
-        // });
+        modelAdd.contracts.forEach(element => {
+            if (!!element.fileList) {
+                element.fileList = element.fileList[0];
+            }
+        });
         this.saveCustomerCommercial(modelAdd);
     }
 
@@ -78,30 +74,31 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                         if (res.data) {
                             console.log(res.data);
                             this.contractList.contracts.forEach(element => {
-                                this.fileList.push(element.fileList);
+                                if (!!element.fileList) {
+                                    this.fileList.push(element.fileList[0]);
+                                }
                             });
-
+                            console.log(this.fileList);
+                            this.uploadFileMoreContract(res.data.idsContract, res.data.id);
                         }
                     }
                 }, err => {
+
                 });
     }
 
-    // uploadFileContract(id: string,partnerId: string) {
-    //     this._catalogueRepo.uploadFileContract(partnerId, id, this.popup.fileList)
-    //         .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-    //         .subscribe(
-    //             (res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     this.fileList = [];
-    //                     this._toastService.success("Upload file successfully!");
-    //                     if (this.isUpdate) {
-    //                         this.getFileContract();
-    //                     }
-    //                 }
-    //             }
-    //         );
-    // }
+    uploadFileMoreContract(idsContract: string[], partnerId: string) {
+        this._catalogueRepo.uploadFileMoreContract(partnerId, idsContract, this.fileList)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.fileList = [];
+                        this._toastService.success("Upload file successfully!");
+                    }
+                }
+            );
+    }
 
 }
 

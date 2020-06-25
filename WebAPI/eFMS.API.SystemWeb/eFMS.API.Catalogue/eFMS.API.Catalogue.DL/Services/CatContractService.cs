@@ -276,6 +276,18 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
+        public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
+        {
+            var result = new ResultHandle();
+            foreach(var item in model)
+            {
+                if(item.Files != null)
+                {
+                    result = await WriteFile(item);
+                }
+            }
+            return result;
+        }
 
         public async Task<ResultHandle> UploadContractFile(ContractFileUploadModel model)
         {

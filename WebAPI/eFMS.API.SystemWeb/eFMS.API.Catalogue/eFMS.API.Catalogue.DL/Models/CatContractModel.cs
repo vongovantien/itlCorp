@@ -17,6 +17,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UserModifiedName { get; set; }
         //public string FolderName { get; set; }
         //public string ChildId { get; set; }
-        //public ICollection<IFormFile> fileList { get; set; }
+        public  IFormFile FileList { get; set; }
     }
 }

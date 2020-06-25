@@ -111,21 +111,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     DataContext.Add(partner);
                     contractRepository.Add(contracts);
 
-                    //foreach (var item in entity.contracts)
-                    //{
-                    //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
-                    //    modeUploadContract.ChildId = item.Id.ToString();
-                    //    modeUploadContract.PartnerId = partner.Id;
-                    //    modeUploadContract.Files = item.fileList.ToList();
-                    //    UploadFileContract(modeUploadContract);
-                    //}
+                    foreach (var item in entity.contracts)
+                    {
+                        ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
+                        modeUploadContract.ChildId = item.Id.ToString();
+                        modeUploadContract.PartnerId = partner.Id;
+                        modeUploadContract.Files = item.FileList;
+                        UploadFileContract(modeUploadContract);
+                    }
                 }
            
                 DataContext.SubmitChanges();
                 contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
-                SendMailCreatedSuccess(partner);
+               // SendMailCreatedSuccess(partner);
             }
             return hs;
         }
@@ -180,47 +180,47 @@ namespace eFMS.API.Catalogue.DL.Services
                 "eFMS System </div>");
             SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
         }
-        //private async void UploadFileContract(ContractFileUploadModel model)
-        //{
-        //    string fileName = "";
-        //    string path = this.webUrl.Value.Url;
-        //    var list = new List<SysImage>();
-        //    /* Kiểm tra các thư mục có tồn tại */
-        //    var hs = new HandleState();
-        //    ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
-        //    List<SysImage> resultUrls = new List<SysImage>();
-        //    foreach (var file in model.Files)
-        //    {
-        //        fileName = file.FileName;
-        //        string objectId = model.PartnerId;
-        //        await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
-        //        string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
-        //        var sysImage = new SysImage
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Url = urlImage,
-        //            Name = fileName,
-        //            Folder = model.FolderName ?? "Partner",
-        //            ObjectId = model.PartnerId.ToString(),
-        //            ChildId = model.ChildId.ToString(),
-        //            UserCreated = currentUser.UserName, //admin.
-        //            UserModified = currentUser.UserName,
-        //            DateTimeCreated = DateTime.Now,
-        //            DatetimeModified = DateTime.Now
-        //        };
-        //        resultUrls.Add(sysImage);
-        //        if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
-        //        {
-        //            list.Add(sysImage);
-        //        }
-        //    }
-        //    if (list.Count > 0)
-        //    {
-        //        list.ForEach(x => x.IsTemp = model.IsTemp);
-        //        hs = await sysImageRepository.AddAsync(list);
-        //    }
+        private async void UploadFileContract(ContractFileUploadModel model)
+        {
+            string fileName = "";
+            string path = this.webUrl.Value.Url;
+            var list = new List<SysImage>();
+            /* Kiểm tra các thư mục có tồn tại */
+            var hs = new HandleState();
+            ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
+            List<SysImage> resultUrls = new List<SysImage>();
+            //foreach (var file in model.Files)
+            //{
+                fileName = model.Files.FileName;
+                string objectId = model.PartnerId;
+                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+                string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                var sysImage = new SysImage
+                {
+                    Id = Guid.NewGuid(),
+                    Url = urlImage,
+                    Name = fileName,
+                    Folder = model.FolderName ?? "Partner",
+                    ObjectId = model.PartnerId.ToString(),
+                    ChildId = model.ChildId.ToString(),
+                    UserCreated = currentUser.UserName, //admin.
+                    UserModified = currentUser.UserName,
+                    DateTimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now
+                };
+                resultUrls.Add(sysImage);
+                if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
+                {
+                    list.Add(sysImage);
+                }
+            //}
+            if (list.Count > 0)
+            {
+                list.ForEach(x => x.IsTemp = model.IsTemp);
+                hs = await sysImageRepository.AddAsync(list);
+            }
 
-        //}
+        }
         public HandleState Update(CatPartnerModel model)
         {
             var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();

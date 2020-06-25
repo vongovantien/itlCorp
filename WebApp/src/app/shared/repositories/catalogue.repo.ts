@@ -307,6 +307,14 @@ export class CatalogueRepo {
     }
 
 
+    uploadFileMoreContract(partnerId: string, contractIds: string[], body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}`, body, 'files', { contractIds: contractIds }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+
     deleteContract(id: string, partnerId: string) {
         return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/${id}/${partnerId}`).pipe(
             catchError((error) => throwError(error)),
