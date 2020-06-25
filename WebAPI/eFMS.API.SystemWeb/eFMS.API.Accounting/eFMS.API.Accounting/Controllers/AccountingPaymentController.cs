@@ -64,6 +64,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="pageSize"></param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [Authorize]
         public IActionResult PagingPayment(PaymentCriteria criteria, int pageNumber, int pageSize)
         {
             var data = accountingPaymentService.Paging(criteria, pageNumber, pageSize, out int totalItems);
@@ -267,7 +268,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("ImportSOAOBHPayment")]
-        public IActionResult ImportSOAOBHPayment([FromBody]List<AccountingPaymentImportModel> list)
+        public IActionResult ImportSOAOBHPayment([FromBody]List<AccountingPaymentOBHImportTemplateModel> list)
         {
             var hs = accountingPaymentService.ImportOBHPayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };

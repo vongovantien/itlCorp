@@ -116,7 +116,7 @@
             <param name="list"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportSOAOBHPayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentImportModel})">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportSOAOBHPayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentOBHImportTemplateModel})">
             <summary>
             import payments for SOA(type charge is OBH)
             </summary>

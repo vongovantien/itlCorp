@@ -539,12 +539,12 @@ export class AccountingRepo {
     }
 
     importInvoicePayment(body: any) {
-        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
             map((data: any) => data)
         );
     }
     importOBHPayment(body: any) {
-        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportSOAOBHPayment`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportSOAOBHPayment`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -567,6 +567,12 @@ export class AccountingRepo {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
             map((data: any) => data)
         );
+    }
+    deletePayment(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
     }
 }
 

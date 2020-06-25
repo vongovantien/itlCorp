@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
@@ -6,21 +6,29 @@ import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
     templateUrl: './list-invoice-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
+    selectedPayment: PaymentModel;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
-        private _sortService: SortService) {
+        private _sortService: SortService,
+        private _toastService: ToastrService,
+        private _progressService: NgProgress) {
         super();
-        // this.requestList = this.requestSearchShipment;
+        this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
     }
 
@@ -65,7 +73,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                 catchError(this.catchError)
             ).subscribe(
                 (res: []) => {
-                    this.payments = res;
+                    this.payments = res || [];
                     console.log(this.payments);
                 },
             );
@@ -76,9 +84,35 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
-    showConfirmDelete(item) { }
+    showConfirmDelete(item, index) {
+        if (index !== this.payments.length - 1) {
+            this.infoNotAllowDelete.show();
+        } else {
+            this.selectedPayment = item;
+            this.confirmDeletePopup.show();
+        }
+    }
     showExtendDateModel(refId: string) {
 
+    }
+    onDeletePayment() {
+        this.isLoading = true;
+        this._accountingRepo.deletePayment(this.selectedPayment.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.confirmDeletePopup.hide();
+                }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getPayments(this.selectedPayment.refId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 }
 

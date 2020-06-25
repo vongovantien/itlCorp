@@ -10,7 +10,7 @@
                                 <span>
                                     <i class="la la-plus"></i>
                                     <span>
-                                        Update sssss
+                                        Update
                                     </span>
                                 </span>
                             </button>
@@ -90,7 +90,7 @@
                                     <tr *ngFor="let payment of payments; trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions">
-                                                <button (click)="showConfirmDelete(payment)"
+                                                <button (click)="showConfirmDelete(payment, i)"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                     <i class="la la-trash"></i>
                                                 </button>
@@ -128,3 +128,10 @@
 </div>
 </div>
 </div>
+
+<confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePayment()">
+</confirm-popup>
+
+<info-popup [body]="'You can only delete the last payment. Please check again!'" [title]="'Notification'"
+    [label]="'Ok'">
+</info-popup>
