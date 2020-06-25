@@ -42,6 +42,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<OpsTransaction> opsTransactionRepo;
         private readonly IContextBase<OpsStageAssigned> opsStageAssignedRepo;
         private readonly IContextBase<SysUser> userRepository;
+        private readonly IContextBase<CatPartner> customerRepository;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -54,7 +55,8 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CatCommodity> commodityRepo,
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<OpsStageAssigned> opsStageAssigned,
-            IContextBase<SysUser> userRepo) : base(repository, mapper)
+            IContextBase<SysUser> userRepo,
+            IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPartnerApi = catPartner;
@@ -67,6 +69,7 @@ namespace eFMS.API.Operation.DL.Services
             opsTransactionRepo = opsTransaction;
             opsStageAssignedRepo = opsStageAssigned;
             userRepository = userRepo;
+            customerRepository = customerRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -322,21 +325,7 @@ namespace eFMS.API.Operation.DL.Services
                                 );
 
 
-            //|| (x.Hblid != null && x.Hblid.ToLower().Contains(keySearch))
-            //|| (x.ExportCountryCode != null && x.ExportCountryCode.ToLower().Contains(keySearch)) || (x.ImportCountryCode != null && x.ImportCountryCode.ToLower().Contains(keySearch)) || (x.CommodityCode != null && x.CommodityCode.ToLower().Contains(keySearch))
-            //|| (x.Note != null && x.Note.ToLower().Contains(keySearch)) || (x.FirstClearanceNo != null && x.FirstClearanceNo.ToLower().Contains(keySearch)) || (x.QtyCont != null && x.QtyCont.ToString().Contains(keySearch)) || string.IsNullOrEmpty(keySearch));
-            var data = Get().Where(query);
-            //var data = DataContext.Get(x => (x.PartnerTaxCode == customerNo)
-            //                    && (clearanceNoArray != null ? clearanceNoArray.Any(val => x.ClearanceNo.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
-            //                                                    : (x.ClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.Hblid != null && x.Hblid.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.ExportCountryCode != null && x.ExportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.ImportCountryCode != null && x.ImportCountryCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.CommodityCode != null && x.CommodityCode.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.FirstClearanceNo != null && x.FirstClearanceNo.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                         || (x.QtyCont.HasValue && x.QtyCont.ToString().Contains(autocompleteKey))
-            //                         || (x.Note != null && x.Note.Contains(autocompleteKey, StringComparison.OrdinalIgnoreCase))
-            //                    ));
+            var data = Get().Where(query); 
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
@@ -355,8 +344,6 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     pageNumber = 1;
                 }
-                //var s = data.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-                //returnList = s?.ProjectTo<CustomsDeclarationModel>(mapper.ConfigurationProvider);
                 returnList = data.Skip((pageNumber - 1) * pageSize).Take(pageSize)?.AsQueryable();
             }
             return returnList;
@@ -371,7 +358,8 @@ namespace eFMS.API.Operation.DL.Services
             var customerCache = catPartnerApi.GetPartners().Result;
             var countries = countryCache != null ? countryCache.ToList() : new List<Provider.Models.CatCountryApiModel>(); //dc.CatCountry;
             var portIndexs = portCache != null ? portCache.Where(x => x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Port)).ToList() : new List<Provider.Models.CatPlaceApiModel>();
-            var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
+            // var customers = customerCache != null ? customerCache.Where(x => x.PartnerGroup.IndexOf(GetTypeFromData.GetPartnerGroup(CatPartnerGroupEnum.CUSTOMER), StringComparison.OrdinalIgnoreCase) > -1).ToList() : new List<Provider.Models.CatPartnerApiModel>();
+            var customers = customerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
             foreach (CustomsDeclaration item in list)
             {
                 var clearance = mapper.Map<CustomsDeclarationModel>(item);
