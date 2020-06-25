@@ -108,17 +108,17 @@ namespace eFMS.API.Catalogue.DL.Services
                         x.UserCreated = currentUser.UserID;
                     });
                     partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
-                    DataContext.Add(partner);
-                    contractRepository.Add(contracts);
+                    DataContext.Add(partner,false);
+                    contractRepository.Add(contracts,false);
 
-                    foreach (var item in entity.contracts)
-                    {
-                        ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
-                        modeUploadContract.ChildId = item.Id.ToString();
-                        modeUploadContract.PartnerId = partner.Id;
-                        modeUploadContract.Files = item.FileList;
-                        UploadFileContract(modeUploadContract);
-                    }
+                    //foreach (var item in entity.contracts)
+                    //{
+                    //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
+                    //    modeUploadContract.ChildId = item.Id.ToString();
+                    //    modeUploadContract.PartnerId = partner.Id;
+                    //    modeUploadContract.Files = item.File;
+                    //    UploadFileContract(modeUploadContract);
+                    //}
                 }
            
                 DataContext.SubmitChanges();

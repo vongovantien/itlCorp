@@ -33,11 +33,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         protected _toastService: ToastrService,
         protected _catalogueRepo: CatalogueRepo,
         private _activedRoute: ActivatedRoute,
-        private _ngProgressService: NgProgress,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        protected _ngProgressService: NgProgress,
     ) {
-        super(_router, _toastService, _catalogueRepo);
-        this._progressRef = this._ngProgressService.ref();
+        super(_router, _toastService, _catalogueRepo, _ngProgressService);
     }
 
     ngOnInit(): void { }

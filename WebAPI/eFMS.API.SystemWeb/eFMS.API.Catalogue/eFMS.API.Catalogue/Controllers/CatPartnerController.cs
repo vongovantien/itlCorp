@@ -217,11 +217,11 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             List<string> idsContract = null;
-            if(model.contracts.Count() > 0)
+            if(model.Contracts.Count() > 0)
             {
                 
-                model.contracts.ForEach(x => x.Id = Guid.NewGuid());
-                idsContract = model.contracts.Select(t => t.Id.ToString()).ToList();
+                model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
+                idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
                 model.idsContract = idsContract;
             }
             var partner = mapper.Map<CatPartnerModel>(model);

@@ -404,6 +404,24 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             );
     }
 
+    onChageTrialCreditDays() {
+        const trialDays = !!this.formGroup.controls['trialCreditDays'].value ? this.formGroup.controls['trialCreditDays'].value : 0;
+        if (!!this.trialExpiredDate.value.startDate) {
+            this.trialExpiredDate.setValue({
+                startDate: new Date(new Date(this.trialExpiredDate.value.startDate).setDate(new Date(this.trialExpiredDate.value.startDate).getDate() + trialDays)),
+                endDate: new Date(new Date(this.trialExpiredDate.value.endDate).setDate(new Date(this.trialExpiredDate.value.endDate).getDate() + trialDays)),
+            });
+        }
+    }
+
+    onUpdateTrialEffectiveDate(value: { startDate: any; endDate: any }) {
+        const trialDays = !!this.formGroup.controls['trialCreditDays'].value ? this.formGroup.controls['trialCreditDays'].value : 0;
+        this.trialExpiredDate.setValue({
+            startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
+            endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
+        });
+    }
+
     close() {
         this.hide();
     }

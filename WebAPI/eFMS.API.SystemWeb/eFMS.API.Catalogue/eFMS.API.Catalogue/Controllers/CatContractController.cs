@@ -112,7 +112,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        public IActionResult Post([FromBody]CatContractModel model)
+        public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
             model.Id = Guid.NewGuid();
@@ -262,22 +262,23 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// attach multi files to shipment
+        /// attach file for more contract
         /// </summary>
         /// <param name="files"></param>
         /// <param name="partnerId"></param>
         /// <param name="contractIds"></param>
         /// 
         /// <returns></returns>
-        [HttpPut("UploadFileMoreContract/{PartnerId}")]
+        [HttpPut("UploadFileMoreContract/{PartnerId}/{contractIds}")]
         [Authorize]
-        public async Task<IActionResult> UploadFileMoreContract([Required]string partnerId, List<IFormFile> files,List<string> contractIds)
+        public async Task<IActionResult> UploadFileMoreContract(List<IFormFile> files,string contractIds,string partnerId)
         {
             string folderName = Request.Headers["Module"];
             ResultHandle result = new ResultHandle();
+            List<string> contractIdlst = contractIds.Split(',').ToList();
             List<ContractFileUploadModel> lst = new List<ContractFileUploadModel>();
             int i = 0;
-            foreach(var item in contractIds)
+            foreach (var item in contractIdlst)
             {
                 ContractFileUploadModel model = new ContractFileUploadModel
                 {
@@ -289,7 +290,7 @@ namespace eFMS.API.Catalogue.Controllers
                 i++;
             }
             result = await catContractService.UploadMoreContractFile(lst);
-            return Ok(result);
+            return Ok();
         }
 
 

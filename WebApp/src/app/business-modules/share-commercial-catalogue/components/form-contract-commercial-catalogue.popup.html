@@ -174,7 +174,7 @@
                                 <div class="form-group">
                                     <label>Trial Credit Days
                                     </label>
-                                    <input type="number"
+                                    <input type="number" (change)="onChageTrialCreditDays()"
                                         [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                         class="form-control" formControlName="trialCreditDays">
                                 </div>
@@ -189,6 +189,7 @@
                                             type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                            (datesUpdated)="onUpdateTrialEffectiveDate($event)"
                                             formControlName="trialEffectDate" readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>

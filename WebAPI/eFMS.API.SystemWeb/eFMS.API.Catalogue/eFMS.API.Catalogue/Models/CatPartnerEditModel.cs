@@ -62,7 +62,7 @@ namespace eFMS.API.Catalogue.Models
         public string InternalReferenceNo { get; set; }
         public string CoLoaderCode { get; set; }
         public string WorkPhoneEx { get; set; }
-        public List<CatContractModel> contracts { get; set; }
+        public List<CatContractModel> Contracts { get; set; }
         public short? GroupId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }

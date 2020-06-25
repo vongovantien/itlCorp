@@ -8,7 +8,10 @@ import { InfoPopupComponent } from '@common';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
 import { Partner } from '@models';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, concatMap } from 'rxjs/operators';
+import { NgProgress } from '@ngx-progressbar/core';
+import { of } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-create-commercial',
@@ -30,8 +33,11 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         protected _router: Router,
         protected _toastService: ToastrService,
         protected _catalogueRepo: CatalogueRepo,
+        protected _ngProgressService: NgProgress
     ) {
         super();
+        this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit(): void { }
@@ -54,52 +60,51 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         }
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
         modelAdd.contracts = [...this.contractList.contracts];
-        modelAdd.contracts.forEach(element => {
-            if (!!element.fileList) {
-                element.fileList = element.fileList[0];
-            }
-        });
+
         this.saveCustomerCommercial(modelAdd);
     }
 
-
     saveCustomerCommercial(body) {
         this._catalogueRepo.createPartner(body)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete()),
+                concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(res.message);
-                        // this._router.navigate(["/home/commercial/customer"]);
                         if (res.data) {
                             console.log(res.data);
+                            this._toastService.success(res.message);
                             this.contractList.contracts.forEach(element => {
                                 if (!!element.fileList) {
                                     this.fileList.push(element.fileList[0]);
                                 }
                             });
-                            console.log(this.fileList);
-                            this.uploadFileMoreContract(res.data.idsContract, res.data.id);
+                            let i = 0;
+                            for (const obj of this.contractList.contracts) {
+                                obj.id = res.data.idsContract[i];
+                                i++;
+                            }
+                            const idsContract: any = [];
+                            this.contractList.contracts.forEach(element => {
+                                if (!!element.fileList) {
+                                    idsContract.push(element.id);
+                                }
+                            });
+
+                            return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
                         }
                     }
-                }, err => {
-
-                });
-    }
-
-    uploadFileMoreContract(idsContract: string[], partnerId: string) {
-        this._catalogueRepo.uploadFileMoreContract(partnerId, idsContract, this.fileList)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this.fileList = [];
-                        this._toastService.success("Upload file successfully!");
-                    }
+                    return of({ data: null, message: 'Something getting error. Please check again!', status: false });
+                })
+            ).subscribe(
+                (res: any) => {
+                    this._router.navigate(["/home/commercial/customer"]);
+                },
+                (error: HttpErrorResponse) => {
+                    console.log(error);
                 }
             );
     }
-
 }
 
 export interface IValidateTaxCode {

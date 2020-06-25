@@ -307,12 +307,11 @@ export class CatalogueRepo {
     }
 
 
-    uploadFileMoreContract(partnerId: string, contractIds: string[], body: any) {
-        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}`, body, 'files', { contractIds: contractIds }).pipe(
+    uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
             map((data: any) => data)
         );
     }
-
 
 
     deleteContract(id: string, partnerId: string) {
@@ -521,6 +520,10 @@ export class CatalogueRepo {
 
 
     createPartner(body: any = {}) {
+        // const formData = new FormData();
+        // for (let i = 0; i < body.contracts.length; i++) {
+        //     formData.append("Contracts[" + i + "].saleManId", body.contracts[i].saleManId)
+        // }
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
             map((data: any) => data)
         );
