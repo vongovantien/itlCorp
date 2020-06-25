@@ -3,9 +3,13 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
 import { AccountingRepo } from '@repositories';
-import { catchError } from 'rxjs/operators';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { SortService } from '@services';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+
+import { catchError } from 'rxjs/operators';
+
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
@@ -17,11 +21,14 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     paymentHeaders: CommonInterface.IHeaderTable[];
     constructor(private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _store: Store<IAppState>,
         private _sortService: SortService) {
         super();
     }
 
     ngOnInit(): void {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
             { title: 'Partner Name', field: 'referenceNo', sortable: true },
