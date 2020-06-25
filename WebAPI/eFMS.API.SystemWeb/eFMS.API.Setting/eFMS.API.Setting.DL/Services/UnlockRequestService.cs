@@ -209,7 +209,7 @@ namespace eFMS.API.Setting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
-                model.StatusApproval = SettingContansts.STATUS_APPROVAL_NEW;
+                model.StatusApproval = SettingConstants.STATUS_APPROVAL_NEW;
                 var unlockRequest = mapper.Map<SetUnlockRequest>(model);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -267,8 +267,8 @@ namespace eFMS.API.Setting.DL.Services
                     {                        
                         var unlockRequest = DataContext.Get(x => x.Id == id).FirstOrDefault();
                         if (unlockRequest == null) return new HandleState((object)"Not found Unlock Request");
-                        if (unlockRequest.StatusApproval != SettingContansts.STATUS_APPROVAL_NEW
-                            && unlockRequest.StatusApproval != SettingContansts.STATUS_APPROVAL_DENIED)
+                        if (unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
+                            && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED)
                         {
                             return new HandleState((object)"Not allow delete. Unlock request are awaiting approval.");
                         }
