@@ -40,7 +40,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
-        this._progressRef = this._progressService.ref();
+
     }
 
     ngOnInit(): void {

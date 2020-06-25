@@ -12,7 +12,8 @@
                     </list-invoice-account-receivable-payable>
                 </tab>
                 <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
-                    <list-obh-account-receivable-payable></list-obh-account-receivable-payable>
+                    <list-obh-account-receivable-payable (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
+                    </list-obh-account-receivable-payable>
                 </tab>
             </tabset>
         </div>

@@ -64,8 +64,12 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                 },
             );
     }
-
+    //refresh page (tab Invoice)
     handleUpdateExtendDateOfInvoice() {
+        this.requestSearchShipment();
+    }
+    //refresh page (tab OBH)
+    handleUpdateExtendDateOfOBH() {
         this.requestSearchShipment();
     }
 }

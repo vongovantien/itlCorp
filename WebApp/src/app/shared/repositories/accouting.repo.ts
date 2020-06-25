@@ -572,7 +572,7 @@ export class AccountingRepo {
     getInvoiceExtendedDate(refId: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refId }).pipe(
             map((data: any) => data)
-        )
+        );
     }
 
     updateExtendDate(body: any) {
@@ -586,6 +586,12 @@ export class AccountingRepo {
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    getOBHSOAExtendedDate(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetOBHSOAExtendedDate`, { id: refId }).pipe(
+            map((data: any) => data)
+        );
     }
 }
 
