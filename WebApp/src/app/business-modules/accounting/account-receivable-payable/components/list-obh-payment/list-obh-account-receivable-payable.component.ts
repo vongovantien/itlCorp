@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
@@ -6,12 +6,14 @@ import { AccountingRepo } from '@repositories';
 import { catchError } from 'rxjs/operators';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { SortService } from '@services';
+import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
     templateUrl: './list-obh-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListOBHPaymentComponent extends AppList implements OnInit {
+    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
@@ -58,7 +60,8 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
     showConfirmDelete(item) { }
     showExtendDateModel(refId: string) {
-
+        console.log(refId);
+        this.updateExtendDayPopup.show();
     }
 }
 

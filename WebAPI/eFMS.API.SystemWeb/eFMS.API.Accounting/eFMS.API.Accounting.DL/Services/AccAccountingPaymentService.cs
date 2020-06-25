@@ -551,7 +551,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (invoice == null) return null;
             return new ExtendDateUpdatedModel { RefId = id,
                 Note = invoice.PaymentNote,
-                NumberDaysExtend = (int)invoice.PaymentExtendDays,
+                NumberDaysExtend = invoice.PaymentExtendDays == null ? 0 : (int)invoice.PaymentExtendDays,
                 PaymentType = PaymentType.Invoice
             };
         }

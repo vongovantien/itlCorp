@@ -59,4 +59,8 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                 },
             );
     }
+
+    handleUpdateExtendDateOfInvoice() {
+        this.requestSearchShipment();
+    }
 }
