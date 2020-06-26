@@ -65,6 +65,7 @@ export class Partner {
     saleMans: SaleManRequest[] = [];
     contracts: Contract[] = [];
 
+    partnerType: string = '';
 
     permission: PermissionPartner = new PermissionPartner();
 

@@ -756,6 +756,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("PartnerName_VN")
                     .HasMaxLength(4000);
 
+                entity.Property(e => e.PartnerType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PaymentBeneficiary).HasMaxLength(4000);
 
                 entity.Property(e => e.PercentCredit).HasColumnType("decimal(18, 4)");

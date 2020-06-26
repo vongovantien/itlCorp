@@ -112,6 +112,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
+        [Authorize]
         public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
@@ -165,14 +166,14 @@ namespace eFMS.API.Catalogue.Controllers
             bool existed = false;
             if (model.Id != Guid.Empty)
             {
-                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id))
+                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && model.ContractNo != null))
                 {
                     existed = true;
                 }
             }
             else
             {
-                existed = catContractService.Any(x => x.ContractNo == model.ContractNo);
+                existed = catContractService.Any(x => x.ContractNo == model.ContractNo && model.ContractNo != null);
             }
             messageDuplicate = existed == true ? "Contract no has been existed!" : string.Empty;
             return messageDuplicate;
@@ -290,7 +291,7 @@ namespace eFMS.API.Catalogue.Controllers
                 i++;
             }
             result = await catContractService.UploadMoreContractFile(lst);
-            return Ok();
+            return Ok(result);
         }
 
 
@@ -329,10 +330,10 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [Authorize]
-        [HttpPut("ActiveInactiveContract/{id}")]
-        public IActionResult ActiveInactiveContract(Guid id)
+        [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
+        public IActionResult ActiveInactiveContract(Guid id,string partnerId)
         {
-            var hs = catContractService.ActiveInActiveContract(id);
+            var hs = catContractService.ActiveInActiveContract(id, partnerId);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

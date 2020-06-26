@@ -69,6 +69,7 @@ namespace eFMS.API.Catalogue.Models
         public string RoundUpMethod { get; set; }
         public string ApplyDim { get; set; }
         public List<string> idsContract { get; set; }
+        public string PartnerType { get; set; }
 
 
 

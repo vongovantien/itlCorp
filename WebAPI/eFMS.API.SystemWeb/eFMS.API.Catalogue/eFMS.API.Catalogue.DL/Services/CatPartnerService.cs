@@ -97,15 +97,15 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(partner);
             if (hs.Success)
             {
-                if (entity.contracts.Count > 0)
+                if (entity.Contracts.Count > 0)
                 {
-                    var contracts = mapper.Map<List<CatContract>>(entity.contracts);
+                    var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
                     contracts.ForEach(x =>
                     {
                         //x.Id = Guid.NewGuid();
                         x.PartnerId = partner.Id;
                         x.DatetimeCreated = DateTime.Now;
-                        x.UserCreated = currentUser.UserID;
+                        x.UserCreated = x.UserModified = currentUser.UserID;
                     });
                     partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
                     DataContext.Add(partner,false);
@@ -231,9 +231,9 @@ namespace eFMS.API.Catalogue.DL.Services
             if (code == 403) return new HandleState(403, "");
 
             var entity = GetModelToUpdate(model);
-            if (model.contracts.Count > 0)
+            if (model.Contracts.Count > 0)
             {
-                entity.SalePersonId = model.contracts.FirstOrDefault().SaleManId.ToString();
+                entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)

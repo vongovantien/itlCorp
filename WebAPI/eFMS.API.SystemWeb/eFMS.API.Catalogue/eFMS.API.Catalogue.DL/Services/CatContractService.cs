@@ -30,6 +30,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         private readonly IContextBase<SysCompany> sysCompanyRepository;
         private readonly IContextBase<SysImage> sysImageRepository;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+
         private readonly IOptions<WebUrl> webUrl;
 
         public CatContractService(
@@ -42,6 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysOffice> sysOfficeRepo,
             IContextBase<SysCompany> sysCompanyRepo,
              IContextBase<SysImage> sysImageRepo,
+                      IContextBase<SysEmployee> sysEmployeeRepo,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -52,6 +55,7 @@ namespace eFMS.API.Catalogue.DL.Services
             catPartnerRepository = partnerRepo;
             webUrl = url;
             sysImageRepository = sysImageRepo;
+            sysEmployeeRepository = sysEmployeeRepo;
         }
 
         public IQueryable<CatContract> GetContracts()
@@ -229,16 +233,76 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId)
         {
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
-                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id);
+                isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
+            }
+            if (isUpdateDone.Success)
+            {
+                DataContext.SubmitChanges();
+                if (objUpdate.Active == true)
+                {
+                    // send email
+                    var ObjPartner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+                    CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
+                    model.ContractService = objUpdate.SaleService;
+                    model.ContractType = objUpdate.ContractType;
+                    SendMailActiveSuccess(model);
+                }
             }
             return isUpdateDone;
+        }
+
+        private void SendMailActiveSuccess(CatPartnerModel partner)
+        {
+            string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
+            string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+            string url = string.Empty;
+            // info send to and cc
+            List<string> lstCc = new List<string>
+            {
+
+            };
+            string emailCreator = objInfoCreator.Email;
+
+            switch (partner.PartnerType)
+            {
+                case "Customer":
+                    url = "home/commercial/customer/";
+                    break;
+                case "Agent":
+                    url = "home/commercial/agent/";
+                    break;
+                default:
+                    url = "home/catalogue/partner-data/detail/";
+                    break;
+            }
+
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+            string linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+            string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            string subject = "Actived Agent - " + partner.ShortName;
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
+
+
+                "<i> You Agent - " + partner.PartnerNameVn + " ] is active with info below </i> </br>" +
+                "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
+
+                "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+                "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
+                + linkEn + "</br>" + linkVn + "</br> </br>" +
+                "<i> Thanks and Regards </i>" + "</br> </br>" +
+                "eFMS System </div>");
+            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com" }, null, null);
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)
@@ -279,9 +343,9 @@ namespace eFMS.API.Catalogue.DL.Services
         public async Task<ResultHandle> UploadMoreContractFile(List<ContractFileUploadModel> model)
         {
             var result = new ResultHandle();
-            foreach(var item in model)
+            foreach (var item in model)
             {
-                if(item.Files != null)
+                if (item.Files != null)
                 {
                     result = await WriteFile(item);
                 }

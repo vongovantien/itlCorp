@@ -74,6 +74,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.fileList = null;
         this.formContractPopup.isUpdate = false;
         this.formContractPopup.isSubmitted = false;
+        this.formContractPopup.partnerId = this.partnerId;
         this.indexlstContract = null;
         if (!this.partnerId) {
             this.formContractPopup.isCreateNewCommercial = true;
@@ -110,6 +111,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     pachValueToFormContract() {
+        this.formContractPopup.activeServices = this.formContractPopup.getCurrentActiveService(this.formContractPopup.selectedContract.saleService);
+        this.formContractPopup.activeVas = this.formContractPopup.getCurrentActiveVas(this.formContractPopup.selectedContract.vas);
+        this.formContractPopup.setError(this.formContractPopup.saleService);
         this.formContractPopup.formGroup.patchValue({
             salesmanId: !!this.formContractPopup.selectedContract.saleManId ? this.formContractPopup.selectedContract.saleManId : null,
             companyId: !!this.formContractPopup.selectedContract.companyId ? this.formContractPopup.selectedContract.companyId : null,
@@ -118,8 +122,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             effectiveDate: !!this.formContractPopup.selectedContract.effectiveDate ? { startDate: new Date(this.formContractPopup.selectedContract.effectiveDate), endDate: new Date(this.formContractPopup.selectedContract.effectiveDate) } : null,
             expiredDate: !!this.formContractPopup.selectedContract.expiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.expiredDate), endDate: new Date(this.formContractPopup.selectedContract.expiredDate) } : null,
             contractType: !!this.formContractPopup.selectedContract.contractType ? [this.formContractPopup.contractTypes.find(type => type.id === this.formContractPopup.selectedContract.contractType)] : null,
-            saleService: !!this.formContractPopup.selectedContract.saleService ? [this.formContractPopup.serviceTypes.find(type => type.id === this.formContractPopup.selectedContract.saleService)] : null,
-            vas: !!this.formContractPopup.selectedContract.vas ? [this.formContractPopup.vaslst.find(type => type.id === this.formContractPopup.selectedContract.vas)] : null,
             paymentTerm: this.formContractPopup.selectedContract.paymentTerm,
             creditLimit: this.formContractPopup.selectedContract.creditLimit,
             creditLimitRate: this.formContractPopup.selectedContract.creditLimitRate,
@@ -134,6 +136,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             customerAmount: this.formContractPopup.selectedContract.customerAdvanceAmount,
             creditRate: this.formContractPopup.selectedContract.creditRate,
             description: this.formContractPopup.selectedContract.description,
+            serviceType: [<CommonInterface.INg2Select>{ id: this.formContractPopup.selectedContract.saleService, text: '' }],
+            vas: [<CommonInterface.INg2Select>{ id: this.formContractPopup.selectedContract.vas, text: '' }],
             paymentMethod: !!this.formContractPopup.selectedContract.paymentMethod ? [this.formContractPopup.paymentMethods.find(type => type.id === this.formContractPopup.selectedContract.paymentMethod)] : null
         });
     }

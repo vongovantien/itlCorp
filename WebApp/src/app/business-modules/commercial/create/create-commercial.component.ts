@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { InfoPopupComponent } from '@common';
@@ -28,19 +28,27 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     invalidTaxCode: string;
 
     fileList: any[] = [];
+    type: string;
 
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
         protected _catalogueRepo: CatalogueRepo,
-        protected _ngProgressService: NgProgress
+        protected _ngProgressService: NgProgress,
+        protected _activeRoute: ActivatedRoute
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
 
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            console.log(result);
+            this.type = result.type;
+            console.log(this.type);
+        })
+    }
 
     gotoList() {
         this._router.navigate(["home/commercial/customer"]);
@@ -59,7 +67,10 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             return;
         }
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
+        modelAdd.partnerType = this.type;
+        this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER;AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
+
 
         this.saveCustomerCommercial(modelAdd);
     }
@@ -90,7 +101,6 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                                     idsContract.push(element.id);
                                 }
                             });
-
                             return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
                         }
                     }
@@ -98,7 +108,9 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 })
             ).subscribe(
                 (res: any) => {
-                    this._router.navigate(["/home/commercial/customer"]);
+                    if (!!res) {
+                        this._router.navigate(["/home/commercial/customer"]);
+                    }
                 },
                 (error: HttpErrorResponse) => {
                     console.log(error);

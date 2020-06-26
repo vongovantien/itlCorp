@@ -14,7 +14,6 @@ import { tap, switchMap, finalize, catchError, concatMap } from 'rxjs/operators'
 import { of } from 'rxjs';
 import _merge from 'lodash/merge';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormContractCommercialPopupComponent } from '../../share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 
 
 @Component({
@@ -36,7 +35,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         private _cd: ChangeDetectorRef,
         protected _ngProgressService: NgProgress,
     ) {
-        super(_router, _toastService, _catalogueRepo, _ngProgressService);
+        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute);
     }
 
     ngOnInit(): void { }
@@ -103,7 +102,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         }
 
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
-        // modelAdd.saleMans = this.contractList.contracts;  // TODO implement contract;
+        modelAdd.contracts = this.contractList.contracts;  // TODO implement contract;
 
         modelAdd.id = this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;

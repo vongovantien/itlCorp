@@ -122,12 +122,13 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && saleService.invalid}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !saleService.valid}">
                                 <label required>Sale Service</label>
-                                <ng-select #sv [items]="serviceTypes" [allowClear]="true"
-                                    (opened)="closeOtherSelects(sv)" formControlName="saleService"
+                                <ng-select #sv [items]="serviceTypes" [allowClear]="true" [active]="activeServices"
+                                    (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
                                     placeholder="Please select">
                                 </ng-select>
+
                             </div>
                         </div>
                     </div>
@@ -145,7 +146,8 @@
                             <div class="form-group">
                                 <label>Vas</label>
                                 <ng-select #vas [items]="vaslst" [allowClear]="true" (opened)="closeOtherSelects(vas)"
-                                    formControlName="vas" placeholder="Please select">
+                                    [active]="activeVas" [multiple]="true" formControlName="vas"
+                                    placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
