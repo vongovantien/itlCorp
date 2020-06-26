@@ -30,6 +30,9 @@ namespace eFMS.API.Common.Infrastructure.Common
                 case 403:
                     message = LanguageSub.DO_NOT_HAVE_PERMISSION;
                     break;
+                case 400:
+                    message = hs.Exception.Message;
+                    break;
                 default:
                     message = LanguageSub.MSG_DATA_NOT_FOUND;
                     break;

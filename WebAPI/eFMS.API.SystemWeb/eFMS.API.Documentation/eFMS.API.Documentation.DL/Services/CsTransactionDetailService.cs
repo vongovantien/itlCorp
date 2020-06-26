@@ -15,6 +15,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -42,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysAuthorization> authorizationRepository;
         readonly IUserPermissionService permissionService;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IStringLocalizer stringLocalizer;
 
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -63,7 +65,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysAuthorization> authorizationRepo,
             ICsShipmentOtherChargeService oChargeService,
             IUserPermissionService perService,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -83,6 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             authorizationRepository = authorizationRepo;
             permissionService = perService;
             sysOfficeRepo = sysOffice;
+            stringLocalizer = localizer;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -1070,7 +1074,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var hbl = DataContext.Where(x => x.Id == hbId).FirstOrDefault();
                 if (hbl == null)
                 {
-                    hs = new HandleState("House Bill not found !");
+                    hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_NOT_FOUND);
                 }
                 else
                 {
@@ -1092,7 +1096,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (isSOA == true)
                     {
-                        hs = new HandleState("Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!");
+                        hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA);
                     }
                     else
                     {
