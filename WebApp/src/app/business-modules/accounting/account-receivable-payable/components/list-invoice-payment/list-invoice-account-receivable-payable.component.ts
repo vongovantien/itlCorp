@@ -17,7 +17,6 @@ import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 
 
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
