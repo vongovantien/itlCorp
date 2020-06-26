@@ -2,13 +2,18 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+
+import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
@@ -24,6 +29,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _progressService: NgProgress) {
@@ -58,6 +64,8 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             { title: 'Update Person', field: 'userModifiedName', sortable: true },
             { title: 'Update Date', field: 'datetimeModified', sortable: true }
         ];
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     ngAfterViewInit() {
