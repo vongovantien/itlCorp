@@ -99,16 +99,15 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,
-            overDueDays: !!dataForm.overdueDate ? dataForm.overdueDate[0].id : null,
+            overDueDays: !!dataForm.overdueDate ? dataForm.overdueDate[0].id : OverDueDays.All,
             fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.endDate) ? formatDate(dataForm.updatedDate.endDate, 'yyyy-MM-dd', 'en') : null,
             fromDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.endDate) ? formatDate(dataForm.dueDate.endDate, 'yyyy-MM-dd', 'en') : null,
-            paymentType: 1
+            paymentType: PaymentType.Invoice
         };
-        console.log(body);
 
         this.onSearch.emit(body);
     }
@@ -130,7 +129,15 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
         this.formSearch.controls["paymentStatus"].setValue([this.payments[0]]);
-        this.onSearch.emit({ paymentStatus: [] });
+        this.onSearch.emit({ paymentStatus: [], paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
+    }
+    selelectedStatus(event) {
+        const currStatus = this.formSearch.controls["paymentStatus"].value;
+        if (currStatus.filter(x => x.id === '').length > 0 && event.id !== '') {
+            currStatus.splice(0);
+            currStatus.push(event);
+            this.formSearch.controls["paymentStatus"].setValue(currStatus);
+        }
     }
 }
 
@@ -146,5 +153,16 @@ interface ISearchAccReceivePayble {
     fromDueDate: string;
     toDueDate: string;
     paymentType: number;
+}
+export enum PaymentType {
+    Invoice = 0,
+    OBH = 1
+}
+enum OverDueDays {
+    All,
+    Between1_15,
+    Between16_30,
+    Between31_60,
+    Between61_90
 }
 

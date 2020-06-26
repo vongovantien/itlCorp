@@ -73,7 +73,7 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
-                                            <td>{{ item.extendDays | date: 'dd/MM/yyyy'}}</td>
+                                            <td>{{ item.extendDays}}</td>
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
                                         <tr class="collapse-panel-row">
@@ -140,6 +140,7 @@
     </div>
 </div>
 
+<update-extend-day-popup (onUpdateExtendDate)="handleUpdateExtendDate($event)"></update-extend-day-popup>
 <!-- <update-extend-day-popup></update-extend-day-popup> -->
 
 

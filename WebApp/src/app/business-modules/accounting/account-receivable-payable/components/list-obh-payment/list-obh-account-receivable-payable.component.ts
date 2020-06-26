@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
@@ -13,6 +13,8 @@ import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 
 import { catchError, finalize } from 'rxjs/operators';
 
+import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
@@ -22,6 +24,9 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
 
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
+    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
+
+    @Output() onUpdateExtendDateOfOBH: EventEmitter<any> = new EventEmitter<any>();
 
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
@@ -29,11 +34,13 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     selectedPayment: PaymentModel;
 
     constructor(private _router: Router,
+        private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastService: ToastrService) {
         super();
+        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit(): void {
@@ -86,7 +93,44 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showExtendDateModel(refId: string) {
+        console.log(refId);
+        this._accountingRepo.getOBHSOAExtendedDate(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe((res: any) => {
+                this.updateExtendDayPopup.refId = res.refId;
+                this.updateExtendDayPopup.numberDaysExtend.setValue(res.numberDaysExtend);
+                this.updateExtendDayPopup.note.setValue(res.note);
+                this.updateExtendDayPopup.paymentType = res.paymentType;
+                this.updateExtendDayPopup.show();
 
+            });
+
+    }
+
+    handleUpdateExtendDate($event) {
+        console.log($event);
+        this._progressRef.start();
+        const body: any = {
+            refId: $event.refId,
+            numberDaysExtend: $event.numberDaysExtend,
+            note: $event.note,
+            paymentType: $event.paymentType,
+        };
+        this._accountingRepo.updateExtendDate(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe((res: any) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
+                    this.onUpdateExtendDateOfOBH.emit();
+                } else {
+                    this._toastService.error(res.message);
+                }
+            });
     }
 
     showConfirmDelete(item, index) {

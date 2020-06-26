@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
@@ -14,18 +14,29 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
+import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+
+
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
     templateUrl: './list-invoice-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
+    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
+
+    @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
+
+
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
+
     selectedPayment: PaymentModel;
+
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -36,6 +47,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
+
     }
 
     ngOnInit(): void {
@@ -69,7 +81,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     }
 
     ngAfterViewInit() {
-        // this.updateExtendDayPopup.show();
+        //this.updateExtendDayPopup.show();
 
     }
     import() {
@@ -92,6 +104,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
+
     showConfirmDelete(item, index) {
         if (index !== this.payments.length - 1) {
             this.infoNotAllowDelete.show();
@@ -100,9 +113,48 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             this.confirmDeletePopup.show();
         }
     }
+
     showExtendDateModel(refId: string) {
+        this._accountingRepo.getInvoiceExtendedDate(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe((res: any) => {
+
+                this.updateExtendDayPopup.refId = res.refId;
+                this.updateExtendDayPopup.numberDaysExtend.setValue(res.numberDaysExtend);
+                this.updateExtendDayPopup.note.setValue(res.note);
+                this.updateExtendDayPopup.paymentType = res.paymentType;
+                this.updateExtendDayPopup.show();
+
+            })
 
     }
+
+    handleUpdateExtendDate($event: any) {
+        console.log("result: ", $event);
+        this._progressRef.start();
+        const body: any = {
+            refId: $event.refId,
+            numberDaysExtend: $event.numberDaysExtend,
+            note: $event.note,
+            paymentType: $event.paymentType,
+        };
+        this._accountingRepo.updateExtendDate(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe((res: any) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
+                    this.onUpdateExtendDateOfInvoice.emit();
+                } else {
+                    this._toastService.error(res.message);
+                }
+            });
+    }
+
     onDeletePayment() {
         this.isLoading = true;
         this._accountingRepo.deletePayment(this.selectedPayment.id)
@@ -123,4 +175,3 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             );
     }
 }
-

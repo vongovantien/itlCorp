@@ -58,7 +58,7 @@
                                             <td><a href="javascript:void(0)"
                                                     (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
                                             </td>
-                                            <td>{{ item.overdueDays }}</td>
+
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
                                                     <span class="text-danger" *ngSwitchCase="'Unpaid'">
@@ -72,7 +72,10 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
-                                            <td>{{ item.extendDays | date: 'dd/MM/yyyy'}}</td>
+
+                                            <!--<td>{{ item.overdueDays }}</td>-->
+
+                                            <td>{{ item.extendDays}}</td>
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
 
@@ -138,6 +141,8 @@
         </div>
     </div>
 </div>
+
+<update-extend-day-popup (onUpdateExtendDate)="handleUpdateExtendDate($event)"></update-extend-day-popup>
 
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePayment()">
 </confirm-popup>
