@@ -59,5 +59,7 @@
   "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge không được để trống!",
 
   "MSG_NOT_EXIST_SHIPMENT": "Những lô hàng này không tồn tại trên hệ thống: ",
-  "DO_NOT_HAVE_PERMISSION": "Do not have permission" //403
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
+  "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Không thể xóa vì house bill này đã được lên SOA hoặc CD Note!",
+  "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !"
 }
