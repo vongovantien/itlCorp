@@ -125,7 +125,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
-               // SendMailCreatedSuccess(partner);
+                SendMailCreatedSuccess(partner);
             }
             return hs;
         }
