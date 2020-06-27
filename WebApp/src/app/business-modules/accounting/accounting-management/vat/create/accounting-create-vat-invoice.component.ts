@@ -14,7 +14,7 @@ import { IAccountingManagementState, InitPartner } from '../../store';
 
 import { catchError } from 'rxjs/operators';
 import _merge from 'lodash/merge';
-import { AccountingConstants } from '@constants';
+import { AccountingConstants, SystemConstants } from '@constants';
 import { Router } from '@angular/router';
 
 
@@ -98,6 +98,10 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                 (res: HttpErrorResponse) => {
                     if (res.error.message === 'Voucher ID has been existed') {
                         this.formCreateComponent.voucherId.setErrors({ existed: true });
+                    }
+                    if ((res.error as CommonInterface.IResult).data === SystemConstants.HTTP_CODE.EXISTED) {
+                        this.formCreateComponent.serie.setErrors({ existed: true });
+                        this.formCreateComponent.invoiceNoTempt.setErrors({ existed: true });
                     }
                 }
             );
