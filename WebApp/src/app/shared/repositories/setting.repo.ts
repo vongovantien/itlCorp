@@ -3,7 +3,7 @@ import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class SettingRepo {
     private VERSION: string = 'v1';
     constructor(private _api: ApiService) {
@@ -113,5 +113,13 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    sendRequestUnlock(body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/SaveAndSendRequest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
+
+
 

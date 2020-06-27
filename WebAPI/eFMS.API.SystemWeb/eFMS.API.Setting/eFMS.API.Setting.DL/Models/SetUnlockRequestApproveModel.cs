@@ -14,5 +14,9 @@ namespace eFMS.API.Setting.DL.Models
         public bool IsApproved { get; set; }
         public string StatusApproval { get; set; }
         public int NumOfDeny { get; set; }
+        public bool IsShowLeader { get; set; }
+        public bool IsShowManager { get; set; }
+        public bool IsShowAccountant { get; set; }
+        public bool IsShowBuHead { get; set; }
     }
 }

@@ -107,7 +107,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     formatNumberCurrency(input: number) {
         return input.toLocaleString(
-            undefined, // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: 3 }
         );
     }

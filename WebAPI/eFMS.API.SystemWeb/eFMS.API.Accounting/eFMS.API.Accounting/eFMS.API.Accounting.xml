@@ -87,10 +87,16 @@
             <summary>
             get list payment by refNo
             </summary>
-            <param name="refNo"></param>
+            <param name="refId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadExcel">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadInvoicePaymentExcel">
+            <summary>
+            download file excel from server
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadOBHPaymentExcel">
             <summary>
             download file excel from server
             </summary>
@@ -110,6 +116,13 @@
             <param name="list"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.ImportSOAOBHPayment(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AccountingPayment.AccountingPaymentOBHImportTemplateModel})">
+            <summary>
+            import payments for SOA(type charge is OBH)
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UpdateExtendDate(eFMS.API.Accounting.DL.Models.AccountingPayment.ExtendDateUpdatedModel)">
             <summary>
             update extend date
@@ -122,6 +135,27 @@
             Delete a payment
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetInvoiceExtendedDate(System.String)">
+            <summary>
+            get extended date of an invoice
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetOBHSOAExtendedDate(System.String)">
+            <summary>
+            get extended date of an SOA(charge type = OBH)
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.UploadOBHPaymentFile(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            upload OBH payment template
+            </summary>
+            <param name="file"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">

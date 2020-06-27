@@ -151,7 +151,8 @@
                                     <span>{{ item.partnerName }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.paymentAmountError === null">{{ item.paymentAmount }}</span>
+                                    <span
+                                        *ngIf="item.paymentAmountError === null">{{ item.paymentAmount | number: '.0-3'}}</span>
                                     <span class="m--font-danger" *ngIf="item.paymentAmountError !== null">{{
                                         item.paymentAmountError }}</span>
                                 </td>

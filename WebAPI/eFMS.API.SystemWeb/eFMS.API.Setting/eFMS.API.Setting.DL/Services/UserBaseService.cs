@@ -19,6 +19,8 @@ namespace eFMS.API.Setting.DL.Services
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysSettingFlow> settingFlowRepo;
+
         public UserBaseService(
             IContextBase<SysUser> repository,
             IMapper mapper,
@@ -26,13 +28,15 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<SysGroup> sysGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysEmployee> sysEmployee,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysSettingFlow> settingFlow) : base(repository, mapper)
         {
             sysUserLevelRepo = sysUserLevel;
             sysGroupRepo = sysGroup;
             catDepartmentRepo = catDepartment;
             sysEmployeeRepo = sysEmployee;
             sysOfficeRepo = sysOffice;
+            settingFlowRepo = settingFlow;
         }
 
         private int? GetGroupIdOfUser(string userId)
@@ -58,7 +62,7 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId)
         {
-            var leaders = sysUserLevelRepo.Get(x => x.Position == SettingContansts.PositionManager
+            var leaders = sysUserLevelRepo.Get(x => x.Position == SettingConstants.PositionManager
                                                     && x.GroupId == groupId
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
@@ -69,8 +73,8 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId)
         {
-            var managers = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var managers = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
                                                     && x.OfficeId == officeId
@@ -80,9 +84,9 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetAccoutantManager(Guid? companyId, Guid? officeId)
         {
-            var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == SettingContansts.DeptTypeAccountant).Select(s => s.Id).ToList();
-            var accountants = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == SettingConstants.DeptTypeAccountant).Select(s => s.Id).ToList();
+            var accountants = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
                                                     && x.OfficeId == officeId
                                                     && x.DepartmentId != null
                                                     && x.CompanyId == companyId)
@@ -93,8 +97,9 @@ namespace eFMS.API.Setting.DL.Services
         
         public List<string> GetBUHead(Guid? companyId, Guid? officeId)
         {
-            var buHeads = sysUserLevelRepo.Get(x => x.GroupId == SettingContansts.SpecialGroup
-                                                    && x.Position == SettingContansts.PositionManager
+            var buHeads = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.Position == SettingConstants.PositionManager
+                                                    && x.DepartmentId == null
                                                     && x.OfficeId == officeId
                                                     && x.CompanyId == companyId).Select(s => s.UserId).ToList();
             return buHeads;
@@ -123,7 +128,7 @@ namespace eFMS.API.Setting.DL.Services
         //Kiểm tra department có phải là department accountant hay không
         public bool CheckIsAccountantDept(int? deptId)
         {
-            var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingContansts.DeptTypeAccountant && x.Id == deptId).Any();
+            var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
         }
 
@@ -145,11 +150,42 @@ namespace eFMS.API.Setting.DL.Services
             //Lấy ra dept code của user dựa vào user
             var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
             var deptTypeOfDept = GetInfoDeptOfUser(departmentId)?.DeptType;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == SettingContansts.DeptTypeAccountant)
+            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == SettingConstants.DeptTypeAccountant)
             {
                 result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
             }
             return result;
         }
+
+        #region --- SETTING FLOW UNLOCK ---
+        public SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId)
+        {
+            var settingFlow = settingFlowRepo.Get(x => x.Flow == "Unlock" && x.Type == type && x.OfficeId == officeId).FirstOrDefault();
+            return settingFlow;
+        }
+
+        public string GetRoleByLevel(string level, string type, Guid? officeId)
+        {
+            var role = string.Empty;
+            switch (level)
+            {
+                case "Leader":
+                    role = GetSettingFlowUnlock(type, officeId)?.Leader;
+                    break;
+                case "Manager":
+                    role = GetSettingFlowUnlock(type, officeId)?.Manager;
+                    break;
+                case "Accountant":
+                    role = GetSettingFlowUnlock(type, officeId)?.Accountant;
+                    break;
+                case "BOD":
+                    role = GetSettingFlowUnlock(type, officeId)?.Bod;
+                    break;
+                default:
+                    break;
+            }
+            return role;
+        }
+        #endregion --- SETTING FLOW UNLOCK ---
     }
 }

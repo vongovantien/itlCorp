@@ -215,10 +215,10 @@
                                         <span>{{charge.customNo}}</span>
                                     </td>
                                     <td>
-                                        <span>{{charge.debit}}</span>
+                                        <span>{{charge.debit | number: '.0-3'}}</span>
                                     </td>
                                     <td>
-                                        <span>{{charge.credit}}</span>
+                                        <span>{{charge.credit | number: '.0-3'}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.currency}}</span>

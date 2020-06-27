@@ -88,8 +88,9 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
                                     <ng-container
                                         *ngIf="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true ;else partnerTemplate">
-                                        <input type="text" class="dropdown-toggle form-control" disabled
-                                            [(ngModel)]="charge.partnerShortName">
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.partnerShortName"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     </ng-container>
                                     <ng-template #partnerTemplate>
                                         <input type="text" class="dropdown-toggle form-control" readonly
@@ -101,6 +102,10 @@
                                     <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.partnerShortName = null"
                                         (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName && !charge.soano 
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName && !charge.soano 
                                         && !charge.debitNo
                                         && !charge.settlementCode
                                         && !charge.voucherId

@@ -53,7 +53,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
-            { title: 'Invoice No', field: 'referenceNo', sortable: true },
+            { title: 'Reference No', field: 'referenceNo', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'HBL', field: 'hblNo', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },

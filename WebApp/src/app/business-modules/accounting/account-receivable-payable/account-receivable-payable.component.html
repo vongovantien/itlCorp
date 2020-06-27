@@ -2,14 +2,18 @@
     <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
-            <form-search-account-receivable-payable></form-search-account-receivable-payable>
+            <form-search-account-receivable-payable (onSearch)="onSearchPayment($event)">
+            </form-search-account-receivable-payable>
 
             <tabset class="custom-class-tab">
-                <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('invoice')">
-                    <list-invoice-account-receivable-payable></list-invoice-account-receivable-payable>
+                <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
+                    <list-invoice-account-receivable-payable
+                        (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
+                    </list-invoice-account-receivable-payable>
                 </tab>
                 <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
-                    <list-obh-account-receivable-payable></list-obh-account-receivable-payable>
+                    <list-obh-account-receivable-payable (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
+                    </list-obh-account-receivable-payable>
                 </tab>
             </tabset>
         </div>

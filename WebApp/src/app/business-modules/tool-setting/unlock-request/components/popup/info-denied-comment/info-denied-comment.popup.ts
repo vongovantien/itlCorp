@@ -20,7 +20,7 @@ export class UnlockRequestInfoDeniedCommentPopupComponent extends PopupBase {
     ngOnInit() {
         this.headers = [
             { title: 'No', field: 'no', sortable: true },
-            { title: 'Name & Deny Time', field: 'name', sortable: true },
+            { title: 'Name & Deny Time', field: 'nameAndTimeDeny', sortable: true },
             { title: 'Level Approval', field: 'levelApprove', sortable: true },
             { title: 'Comment', field: 'comment', sortable: true },
         ];

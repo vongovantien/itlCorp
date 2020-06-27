@@ -46,7 +46,8 @@
                         </div>
                         <div class="col">
                             <select [(ngModel)]="approval.bod" class="form-control">
-                                <option *ngFor="let setting of settings" [value]="setting.value">{{setting.title}}
+                                <option *ngFor="let setting of settingSpecials" [value]="setting.value">
+                                    {{setting.title}}
                                 </option>
                             </select>
                         </div>
@@ -76,21 +77,21 @@
                         <div class="col">{{item.type}}</div>
                         <div class="col">
                             <select [(ngModel)]="item.leader" class="form-control">
-                                <option *ngFor="let setting of settingSpecials" [value]="setting.value">
+                                <option *ngFor="let setting of settings" [value]="setting.value">
                                     {{setting.title}}
                                 </option>
                             </select>
                         </div>
                         <div class="col">
                             <select [(ngModel)]="item.manager" class="form-control">
-                                <option *ngFor="let setting of settingSpecials" [value]="setting.value">
+                                <option *ngFor="let setting of settings" [value]="setting.value">
                                     {{setting.title}}
                                 </option>
                             </select>
                         </div>
                         <div class="col">
                             <select [(ngModel)]="item.accountant" class="form-control">
-                                <option *ngFor="let setting of settingSpecials" [value]="setting.value">
+                                <option *ngFor="let setting of settings" [value]="setting.value">
                                     {{setting.title}}
                                 </option>
                             </select>

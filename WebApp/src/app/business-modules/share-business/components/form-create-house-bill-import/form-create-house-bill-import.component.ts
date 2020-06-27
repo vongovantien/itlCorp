@@ -79,8 +79,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     notifyPartyModel: string;
     isSubmited: boolean = false;
     PortChargeLikePortLoading: boolean = false;
-    countChangePort: number = 0;
-    countChangePartner: number = 0;
+
     mindateEta: any = null;
     mindateEtaWareHouse: any = null;
     saleMans: any = [];
@@ -176,7 +175,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                         this.pod.setValue(this.shipmentDetail.pod);
                         this.localVessel.setValue(this.shipmentDetail.flightVesselName);
                         this.localVoyNo.setValue(this.shipmentDetail.voyNo);
-
+                        this.finalDestinationPlace.setValue(this.shipmentDetail.podName);
                         if (this.shipmentDetail.eta != null) {
 
                             this.eta.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
@@ -190,7 +189,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
                         }
 
-                        this._dataService.setDataService("podName", !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : "");
+                        this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
 
                     }
                 );
@@ -479,9 +478,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 break;
             case 'PortOfDischarge':
                 this.pod.setValue(data.id);
-                if (this.countChangePort === 0) {
-                    this.finalDestinationPlace.setValue(data.nameEn);
-                }
+                this.finalDestinationPlace.setValue(data.nameEn);
 
                 // * Validate duplicate port.
                 if (this.pol.value !== undefined && this.pod.value !== undefined) {
@@ -491,10 +488,9 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                         this.PortChargeLikePortLoading = false;
                     }
                 }
-                this.countChangePort++;
 
                 // * Update default value for sentTo delivery order.
-                this._dataService.setDataService("podName", data.warehouseNameVn || "");
+                this._dataService.setDataService("podName", data.nameVn || "");
 
                 break;
             case 'Supplier':

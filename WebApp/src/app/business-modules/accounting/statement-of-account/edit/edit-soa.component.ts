@@ -67,6 +67,7 @@ export class StatementOfAccountEditComponent extends AppList {
             { title: 'Debit', field: 'debit', sortable: true },
             { title: 'Credit', field: 'credit', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'C/D Note', field: 'cdNote', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },

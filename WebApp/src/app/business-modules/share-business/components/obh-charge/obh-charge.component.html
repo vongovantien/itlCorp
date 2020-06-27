@@ -76,12 +76,21 @@
                                     <ng-container
                                         *ngIf="!!charge.creditNo || !!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true;else  payerCharge">
                                         <input type="text" class="dropdown-toggle form-control" readonly
-                                            [(ngModel)]="charge.payerName" placeholder="Please Select">
+                                            [(ngModel)]="charge.payerShortName" placeholder="Please Select">
                                     </ng-container>
                                     <ng-template #payerCharge>
                                         <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                            [(ngModel)]="charge.payerName" placeholder="Partner Name"
+                                            [(ngModel)]="charge.payerShortName" placeholder="Partner Name"
                                             [disabled]="isShowLoadingPartner ? 'disabled': null">
+                                        <combo-grid-icon (onDelete)="charge.payerId = null; 
+                                            charge.payerShortName = null" [showDelete]="!!charge.payerName 
+                                        && !charge.soano
+                                        && !charge.creditNo
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate">
+                                        </combo-grid-icon>
                                         <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
                                             <div class="d-flex justify-content-end dropdown-partner__header">
                                                 <a class="text-primary text-underline m--margin-right-20 pointer"
@@ -89,10 +98,11 @@
                                                     [title]="type.displayName"
                                                     (click)="selectPartnerTypes(type, charge, 'payer')">{{type.displayName}}</a>
                                             </div>
-                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                            <app-combo-grid #d [headers]="headerPartner" [data]="listPartner"
                                                 [fields]="['taxCode','partnerNameEn']" [active]="charge.payerId"
                                                 (onClick)="onSelectPayerReceiver($event, charge, 'payer')">
                                             </app-combo-grid>
+
                                         </div>
                                     </ng-template>
                                 </div>
@@ -102,8 +112,9 @@
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }">
                                     <ng-container
                                         *ngIf="!!charge.creditNo || !!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true; else partnerTemplate">
-                                        <input type="text" class="dropdown-toggle form-control" disabled
-                                            [(ngModel)]="charge.receiverName">
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.receiverName"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
                                     </ng-container>
                                     <ng-template #partnerTemplate>
                                         <input type="text" class="dropdown-toggle form-control" readonly

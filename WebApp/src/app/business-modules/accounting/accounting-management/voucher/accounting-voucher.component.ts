@@ -45,8 +45,8 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
-            { title: 'Voucher ID', field: 'VoucherId', sortable: true },
-            { title: 'Partner Name', field: 'PartnerName', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true },
+            { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Total Amount', field: 'totalAmount', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
             { title: 'Voucher Date', field: 'date', sortable: true },
@@ -106,7 +106,7 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
 
     exportVoucher() {
         this._progressRef.start();
-        this._exportRepo.exportAccountingManagement("Voucher")
+        this._exportRepo.exportAccountingManagement(this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

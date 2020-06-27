@@ -162,7 +162,53 @@ export class UnlockRequestAddNewComponent extends AppForm {
     }
 
     sendRequest() {
+        this.isSubmited = true;
+        console.log(this.listJobComponent.dataJobs);
+        if (this.formAdd.valid) {
+            if (!this.listJobComponent.dataJobs.length) {
+                this._toastService.warning("Unlock request don't have any job/advance/settlement in this period, Please check it again!");
+                return;
+            }
+            const _unlockRequest: SetUnlockRequestModel = {
+                id: SystemConstants.EMPTY_GUID,
+                subject: this.subject.value,
+                requester: null,
+                unlockType: this.unlockType.value[0].id,
+                newServiceDate: this.unlockTypeEnum === CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE ? (this.serviceDate.value.startDate !== null ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+                generalReason: this.generalReason.value,
+                requestDate: null,
+                requestUser: null,
+                statusApproval: null,
+                userCreated: null,
+                datetimeCreated: null,
+                userModified: null,
+                datetimeModified: null,
+                groupId: 0,
+                departmentId: 0,
+                officeId: SystemConstants.EMPTY_GUID,
+                companyId: SystemConstants.EMPTY_GUID,
+                jobs: this.listJobComponent.dataJobs,
+                requesterName: null,
+                userNameCreated: null,
+                userNameModified: null
+            };
+            console.log(_unlockRequest);
+            this._progressRef.start();
+            this._settingRepo.sendRequestUnlock(_unlockRequest)
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this._progressRef.complete();
+                }))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(`'Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
 
+        }
     }
 
     confirmCancel() {

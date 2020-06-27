@@ -178,14 +178,17 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         switch (type) {
             case 'receiver':
                 if (!!partnerData) {
-                    chargeItem.receiverName = partnerData.shortName;
+                    chargeItem.receiverName = partnerData.partnerNameEn;
                     chargeItem.paymentObjectId = partnerData.id;
+                    chargeItem.receiverShortName = partnerData.shortName;
                 }
                 break;
             case 'payer':
                 if (!!partnerData) {
-                    chargeItem.payerName = partnerData.shortName;
+                    chargeItem.payerName = partnerData.partnerNameEn;
                     chargeItem.payerId = partnerData.id;
+                    chargeItem.payerShortName = partnerData.shortName;
+
                 }
                 break;
             default:

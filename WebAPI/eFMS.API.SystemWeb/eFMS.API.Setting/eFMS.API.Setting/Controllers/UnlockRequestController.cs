@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
@@ -27,17 +28,19 @@ namespace eFMS.API.Setting.Controllers
         readonly ICurrentUser currentUser;
         private readonly IUnlockRequestService unlockRequestService;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IUnlockRequestApproveService unlockRequestApproveService;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="currUser"></param>
-        public UnlockRequestController(IStringLocalizer<LanguageSub> localizer, IUnlockRequestService service, ICurrentUser currUser)
+        public UnlockRequestController(IStringLocalizer<LanguageSub> localizer, IUnlockRequestService service, ICurrentUser currUser, IUnlockRequestApproveService unlockRequestApprove)
         {
             stringLocalizer = localizer;
             unlockRequestService = service;
             currentUser = currUser;
+            unlockRequestApproveService = unlockRequestApprove;
         }
 
         [HttpGet()]
@@ -136,6 +139,104 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(new HandleState());
         }
-        
+
+        [HttpPost]
+        [Route("SaveAndSendRequest")]
+        [Authorize]
+        public IActionResult SaveAndSendRequest(SetUnlockRequestModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            
+            HandleState hs;
+            var message = string.Empty;
+            if (model.Id == null || model.Id == Guid.Empty) //Insert Unlock Request
+            {
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = unlockRequestApproveService.CheckExistSettingFlow(model.UnlockType, currentUser.OfficeID);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = unlockRequestApproveService.CheckExistUserApproval(model.UnlockType, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
+                model.StatusApproval = SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.RequestDate = DateTime.Now;
+                model.RequestUser = currentUser.UserID;
+                hs = unlockRequestService.AddUnlockRequest(model);
+                message = HandleError.GetMessage(hs, Crud.Insert);
+            }
+            else //Update Unlock Request
+            {
+                var unlockRequestCurrent = unlockRequestService.Get(x => x.Id == model.Id).FirstOrDefault();
+                #region -- Check Exist Unlock Request --
+                if (unlockRequestCurrent == null)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Not found unlock request" };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Unlock Request --
+
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = unlockRequestApproveService.CheckExistSettingFlow(unlockRequestCurrent.UnlockType, unlockRequestCurrent.OfficeId);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = unlockRequestApproveService.CheckExistUserApproval(model.UnlockType, unlockRequestCurrent.GroupId, unlockRequestCurrent.DepartmentId, unlockRequestCurrent.OfficeId, unlockRequestCurrent.CompanyId);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
+                #region -- Check Unlock Request Approving --
+                if (!model.StatusApproval.Equals(SettingConstants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(SettingConstants.STATUS_APPROVAL_DENIED))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the unlock request status is New or Deny" };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Unlock Request Approving --
+
+                model.StatusApproval = SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
+                model.RequestDate = DateTime.Now;
+                model.RequestUser = currentUser.UserID;
+                hs = unlockRequestService.UpdateUnlockRequest(model);
+                message = HandleError.GetMessage(hs, Crud.Update);
+            }
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (hs.Success)
+            {
+                SetUnlockRequestApproveModel approve = new SetUnlockRequestApproveModel
+                {
+                    UnlockRequestId = model.Id
+                };
+                var resultInsertUpdateApproval = unlockRequestApproveService.InsertOrUpdateApproval(approve);
+                if (!resultInsertUpdateApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }
