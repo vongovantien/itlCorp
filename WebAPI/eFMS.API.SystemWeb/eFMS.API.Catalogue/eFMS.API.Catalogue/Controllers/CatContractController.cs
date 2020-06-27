@@ -191,13 +191,12 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var saleman = mapper.Map<CatContractModel>(model);
             string messageExisted = CheckExistedContract(model);
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
             }
-            var hs = catContractService.Update(saleman);
+            var hs = catContractService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

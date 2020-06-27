@@ -39,6 +39,7 @@ export class Contract {
     index: number = null;
     fileList: any = null;
     file: File = null;
+    isRequestApproval: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

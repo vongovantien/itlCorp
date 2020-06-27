@@ -115,9 +115,19 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
-            var hs = DataContext.Add(contract);
+            var hs = DataContext.Add(contract,false);
             if (hs.Success)
             {
+                DataContext.SubmitChanges();
+                if(entity.isRequestApproval == true)
+                {
+                    var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
+                    CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
+                    model.ContractService = entity.SaleService;
+                    model.ContractType = entity.ContractType;
+                    model.ContractNo = entity.ContractNo;
+                    SendMailActiveSuccess(model, string.Empty);
+                }
                 ClearCache();
                 Get();
             }
@@ -132,9 +142,19 @@ namespace eFMS.API.Catalogue.DL.Services
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
-            var hs = DataContext.Update(entity, x => x.Id == model.Id);
+            var hs = DataContext.Update(entity, x => x.Id == model.Id,false);
             if (hs.Success)
             {
+                DataContext.SubmitChanges();
+                if (model.isRequestApproval == true)
+                {
+                    var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
+                    CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
+                    modelPartner.ContractService = entity.SaleService;
+                    modelPartner.ContractType = entity.ContractType;
+                    modelPartner.ContractNo = entity.ContractNo;
+                    SendMailActiveSuccess(modelPartner, string.Empty);
+                }
                 ClearCache();
                 Get();
             }
@@ -252,13 +272,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = objUpdate.SaleService;
                     model.ContractType = objUpdate.ContractType;
-                    SendMailActiveSuccess(model);
+                    SendMailActiveSuccess(model,"active");
                 }
             }
             return isUpdateDone;
         }
 
-        private void SendMailActiveSuccess(CatPartnerModel partner)
+        private void SendMailActiveSuccess(CatPartnerModel partner,string type)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
@@ -285,23 +305,53 @@ namespace eFMS.API.Catalogue.DL.Services
                     break;
             }
 
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string subject = string.Empty;
+            string body = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-            string linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
-            string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            string subject = "Actived Agent - " + partner.ShortName;
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
+            if(type == "active")
+            {
+                linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+                linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+                subject = "Actived Agent - " + partner.ShortName;
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
 
+                    "<i> You Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
+                    "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
 
-                "<i> You Agent - " + partner.PartnerNameVn + " ] is active with info below </i> </br>" +
-                "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
+                    "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                    "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+                    "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
+                    + linkEn + "</br>" + linkVn + "</br> </br>" +
+                    "<i> Thanks and Regards </i>" + "</br> </br>" +
+                    "eFMS System </div>");
+            } else
+            {
+                linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+                linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+                subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-                "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-                "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
-                "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
-                + linkEn + "</br>" + linkVn + "</br> </br>" +
-                "<i> Thanks and Regards </i>" + "</br> </br>" +
-                "eFMS System </div>");
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, "  + " </br> </br>" +
+
+                  "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+                  "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+
+                  "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+                  "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                  "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+
+                  "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+                  "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>"+
+                  "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" + 
+                  "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
+
+                  + linkEn + "</br>" + linkVn + "</br> </br>" +
+                  "<i> Thanks and Regards </i>" + "</br> </br>" +
+                  "eFMS System </div>");
+            }
+    
             SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com" }, null, null);
         }
 

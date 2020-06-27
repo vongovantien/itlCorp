@@ -45,7 +45,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     minDateEffective: any = null;
     minDateExpired: any = null;
 
-    partnerId: string;
+    partnerId: string = null;
 
     users: User[] = [];
     companies: Company[] = [];
@@ -293,7 +293,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
 
-    onSubmit() {
+    onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
         this.isSubmitted = true;
@@ -308,6 +308,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         if (this.formGroup.valid) {
             this.asignValueToModel();
+            if (isRequestApproval) {
+                this.selectedContract.isRequestApproval = true;
+            }
             console.log(this.selectedContract);
             if (!this.isUpdate && !this.isCreateNewCommercial) {
                 this._catalogueRepo.createContract(this.selectedContract)
