@@ -95,7 +95,7 @@ namespace eFMS.API.System.DL.Services
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
 
-                    hs = DataContext.Update(item, x => x.Id == item.OfficeId, false);
+                    hs = DataContext.Update(item, x => x.Id == item.Id, false);
                 }
             }
             DataContext.SubmitChanges();
