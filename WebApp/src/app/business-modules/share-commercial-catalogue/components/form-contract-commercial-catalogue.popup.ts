@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { finalize, catchError, mergeMap } from 'rxjs/operators';
+import { finalize, catchError, mergeMap, distinctUntilChanged, map } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
@@ -44,6 +44,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     minDateEffective: any = null;
     minDateExpired: any = null;
+    minDateExpiredTrial: any = null;
+
 
     partnerId: string = null;
 
@@ -69,6 +71,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     files: any = {};
 
     menuSpecialPermission: Observable<any[]>;
+
+
 
     contractTypes: CommonInterface.INg2Select[] = [
         { id: "Trial", text: "Trial" },
@@ -121,6 +125,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.formGroup.controls['paymentTerm'].setValue(30);
             this.formGroup.controls['creditLimitRate'].setValue(120);
         }
+
+        this.formGroup.get("effectiveDate").valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
+            )
+            .subscribe((value: any) => {
+                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+            });
+        this.formGroup.get("trialEffectDate").valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
+            )
+            .subscribe((value: any) => {
+                this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+            });
     }
 
 
@@ -389,6 +410,39 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         });
         return activeVasList;
     }
+
+    pachValueToFormContract() {
+        this.activeServices = this.getCurrentActiveService(this.selectedContract.saleService);
+        this.activeVas = this.getCurrentActiveVas(this.selectedContract.vas);
+        this.setError(this.saleService);
+        this.formGroup.patchValue({
+            salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
+            companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
+            officeId: !!this.selectedContract.officeId ? this.selectedContract.officeId : null,
+            contractNo: this.selectedContract.contractNo,
+            effectiveDate: !!this.selectedContract.effectiveDate ? { startDate: new Date(this.selectedContract.effectiveDate), endDate: new Date(this.selectedContract.effectiveDate) } : null,
+            expiredDate: !!this.selectedContract.expiredDate ? { startDate: new Date(this.selectedContract.expiredDate), endDate: new Date(this.selectedContract.expiredDate) } : null,
+            contractType: !!this.selectedContract.contractType ? [this.contractTypes.find(type => type.id === this.selectedContract.contractType)] : null,
+            paymentTerm: this.selectedContract.paymentTerm,
+            creditLimit: this.selectedContract.creditLimit,
+            creditLimitRate: this.selectedContract.creditLimitRate,
+            trialCreditLimit: this.selectedContract.trialCreditLimited,
+            trialCreditDays: this.selectedContract.trialCreditDays,
+            trialEffectDate: !!this.selectedContract.trialEffectDate ? { startDate: new Date(this.selectedContract.trialEffectDate), endDate: new Date(this.selectedContract.trialEffectDate) } : null,
+            trialExpiredDate: !!this.selectedContract.trialExpiredDate ? { startDate: new Date(this.selectedContract.trialExpiredDate), endDate: new Date(this.selectedContract.trialExpiredDate) } : null,
+            creditAmount: this.selectedContract.creditAmount,
+            billingAmount: this.selectedContract.billingAmount,
+            paidAmount: this.selectedContract.paidAmount,
+            unpaidAmount: this.selectedContract.unpaidAmount,
+            customerAmount: this.selectedContract.customerAdvanceAmount,
+            creditRate: this.selectedContract.creditRate,
+            description: this.selectedContract.description,
+            serviceType: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
+            vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
+            paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null
+        });
+    }
+
 
     asignValueToModel() {
         this.selectedContract = new Contract();

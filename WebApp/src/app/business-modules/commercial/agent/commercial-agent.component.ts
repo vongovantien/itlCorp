@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
 import { catchError, finalize } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-commercial-agent',
@@ -31,6 +32,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _router: Router,
         private _exportRepo: ExportRepo) {
         super();
 
@@ -80,7 +82,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     getPartners() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerGroup: CommonEnum.PartnerGroupEnum.AGENT }, this.dataSearch))
+        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerType: 'Agent' }, this.dataSearch))
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -177,6 +179,25 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                 }
             );
     }
+
+
+    showDetail(agent: Partner) {
+        this.selectedAgent = agent;
+        this._catalogueRepo.checkViewDetailPartnerPermission(this.selectedAgent.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: boolean) => {
+                    if (res) {
+                        this._router.navigate([`/home/commercial/agent/${this.selectedAgent.id}`]);
+                    } else {
+                        this.info403Popup.show();
+                    }
+                },
+            );
+    }
+
 }
 
 

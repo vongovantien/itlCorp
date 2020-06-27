@@ -51,7 +51,11 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate(["home/commercial/customer"]);
+        if (this.type === 'Customer') {
+            this._router.navigate(["home/commercial/customer"]);
+        } else {
+            this._router.navigate(["home/commercial/agent"]);
+        }
     }
 
     onSave() {
@@ -101,6 +105,14 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                                     idsContract.push(element.id);
                                 }
                             });
+                            if (this.fileList.length === 0) {
+                                if (this.type === 'Customer') {
+                                    this._router.navigate(["/home/commercial/customer"]);
+                                } else {
+                                    this._router.navigate(["/home/commercial/agent"]);
+
+                                }
+                            }
                             return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
                         }
                     }
@@ -108,9 +120,13 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 })
             ).subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    if (this.type === 'Customer') {
                         this._router.navigate(["/home/commercial/customer"]);
+                    } else {
+                        this._router.navigate(["/home/commercial/agent"]);
+
                     }
+
                 },
                 (error: HttpErrorResponse) => {
                     console.log(error);

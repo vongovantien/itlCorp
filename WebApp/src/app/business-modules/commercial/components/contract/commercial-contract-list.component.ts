@@ -95,7 +95,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                         this.selectedContract = res;
                         this.formContractPopup.idContract = this.selectedContract.id;
                         this.formContractPopup.selectedContract = res;
-                        this.pachValueToFormContract();
+                        this.formContractPopup.pachValueToFormContract();
                         this.formContractPopup.show();
                     }
                 );
@@ -105,42 +105,11 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 this.formContractPopup.indexDetailContract = this.indexlstContract;
                 this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
             }
-            this.pachValueToFormContract();
+            this.formContractPopup.pachValueToFormContract();
             this.formContractPopup.show();
         }
     }
 
-    pachValueToFormContract() {
-        this.formContractPopup.activeServices = this.formContractPopup.getCurrentActiveService(this.formContractPopup.selectedContract.saleService);
-        this.formContractPopup.activeVas = this.formContractPopup.getCurrentActiveVas(this.formContractPopup.selectedContract.vas);
-        this.formContractPopup.setError(this.formContractPopup.saleService);
-        this.formContractPopup.formGroup.patchValue({
-            salesmanId: !!this.formContractPopup.selectedContract.saleManId ? this.formContractPopup.selectedContract.saleManId : null,
-            companyId: !!this.formContractPopup.selectedContract.companyId ? this.formContractPopup.selectedContract.companyId : null,
-            officeId: !!this.formContractPopup.selectedContract.officeId ? this.formContractPopup.selectedContract.officeId : null,
-            contractNo: this.formContractPopup.selectedContract.contractNo,
-            effectiveDate: !!this.formContractPopup.selectedContract.effectiveDate ? { startDate: new Date(this.formContractPopup.selectedContract.effectiveDate), endDate: new Date(this.formContractPopup.selectedContract.effectiveDate) } : null,
-            expiredDate: !!this.formContractPopup.selectedContract.expiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.expiredDate), endDate: new Date(this.formContractPopup.selectedContract.expiredDate) } : null,
-            contractType: !!this.formContractPopup.selectedContract.contractType ? [this.formContractPopup.contractTypes.find(type => type.id === this.formContractPopup.selectedContract.contractType)] : null,
-            paymentTerm: this.formContractPopup.selectedContract.paymentTerm,
-            creditLimit: this.formContractPopup.selectedContract.creditLimit,
-            creditLimitRate: this.formContractPopup.selectedContract.creditLimitRate,
-            trialCreditLimit: this.formContractPopup.selectedContract.trialCreditLimited,
-            trialCreditDays: this.formContractPopup.selectedContract.trialCreditDays,
-            trialEffectDate: !!this.formContractPopup.selectedContract.trialEffectDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialEffectDate), endDate: new Date(this.formContractPopup.selectedContract.trialEffectDate) } : null,
-            trialExpiredDate: !!this.formContractPopup.selectedContract.trialExpiredDate ? { startDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate), endDate: new Date(this.formContractPopup.selectedContract.trialExpiredDate) } : null,
-            creditAmount: this.formContractPopup.selectedContract.creditAmount,
-            billingAmount: this.formContractPopup.selectedContract.billingAmount,
-            paidAmount: this.formContractPopup.selectedContract.paidAmount,
-            unpaidAmount: this.formContractPopup.selectedContract.unpaidAmount,
-            customerAmount: this.formContractPopup.selectedContract.customerAdvanceAmount,
-            creditRate: this.formContractPopup.selectedContract.creditRate,
-            description: this.formContractPopup.selectedContract.description,
-            serviceType: [<CommonInterface.INg2Select>{ id: this.formContractPopup.selectedContract.saleService, text: '' }],
-            vas: [<CommonInterface.INg2Select>{ id: this.formContractPopup.selectedContract.vas, text: '' }],
-            paymentMethod: !!this.formContractPopup.selectedContract.paymentMethod ? [this.formContractPopup.paymentMethods.find(type => type.id === this.formContractPopup.selectedContract.paymentMethod)] : null
-        });
-    }
 
     getFileContract() {
         this.formContractPopup.isLoading = true;

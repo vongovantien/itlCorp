@@ -99,7 +99,8 @@
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="expiredDate" readonly />
+                                        name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
+                                        [minDate]="minDateExpired" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -211,7 +212,8 @@
                                             type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                            formControlName="trialExpiredDate" readonly />
+                                            formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
+                                            readonly />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
