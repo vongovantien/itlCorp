@@ -109,7 +109,7 @@
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
                                 <button title="Save" type="button"
-                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
+                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && !unlockRequest.isManager"
                                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
                                     <span>
                                         <i class="la la-save"></i>
@@ -119,7 +119,7 @@
                                     </span>
                                 </button>
                                 <button title="Send Request" type="button"
-                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
+                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && !unlockRequest.isManager"
                                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="sendRequest()">
                                     <span>
@@ -141,7 +141,7 @@
                                     </span>
                                 </button>
                                 <button title="Confirm" type="button"
-                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done'"
+                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager"
                                     class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="confirmRequest()">
                                     <span>
@@ -152,7 +152,7 @@
                                     </span>
                                 </button>
                                 <button title="Deny" type="button"
-                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done'"
+                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="denyRequest()">
                                     <span>

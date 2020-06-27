@@ -34,6 +34,8 @@ export class SetUnlockRequestModel extends SetUnlockRequest {
     requesterName: string = null;
     userNameCreated: string = null;
     userNameModified: string = null;
+    isManager: boolean = false;
+    isApproved: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

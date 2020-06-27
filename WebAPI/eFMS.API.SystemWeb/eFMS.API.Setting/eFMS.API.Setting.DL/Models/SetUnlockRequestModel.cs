@@ -11,5 +11,7 @@ namespace eFMS.API.Setting.DL.Models
         public string RequesterName { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
+        public bool IsManager { get; set; }
+        public bool IsApproved { get; set; }
     }
 }

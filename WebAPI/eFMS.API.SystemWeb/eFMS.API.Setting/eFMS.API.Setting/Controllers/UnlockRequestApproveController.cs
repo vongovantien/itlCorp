@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.Infrastructure.Middlewares;
@@ -60,6 +61,63 @@ namespace eFMS.API.Setting.Controllers
         {
             var data = unlockRequestApproveService.GetHistoryDenied(id);
             return Ok(data);
+        }
+
+        [HttpPost]
+        [Route("UpdateApprove")]
+        [Authorize]
+        public IActionResult UpdateApprove(Guid id)
+        {
+            var updateApproval = unlockRequestApproveService.UpdateApproval(id);
+            ResultHandle _result;
+            if (!updateApproval.Success)
+            {
+                _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            else
+            {
+                _result = new ResultHandle { Status = updateApproval.Success };
+                return Ok(_result);
+            }
+        }
+
+        [HttpPost]
+        [Route("DeniedApprove")]
+        [Authorize]
+        public IActionResult DeniedApprove(Guid id, string comment)
+        {
+            var denieApproval = unlockRequestApproveService.DeniedApprove(id, comment);
+            ResultHandle _result;
+            if (!denieApproval.Success)
+            {
+                _result = new ResultHandle { Status = denieApproval.Success, Message = denieApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            else
+            {
+                _result = new ResultHandle { Status = denieApproval.Success };
+                return Ok(_result);
+            }
+        }
+
+        [HttpPost]
+        [Route("CancelRequest")]
+        [Authorize]
+        public IActionResult CancelRequest(Guid id)
+        {
+            var updateApproval = unlockRequestApproveService.CancelRequest(id);
+            ResultHandle _result;
+            if (!updateApproval.Success)
+            {
+                _result = new ResultHandle { Status = updateApproval.Success, Message = updateApproval.Exception.Message };
+                return BadRequest(_result);
+            }
+            else
+            {
+                _result = new ResultHandle { Status = updateApproval.Success };
+                return Ok(_result);
+            }
         }
     }
 }

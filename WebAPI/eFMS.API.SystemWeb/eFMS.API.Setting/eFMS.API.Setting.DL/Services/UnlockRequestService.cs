@@ -30,6 +30,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsRepo;
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
+        private readonly IUnlockRequestApproveService unlockRequestApproveService;
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -44,7 +45,8 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CsTransactionDetail> transDetail,
             IContextBase<CustomsDeclaration> customs,
             IContextBase<SysUser> sysUser,
-            IContextBase<CsShipmentSurcharge> surcharge) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surcharge,
+            IUnlockRequestApproveService unlockRequestApprove) : base(repository, mapper)
         {
             currentUser = user;
             setUnlockRequestJobRepo = setUnlockRequestJob;
@@ -57,6 +59,7 @@ namespace eFMS.API.Setting.DL.Services
             customsRepo = customs;
             userRepo = sysUser;
             surchargeRepo = surcharge;
+            unlockRequestApproveService = unlockRequestApprove;
         }
         
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -475,6 +478,13 @@ namespace eFMS.API.Setting.DL.Services
                 detail.RequesterName = userRepo.Where(x => x.Id == unlockRequest.Requester).FirstOrDefault()?.Username;
                 detail.UserNameCreated = userRepo.Where(x => x.Id == unlockRequest.UserCreated).FirstOrDefault()?.Username;
                 detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
+                var unlockApprove = setUnlockRequestApproveRepo.Get(x => x.UnlockRequestId == id).FirstOrDefault();
+                detail.IsManager = currentUser.GroupId == SettingConstants.SpecialGroup && 
+                    (currentUser.UserID == unlockApprove.Manager 
+                    || currentUser.UserID == unlockApprove.ManagerApr 
+                    || currentUser.UserID == unlockApprove.Accountant 
+                    || currentUser.UserID == unlockApprove.AccountantApr) ? true : false;
+                detail.IsApproved = unlockRequestApproveService.CheckUserInApprove(currentUser, unlockRequest, unlockApprove);
             }
             return detail;
         }

@@ -4,7 +4,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using eFMS.IdentityServer.DL.UserManager;
 
 namespace eFMS.API.Setting.DL.IService
 {
@@ -15,5 +15,9 @@ namespace eFMS.API.Setting.DL.IService
         HandleState InsertOrUpdateApproval(SetUnlockRequestApproveModel approve);
         HandleState CheckExistSettingFlow(string type, Guid? officeId);
         HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        HandleState UpdateApproval(Guid id);
+        HandleState DeniedApprove(Guid id, string comment);
+        HandleState CancelRequest(Guid id);
+        bool CheckUserInApprove(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve);
     }
 }
