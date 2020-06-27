@@ -23,6 +23,10 @@ export class Authorization {
     officeId: string = '';
     companyId: string = '';
     permission: PermissionShipment = new PermissionShipment();
+
+    userModifiedName?: string = null;
+    userCreatedName?: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

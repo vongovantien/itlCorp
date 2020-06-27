@@ -43,11 +43,16 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     minDateExpired: any = null;
     minDateEffective: any = null;
 
+    datetimeCreated: string;
+    userCreatedName: string;
+    datetimeModified: string;
+    userModifiedName: string;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
-        private _toastService: ToastrService, ) {
+        private _toastService: ToastrService,) {
         super();
     }
 
@@ -142,7 +147,8 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 departmentId: this.authorization.departmentId,
                 officeId: this.authorization.officeId,
                 companyId: this.authorization.companyId,
-                permission: this.authorization.permission
+                permission: this.authorization.permission,
+
             };
             this.authorizationToUpdate = _authorization;
             if (this.action === "create") {
@@ -188,6 +194,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     getDetail() {
+        this.isShowUpdate = true;
         const indexPIC = this.personInChargeList.findIndex(x => x.id === this.authorization.userId);
         if (indexPIC > -1) {
             this.personInChargeActive = [this.personInChargeList[indexPIC]];
@@ -208,6 +215,11 @@ export class AuthorizationAddPopupComponent extends PopupBase {
             authorizationNote: this.authorization.description,
             authorizationActive: this.authorization.active
         });
+
+        this.datetimeCreated = this.authorization.datetimeCreated;
+        this.userCreatedName = this.authorization.userCreatedName;
+        this.datetimeModified = this.authorization.datetimeModified;
+        this.userModifiedName = this.authorization.userModifiedName;
     }
 
     getCurrentActiveService(ChargeService: any) {
