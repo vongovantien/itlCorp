@@ -634,17 +634,12 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     if (!!value && !!value.length) {
                         switch (value[0].id) {
                             case 'PP':
-                                if (!this.dueAgentPp.value) {
-                                    this.dueAgentCll.setValue(null);
-                                }
+                                this.updateDueAgentCarrierWithTotalAgent(this.dueAgentCll.value, this.dueCarrierCll.value);
                                 break;
                             case 'CLL':
-                                if (!this.dueAgentCll.value) {
-                                    this.dueAgentPp.setValue(null);
-                                }
+                                this.updateDueAgentCarrierWithTotalAgent(this.dueAgentPp.value, this.dueCarrierPp.value);
                                 break;
                         }
-                        this.updateDueAgentCarrierWithTotalAgent(this.otherChargedata.totalAmountAgent, this.otherChargedata.totalAmountCarrier);
                         this.updateTotalPrepaidCollect();
 
                     } else {
