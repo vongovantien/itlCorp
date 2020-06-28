@@ -34,6 +34,7 @@ export class SetUnlockRequestModel extends SetUnlockRequest {
     requesterName: string = null;
     userNameCreated: string = null;
     userNameModified: string = null;
+    isRequester: boolean = false;
     isManager: boolean = false;
     isApproved: boolean = false;
     constructor(object?: any) {
@@ -111,8 +112,8 @@ export class SetUnlockRequestApprove {
     accountantApr: string = null;
     accountantAprDate: string = null;
     buhead: string = null;
-    BuheadApr: string = null;
-    BuheadAprDate: string = null;
+    buheadApr: string = null;
+    buheadAprDate: string = null;
     userCreated: string = null;
     datetimeCreated: string = null;
     userModified: string = null;

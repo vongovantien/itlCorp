@@ -103,13 +103,12 @@
                     </div>
                     <process-approve-unlock-request></process-approve-unlock-request>
                 </form>
-
                 <div class="row" *ngIf="!!unlockRequest">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
                                 <button title="Save" type="button"
-                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && !unlockRequest.isManager"
+                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && unlockRequest.isRequester"
                                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
                                     <span>
                                         <i class="la la-save"></i>
@@ -119,7 +118,7 @@
                                     </span>
                                 </button>
                                 <button title="Send Request" type="button"
-                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && !unlockRequest.isManager"
+                                    *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && unlockRequest.isRequester"
                                     class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="sendRequest()">
                                     <span>
@@ -130,7 +129,7 @@
                                     </span>
                                 </button>
                                 <button title="Cancel Request" type="button"
-                                    *ngIf="unlockRequest.statusApproval === 'Request Approval'"
+                                    *ngIf="unlockRequest.statusApproval === 'Request Approval' && unlockRequest.isRequester"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="cancelRequest()">
                                     <span>
@@ -141,7 +140,7 @@
                                     </span>
                                 </button>
                                 <button title="Confirm" type="button"
-                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager"
+                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager && !unlockRequest.isApproved"
                                     class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="confirmRequest()">
                                     <span>
@@ -152,9 +151,10 @@
                                     </span>
                                 </button>
                                 <button title="Deny" type="button"
-                                    *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager"
+                                    *ngIf="(unlockRequest.isManager && (unlockRequest.statusApproval === 'Request Approval' || unlockRequest.statusApproval === 'Leader Approved' || unlockRequest.statusApproval === 'Manager Approved' ||
+                                    unlockRequest.statusApproval==='Accoutant Approved' )) || !unlockRequest.isApproved"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="denyRequest()">
+                                    (click)="showInputCommentDeny()">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -172,7 +172,7 @@
         </div>
     </div>
 </div>
-<input-denied-comment-popup></input-denied-comment-popup>
+<input-denied-comment-popup (onComment)="sendDeny($event)"></input-denied-comment-popup>
 <confirm-popup #confirmCancelPopup [body]="'Do you want to exit without saving?'" [labelConfirm]="'Yes'"
     (onSubmit)="onCancelUnlock()">
 </confirm-popup>

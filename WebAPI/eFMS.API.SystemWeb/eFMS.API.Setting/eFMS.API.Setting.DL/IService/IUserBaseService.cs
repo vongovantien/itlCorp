@@ -18,6 +18,7 @@ namespace eFMS.API.Setting.DL.IService
         SysEmployee GetEmployeeByEmployeeId(string employeeId);
         SysEmployee GetEmployeeByUserId(string userId);
         bool CheckIsAccountantDept(int? deptId);
+        bool CheckIsBOD(Guid? officeId);
         List<string> GetListUserDeputyByDept(string dept);
         bool CheckDeputyManagerByUser(int? departmentId, string userId);
         bool CheckDeputyAccountantByUser(int? departmentId, string userId);

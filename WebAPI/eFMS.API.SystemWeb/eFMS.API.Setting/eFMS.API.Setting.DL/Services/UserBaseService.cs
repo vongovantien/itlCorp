@@ -130,6 +130,15 @@ namespace eFMS.API.Setting.DL.Services
         {
             var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
+        }       
+
+        public bool CheckIsBOD(Guid? officeId)
+        {
+            var isBod = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
+                                                    && x.DepartmentId == null
+                                                    && x.OfficeId != null
+                                                    && x.CompanyId != null).Select(s => s.UserId).Any();
+            return isBod;
         }
 
         //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept
@@ -160,6 +169,7 @@ namespace eFMS.API.Setting.DL.Services
         #region --- SETTING FLOW UNLOCK ---
         public SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId)
         {
+            type = (type == "Change Service Date") ? "Shipment" : type;
             var settingFlow = settingFlowRepo.Get(x => x.Flow == "Unlock" && x.Type == type && x.OfficeId == officeId).FirstOrDefault();
             return settingFlow;
         }

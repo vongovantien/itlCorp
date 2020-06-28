@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
@@ -7,6 +8,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +19,34 @@ namespace eFMS.API.Setting.DL.Services
     public class UnlockRequestApproveService : RepositoryBase<SetUnlockRequestApprove, SetUnlockRequestApproveModel>, IUnlockRequestApproveService
     {
         private readonly ICurrentUser currentUser;
+        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SetUnlockRequest> unlockRequestRepo;
+        readonly IContextBase<SetUnlockRequestJob> unlockRequestJobRepo;
+        readonly IContextBase<OpsTransaction> opsTransactionRepo;
+        readonly IContextBase<CsTransaction> csTransactionRepo;
 
         public UnlockRequestApproveService(
             IContextBase<SetUnlockRequestApprove> repository,
+            IOptions<WebUrl> wUrl,
+            IOptions<ApiUrl> aUrl,
             IMapper mapper,
             ICurrentUser user,
             IUserBaseService userBase,
-            IContextBase<SetUnlockRequest> unlockRequest) : base(repository, mapper)
+            IContextBase<SetUnlockRequest> unlockRequest,
+            IContextBase<SetUnlockRequestJob> unlockRequestJob,
+            IContextBase<OpsTransaction> opsTransaction,
+            IContextBase<CsTransaction> csTransaction) : base(repository, mapper)
         {
+            webUrl = wUrl;
+            apiUrl = aUrl;
             currentUser = user;
             userBaseService = userBase;
             unlockRequestRepo = unlockRequest;
+            unlockRequestJobRepo = unlockRequestJob;
+            opsTransactionRepo = opsTransaction;
+            csTransactionRepo = csTransaction;
         }
 
         public SetUnlockRequestApproveModel GetInfoApproveUnlockRequest(Guid id)
@@ -37,10 +54,6 @@ namespace eFMS.API.Setting.DL.Services
             var userCurrent = currentUser.UserID;
             var unlockApprove = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == false).FirstOrDefault();
             var unlockRequest = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault();
-            if (unlockRequest != null)
-            {
-                unlockRequest.UnlockType = unlockRequest.UnlockType == "Change Service Date" ? "Shipment" : unlockRequest.UnlockType;
-            }
 
             SetUnlockRequestApproveModel unlockApproveModel = new SetUnlockRequestApproveModel();
 
@@ -76,7 +89,7 @@ namespace eFMS.API.Setting.DL.Services
             {
                 var item = new DeniedUnlockRequestResult();
                 item.No = i;
-                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + "\n" + approve.DatetimeModified?.ToString("dd/MM/yyyy HH:mm");
+                item.NameAndTimeDeny = userBaseService.GetEmployeeByUserId(approve.UserModified)?.EmployeeNameVn + "\r\n" + approve.DatetimeModified?.ToString("dd/MM/yyyy HH:mm");
                 item.LevelApprove = approve.LevelApprove;
                 item.Comment = approve.Comment;
                 data.Add(item);
@@ -93,7 +106,6 @@ namespace eFMS.API.Setting.DL.Services
                 var unlockApprove = mapper.Map<SetUnlockRequestApprove>(approve);
 
                 var unlockRequest = unlockRequestRepo.Get(x => x.Id == approve.UnlockRequestId).FirstOrDefault();
-                if (unlockRequest != null) unlockRequest.UnlockType = unlockRequest.UnlockType == "Change Service Date" ? "Shipment" : unlockRequest.UnlockType;
 
                 if (approve.UnlockRequestId == Guid.Empty)
                 {
@@ -122,105 +134,159 @@ namespace eFMS.API.Setting.DL.Services
                         string _accountant = null;
                         string _bhHead = null;
 
-                        var infoLevelApprove = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
-
-                        if (infoLevelApprove.Role == "None")
+                        var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(unlockRequest.UnlockType, unlockRequest.OfficeId);
+                        if (isAllLevelAutoOrNone)
                         {
                             //Cập nhật Status Approval là Done cho Unlock Request
                             unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                             var hsUpdateUnlockRequest = unlockRequestRepo.Update(unlockRequest, x => x.Id == unlockRequest.Id, false);
                         }
-                        else if (infoLevelApprove.Role == "Auto" || infoLevelApprove.Role == "Approval")
+
+                        var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+                        var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+                        var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+                        var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+
+                        var userLeaderOrManager = string.Empty;
+                        var mailLeaderOrManager = string.Empty;
+                        List<string> mailUsersDeputy = new List<string>();
+
+                        if (leaderLevel.Role == "Auto" || leaderLevel.Role == "Approval")
                         {
-                            if (infoLevelApprove.LevelApprove == "Leader")
+                            _leader = leaderLevel.UserId;
+                            if (string.IsNullOrEmpty(_leader)) return new HandleState("Not found leader");
+                            if (leaderLevel.Role == "Auto")
                             {
-                                _leader = infoLevelApprove.UserId;
-                                if (string.IsNullOrEmpty(_leader)) return new HandleState("Not found leader");
-                                if (infoLevelApprove.Role == "Auto")
-                                {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                    unlockApprove.LeaderApr = userCurrent;
-                                    unlockApprove.LeaderAprDate = DateTime.Now;
-                                    unlockApprove.LevelApprove = "Leader";
-                                }
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_LEADERAPPROVED;
+                                unlockApprove.LeaderApr = userCurrent;
+                                unlockApprove.LeaderAprDate = DateTime.Now;
+                                unlockApprove.LevelApprove = "Leader";
+                            }
+                            if (leaderLevel.Role == "Approval")
+                            {
+                                userLeaderOrManager = leaderLevel.UserId;
+                                mailLeaderOrManager = leaderLevel.EmailUser;
+                                mailUsersDeputy = leaderLevel.EmailDeputies;
                             }
                         }
 
-                        var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
                         if (managerLevel.Role == "Auto" || managerLevel.Role == "Approval")
                         {
                             _manager = managerLevel.UserId;
                             if (string.IsNullOrEmpty(_manager)) return new HandleState("Not found manager");
-                            if (managerLevel.Role == "Auto" && (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role != "Approval"))
+                            if (managerLevel.Role == "Auto" && leaderLevel.Role != "Approval")
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED;
                                 unlockApprove.ManagerApr = userCurrent;
                                 unlockApprove.ManagerAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "Manager";
                             }
+                            if (managerLevel.Role == "Approval" && leaderLevel.Role != "Approval")
+                            {
+                                userLeaderOrManager = managerLevel.UserId;
+                                mailLeaderOrManager = managerLevel.EmailUser;
+                                mailUsersDeputy = managerLevel.EmailDeputies;
+                            }
                         }
 
-                        var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
                         if (accountantLevel.Role == "Auto" || accountantLevel.Role == "Approval")
                         {
                             _accountant = accountantLevel.UserId;
                             if (string.IsNullOrEmpty(_accountant)) return new HandleState("Not found accountant");
-                            if (accountantLevel.Role == "Auto" 
+                            if (accountantLevel.Role == "Auto"
                                 && managerLevel.Role != "Approval"
-                                && (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role != "Approval"))
+                                && leaderLevel.Role != "Approval")
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
                                 unlockApprove.AccountantApr = userCurrent;
                                 unlockApprove.AccountantAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "Accountant";
                             }
+                            if (accountantLevel.Role == "Approval"
+                                && managerLevel.Role != "Approval"
+                                && leaderLevel.Role != "Approval")
+                            {
+                                userLeaderOrManager = accountantLevel.UserId;
+                                mailLeaderOrManager = accountantLevel.EmailUser;
+                                mailUsersDeputy = accountantLevel.EmailDeputies;
+                            }
                         }
 
-                        var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
                         if (buHeadLevel.Role == "Auto" || buHeadLevel.Role == "Approval")
                         {
                             _bhHead = buHeadLevel.UserId;
                             if (string.IsNullOrEmpty(_bhHead)) return new HandleState("Not found BOD");
-                            if (buHeadLevel.Role == "Auto" 
-                                && accountantLevel.Role != "Approval" 
-                                && managerLevel.Role != "Approval" 
-                                && (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role != "Approval"))
+                            if (buHeadLevel.Role == "Auto"
+                                && accountantLevel.Role != "Approval"
+                                && managerLevel.Role != "Approval"
+                                && leaderLevel.Role != "Approval")
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                                 unlockApprove.BuheadApr = userCurrent;
                                 unlockApprove.BuheadAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "BOD";
                             }
+                            if (buHeadLevel.Role == "Approval"
+                                && accountantLevel.Role != "Approval"
+                                && managerLevel.Role != "Approval"
+                                && leaderLevel.Role != "Approval")
+                            {
+                                userLeaderOrManager = buHeadLevel.UserId;
+                                mailLeaderOrManager = buHeadLevel.EmailUser;
+                                mailUsersDeputy = buHeadLevel.EmailDeputies;
+                            }
                         }
 
-                        //var sendMailResult = SendMailSuggestApproval(acctApprove.AdvanceNo, userLeaderOrManager, emailLeaderOrManager, usersDeputy);
-
-                        //if (sendMailResult)
+                        var sendMailApproved = true;
+                        var sendMailSuggest = true;
+                        if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
                         {
-                            var checkExistsApproveByUnlockRequestId = DataContext.Get(x => x.UnlockRequestId == approve.UnlockRequestId && x.IsDeny == false).FirstOrDefault();
-                            if (checkExistsApproveByUnlockRequestId == null) //Insert UnlockRequestApprove
-                            {
-                                unlockApprove.Id = Guid.NewGuid();
-                                unlockApprove.Leader = _leader;
-                                unlockApprove.Manager = _manager;
-                                unlockApprove.Accountant = _accountant;
-                                unlockApprove.Buhead = _bhHead;
-                                unlockApprove.UserCreated = unlockApprove.UserModified = userCurrent;
-                                unlockApprove.DatetimeCreated = unlockApprove.DatetimeModified = DateTime.Now;
-                                unlockApprove.IsDeny = false;
-                                var hsAddApprove = DataContext.Add(unlockApprove, false);
-                            }
-                            else //Update unlockRequest by Id
-                            {
-                                checkExistsApproveByUnlockRequestId.UserModified = userCurrent;
-                                checkExistsApproveByUnlockRequestId.DatetimeModified = DateTime.Now;
-                                var hsUpdateApprove = DataContext.Update(checkExistsApproveByUnlockRequestId, x => x.Id == checkExistsApproveByUnlockRequestId.Id);
-                            }
-
-                            unlockRequestRepo.SubmitChanges();
-                            DataContext.SubmitChanges();
-                            trans.Commit();
+                            //Send Mail Approved
+                            sendMailApproved = SendMailApprove(unlockRequest, DateTime.Now);
                         }
+                        else
+                        {
+                            //Send Mail Suggest
+                            sendMailSuggest = SendMailSuggest(unlockRequest, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
+                        }
+
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest Approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail Approved Approval failed");
+                        }
+                        else
+                        {
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = New; Change Service Date: Update SeviceDate = New Service Date
+
+                        }
+
+                        var checkExistsApproveByUnlockRequestId = DataContext.Get(x => x.UnlockRequestId == approve.UnlockRequestId && x.IsDeny == false).FirstOrDefault();
+                        if (checkExistsApproveByUnlockRequestId == null) //Insert UnlockRequestApprove
+                        {
+                            unlockApprove.Id = Guid.NewGuid();
+                            unlockApprove.Leader = _leader;
+                            unlockApprove.Manager = _manager;
+                            unlockApprove.Accountant = _accountant;
+                            unlockApprove.Buhead = _bhHead;
+                            unlockApprove.UserCreated = unlockApprove.UserModified = userCurrent;
+                            unlockApprove.DatetimeCreated = unlockApprove.DatetimeModified = DateTime.Now;
+                            unlockApprove.IsDeny = false;
+                            var hsAddApprove = DataContext.Add(unlockApprove, false);
+                        }
+                        else //Update unlockRequest by Id
+                        {
+                            checkExistsApproveByUnlockRequestId.UserModified = userCurrent;
+                            checkExistsApproveByUnlockRequestId.DatetimeModified = DateTime.Now;
+                            var hsUpdateApprove = DataContext.Update(checkExistsApproveByUnlockRequestId, x => x.Id == checkExistsApproveByUnlockRequestId.Id);
+                        }
+
+                        unlockRequestRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
+                        trans.Commit();
 
                         return new HandleState();
                     }
@@ -242,6 +308,23 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         #region -- Info Level Approve --
+        public bool CheckAllLevelIsAutoOrNone(string type, Guid? officeId)
+        {
+            var roleLeader = userBaseService.GetRoleByLevel("Leader", type, officeId);
+            var roleManager = userBaseService.GetRoleByLevel("Manager", type, officeId);
+            var roleAccountant = userBaseService.GetRoleByLevel("Accountant", type, officeId);
+            var roleBuHead = userBaseService.GetRoleByLevel("BOD", type, officeId);
+            if (
+                (roleLeader == "Auto" && roleManager == "Auto" && roleAccountant == "Auto" && roleBuHead == "Auto")
+                ||
+                (roleLeader == "None" && roleManager == "None" && roleAccountant == "None" && roleBuHead == "None")
+               )
+            {
+                return true;
+            }
+            return false;
+        }
+
         public InfoLevelApproveResult LeaderLevel(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var result = new InfoLevelApproveResult();
@@ -252,12 +335,18 @@ namespace eFMS.API.Setting.DL.Services
             switch (roleLeader)
             {
                 case "None":
-                    result = ManagerLevel(type, departmentId, officeId, companyId);
+                    result.LevelApprove = "Leader";
+                    result.Role = "None";
+                    result.UserId = userLeader;
+                    result.UserDeputies = new List<string>();
+                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
+                    result.EmailDeputies = new List<string>();
                     break;
                 case "Auto":
                     result.LevelApprove = "Leader";
                     result.Role = "Auto";
                     result.UserId = userLeader;
+                    result.UserDeputies = new List<string>();
                     result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
                     result.EmailDeputies = new List<string>();
                     break;
@@ -265,6 +354,7 @@ namespace eFMS.API.Setting.DL.Services
                     result.LevelApprove = "Leader";
                     result.Role = "Approval";
                     result.UserId = userLeader;
+                    result.UserDeputies = new List<string>();
                     result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
                     result.EmailDeputies = new List<string>();
                     break;
@@ -284,7 +374,12 @@ namespace eFMS.API.Setting.DL.Services
             switch (roleManager)
             {
                 case "None":
-                    result = AccountantLevel(type, officeId, companyId);
+                    result.LevelApprove = "Manager";
+                    result.Role = "None";
+                    result.UserId = userManager;
+                    result.UserDeputies = new List<string>();
+                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
+                    result.EmailDeputies = new List<string>();
                     break;
                 case "Auto":
                     result.LevelApprove = "Manager";
@@ -318,7 +413,12 @@ namespace eFMS.API.Setting.DL.Services
             switch (roleAccountant)
             {
                 case "None":
-                    result = BuHeadLevel(type, officeId, companyId);
+                    result.LevelApprove = "Accountant";
+                    result.Role = "None";
+                    result.UserId = userAccountant;
+                    result.UserDeputies = new List<string>();
+                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
+                    result.EmailDeputies = new List<string>();
                     break;
                 case "Auto":
                     result.LevelApprove = "Accountant";
@@ -354,6 +454,10 @@ namespace eFMS.API.Setting.DL.Services
                 case "None":
                     result.LevelApprove = "BOD";
                     result.Role = "None";
+                    result.UserId = userBuHead;
+                    result.UserDeputies = new List<string>();
+                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
+                    result.EmailDeputies = new List<string>();
                     break;
                 case "Auto":
                     result.LevelApprove = "BOD";
@@ -386,7 +490,7 @@ namespace eFMS.API.Setting.DL.Services
         }
         #endregion -- Info Level Approve --
 
-        #region -- Check Exist --
+        #region -- Check Exist, Check Is Manager, Is Approved --
         public HandleState CheckExistSettingFlow(string type, Guid? officeId)
         {
             type = (type == "Change Service Date") ? "Shipment" : type;
@@ -430,14 +534,182 @@ namespace eFMS.API.Setting.DL.Services
             }
             return new HandleState();
         }
-        #endregion -- Check Exist --
+
+        public bool CheckUserIsApproved(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve)
+        {
+            var isApproved = false;
+            if (approve == null) return true;
+            var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+            var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+
+            if (!isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && userCurrent.UserID == unlockRequest.RequestUser) //Requester
+            {
+                isApproved = true;
+                if (unlockRequest.RequestDate == null)
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                      ||
+                        leaderLevel.UserDeputies.Contains(userCurrent.UserID)
+                    ) //Leader
+            {
+                isApproved = true;
+                if (string.IsNullOrEmpty(approve.LeaderApr) && leaderLevel.Role != "None")
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (isManager && !isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                      ||
+                        managerLevel.UserDeputies.Contains(currentUser.UserID)
+                    ) //Dept Manager
+            {
+                isApproved = true;
+                if (leaderLevel.Role == "Approval" && string.IsNullOrEmpty(approve.LeaderApr))
+                {
+                    return true;
+                }
+                if (string.IsNullOrEmpty(approve.ManagerApr) && managerLevel.Role != "None")
+                {
+                    isApproved = false;
+                }
+
+            }
+            else if (
+                        (isAccountant && isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                      ||
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)
+                    ) //Accountant Manager
+            {
+                isApproved = true;
+                if (managerLevel.Role == "Approval" && string.IsNullOrEmpty(approve.ManagerApr))
+                {
+                    return true;
+                }
+                if (string.IsNullOrEmpty(approve.AccountantApr) && accountantLevel.Role != "None")
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (userCurrent.GroupId == SettingConstants.SpecialGroup && isBuHead && isBod && (userCurrent.UserID == approve.Buhead || userCurrent.UserID == approve.BuheadApr))
+                      ||
+                        buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                    ) //BUHead
+            {
+                isApproved = true;
+                if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                {
+                    return true;
+                }
+                if (
+                    (string.IsNullOrEmpty(approve.BuheadApr) && buHeadLevel.Role != "None")
+                    ||
+                    (buHeadLevel.Role == "Special" && !string.IsNullOrEmpty(unlockRequest.RequestUser))
+                   )
+                {
+                    isApproved = false;
+                }
+            }
+            else
+            {
+                //Đây là trường hợp các User không thuộc Approve
+                isApproved = true;
+            }
+            return isApproved;
+        }
+
+        public bool CheckUserIsManager(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve)
+        {
+            var isManagerOrLeader = false;
+
+            var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            if (approve == null)
+            {
+                if ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isManager && userCurrent.GroupId == SettingConstants.SpecialGroup) || managerLevel.UserDeputies.Contains(currentUser.UserID)) //Dept Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isBuHead && userCurrent.GroupId == SettingConstants.SpecialGroup) || buHeadLevel.UserDeputies.Contains(userCurrent.UserID)) //BUHead
+                {
+                    isManagerOrLeader = true;
+                }
+            }
+            else
+            {
+                if (
+                     (isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                     ||
+                     leaderLevel.UserDeputies.Contains(userCurrent.UserID)
+                   ) //Leader
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (isManager && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                          ||
+                            managerLevel.UserDeputies.Contains(currentUser.UserID)
+                        ) //Dept Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (userCurrent.GroupId == SettingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                          ||
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
+                        ) //Accountant Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (userCurrent.GroupId == SettingConstants.SpecialGroup && isBuHead && (userCurrent.UserID == approve.Buhead || userCurrent.UserID == approve.BuheadApr))
+                          ||
+                            buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                        ) //BUHead
+                {
+                    isManagerOrLeader = true;
+                }
+            }
+            return isManagerOrLeader;
+        }
+
+        #endregion -- Check Exist, Check Is Manager, Is Approved --
 
         #region -- APPROVE, DENY, CANCEL REQUEST --
         public HandleState UpdateApproval(Guid id)
         {
             var userCurrent = currentUser.UserID;
-            var emailUserAprNext = string.Empty;
-            List<string> emailUserDeputies = new List<string>();
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -454,86 +726,69 @@ namespace eFMS.API.Setting.DL.Services
                         return new HandleState("Not found unlock request approval");
                     }
 
-                    var infoLevelApprove = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+                    var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(unlockRequest.UnlockType, unlockRequest.OfficeId);
+                    if (isAllLevelAutoOrNone)
+                    {
+                        //Cập nhật Status Approval là Done cho Unlock Request
+                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                    }
+
+                    var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
 
-                    if (infoLevelApprove.Role != "None")
+                    var userApproveNext = string.Empty;
+                    var mailUserApproveNext = string.Empty;
+                    List<string> mailUsersDeputy = new List<string>();
+
+                    var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
+                    var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+                    if (leaderLevel.Role == "Approval"
+                         &&
+                         (
+                           (isLeader && currentUser.GroupId != SettingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
+                           ||
+                           leaderLevel.UserDeputies.Contains(userCurrent)
+                          )
+                        )
                     {
-                        if (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role == "Approval")
+                        if (string.IsNullOrEmpty(approve.LeaderApr))
                         {
-                            if (string.IsNullOrEmpty(approve.LeaderApr))
+                            if (!string.IsNullOrEmpty(unlockRequest.RequestUser))
                             {
-                                if ((userCurrent == infoLevelApprove.UserId || infoLevelApprove.UserDeputies.Contains(userCurrent)) && !string.IsNullOrEmpty(unlockRequest.RequestUser))
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_LEADERAPPROVED;
+                                approve.LeaderApr = userCurrent;
+                                approve.LeaderAprDate = DateTime.Now;
+                                approve.LevelApprove = "Leader";
+                                userApproveNext = managerLevel.UserId;
+                                mailUserApproveNext = managerLevel.EmailUser;
+                                mailUsersDeputy = managerLevel.EmailDeputies;
+                                if (managerLevel.Role == "Auto" || managerLevel.Role == "None")
                                 {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                    approve.LeaderApr = userCurrent;
-                                    approve.LeaderAprDate = DateTime.Now;
-                                    approve.LevelApprove = "Leader";
-                                    emailUserAprNext = managerLevel.EmailUser;
-                                    emailUserDeputies = managerLevel.EmailDeputies;
                                     if (managerLevel.Role == "Auto")
                                     {
                                         unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED;
                                         approve.ManagerApr = managerLevel.UserId;
                                         approve.ManagerAprDate = DateTime.Now;
                                         approve.LevelApprove = "Manager";
-                                        emailUserAprNext = accountantLevel.EmailUser;
-                                        emailUserDeputies = accountantLevel.EmailDeputies;
+                                        userApproveNext = accountantLevel.UserId;
+                                        mailUserApproveNext = accountantLevel.EmailUser;
+                                        mailUsersDeputy = accountantLevel.EmailDeputies;
+                                    }
+                                    if (accountantLevel.Role == "Auto" || accountantLevel.Role == "None")
+                                    {
                                         if (accountantLevel.Role == "Auto")
                                         {
                                             unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
                                             approve.AccountantApr = accountantLevel.UserId;
                                             approve.AccountantAprDate = DateTime.Now;
                                             approve.LevelApprove = "Accountant";
-                                            emailUserAprNext = buHeadLevel.EmailUser;
-                                            emailUserDeputies = buHeadLevel.EmailDeputies;
-                                            if (buHeadLevel.Role == "Auto")
-                                            {
-                                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-                                                approve.BuheadApr = buHeadLevel.UserId;
-                                                approve.BuheadAprDate = DateTime.Now;
-                                                approve.LevelApprove = "BOD";
-                                            }
+                                            userApproveNext = buHeadLevel.UserId;
+                                            mailUserApproveNext = buHeadLevel.EmailUser;
+                                            mailUsersDeputy = buHeadLevel.EmailDeputies;
                                         }
-                                    }
-                                }
-                                else
-                                {
-                                    return new HandleState("Not allow approve");
-                                }
-                            }
-                            else
-                            {
-                                return new HandleState("The leader has not approved it yet");
-                            }
-                        }
-
-                        if (managerLevel.Role == "Approval")
-                        {
-                            if (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role == "Approval" && string.IsNullOrEmpty(approve.LeaderApr))
-                            {
-                                return new HandleState("Leader not approve");
-                            }
-                            if (string.IsNullOrEmpty(approve.ManagerApr))
-                            {
-                                if (userCurrent == managerLevel.UserId || managerLevel.UserDeputies.Contains(userCurrent))
-                                {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED;
-                                    approve.ManagerApr = userCurrent;
-                                    approve.ManagerAprDate = DateTime.Now;
-                                    approve.LevelApprove = "Manager";
-                                    emailUserAprNext = accountantLevel.EmailUser;
-                                    emailUserDeputies = accountantLevel.EmailDeputies;
-                                    if (accountantLevel.Role == "Auto")
-                                    {
-                                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                        approve.AccountantApr = accountantLevel.UserId;
-                                        approve.AccountantAprDate = DateTime.Now;
-                                        approve.LevelApprove = "Accountant";
-                                        emailUserAprNext = buHeadLevel.EmailUser;
-                                        emailUserDeputies = buHeadLevel.EmailDeputies;
                                         if (buHeadLevel.Role == "Auto")
                                         {
                                             unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
@@ -543,33 +798,55 @@ namespace eFMS.API.Setting.DL.Services
                                         }
                                     }
                                 }
-                                else
-                                {
-                                    return new HandleState("Not allow approve");
-                                }
                             }
                             else
                             {
-                                return new HandleState("Manager approved");
+                                return new HandleState("Not allow approve");
                             }
                         }
-
-                        if (accountantLevel.Role == "Approval")
+                        else
                         {
-                            if (managerLevel.Role == "Approval" && string.IsNullOrEmpty(approve.ManagerApr))
+                            return new HandleState("Leader approved");
+                        }
+                    }
+
+                    var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+                    if (managerLevel.Role == "Approval" && !isDeptAccountant
+                        &&
+                        (
+                           (isManager && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
+                           ||
+                           managerLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (leaderLevel.Role == "Approval" && string.IsNullOrEmpty(approve.LeaderApr))
+                        {
+                            return new HandleState("Leader not approve");
+                        }
+                        if (string.IsNullOrEmpty(approve.ManagerApr))
+                        {
+                            if (!string.IsNullOrEmpty(approve.LeaderApr) || leaderLevel.Role == "None" || leaderLevel.Role == "Auto")
                             {
-                                return new HandleState("The manager has not approved it yet");
-                            }
-                            if (string.IsNullOrEmpty(approve.AccountantApr))
-                            {
-                                if (userCurrent == accountantLevel.UserId || accountantLevel.UserDeputies.Contains(userCurrent))
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED;
+                                approve.ManagerApr = userCurrent;
+                                approve.ManagerAprDate = DateTime.Now;
+                                approve.LevelApprove = "Manager";
+                                userApproveNext = accountantLevel.UserId;
+                                mailUserApproveNext = accountantLevel.EmailUser;
+                                mailUsersDeputy = accountantLevel.EmailDeputies;
+                                if (accountantLevel.Role == "Auto" || accountantLevel.Role == "None")
                                 {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                    approve.AccountantApr = userCurrent;
-                                    approve.AccountantAprDate = DateTime.Now;
-                                    approve.LevelApprove = "Accountant";
-                                    emailUserAprNext = buHeadLevel.EmailUser;
-                                    emailUserDeputies = buHeadLevel.EmailDeputies;
+                                    if (accountantLevel.Role == "Auto")
+                                    {
+                                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                        approve.AccountantApr = accountantLevel.UserId;
+                                        approve.AccountantAprDate = DateTime.Now;
+                                        approve.LevelApprove = "Accountant";
+                                        userApproveNext = buHeadLevel.UserId;
+                                        mailUserApproveNext = buHeadLevel.EmailUser;
+                                        mailUsersDeputy = buHeadLevel.EmailDeputies;
+                                    }
                                     if (buHeadLevel.Role == "Auto")
                                     {
                                         unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
@@ -578,62 +855,109 @@ namespace eFMS.API.Setting.DL.Services
                                         approve.LevelApprove = "BOD";
                                     }
                                 }
-                                else
-                                {
-                                    return new HandleState("Not allow approve");
-                                }
                             }
                             else
                             {
-                                return new HandleState("Accountant approved");
+                                return new HandleState("Not allow approve");
                             }
                         }
-
-                        if (buHeadLevel.Role == "Approval")
+                        else
                         {
-                            if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
-                            {
-                                return new HandleState("The accountant has not approved it yet");
-                            }
-                            if (string.IsNullOrEmpty(approve.BuheadApr))
-                            {
-                                if (userCurrent == buHeadLevel.UserId || buHeadLevel.UserDeputies.Contains(userCurrent))
-                                {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-                                    approve.BuheadApr = userCurrent;
-                                    approve.BuheadAprDate = DateTime.Now;
-                                    approve.LevelApprove = "BOD";
-
-                                    //Send Mail Approved
-                                }
-                                else
-                                {
-                                    return new HandleState("Not allow approve");
-                                }
-                            }
-                            else
-                            {
-                                return new HandleState("BOD approved");
-                            }
+                            return new HandleState("Manager approved");
                         }
                     }
-                    else
+
+                    var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    if (accountantLevel.Role == "Approval" && isDeptAccountant
+                        &&
+                        (
+                           (isAccountant && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
+                           ||
+                           accountantLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
                     {
-                        //Cập nhật Status Approval là Done cho Unlock Request
-                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                        if (managerLevel.Role == "Approval" && string.IsNullOrEmpty(approve.ManagerApr))
+                        {
+                            return new HandleState("The manager has not approved it yet");
+                        }
+                        if (string.IsNullOrEmpty(approve.AccountantApr))
+                        {
+                            if (!string.IsNullOrEmpty(approve.ManagerApr) || managerLevel.Role == "None" || managerLevel.Role == "Auto")
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                approve.AccountantApr = userCurrent;
+                                approve.AccountantAprDate = DateTime.Now;
+                                approve.LevelApprove = "Accountant";
+                                userApproveNext = buHeadLevel.UserId;
+                                mailUserApproveNext = buHeadLevel.EmailUser;
+                                mailUsersDeputy = buHeadLevel.EmailDeputies;
+                                if (buHeadLevel.Role == "Auto")
+                                {
+                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                    approve.BuheadApr = buHeadLevel.UserId;
+                                    approve.BuheadAprDate = DateTime.Now;
+                                    approve.LevelApprove = "BOD";
+                                }
+                            }
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState("Accountant approved");
+                        }
+                    }
+
+                    var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+                    if (buHeadLevel.Role == "Approval" && isBod
+                        &&
+                        (
+                          (isBuHead && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
+                          ||
+                          buHeadLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                        {
+                            return new HandleState("The accountant has not approved it yet");
+                        }
+                        if (string.IsNullOrEmpty(approve.BuheadApr))
+                        {
+                            if (!string.IsNullOrEmpty(approve.AccountantApr) || accountantLevel.Role == "None" || accountantLevel.Role == "Auto")
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                approve.BuheadApr = userCurrent;
+                                approve.BuheadAprDate = DateTime.Now;
+                                approve.LevelApprove = "BOD";
+                            }
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState("BOD approved");
+                        }
                     }
 
                     var sendMailApproved = true;
                     var sendMailSuggest = true;
+
                     if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
                     {
                         //Send Mail Approved
-
+                        sendMailApproved = SendMailApprove(unlockRequest, DateTime.Now);
                     }
                     else
                     {
                         //Send Mail Suggest
-
+                        sendMailSuggest = SendMailSuggest(unlockRequest, userApproveNext, mailUserApproveNext, mailUsersDeputy);
                     }
 
                     if (!sendMailSuggest)
@@ -644,6 +968,11 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return new HandleState("Send mail Approved Approval failed");
                     }
+                    else
+                    {
+                        //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = New; Change Service Date: Update SeviceDate = New Service Date
+
+                    }
 
                     unlockRequest.UserModified = approve.UserModified = userCurrent;
                     unlockRequest.DatetimeModified = approve.DatetimeModified = DateTime.Now;
@@ -652,6 +981,7 @@ namespace eFMS.API.Setting.DL.Services
                     var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id);
 
                     unlockRequestRepo.SubmitChanges();
+                    DataContext.SubmitChanges();
                     trans.Commit();
                     return new HandleState();
                 }
@@ -687,102 +1017,124 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return new HandleState("Unlock request has been denied");
                     }
-                    var infoLevelApprove = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+
+                    var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
                     var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
 
-                    if (infoLevelApprove.Role != "None")
+                    var isApprover = false;
+                    var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
+                    var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+                    if (leaderLevel.Role == "Approval"
+                        &&
+                        (
+                            (isLeader && currentUser.GroupId != SettingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
+                            ||
+                            leaderLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
                     {
-                        if (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role == "Approval")
+                        if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED
+                            || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                            || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
                         {
-                            if ((userCurrent == infoLevelApprove.UserId || infoLevelApprove.UserDeputies.Contains(userCurrent)) && !string.IsNullOrEmpty(unlockRequest.RequestUser))
-                            {
-                                approve.LeaderApr = userCurrent;
-                                approve.LeaderAprDate = DateTime.Now;
-                                approve.LevelApprove = "Leader";
-                            }
-                            else
-                            {
-                                return new HandleState("Not allow deny");
-                            }
+                            return new HandleState("Not allow deny. Unlock request has been approved");
                         }
 
-                        if (managerLevel.Role == "Approval")
+                        if (string.IsNullOrEmpty(unlockRequest.RequestUser))
                         {
-                            if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Not allow deny. Unlock request has been approved");
-                            }
-
-                            if (infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role == "Approval" && string.IsNullOrEmpty(approve.LeaderApr))
-                            {
-                                return new HandleState("Leader not approve");
-                            }
-
-                            if (userCurrent == managerLevel.UserId || managerLevel.UserDeputies.Contains(userCurrent))
-                            {
-                                approve.ManagerApr = userCurrent;
-                                approve.ManagerAprDate = DateTime.Now;
-                                approve.LevelApprove = "Manager";
-                            }
-                            else
-                            {
-                                return new HandleState("Not allow deny");
-                            }
+                            return new HandleState("The requester has not send the request yet");
                         }
+                        approve.LeaderApr = userCurrent;
+                        approve.LeaderAprDate = DateTime.Now;
+                        approve.LevelApprove = "Leader";
 
-                        if (accountantLevel.Role == "Approval")
-                        {
-                            if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Not allow deny. Unlock request has been approved");
-                            }
-
-                            if (managerLevel.Role == "Approval" && string.IsNullOrEmpty(approve.ManagerApr))
-                            {
-                                return new HandleState("The manager has not approved it yet");
-                            }
-
-                            if (userCurrent == accountantLevel.UserId || accountantLevel.UserDeputies.Contains(userCurrent))
-                            {
-                                approve.AccountantApr = userCurrent;
-                                approve.AccountantAprDate = DateTime.Now;
-                                approve.LevelApprove = "Accountant";
-                            }
-                            else
-                            {
-                                return new HandleState("Not allow deny");
-                            }
-                        }
-
-                        if (buHeadLevel.Role == "Approval")
-                        {
-                            if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
-                            {
-                                return new HandleState("The accountant has not approved it yet");
-                            }
-
-                            if (userCurrent == buHeadLevel.UserId || buHeadLevel.UserDeputies.Contains(userCurrent))
-                            {
-                                approve.BuheadApr = userCurrent;
-                                approve.BuheadAprDate = DateTime.Now;
-                                approve.LevelApprove = "BOD";
-                            }
-                            else
-                            {
-                                return new HandleState("Not allow deny");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Cập nhật Status Approval là Done cho Unlock Request
-                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-
+                        isApprover = true;
                     }
 
-                    var sendMailDeny = true;
+                    var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+                    if (managerLevel.Role == "Approval" && !isDeptAccountant
+                        &&
+                        (
+                            (isManager && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
+                            ||
+                            managerLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                            || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            return new HandleState("Not allow deny. Unlock request has been approved");
+                        }
+
+                        if (leaderLevel.Role == "Approval" && string.IsNullOrEmpty(approve.LeaderApr))
+                        {
+                            return new HandleState("Leader not approve");
+                        }
+                        approve.ManagerApr = userCurrent;
+                        approve.ManagerAprDate = DateTime.Now;
+                        approve.LevelApprove = "Manager";
+
+                        isApprover = true;
+                    }
+
+                    var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    if (accountantLevel.Role == "Approval" && isDeptAccountant
+                        &&
+                        (
+                            (isAccountant && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
+                            ||
+                            accountantLevel.UserDeputies.Contains(userCurrent)
+                         )
+                        )
+                    {
+                        if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            return new HandleState("Not allow deny. Unlock request has been approved");
+                        }
+
+                        if (managerLevel.Role == "Approval" && string.IsNullOrEmpty(approve.ManagerApr))
+                        {
+                            return new HandleState("The manager has not approved it yet");
+                        }
+                        approve.AccountantApr = userCurrent;
+                        approve.AccountantAprDate = DateTime.Now;
+                        approve.LevelApprove = "Accountant";
+
+                        isApprover = true;
+                    }
+
+                    var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+                    if (buHeadLevel.Role == "Approval" && isBod
+                        &&
+                        (
+                          (isBuHead && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
+                          ||
+                          buHeadLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                        {
+                            return new HandleState("The accountant has not approved it yet");
+                        }
+                        approve.BuheadApr = userCurrent;
+                        approve.BuheadAprDate = DateTime.Now;
+                        approve.LevelApprove = "BOD";
+
+                        isApprover = true;
+                    }
+
+                    if (!isApprover)
+                    {
+                        return new HandleState("Not allow deny. You are not in the approval process.");
+                    }
+
+                    var sendMailDeny = SendMailDeny(unlockRequest, comment, DateTime.Now);
                     if (!sendMailDeny)
                     {
                         return new HandleState("Send mail denied failed");
@@ -800,6 +1152,7 @@ namespace eFMS.API.Setting.DL.Services
                     var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id);
 
                     unlockRequestRepo.SubmitChanges();
+                    DataContext.SubmitChanges();
                     trans.Commit();
                     return new HandleState();
                 }
@@ -858,6 +1211,7 @@ namespace eFMS.API.Setting.DL.Services
                         unlockRequest.DatetimeModified = DateTime.Now;
                         var hsUpdateUnlockRequest = unlockRequestRepo.Update(unlockRequest, x => x.Id == unlockRequest.Id, false);
                         unlockRequestRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
                         trans.Commit();
                     }
 
@@ -876,79 +1230,447 @@ namespace eFMS.API.Setting.DL.Services
         }
         #endregion -- APPROVE, DENY, CANCEL REQUEST --
 
-        public bool CheckUserInApprove(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve)
+        #region -- TEMPLATE & SEND EMAIL --
+        private string GetTableServiceDate(SetUnlockRequest unlockRequest)
         {
-            var isApproved = false;
+            var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id);
+            var opss = opsTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get();
+            var dataOps = (from job in requestJobs
+                           join ops in opss on job.Job equals ops.JobNo
+                           select new OpsTransaction
+                           {
+                               JobNo = job.Job,
+                               ServiceDate = ops.ServiceDate
+                           }).ToList();
+            var dataDoc = (from job in requestJobs
+                           join cst in csTrans on job.Job equals cst.JobNo
+                           select new CsTransaction
+                           {
+                               JobNo = job.Job,
+                               ServiceDate = cst.ServiceDate
+                           }).ToList();
 
-            var infoLevelApprove = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
-            var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
-            var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
-            var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
-            // 1 user vừa có thể là Requester, Manager Dept, Accountant Dept nên khi check Approved cần phải dựa vào group
-            // Group 11 chính là group Manager
+            var dataJob = string.Empty;
+            if (dataOps != null && dataOps.Count > 0)
+            {
+                foreach (var item in dataOps)
+                {
+                    string _serviceDate = item.ServiceDate != null ? item.ServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                    string _newServiceDate = unlockRequest.NewServiceDate != null ? unlockRequest.NewServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                    dataJob += "<tr><td style='border: 1px solid #dddddd; width: 40%;'>" + item.JobNo + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _serviceDate + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _newServiceDate + "</td></tr>";
+                }
+            }
+            if (dataDoc != null && dataDoc.Count > 0)
+            {
+                foreach (var item in dataDoc)
+                {
+                    string _serviceDate = item.ServiceDate != null ? item.ServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                    string _newServiceDate = unlockRequest.NewServiceDate != null ? unlockRequest.NewServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                    dataJob += "<tr><td style='border: 1px solid #dddddd; width: 40%;'>" + item.JobNo + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _serviceDate + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _newServiceDate + "</td></tr>";
+                }
+            }
 
-            if (userCurrent.GroupId != SettingConstants.SpecialGroup
-                && userCurrent.UserID == unlockRequest.RequestUser) //Requester
-            {
-                isApproved = true;
-                if (unlockRequest.RequestDate == null)
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.GroupId != SettingConstants.SpecialGroup 
-                && (
-                    (infoLevelApprove.UserDeputies.Contains(userCurrent.UserID) && infoLevelApprove.LevelApprove == "Leader") 
-                || userCurrent.UserID == approve.Leader)) //Leader
-            {
-                isApproved = true;
-                if (approve.LeaderAprDate == null && infoLevelApprove.LevelApprove == "Leader" && infoLevelApprove.Role != "None")
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.GroupId == SettingConstants.SpecialGroup
-                && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId) == false
-                && (userCurrent.UserID == approve.Manager
-                    || userCurrent.UserID == approve.ManagerApr
-                    || managerLevel.UserDeputies.Contains(currentUser.UserID))) //Dept Manager
-            {
-                isApproved = true;
-                var isDeptWaitingApprove = unlockRequestRepo.Get(x => x.Id == approve.UnlockRequestId && (x.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED)).Any();
-                if (approve.ManagerAprDate == null && isDeptWaitingApprove && managerLevel.Role != "None")
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.GroupId == SettingConstants.SpecialGroup
-                && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId)
-                && (userCurrent.UserID == approve.Accountant
-                    || userCurrent.UserID == approve.AccountantApr
-                    || accountantLevel.UserDeputies.Contains(currentUser.UserID))) //Accountant Manager
-            {
-                isApproved = true;
-                var isDeptWaitingApprove = unlockRequestRepo.Get(x => x.Id == approve.UnlockRequestId && (x.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
-                if (approve.AccountantAprDate == null && isDeptWaitingApprove && accountantLevel.Role != "None")
-                {
-                    isApproved = false;
-                }
-            }
-            else if (userCurrent.UserID == approve.Buhead 
-                || userCurrent.UserID == approve.BuheadApr 
-                || buHeadLevel.UserDeputies.Contains(userCurrent.UserID)) //BUHead
-            {
-                isApproved = true;
-                if (string.IsNullOrEmpty(approve.BuheadApr) && approve.BuheadAprDate == null && buHeadLevel.Role != "None")
-                {
-                    isApproved = false;
-                }
-            }
-            else
-            {
-                //Đây là trường hợp các User không thuộc Approve Advance
-                isApproved = true;
-            }
-            return isApproved;
+            var result = "<table style='width: 100%; border: 1px solid #dddddd;border-collapse: collapse;'><tr><td style='border: 1px solid #dddddd; font-weight: bold;'>JobID</td><td style='border: 1px solid #dddddd; font-weight: bold;'>Service Date</td><td style='border: 1px solid #dddddd; font-weight: bold;'>New Service Date</td></tr>" + dataJob + "</table>";
+            return result;
         }
+
+        private bool SendMailSuggestUnlockShipment(SetUnlockRequest unlockRequest, string userReciver, string mailUserReciver, List<string> mailUsersDeputy)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //Lấy ra tên của user Approval
+            var userReciverId = userBaseService.GetEmployeeIdOfUser(userReciver);
+            var userReciverName = userBaseService.GetEmployeeByEmployeeId(userReciverId)?.EmployeeNameEn;
+
+            //List String Shipment
+            var jobIds = string.Join("; ", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Shipment";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Unlock Approval Request from <b>[RequesterName]</b> as below info: </p><p><i>Anh/ Chị có một yêu cầu duyệt mở khóa từ <b>[RequesterName]</b> với thông tin như sau:</i></p><p><i><b>List Shipment:</b></i> [JobIds]</p><p>[GeneralReason]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[UserName]", userReciverName);
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[GeneralReason]", unlockRequest.GeneralReason);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                mailUserReciver
+            };
+            List<string> attachments = null;
+
+            //CC cho User Requester để biết được quá trình Approve đã đến bước nào. Và các User được ủy quyền
+            List<string> emailCCs = new List<string>();
+            emailCCs = mailUsersDeputy;
+            emailCCs.Add(emailRequester);
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailSuggestUnlockAdvanceOrSettlement(SetUnlockRequest unlockRequest, string userReciver, string mailUserReciver, List<string> mailUsersDeputy)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //Lấy ra tên của user Approval
+            var userReciverId = userBaseService.GetEmployeeIdOfUser(userReciver);
+            var userReciverName = userBaseService.GetEmployeeByEmployeeId(userReciverId)?.EmployeeNameEn;
+
+            //List String Advance/ Settlement
+            var jobIds = string.Join("\r\n", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock " + unlockRequest.UnlockType;
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Unlock Approval Request from <b>[RequesterName]</b> as below info: </p><p><i>Anh/ Chị có một yêu cầu duyệt mở khóa từ <b>[RequesterName]</b> với thông tin như sau:</i></p><p><i><b>List [Type]:</b></i> [JobIds]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[UserName]", userReciverName);
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[Type]", unlockRequest.UnlockType);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                mailUserReciver
+            };
+            List<string> attachments = null;
+
+            //CC cho User Requester để biết được quá trình Approve đã đến bước nào. Và các User được ủy quyền
+            List<string> emailCCs = new List<string>();
+            emailCCs = mailUsersDeputy;
+            emailCCs.Add(emailRequester);
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailSuggestChangeServiceDate(SetUnlockRequest unlockRequest, string userReciver, string mailUserReciver, List<string> mailUsersDeputy)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //Lấy ra tên của user Approval
+            var userReciverId = userBaseService.GetEmployeeIdOfUser(userReciver);
+            var userReciverName = userBaseService.GetEmployeeByEmployeeId(userReciverId)?.EmployeeNameEn;
+
+            //List Job ID, Service Date
+            var jobIds = GetTableServiceDate(unlockRequest);
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Change Service Date";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [UserName],</b></i></p><p>You have new Unlock Approval Request from <b>[RequesterName]</b> as below info: </p><p><i>Anh/ Chị có một yêu cầu duyệt mở khóa từ <b>[RequesterName]</b> với thông tin như sau:</i></p><p>[JobIds]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[UserName]", userReciverName);
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                mailUserReciver
+            };
+            List<string> attachments = null;
+
+            //CC cho User Requester để biết được quá trình Approve đã đến bước nào. Và các User được ủy quyền
+            List<string> emailCCs = new List<string>();
+            emailCCs = mailUsersDeputy;
+            emailCCs.Add(emailRequester);
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailSuggest(SetUnlockRequest unlockRequest, string userReciver, string mailUserReciver, List<string> mailUsersDeputy)
+        {
+            var sendMailSuggest = false;
+            switch (unlockRequest.UnlockType)
+            {
+                case "Shipment":
+                    sendMailSuggest = SendMailSuggestUnlockShipment(unlockRequest, userReciver, mailUserReciver, mailUsersDeputy);
+                    break;
+                case "Advance":
+                    sendMailSuggest = SendMailSuggestUnlockAdvanceOrSettlement(unlockRequest, userReciver, mailUserReciver, mailUsersDeputy);
+                    break;
+                case "Settlement":
+                    sendMailSuggest = SendMailSuggestUnlockAdvanceOrSettlement(unlockRequest, userReciver, mailUserReciver, mailUsersDeputy);
+                    break;
+                case "Change Service Date":
+                    sendMailSuggest = SendMailSuggestChangeServiceDate(unlockRequest, userReciver, mailUserReciver, mailUsersDeputy);
+                    break;
+            }
+            return sendMailSuggest;
+        }
+
+        private bool SendMailApproveUnlockShipment(SetUnlockRequest unlockRequest, DateTime approvedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List String Shipment
+            var jobIds = string.Join("; ", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Shipment is approved";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request is approved at <b>[ApprovedDate]</b> as below info: </p><p><i>Anh/ Chị có một đề nghị mở khóa đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với các thông tin như sau:</i></p><p><i><b>List Shipment:</b></i> [JobIds]</p><p>[GeneralReason]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[GeneralReason]", unlockRequest.GeneralReason);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailApproveUnlockAdvanceOrSettlement(SetUnlockRequest unlockRequest, DateTime approvedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List String Shipment
+            var jobIds = string.Join("; ", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock " + unlockRequest.UnlockType + " is approved";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request is approved at <b>[ApprovedDate]</b> as below info: </p><p><i>Anh/ Chị có một đề nghị mở khóa đã được phê duyệt vào lúc <b>[ApprovedDate]</b> với các thông tin như sau:</i></p><p><i><b>List [Type]:</b></i> [JobIds]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[Type]", unlockRequest.UnlockType);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailApproveChangeServiceDate(SetUnlockRequest unlockRequest, DateTime approvedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List Job ID, Service Date
+            var jobIds = GetTableServiceDate(unlockRequest);
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Change Service Date is approved";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request from <b>[RequesterName]</b> as below info: </p><p><i>Anh/ Chị có một yêu cầu duyệt mở khóa từ <b>[RequesterName]</b> với thông tin như sau:</i></p><p>[JobIds]</p><p>You click here to check more detail and approve: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[ApprovedDate]", approvedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailApprove(SetUnlockRequest unlockRequest, DateTime approvedDate)
+        {
+            var sendMailApproved = false;
+            switch (unlockRequest.UnlockType)
+            {
+                case "Shipment":
+                    sendMailApproved = SendMailApproveUnlockShipment(unlockRequest, DateTime.Now);
+                    break;
+                case "Advance":
+                    sendMailApproved = SendMailApproveUnlockAdvanceOrSettlement(unlockRequest, DateTime.Now);
+                    break;
+                case "Settlement":
+                    sendMailApproved = SendMailApproveUnlockAdvanceOrSettlement(unlockRequest, DateTime.Now);
+                    break;
+                case "Change Service Date":
+                    sendMailApproved = SendMailApproveChangeServiceDate(unlockRequest, DateTime.Now);
+                    break;
+            }
+            return sendMailApproved;
+        }
+
+        private bool SendMailDenyUnlockShipment(SetUnlockRequest unlockRequest, string comment, DateTime deniedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List String Shipment
+            var jobIds = string.Join("; ", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Shipment is denied";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request is denied at <b>[DeniedDate]</b> as below info: </p><p><i>Anh/ Chị có một đề nghị bị từ chối vào lúc <b>[DeniedDate]</b> với thông tin như sau: </i></p><ul><li><p><i><b>List Shipment:</b></i> [JobIds]</p><p>[GeneralReason]</p></li><li><p><i>Comment/ Lý do từ chối: </i>[Comment]</p></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[DeniedDate]", deniedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[GeneralReason]", unlockRequest.GeneralReason);
+            body = body.Replace("[Comment]", comment);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailDenyUnlockAdvanceOrSettlement(SetUnlockRequest unlockRequest, string comment, DateTime deniedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List String Shipment
+            var jobIds = string.Join("; ", unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job));
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock " + unlockRequest.UnlockType + " is denied";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request is denied at <b>[DeniedDate]</b> as below info: </p><p><i>Anh/ Chị có một đề nghị bị từ chối vào lúc <b>[DeniedDate]</b> với thông tin như sau:</i></p><ul><li><p><i><b>List [Type]:</b></i> [JobIds]</p></li><li><p><i>Comment/ Lý do từ chối: </i>[Comment]</p></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[DeniedDate]", deniedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[Type]", unlockRequest.UnlockType);
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Comment]", comment);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailDenyChangeServiceDate(SetUnlockRequest unlockRequest, string comment, DateTime deniedDate)
+        {
+            //Lấy ra tên & email của user Requester
+            var requesterId = userBaseService.GetEmployeeIdOfUser(unlockRequest.Requester);
+            var requesterName = userBaseService.GetEmployeeByEmployeeId(requesterId)?.EmployeeNameEn;
+            var emailRequester = userBaseService.GetEmployeeByEmployeeId(requesterId)?.Email;
+
+            //List Job ID, Service Date
+            var jobIds = GetTableServiceDate(unlockRequest);
+
+            string subject = "eFMS - Unlock Approval Request from [RequesterName] - Unlock Change Service Date is denied";
+            subject = subject.Replace("[RequesterName]", requesterName);
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'><p><i><b>Dear Mr/Mrs [RequesterName],</b></i></p><p>You have new Unlock Approval Request is denied at <b>[DeniedDate]</b> as below info: </p><p><i>Anh/ Chị có một đề nghị bị từ chối vào lúc <b>[DeniedDate]</b> với thông tin như sau:</i></p><p>[JobIds]</p><ul><li><p></p><i>Comment/ Lý do từ chối: </i>[Comment]</p></li></ul><p>You click here to recheck detail: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Detail Unlock Request</a></span></p><p><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span><a href='[Url]/[lang]/[UrlFunc]/[UnlockRequestId]' target='_blank'>Chi tiết phiếu đề nghị mở khóa</a></span></i></p><p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p></div>");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[DeniedDate]", deniedDate.ToString("HH:mm - dd/MM/yyyy"));
+            body = body.Replace("[JobIds]", jobIds);
+            body = body.Replace("[Comment]", comment);
+            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            body = body.Replace("[lang]", "en");
+            body = body.Replace("[UrlFunc]", "#/home/tool/unlock-request");
+            body = body.Replace("[UnlockRequestId]", unlockRequest.Id.ToString());
+            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+            List<string> toEmails = new List<string> {
+                emailRequester
+            };
+            List<string> attachments = null;
+
+            //Không cần CC
+            List<string> emailCCs = new List<string>();
+
+            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            return sendMailResult;
+        }
+
+        private bool SendMailDeny(SetUnlockRequest unlockRequest, string comment, DateTime deniedDate)
+        {
+            var sendMailDeny = false;
+            switch (unlockRequest.UnlockType)
+            {
+                case "Shipment":
+                    sendMailDeny = SendMailDenyUnlockShipment(unlockRequest, comment, DateTime.Now);
+                    break;
+                case "Advance":
+                    sendMailDeny = SendMailDenyUnlockAdvanceOrSettlement(unlockRequest, comment, DateTime.Now);
+                    break;
+                case "Settlement":
+                    sendMailDeny = SendMailDenyUnlockAdvanceOrSettlement(unlockRequest, comment, DateTime.Now);
+                    break;
+                case "Change Service Date":
+                    sendMailDeny = SendMailDenyChangeServiceDate(unlockRequest, comment, DateTime.Now);
+                    break;
+            }
+            return sendMailDeny;
+        }
+        #endregion -- TEMPLATE & SEND EMAIL --
+
+        #region -- UPDATED UNLOCK SHIPMENT, ADVANCE, SETTLEMENT, CHANGE SERVICE DATE --
+        #endregion -- UPDATED UNLOCK SHIPMENT, ADVANCE, SETTLEMENT, CHANGE SERVICE DATE --
     }
 }
