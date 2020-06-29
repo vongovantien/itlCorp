@@ -32,7 +32,11 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
 
     partners: Observable<Partner[]>;
 
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'partnerNameVn', label: 'Name Local' },
+        { field: 'taxCode', label: 'Tax Code' },
+    ];
 
     payments: CommonInterface.INg2Select[] = [
         { id: '', text: 'All' },

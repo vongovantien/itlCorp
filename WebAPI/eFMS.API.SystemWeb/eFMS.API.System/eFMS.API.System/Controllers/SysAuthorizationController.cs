@@ -280,7 +280,6 @@ namespace eFMS.API.System.Controllers
                            x.UserId == model.UserId
                         && x.AssignTo == model.AssignTo
                         && x.Services == model.Services
-                        && x.AssignTo == model.AssignTo
                         && model.StartDate.Date >= x.StartDate.Date && model.EndDate.Value.Date <= x.EndDate.Value.Date)
                         .OrderByDescending(o => o.EndDate)
                         .FirstOrDefault();
@@ -290,7 +289,6 @@ namespace eFMS.API.System.Controllers
                            x.UserId == model.UserId
                         && x.AssignTo == model.AssignTo
                         && x.Services == model.Services
-                        && x.AssignTo == model.AssignTo
                         && model.StartDate.Date >= x.StartDate.Date)
                         .OrderByDescending(o => o.StartDate)
                         .FirstOrDefault();

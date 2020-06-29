@@ -134,6 +134,27 @@
                                     </app-switch>
                                 </div>
                             </div>
+                            <ng-container *ngIf="!!isShowUpdate">
+                                <div class="row">
+
+                                    <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Create:</span>
+                                        <span
+                                            class="m--font-success m--margin-left-5">{{datetimeCreated | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span class="m--font-success m--margin-left-5">{{userCreatedName}}</span>
+                                    </div>
+                                    <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
+                                        <span class="m--font-bolder">Modified:</span>
+                                        <ng-container *ngIf="!!userModifiedName">
+                                            <span
+                                                class="m--font-success m--margin-left-5">{{datetimeModified | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                            <span class="m--font-bolder m--margin-left-5">by</span>
+                                            <span class="m--font-success m--margin-left-5">{{userModifiedName}}</span>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </ng-container>
                         </div>
                     </div>
                 </form>

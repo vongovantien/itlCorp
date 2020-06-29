@@ -30,7 +30,7 @@ const routes: Routes = [
         }
     },
     {
-        path: 'management', loadChildren: () => import('./accounting-management/accounting-managment.module').then(m => m.AccountingManagementModule), data: { name: 'Management' }
+        path: 'management', loadChildren: () => import('./accounting-management/accounting-managment.module').then(m => m.AccountingManagementModule), data: { name: 'Accounting Management' }
     },
     // TODO another MODULE...
 ];
