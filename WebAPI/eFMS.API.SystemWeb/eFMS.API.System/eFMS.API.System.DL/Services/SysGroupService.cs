@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.Models.Criteria;
@@ -196,11 +197,11 @@ namespace eFMS.API.System.DL.Services
             }
         }
 
-        public IQueryable<CatDepartmentGroupCriteria> GetGroupDepartmentPermission(string userId, Guid officeId)
+        public List<CatDepartmentGroupCriteria> GetGroupDepartmentPermission(string userId, Guid officeId)
         {
             try
             {
-                IQueryable<CatDepartmentGroupCriteria> results = null;
+                List<CatDepartmentGroupCriteria> results = null;
                 // Các department user đc phân.
                 var currentUserDepartments = sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId && lv != null)?.Select(l => l.DepartmentId).ToList();
                 if (currentUserDepartments.Count() > 0)
@@ -209,7 +210,7 @@ namespace eFMS.API.System.DL.Services
                     var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == userId && lv.DepartmentId == currentUserDepartments.First())?.Select(l => l.GroupId).ToList(); 
                     if (currentUserGroups.Count() > 0)
                     {
-                        var query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId)
+                        IQueryable<CatDepartmentGroupCriteria> query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId)
                                     join dp in departmentRepository.Get() on lv.DepartmentId equals dp.Id
                                     join sg in DataContext.Get() on lv.GroupId equals sg.Id
                                     select new CatDepartmentGroupCriteria
@@ -220,8 +221,23 @@ namespace eFMS.API.System.DL.Services
                                         GroupId = lv.GroupId,
                                         GroupName = sg.ShortName,
                                     };
-                        results =  query;
+                        results =  query.ToList();
                     }
+                }
+
+                IQueryable<SysUserLevel> bodOffice = sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId && lv.DepartmentId == null && lv.GroupId == SystemConstants.SpecialGroup);
+                if(bodOffice != null) // user vừa là manager(bod) của office đó
+                {
+                    List<CatDepartmentGroupCriteria> queryBod = bodOffice.Select(x => new CatDepartmentGroupCriteria
+                    {
+                        UserId = x.UserId,
+                        DepartmentId = null,
+                        DepartmentName = "",
+                        GroupName = "",
+                        GroupId = x.GroupId,
+                        Type = "BOD"
+                    }).ToList();
+                    results.Add(queryBod.FirstOrDefault());
                 }
                 else // user k có department | group.
                 {
