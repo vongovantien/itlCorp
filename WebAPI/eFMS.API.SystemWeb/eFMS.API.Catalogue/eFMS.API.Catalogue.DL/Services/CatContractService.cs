@@ -33,6 +33,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
 
         private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> ApiUrl;
+
 
         public CatContractService(
             IContextBase<CatContract> repository,
@@ -45,7 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysCompany> sysCompanyRepo,
              IContextBase<SysImage> sysImageRepo,
                       IContextBase<SysEmployee> sysEmployeeRepo,
-            ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url) : base(repository, cacheService, mapper)
+            ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -56,6 +58,7 @@ namespace eFMS.API.Catalogue.DL.Services
             webUrl = url;
             sysImageRepository = sysImageRepo;
             sysEmployeeRepository = sysEmployeeRepo;
+            ApiUrl = apiurl;
         }
 
         public IQueryable<CatContract> GetContracts()
@@ -412,7 +415,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.webUrl.Value.Url;
+            string path = this.ApiUrl.Value.Url + "/Catalogue";
             try
             {
                 var list = new List<SysImage>();

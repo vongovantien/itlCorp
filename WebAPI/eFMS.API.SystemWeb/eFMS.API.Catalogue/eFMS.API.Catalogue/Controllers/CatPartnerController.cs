@@ -172,7 +172,7 @@ namespace eFMS.API.Catalogue.Controllers
             string refNo = model.InternalReferenceNo == null ? "" : model.InternalReferenceNo.Trim().ToLower();
             if (string.IsNullOrEmpty(model.Id))
             {
-                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
                                                     && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0)
