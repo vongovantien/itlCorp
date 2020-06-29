@@ -9,6 +9,7 @@ import { ConfirmPopupComponent } from '@common';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from '@constants';
+import { SortService } from '@services';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -27,9 +28,13 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
-        private _ngProgressService: NgProgress) {
+        private _ngProgressService: NgProgress,
+        private _sortService: SortService,
+    ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+        this.requestSort = this.sortLocal;
+
     }
 
     ngOnInit(): void {
@@ -44,6 +49,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Office', field: 'officeName', sortable: true },
             { title: 'Company', field: 'companyName', sortable: true },
         ];
+    }
+
+    sortLocal(sort: string): void {
+        this.contracts = this._sortService.sort(this.contracts, sort, this.order);
     }
 
     gotoCreateContract() {

@@ -76,6 +76,11 @@ export class AddPartnerDataComponent extends AppList {
         private _toastService: ToastrService
     ) {
         super();
+        this.requestSort = this.sortLocal;
+    }
+
+    sortLocal(sort: string): void {
+        this.contracts = this._sortService.sort(this.contracts, sort, this.order);
     }
 
     ngOnInit() {
