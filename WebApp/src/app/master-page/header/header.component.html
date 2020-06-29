@@ -188,19 +188,30 @@
                                     <i class="la la-users"></i>
                                 </span>
                                 <span class="m-nav__link-text m-name" *ngIf="!!selectedDepartmentGroup">
-                                    {{selectedDepartmentGroup.departmentName}} - {{selectedDepartmentGroup.groupName}}
+                                    <ng-container *ngIf="selectedDepartmentGroup.type === 'BOD';else normal">BOD
+                                    </ng-container>
+                                    <ng-template #normal> {{selectedDepartmentGroup.departmentName}} -
+                                        {{selectedDepartmentGroup.groupName}} </ng-template>
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
                                 <ul class="m-nav">
                                     <li class="m-nav__item pointer" *ngFor="let item of departmentGroups"
-                                        (click)="changeDepartmentGroup(item)"
-                                        [class.m-nav__item--active]="!!selectedDepartmentGroup &&  selectedDepartmentGroup.departmentName + selectedDepartmentGroup.groupName == item.departmentName+item.groupName">
-                                        <a class="m-nav__link active" data-toggle="modal"
-                                            data-target="#change-group-modal">
-                                            <span class="m-nav__link-text">
-                                                {{item.departmentName}} - {{item.groupName}}
-                                            </span>
+                                        (click)="changeDepartmentGroup(item)" [class.m-nav__item--active]="!!selectedDepartmentGroup 
+                                        && selectedDepartmentGroup.departmentId === item.departmentId
+                                        && selectedDepartmentGroup.groupId === item.groupId
+                                        ">
+                                        <a class="m-nav__link" data-toggle="modal" data-target="#change-group-modal">
+                                            <ng-container *ngIf="item.type === 'BOD';else normalUser">
+                                                <span class="m-nav__link-text">
+                                                    BOD
+                                                </span>
+                                            </ng-container>
+                                            <ng-template #normalUser>
+                                                <span class="m-nav__link-text">
+                                                    {{item.departmentName}} - {{item.groupName}}
+                                                </span>
+                                            </ng-template>
                                         </a>
                                     </li>
                                 </ul>
