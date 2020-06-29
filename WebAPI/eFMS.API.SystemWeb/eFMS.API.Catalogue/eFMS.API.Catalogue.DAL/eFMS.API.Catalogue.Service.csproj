@@ -58,7 +58,6 @@
     <Compile Remove="Models\SysDepartment.cs" />
     <Compile Remove="Models\SysGroup.cs" />
     <Compile Remove="Models\SysGroupRole.cs" />
-    <Compile Remove="Models\SysImage.cs" />
     <Compile Remove="Models\SysMenu.cs" />
     <Compile Remove="Models\SysMenuPermissionInstruction.cs" />
     <Compile Remove="Models\SysNotification.cs" />

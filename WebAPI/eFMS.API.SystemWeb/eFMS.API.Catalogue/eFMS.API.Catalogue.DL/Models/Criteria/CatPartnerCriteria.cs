@@ -9,6 +9,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     {
         public string All { get; set; }
         public CatPartnerGroupEnum PartnerGroup { get; set; }
+        public string PartnerType { get; set; }
         public string Id { get; set; }
         public string PartnerNameVn { get; set; }
         public string PartnerNameEn { get; set; }

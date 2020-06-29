@@ -87,7 +87,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     getPartners() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerGroup: CommonEnum.PartnerGroupEnum.CUSTOMER }, this.dataSearch))
+        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerType: 'Customer' }, this.dataSearch))
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -115,7 +115,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     showSaleman(customerId: string) {
-        this._catalogueRepo.getListSaleman(customerId)
+        this._catalogueRepo.getListContract(customerId)
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {
