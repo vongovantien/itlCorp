@@ -114,6 +114,7 @@
   //------------end  : STAGE
   //------------start: VOUCHER PAYMENT
   "MSG_ADVANCE_NO_DUPLICATE": "Advance no {0} has been duplicated!|wrong",
+  "MSG_ADVANCE_NO_NOT_APPROVAL": "Advance no {0} has not been approved!|wrong",
   "MSG_ADVANCE_NO_EMPTY": "Advance no is not allow empty!|wrong",
   "MSG_ADVANCE_NO_NOT_EXIST": "Advance no not exist",
   "MSG_VOUCHER_NO_EMPTY": "Voucher no is not allow empty!|wrong",
