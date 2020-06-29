@@ -181,7 +181,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id 
                                                       && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0)
