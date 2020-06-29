@@ -132,12 +132,16 @@ namespace eFMS.API.Setting.DL.Services
             return isAccountantDept;
         }       
 
-        public bool CheckIsBOD(Guid? officeId)
+        public bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId)
         {
             var isBod = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
-                                                    && x.DepartmentId == null
+                                                    && x.DepartmentId == null                                                    
                                                     && x.OfficeId != null
-                                                    && x.CompanyId != null).Select(s => s.UserId).Any();
+                                                    && x.CompanyId != null
+                                                    && x.DepartmentId == departmentId 
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId
+                                                    ).Select(s => s.UserId).Any();
             return isBod;
         }
 

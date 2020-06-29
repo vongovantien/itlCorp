@@ -212,7 +212,7 @@ namespace eFMS.API.Setting.DL.Services
                             }
                         }
 
-                        if (buHeadLevel.Role == "Auto" || buHeadLevel.Role == "Approval")
+                        if (buHeadLevel.Role == "Auto" || buHeadLevel.Role == "Approval" || buHeadLevel.Role == "Special")
                         {
                             _bhHead = buHeadLevel.UserId;
                             if (string.IsNullOrEmpty(_bhHead)) return new HandleState("Not found BOD");
@@ -226,7 +226,7 @@ namespace eFMS.API.Setting.DL.Services
                                 unlockApprove.BuheadAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "BOD";
                             }
-                            if (buHeadLevel.Role == "Approval"
+                            if ((buHeadLevel.Role == "Approval" || buHeadLevel.Role == "Special")
                                 && accountantLevel.Role != "Approval"
                                 && managerLevel.Role != "Approval"
                                 && leaderLevel.Role != "Approval")
@@ -550,7 +550,7 @@ namespace eFMS.API.Setting.DL.Services
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
             var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
-            var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+            var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
 
             if (!isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && userCurrent.UserID == unlockRequest.RequestUser) //Requester
             {
@@ -612,9 +612,12 @@ namespace eFMS.API.Setting.DL.Services
                     ) //BUHead
             {
                 isApproved = true;
-                if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                if (buHeadLevel.Role != "Special")
                 {
-                    return true;
+                    if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                    {
+                        return true;
+                    }
                 }
                 if (
                     (string.IsNullOrEmpty(approve.BuheadApr) && buHeadLevel.Role != "None")
@@ -719,7 +722,7 @@ namespace eFMS.API.Setting.DL.Services
             var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
 
             var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
-            //var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+            var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
 
             var isShowBtnDeny = false;
 
@@ -727,7 +730,7 @@ namespace eFMS.API.Setting.DL.Services
                         ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
                       ||
                         leaderLevel.UserDeputies.Contains(userCurrent.UserID))
-                        
+
                     ) //Leader
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED)
@@ -743,13 +746,14 @@ namespace eFMS.API.Setting.DL.Services
                         ((isManager && !isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
                       ||
                         managerLevel.UserDeputies.Contains(currentUser.UserID))
-                        
+
                     ) //Dept Manager
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED && leaderLevel.Role != "None"))
                 {
                     isShowBtnDeny = true;
-                }else
+                }
+                else
                 {
                     isShowBtnDeny = false;
                 }
@@ -768,6 +772,18 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     isShowBtnDeny = false;
                 }
+            }
+            else if (buHeadLevel.Role == "Special" && isBod
+                &&
+                (
+                  (isBuHead && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent.UserID == buHeadLevel.UserId)
+                  ||
+                  buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                )
+                && unlockRequest.StatusApproval != "New" && unlockRequest.StatusApproval != "Denied" && unlockRequest.StatusApproval != "Done"
+               )
+            {
+                isShowBtnDeny = true;
             }
             else
             {
@@ -983,8 +999,8 @@ namespace eFMS.API.Setting.DL.Services
                     }
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
-                    var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
-                    if (buHeadLevel.Role == "Approval" && isBod
+                    var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                    if ((buHeadLevel.Role == "Approval" || buHeadLevel.Role == "Special") && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
@@ -993,13 +1009,16 @@ namespace eFMS.API.Setting.DL.Services
                         )
                        )
                     {
-                        if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                        if (buHeadLevel.Role != "Special")
                         {
-                            return new HandleState("The accountant has not approved it yet");
+                            if (accountantLevel.Role == "Approval" && string.IsNullOrEmpty(approve.AccountantApr))
+                            {
+                                return new HandleState("The accountant has not approved it yet");
+                            }
                         }
                         if (string.IsNullOrEmpty(approve.BuheadApr))
                         {
-                            if (!string.IsNullOrEmpty(approve.AccountantApr) || accountantLevel.Role == "None" || accountantLevel.Role == "Auto")
+                            if (!string.IsNullOrEmpty(approve.AccountantApr) || accountantLevel.Role == "None" || accountantLevel.Role == "Auto" || buHeadLevel.Role == "Special")
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                                 approve.BuheadApr = userCurrent;
@@ -1179,7 +1198,7 @@ namespace eFMS.API.Setting.DL.Services
                     }
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
-                    var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+                    var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
                     if (buHeadLevel.Role == "Approval" && isBod
                         &&
                         (
@@ -1278,6 +1297,8 @@ namespace eFMS.API.Setting.DL.Services
 
                         //Cập nhật lại advance status của Unlock request
                         unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_NEW;
+                        unlockRequest.RequestUser = null;
+                        unlockRequest.RequestDate = null;
                         unlockRequest.UserModified = userCurrent;
                         unlockRequest.DatetimeModified = DateTime.Now;
                         var hsUpdateUnlockRequest = unlockRequestRepo.Update(unlockRequest, x => x.Id == unlockRequest.Id, false);

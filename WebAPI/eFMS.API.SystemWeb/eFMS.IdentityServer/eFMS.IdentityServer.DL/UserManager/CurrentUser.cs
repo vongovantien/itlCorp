@@ -47,10 +47,18 @@ namespace eFMS.IdentityServer.DL.UserManager
             {
                 if (departmentId == null && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
-                    departmentId = Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "departmentId").Value);
-                    if(departmentId == 0)
+                    var _departmentId = currentUser.FirstOrDefault(x => x.Type == "departmentId").Value;
+                    if (string.IsNullOrEmpty(_departmentId))
                     {
                         departmentId = null;
+                    }
+                    else
+                    {
+                        departmentId = Convert.ToInt32(_departmentId);
+                        //if(departmentId == 0)
+                        //{
+                        //    departmentId = null;
+                        //}
                     }
                 }
                 return departmentId;
