@@ -97,6 +97,7 @@ namespace eFMS.API.Catalogue
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
+            app.UseStaticFiles();
         }
     }
 }

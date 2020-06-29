@@ -5,7 +5,7 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>Customer</h3>
+                    <h3>{{type == 'Customer'? 'Customer': 'Agent'}}</h3>
                     <div>
                         <div class="c-button-actions">
                             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSave()">

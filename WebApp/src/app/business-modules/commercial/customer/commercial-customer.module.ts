@@ -18,7 +18,7 @@ const routing: Routes = [
             },
             {
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Customer' }
-            },
+            }
 
         ]
     }

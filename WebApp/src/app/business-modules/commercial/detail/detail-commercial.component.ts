@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { ToastrService } from 'ngx-toastr';
@@ -32,16 +32,16 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         protected _toastService: ToastrService,
         protected _catalogueRepo: CatalogueRepo,
         private _activedRoute: ActivatedRoute,
-        private _ngProgressService: NgProgress,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        protected _ngProgressService: NgProgress,
     ) {
-        super(_router, _toastService, _catalogueRepo);
-        this._progressRef = this._ngProgressService.ref();
+        super(_router, _toastService, _catalogueRepo, _ngProgressService, _activedRoute);
     }
 
     ngOnInit(): void { }
 
     ngAfterViewInit() {
+
         this._activedRoute.params.pipe(
             tap((param: Params) => {
                 this.partnerId = !!param.partnerId ? param.partnerId : '';
@@ -51,13 +51,15 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         ).subscribe(
             (partnerId: string) => {
                 if (partnerId) {
+                    this.contractList.partnerId = partnerId;
                     this.getDetailCustomer(partnerId);
-                    this.getListContract(partnerId);
+                    this.contractList.getListContract(partnerId);
                 } else {
                     this.gotoList();
                 }
             }
         );
+        this._cd.detectChanges();
     }
 
     getDetailCustomer(partnerId: string) {
@@ -100,7 +102,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         }
 
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
-        modelAdd.saleMans = this.contractList.contracts;  // TODO implement contract;
+        modelAdd.contracts = this.contractList.contracts;  // TODO implement contract;
 
         modelAdd.id = this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;

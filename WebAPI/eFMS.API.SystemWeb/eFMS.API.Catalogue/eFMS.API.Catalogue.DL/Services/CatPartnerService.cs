@@ -32,13 +32,14 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
 
-        private readonly IContextBase<CatSaleman> salemanRepository;
+        private readonly IContextBase<CatContract> contractRepository;
         private readonly ICatPlaceService placeService;
         private readonly ICatCountryService countryService;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
 
 
         public CatPartnerService(IContextBase<CatPartner> repository,
@@ -49,21 +50,23 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             ICatPlaceService place,
             ICatCountryService country,
-            IContextBase<CatSaleman> salemanRepo, IOptions<WebUrl> url,
+            IContextBase<CatContract> contractRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
-            IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysImage> sysImageRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
             placeService = place;
-            salemanRepository = salemanRepo;
+            contractRepository = contractRepo;
             sysUserRepository = sysUserRepo;
             countryService = country;
             webUrl = url;
             officeRepository = officeRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             catCountryRepository = catCountryRepo;
+            sysImageRepository = sysImageRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -85,7 +88,7 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
-        public override HandleState Add(CatPartnerModel entity)
+        public HandleState Add(CatPartnerModel entity)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -94,22 +97,32 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Add(partner);
             if (hs.Success)
             {
-                if (entity.SaleMans.Count > 0)
+                if (entity.Contracts.Count > 0)
                 {
-                    var salemans = mapper.Map<List<CatSaleman>>(entity.SaleMans);
-                    salemans.ForEach(x =>
+                    var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
+                    contracts.ForEach(x =>
                     {
-                        x.Id = Guid.NewGuid();
+                        //x.Id = Guid.NewGuid();
                         x.PartnerId = partner.Id;
-                        x.CreateDate = DateTime.Now;
-                        x.UserCreated = currentUser.UserID;
+                        x.DatetimeCreated = DateTime.Now;
+                        x.UserCreated = x.UserModified = currentUser.UserID;
                     });
-                    partner.SalePersonId = salemans.FirstOrDefault().SaleManId.ToString();
-                    DataContext.Update(partner, x => x.Id == partner.Id);
-                    salemanRepository.Add(salemans);
+                    partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
+                    DataContext.Add(partner,false);
+                    contractRepository.Add(contracts,false);
+
+                    //foreach (var item in entity.contracts)
+                    //{
+                    //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
+                    //    modeUploadContract.ChildId = item.Id.ToString();
+                    //    modeUploadContract.PartnerId = partner.Id;
+                    //    modeUploadContract.Files = item.File;
+                    //    UploadFileContract(modeUploadContract);
+                    //}
                 }
+           
                 DataContext.SubmitChanges();
-                salemanRepository.SubmitChanges();
+                contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
                 SendMailCreatedSuccess(partner);
@@ -149,28 +162,68 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private void SendMailCreatedSuccess(CatPartner partner)
         {
-                string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
-                string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
-                string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
-                string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
-                string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
-                string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
-                    "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" + 
-                    "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
-                    "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
-                    "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
-                    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                    "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
-                    "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn +"</br>" + linkVn + "</br> </br>" +
-                    "<i> Thanks and Regards </i>" + "</br> </br>" +
-                    "eFMS System </div>") ;
-                SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com","alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
+            string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
+            string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
+            string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
+            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant Team: </br> </br>" +
+                "<i> You have a Partner Approval request From " + fullNameCreatetor + " as info bellow: </i> </br>" +
+                "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+                "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+                "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+                "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
+                "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
+                "<i> Thanks and Regards </i>" + "</br> </br>" +
+                "eFMS System </div>");
+            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
+        }
+        private async void UploadFileContract(ContractFileUploadModel model)
+        {
+            string fileName = "";
+            string path = this.webUrl.Value.Url;
+            var list = new List<SysImage>();
+            /* Kiểm tra các thư mục có tồn tại */
+            var hs = new HandleState();
+            ImageHelper.CreateDirectoryFile(model.FolderName, model.PartnerId);
+            List<SysImage> resultUrls = new List<SysImage>();
+            //foreach (var file in model.Files)
+            //{
+                fileName = model.Files.FileName;
+                string objectId = model.PartnerId;
+                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+                string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+                var sysImage = new SysImage
+                {
+                    Id = Guid.NewGuid(),
+                    Url = urlImage,
+                    Name = fileName,
+                    Folder = model.FolderName ?? "Partner",
+                    ObjectId = model.PartnerId.ToString(),
+                    ChildId = model.ChildId.ToString(),
+                    UserCreated = currentUser.UserName, //admin.
+                    UserModified = currentUser.UserName,
+                    DateTimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now
+                };
+                resultUrls.Add(sysImage);
+                if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
+                {
+                    list.Add(sysImage);
+                }
+            //}
+            if (list.Count > 0)
+            {
+                list.ForEach(x => x.IsTemp = model.IsTemp);
+                hs = await sysImageRepository.AddAsync(list);
             }
 
+        }
         public HandleState Update(CatPartnerModel model)
         {
-            var listSalemans = salemanRepository.Get(x => x.PartnerId == model.Id).ToList();
+            var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
 
@@ -178,34 +231,34 @@ namespace eFMS.API.Catalogue.DL.Services
             if (code == 403) return new HandleState(403, "");
 
             var entity = GetModelToUpdate(model);
-            if (model.SaleMans.Count > 0)
+            if (model.Contracts.Count > 0)
             {
-                entity.SalePersonId = model.SaleMans.FirstOrDefault().SaleManId.ToString();
+                entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
             if (hs.Success)
             {
-                var hsoldman = salemanRepository.Delete(x => x.PartnerId == model.Id && !model.SaleMans.Any(sale => sale.Id == x.Id));
-                var salemans = mapper.Map<List<CatSaleman>>(model.SaleMans);
+                //var hsoldman = contractRepository.Delete(x => x.PartnerId == model.Id && !model.contracts.Any(sale => sale.Id == x.Id));
+                //var salemans = mapper.Map<List<CatContract>>(model.contracts);
 
-                foreach (var item in model.SaleMans)
-                {
-                    if (item.Id == Guid.Empty)
-                    {
-                        item.Id = Guid.NewGuid();
-                        item.PartnerId = entity.Id;
-                        item.CreateDate = DateTime.Now;
-                        item.UserCreated = currentUser.UserID;
-                        salemanRepository.Add(item);
-                    }
-                    else
-                    {
-                        item.ModifiedDate = DateTime.Now;
-                        item.UserModified = currentUser.UserID;
-                        salemanRepository.Update(item, x => x.Id == item.Id);
-                    }
-                }
-                salemanRepository.SubmitChanges();
+                //foreach (var item in model.contracts)
+                //{
+                //    if (item.Id == Guid.Empty)
+                //    {
+                //        item.Id = Guid.NewGuid();
+                //        item.PartnerId = entity.Id;
+                //        item.DatetimeCreated = DateTime.Now;
+                //        item.UserCreated = currentUser.UserID;
+                //        contractRepository.Add(item);
+                //    }
+                //    else
+                //    {
+                //        item.DatetimeCreated = DateTime.Now;
+                //        item.UserModified = currentUser.UserID;
+                //        contractRepository.Update(item, x => x.Id == item.Id);
+                //    }
+                //}
+                //contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -249,8 +302,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
-                var s = salemanRepository.Delete(x => x.PartnerId == id);
-                salemanRepository.SubmitChanges();
+                var s = contractRepository.Delete(x => x.PartnerId == id);
+                contractRepository.SubmitChanges();
                 ClearCache();
                 Get();
             }
@@ -265,7 +318,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            var salemans = salemanRepository.Get().ToList();
+            var salemans = contractRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
@@ -363,7 +416,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            var salemans = salemanRepository.Get().ToList();
+            var salemans = contractRepository.Get().ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
@@ -465,7 +518,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public int CheckDetailPermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
-            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
@@ -475,7 +528,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public int CheckDeletePermission(string id)
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
-            var salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int code = GetPermissionToDelete(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
@@ -522,6 +575,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.user.Username ?? "").IndexOf(criteria.UserCreated ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.AccountNo ?? "").IndexOf(criteria.AccountNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
+                           && (x.partner.PartnerType ?? "").Contains(criteria.PartnerType ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
                            ));
             }
@@ -539,6 +593,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.AccountNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                           || (x.partner.PartnerType ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null));
@@ -575,11 +630,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatPartnerModel GetDetail(string id)
         {
             CatPartnerModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
-            if(queryDetail == null)
+            if (queryDetail == null)
             {
                 return null;
             }
-            List<CatSaleman> salemans = salemanRepository.Get(x => x.PartnerId == id).ToList();
+            List<CatContract> salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -592,7 +647,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 AllowDelete = checkDelete == 403 ? false : true
             };
 
-            if(queryDetail.CountryId != null)
+            if (queryDetail.CountryId != null)
             {
                 CatCountry country = catCountryRepository.Get(x => x.Id == queryDetail.CountryId)?.FirstOrDefault();
                 queryDetail.CountryName = country.NameEn;
@@ -610,13 +665,13 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (queryDetail.ProvinceShippingId != null)
             {
-                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province) )?.FirstOrDefault();
+                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
                 queryDetail.ProvinceShippingName = province.NameEn;
             }
             return queryDetail;
         }
 
-        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<CatSaleman> salemans, CatPartnerModel detail)
+        private bool GetPermissionDetail(PermissionRange permissionRangeWrite, List<CatContract> salemans, CatPartnerModel detail)
         {
             bool result = false;
             switch (permissionRangeWrite)
@@ -688,7 +743,7 @@ namespace eFMS.API.Catalogue.DL.Services
             try
             {
                 var partners = new List<CatPartner>();
-                var salesmans = new List<CatSaleman>();
+                var salesmans = new List<CatContract>();
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
@@ -705,21 +760,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
-                    var salesman = new CatSaleman
+                    var salesman = new CatContract
                     {
                         Id = Guid.NewGuid(),
-                        Office = item.OfficeId,
-                        Company = item.CompanyId,
+                        OfficeId = item.OfficeId,
+                        CompanyId = item.CompanyId,
                         SaleManId = item.SalePersonId,
-                        FreightPayment = item.PaymentTerm,
-                        EffectDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
-                        Status = true,
+                        PaymentMethod = item.PaymentTerm,
+                        EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
+                        Active = true,
                         PartnerId = partner.Id,
-                        CreateDate = DateTime.Now,
-                        ModifiedDate = DateTime.Now,
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
-                        Service = item.ServiceId
+                        SaleService = item.ServiceId
                     };
                     partners.Add(partner);
                     salesmans.Add(salesman);
@@ -731,7 +786,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         var hs = DataContext.Add(partners);
                         if (hs.Success)
                         {
-                            hs = salemanRepository.Add(salesmans);
+                            hs = contractRepository.Add(salesmans);
                             if (hs.Success)
                             {
                                 trans.Commit();

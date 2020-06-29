@@ -167,6 +167,7 @@ export class AuthorizationComponent extends AppList {
                 this.authorizationAddPopupComponent.personInChargeActive = [this.authorizationAddPopupComponent.personInChargeList[indexPIC]];
             }
 
+            this.authorizationAddPopupComponent.isShowUpdate = false;
             this.authorizationAddPopupComponent.show();
         }
 
