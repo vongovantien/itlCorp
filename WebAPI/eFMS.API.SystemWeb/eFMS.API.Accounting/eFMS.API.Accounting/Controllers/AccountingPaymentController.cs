@@ -426,5 +426,12 @@ namespace eFMS.API.Accounting.Controllers
             }
             return dataList;
         }
+        [HttpPost("ExportAccountingPayment")]
+        [Authorize]
+        public IActionResult ExportAccountingPayment(PaymentCriteria criteria)
+        {
+            var data = accountingPaymentService.ExportAccountingPayment(criteria);
+            return Ok(data);
+        }
     }
 }

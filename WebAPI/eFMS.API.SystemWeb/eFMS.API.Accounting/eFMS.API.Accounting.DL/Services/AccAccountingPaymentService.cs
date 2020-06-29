@@ -827,5 +827,10 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return list;
         }
+        public IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria)
+        {
+            IQueryable<AccountingPaymentModel> results = Query(criteria);
+            return results;
+        }
     }
 }

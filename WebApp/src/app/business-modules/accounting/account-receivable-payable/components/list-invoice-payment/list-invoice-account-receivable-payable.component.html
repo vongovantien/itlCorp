@@ -69,7 +69,7 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
-                                            <td>{{ item.extendDays | date: 'dd/MM/yyyy'}}</td>
+                                            <td>{{ item.extendDays }}</td>
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
                                         <tr class="collapse-panel-row">
@@ -81,53 +81,59 @@
                                                             <table class="table table-secondary dataTable">
                                                                 <thead app-table-header [headers]="paymentHeaders"
                                                                     (onClick)="sortPayment($event.sortField, $event.order)">
-                                            <th class="m--w-50 first table-actions-col">
-                                                Actions
-                                            </th>
-                                            </thead>
-                            <tbody>
-                                <ng-container *ngIf="!!payments.length">
-                                    <tr *ngFor="let payment of payments; trackBy: trackByFn">
-                                        <td class="table-actions-col">
-                                            <div class="table-actions">
-                                                <button (click)="showConfirmDelete(payment, i)"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                    <i class="la la-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                        <td>{{ payment.paymentNo }}</td>
-                                        <td>{{ payment.paymentAmount| number: '.0-3'  }}</td>
-                                        <td>{{ payment.balance| number: '.0-3' }}</td>
-                                        <td>{{ payment.currencyId }}</td>
-                                        <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}</td>
-                                        <td>{{ payment.paymentType }}</td>
-                                        <td>{{ payment.userModifiedName }}</td>
-                                        <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}</td>
-                                    </tr>
+                                                                    <th class="m--w-50 first table-actions-col">
+                                                                        Actions
+                                                                    </th>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <ng-container *ngIf="!!payments.length">
+                                                                        <tr
+                                                                            *ngFor="let payment of payments; trackBy: trackByFn">
+                                                                            <td class="table-actions-col">
+                                                                                <div class="table-actions">
+                                                                                    <button
+                                                                                        (click)="showConfirmDelete(payment, i)"
+                                                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                                                        <i class="la la-trash"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>{{ payment.paymentNo }}</td>
+                                                                            <td>{{ payment.paymentAmount| number: '.0-3'  }}
+                                                                            </td>
+                                                                            <td>{{ payment.balance| number: '.0-3' }}
+                                                                            </td>
+                                                                            <td>{{ payment.currencyId }}</td>
+                                                                            <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
+                                                                            </td>
+                                                                            <td>{{ payment.paymentType }}</td>
+                                                                            <td>{{ payment.userModifiedName }}</td>
+                                                                            <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </ng-container>
+                                                                    <tr app-table-none-record *ngIf="!payments.length">
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </perfect-scrollbar>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!payments.length">
+                                <tr app-table-none-record *ngIf="!(isLoading | async) && !refPaymens.length">
                                 </tr>
+                                <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
                         </table>
-                        </perfect-scrollbar>
                     </div>
                 </div>
-                </td>
-                </tr>
-                </ng-container>
-                </ng-container>
-                <tr app-table-none-record *ngIf="!(isLoading | async) && !refPaymens.length">
-                </tr>
-                <tr app-table-row-loading *ngIf="isLoading"></tr>
-                </tbody>
-                </table>
             </div>
         </div>
-    </div>
-</div>
 
-</div>
+    </div>
 </div>
 
 <!-- <update-extend-day-popup></update-extend-day-popup> -->
