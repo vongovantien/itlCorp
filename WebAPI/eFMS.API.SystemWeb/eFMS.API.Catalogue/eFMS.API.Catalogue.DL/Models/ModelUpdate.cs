@@ -8,7 +8,7 @@ namespace eFMS.API.Catalogue.DL.Models
     {
         public string UserCreator { get; set; }
         public string PartnerGroup { get; set; }
-        public List<CatSaleman> Salemans { get; set; }
+        public List<CatContract> Salemans { get; set; }
 
     }
 }

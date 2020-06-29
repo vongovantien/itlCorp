@@ -216,10 +216,18 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            List<string> idsContract = null;
+            if(model.Contracts.Count() > 0)
+            {
+                
+                model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
+                idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
+                model.idsContract = idsContract;
+            }
             var partner = mapper.Map<CatPartnerModel>(model);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -298,17 +306,24 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id.Length == 0)
             {
-                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
+                if(model.AccountNo != null)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    }
                 }
             }
             else
             {
-                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo && x.Id != id))
+                if (model.AccountNo != null)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    if (catPartnerService.Any(x => x.AccountNo == model.AccountNo && x.Id != id))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    }
                 }
+               
             }
             return message;
         }

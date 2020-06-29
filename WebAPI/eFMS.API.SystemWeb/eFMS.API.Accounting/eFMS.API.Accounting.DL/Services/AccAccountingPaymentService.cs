@@ -216,7 +216,7 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
         }
 
-        // get charges that have type OBH and SOANo
+        // get charges that have type OBH and SOANo(Debit)
         private IQueryable<AccountingPaymentModel> QueryOBHPayment(PaymentCriteria criteria)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
@@ -225,8 +225,6 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AcctSoa, bool>> perQuery = GetQueryOBHPermission(rangeSearch, _user);
             Expression<Func<AcctSoa, bool>> query = x => (x.Customer == criteria.PartnerId || criteria.PartnerId == null)
                                                       && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null);
-            //&& (criteria.PaymentStatus.Contains(x.PaymentStatus) || string.IsNullOrEmpty(x.PaymentStatus) || criteria.PaymentStatus == null);
-
             if (criteria.PaymentStatus.Count > 0)
             {
                 query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "") || criteria.PaymentStatus == null);
@@ -330,7 +328,6 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && x.Status != "New"
                                                                       && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                                                       && (criteria.ReferenceNos.Contains(x.InvoiceNoReal) || criteria.ReferenceNos == null);
-                                                                      //&& (criteria.PaymentStatus.Contains(x.PaymentStatus??"") || criteria.PaymentStatus == null);
             if(criteria.PaymentStatus.Count > 0)
             {
                 query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "") || criteria.PaymentStatus == null);
@@ -677,7 +674,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (invoice == null) return null;
             return new ExtendDateUpdatedModel { RefId = id,
                 Note = invoice.PaymentNote,
-                NumberDaysExtend = (int)invoice.PaymentExtendDays,
+                NumberDaysExtend = invoice.PaymentExtendDays == null ? 0 : (int)invoice.PaymentExtendDays,
                 PaymentType = PaymentType.Invoice
             };
         }

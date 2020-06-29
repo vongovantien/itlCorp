@@ -134,7 +134,7 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     showSaleman(partnerId: string) {
-        this._catalogueRepo.getListSaleman(partnerId)
+        this._catalogueRepo.getListContract(partnerId)
             .pipe(catchError(this.catchError), finalize(() => {
             })).subscribe(
                 (res: any) => {

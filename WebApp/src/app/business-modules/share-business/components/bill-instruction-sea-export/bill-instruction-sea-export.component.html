@@ -136,12 +136,12 @@
                                     (remove)="resetFormControl(consignee)">
                                 </app-combo-grid-virtual-scroll>
 
-                                <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
-                                    name="consigneeDescription" formControlName="consigneeDescription"></textarea>
-
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !consignee.value">
-                                    Consignee is required
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted &&  !consigneeDescription.value}">
+                                    <textarea class="form-control m-input--square" id="" rows="3" autocomplete="nope"
+                                        name="consigneeDescription" formControlName="consigneeDescription"></textarea>
                                 </div>
+
 
                             </div>
                         </div>

@@ -258,7 +258,7 @@ export class PartnerDetailComponent extends AppList {
         }
         this.confirmDeleteSalemanPopup.hide();
         if (!!this.salemansId) {
-            this._catalogueRepo.deleteSaleman(this.salemansId, this.partner.id)
+            this._catalogueRepo.deleteContract(this.salemansId, this.partner.id)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

@@ -284,6 +284,7 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [Authorize]
         [HttpPut("UpdateExtendDate")]
         public IActionResult UpdateExtendDate(ExtendDateUpdatedModel model)
         {

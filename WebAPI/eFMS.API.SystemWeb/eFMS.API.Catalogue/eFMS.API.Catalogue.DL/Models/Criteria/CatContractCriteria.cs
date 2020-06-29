@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models.Criteria
 {
-    public class CatSalemanCriteria
+    public class CatContractCriteria
     {
         public string All { get; set; }
         public string Saleman_ID { get; set; }

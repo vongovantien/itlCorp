@@ -261,10 +261,14 @@ namespace eFMS.API.Accounting.DL.Services
                            VoucherId = acc.VoucherId,
                            InvoiceNoTempt = acc.InvoiceNoTempt,
                            InvoiceNoReal = acc.InvoiceNoReal,
+                           PartnerId = acc.PartnerId,
                            PartnerName = pat.ShortName,
                            TotalAmount = acc.TotalAmount,
                            Currency = acc.Currency,
                            Date = acc.Date, //Invoice Date or Voucher Date
+                           Type = acc.Type,
+                           AccountNo = acc.AccountNo,
+                           Description = acc.Description,
                            DatetimeCreated = acc.DatetimeCreated, //Issue Date
                            CreatorName = user.Username,
                            Status = acc.Status, //Status Invoice,
@@ -1120,9 +1124,10 @@ namespace eFMS.API.Accounting.DL.Services
             return customNos.FirstOrDefault();
         }
 
-        public List<AccountingManagementExport> GetDataAcctMngtExport(string typeOfAcctMngt)
+        public List<AccountingManagementExport> GetDataAcctMngtExport(AccAccountingManagementCriteria criteria)
         {
-            var accountings = DataContext.Get(x => x.Type == typeOfAcctMngt);
+            var query = ExpressionQuery(criteria);
+            var accountings = GetAcctMngtPermission().Where(query);
             var partners = partnerRepo.Get();
             var data = new List<AccountingManagementExport>();
             foreach (var acct in accountings)

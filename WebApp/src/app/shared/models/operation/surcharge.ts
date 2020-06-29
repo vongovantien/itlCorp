@@ -46,6 +46,9 @@ export class Surcharge {
     hblno: string = null;
     advanceNo: string = null;
 
+    shipmentId: string = null; // * Id trong OpsTransation,CsTransation.
+    typeService: string = null; // * "DOC | OPS"
+
     // * Custom
     obhId: string = null;
 

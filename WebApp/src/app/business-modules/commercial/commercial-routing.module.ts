@@ -9,12 +9,12 @@ const routes: Routes = [
     },
     {
         path: 'agent', loadChildren: () => import('./agent/commercial-agent.module').then(m => m.CommercialAgentModule),
-        data: { name: 'Agent' }
+        data: { name: 'Agent', type: 'Agent' }
     },
     {
         path: 'customer', loadChildren: () => import('./customer/commercial-customer.module').then(m => m.CommercialCustomerModule),
-        data: { name: 'Customer' }
-    },
+        data: { name: 'Customer', type: 'Customer' }
+    }
 ];
 
 export const routing: ModuleWithProviders = RouterModule.forChild(routes);

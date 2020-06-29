@@ -568,11 +568,30 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getInvoiceExtendedDate(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateExtendDate(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UpdateExtendDate`, body).pipe(
+            map((data: any) => data)
+        )
+    }
+
     deletePayment(id: string) {
         return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/` + id)
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    getOBHSOAExtendedDate(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetOBHSOAExtendedDate`, { id: refId }).pipe(
+            map((data: any) => data)
+        );
     }
 }
 

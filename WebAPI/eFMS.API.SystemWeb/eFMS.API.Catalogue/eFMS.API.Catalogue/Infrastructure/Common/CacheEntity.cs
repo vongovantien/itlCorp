@@ -17,7 +17,7 @@
         CatPlace,
         CatStage,
         CatUnit,
-        CatSaleman,
+        CatContract,
         catChartOfAccounts
 
     }

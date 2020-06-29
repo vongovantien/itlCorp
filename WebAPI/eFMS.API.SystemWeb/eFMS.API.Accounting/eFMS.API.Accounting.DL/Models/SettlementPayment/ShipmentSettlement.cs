@@ -12,6 +12,9 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string MBL { get; set; }
         public decimal TotalAmount { get; set; }
         public string CurrencyShipment { get; set; }
+        public Guid HblId { get; set; }
+        public Guid ShipmentId { get; set; }
+        public string Type { get; set; }
         public List<ShipmentChargeSettlement> ChargeSettlements { get; set; }
     }
 }

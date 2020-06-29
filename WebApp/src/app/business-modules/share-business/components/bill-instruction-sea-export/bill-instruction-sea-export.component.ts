@@ -1,13 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
-import { DataService } from '@services';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
 import { AppForm } from 'src/app/app.form';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'bill-instruction-sea-export',
@@ -50,21 +50,14 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
     packages: AbstractControl;
     gw: AbstractControl;
     cbm: AbstractControl;
+
     displayFieldIsseBy: CommonInterface.IComboGridDisplayField[] = [
         { field: 'username', label: 'User Name' },
         { field: 'employeeNameEn', label: 'Full Name' }
     ];
-    displayFieldPartner: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'accountNo', label: 'Partner ID' },
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' }
-    ];
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' }
-    ];
+
+    displayFieldPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
     constructor(private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,

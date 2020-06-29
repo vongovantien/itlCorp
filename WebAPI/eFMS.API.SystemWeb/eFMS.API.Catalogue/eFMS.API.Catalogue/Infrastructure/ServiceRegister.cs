@@ -85,9 +85,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             new CacheServiceBase<CatChargeGroup>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatChargeGroup)));
 
-            services.AddSingleton<ICacheServiceBase<CatSaleman>>(x =>
-            new CacheServiceBase<CatSaleman>(x.GetRequiredService<IConnectionMultiplexer>()
-            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatSaleman)));
+            services.AddSingleton<ICacheServiceBase<CatContract>>(x =>
+            new CacheServiceBase<CatContract>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatContract)));
 
 
             services.AddSingleton<ICacheServiceBase<CatChartOfAccounts>>(x =>
@@ -109,7 +109,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatChargeDefaultAccountService, CatChargeDefaultService>();
             services.AddTransient<ICatCurrencyService, CatCurrencyService>();
             services.AddTransient<ICatCurrencyExchangeService, CatCurrencyExchangeService>();
-            services.AddTransient<ICatSaleManService, CatSalemanService>();
+            services.AddTransient<ICatContractService, CatContractService>();
             services.AddTransient<ICatPartnerChargeService, CatPartnerChargeService>();
             services.AddTransient<ICatChargeGroupService, CatChargeGroupService>();
             services.AddTransient<ICatChartOfAccountsService, CatChartOfAccountsService>();

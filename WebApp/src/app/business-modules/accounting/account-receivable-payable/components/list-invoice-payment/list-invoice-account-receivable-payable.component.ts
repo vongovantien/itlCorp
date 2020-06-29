@@ -1,35 +1,52 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+
+import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+
+import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+
+
 
 @Component({
     selector: 'list-invoice-account-receivable-payable',
     templateUrl: './list-invoice-account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableListInvoicePaymentComponent extends AppList implements OnInit {
+    @ViewChild(AccountReceivablePayableUpdateExtendDayPopupComponent, { static: false }) updateExtendDayPopup: AccountReceivablePayableUpdateExtendDayPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoNotAllowDelete: InfoPopupComponent;
+
+    @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
+
+
     refPaymens: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
+
     selectedPayment: PaymentModel;
+
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _progressService: NgProgress) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
+
     }
 
     ngOnInit(): void {
@@ -58,10 +75,12 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             { title: 'Update Person', field: 'userModifiedName', sortable: true },
             { title: 'Update Date', field: 'datetimeModified', sortable: true }
         ];
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     ngAfterViewInit() {
-        // this.updateExtendDayPopup.show();
+        //this.updateExtendDayPopup.show();
 
     }
     import() {
@@ -84,6 +103,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
+
     showConfirmDelete(item, index) {
         if (index !== this.payments.length - 1) {
             this.infoNotAllowDelete.show();
@@ -92,9 +112,48 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             this.confirmDeletePopup.show();
         }
     }
+
     showExtendDateModel(refId: string) {
+        this._accountingRepo.getInvoiceExtendedDate(refId)
+            .pipe(
+                catchError(this.catchError)
+            ).subscribe((res: any) => {
+
+                this.updateExtendDayPopup.refId = res.refId;
+                this.updateExtendDayPopup.numberDaysExtend.setValue(res.numberDaysExtend);
+                this.updateExtendDayPopup.note.setValue(res.note);
+                this.updateExtendDayPopup.paymentType = res.paymentType;
+                this.updateExtendDayPopup.show();
+
+            })
 
     }
+
+    handleUpdateExtendDate($event: any) {
+        console.log("result: ", $event);
+        this._progressRef.start();
+        const body: any = {
+            refId: $event.refId,
+            numberDaysExtend: $event.numberDaysExtend,
+            note: $event.note,
+            paymentType: $event.paymentType,
+        };
+        this._accountingRepo.updateExtendDate(body)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe((res: any) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
+                    this.onUpdateExtendDateOfInvoice.emit();
+                } else {
+                    this._toastService.error(res.message);
+                }
+            });
+    }
+
     onDeletePayment() {
         this.isLoading = true;
         this._accountingRepo.deletePayment(this.selectedPayment.id)
@@ -115,4 +174,3 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             );
     }
 }
-

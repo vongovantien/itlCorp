@@ -10,9 +10,14 @@
                     <span></span>
                 </label>
             </a>
-            <!-- <a>
-                <i class="la la-file-text"></i>
-            </a> -->
+            <a class="dropdown m-dropdown m-dropdown--inline">
+                <i class="la la-file-text" data-toggle="dropdown"></i>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="previewPLsheet($event,'USD')">Preview PL with USD</a>
+                    <a class="dropdown-item pointer" (click)="previewPLsheet($event,'VND')">Preview PL with VND</a>
+                </div>
+            </a>
+
         </div>
     </div>
     <div class="col-lg-2">
@@ -50,5 +55,3 @@
             Management</a>
     </div>
 </div>
-
-<payment-management-popup></payment-management-popup>

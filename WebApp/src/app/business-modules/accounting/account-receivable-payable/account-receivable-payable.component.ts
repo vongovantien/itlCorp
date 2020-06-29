@@ -5,6 +5,8 @@ import { AccountingRepo } from '@repositories';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { AccountReceivablePayableListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-receivable-payable.component';
 import { AccountReceivablePayableListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-receivable-payable.component';
+import { PaymentType } from './components/form-search/form-search-account-receivable-payable.component';
+type TAB = 'INVOICE' | 'OBH';
 
 @Component({
     selector: 'app-account-receivable-payable',
@@ -13,7 +15,7 @@ import { AccountReceivablePayableListOBHPaymentComponent } from './components/li
 export class AccountReceivablePayableComponent extends AppList implements OnInit {
     @ViewChild(AccountReceivablePayableListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountReceivablePayableListInvoicePaymentComponent;
     @ViewChild(AccountReceivablePayableListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountReceivablePayableListOBHPaymentComponent;
-    selectedTab: string = "INVOICE";
+    selectedTab: TAB | string = "INVOICE";
 
     constructor(private _ngProgessSerice: NgProgress,
         private _accountingRepo: AccountingRepo) {
@@ -23,25 +25,25 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     ngOnInit() {
         this.dataSearch.paymentStatus = [];
-        this.dataSearch.paymentType = 0;
         this.requestSearchShipment();
     }
     onSelectTabLocation(tabname) {
         this.selectedTab = tabname;
-        if (tabname === "INVOICE") {
-            this.dataSearch.paymentType = 0;
-        } else {
-            this.dataSearch.paymentType = 1;
-        }
+        this.dataSearch.paymentType = this.getPaymentType();
         this.requestSearchShipment();
     }
-    onSearchPayment(event) {
+    getPaymentType() {
+        let paymentType: number;
         if (this.selectedTab === "INVOICE") {
-            this.dataSearch.paymentType = 0;
+            paymentType = PaymentType.Invoice;
         } else {
-            this.dataSearch.paymentType = 1;
+            paymentType = PaymentType.OBH;
         }
+        return paymentType;
+    }
+    onSearchPayment(event) {
         this.dataSearch = event;
+        this.dataSearch.paymentType = this.getPaymentType();
         this.requestSearchShipment();
     }
     requestSearchShipment() {
@@ -63,5 +65,13 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                     }
                 },
             );
+    }
+    // refresh page (tab Invoice)
+    handleUpdateExtendDateOfInvoice() {
+        this.requestSearchShipment();
+    }
+    // refresh page (tab OBH)
+    handleUpdateExtendDateOfOBH() {
+        this.requestSearchShipment();
     }
 }

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { CommercialAgentComponent } from './commercial-agent.component';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { CommercialDetailComponent } from '../detail/detail-commercial.component';
+import { CommercialCreateComponent } from '../create/create-commercial.component';
+import { ShareCommercialModule } from '../share-commercial.module';
 
 const routing: Routes = [
     {
@@ -10,7 +13,12 @@ const routing: Routes = [
             {
                 path: '', component: CommercialAgentComponent
             },
-
+            {
+                path: 'new', component: CommercialCreateComponent, data: { name: 'New' }
+            },
+            {
+                path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Agent' }
+            }
         ]
     }
 ];
@@ -18,12 +26,14 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        CommercialAgentComponent
+        CommercialAgentComponent,
+
     ],
     imports: [
         CommonModule,
         RouterModule.forChild(routing),
-        SharedModule
+        SharedModule,
+        ShareCommercialModule
     ],
     exports: [],
     providers: [],

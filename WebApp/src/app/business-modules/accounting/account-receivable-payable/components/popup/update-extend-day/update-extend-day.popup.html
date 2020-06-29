@@ -1,35 +1,44 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Update Extends Days</h5>
-                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                <button type="button" class="close" aria-label="Close" (click)=closePopup()>
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label for="">Extends Days</label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                    [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
-                                    [alwaysShowCalendars]="true" placeholder="/ /" readonly calendar />
+                <form class="m-form m-form--state" [formGroup]="formUpdateExtenDate">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label required>Extends Days</label>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':(checkError && (numberDaysExtend.value <= 0 || numberDaysExtend.value % 1 !== 0) ) }">
+                                    <input type="number" class="form-control" formControlName="numberDaysExtend" />
+                                    <div class="m--font-danger" *ngIf="numberDaysExtend.value === 0 && checkError">
+                                        Number Days Extend is required
+                                    </div>
+                                    <div class="m--font-danger" *ngIf="numberDaysExtend.value < 0 && checkError">
+                                        Number Days Extend invalid
+                                    </div>
+                                    <div class="m--font-danger" *ngIf="numberDaysExtend.value % 1 !== 0 && checkError">
+                                        Number Days Extend must be integer type
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Note</label>
+                                <textarea class="form-control " formControlName="note" rows="5"></textarea>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Note</label>
-                            <textarea class="form-control" rows="5" [(ngModel)]="keyword"></textarea>
-                        </div>
                     </div>
-                </div>
+                </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="updateExtendDate()">
                     <span>
-                        <i class="la la-search"></i>
+                        <i class="la la-save"></i>
                         <span> Update </span>
                     </span>
                 </button>
