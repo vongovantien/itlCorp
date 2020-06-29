@@ -130,12 +130,14 @@
                                         </tr>
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!(isLoading | async) && !refPaymens.length">
+                                <tr app-table-none-record *ngIf="!isLoading && !refPaymens.length">
                                 </tr>
                                 <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
                         </table>
                     </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
                 </div>
             </div>
         </div>

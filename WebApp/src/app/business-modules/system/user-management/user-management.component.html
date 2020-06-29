@@ -28,7 +28,7 @@
                             </th>
                         </thead>
                         <tbody class="tbody-group">
-                            <ng-container *ngIf="!isLoading && !!users.length">
+                            <ng-container *ngIf="!!users.length">
                                 <tr *ngFor="let user of users; let i = index; trackBy: trackByFn">
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
