@@ -226,22 +226,17 @@ namespace eFMS.API.System.DL.Services
                 }
 
                 IQueryable<SysUserLevel> bodOffice = sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId && lv.DepartmentId == null && lv.GroupId == SystemConstants.SpecialGroup);
-                if(bodOffice != null) // user vừa là manager(bod) của office đó
+                if(bodOffice.Count() > 0) // user vừa là manager(bod) của office đó
                 {
                     List<CatDepartmentGroupCriteria> queryBod = bodOffice.Select(x => new CatDepartmentGroupCriteria
                     {
                         UserId = x.UserId,
-                        DepartmentId = null,
+                        GroupId = x.GroupId,
                         DepartmentName = "",
                         GroupName = "",
-                        GroupId = x.GroupId,
                         Type = "BOD"
                     }).ToList();
                     results.Add(queryBod.FirstOrDefault());
-                }
-                else // user k có department | group.
-                {
-                    return null;
                 }
 
                 return results;

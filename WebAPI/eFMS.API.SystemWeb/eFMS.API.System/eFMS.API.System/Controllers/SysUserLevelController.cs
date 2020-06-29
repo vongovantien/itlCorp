@@ -203,6 +203,7 @@ namespace eFMS.API.System.Controllers
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.OfficeId == model.OfficeId
                                             && x.UserId == model.UserId
+                                            && x.DepartmentId == null
                                             && x.GroupId == SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
@@ -214,7 +215,7 @@ namespace eFMS.API.System.Controllers
                                             && x.OfficeId == model.OfficeId
                                             && x.UserId == model.UserId
                                             && x.GroupId == SystemConstants.SpecialGroup
-                                            && x.DepartmentId == model.DepartmentId
+                                            && x.DepartmentId == null
                                             && x.Id != model.Id))
                 {
                     isDuplicate = true;
@@ -230,6 +231,8 @@ namespace eFMS.API.System.Controllers
             {
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.UserId == model.UserId
+                                            && x.OfficeId == null
+                                            && x.DepartmentId == null
                                             && x.GroupId == SystemConstants.SpecialGroup))
                 {
                     isDuplicate = true;
@@ -240,7 +243,8 @@ namespace eFMS.API.System.Controllers
                 if (userLevelService.Any(x => x.CompanyId == model.CompanyId
                                             && x.UserId == model.UserId
                                             && x.GroupId == SystemConstants.SpecialGroup
-                                            && x.OfficeId == model.OfficeId
+                                            && x.OfficeId == null
+                                            && x.DepartmentId == null
                                             && x.Id != model.Id))
                 {
                     isDuplicate = true;

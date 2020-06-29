@@ -21,6 +21,7 @@ namespace SystemInterface {
         groupId: number;
         departmentName: string;
         groupName: string;
+        type: string;
     }
 
     export interface IUserPermission {

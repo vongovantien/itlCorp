@@ -45,7 +45,16 @@ namespace eFMS.IdentityServer
                 }
                 else
                 {
-                    short departmentId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["departmentId"]);
+                    short? departmentId = null;
+                    if (deptId == "null")
+                    {
+                        departmentId = null;
+                    }
+                    else
+                    {
+                        departmentId = Int16.Parse(deptId);
+
+                    }
                     int groupId = Int16.Parse(_contextAccessor.HttpContext.Request.Headers["groupId"]);
                     userPermissionInfo = new PermissionInfo
                     {
@@ -99,7 +108,7 @@ namespace eFMS.IdentityServer
                 list_Claim.Add(new Claim("email", modelReturn.email));
                 list_Claim.Add(new Claim("companyId", modelReturn.companyId.ToString()));
                 list_Claim.Add(new Claim("officeId", modelReturn.officeId.ToString()));
-                list_Claim.Add(new Claim("departmentId", (modelReturn.departmentId ?? 0).ToString()));
+                list_Claim.Add(new Claim("departmentId", (modelReturn.departmentId ?? null).ToString()));
                 list_Claim.Add(new Claim("groupId", modelReturn.groupId.ToString()));
                 list_Claim.Add(new Claim("nameEn", modelReturn.NameEn.ToString()));
                 list_Claim.Add(new Claim("nameVn", modelReturn.NameVn.ToString()));
