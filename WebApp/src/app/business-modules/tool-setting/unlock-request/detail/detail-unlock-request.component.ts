@@ -176,7 +176,8 @@ export class UnlockRequestDetailComponent extends AppForm {
                 userNameModified: null,
                 isRequester: false,
                 isManager: false,
-                isApproved: false
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();
@@ -229,7 +230,8 @@ export class UnlockRequestDetailComponent extends AppForm {
                 userNameModified: null,
                 isRequester: false,
                 isManager: false,
-                isApproved: false
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();

@@ -37,6 +37,7 @@ export class SetUnlockRequestModel extends SetUnlockRequest {
     isRequester: boolean = false;
     isManager: boolean = false;
     isApproved: boolean = false;
+    isShowBtnDeny: boolean = false;
     constructor(object?: any) {
         super();
         const self = this;

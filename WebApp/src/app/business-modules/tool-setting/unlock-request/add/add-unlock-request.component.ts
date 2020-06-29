@@ -140,7 +140,8 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 userNameModified: null,
                 isRequester: false,
                 isManager: false,
-                isApproved: false
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();
@@ -194,7 +195,8 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 userNameModified: null,
                 isRequester: false,
                 isManager: false,
-                isApproved: false
+                isApproved: false,
+                isShowBtnDeny: false
             };
             this._progressRef.start();
             this._settingRepo.sendRequestUnlock(_unlockRequest)

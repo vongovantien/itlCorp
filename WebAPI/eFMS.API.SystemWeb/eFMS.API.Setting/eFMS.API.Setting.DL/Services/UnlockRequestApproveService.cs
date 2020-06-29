@@ -704,6 +704,77 @@ namespace eFMS.API.Setting.DL.Services
             return isManagerOrLeader;
         }
 
+        public bool CheckIsShowBtnDeny(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve)
+        {
+            if (approve == null) return false;
+
+            var leaderLevel = LeaderLevel(unlockRequest.UnlockType, unlockRequest.GroupId, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var managerLevel = ManagerLevel(unlockRequest.UnlockType, unlockRequest.DepartmentId, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var accountantLevel = AccountantLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+            var buHeadLevel = BuHeadLevel(unlockRequest.UnlockType, unlockRequest.OfficeId, unlockRequest.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+            //var isBod = userBaseService.CheckIsBOD(currentUser.OfficeID);
+
+            var isShowBtnDeny = false;
+
+            if (
+                        ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                      ||
+                        leaderLevel.UserDeputies.Contains(userCurrent.UserID))
+                        
+                    ) //Leader
+            {
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED)
+                {
+                    isShowBtnDeny = true;
+                }
+                else
+                {
+                    isShowBtnDeny = false;
+                }
+            }
+            else if (
+                        ((isManager && !isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                      ||
+                        managerLevel.UserDeputies.Contains(currentUser.UserID))
+                        
+                    ) //Dept Manager
+            {
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED && leaderLevel.Role != "None"))
+                {
+                    isShowBtnDeny = true;
+                }else
+                {
+                    isShowBtnDeny = false;
+                }
+            }
+            else if (
+                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                      ||
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                    ) //Accountant Manager
+            {
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED && managerLevel.Role != "None"))
+                {
+                    isShowBtnDeny = true;
+                }
+                else
+                {
+                    isShowBtnDeny = false;
+                }
+            }
+            else
+            {
+                isShowBtnDeny = false;
+            }
+            return isShowBtnDeny;
+        }
         #endregion -- Check Exist, Check Is Manager, Is Approved --
 
         #region -- APPROVE, DENY, CANCEL REQUEST --

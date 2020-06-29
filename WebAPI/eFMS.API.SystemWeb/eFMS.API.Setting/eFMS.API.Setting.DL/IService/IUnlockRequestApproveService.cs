@@ -20,5 +20,6 @@ namespace eFMS.API.Setting.DL.IService
         HandleState CancelRequest(Guid id);
         bool CheckUserIsApproved(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve);
         bool CheckUserIsManager(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve);
+        bool CheckIsShowBtnDeny(ICurrentUser userCurrent, SetUnlockRequest unlockRequest, SetUnlockRequestApprove approve);
     }
 }

@@ -150,9 +150,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button title="Deny" type="button"
-                                    *ngIf="(unlockRequest.isManager && (unlockRequest.statusApproval === 'Request Approval' || unlockRequest.statusApproval === 'Leader Approved' || unlockRequest.statusApproval === 'Manager Approved' ||
-                                    unlockRequest.statusApproval==='Accoutant Approved' )) || !unlockRequest.isApproved"
+                                <button title="Deny" type="button" *ngIf="unlockRequest.isShowBtnDeny"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                                     (click)="showInputCommentDeny()">
                                     <span>

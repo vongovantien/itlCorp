@@ -483,9 +483,14 @@ namespace eFMS.API.Setting.DL.Services
                 detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
                 var unlockApprove = setUnlockRequestApproveRepo.Get(x => x.UnlockRequestId == id && x.IsDeny == false).FirstOrDefault();
 
-                detail.IsRequester = (currentUser.UserID == unlockRequest.Requester && currentUser.GroupId != SettingConstants.SpecialGroup)  ? true : false;                
+                detail.IsRequester = (currentUser.UserID == unlockRequest.Requester 
+                    && currentUser.GroupId == unlockRequest.GroupId 
+                    && currentUser.DepartmentId == unlockRequest.DepartmentId 
+                    && currentUser.OfficeID == unlockRequest.OfficeId 
+                    && currentUser.CompanyID == unlockRequest.CompanyId)  ? true : false;                
                 detail.IsManager = unlockRequestApproveService.CheckUserIsManager(currentUser, unlockRequest, unlockApprove);
                 detail.IsApproved = unlockRequestApproveService.CheckUserIsApproved(currentUser, unlockRequest, unlockApprove);
+                detail.IsShowBtnDeny = unlockRequestApproveService.CheckIsShowBtnDeny(currentUser, unlockRequest, unlockApprove);
             }
             return detail;
         }

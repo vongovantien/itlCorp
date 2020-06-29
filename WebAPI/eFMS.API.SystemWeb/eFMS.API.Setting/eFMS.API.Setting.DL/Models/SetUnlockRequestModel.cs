@@ -14,5 +14,6 @@ namespace eFMS.API.Setting.DL.Models
         public bool IsRequester { get; set; }
         public bool IsManager { get; set; }
         public bool IsApproved { get; set; }
+        public bool IsShowBtnDeny { get; set; }
     }
 }
