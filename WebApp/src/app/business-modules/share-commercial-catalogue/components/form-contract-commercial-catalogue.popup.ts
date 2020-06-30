@@ -319,6 +319,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.paymentMethod);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
+        if (!this.effectiveDate.value.startDate) {
+            return;
+        }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
             if (this.contractType.value[0].id === this.contractTypes[1].id) {
                 this.isRequiredContractNo = true;
@@ -464,7 +467,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value[0].id : null;
         this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
-        if (this.contractType.value[0].id === 'Trial') {
+        if (this.contractType.value[0].id === 'Trial' && !this.isUpdate) {
             if (!!this.effectiveDate.value.startDate) {
                 this.trialEffectDate.setValue({
                     startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate())),
@@ -482,10 +485,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             if (!!this.effectiveDate.value.startDate && !!this.expiredDate.value.startDate) {
                 this.trialCreditDays.setValue(this.expiredDate.value.startDate.diff(this.effectiveDate.value.startDate, 'days'));
             }
-        } else {
-            this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
-            this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         }
+        this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
         this.selectedContract.creditLimit = this.formGroup.controls['creditLimit'].value;
         this.selectedContract.creditLimitRate = this.formGroup.controls['creditLimitRate'].value;
@@ -496,6 +498,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.customerAdvanceAmount = this.formGroup.controls['customerAmount'].value;
         this.selectedContract.creditRate = this.formGroup.controls['creditRate'].value;
         this.selectedContract.description = this.formGroup.controls['description'].value;
+        this.selectedContract.trialCreditDays = this.trialCreditDays.value;
+
         this.selectedContract.partnerId = this.partnerId;
     }
 

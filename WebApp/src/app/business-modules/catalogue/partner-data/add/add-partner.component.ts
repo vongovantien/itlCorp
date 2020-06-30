@@ -16,6 +16,9 @@ import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { formatDate } from '@angular/common';
 import { Company } from '@models';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
+import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -28,6 +31,15 @@ export class AddPartnerDataComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) confirmTaxcode: InfoPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
+    @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+
+    contracts: Contract[] = [];
+    selectedContract: Contract = new Contract();
+    contract: Contract = new Contract();
+
+    indexToRemove: number = 0;
+    indexlstContract: number = null;
+
     saleMans = [];
     activeNg: boolean = true;
     partner: Partner = new Partner();
@@ -60,9 +72,15 @@ export class AddPartnerDataComponent extends AppList {
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
         private toastr: ToastrService,
-        private _systemRepo: SystemRepo
+        private _systemRepo: SystemRepo,
+        private _toastService: ToastrService
     ) {
         super();
+        this.requestSort = this.sortLocal;
+    }
+
+    sortLocal(sort: string): void {
+        this.contracts = this._sortService.sort(this.contracts, sort, this.order);
     }
 
     ngOnInit() {
@@ -83,13 +101,15 @@ export class AddPartnerDataComponent extends AppList {
 
     initHeaderSalemanTable() {
         this.headerSaleman = [
-            { title: '', field: '', sortable: false },
             { title: 'Salesman', field: 'username', sortable: true },
-            { title: 'Service', field: 'serviceName', sortable: true },
-            { title: 'Office', field: 'office', sortable: true },
-            { title: 'Company', field: 'company', sortable: true },
+            { title: 'Contract No', field: 'username', sortable: true },
+            { title: 'Contract Type', field: 'username', sortable: true },
+            { title: 'Service', field: 'username', sortable: true },
+            { title: 'Effective Date', field: 'username', sortable: true },
+            { title: 'Expired Date', field: 'username', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
-            { title: 'CreatedDate', field: 'createDate', sortable: true }
+            { title: 'Office', field: 'officeName', sortable: true },
+            { title: 'Company', field: 'companyName', sortable: true },
         ];
     }
 
@@ -337,11 +357,12 @@ export class AddPartnerDataComponent extends AppList {
 
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
-        this.partner.saleMans = this.saleMandetail;
-        this.partner.saleMans.forEach(element => {
-            element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
-            element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
-        });
+        // this.partner.saleMans = this.saleMandetail;
+        // this.partner.saleMans.forEach(element => {
+        //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
+        //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
+        // });
+        this.partner.contracts = this.contracts;
         this.getFormPartnerData();
         console.log(this.partner);
         if (this.partner.countryId == null || this.partner.provinceId == null
@@ -352,34 +373,38 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUp.setErrors(null);
-        if (this.formPartnerComponent.partnerForm.valid) {
-            if (this.saleMandetail.length === 0) {
-                if (this.isShowSaleMan) {
-                    this.toastr.error('Please add saleman and service for customer!');
-                    return;
-                }
-            }
+        // if (!this.contracts.length) {
+        //     this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
+        //     return;
+        // }
+        // if (this.formPartnerComponent.partnerForm.valid) {
+        //     if (this.saleMandetail.length === 0) {
+        //         if (this.isShowSaleMan) {
+        //             this.toastr.error('Please add saleman and service for customer!');
+        //             return;
+        //         }
+        //     }
 
-            if (this.saleMandetail.length > 0) {
-                for (const it of this.saleMandetail) {
-                    this.services.forEach(item => {
-                        if (it.service[0].id === item.id) {
-                            it.service = item.id;
-                        }
-                    });
-                }
-            }
+        //     if (this.saleMandetail.length > 0) {
+        //         for (const it of this.saleMandetail) {
+        //             this.services.forEach(item => {
+        //                 if (it.service[0].id === item.id) {
+        //                     it.service = item.id;
+        //                 }
+        //             });
+        //         }
+        //     }
 
-            if (this.isShowSaleMan) {
-                if (this.saleMandetail.length === 0) {
-                    this.toastr.error('Please add saleman and service for customer!');
-                } else {
-                    this.onCreatePartner();
-                }
+        if (this.isShowSaleMan) {
+            if (this.contracts.length === 0) {
+                this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
             } else {
                 this.onCreatePartner();
             }
+        } else {
+            this.onCreatePartner();
         }
+
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
@@ -513,4 +538,116 @@ export class AddPartnerDataComponent extends AppList {
         this.poupSaleman.showSaleman(saleMane);
         this.poupSaleman.show();
     }
+
+    getListContract(partneId: string) {
+        this.isLoading = true;
+        this._catalogueRepo.getListContract(partneId)
+            .pipe(
+                finalize(() => this.isLoading = false)
+            )
+            .subscribe(
+                (res: any[]) => {
+                    this.contracts = res || [];
+                }
+            );
+    }
+
+    onRequestContract($event: any) {
+        this.contract = $event;
+        this.selectedContract = new Contract(this.contract);
+        if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
+            this.getListContract(null);
+        } else {
+            console.log(this.selectedContract);
+            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
+            if (this.indexlstContract !== null) {
+                this.contracts[this.indexlstContract] = this.selectedContract;
+                this.formContractPopup.hide();
+            } else {
+                if (objCheckContract && objCheckContract != null) {
+                    this.formContractPopup.isDuplicateContract = true;
+                    this._toastService.error('Contract no has been existed!');
+                } else {
+                    this.formContractPopup.isDuplicateContract = false;
+                    this.contracts.push(this.selectedContract);
+                }
+            }
+        }
+        this.formContractPopup.contracts = this.contracts;
+    }
+
+    getDetailContract(id: string, index: number) {
+        this.formContractPopup.isUpdate = true;
+        this.formContractPopup.partnerId = null;
+        this.formContractPopup.selectedContract.id = id;
+        this.indexlstContract = index;
+        if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
+            this.formContractPopup.getFileContract();
+            this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
+                .subscribe(
+                    (res: Contract) => {
+                        this.selectedContract = res;
+                        this.formContractPopup.idContract = this.selectedContract.id;
+                        this.formContractPopup.selectedContract = res;
+                        this.formContractPopup.pachValueToFormContract();
+                        this.formContractPopup.show();
+                    }
+                );
+        } else {
+            if (this.contracts.length > 0) {
+                this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
+                this.formContractPopup.indexDetailContract = this.indexlstContract;
+                this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
+            }
+            this.formContractPopup.pachValueToFormContract();
+            this.formContractPopup.show();
+        }
+    }
+
+    showConfirmDelete(contract: Contract, index: number) {
+        this.selectedContract = contract;
+        this.indexToRemove = index;
+        if (this.selectedContract.id === SystemConstants.EMPTY_GUID) {
+            this.contracts = [...this.contracts.slice(0, index), ...this.contracts.slice(index + 1)];
+        }
+    }
+
+
+    gotoCreateContract() {
+        this.formContractPopup.formGroup.patchValue({
+            salesmanId: null,
+            officeId: null,
+            contractNo: null,
+            effectiveDate: null,
+            expiredDate: null,
+            paymentTerm: null,
+            creditLimit: null,
+            creditLimitRate: null,
+            trialCreditLimit: null,
+            trialCreditDays: null,
+            trialEffectDate: null,
+            trialExpiredDate: null,
+            creditAmount: null,
+            billingAmount: null,
+            paidAmount: null,
+            unpaidAmount: null,
+            customerAmount: null,
+            creditRate: null,
+            description: null,
+            vas: null,
+            saleService: null
+        });
+        this.formContractPopup.files = null;
+        this.formContractPopup.fileList = null;
+        this.formContractPopup.isUpdate = false;
+        this.formContractPopup.isSubmitted = false;
+        this.formContractPopup.partnerId = null;
+        this.indexlstContract = null;
+        this.formContractPopup.isCreateNewCommercial = true;
+        this.formContractPopup.show();
+    }
+
+
+
+
 }

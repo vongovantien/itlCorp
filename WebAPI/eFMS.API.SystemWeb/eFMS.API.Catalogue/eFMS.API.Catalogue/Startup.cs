@@ -91,13 +91,13 @@ namespace eFMS.API.Catalogue
                         description.GroupName.ToUpperInvariant());
                 }
             });
-
+            app.UseStaticFiles();
             app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            app.UseStaticFiles();
+            
         }
     }
 }
