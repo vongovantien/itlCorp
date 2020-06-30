@@ -16,6 +16,6 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysGroupModel> Query(SysGroupCriteria criteria);
         SysGroupModel GetById(short id);
         IQueryable<SysGroupModel> GetGroupByDepartment(int id);
-        IQueryable<CatDepartmentGroupCriteria> GetGroupDepartmentPermission(string username , Guid officeId);
+        List<CatDepartmentGroupCriteria> GetGroupDepartmentPermission(string username , Guid officeId);
     }
 }

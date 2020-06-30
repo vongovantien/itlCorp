@@ -141,6 +141,7 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string MSG_VOUCHER_DATE_EMPTY = "MSG_VOUCHER_DATE_EMPTY";
         public static readonly string MSG_ADVANCE_NO_DUPLICATE = "MSG_ADVANCE_NO_DUPLICATE";
         public static readonly string MSG_VOUCHER_DATE_NOT_VALID = "MSG_VOUCHER_DATE_NOT_VALID";
+        public static readonly string MSG_ADVANCE_NO_NOT_APPROVAL = "MSG_ADVANCE_NO_NOT_APPROVAL";
         #endregion
 
         #region voucher advance payment

@@ -143,7 +143,7 @@ namespace eFMS.IdentityServer.DL.Services
                     info = new PermissionInfo
                     {
                         OfficeID = userLevel.OfficeId,
-                        DepartmentID = userLevel.DepartmentId != null ? (Int16)userLevel.DepartmentId : (Int16)0,
+                        DepartmentID = userLevel.DepartmentId != null ? (short)userLevel.DepartmentId : (short?)null,
                         GroupID = userLevel.GroupId,
                         CompanyID = userLevel.CompanyId
                     };
@@ -175,7 +175,7 @@ namespace eFMS.IdentityServer.DL.Services
                 userLevel = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
             }
             // switch office
-            else if (permissionInfo.OfficeID != null && (permissionInfo.DepartmentID == null || permissionInfo.GroupID == null))
+            else if (permissionInfo.OfficeID != null && (permissionInfo.GroupID == null))
             {
                 userLevel = userLevelRepository.Get(lv => lv.UserId == userId
                 && lv.OfficeId == permissionInfo.OfficeID

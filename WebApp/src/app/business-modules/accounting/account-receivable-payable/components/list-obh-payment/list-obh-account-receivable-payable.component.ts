@@ -41,25 +41,28 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
         private _toastService: ToastrService) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestList = this.getPagingData;
+        this.requestSort = this.sortRefPayment;
     }
 
     ngOnInit(): void {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
         this.headers = [
-            { title: 'Reference No', field: 'referenceNo', sortable: true },
-            { title: 'Partner Name', field: 'referenceNo', sortable: true },
-            { title: 'OBH Amount', field: 'referenceNo', sortable: true },
-            { title: 'Currency', field: 'referenceNo', sortable: true },
-            { title: 'Issue Date', field: 'referenceNo', sortable: true },
-            { title: 'Paid Amount', field: 'referenceNo', sortable: true },
-            { title: 'Unpaid Amount', field: 'referenceNo', sortable: true },
-            { title: 'Due Date', field: 'referenceNo', sortable: true },
-            { title: 'Overdue Days', field: 'referenceNo', sortable: true },
-            { title: 'Payment Status', field: 'referenceNo', sortable: true },
-            { title: 'Extend days', field: 'referenceNo', sortable: true },
-            { title: 'Notes', field: 'referenceNo', sortable: true },
+            { title: 'Reference No', field: 'soaNo', sortable: true },
+            { title: 'Partner Name', field: 'partnerName', sortable: true },
+            { title: 'OBH Amount', field: 'amount', sortable: true },
+            { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Issue Date', field: 'issuedDate', sortable: true },
+            { title: 'Paid Amount', field: 'paidAmount', sortable: true },
+            { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
+            { title: 'Due Date', field: 'dueDate', sortable: true },
+            { title: 'Overdue Days', field: 'overdueDays', sortable: true },
+            { title: 'Payment Status', field: 'status', sortable: true },
+            { title: 'Extend days', field: 'extendDays', sortable: true },
+            { title: 'Notes', field: 'extendNote', sortable: true },
         ];
+
         this.paymentHeaders = [
             { title: 'Payment No', field: 'paymentNo', sortable: true },
             { title: 'Payment Amount', field: 'paymentAmount', sortable: true },
@@ -70,6 +73,22 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
             { title: 'Update Person', field: 'userModifiedName', sortable: true },
             { title: 'Update Date', field: 'datetimeModified', sortable: true }
         ];
+    }
+
+    getPagingData() {
+        this._progressRef.start();
+        this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (res: CommonInterface.IResponsePaging) => {
+                    this.refPaymens = res.data || [];
+                    this.totalItems = res.totalItems;
+                },
+            );
     }
 
     import() {
@@ -90,6 +109,10 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
 
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
+    }
+
+    sortRefPayment(sortField: string, order: boolean) {
+        this.refPaymens = this._sortService.sort(this.refPaymens, sortField, order);
     }
 
     showExtendDateModel(refId: string) {

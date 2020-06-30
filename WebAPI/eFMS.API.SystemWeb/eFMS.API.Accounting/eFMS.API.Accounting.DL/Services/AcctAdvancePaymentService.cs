@@ -2743,6 +2743,11 @@ namespace eFMS.API.Accounting.DL.Services
                         item.AdvanceNoError = string.Format(stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_DUPLICATE], item.AdvanceNo);
                         item.IsValid = false;
                     }
+                    if (DataContext.Any(x => x.AdvanceNo == item.AdvanceNo && x.StatusApproval != "Done"))
+                    {
+                        item.AdvanceNoError = string.Format(stringLocalizer[AccountingLanguageSub.MSG_ADVANCE_NO_NOT_APPROVAL], item.AdvanceNo);
+                        item.IsValid = false;
+                    }
                 }
                 if (string.IsNullOrEmpty(item.VoucherNo))
                 {
@@ -2759,5 +2764,5 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return list;
         }
-    }
+}
 }

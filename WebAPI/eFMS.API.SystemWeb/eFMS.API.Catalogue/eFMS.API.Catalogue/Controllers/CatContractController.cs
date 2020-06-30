@@ -222,7 +222,7 @@ namespace eFMS.API.Catalogue.Controllers
             if (hs.Success)
             {
                 var objPartner = partnerService.Get(x => x.Id == partnerId).FirstOrDefault();
-                objPartner.SalePersonId = catContractService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.DatetimeCreated).FirstOrDefault().SaleManId.ToString();
+                objPartner.SalePersonId = catContractService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.DatetimeCreated).FirstOrDefault()?.SaleManId.ToString();
                 var hsPartner = partnerService.Update(objPartner, x=>x.Id == partnerId);
                 if (!hsPartner.Success)
                 {

@@ -39,14 +39,11 @@ export class UnlockRequestAddNewComponent extends AppForm {
     ];
     isSubmited: boolean = false;
     userLogged: User;
-    tableDefault: string = `<table style="width: 100%;"><tbody><tr><td style="width: 50%; text-align: left;">JOB ID
-				<br><br></td><td style="width: 50.0000%;"><br></td></tr><tr><td style="width: 50.0000%;">CHARGE NAME
-                <br><br></td><td style="width: 50.0000%;"><br></td></tr><tr><td style="width: 50.0000%;"><span style="color: red;">CURRENT VALUE</span><br><br></td><td style="width: 50.0000%;">
-                <br></td></tr><tr><td style="width: 50.0000%;"><span style="color: red;">UPDATE VALUE</span><br><br></td><td style="width: 50.0000%;"><br></td></tr><tr><td style="width: 50.0000%;"><span style="color: red;">PROFIT BEFORE REVISING</span>
-                <br><br></td><td style="width: 50.0000%;">
-                <br></td></tr><tr><td style="width: 50.0000%;"><span style="color: red;">PROFIT AFTER REVISING</span><br><br></td><td style="width: 50.0000%;"><br></td></tr><tr><td style="width: 50.0000%;">REASON
-				<br><br></td><td style="width: 50.0000%;"><br></td></tr><tr><td style="width: 50.0000%;">ANY OTHER SPECIAL REQUIREMENT
-				<br><br></td><td style="width: 50.0000%;"><br></td></tr></tbody></table>`;
+    tableDefault: string = `<table style="width: 100%;border: 1px solid #dddddd;border-collapse: collapse;"><tbody><tr><td style="width: 50%;border: 1px solid #dddddd;">JOB ID
+				<br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;">CHARGE NAME
+				<br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;"><span style="color: red;">CURRENT VALUE</span><br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;"><span style="color: red;">UPDATE VALUE</span><br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;"><span style="color: red;">PROFIT BEFORE REVISING</span><br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;"><span style="color: red;">PROFIT AFTER REVISING</span><br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;">REASON
+				<br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr><tr><td style="width: 50.0000%;border: 1px solid #dddddd;">ANY OTHER SPECIAL REQUIREMENT
+				<br><br></td><td style="width: 50.0000%;border: 1px solid #dddddd;"><br></td></tr></tbody></table>`;
     constructor(
         private _toastService: ToastrService,
         private _router: Router,
@@ -140,7 +137,11 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 jobs: this.listJobComponent.dataJobs,
                 requesterName: null,
                 userNameCreated: null,
-                userNameModified: null
+                userNameModified: null,
+                isRequester: false,
+                isManager: false,
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();
@@ -152,6 +153,7 @@ export class UnlockRequestAddNewComponent extends AppForm {
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success(res.message);
+                            this._router.navigate([`home/tool/unlock-request/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -190,9 +192,12 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 jobs: this.listJobComponent.dataJobs,
                 requesterName: null,
                 userNameCreated: null,
-                userNameModified: null
+                userNameModified: null,
+                isRequester: false,
+                isManager: false,
+                isApproved: false,
+                isShowBtnDeny: false
             };
-            console.log(_unlockRequest);
             this._progressRef.start();
             this._settingRepo.sendRequestUnlock(_unlockRequest)
                 .pipe(catchError(this.catchError), finalize(() => {
@@ -201,7 +206,8 @@ export class UnlockRequestAddNewComponent extends AppForm {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success(`'Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                            this._toastService.success('Send Request successfully', 'Save Success !', { positionClass: 'toast-bottom-right' });
+                            this._router.navigate([`home/tool/unlock-request/${res.data.id}`]);
                         } else {
                             this._toastService.error(res.message);
                         }

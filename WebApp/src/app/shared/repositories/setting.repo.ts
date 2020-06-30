@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
+import { IdentityRepo } from './identity.repo';
 
 @Injectable({ providedIn: 'root' })
 export class SettingRepo {
@@ -118,6 +119,27 @@ export class SettingRepo {
         return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/SaveAndSendRequest`, body).pipe(
             map((data: any) => data)
         );
+    }
+
+    approveUnlockRequest(id: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/UpdateApprove`, {}, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deniedApproveUnlockRequest(id: string, comment: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/DeniedApprove`, {}, { id: id, comment: comment })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    cancelRequestUnlockRequest(id: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/CancelRequest`, {}, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
     }
 }
 

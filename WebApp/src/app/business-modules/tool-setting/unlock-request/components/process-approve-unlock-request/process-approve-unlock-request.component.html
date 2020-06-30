@@ -67,13 +67,13 @@
                     <div class="progress-content text-center">
                         <div class="font-weight-bolder">BU HEAD</div>
                         <div class="icon-check">
-                            <i class="la la-check-circle-o" *ngIf="!!processApprove.BuheadAprDate"></i>
+                            <i class="la la-check-circle-o" *ngIf="!!processApprove.buheadAprDate"></i>
                         </div>
                         <div class="font-weight-bold">
                             {{processApprove.buHeadName}}
                         </div>
                         <div class="font-weight-bold">
-                            {{!!processApprove.BuheadAprDate ? (processApprove.BuheadAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
+                            {{!!processApprove.buheadAprDate ? (processApprove.buheadAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
                         </div>
                     </div>
                 </li>

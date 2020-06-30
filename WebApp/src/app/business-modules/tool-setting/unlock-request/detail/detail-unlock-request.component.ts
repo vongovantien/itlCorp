@@ -173,7 +173,11 @@ export class UnlockRequestDetailComponent extends AppForm {
                 jobs: this.listJobComponent.dataJobs,
                 requesterName: null,
                 userNameCreated: null,
-                userNameModified: null
+                userNameModified: null,
+                isRequester: false,
+                isManager: false,
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();
@@ -223,7 +227,11 @@ export class UnlockRequestDetailComponent extends AppForm {
                 jobs: this.listJobComponent.dataJobs,
                 requesterName: null,
                 userNameCreated: null,
-                userNameModified: null
+                userNameModified: null,
+                isRequester: false,
+                isManager: false,
+                isApproved: false,
+                isShowBtnDeny: false
             };
             console.log(_unlockRequest);
             this._progressRef.start();
@@ -234,7 +242,7 @@ export class UnlockRequestDetailComponent extends AppForm {
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            this._toastService.success(`'Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                            this._toastService.success('Send Request successfully', 'Save Success !', { positionClass: 'toast-bottom-right' });
                             this.getDetail(res.data.id);
                         } else {
                             this._toastService.error(res.message);
@@ -245,15 +253,68 @@ export class UnlockRequestDetailComponent extends AppForm {
     }
 
     cancelRequest() {
-
+        this._progressRef.start();
+        this._settingRepo.cancelRequestUnlockRequest(this.unlockRequest.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Cancel request Is Successfull');
+                        this.getDetail(this.unlockRequest.id);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
+                },
+            );
     }
 
     confirmRequest() {
-
+        this._progressRef.start();
+        this._settingRepo.approveUnlockRequest(this.unlockRequest.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Approve Is Successfull');
+                        this.getDetail(this.unlockRequest.id);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
+                },
+            );
     }
 
-    denyRequest() {
+    showInputCommentDeny() {
         this.inputDeniedCommentPopup.show();
+    }
+
+    sendDeny(comment: string) {
+        console.log(comment);
+        this._progressRef.start();
+        this._settingRepo.deniedApproveUnlockRequest(this.unlockRequest.id, comment)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (res.status) {
+                        this._toastService.success(res.message, 'Denie Is Successfull');
+                        this.getDetail(this.unlockRequest.id);
+                    } else {
+                        this._toastService.error(res.message, '');
+                    }
+                },
+            );
     }
 
     confirmCancel() {

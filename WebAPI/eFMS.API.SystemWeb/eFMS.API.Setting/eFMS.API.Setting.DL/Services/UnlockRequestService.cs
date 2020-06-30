@@ -30,6 +30,8 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsRepo;
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
+        private readonly IUnlockRequestApproveService unlockRequestApproveService;
+        readonly IUserBaseService userBaseService;
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -44,7 +46,9 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CsTransactionDetail> transDetail,
             IContextBase<CustomsDeclaration> customs,
             IContextBase<SysUser> sysUser,
-            IContextBase<CsShipmentSurcharge> surcharge) : base(repository, mapper)
+            IContextBase<CsShipmentSurcharge> surcharge,
+            IUnlockRequestApproveService unlockRequestApprove,
+            IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
             setUnlockRequestJobRepo = setUnlockRequestJob;
@@ -57,8 +61,10 @@ namespace eFMS.API.Setting.DL.Services
             customsRepo = customs;
             userRepo = sysUser;
             surchargeRepo = surcharge;
+            unlockRequestApproveService = unlockRequestApprove;
+            userBaseService = userBase;
         }
-        
+
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
         private List<SetUnlockRequestJobModel> GetAdvance(UnlockJobCriteria criteria)
         {
@@ -160,7 +166,7 @@ namespace eFMS.API.Setting.DL.Services
                     break;
                 default:
                     break;
-            }                          
+            }
             return result;
         }
 
@@ -168,15 +174,15 @@ namespace eFMS.API.Setting.DL.Services
         {
             var hs = new HandleState();
             if (criteria.Advances == null || criteria.Advances.Count == 0) return hs;
-            foreach(var adv in criteria.Advances)
+            foreach (var adv in criteria.Advances)
             {
-                var advance = advancePaymentRepo.Get(x =>  x.AdvanceNo == adv && !string.IsNullOrEmpty(x.VoucherNo)).FirstOrDefault();
+                var advance = advancePaymentRepo.Get(x => x.AdvanceNo == adv && !string.IsNullOrEmpty(x.VoucherNo)).FirstOrDefault();
                 if (advance != null)
                 {
                     object message = "You cant's unlock " + advance.AdvanceNo + ", because it has  existed in " + advance.VoucherNo + ", please recheck!";
-                    return new HandleState(message);                   
+                    return new HandleState(message);
                 }
-            }           
+            }
             return hs;
         }
         public HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria)
@@ -185,7 +191,7 @@ namespace eFMS.API.Setting.DL.Services
             if (criteria.Settlements == null || criteria.Settlements.Count == 0) return hs;
             foreach (var settle in criteria.Settlements)
             {
-                var charge = surchargeRepo.Get(x => x.SettlementCode == settle && (!string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId) )).FirstOrDefault();
+                var charge = surchargeRepo.Get(x => x.SettlementCode == settle && (!string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId))).FirstOrDefault();
                 if (charge != null)
                 {
                     object message = "You cant's unlock " + settle + ", because it has  existed in " + charge.InvoiceNo + " " + charge.VoucherId + ", please recheck!";
@@ -209,7 +215,7 @@ namespace eFMS.API.Setting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
-                model.StatusApproval = SettingConstants.STATUS_APPROVAL_NEW;
+                model.StatusApproval = model.StatusApproval = string.IsNullOrEmpty(model.StatusApproval) ? SettingConstants.STATUS_APPROVAL_NEW : model.StatusApproval;
                 var unlockRequest = mapper.Map<SetUnlockRequest>(model);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -264,7 +270,7 @@ namespace eFMS.API.Setting.DL.Services
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
-                    {                        
+                    {
                         var unlockRequest = DataContext.Get(x => x.Id == id).FirstOrDefault();
                         if (unlockRequest == null) return new HandleState((object)"Not found Unlock Request");
                         if (unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
@@ -285,7 +291,7 @@ namespace eFMS.API.Setting.DL.Services
                                 }
                                 setUnlockRequestJobRepo.SubmitChanges();
                             }
-                            
+
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -383,7 +389,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             var unlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum);
             Expression<Func<SetUnlockRequest, bool>> query = q => true;
-            
+
             if (!string.IsNullOrEmpty(unlockType))
             {
                 query = query.And(x => x.UnlockType == unlockType);
@@ -408,31 +414,31 @@ namespace eFMS.API.Setting.DL.Services
 
         public IQueryable<UnlockRequestResult> GetData(UnlockRequestCriteria criteria)
         {
-            var queryUnlockRequest = ExpressionQuery(criteria);            
+            var queryUnlockRequest = ExpressionQuery(criteria);
             var unlockRequests = DataContext.Get().Where(queryUnlockRequest);
-            
+
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 var unlockRequestJobs = setUnlockRequestJobRepo.Get(x => criteria.ReferenceNos.Contains(x.UnlockName));
                 unlockRequests = unlockRequests.Join(unlockRequestJobs, u => u.Id, j => j.UnlockRequestId, (u, j) => u);
             }
-            
+
             var users = userRepo.Get();
             var data = from ur in unlockRequests
                        join user in users on ur.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
                        select new UnlockRequestResult()
-                        {
-                            Id = ur.Id,
-                            Subject = ur.Subject,
-                            RequestDate = ur.RequestDate,
-                            Requester = ur.Requester,
-                            RequesterName = user.Username,
-                            UnlockType = ur.UnlockType,
-                            StatusApproval = ur.StatusApproval,
-                            DatetimeCreated = ur.DatetimeCreated,
-                            DatetimeModified = ur.DatetimeModified
-                        };
+                       {
+                           Id = ur.Id,
+                           Subject = ur.Subject,
+                           RequestDate = ur.RequestDate,
+                           Requester = ur.Requester,
+                           RequesterName = user.Username,
+                           UnlockType = ur.UnlockType,
+                           StatusApproval = ur.StatusApproval,
+                           DatetimeCreated = ur.DatetimeCreated,
+                           DatetimeModified = ur.DatetimeModified
+                       };
 
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
@@ -475,6 +481,16 @@ namespace eFMS.API.Setting.DL.Services
                 detail.RequesterName = userRepo.Where(x => x.Id == unlockRequest.Requester).FirstOrDefault()?.Username;
                 detail.UserNameCreated = userRepo.Where(x => x.Id == unlockRequest.UserCreated).FirstOrDefault()?.Username;
                 detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
+                var unlockApprove = setUnlockRequestApproveRepo.Get(x => x.UnlockRequestId == id && x.IsDeny == false).FirstOrDefault();
+
+                detail.IsRequester = (currentUser.UserID == unlockRequest.Requester 
+                    && currentUser.GroupId == unlockRequest.GroupId 
+                    && currentUser.DepartmentId == unlockRequest.DepartmentId 
+                    && currentUser.OfficeID == unlockRequest.OfficeId 
+                    && currentUser.CompanyID == unlockRequest.CompanyId)  ? true : false;                
+                detail.IsManager = unlockRequestApproveService.CheckUserIsManager(currentUser, unlockRequest, unlockApprove);
+                detail.IsApproved = unlockRequestApproveService.CheckUserIsApproved(currentUser, unlockRequest, unlockApprove);
+                detail.IsShowBtnDeny = unlockRequestApproveService.CheckIsShowBtnDeny(currentUser, unlockRequest, unlockApprove);
             }
             return detail;
         }
