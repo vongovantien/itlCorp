@@ -81,17 +81,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
-
-                        this.containers = action.payload;
-                    }
-                });
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (action: fromShareBussiness.ContainerAction) => {
-                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
 
                         if (!!this.containers) {
@@ -236,7 +225,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                                 startDate: new Date(),
                                 endDate: new Date()
                             },
-                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
+                            doheader1: !!this.shipmentDetail.podName ? this.shipmentDetail.podName : null
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
@@ -389,10 +378,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             dosentTo2: null,
         };
         return body;
-    }
-
-    onSelectTabDO(event) {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey("podName") || "";
     }
 }
 
