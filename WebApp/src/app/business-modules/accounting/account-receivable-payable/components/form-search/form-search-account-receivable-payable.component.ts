@@ -45,7 +45,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         { id: 'Paid', text: 'Paid' },
     ];
     overDueDays: CommonInterface.INg2Select[] = [
-        { id: 0, text: 'All' },
+        { id: '0', text: 'All' },
         { id: 1, text: '01-15 days' },
         { id: 2, text: '16-30 days' },
         { id: 3, text: '31-60 days' },
@@ -103,7 +103,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,
-            overDueDays: !!dataForm.overdueDate ? dataForm.overdueDate[0].id : OverDueDays.All,
+            overDueDays: !!dataForm.overdueDate ? +dataForm.overdueDate[0].id : OverDueDays.All,
             fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,

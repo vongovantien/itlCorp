@@ -13,8 +13,10 @@ type TAB = 'INVOICE' | 'OBH';
     templateUrl: './account-receivable-payable.component.html',
 })
 export class AccountReceivablePayableComponent extends AppList implements OnInit {
+
     @ViewChild(AccountReceivablePayableListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountReceivablePayableListInvoicePaymentComponent;
     @ViewChild(AccountReceivablePayableListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountReceivablePayableListOBHPaymentComponent;
+
     selectedTab: TAB | string = "INVOICE";
 
     constructor(private _ngProgessSerice: NgProgress,
@@ -24,14 +26,21 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     }
 
     ngOnInit() {
-        this.dataSearch.paymentStatus = [];
-        this.requestSearchShipment();
     }
+
+    ngAfterViewInit() {
+        this.invoiceListComponent.dataSearch.paymentStatus = [];
+
+        this.invoiceListComponent.getPagingData();
+    }
+
     onSelectTabLocation(tabname) {
         this.selectedTab = tabname;
         this.dataSearch.paymentType = this.getPaymentType();
+        this.dataSearch.paymentStatus = [];
         this.requestSearchShipment();
     }
+
     getPaymentType() {
         let paymentType: number;
         if (this.selectedTab === "INVOICE") {
@@ -41,12 +50,15 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         }
         return paymentType;
     }
+
     onSearchPayment(event) {
         this.dataSearch = event;
         this.dataSearch.paymentType = this.getPaymentType();
         this.requestSearchShipment();
     }
+
     requestSearchShipment() {
+        console.log(this.dataSearch);
         this._progressRef.start();
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
@@ -55,21 +67,26 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                     this._progressRef.complete();
                 })
             ).subscribe(
-                (res: any) => {
-                    this.totalItems = res.totalItems || 0;
+                (res: CommonInterface.IResponsePaging) => {
                     if (this.selectedTab === "INVOICE") {
                         this.invoiceListComponent.refPaymens = res.data || [];
+                        this.invoiceListComponent.totalItems = res.totalItems;
+
                     } else {
                         this.obhSOAListComponent.refPaymens = res.data || [];
+                        this.obhSOAListComponent.totalItems = res.totalItems;
+
                         console.log(this.obhSOAListComponent.refPaymens);
                     }
                 },
             );
     }
+
     // refresh page (tab Invoice)
     handleUpdateExtendDateOfInvoice() {
         this.requestSearchShipment();
     }
+
     // refresh page (tab OBH)
     handleUpdateExtendDateOfOBH() {
         this.requestSearchShipment();

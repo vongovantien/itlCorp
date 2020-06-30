@@ -46,6 +46,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         super();
         this._progressRef = this._progressService.ref();
         this.requestSort = this.sortAccPayment;
+        this.requestList = this.getPagingData;
 
     }
 
@@ -80,12 +81,28 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
     }
 
     ngAfterViewInit() {
-        //this.updateExtendDayPopup.show();
-
     }
+
+    getPagingData() {
+        this._progressRef.start();
+        this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (res: CommonInterface.IResponsePaging) => {
+                    this.refPaymens = res.data || [];
+                    this.totalItems = res.totalItems;
+                },
+            );
+    }
+
     import() {
         this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
     }
+
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)
             .pipe(
@@ -97,9 +114,11 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                 },
             );
     }
+
     sortAccPayment(sortField: string, order: boolean) {
         this.refPaymens = this._sortService.sort(this.refPaymens, sortField, order);
     }
+
     sortPayment(sortField: string, order: boolean) {
         this.payments = this._sortService.sort(this.payments, sortField, order);
     }
@@ -125,8 +144,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                 this.updateExtendDayPopup.paymentType = res.paymentType;
                 this.updateExtendDayPopup.show();
 
-            })
-
+            });
     }
 
     handleUpdateExtendDate($event: any) {
