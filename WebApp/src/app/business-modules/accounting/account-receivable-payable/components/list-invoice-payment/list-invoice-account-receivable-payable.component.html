@@ -73,11 +73,7 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
-<<<<<<< HEAD
-                                            <td>{{ item.extendDays }}</td>
-=======
                                             <td>{{ item.extendDays}}</td>
->>>>>>> feature/sprint17-10-06-2020
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
                                         <tr class="collapse-panel-row">
@@ -96,15 +92,11 @@
                                                                 <tbody>
                                                                     <ng-container *ngIf="!!payments.length">
                                                                         <tr
-                                                                            *ngFor="let payment of payments; trackBy: trackByFn">
+                                                                            *ngFor="let payment of payments; let j = index; trackBy: trackByFn">
                                                                             <td class="table-actions-col">
                                                                                 <div class="table-actions">
                                                                                     <button
-<<<<<<< HEAD
-                                                                                        (click)="showConfirmDelete(payment, i)"
-=======
-                                                                                        (click)="showConfirmDelete(payment)"
->>>>>>> feature/sprint17-10-06-2020
+                                                                                        (click)="showConfirmDelete(payment, j)"
                                                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                                                         <i class="la la-trash"></i>
                                                                                     </button>
@@ -135,12 +127,14 @@
                                         </tr>
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!(isLoading | async) && !refPaymens.length">
+                                <tr app-table-none-record *ngIf="!isLoading && !refPaymens.length">
                                 </tr>
                                 <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
                         </table>
                     </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
                 </div>
             </div>
         </div>
@@ -149,7 +143,6 @@
 </div>
 
 <update-extend-day-popup (onUpdateExtendDate)="handleUpdateExtendDate($event)"></update-extend-day-popup>
-<!-- <update-extend-day-popup></update-extend-day-popup> -->
 
 
 <confirm-popup [body]="'Do you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeletePayment()">
