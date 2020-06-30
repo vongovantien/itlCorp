@@ -95,7 +95,8 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && shippingCountry.invalid}">
                                         <label required>Country</label>
                                         <app-combo-grid-virtual-scroll
                                             (itemSelected)="onSelectDataFormInfo($event, 'shippping-country')"
@@ -111,8 +112,8 @@
                                         <label>City</label>
                                         <app-combo-grid-virtual-scroll
                                             (itemSelected)="onSelectDataFormInfo($event, 'shippping-city')"
-                                            [currentActiveItemId]="{ field: 'id', value: provinceShippingId.value, hardValue: provinceShippingName.value}"
-                                            [selectedDisplayFields]="['name_EN']" [dataSources]="shippingProvinces"
+                                            [currentActiveItemId]="{ field: 'id', value: provinceShippingId.value}"
+                                            [selectedDisplayFields]="['name_EN']" [dataSources]="shipingsProvinces"
                                             [displayFields]="displayFieldCity" placeholder="Select country"
                                             (remove)="resetFormControl(provinceShippingId)" [size]="15">
                                         </app-combo-grid-virtual-scroll>
@@ -144,7 +145,8 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && countryId.invalid}">
                                         <label required>Country</label>
                                         <app-combo-grid-virtual-scroll
                                             (itemSelected)="onSelectDataFormInfo($event, 'billing-country')"
@@ -160,9 +162,9 @@
                                         <label>City</label>
                                         <app-combo-grid-virtual-scroll
                                             (itemSelected)="onSelectDataFormInfo($event, 'billing-city')"
-                                            [currentActiveItemId]="{ field: 'id', value: provinceId.value, hardValue: provinceName.value}"
-                                            [selectedDisplayFields]="['name_EN']" [dataSources]="billingProvinces"
-                                            [displayFields]="displayFieldCity" placeholder="Select country"
+                                            [currentActiveItemId]="{ field: 'id', value: provinceId.value}"
+                                            [selectedDisplayFields]="['name_EN']" [dataSources]="billingsProvinces"
+                                            [displayFields]="displayFieldCity" placeholder="Select city"
                                             (remove)="resetFormControl(provinceId)" [size]="15">
                                         </app-combo-grid-virtual-scroll>
                                     </div>

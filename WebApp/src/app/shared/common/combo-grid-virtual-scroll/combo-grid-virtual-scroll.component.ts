@@ -185,6 +185,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
                 } else if (!!data.hardValue) {
                     this.displaySelectedStr = data.hardValue;
+                } else {
+                    this.displaySelectedStr = null;
                 }
             }
 

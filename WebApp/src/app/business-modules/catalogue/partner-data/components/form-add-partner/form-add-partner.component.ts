@@ -97,7 +97,7 @@ export class FormAddPartnerComponent extends AppForm {
                 console.log(this.shippingProvince.value);
                 break;
             case 'billingCountry':
-                this.getBillingProvinces(event.id, !!this.billingProvince.value && this.shippingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
+                this.getBillingProvinces(event.id, !!this.billingProvince.value && this.billingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
                 break;
             case 'category':
                 this.groups = this.groups + ";" + event.id;
