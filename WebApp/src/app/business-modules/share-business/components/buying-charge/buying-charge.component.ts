@@ -527,6 +527,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
+
+                chargeItem = this.updateUnitSurcharge(chargeItem, 'CBM');
                 break;
             case CommonEnum.QUANTITY_TYPE.CONT:
                 chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
