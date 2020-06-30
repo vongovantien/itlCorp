@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, ElementRef, NgZone } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { Router, ActivatedRoute, Params } from "@angular/router";
 import { FormBuilder, FormGroup, AbstractControl, Validators } from "@angular/forms";
@@ -11,10 +11,10 @@ import { UnlockRequestInputDeniedCommentPopupComponent } from "../components/pop
 import { catchError, finalize } from "rxjs/operators";
 import { SetUnlockRequestModel } from "@models";
 import { SelectItem } from "ng2-select";
-import { SystemConstants } from "@constants";
 import { formatDate } from "@angular/common";
 import { ConfirmPopupComponent } from "@common";
 import { UnlockRequestProcessApproveComponent } from "../components/process-approve-unlock-request/process-approve-unlock-request.component";
+declare var $: any;
 
 @Component({
     selector: 'app-unlock-request-detail',
@@ -22,10 +22,12 @@ import { UnlockRequestProcessApproveComponent } from "../components/process-appr
 })
 
 export class UnlockRequestDetailComponent extends AppForm {
-    @ViewChild(UnlockRequestListJobComponent, { static: false }) listJobComponent: UnlockRequestListJobComponent;
+    @ViewChild(UnlockRequestListJobComponent, { static: true }) listJobComponent: UnlockRequestListJobComponent;
     @ViewChild(UnlockRequestInputDeniedCommentPopupComponent, { static: false }) inputDeniedCommentPopup: UnlockRequestInputDeniedCommentPopupComponent;
     @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
     @ViewChild(UnlockRequestProcessApproveComponent, { static: false }) processApprovalComponent: UnlockRequestProcessApproveComponent;
+    @ViewChild('confirmCancelRequestPopup', { static: false }) confirmCancelRequestPopup: ConfirmPopupComponent;
+
     formDetail: FormGroup;
     subject: AbstractControl;
     requester: AbstractControl;
@@ -44,6 +46,8 @@ export class UnlockRequestDetailComponent extends AppForm {
 
     unlockTypeEnum: CommonEnum.UnlockTypeEnum = CommonEnum.UnlockTypeEnum.SHIPMENT;
     isSubmited: boolean = false;
+    action: string = 'update';
+
     constructor(
         private _toastService: ToastrService,
         private _router: Router,
@@ -95,6 +99,19 @@ export class UnlockRequestDetailComponent extends AppForm {
                 (res: any) => {
                     if (res.id !== 0) {
                         this.unlockRequest = new SetUnlockRequestModel(res);
+                        switch (this.unlockRequest.statusApproval) {
+                            case 'New':
+                            case 'Denied':
+                                this.action = 'update';
+                                // TODO : Read more Documentation Lib
+                                $("#textEditor").froalaEditor("edit.on");
+                                break;
+                            default:
+                                this.action = 'read';
+                                // TODO : Read more Documentation Lib
+                                $("#textEditor").froalaEditor("edit.off");
+                                break;
+                        }
                         const indexUnlockType = this.unlockTypeList.findIndex(x => x.id === this.unlockRequest.unlockType);
                         let _unlockTypeActive = [];
                         if (indexUnlockType > -1) {
@@ -110,6 +127,8 @@ export class UnlockRequestDetailComponent extends AppForm {
                         this.listJobComponent.dataJobs = this.unlockRequest.jobs;
                         this.getUnlockTypeEnum(this.unlockRequest.unlockType);
                         this.processApprovalComponent.getInfoProcessApprove(this.unlockRequest.id);
+
+
                     } else {
                         // Reset 
                         this.formDetail.reset();
@@ -324,5 +343,15 @@ export class UnlockRequestDetailComponent extends AppForm {
     onCancelUnlock() {
         this.confirmCancelPopup.hide();
         this._router.navigate([`home/tool/unlock-request`]);
+    }
+
+    // RECALL REQUEST
+    confirmCancelRequest() {
+        this.confirmCancelRequestPopup.show();
+    }
+
+    onCancelRequest() {
+        this.confirmCancelRequestPopup.hide();
+        this.cancelRequest();
     }
 }

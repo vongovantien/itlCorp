@@ -67,10 +67,10 @@ namespace eFMS.API.Setting.DL.Services
                 unlockApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Buhead)?.EmployeeNameVn;
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
                 unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
-                unlockApproveModel.IsShowLeader = userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowManager = userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowAccountant = userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowBuHead = userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowLeader = !string.IsNullOrEmpty(unlockApprove.Leader);//userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowManager = !string.IsNullOrEmpty(unlockApprove.Manager);//userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowAccountant = !string.IsNullOrEmpty(unlockApprove.Accountant);//userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowBuHead = !string.IsNullOrEmpty(unlockApprove.Buhead);//userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
             }
             else
             {
@@ -201,6 +201,13 @@ namespace eFMS.API.Setting.DL.Services
                                 unlockApprove.AccountantApr = userCurrent;
                                 unlockApprove.AccountantAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "Accountant";
+                                if (buHeadLevel.Role == "Special")
+                                {
+                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                    unlockApprove.BuheadApr = unlockApprove.AccountantApr = userCurrent;
+                                    unlockApprove.BuheadAprDate = unlockApprove.AccountantAprDate = DateTime.Now;
+                                    unlockApprove.LevelApprove = "BOD";
+                                }
                             }
                             if (accountantLevel.Role == "Approval"
                                 && managerLevel.Role != "Approval"
@@ -235,6 +242,28 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
+                            if (buHeadLevel.Role == "Special" && (leaderLevel.Role == "None" || leaderLevel.Role == "Auto") && (managerLevel.Role == "None" || managerLevel.Role == "Auto") && (accountantLevel.Role == "None" || accountantLevel.Role == "Auto"))
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                unlockApprove.BuheadApr = userCurrent;
+                                unlockApprove.BuheadAprDate = DateTime.Now;
+                                unlockApprove.LevelApprove = "BOD";
+                                if (leaderLevel.Role != "None")
+                                {
+                                    unlockApprove.LeaderApr = userCurrent;
+                                    unlockApprove.LeaderAprDate = DateTime.Now;
+                                }
+                                if (managerLevel.Role != "None")
+                                {
+                                    unlockApprove.ManagerApr = userCurrent;
+                                    unlockApprove.ManagerAprDate = DateTime.Now;
+                                }
+                                if(accountantLevel.Role != "None")
+                                {
+                                    unlockApprove.AccountantApr = userCurrent;
+                                    unlockApprove.AccountantAprDate = DateTime.Now;
+                                }
+                            }
                         }
 
                         var sendMailApproved = true;
@@ -260,7 +289,7 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = New; Change Service Date: Update SeviceDate = New Service Date
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denied; Change Service Date: Update SeviceDate = New Service Date
 
                         }
 
@@ -727,11 +756,10 @@ namespace eFMS.API.Setting.DL.Services
             var isShowBtnDeny = false;
 
             if (
-                        ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
-                      ||
-                        leaderLevel.UserDeputies.Contains(userCurrent.UserID))
-
-                    ) //Leader
+                 ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                 ||
+                 leaderLevel.UserDeputies.Contains(userCurrent.UserID))
+               ) //Leader
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED)
                 {
@@ -749,7 +777,7 @@ namespace eFMS.API.Setting.DL.Services
 
                     ) //Dept Manager
             {
-                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED && leaderLevel.Role != "None"))
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED || (leaderLevel.Role == "None" && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))
                 {
                     isShowBtnDeny = true;
                 }
@@ -764,7 +792,7 @@ namespace eFMS.API.Setting.DL.Services
                         accountantLevel.UserDeputies.Contains(currentUser.UserID))
                     ) //Accountant Manager
             {
-                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED && managerLevel.Role != "None"))
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (managerLevel.Role == "None" && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))
                 {
                     isShowBtnDeny = true;
                 }
@@ -780,7 +808,7 @@ namespace eFMS.API.Setting.DL.Services
                   ||
                   buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
                 )
-                && unlockRequest.StatusApproval != "New" && unlockRequest.StatusApproval != "Denied" && unlockRequest.StatusApproval != "Done"
+                && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE
                )
             {
                 isShowBtnDeny = true;
