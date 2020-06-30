@@ -102,7 +102,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         }
 
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
-        modelAdd.contracts = this.contractList.contracts;  // TODO implement contract;
+        modelAdd.contracts = this.contractList.contracts;
 
         modelAdd.id = this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;

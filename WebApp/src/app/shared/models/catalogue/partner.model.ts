@@ -62,7 +62,6 @@ export class Partner {
     applyDim: string = '';
 
     saleManRequests: SaleManRequest[] = [];
-    saleMans: SaleManRequest[] = [];
     contracts: Contract[] = [];
 
     partnerType: string = '';

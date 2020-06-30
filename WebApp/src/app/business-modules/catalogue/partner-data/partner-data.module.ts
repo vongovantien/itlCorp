@@ -17,6 +17,7 @@ import { AddPartnerDataComponent } from './add/add-partner.component';
 import { PartnerListComponent } from './components/partner-list/partner-list.component';
 import { PartnerDetailComponent } from './detail/detail-partner.component';
 import { PartnerOtherChargePopupComponent } from './components/other-charge/partner-other-charge.popup';
+import { ShareCommercialCatalogueModule } from '../../share-commercial-catalogue/share-commercial-catalogue.module';
 
 const routing: Routes = [
     {
@@ -51,7 +52,8 @@ const routing: Routes = [
         NgxDaterangepickerMd,
         PaginationModule.forRoot(),
         ModalModule.forRoot(),
-        TabsModule.forRoot()
+        TabsModule.forRoot(),
+        ShareCommercialCatalogueModule
     ],
     exports: [],
     declarations: [

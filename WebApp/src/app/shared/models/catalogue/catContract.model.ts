@@ -9,8 +9,8 @@ export class Contract {
     username: string = '';
     officeNameEn: string = '';
     companyNameEn: string = '';
-    effectiveDate: string = '';
-    expiredDate: string = '';
+    effectiveDate: any = '';
+    expiredDate: any = '';
     description: string = '';
     paymentMethod: string = '';
     contractNo: string = '';
@@ -18,8 +18,8 @@ export class Contract {
     vas: string = '';
     trialCreditLimited: number = null;
     trialCreditDays: number = null;
-    trialEffectDate: string = '';
-    trialExpiredDate: string = '';
+    trialEffectDate: any = '';
+    trialExpiredDate: any = '';
     paymentTerm: number = null;
     creditLimit: number = null;
     creditLimitRate: number = null;
