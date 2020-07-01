@@ -125,9 +125,9 @@ namespace eFMS.API.Accounting.DL.Services
         public List<string> GetListUserDeputyByDept(string dept)
         {
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
-                 { "william.hiep", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
-                 { "linda.linh", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "christina.my", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
+                 { "7569a3ec-7d1c-41a6-9b02-79f7d13f0dc8", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
+                 { "bc34e764-2fc3-4d7c-9d5e-7c6dc56a208f", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "5983f430-dc42-4276-8997-4c1fec1fa739", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
