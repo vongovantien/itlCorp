@@ -9,7 +9,7 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, catchError, tap } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -189,7 +189,8 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
 
                         }
 
-                        this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
+                        // this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
+                        this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
 
                     }
                 );
@@ -490,7 +491,10 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                 }
 
                 // * Update default value for sentTo delivery order.
-                this._dataService.setDataService("podName", data.nameVn || "");
+                // this._dataService.setDataService("podName", data.nameVn || "");
+                // this._dataService.$data.next(data.nameVn);
+                this._dataService.setData("podName", data.nameVn || "");
+
 
                 break;
             case 'Supplier':
@@ -563,11 +567,5 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     getListSaleman() {
         this.isLoading = true;
         this.saleMans = this._systemRepo.getListSystemUser();
-
-        // this._catalogueRepo.getListSaleManDetail(null, 'SFI').pipe(catchError(this.catchError))
-        //     .subscribe((res: any) => {
-        //         this.listSaleMan = res || [];
-        //         this.listSaleMan = this.listSaleMan.filter(x => x.service === this.type && x.status === true);
-        //     });
     }
 }
