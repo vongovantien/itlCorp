@@ -4,7 +4,7 @@ export class Surcharge {
     chargeName: string = '';
     chargeCode: string = '';
     clearanceNo: string = '';
-    contNo: number = 0;
+    contNo: string = '';
     currencyId: string = '';
     hbl: string = '';
     invoiceDate: any = null;

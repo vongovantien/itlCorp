@@ -1104,11 +1104,14 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                                x.ChargeId == criteria.ChargeID
-                            && x.Hblid != criteria.HBLID
+                            && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1136,11 +1139,14 @@ namespace eFMS.API.Accounting.DL.Services
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                                x.Id != criteria.SurchargeID
                             && x.ChargeId == criteria.ChargeID
-                            && x.Hblid != criteria.HBLID
+                            && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
