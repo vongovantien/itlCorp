@@ -273,7 +273,7 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.SCI = string.Empty; //NOT USE
                 awb.ReferrenceNo = string.Empty; //NOT USE
                 awb.OSI = string.Empty; //NOT USE
-                awb.ISSUED = string.Empty; //NOT USE
+                awb.ISSUED = data.IssuedBy; //NOT USE
                 awb.ConsigneeID = data.ConsigneeId; //NOT USE
                 awb.ICASNC = string.Empty; //NOT USE
                 awb.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
@@ -308,9 +308,9 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.ExecutedOn = data.IssuedPlace?.ToUpper(); //Issued On
                 awb.ExecutedAt = data.IssuedDate != null ? data.IssuedDate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 awb.Signature = string.Empty; //NOT USE
-                var dimAir = dimensionDetailService.Get(x => x.AirWayBillId == data.Id);
-                string _dimensions = string.Join("\r\n", dimAir.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
-                awb.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
+                //var dimAir = dimensionDetailService.Get(x => x.AirWayBillId == data.Id);
+                //string _dimensions = string.Join("\r\n", dimAir.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
+                awb.Dimensions = data.VolumeField; 
                 awb.ShipPicture = null; //NOT USE
                 awb.PicMarks = string.Empty; //Gán rỗng
                 awb.GoodsDelivery = string.Empty; //
