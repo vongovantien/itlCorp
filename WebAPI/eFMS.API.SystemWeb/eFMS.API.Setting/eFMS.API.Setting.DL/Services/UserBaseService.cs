@@ -20,6 +20,7 @@ namespace eFMS.API.Setting.DL.Services
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysSettingFlow> settingFlowRepo;
+        readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
 
         public UserBaseService(
             IContextBase<SysUser> repository,
@@ -29,7 +30,8 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<SysSettingFlow> settingFlow) : base(repository, mapper)
+            IContextBase<SysSettingFlow> settingFlow,
+            IContextBase<SysAuthorizedApproval> authourizedApproval) : base(repository, mapper)
         {
             sysUserLevelRepo = sysUserLevel;
             sysGroupRepo = sysGroup;
@@ -37,6 +39,7 @@ namespace eFMS.API.Setting.DL.Services
             sysEmployeeRepo = sysEmployee;
             sysOfficeRepo = sysOffice;
             settingFlowRepo = settingFlow;
+            authourizedApprovalRepo = authourizedApproval;
         }
 
         private int? GetGroupIdOfUser(string userId)
@@ -201,5 +204,31 @@ namespace eFMS.API.Setting.DL.Services
             return role;
         }
         #endregion --- SETTING FLOW UNLOCK ---
+
+        #region --- AUTHOIRIZED APPROVAL ---
+        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
+        {
+            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
+            return userAuthorizedApprovals;
+        }
+        #endregion  --- AUTHOIRIZED APPROVAL ---
+
+        public bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var result = false;
+            if (groupId != null && departmentId != null && officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.GroupId == groupId && x.DepartmentId == departmentId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            if (departmentId != null && officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.DepartmentId == departmentId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            if (officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            return result;
+        }
     }
 }
