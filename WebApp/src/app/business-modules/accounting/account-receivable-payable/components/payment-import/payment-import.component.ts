@@ -117,7 +117,17 @@ export class PaymentImportComponent extends AppPage implements OnInit {
             );
     }
     import(element) {
-        if (this.data == null) { return; }
+
+        if (this.data == null) {
+            this.invaliDataAlert.show();
+            this._progressRef.complete();
+            return;
+        }
+        if (this.data.length === 0) {
+            this.invaliDataAlert.show();
+            this._progressRef.complete();
+            return;
+        }
         if (this.totalRows - this.totalValidRows > 0) {
             this.invaliDataAlert.show();
             this._progressRef.complete();

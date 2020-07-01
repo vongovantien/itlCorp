@@ -29,7 +29,9 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     }
 
     ngAfterViewInit() {
-        this.invoiceListComponent.dataSearch.paymentStatus = [];
+        this.dataSearch.paymentStatus = [];
+        this.invoiceListComponent.dataSearch = this.dataSearch;
+        this.obhSOAListComponent.dataSearch = this.dataSearch;
 
         this.invoiceListComponent.getPagingData();
     }
@@ -37,7 +39,13 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     onSelectTabLocation(tabname) {
         this.selectedTab = tabname;
         this.dataSearch.paymentType = this.getPaymentType();
-        this.dataSearch.paymentStatus = [];
+        // this.dataSearch.paymentStatus = [];
+
+        if (tabname === 'OBH') {
+            this.obhSOAListComponent.dataSearch = this.dataSearch;
+        } else {
+            this.invoiceListComponent.dataSearch = this.dataSearch;
+        }
         this.requestSearchShipment();
     }
 
@@ -54,11 +62,18 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     onSearchPayment(event) {
         this.dataSearch = event;
         this.dataSearch.paymentType = this.getPaymentType();
-        this.requestSearchShipment();
+        if (this.dataSearch.paymentType === 0) {
+            this.invoiceListComponent.dataSearch = this.dataSearch;
+            this.requestSearchShipment();
+        } else {
+            this.obhSOAListComponent.dataSearch = this.dataSearch;
+            this.requestSearchShipment();
+        }
+
     }
 
     requestSearchShipment() {
-        console.log(this.dataSearch);
+        //console.log(this.dataSearch);
         this._progressRef.start();
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
@@ -76,7 +91,7 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                         this.obhSOAListComponent.refPaymens = res.data || [];
                         this.obhSOAListComponent.totalItems = res.totalItems;
 
-                        console.log(this.obhSOAListComponent.refPaymens);
+                        //console.log(this.obhSOAListComponent.refPaymens);
                     }
                 },
             );

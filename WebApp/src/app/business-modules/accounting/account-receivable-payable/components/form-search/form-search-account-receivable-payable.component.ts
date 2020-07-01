@@ -39,7 +39,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
     ];
 
     payments: CommonInterface.INg2Select[] = [
-        { id: '', text: 'All' },
+        { id: 'All', text: 'All' },
         { id: 'Unpaid', text: 'UnPaid' },
         { id: 'Paid A Part', text: 'Paid A Part' },
         { id: 'Paid', text: 'Paid' },
@@ -116,17 +116,24 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         this.onSearch.emit(body);
     }
     getSearchStatus(paymentStatus: []) {
+        console.log(paymentStatus);
+
         let strStatus = null;
         if (!!paymentStatus) {
             strStatus = [];
 
             paymentStatus.forEach(element => {
-                if (element['id'] !== '') {
+                if (element['id'] !== 'All') {
                     strStatus.push(element['id']);
+                } else {
+                    return [];
                 }
             });
         }
+        console.log(strStatus);
+
         return strStatus;
+
     }
 
     resetSearch() {
@@ -135,13 +142,27 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         this.formSearch.controls["paymentStatus"].setValue([this.payments[0]]);
         this.onSearch.emit({ paymentStatus: [], paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
     }
+
     selelectedStatus(event) {
+        console.log("obj current: ", event);
+
         const currStatus = this.formSearch.controls["paymentStatus"].value;
-        if (currStatus.filter(x => x.id === '').length > 0 && event.id !== '') {
+        console.log("list obj current: ", currStatus);
+        if (currStatus.filter(x => x.id === 'All').length > 0 && event.id !== 'All') {
+            //console.log("All: ", currStatus);
+            console.log("co vo day!");
+
             currStatus.splice(0);
             currStatus.push(event);
             this.formSearch.controls["paymentStatus"].setValue(currStatus);
+
         }
+        if (event.id === 'All') {
+            const onlyAllObj = currStatus.filter(ele => ele.id === 'All');
+            this.formSearch.controls["paymentStatus"].setValue(onlyAllObj);
+        }
+        // 
+
     }
 }
 

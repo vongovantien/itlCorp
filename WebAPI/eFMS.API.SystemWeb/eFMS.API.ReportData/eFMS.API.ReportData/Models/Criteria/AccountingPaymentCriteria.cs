@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.Models.Criteria
 {
-    public class InvoicePaymentCriteria
+    public class AccountingPaymentCriteria
     {
         public List<string> ReferenceNos { get; set; }
         public string PartnerId { get; set; }

@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
-
+import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -42,6 +42,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         private _store: Store<IAppState>,
         private _sortService: SortService,
         private _toastService: ToastrService,
+        private _exportRepo: ExportRepo,
         private _progressService: NgProgress) {
         super();
         this._progressRef = this._progressService.ref();
@@ -85,6 +86,8 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
 
     getPagingData() {
         this._progressRef.start();
+
+
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
@@ -103,6 +106,15 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
         this._router.navigate(["home/accounting/account-receivable-payable/payment-import"]);
     }
 
+    exportExcel() {
+        this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+                }
+            );
+    }
+
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)
             .pipe(
@@ -110,7 +122,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             ).subscribe(
                 (res: []) => {
                     this.payments = res || [];
-                    console.log(this.payments);
+                    //console.log(this.payments);
                 },
             );
     }

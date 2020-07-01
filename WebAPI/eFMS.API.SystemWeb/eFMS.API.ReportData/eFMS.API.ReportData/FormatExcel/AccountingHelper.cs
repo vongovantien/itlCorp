@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
+using eFMS.API.ReportData.Models.Common.Enums;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -316,6 +317,128 @@ namespace eFMS.API.ReportData.FormatExcel
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        public Stream GenerateInvoicePaymentShipmentExcel(List<AccountingPaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "Ref Id",
+                "Invoice No Real",
+                "Partner Id",
+                "Partner Name",
+                "Amount",
+                "Currency",
+                "Issued Date",
+                "Serie",
+                "Unpaid Amount",
+                "Paid Amount",
+                "Due Date",
+                "Overdue Days",
+                "Status",
+                "Extend Days",
+                "Extend Note"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Invoice Payment");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers,"INVOICE PAYMENT INFORMATION");
+                    for(int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[addressStartContent, 1].Value = item.RefId;
+                        worksheet.Cells[addressStartContent, 2].Value = item.InvoiceNoReal;
+                        worksheet.Cells[addressStartContent, 3].Value = item.PartnerId;
+                        worksheet.Cells[addressStartContent, 4].Value = item.PartnerName;
+                        worksheet.Cells[addressStartContent, 5].Value = item.Amount.HasValue ? item.Amount.Value : 0;
+                        worksheet.Cells[addressStartContent, 5].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 6].Value = item.Currency;
+                        worksheet.Cells[addressStartContent, 7].Value = item.IssuedDate.HasValue ? item.IssuedDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[addressStartContent, 8].Value = item.Serie;
+                        worksheet.Cells[addressStartContent, 9].Value = item.UnpaidAmount.HasValue ? item.UnpaidAmount.Value : 0 ;
+                        worksheet.Cells[addressStartContent, 9].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 10].Value = item.PaidAmount.HasValue ? item.PaidAmount.Value : 0 ;
+                        worksheet.Cells[addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 11].Value = item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[addressStartContent, 12].Value = item.OverdueDays;
+                        worksheet.Cells[addressStartContent, 13].Value = item.Status;
+                        worksheet.Cells[addressStartContent, 14].Value = item.ExtendDays;
+                        worksheet.Cells[addressStartContent, 15].Value = item.ExtendNote;
+                        addressStartContent++;
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+                
+            }
+            catch(Exception ex)
+            {
+                return null;
+            }
+        }
+        public Stream GenerateOBHPaymentShipmentExcel(List<AccountingPaymentModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+                "Ref Id",
+                "SOA No",
+                "Partner Id",
+                "Partner Name",
+                "Amount",
+                "Currency",
+                "Issued Date",
+                "Unpaid Amount",
+                "Paid Amount",
+                "Due Date",
+                "Overdue Days",
+                "Status",
+                "Extend Days",
+                "Extend Note"
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("OBH Payment");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers,"OBH PAYMENT INFORMATION");
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+                        worksheet.Cells[addressStartContent, 1].Value = item.RefId;
+                        worksheet.Cells[addressStartContent, 2].Value = item.SOANo;
+                        worksheet.Cells[addressStartContent, 3].Value = item.PartnerId;
+                        worksheet.Cells[addressStartContent, 4].Value = item.PartnerName;
+                        worksheet.Cells[addressStartContent, 5].Value = item.Amount.HasValue ? item.Amount.Value : 0;
+                        worksheet.Cells[addressStartContent, 5].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 6].Value = item.Currency;
+                        worksheet.Cells[addressStartContent, 7].Value = item.IssuedDate.HasValue ? item.IssuedDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[addressStartContent, 8].Value = item.UnpaidAmount.HasValue ? item.UnpaidAmount.Value : 0;
+                        worksheet.Cells[addressStartContent, 8].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 9].Value = item.PaidAmount.HasValue ? item.PaidAmount.Value : 0;
+                        worksheet.Cells[addressStartContent, 9].Style.Numberformat.Format = numberFormat;
+                        worksheet.Cells[addressStartContent, 10].Value = item.DueDate.HasValue ? item.DueDate.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[addressStartContent, 11].Value = item.OverdueDays;
+                        worksheet.Cells[addressStartContent, 12].Value = item.Status;
+                        worksheet.Cells[addressStartContent, 13].Value = item.ExtendDays;
+                        worksheet.Cells[addressStartContent, 14].Value = item.ExtendNote;
+                        addressStartContent++;
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+
             }
             catch (Exception ex)
             {

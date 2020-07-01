@@ -77,7 +77,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
-            var _totalItem = data.Select(s => s.RefId).Count();
+            var _totalItem = data.Select(s => s.RefId).Distinct().Count();
             rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
             {
@@ -85,10 +85,19 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     page = 1;
                 }
-                data = data.Skip((page - 1) * size).Take(size);
+                
                 data = GetReferencesData(data, criteria.PaymentType);
+                data = data.Skip((page - 1) * size).Take(size);
             }
-
+            //var _totalItem = data.Select(s => s.RefId).Count();
+            //rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            return data;
+        }
+        public IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria)
+        {
+            var data = Query(criteria);
+            if (data == null) return null;
+            data = GetReferencesData(data, criteria.PaymentType);
             return data;
         }
 
@@ -120,7 +129,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     part.ShortName,
                                     Balance = detail != null ? detail.Balance : 0,
                                     PaymentAmount = detail != null ? detail.PaymentAmount : 0
-                                });
+                                }).ToList();
             var resultGroups = resultsQuery.GroupBy(x => new {
                 x.soa.RefId,
                 x.soa.SOANo,
@@ -151,7 +160,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 ExtendNote = x.Key.ExtendNote,
                                 PaidAmount = x.Sum(c => c.PaymentAmount),
                                 UnpaidAmount = x.Sum(c => c.Balance)
-                            });
+                            }).AsQueryable();
             return results;
         }
 
@@ -164,8 +173,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 join payment in DataContext.Get() on invoice.RefId.ToLower() equals payment.RefId into grpPayments
                                 from detail in grpPayments.DefaultIfEmpty()
                                 select new { invoice, part.ShortName,
-                                    Balance = detail != null ? detail.Balance : 0,
-                                    PaymentAmount = detail != null ? detail.PaymentAmount : 0 });
+                                    Balance = detail != null ? detail.Balance : (Decimal?)0,
+                                    PaymentAmount = detail != null ? detail.PaymentAmount : (Decimal?)0
+                                }).ToList();
             var resultGroups = resultsQuery.GroupBy(x => new {
                 x.invoice.RefId,
                 x.invoice.InvoiceNoReal,
@@ -197,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                              ExtendNote = x.Key.ExtendNote,
                              PaidAmount = x.Sum(c => c.PaymentAmount),
                              UnpaidAmount = x.Sum(c => c.Balance)
-                         });
+                         }).AsQueryable();
             return results;
         }
 
@@ -824,10 +834,7 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return list;
         }
-        public IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria)
-        {
-            IQueryable<AccountingPaymentModel> results = Query(criteria);
-            return results;
-        }
+        
+        
     }
 }

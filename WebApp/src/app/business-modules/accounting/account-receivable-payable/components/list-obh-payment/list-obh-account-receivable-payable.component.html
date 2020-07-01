@@ -17,7 +17,7 @@
                                 </button>
                             </ng-container>
                             <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'ExportOBH'">
-                                <app-permission-button type="export"></app-permission-button>
+                                <app-permission-button type="export" (onClick)="exportExcel()"></app-permission-button>
                             </ng-container>
                         </div>
                     </div>
@@ -58,6 +58,7 @@
                                             <td><a href="javascript:void(0)"
                                                     (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
                                             </td>
+                                            <td>{{ item.overdueDays }}</td>
 
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
@@ -72,7 +73,7 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
-                                            <td>{{ item.extendDays }}</td>
+                                            <td>{{item.extendDays}}</td>
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
 
@@ -92,11 +93,11 @@
                                                                 <tbody>
                                                                     <ng-container *ngIf="!!payments.length">
                                                                         <tr
-                                                                            *ngFor="let payment of payments; trackBy: trackByFn">
+                                                                            *ngFor="let payment of payments; let j = index; trackBy: trackByFn">
                                                                             <td class="table-actions-col">
                                                                                 <div class="table-actions">
                                                                                     <button
-                                                                                        (click)="showConfirmDelete(payment, i)"
+                                                                                        (click)="showConfirmDelete(payment, j)"
                                                                                         class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                                                         <i class="la la-trash"></i>
                                                                                     </button>
