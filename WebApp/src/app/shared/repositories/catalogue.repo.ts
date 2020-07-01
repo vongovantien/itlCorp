@@ -163,7 +163,7 @@ export class CatalogueRepo {
     }
 
     getSalemanIdByPartnerId(partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleman/GetSalemanIdByPartnerId/${partnerId}`).pipe(
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetSalemanIdByPartnerId/${partnerId}`).pipe(
             map((res: any) => {
                 return res;
             })
