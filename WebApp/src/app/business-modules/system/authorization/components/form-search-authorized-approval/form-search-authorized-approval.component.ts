@@ -95,6 +95,7 @@ export class AuthorizedApprovalFormSearchComponent extends AppForm {
                 (res: any) => {
                     if (!!res) {
                         this.users = res;
+                        this.users = this.users.filter(x => x.active === true);
                     }
                 },
             );
