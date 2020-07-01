@@ -221,7 +221,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
                                 || (apr.AccountantApr == criteria.Requester
                                     && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (isManagerDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
+                                || (isManagerDeputy && ad.DepartmentId == currentUser.DepartmentId && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
                                 || (isAccountantDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
                             )
                             :
@@ -1536,6 +1536,12 @@ namespace eFMS.API.Accounting.DL.Services
                 return result;
             }
 
+            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+            {
+                result = new HandleState("Advance payment approved");
+                return result;
+            }
+
             //Lấy ra brandId của user requester
             var brandOfUserRequest = advance.OfficeId;
             if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
@@ -1549,11 +1555,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 //Manager Department Approve
                 var managerOfUserRequester = userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault();
+                var isDeputyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup
+                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
-                    && (_userCurrent.UserID == managerOfUserRequester
-                        || userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID)))
+                    && _userCurrent.UserID == managerOfUserRequester)
+                        || isDeputyManager)
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1589,11 +1596,13 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 var accountantOfUser = userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault();
+                var isDeputyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup
+                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
-                    && (_userCurrent.UserID == accountantOfUser
-                        || userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID)))
+                    && _userCurrent.UserID == accountantOfUser)
+                    || isDeputyAccountant
+                    )
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1658,11 +1667,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Manager Department Approve
                 var managerOfUserRequester = userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault();
+                var isDeputyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
-                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup
+                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
-                    && (_userCurrent.UserID == managerOfUserRequester
-                        || userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID)))
+                    && _userCurrent.UserID == managerOfUserRequester)
+                    || isDeputyManager)
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1701,11 +1711,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 var accountantOfUser = userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault();
+                var isDeputyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
-                if (_userCurrent.GroupId == AccountingConstants.SpecialGroup
+                if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
-                    && (_userCurrent.UserID == accountantOfUser
-                        || userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID)))
+                    && _userCurrent.UserID == accountantOfUser)
+                    || isDeputyAccountant)
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1801,9 +1812,11 @@ namespace eFMS.API.Accounting.DL.Services
                             var deptCodeRequester = userBaseService.GetInfoDeptOfUser(advance.DepartmentId)?.Code;
                             usersDeputy = userBaseService.GetListUserDeputyByDept(deptCodeRequester);
                         }
-                        else if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
-                                && (userCurrent == userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault()
-                                    || userBaseService.GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent)))
+                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
+                            && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
+                            && userCurrent == userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault()
+                                )
+                                || userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
                                 || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
@@ -1823,10 +1836,11 @@ namespace eFMS.API.Accounting.DL.Services
                             //var deptCodeAccountant = GetInfoDeptOfUser(AccountingConstants.AccountantDeptId)?.Code;
                             //usersDeputy = GetListUserDeputyByDept(deptCodeAccountant);
                         }
-                        else if (
-                            userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
-                            && (userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault()//GetAccountantId(brandOfUserId.ToString()) 
-                                || userBaseService.GetListUserDeputyByDept(deptCodeOfUser).Contains(userCurrent)))
+                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
+                                && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
+                                && userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault()
+                                    )
+                                    || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
@@ -1850,8 +1864,9 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     //Nếu currentUser là Accoutant of Requester thì return
-                    if (userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
+                    if ((userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
                         && userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault())
+                        || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
                     {
                         return new HandleState();
                     }
@@ -1931,14 +1946,16 @@ namespace eFMS.API.Accounting.DL.Services
                             if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
                             approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
                         }
-                        else if (currentUser.GroupId == AccountingConstants.SpecialGroup
+                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
                             && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
-                            && (userCurrent == userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault()
-                                || userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID)))
+                            && userCurrent == userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault()
+                                )
+                            || userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
                             //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
-                            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED 
+                                || advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
                                 return new HandleState("Not allow deny. Advance payment has been approved");
                             }
@@ -1946,14 +1963,19 @@ namespace eFMS.API.Accounting.DL.Services
                             approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
                             approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
                         }
-                        else if (currentUser.GroupId == AccountingConstants.SpecialGroup
+                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
                             && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
-                            && (userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault()
-                                || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID)))
+                            && userCurrent == userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault()
+                                )
+                                || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
                         {
                             //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
-                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                            //var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(advance.AdvanceNo, currentUser, deptCodeOfUser);
+                            //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
+                            if (advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Not allow deny. Advance payment has been approved");
+                            }
                             approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
                             approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
                         }
@@ -2208,11 +2230,13 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent.GroupId == AccountingConstants.SpecialGroup
+            else if (
+                (userCurrent.GroupId == AccountingConstants.SpecialGroup
                 && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId) == false
                 && (userCurrent.UserID == approveAdvance.Manager
-                    || userCurrent.UserID == approveAdvance.ManagerApr
-                    || isDeputyManage)) //Dept Manager
+                    || userCurrent.UserID == approveAdvance.ManagerApr))
+
+                    || isDeputyManage) //Dept Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)).Any();
@@ -2221,11 +2245,13 @@ namespace eFMS.API.Accounting.DL.Services
                     isApproved = false;
                 }
             }
-            else if (userCurrent.GroupId == AccountingConstants.SpecialGroup
+            else if (
+                (userCurrent.GroupId == AccountingConstants.SpecialGroup
                 && userBaseService.CheckIsAccountantDept(userCurrent.DepartmentId)
                 && (userCurrent.UserID == approveAdvance.Accountant
-                    || userCurrent.UserID == approveAdvance.AccountantApr
-                    || isDeputyAccoutant)) //Accountant Manager
+                    || userCurrent.UserID == approveAdvance.AccountantApr))
+
+                    || isDeputyAccoutant)//Accountant Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
@@ -2272,7 +2298,8 @@ namespace eFMS.API.Accounting.DL.Services
                 aprAdvanceMap.StatusApproval = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo).FirstOrDefault()?.StatusApproval;
 
                 var isManagerDeputy = userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID);
-                aprAdvanceMap.IsManager = currentUser.GroupId == AccountingConstants.SpecialGroup && (userCurrent == approveAdvance.Manager || userCurrent == approveAdvance.ManagerApr || isManagerDeputy) ? true : false;
+                var isAccountantDeputy = userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID);
+                aprAdvanceMap.IsManager = (currentUser.GroupId == AccountingConstants.SpecialGroup && (userCurrent == approveAdvance.Manager || userCurrent == approveAdvance.ManagerApr)) || isManagerDeputy || isAccountantDeputy ? true : false;
             }
             else
             {

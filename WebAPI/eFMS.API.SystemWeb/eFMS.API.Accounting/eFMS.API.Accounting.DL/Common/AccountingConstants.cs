@@ -40,8 +40,8 @@
         #endregion -- ADVANCE TYPE --
 
         #region -- DEPARTMENT CODE --
-        public static readonly string DEPT_CODE_ACCOUNTANT = "Accountant";
-        public static readonly string DEPT_CODE_OPS = "OPS";
+        public static readonly string DEPT_CODE_ACCOUNTANT = "FA-01";
+        public static readonly string DEPT_CODE_OPS = "LOGISTIC-01";
         #endregion -- DEPARTMENT CODE --
 
         #region -- INFO COMPANY --
