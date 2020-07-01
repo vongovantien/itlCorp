@@ -126,14 +126,14 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
 
         console.log(modelAdd);
-        // this.updatePartner(body);
+        this.updatePartner(modelAdd);
     }
 
     updatePartner(body: Partner) {
         this._catalogueRepo.checkTaxCode(this.partner)
             .pipe(
-                tap(),
-                switchMap(() => (responseValidateTaxCode: any) => {
+
+                switchMap((responseValidateTaxCode: any) => {
                     if (!!responseValidateTaxCode) {
                         this.setError(this.formCreate.formGroup.controls["internalReferenceNo"], { taxCode: true });
                     }

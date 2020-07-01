@@ -8,7 +8,7 @@ import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { shareReplay, catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'form-create-commercial',
@@ -43,6 +43,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     initShippingProvinces: ProviceModel[];
     billingProvinces: ProviceModel[];
     initbillingProvinces: ProviceModel[];
+    billingsProvinces: ProviceModel[] = [];
+    shipingsProvinces: ProviceModel[] = [];
+
+
 
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
@@ -102,9 +106,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             provinceShippingName: [],
             provinceName: [],
 
-            shippingCountry: [],
+            shippingCountry: [null, Validators.required],
             provinceShippingId: [],
-            countryId: [],
+            countryId: [null, Validators.required],
             provinceId: [],
             parentId: [],
         });
@@ -131,28 +135,33 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'acRef':
-                this.parentId.setValue((data as Customer).id);
+                this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
-                this.shippingCountry.setValue((data as Customer).id);
-                this.provinceShippingId.setValue(null);
-                this.provinceShippingName.setValue(null);
+                this.shippingCountry.setValue(data.id);
+                // this.provinceShippingId.setValue(null);
+                // this.provinceShippingName.setValue(null);
 
-                this.shippingProvinces = [...this.initShippingProvinces.filter(x => x.countryID === data.id)];
-                if (this.shippingProvinces.length === 1) {
-                    this.provinceShippingId.setValue(this.shippingProvinces[0].id);
-                }
+                // this.shippingProvinces = [...this.initShippingProvinces.filter(x => x.countryID === data.id)];
+                // // if (this.shippingProvinces.length === 1) {
+                // //     //  this.provinceShippingId.setValue(this.shippingProvinces[0].id);
+                // // } else {
+                // //     this.provinceShippingId.setValue(null);
+                // // }
+                this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
-                this.provinceShippingId.setValue((data as Customer).id);
+                this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':
-                this.countryId.setValue((data as Customer).id);
-                this.getBillingProvince(data.id);
+                this.countryId.setValue(data.id);
 
+                // this.getBillingProvince(data.id);
+                this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
             case 'billing-city':
-                this.provinceId.setValue((data as Customer).id);
+                this.provinceId.setValue(data.id);
+
                 break;
             default:
                 break;
@@ -165,7 +174,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
         this.billingProvinces = [...this.initbillingProvinces.filter(x => x.countryID === countryId)];
         if (this.billingProvinces.length === 1) {
-            this.provinceId.setValue(this.billingProvinces[0].id);
+            // this.provinceId.setValue(this.billingProvinces[0].id);
+        } else {
+            this.provinceId.setValue(null);
         }
     }
 
@@ -178,5 +189,66 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.formGroup.controls['zipCode'].setValue(this.formGroup.controls['zipCodeShipping'].value);
         this.formGroup.controls['addressVn'].setValue(this.formGroup.controls['addressShippingVn'].value);
         this.formGroup.controls['addressEn'].setValue(this.formGroup.controls['addressShippingEn'].value);
+    }
+
+    getShippingProvinces(countryId?: string, provinceId: string = null) {
+        if (countryId) {
+            this._catalogueRepo.getProvincesBycountry(countryId)
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.shipingsProvinces = res;
+                        console.log(this.shipingsProvinces);
+                        if (!!provinceId) {
+                            const obj = this.shipingsProvinces.find(x => x.id === provinceId);
+                            if (obj === undefined) {
+                                this.provinceShippingId.setValue(null);
+                            }
+                        } else {
+                            this.provinceShippingId.setValue(null);
+                        }
+
+                    }
+                );
+        } else {
+            this._catalogueRepo.getProvinces()
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.billingsProvinces = res;
+                    }
+                );
+        }
+    }
+
+    getBillingProvinces(countryId?: string, provinceId: string = null) {
+        if (countryId) {
+            this._catalogueRepo.getProvincesBycountry(countryId)
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.billingsProvinces = res;
+                        console.log(this.billingsProvinces);
+                        if (!!provinceId) {
+                            const obj = this.billingsProvinces.find(x => x.id === provinceId);
+                            if (obj === undefined) {
+                                this.provinceId.setValue(null);
+
+                            }
+                        } else {
+                            this.provinceId.setValue(null);
+                        }
+
+                    }
+                );
+        } else {
+            this._catalogueRepo.getProvinces()
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.billingsProvinces = res;
+                    }
+                );
+        }
     }
 }
