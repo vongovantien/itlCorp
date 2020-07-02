@@ -9,18 +9,19 @@
                 <button type="button" (click)="confirmCancel.show()" class="close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-
-                <div class="modal-actions c-button-actions" *ngIf="!!isShowGetFromHAWB">
-                    <button class="btn btn-sm btn-primary m-btn--square m-btn--icon"
-                        (click)="confirmGetFromHAWB.show()">
-                        <span>
-                            <i class="la la-refresh"></i>
+                <ng-container *ngIf="!(isLocked | async)">
+                    <div class="modal-actions c-button-actions" *ngIf="!!isShowGetFromHAWB">
+                        <button class="btn btn-sm btn-primary m-btn--square m-btn--icon"
+                            (click)="confirmGetFromHAWB.show()">
                             <span>
-                                Get From HAWB
+                                <i class="la la-refresh"></i>
+                                <span>
+                                    Get From HAWB
+                                </span>
                             </span>
-                        </span>
-                    </button>
-                </div>
+                        </button>
+                    </div>
+                </ng-container>
             </div>
             <div class="modal-body pb-0">
                 <div class="row align-items-center m--margin-bottom-10">
@@ -84,9 +85,11 @@
                         <span class="no-data-text">No records found</span>
                     </div>
                 </ng-template>
-                <a title="Add" class="pointer" (click)="addDIM()">
-                    <i class="fa fa-plus-circle fa-2x text-success"></i>
-                </a>
+                <ng-container *ngIf="!(isLocked | async)">
+                    <a title="Add" class="pointer" (click)="addDIM()">
+                        <i class="fa fa-plus-circle fa-2x text-success"></i>
+                    </a>
+                </ng-container>
                 <div class="row pt-2 border border-bottom-0 mt-2 align-items-center pb-2">
                     <div class="col-md-5">
                         <div class="hw-constant d-flex justify-content-center align-items-center">
@@ -121,25 +124,12 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="m--align-center">
-                            <button
-                                class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="saveDIM()">
-                                <span>
-                                    <i class="la la-save"></i>
-                                    <span>
-                                        Save
-                                    </span>
-                                </span>
-                            </button>
-                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" title="Cancel"
-                                (click)="confirmCancel.show()">
-                                <span>
-                                    <i class="la la-ban"></i>
-                                    <span>
-                                        Cancel
-                                    </span>
-                                </span>
-                            </button>
+                            <ng-container *ngIf="!(isLocked | async)">
+                                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveDIM()">
+                                </app-default-button>
+                            </ng-container>
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel.show()">
+                            </app-default-button>
                         </div>
                     </div>
                 </div>
