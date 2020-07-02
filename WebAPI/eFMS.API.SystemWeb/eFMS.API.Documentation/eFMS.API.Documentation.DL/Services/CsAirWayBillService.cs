@@ -230,7 +230,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var airlineId = csTransactionRepo.Get(x => x.Id == data.JobId).FirstOrDefault()?.ColoaderId;
-                awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName; // Name ABBR
+                string nameEn = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.PartnerNameEn;
+                awb.AirlineAbbrName = catPartnerRepo.Get(x => x.Id == airlineId).FirstOrDefault()?.ShortName ; // Name ABBR
+                awb.CarrierNameEn = !string.IsNullOrEmpty(nameEn) ? " - " + nameEn : string.Empty;
                 awb.MAWB = data.Mblno1 + "-" + data.Mblno3;
                 awb.MBLNO1 = data.Mblno1;
                 awb.MBLNO2 = data.Mblno2;
@@ -273,7 +275,7 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.SCI = string.Empty; //NOT USE
                 awb.ReferrenceNo = string.Empty; //NOT USE
                 awb.OSI = string.Empty; //NOT USE
-                awb.ISSUED = string.Empty; //NOT USE
+                awb.ISSUED = data.IssuedBy; //NOT USE
                 awb.ConsigneeID = data.ConsigneeId; //NOT USE
                 awb.ICASNC = string.Empty; //NOT USE
                 awb.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
@@ -284,23 +286,95 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 awb.WChargeable = data.ChargeWeight ?? 0; //CW
                 awb.ChWDecimal = 2; //NOT USE
-                awb.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
-                awb.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
+
+                decimal RateCharge =  Convert.ToDecimal(data.RateCharge);
+
+                awb.Rchge =  RateCharge.ToString("0.00"); //RateCharge
+                double num;
+                decimal total = 0M;
+                bool TotalIsNumber = false;
+                if (double.TryParse(data.Total, out num))
+                {
+                    // It's a number!
+                    total = Convert.ToDecimal(data.Total);
+                    TotalIsNumber = true;
+                }
+
+                awb.Ttal = TotalIsNumber ? total.ToString("0.00") : data.Total;
                 awb.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
-                awb.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
-                awb.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
+
+                decimal Wtpp = 0M;
+                bool WghtPPNumber = false;
+                if (double.TryParse(data.Wtpp, out num))
+                {
+                    // It's a number!
+                    Wtpp = Convert.ToDecimal(data.Wtpp);
+                    WghtPPNumber = true;
+                }
+                awb.WghtPP = WghtPPNumber ? Wtpp.ToString("0.00") : data.Wtpp?.ToUpper();//WT (prepaid)
+
+
+                decimal Wtcc = 0M;
+                bool WghtCCNumber = false;
+                if (double.TryParse(data.Wtcll, out num))
+                {
+                    // It's a number!
+                    Wtcc = Convert.ToDecimal(data.Wtcll);
+                    WghtCCNumber = true;
+                }
+
+                decimal DueAgentPp = 0M;
+                bool DueAgentPpNumber = false;
+                if (double.TryParse(data.DueAgentPp, out num))
+                {
+                    // It's a number!
+                    DueAgentPp = Convert.ToDecimal(data.DueAgentPp);
+                    DueAgentPpNumber = true;
+                }
+
+                decimal DueAgentCc = 0M;
+                bool DueAgentCcNumber = false;
+                if (double.TryParse(data.DueAgentCll, out num))
+                {
+                    // It's a number!
+                    DueAgentCc = Convert.ToDecimal(data.DueAgentCll);
+                    DueAgentCcNumber = true;
+                }
+
+                decimal TtalPP = 0M;
+                bool TtalPPNumber = false;
+                if (double.TryParse(data.TotalPp, out num))
+                {
+                    // It's a number!
+                    TtalPP = Convert.ToDecimal(data.TotalPp);
+                    TtalPPNumber = true;
+                }
+
+                decimal TtalCC = 0M;
+                bool TtalCCNumber = false;
+                if (double.TryParse(data.TotalCll, out num))
+                {
+                    // It's a number!
+                    TtalCC = Convert.ToDecimal(data.TotalCll);
+                    TtalCCNumber = true;
+                }
+
+                awb.WghtPP = WghtPPNumber ? Wtpp.ToString("0.00") : data.Wtpp?.ToUpper();//WT (prepaid)
+                awb.WghtCC = WghtCCNumber ? Wtcc.ToString("0.00") : data.Wtcll?.ToUpper();//WT (Collect)
+                //awb.WghtCC = data.Wtcll?.ToUpper(); 
+
                 awb.ValChPP = string.Empty; //NOT USE
                 awb.ValChCC = string.Empty; //NOT USE
                 awb.TxPP = string.Empty; //NOT USE
                 awb.TxCC = string.Empty; //NOT USE
                 awb.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 awb.OChrVal = string.Empty; //NOT USE
-                awb.TTChgAgntPP = data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
-                awb.TTChgAgntCC = data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
+                awb.TTChgAgntPP = DueAgentPpNumber ? DueAgentPp.ToString("0.00") :  data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
+                awb.TTChgAgntCC = DueAgentCcNumber ? DueAgentCc.ToString("0.00") :   data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
                 awb.TTCarrPP = string.Empty; //NOT USE
                 awb.TTCarrCC = string.Empty; //NOT USE
-                awb.TtalPP = data.TotalPp?.ToUpper(); //Total (prepaid)
-                awb.TtalCC = data.TotalCll?.ToUpper(); //Total (Collect)
+                awb.TtalPP = TtalPPNumber? TtalPP.ToString("0.00") : data.TotalPp?.ToUpper(); //Total (prepaid)
+                awb.TtalCC = TtalCCNumber? TtalCC.ToString("0.00") :  data.TotalCll?.ToUpper(); //Total (Collect)
                 awb.CurConvRate = string.Empty; //NOT USE
                 awb.CCChgDes = string.Empty; //NOT USE
                 awb.SpecialNote = data.ShippingMark?.ToUpper(); //Shipping Mark
@@ -308,9 +382,9 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.ExecutedOn = data.IssuedPlace?.ToUpper(); //Issued On
                 awb.ExecutedAt = data.IssuedDate != null ? data.IssuedDate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 awb.Signature = string.Empty; //NOT USE
-                var dimAir = dimensionDetailService.Get(x => x.AirWayBillId == data.Id);
-                string _dimensions = string.Join("\r\n", dimAir.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
-                awb.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
+                //var dimAir = dimensionDetailService.Get(x => x.AirWayBillId == data.Id);
+                //string _dimensions = string.Join("\r\n", dimAir.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
+                awb.Dimensions = data.VolumeField; 
                 awb.ShipPicture = null; //NOT USE
                 awb.PicMarks = string.Empty; //Gán rỗng
                 awb.GoodsDelivery = string.Empty; //
