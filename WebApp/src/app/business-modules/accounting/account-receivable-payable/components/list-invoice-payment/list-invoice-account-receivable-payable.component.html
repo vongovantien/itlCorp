@@ -17,7 +17,7 @@
                                 </button>
                             </ng-container>
                             <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'ExportInvoice'">
-                                <app-permission-button type="export"></app-permission-button>
+                                <app-permission-button type="export" (onClick)="exportExcel()"></app-permission-button>
                             </ng-container>
                         </div>
                     </div>

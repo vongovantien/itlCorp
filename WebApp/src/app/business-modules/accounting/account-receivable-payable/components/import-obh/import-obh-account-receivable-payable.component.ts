@@ -126,6 +126,11 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
     }
     import(element) {
         if (this.data == null) { return; }
+        if (this.data.length === 0) {
+            this.invaliDataAlert.show();
+            this._progressRef.complete();
+            return;
+        }
         if (this.totalRows - this.totalValidRows > 0) {
             this.invaliDataAlert.show();
             this._progressRef.complete();

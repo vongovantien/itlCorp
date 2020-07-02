@@ -22,5 +22,6 @@ namespace eFMS.API.Accounting.DL.IService
         ExtendDateUpdatedModel GetOBHSOAExtendedDate(string id);
         HandleState ImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> list);
         List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> dataList);
+        IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria);
     }
 }

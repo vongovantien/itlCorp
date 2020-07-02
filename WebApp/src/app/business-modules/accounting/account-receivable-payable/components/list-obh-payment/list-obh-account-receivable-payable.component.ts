@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/cor
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-
+import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 
@@ -37,12 +37,14 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
+        private _exportRepo: ExportRepo,
         private _sortService: SortService,
         private _toastService: ToastrService) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.getPagingData;
         this.requestSort = this.sortRefPayment;
+
     }
 
     ngOnInit(): void {
@@ -77,6 +79,8 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
 
     getPagingData() {
         this._progressRef.start();
+
+
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
@@ -95,6 +99,16 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
         this._router.navigate(["home/accounting/account-receivable-payable/import-obh"]);
     }
 
+    exportExcel() {
+
+        this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'obh-payment.xlsx');
+                }
+            );
+    }
+
     getPayments(refId: string) {
         this._accountingRepo.getPaymentByrefId(refId)
             .pipe(
@@ -102,7 +116,7 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
             ).subscribe(
                 (res: []) => {
                     this.payments = res;
-                    console.log(this.payments);
+
                 },
             );
     }
@@ -116,7 +130,7 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showExtendDateModel(refId: string) {
-        console.log(refId);
+        //console.log(refId);
         this._accountingRepo.getOBHSOAExtendedDate(refId)
             .pipe(
                 catchError(this.catchError)
@@ -157,12 +171,16 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showConfirmDelete(item, index) {
-        if (index !== this.payments.length - 1) {
+        console.log("this.payments: ", this.payments);
+        console.log("item: ", item);
+        console.log("index: ", index);
+        if (index < this.payments.length - 1) {
             this.infoNotAllowDelete.show();
         } else {
             this.selectedPayment = item;
             this.confirmDeletePopup.show();
         }
+
     }
 
     onDeletePayment() {
@@ -172,6 +190,7 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
                 catchError(this.catchError),
                 finalize(() => {
                     this.confirmDeletePopup.hide();
+                    this.isLoading = false;
                 }),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
