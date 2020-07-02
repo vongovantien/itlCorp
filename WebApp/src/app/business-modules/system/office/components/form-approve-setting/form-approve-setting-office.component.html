@@ -132,7 +132,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockDate}">
                                 <select [(ngModel)]="service.lockDate" class="form-control">
-                                    <option value="null">Please select</option>
+                                    <option [value]="null" disabled>Please select</option>
                                     <option *ngFor="let date of dates" [value]="date">
                                         {{date}}
                                     </option>
@@ -147,7 +147,7 @@
                                     <option *ngFor="let date of dates" [value]="date">
                                         {{date}}
                                     </option>
-                                    <option value="null">Please select</option>
+                                    <option [value]="null" disabled>Please select</option>
                                 </select>
                             </div>
 
