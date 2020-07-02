@@ -67,6 +67,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             settingFields: this.headers.map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
+        this.dataSearch = { All: '' };
+
         this.getPartners();
 
     }

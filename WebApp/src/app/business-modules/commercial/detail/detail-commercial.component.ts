@@ -10,8 +10,8 @@ import { Partner } from '@models';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
 
-import { tap, switchMap, finalize, catchError, concatMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { tap, switchMap, finalize, catchError, concatMap, map } from 'rxjs/operators';
+import { of, combineLatest } from 'rxjs';
 import _merge from 'lodash/merge';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -42,24 +42,28 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     ngAfterViewInit() {
 
-        this._activedRoute.params.pipe(
-            tap((param: Params) => {
-                this.partnerId = !!param.partnerId ? param.partnerId : '';
-
-            }),
-            switchMap(() => of(this.partnerId)),
+        combineLatest([
+            this._activedRoute.params,
+            this._activedRoute.data,
+        ]).pipe(
+            map(([p, d]) => ({ ...p, ...d }))
         ).subscribe(
-            (partnerId: string) => {
-                if (partnerId) {
-                    this.contractList.partnerId = partnerId;
-                    this.getDetailCustomer(partnerId);
-                    this.contractList.getListContract(partnerId);
+            (res: any) => {
+                if (res.type) {
+                    this.type = res.type;
+                }
+                if (res.partnerId) {
+                    this.partnerId = res.partnerId;
+                    this.contractList.partnerId = this.partnerId;
+
+                    this.getDetailCustomer(this.partnerId);
+                    this.contractList.getListContract(this.partnerId);
                 } else {
                     this.gotoList();
                 }
-            }
-        );
+            });
         this._cd.detectChanges();
+
     }
 
     getDetailCustomer(partnerId: string) {
