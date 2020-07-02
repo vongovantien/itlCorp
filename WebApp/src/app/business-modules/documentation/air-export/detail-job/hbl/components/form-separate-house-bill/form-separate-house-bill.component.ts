@@ -105,7 +105,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             modelUpdate.parentId = this.hblId;
 
             for (const dim of modelUpdate.dimensionDetails) {
-                dim.hblId = this.hblSeparateId;
+                dim.hblid = this.hblSeparateId;
             }
             this.updateHbl(modelUpdate, true);
         }
