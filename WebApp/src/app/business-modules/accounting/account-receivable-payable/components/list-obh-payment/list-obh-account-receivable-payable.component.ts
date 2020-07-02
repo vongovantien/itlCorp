@@ -110,6 +110,8 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     getPayments(refId: string) {
+
+
         this._accountingRepo.getPaymentByrefId(refId)
             .pipe(
                 catchError(this.catchError)
@@ -171,13 +173,13 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showConfirmDelete(item, index) {
-        console.log("this.payments: ", this.payments);
-        console.log("item: ", item);
-        console.log("index: ", index);
+
+
         if (index < this.payments.length - 1) {
             this.infoNotAllowDelete.show();
         } else {
             this.selectedPayment = item;
+            this.selectedPayment.refId = item.refNo;
             this.confirmDeletePopup.show();
         }
 
@@ -196,6 +198,8 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
+
+
                         this.getPayments(this.selectedPayment.refId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
