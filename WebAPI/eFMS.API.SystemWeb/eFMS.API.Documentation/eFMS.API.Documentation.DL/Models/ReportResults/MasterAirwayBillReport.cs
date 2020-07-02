@@ -5,6 +5,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
     public class MasterAirwayBillReport
     {
         public string AirlineAbbrName { get; set; }
+
+        public string CarrierNameEn { get; set; }
         public string MAWB { get; set; }
         public string HWBNO { get; set; }
         public string ATTN { get; set; }

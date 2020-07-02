@@ -172,7 +172,7 @@ namespace eFMS.API.Catalogue.Controllers
             string refNo = model.InternalReferenceNo == null ? "" : model.InternalReferenceNo.Trim().ToLower();
             if (string.IsNullOrEmpty(model.Id))
             {
-                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
                                                     && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0)
@@ -181,11 +181,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id 
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id 
                                                       && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
-                                                      || refNo.Length == 0)
-                            )?.FirstOrDefault();
+                                                      || refNo.Length == 0))
+                            ?.FirstOrDefault();
                 return Ok(result);
             }
         }

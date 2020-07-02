@@ -66,6 +66,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     isUpdate: boolean = false;
     isDuplicateChargeCode: boolean = false;
     isDuplicateInvoice: boolean = false;
+    isDuplicatedContNo: boolean = false;
 
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[];
@@ -96,6 +97,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Serie No', field: 'serieNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Cont No', field: 'contNo', sortable: true },
         ];
 
         this.configChargeDisplayFields = [
@@ -339,7 +341,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     onSelectDataTableInfo(data: any, chargeItem: Surcharge, type: string) {
         this.isSubmitted = false;
-        [this.isDuplicateChargeCode, this.isDuplicateInvoice] = [false, false];
+        [this.isDuplicateChargeCode, this.isDuplicateInvoice, this.isDuplicatedContNo] = [false, false, false];
 
         switch (type) {
             case 'charge':
@@ -386,7 +388,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':
@@ -568,18 +570,43 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         return valid;
     }
 
+    checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): boolean {
+        let seenDuplicate = false;
+        const testObject = {};
+
+        inputArray.map(function (item: { [x: string]: any; duplicate: boolean; }) {
+            const itemPropertyName = item[propertyName];
+            if (itemPropertyName in testObject) {
+                testObject[itemPropertyName].duplicate = true;
+                item.duplicate = true;
+                seenDuplicate = true;
+            } else {
+                testObject[itemPropertyName] = item;
+                delete item.duplicate;
+            }
+        });
+
+        return seenDuplicate;
+    }
+
     checkDuplicate() {
         let valid: boolean = true;
-        if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
+        if (this.checkDuplicateInObject("chargeId", this.charges)
+            && this.checkDuplicateInObject("invoiceNo", this.charges)
+            && this.checkDuplicateInObject("contNo", this.charges)
+        ) {
             this.isDuplicateChargeCode = true;
             this.isDuplicateInvoice = true;
+            this.isDuplicatedContNo = true;
+
             valid = false;
-            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
+            this._toastService.warning("The Charge code, ContNo and InvoiceNo is duplicated");
             return;
         } else {
             valid = true;
             this.isDuplicateChargeCode = false;
             this.isDuplicateInvoice = false;
+            this.isDuplicatedContNo = false;
         }
         return valid;
     }

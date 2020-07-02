@@ -1,5 +1,5 @@
 <div class="row m--margin-top-20 m--margin-bottom-20">
-    <div class="col-lg-6">
+    <div class="col-lg-6" *ngIf="state === 'update'">
         <div class="c-button-actions">
             <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" type="button"
                 (click)="addDetail()">
@@ -22,7 +22,7 @@
             <table class="table table-striped table-brand dataTable">
                 <thead app-table-header [headers]="headers"
                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                    <th class="first table-actions-col">
+                    <th class="first table-actions-col" *ngIf="state === 'update'">
                         <label class="m-checkbox">
                             <input type="checkbox" [(ngModel)]="isCheckAll" (change)="checkUncheckAllCharge()">
                             <span></span>
@@ -32,7 +32,7 @@
                 <tbody>
                     <ng-container *ngIf="!!dataJobs.length">
                         <tr *ngFor="let job of dataJobs; let i = index; trackBy: trackByFn">
-                            <td class="table-actions-col">
+                            <td class="table-actions-col" *ngIf="state === 'update'">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
                                         <input type="checkbox" (change)="onChangeCheckBoxCharge()" [value]="job"
@@ -43,7 +43,9 @@
                             </td>
                             <td>{{job.unlockName}}</td>
                             <td>
-                                <input type="text" class="form-control" [(ngModel)]="job.reason">
+                                <input type="text" class="form-control" [(ngModel)]="job.reason"
+                                    *ngIf="state === 'update' else notedit">
+                                <ng-template #notedit>{{job.reason}}</ng-template>
                             </td>
                         </tr>
                     </ng-container>

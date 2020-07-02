@@ -145,7 +145,7 @@ export class CreateHouseBillComponent extends AppForm {
                         const objDelivery = {
                             deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
                             deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
-                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
+                            doheader1: !!this.shipmentDetail.podName ? this.shipmentDetail.podName : null
                         };
                         this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
                     }
@@ -330,10 +330,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     handleStringCont(contOb: { contName: string, quantity: number }) {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
-    }
-
-    onSelectTabDO() {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey('podName') || "";
     }
 }
 
