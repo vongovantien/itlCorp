@@ -26,6 +26,10 @@ namespace eFMS.API.Setting.DL.Services
         readonly IContextBase<SetUnlockRequestJob> unlockRequestJobRepo;
         readonly IContextBase<OpsTransaction> opsTransactionRepo;
         readonly IContextBase<CsTransaction> csTransactionRepo;
+        readonly IContextBase<AcctAdvancePayment> advancePaymentRepo;
+        readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
+        readonly IContextBase<AcctApproveAdvance> approveAdvanceRepo;
+        readonly IContextBase<AcctApproveSettlement> approveSettlementRepo;
 
         public UnlockRequestApproveService(
             IContextBase<SetUnlockRequestApprove> repository,
@@ -37,7 +41,11 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<SetUnlockRequest> unlockRequest,
             IContextBase<SetUnlockRequestJob> unlockRequestJob,
             IContextBase<OpsTransaction> opsTransaction,
-            IContextBase<CsTransaction> csTransaction) : base(repository, mapper)
+            IContextBase<CsTransaction> csTransaction,
+            IContextBase<AcctAdvancePayment> advancePayment,
+            IContextBase<AcctSettlementPayment> settlementPayment,
+            IContextBase<AcctApproveAdvance> approveAdvance,
+            IContextBase<AcctApproveSettlement> approveSettlement) : base(repository, mapper)
         {
             webUrl = wUrl;
             apiUrl = aUrl;
@@ -47,6 +55,10 @@ namespace eFMS.API.Setting.DL.Services
             unlockRequestJobRepo = unlockRequestJob;
             opsTransactionRepo = opsTransaction;
             csTransactionRepo = csTransaction;
+            advancePaymentRepo = advancePayment;
+            settlementPaymentRepo = settlementPayment;
+            approveAdvanceRepo = approveAdvance;
+            approveSettlementRepo = approveSettlement;
         }
 
         public SetUnlockRequestApproveModel GetInfoApproveUnlockRequest(Guid id)
@@ -67,10 +79,10 @@ namespace eFMS.API.Setting.DL.Services
                 unlockApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Buhead)?.EmployeeNameVn;
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
                 unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
-                unlockApproveModel.IsShowLeader = !string.IsNullOrEmpty(unlockApprove.Leader);//userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowManager = !string.IsNullOrEmpty(unlockApprove.Manager);//userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowAccountant = !string.IsNullOrEmpty(unlockApprove.Accountant);//userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowBuHead = !string.IsNullOrEmpty(unlockApprove.Buhead);//userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowLeader = !string.IsNullOrEmpty(unlockApprove.Leader);
+                unlockApproveModel.IsShowManager = !string.IsNullOrEmpty(unlockApprove.Manager);
+                unlockApproveModel.IsShowAccountant = !string.IsNullOrEmpty(unlockApprove.Accountant);
+                unlockApproveModel.IsShowBuHead = !string.IsNullOrEmpty(unlockApprove.Buhead);
             }
             else
             {
@@ -281,16 +293,17 @@ namespace eFMS.API.Setting.DL.Services
 
                         if (!sendMailSuggest)
                         {
-                            return new HandleState("Send mail suggest Approval failed");
+                            return new HandleState("Send mail suggest approval failed");
                         }
                         if (!sendMailApproved)
                         {
-                            return new HandleState("Send mail Approved Approval failed");
+                            return new HandleState("Send mail approved approval failed");
                         }
                         else
                         {
-                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denied; Change Service Date: Update SeviceDate = New Service Date
-
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
+                            var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
+                            UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
                         }
 
                         var checkExistsApproveByUnlockRequestId = DataContext.Get(x => x.UnlockRequestId == approve.UnlockRequestId && x.IsDeny == false).FirstOrDefault();
@@ -336,41 +349,7 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
-        #region -- Info Level Approve --
-        private List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
-        {
-            var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
-            //Get list user authorized of user leader
-            var userAuthorizedApprovals = userBaseService.GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId);
-
-            var userDeputies = new List<string>();
-            foreach (var userAuth in userAuthorizedApprovals)
-            {
-                var isSame = userBaseService.CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);                
-                if (isSame)
-                {
-                    userDeputies.Add(userAuth);
-                }
-            }
-            return userDeputies;
-        }
-
-        private List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
-        {
-            var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
-            var emailUserDeputies = new List<string>();
-            foreach(var user in users)
-            {
-                var employeeIdOfUser = userBaseService.GetEmployeeIdOfUser(user);
-                var email = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-                if (!string.IsNullOrEmpty(email))
-                {
-                    emailUserDeputies.Add(email);
-                }
-            }
-            return emailUserDeputies;
-        }
-
+        #region -- Info Level Approve --        
         public bool CheckAllLevelIsAutoOrNone(string type, Guid? officeId)
         {
             var roleLeader = userBaseService.GetRoleByLevel("Leader", type, officeId);
@@ -395,8 +374,8 @@ namespace eFMS.API.Setting.DL.Services
             var userLeader = userBaseService.GetLeaderGroup(companyId, officeId, departmentId, groupId).FirstOrDefault();
             var employeeIdOfLeader = userBaseService.GetEmployeeIdOfUser(userLeader);
 
-            var userDeputies = GetUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
-            var emailDeputies = GetEmailUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
 
             result.LevelApprove = "Leader";
             result.Role = roleLeader;
@@ -415,8 +394,8 @@ namespace eFMS.API.Setting.DL.Services
             var userManager = userBaseService.GetDeptManager(companyId, officeId, departmentId).FirstOrDefault();
             var employeeIdOfManager = userBaseService.GetEmployeeIdOfUser(userManager);
 
-            var userDeputies = GetUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
-            var emailDeputies = GetEmailUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
 
             result.LevelApprove = "Manager";
             result.Role = roleManager;
@@ -435,8 +414,8 @@ namespace eFMS.API.Setting.DL.Services
             var userAccountant = userBaseService.GetAccoutantManager(companyId, officeId).FirstOrDefault();
             var employeeIdOfAccountant = userBaseService.GetEmployeeIdOfUser(userAccountant);
 
-            var userDeputies = GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
-            var emailDeputies = GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
 
             result.LevelApprove = "Accountant";
             result.Role = roleAccountant;
@@ -455,8 +434,8 @@ namespace eFMS.API.Setting.DL.Services
             var userBuHead = userBaseService.GetBUHead(companyId, officeId).FirstOrDefault();
             var employeeIdOfBuHead = userBaseService.GetEmployeeIdOfUser(userBuHead);
 
-            var userDeputies = GetUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
-            var emailDeputies = GetEmailUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
 
             result.LevelApprove = "BOD";
             result.Role = roleBuHead;
@@ -1038,8 +1017,9 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     else
                     {
-                        //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = New; Change Service Date: Update SeviceDate = New Service Date
-
+                        //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
+                        var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
+                        UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
                     }
 
                     unlockRequest.UserModified = approve.UserModified = userCurrent;
@@ -1741,6 +1721,87 @@ namespace eFMS.API.Setting.DL.Services
         #endregion -- TEMPLATE & SEND EMAIL --
 
         #region -- UPDATED UNLOCK SHIPMENT, ADVANCE, SETTLEMENT, CHANGE SERVICE DATE --
+        public void UpdatedUnlockRequest(Guid id, string unlockType, List<string> jobs, DateTime? newServiceDate)
+        {
+            switch (unlockType)
+            {
+                case "Shipment":
+                case "Change Service Date":
+                    UpdatedUnlockShipmentOrChangeServiceDate(id, unlockType, jobs, newServiceDate);
+                    break;
+                case "Advance":
+                    UpdatedUnlockAdvance(id, jobs);
+                    break;
+                case "Settlement":
+                    UpdatedUnlockSettlement(id, jobs);
+                    break;
+            }
+        } 
+
+        private void UpdatedUnlockShipmentOrChangeServiceDate(Guid id, string type, List<string> jobs, DateTime? newServiceDate)
+        {            
+            foreach(var job in jobs)
+            {
+                var ops = opsTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
+                if (ops != null)
+                {
+                    if (type == "Shipment")
+                    {
+                        ops.IsLocked = false;
+                    }
+                    if (type == "Change Service Date")
+                    {
+                        ops.ServiceDate = newServiceDate;
+                    }
+                    ops.UserModified = currentUser.UserID;
+                    ops.DatetimeModified = DateTime.Now;
+                    opsTransactionRepo.Update(ops, x => x.Id == ops.Id, false);
+                }
+                else
+                {
+                    var doc = csTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
+                    doc.IsLocked = false;
+                    doc.UserModified = currentUser.UserID;
+                    doc.DatetimeModified = DateTime.Now;
+                    csTransactionRepo.Update(doc, x => x.Id == doc.Id, false);
+                }
+            }
+        }
+
+        private void UpdatedUnlockAdvance(Guid id, List<string> jobs)
+        {
+            foreach(var job in jobs)
+            {
+                var adv = advancePaymentRepo.Get(x => x.AdvanceNo == job).FirstOrDefault();
+                adv.StatusApproval = SettingConstants.STATUS_APPROVAL_DENIED;
+                adv.UserModified = currentUser.UserID;
+                adv.DatetimeModified = DateTime.Now;
+                advancePaymentRepo.Update(adv, x => x.Id == adv.Id, false);
+
+                var aprAdv = approveAdvanceRepo.Get(x => x.AdvanceNo == adv.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                aprAdv.IsDeputy = true;
+                aprAdv.Comment = "UNLOCK REQUEST ADVANCE";
+                approveAdvanceRepo.Update(aprAdv, x => x.Id == aprAdv.Id, false);
+            }
+        }
+
+        private void UpdatedUnlockSettlement(Guid id, List<string> jobs)
+        {
+            foreach (var job in jobs)
+            {
+                var settle = settlementPaymentRepo.Get(x => x.SettlementNo == job).FirstOrDefault();
+                settle.StatusApproval = SettingConstants.STATUS_APPROVAL_DENIED;
+                settle.UserModified = currentUser.UserID;
+                settle.DatetimeModified = DateTime.Now;
+                settlementPaymentRepo.Update(settle, x => x.Id == settle.Id, false);
+
+                var aprSettle = approveSettlementRepo.Get(x => x.SettlementNo == settle.SettlementNo && x.IsDeputy == false).FirstOrDefault();
+                aprSettle.IsDeputy = true;
+                aprSettle.Comment = "UNLOCK REQUEST SETTLEMENT";
+                approveSettlementRepo.Update(aprSettle, x => x.Id == aprSettle.Id, false);
+            }
+        }
+        
         #endregion -- UPDATED UNLOCK SHIPMENT, ADVANCE, SETTLEMENT, CHANGE SERVICE DATE --
     }
 }

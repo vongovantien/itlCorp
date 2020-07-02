@@ -230,5 +230,39 @@ namespace eFMS.API.Setting.DL.Services
             }
             return result;
         }
+
+        public List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
+            //Get list user authorized of user
+            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId);
+
+            var userDeputies = new List<string>();
+            foreach (var userAuth in userAuthorizedApprovals)
+            {
+                var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
+                if (isSame)
+                {
+                    userDeputies.Add(userAuth);
+                }
+            }
+            return userDeputies;
+        }
+
+        public List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            var emailUserDeputies = new List<string>();
+            foreach (var user in users)
+            {
+                var employeeIdOfUser = GetEmployeeIdOfUser(user);
+                var email = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    emailUserDeputies.Add(email);
+                }
+            }
+            return emailUserDeputies;
+        }
     }
 }

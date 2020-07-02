@@ -16,6 +16,8 @@ namespace eFMS.API.Setting.Service.Models
         }
 
         public virtual DbSet<AcctAdvancePayment> AcctAdvancePayment { get; set; }
+        public virtual DbSet<AcctApproveAdvance> AcctApproveAdvance { get; set; }
+        public virtual DbSet<AcctApproveSettlement> AcctApproveSettlement { get; set; }
         public virtual DbSet<AcctSettlementPayment> AcctSettlementPayment { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
@@ -113,6 +115,148 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.VoucherNo)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AcctApproveAdvance>(entity =>
+            {
+                entity.ToTable("acctApproveAdvance");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Accountant)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountantApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountantAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.AdvanceNo)
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Buhead)
+                    .HasColumnName("BUHead")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadApr)
+                    .HasColumnName("BUHeadApr")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadAprDate)
+                    .HasColumnName("BUHeadAprDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Leader)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Manager)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Requester)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RequesterAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AcctApproveSettlement>(entity =>
+            {
+                entity.ToTable("acctApproveSettlement");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Accountant)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountantApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AccountantAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Buhead)
+                    .HasColumnName("BUHead")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadApr)
+                    .HasColumnName("BUHeadApr")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BuheadAprDate)
+                    .HasColumnName("BUHeadAprDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.DateCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DateModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Leader)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Manager)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ManagerAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Requester)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RequesterAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.SettlementNo)
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 

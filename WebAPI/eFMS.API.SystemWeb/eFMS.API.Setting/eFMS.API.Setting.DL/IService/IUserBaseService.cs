@@ -26,5 +26,7 @@ namespace eFMS.API.Setting.DL.IService
         string GetRoleByLevel(string level, string type, Guid? officeId);
         List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer);
         bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
     }
 }

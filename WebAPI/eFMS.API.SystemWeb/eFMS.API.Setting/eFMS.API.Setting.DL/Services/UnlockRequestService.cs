@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
@@ -387,6 +388,13 @@ namespace eFMS.API.Setting.DL.Services
         #endregion --- CRUD ---
 
         #region --- LIST & PAGING ---
+        private PermissionRange GetPermissionRangeOfRequester()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingUnlockRequest);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            return _permissionRange;
+        }
+        
         private Expression<Func<SetUnlockRequest, bool>> ExpressionQuery(UnlockRequestCriteria criteria)
         {
             var unlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum);
@@ -414,10 +422,96 @@ namespace eFMS.API.Setting.DL.Services
             return query;
         }
 
+        private IQueryable<SetUnlockRequest> GetDataUnlockRequest()
+        {
+            var permissionRangeRequester = GetPermissionRangeOfRequester();
+            var unlockRequests = DataContext.Get();
+            var unlockRequestAprs = setUnlockRequestApproveRepo.Get(x => x.IsDeny == false);
+            var data = from unlockRequest in unlockRequests
+                       join unlockRequestApr in unlockRequestAprs on unlockRequest.Id equals unlockRequestApr.UnlockRequestId into unlockRequestApr2
+                       from unlockRequestApr in unlockRequestApr2.DefaultIfEmpty()
+                       select new { unlockRequest, unlockRequestApr};
+            var result = data.Where(x =>
+                (
+                    permissionRangeRequester == PermissionRange.None ? false : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Owner ? x.unlockRequest.UserCreated == currentUser.UserID : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Group ? (x.unlockRequest.GroupId == currentUser.GroupId
+                                                                        && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                                                                        && x.unlockRequest.OfficeId == currentUser.OfficeID
+                                                                        && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Department ? (x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                                                                              && x.unlockRequest.OfficeId == currentUser.OfficeID
+                                                                              && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Office ? (x.unlockRequest.OfficeId == currentUser.OfficeID
+                                                                          && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Company ? x.unlockRequest.CompanyId == currentUser.CompanyID : true
+                )
+                ||
+                (x.unlockRequestApr != null && (x.unlockRequestApr.Leader == currentUser.UserID
+                  || x.unlockRequestApr.LeaderApr == currentUser.UserID
+                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Leader ?? null, x.unlockRequest.GroupId, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                && x.unlockRequest.GroupId == currentUser.GroupId
+                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                && x.unlockRequest.OfficeId == currentUser.OfficeID
+                && x.unlockRequest.CompanyId == currentUser.CompanyID
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
+                ) //LEADER AND DEPUTY OF LEADER
+                ||
+                (x.unlockRequestApr != null && (x.unlockRequestApr.Manager == currentUser.UserID
+                  || x.unlockRequestApr.ManagerApr == currentUser.UserID
+                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager ?? null, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                && x.unlockRequest.GroupId == currentUser.GroupId
+                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                && x.unlockRequest.OfficeId == currentUser.OfficeID
+                && x.unlockRequest.CompanyId == currentUser.CompanyID
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                ) //MANANER AND DEPUTY OF MANAGER
+                ||
+                (x.unlockRequestApr != null && (x.unlockRequestApr.Accountant == currentUser.UserID
+                  || x.unlockRequestApr.AccountantApr == currentUser.UserID
+                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                && x.unlockRequest.GroupId == currentUser.GroupId
+                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                && x.unlockRequest.OfficeId == currentUser.OfficeID
+                && x.unlockRequest.CompanyId == currentUser.CompanyID
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
+                ||
+                (x.unlockRequestApr != null && (x.unlockRequestApr.Buhead == currentUser.UserID
+                  || x.unlockRequestApr.BuheadApr == currentUser.UserID
+                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                && x.unlockRequest.GroupId == currentUser.GroupId
+                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                && x.unlockRequest.OfficeId == currentUser.OfficeID
+                && x.unlockRequest.CompanyId == currentUser.CompanyID
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
+                && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                && (!string.IsNullOrEmpty(x.unlockRequestApr.Accountant) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED : true)
+                ) //BOD AND DEPUTY OF BOD                
+            ).Select(s => s.unlockRequest);
+
+            return result.AsQueryable();                
+        }
+
         public IQueryable<UnlockRequestResult> GetData(UnlockRequestCriteria criteria)
         {
             var queryUnlockRequest = ExpressionQuery(criteria);
-            var unlockRequests = DataContext.Get().Where(queryUnlockRequest);
+            var dataUnlockRequests = GetDataUnlockRequest();
+            if (dataUnlockRequests == null) return null;
+            var unlockRequests = dataUnlockRequests.Where(queryUnlockRequest);
 
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
