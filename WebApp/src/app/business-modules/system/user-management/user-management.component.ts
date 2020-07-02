@@ -143,7 +143,7 @@ export class UserManagementComponent extends AppList {
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
                     this.users = res.data;
-                    console.log(this.users);
+
                 },
             );
     }

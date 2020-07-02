@@ -43,7 +43,7 @@ export class AddRoleUserComponent extends AppList {
             if (param.id) {
                 this.id = param.id;
             }
-    });
+        });
         this.headers = [
             { title: 'Role Name', field: 'name', required: true },
             { title: 'Company', field: '', required: true },
@@ -51,7 +51,7 @@ export class AddRoleUserComponent extends AppList {
         ];
         this.getDataCombobox();
         this.getCompanies();
-        if(!!this.id){
+        if (!!this.id) {
             this.getPermissionsByUserId();
         }
     }
@@ -69,7 +69,7 @@ export class AddRoleUserComponent extends AppList {
     }
 
     getCompanies() {
-     
+
         this._systemRepo.getListCompaniesByUserId(this.id)
             .pipe(
                 catchError(this.catchError),
@@ -109,8 +109,8 @@ export class AddRoleUserComponent extends AppList {
                             });
                         });
                     }, 300);
-            
-                    console.log(this.listRoles);
+
+
                     this.listRolesTemp = this.listRoles;
                 }
             },

@@ -14,5 +14,9 @@ namespace eFMS.API.System.DL.Models
         public string CompanyName { get; set; }
         public string OfficeName { get; set; }
         public string DepartmentName { get; set; }
+        public string GroupAbbrName { get; set; }
+        public string CompanyAbbrName { get; set; }
+        public string OfficeAbbrName { get; set; }
+        public string DepartmentAbbrName { get; set; }
     }
 }

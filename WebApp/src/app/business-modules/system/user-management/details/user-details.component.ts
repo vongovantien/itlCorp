@@ -149,7 +149,6 @@ export class UserDetailsComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.userLevels = res;
-                        console.log(this.userLevels);
                     }
                 },
             );

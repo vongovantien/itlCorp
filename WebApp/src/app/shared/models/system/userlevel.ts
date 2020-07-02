@@ -14,6 +14,11 @@ export class UserLevel {
     companyName: string = null;
     departmentName: string = null;
     officeName: string = null;
+    //
+    groupAbbrName: string = null;
+    companyAbbrName: string = null;
+    departmentAbbrName: string = null;
+    officeAbbrName: string = null;
 
     constructor(data?: any) {
         let self = this;
