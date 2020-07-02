@@ -24,5 +24,7 @@ namespace eFMS.API.Setting.DL.IService
         bool CheckDeputyAccountantByUser(int? departmentId, string userId);
         SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId);
         string GetRoleByLevel(string level, string type, Guid? officeId);
+        List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer);
+        bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
     }
 }
