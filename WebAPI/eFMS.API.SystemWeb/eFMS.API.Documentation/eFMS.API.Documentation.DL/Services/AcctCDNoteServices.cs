@@ -811,7 +811,7 @@ namespace eFMS.API.Documentation.DL.Services
                         GW = model.GW,
                         NW = null,
                         SeaCBM = model.CBM,
-                        SOTK = _clearance.ClearanceNo,
+                        SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),
