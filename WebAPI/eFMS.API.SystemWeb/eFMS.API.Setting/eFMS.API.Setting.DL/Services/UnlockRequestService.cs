@@ -14,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -394,7 +393,7 @@ namespace eFMS.API.Setting.DL.Services
             PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             return _permissionRange;
         }
-        
+
         private Expression<Func<SetUnlockRequest, bool>> ExpressionQuery(UnlockRequestCriteria criteria)
         {
             var unlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum);
@@ -430,7 +429,7 @@ namespace eFMS.API.Setting.DL.Services
             var data = from unlockRequest in unlockRequests
                        join unlockRequestApr in unlockRequestAprs on unlockRequest.Id equals unlockRequestApr.UnlockRequestId into unlockRequestApr2
                        from unlockRequestApr in unlockRequestApr2.DefaultIfEmpty()
-                       select new { unlockRequest, unlockRequestApr};
+                       select new { unlockRequest, unlockRequestApr };
             var result = data.Where(x =>
                 (
                     permissionRangeRequester == PermissionRange.None ? false : true
@@ -454,7 +453,8 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Leader == currentUser.UserID
                   || x.unlockRequestApr.LeaderApr == currentUser.UserID
-                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Leader ?? null, x.unlockRequest.GroupId, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Leader, x.unlockRequest.GroupId, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                )
                 && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
@@ -465,7 +465,8 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Manager == currentUser.UserID
                   || x.unlockRequestApr.ManagerApr == currentUser.UserID
-                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager ?? null, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  )
                 && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
@@ -477,7 +478,8 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Accountant == currentUser.UserID
                   || x.unlockRequestApr.AccountantApr == currentUser.UserID
-                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  )
                 && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
@@ -490,7 +492,8 @@ namespace eFMS.API.Setting.DL.Services
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Buhead == currentUser.UserID
                   || x.unlockRequestApr.BuheadApr == currentUser.UserID
-                  || userBaseService.GetUsersDeputyByCondition(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId).Any())
+                  || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
+                  )
                 && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
@@ -503,7 +506,7 @@ namespace eFMS.API.Setting.DL.Services
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.unlockRequest);
 
-            return result.AsQueryable();                
+            return result;
         }
 
         public IQueryable<UnlockRequestResult> GetData(UnlockRequestCriteria criteria)
@@ -579,11 +582,11 @@ namespace eFMS.API.Setting.DL.Services
                 detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
                 var unlockApprove = setUnlockRequestApproveRepo.Get(x => x.UnlockRequestId == id && x.IsDeny == false).FirstOrDefault();
 
-                detail.IsRequester = (currentUser.UserID == unlockRequest.Requester 
-                    && currentUser.GroupId == unlockRequest.GroupId 
-                    && currentUser.DepartmentId == unlockRequest.DepartmentId 
-                    && currentUser.OfficeID == unlockRequest.OfficeId 
-                    && currentUser.CompanyID == unlockRequest.CompanyId)  ? true : false;                
+                detail.IsRequester = (currentUser.UserID == unlockRequest.Requester
+                    && currentUser.GroupId == unlockRequest.GroupId
+                    && currentUser.DepartmentId == unlockRequest.DepartmentId
+                    && currentUser.OfficeID == unlockRequest.OfficeId
+                    && currentUser.CompanyID == unlockRequest.CompanyId) ? true : false;
                 detail.IsManager = unlockRequestApproveService.CheckUserIsManager(currentUser, unlockRequest, unlockApprove);
                 detail.IsApproved = unlockRequestApproveService.CheckUserIsApproved(currentUser, unlockRequest, unlockApprove);
                 detail.IsShowBtnDeny = unlockRequestApproveService.CheckIsShowBtnDeny(currentUser, unlockRequest, unlockApprove);

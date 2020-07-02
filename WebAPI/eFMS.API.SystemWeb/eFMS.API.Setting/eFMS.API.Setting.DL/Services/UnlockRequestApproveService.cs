@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -270,7 +269,7 @@ namespace eFMS.API.Setting.DL.Services
                                     unlockApprove.ManagerApr = userCurrent;
                                     unlockApprove.ManagerAprDate = DateTime.Now;
                                 }
-                                if(accountantLevel.Role != "None")
+                                if (accountantLevel.Role != "None")
                                 {
                                     unlockApprove.AccountantApr = userCurrent;
                                     unlockApprove.AccountantAprDate = DateTime.Now;
@@ -284,6 +283,12 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             //Send Mail Approved
                             sendMailApproved = SendMailApprove(unlockRequest, DateTime.Now);
+                            if (sendMailApproved)
+                            {
+                                //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
+                                var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
+                                UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
+                            }
                         }
                         else
                         {
@@ -298,12 +303,6 @@ namespace eFMS.API.Setting.DL.Services
                         if (!sendMailApproved)
                         {
                             return new HandleState("Send mail approved approval failed");
-                        }
-                        else
-                        {
-                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
-                            var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
-                            UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
                         }
 
                         var checkExistsApproveByUnlockRequestId = DataContext.Get(x => x.UnlockRequestId == approve.UnlockRequestId && x.IsDeny == false).FirstOrDefault();
@@ -326,7 +325,13 @@ namespace eFMS.API.Setting.DL.Services
                             var hsUpdateApprove = DataContext.Update(checkExistsApproveByUnlockRequestId, x => x.Id == checkExistsApproveByUnlockRequestId.Id);
                         }
 
+                        opsTransactionRepo.SubmitChanges();
+                        csTransactionRepo.SubmitChanges();
                         unlockRequestRepo.SubmitChanges();
+                        advancePaymentRepo.SubmitChanges();
+                        settlementPaymentRepo.SubmitChanges();
+                        approveAdvanceRepo.SubmitChanges();
+                        approveSettlementRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
 
@@ -383,7 +388,7 @@ namespace eFMS.API.Setting.DL.Services
             result.UserDeputies = userDeputies;
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
             result.EmailDeputies = emailDeputies;
-            
+
             return result;
         }
 
@@ -403,7 +408,7 @@ namespace eFMS.API.Setting.DL.Services
             result.UserDeputies = userDeputies;
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
             result.EmailDeputies = emailDeputies;
-            
+
             return result;
         }
 
@@ -423,7 +428,7 @@ namespace eFMS.API.Setting.DL.Services
             result.UserDeputies = userDeputies;
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
             result.EmailDeputies = emailDeputies;
-            
+
             return result;
         }
 
@@ -443,7 +448,7 @@ namespace eFMS.API.Setting.DL.Services
             result.UserDeputies = userDeputies;
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
             result.EmailDeputies = emailDeputies;
-            
+
             return result;
         }
         #endregion -- Info Level Approve --
@@ -1000,6 +1005,12 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         //Send Mail Approved
                         sendMailApproved = SendMailApprove(unlockRequest, DateTime.Now);
+                        if (sendMailApproved)
+                        {
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
+                            var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
+                            UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
+                        }
                     }
                     else
                     {
@@ -1015,18 +1026,19 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return new HandleState("Send mail Approved Approval failed");
                     }
-                    else
-                    {
-                        //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
-                        var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
-                        UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
-                    }
 
                     unlockRequest.UserModified = approve.UserModified = userCurrent;
                     unlockRequest.DatetimeModified = approve.DatetimeModified = DateTime.Now;
 
                     var hsUpdateUnlockRequest = unlockRequestRepo.Update(unlockRequest, x => x.Id == unlockRequest.Id, false);
-                    var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id);
+                    var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id, false);
+
+                    opsTransactionRepo.SubmitChanges();
+                    csTransactionRepo.SubmitChanges();
+                    advancePaymentRepo.SubmitChanges();
+                    settlementPaymentRepo.SubmitChanges();
+                    approveAdvanceRepo.SubmitChanges();
+                    approveSettlementRepo.SubmitChanges();
 
                     unlockRequestRepo.SubmitChanges();
                     DataContext.SubmitChanges();
@@ -1736,11 +1748,11 @@ namespace eFMS.API.Setting.DL.Services
                     UpdatedUnlockSettlement(id, jobs);
                     break;
             }
-        } 
+        }
 
         private void UpdatedUnlockShipmentOrChangeServiceDate(Guid id, string type, List<string> jobs, DateTime? newServiceDate)
-        {            
-            foreach(var job in jobs)
+        {
+            foreach (var job in jobs)
             {
                 var ops = opsTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
                 if (ops != null)
@@ -1760,7 +1772,14 @@ namespace eFMS.API.Setting.DL.Services
                 else
                 {
                     var doc = csTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
-                    doc.IsLocked = false;
+                    if (type == "Shipment")
+                    {
+                        doc.IsLocked = false;
+                    }
+                    if (type == "Change Service Date")
+                    {
+                        doc.ServiceDate = newServiceDate;
+                    }
                     doc.UserModified = currentUser.UserID;
                     doc.DatetimeModified = DateTime.Now;
                     csTransactionRepo.Update(doc, x => x.Id == doc.Id, false);
@@ -1770,7 +1789,7 @@ namespace eFMS.API.Setting.DL.Services
 
         private void UpdatedUnlockAdvance(Guid id, List<string> jobs)
         {
-            foreach(var job in jobs)
+            foreach (var job in jobs)
             {
                 var adv = advancePaymentRepo.Get(x => x.AdvanceNo == job).FirstOrDefault();
                 adv.StatusApproval = SettingConstants.STATUS_APPROVAL_DENIED;
@@ -1801,7 +1820,7 @@ namespace eFMS.API.Setting.DL.Services
                 approveSettlementRepo.Update(aprSettle, x => x.Id == aprSettle.Id, false);
             }
         }
-        
+
         #endregion -- UPDATED UNLOCK SHIPMENT, ADVANCE, SETTLEMENT, CHANGE SERVICE DATE --
     }
 }

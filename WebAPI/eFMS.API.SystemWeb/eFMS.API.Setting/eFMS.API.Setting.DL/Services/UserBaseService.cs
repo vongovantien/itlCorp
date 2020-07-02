@@ -8,7 +8,6 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -55,7 +54,7 @@ namespace eFMS.API.Setting.DL.Services
             var infoGrpOfUser = sysGroupRepo.Get(x => x.Id == grpIdOfUser).FirstOrDefault();
             return infoGrpOfUser;
         }
-        
+
         //Lấy Info Dept của User
         public CatDepartment GetInfoDeptOfUser(int? departmentId)
         {
@@ -63,6 +62,7 @@ namespace eFMS.API.Setting.DL.Services
             return deptOfUser;
         }
 
+        #region -- LEADER, MANAGER, ACCOUNTANT, BOD --
         public List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId)
         {
             var leaders = sysUserLevelRepo.Get(x => x.Position == SettingConstants.PositionManager
@@ -97,7 +97,7 @@ namespace eFMS.API.Setting.DL.Services
                                                     .Select(s => s.UserId).ToList();
             return accountants;
         }
-        
+
         public List<string> GetBUHead(Guid? companyId, Guid? officeId)
         {
             var buHeads = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
@@ -107,6 +107,7 @@ namespace eFMS.API.Setting.DL.Services
                                                     && x.CompanyId == companyId).Select(s => s.UserId).ToList();
             return buHeads;
         }
+        #endregion -- LEADER, MANAGER, ACCOUNTANT, BOD --
 
         //Lấy ra employeeId của User
         public string GetEmployeeIdOfUser(string userId)
@@ -133,44 +134,19 @@ namespace eFMS.API.Setting.DL.Services
         {
             var isAccountantDept = catDepartmentRepo.Get(x => x.DeptType == SettingConstants.DeptTypeAccountant && x.Id == deptId).Any();
             return isAccountantDept;
-        }       
+        }
 
         public bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId)
         {
             var isBod = sysUserLevelRepo.Get(x => x.GroupId == SettingConstants.SpecialGroup
-                                                    && x.DepartmentId == null                                                    
+                                                    && x.DepartmentId == null
                                                     && x.OfficeId != null
                                                     && x.CompanyId != null
-                                                    && x.DepartmentId == departmentId 
+                                                    && x.DepartmentId == departmentId
                                                     && x.OfficeId == officeId
                                                     && x.CompanyId == companyId
                                                     ).Select(s => s.UserId).Any();
             return isBod;
-        }
-
-        //Lấy ra ds các user được ủy quyền theo nhóm leader, manager department, accountant manager, BUHead dựa vào dept
-        public List<string> GetListUserDeputyByDept(string dept)
-        {
-            return null;
-        }
-
-        public bool CheckDeputyManagerByUser(int? departmentId, string userId)
-        {
-            var result = false;
-            return result;
-        }
-
-        public bool CheckDeputyAccountantByUser(int? departmentId, string userId)
-        {
-            var result = false;
-            //Lấy ra dept code của user dựa vào user
-            var deptCodeOfUser = GetInfoDeptOfUser(departmentId)?.Code;
-            var deptTypeOfDept = GetInfoDeptOfUser(departmentId)?.DeptType;
-            if (!string.IsNullOrEmpty(deptCodeOfUser) && deptTypeOfDept == SettingConstants.DeptTypeAccountant)
-            {
-                result = GetListUserDeputyByDept(deptCodeOfUser).Contains(userId) ? true : false;
-            }
-            return result;
         }
 
         #region --- SETTING FLOW UNLOCK ---
@@ -213,6 +189,7 @@ namespace eFMS.API.Setting.DL.Services
         }
         #endregion  --- AUTHOIRIZED APPROVAL ---
 
+        #region -- DEPUTY USER --
         public bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var result = false;
@@ -233,11 +210,12 @@ namespace eFMS.API.Setting.DL.Services
 
         public List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
+            var userDeputies = new List<string>();
+            if (string.IsNullOrEmpty(userId)) return userDeputies;
             var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
             //Get list user authorized of user
             var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId);
 
-            var userDeputies = new List<string>();
             foreach (var userAuth in userAuthorizedApprovals)
             {
                 var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
@@ -264,5 +242,13 @@ namespace eFMS.API.Setting.DL.Services
             }
             return emailUserDeputies;
         }
+
+        public bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            return deputies.Any();
+        }
+
+        #endregion -- DEPUTY USER --
     }
 }
