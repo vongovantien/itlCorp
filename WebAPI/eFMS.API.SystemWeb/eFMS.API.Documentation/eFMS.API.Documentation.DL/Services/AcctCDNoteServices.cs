@@ -705,7 +705,9 @@ namespace eFMS.API.Documentation.DL.Services
             CustomsDeclaration _clearance = null;
             if (_customClearances.Count() > 0 || _customClearances != null)
             {
-                _clearance = _customClearances.OrderByDescending(x => x.ClearanceDate)?.FirstOrDefault();
+                var orderClearance = _customClearances.OrderBy(x => x.ClearanceDate);
+                _clearance = orderClearance.FirstOrDefault();
+
             }
 
             var parameter = new AcctSOAReportParams
