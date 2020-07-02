@@ -41,6 +41,8 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysOffice> sysOfficeRepo;
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
+        IContextBase<CustomsDeclaration> customsDeclarationRepository;
+
         //IOpsTransactionService opsTransactionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -63,6 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             ICsShipmentSurchargeService surcharge,
             ICsTransactionDetailService transDetailService,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             //IOpsTransactionService opsTransService
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
@@ -88,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionDetailService = transDetailService;
             //opsTransactionService = opsTransService;
             currencyExchangeService = currencyExchange;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -697,6 +701,15 @@ namespace eFMS.API.Documentation.DL.Services
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
 
+            IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == model.JobNo);
+            CustomsDeclaration _clearance = null;
+            if (_customClearances.Count() > 0 || _customClearances != null)
+            {
+                var orderClearance = _customClearances.OrderBy(x => x.ClearanceDate);
+                _clearance = orderClearance.FirstOrDefault();
+
+            }
+
             var parameter = new AcctSOAReportParams
             {
                 DBTitle = "N/A",
@@ -800,13 +813,14 @@ namespace eFMS.API.Documentation.DL.Services
                         GW = model.GW,
                         NW = null,
                         SeaCBM = model.CBM,
-                        SOTK = "N/A",
+                        SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),
                         TransDate = null,
                         Unit = item.CurrencyId,
-                        UnitPieaces = "N/A"
+                        UnitPieaces = "N/A",
+                        CustomDate = _clearance?.ClearanceDate
                     };
                     listSOA.Add(acctCDNo);
                 }
