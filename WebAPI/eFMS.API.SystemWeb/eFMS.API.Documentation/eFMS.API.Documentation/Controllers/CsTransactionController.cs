@@ -449,6 +449,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
+        [Authorize]
         [Route("PreviewShipmentCoverPage")]
         public IActionResult PreviewShipmentCoverPage(Guid id)
         {
