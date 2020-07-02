@@ -7,8 +7,8 @@ export class DIM {
     height: number = null;
     package: number = null;
     hw: number = null;
-    mblId: string = SystemConstants.EMPTY_GUID;
-    hblId: string = SystemConstants.EMPTY_GUID;
+    mblid: string = SystemConstants.EMPTY_GUID;
+    hblid: string = SystemConstants.EMPTY_GUID;
     airWayBillId: string = SystemConstants.EMPTY_GUID;
 
     // * Custom

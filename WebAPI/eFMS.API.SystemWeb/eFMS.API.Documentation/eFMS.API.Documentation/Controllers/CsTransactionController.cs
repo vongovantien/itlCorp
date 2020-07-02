@@ -423,7 +423,15 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult SyncShipmentByAirWayBill(Guid id, csTransactionSyncAirWayBill model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var result = csTransactionService.SyncShipmentByAirWayBill(id, model);
+            HandleState hs = csTransactionService.SyncShipmentByAirWayBill(id, model);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
 
