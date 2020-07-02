@@ -68,9 +68,10 @@ namespace eFMS.API.Setting.DL.Services
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
         private List<SetUnlockRequestJobModel> GetAdvance(UnlockJobCriteria criteria)
         {
+            //Only Advance Payment has Status Approval is DONE
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.Advances == null || criteria.Advances.Count == 0) return result;
-            var data = advancePaymentRepo.Get(x => criteria.Advances.Where(w => !string.IsNullOrEmpty(w)).Contains(x.AdvanceNo)).Select(s => new SetUnlockRequestJobModel()
+            var data = advancePaymentRepo.Get(x => criteria.Advances.Where(w => x.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE && !string.IsNullOrEmpty(w)).Contains(x.AdvanceNo)).Select(s => new SetUnlockRequestJobModel()
             {
                 UnlockName = s.AdvanceNo,
                 Job = s.AdvanceNo,
@@ -81,9 +82,10 @@ namespace eFMS.API.Setting.DL.Services
 
         private List<SetUnlockRequestJobModel> GetSettlement(UnlockJobCriteria criteria)
         {
+            //Only Settlement Payment has Status Approval is DONE
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.Settlements == null || criteria.Settlements.Count == 0) return result;
-            var data = settlementPaymentRepo.Get(x => criteria.Settlements.Where(w => !string.IsNullOrEmpty(w)).Contains(x.SettlementNo)).Select(s => new SetUnlockRequestJobModel()
+            var data = settlementPaymentRepo.Get(x => criteria.Settlements.Where(w => x.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE && !string.IsNullOrEmpty(w)).Contains(x.SettlementNo)).Select(s => new SetUnlockRequestJobModel()
             {
                 UnlockName = s.SettlementNo,
                 Job = s.SettlementNo,

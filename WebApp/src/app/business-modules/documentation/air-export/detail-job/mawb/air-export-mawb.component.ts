@@ -180,6 +180,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         this.isUpdate = true;
                         this.otherCharges = res.otherCharges;
                         this.dimensionDetails = res.dimensionDetails;
+                        console.log(this.dimensionDetails);
 
                         this._store.dispatch(new GetShipmentOtherChargeSuccessAction(this.otherCharges));
                         this._store.dispatch(new GetDimensionSuccessAction(this.dimensionDetails));

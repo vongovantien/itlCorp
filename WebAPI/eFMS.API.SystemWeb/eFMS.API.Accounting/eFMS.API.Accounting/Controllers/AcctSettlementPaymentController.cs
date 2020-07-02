@@ -285,6 +285,16 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                var isDuplicateCharge = model.ShipmentCharge.Where(x =>
+                    !string.IsNullOrEmpty(x.ClearanceNo)
+                    || !string.IsNullOrEmpty(x.ContNo)
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.ClearanceNo, x.ContNo, x.InvoiceNo }).Where(w => w.Skip(1).Any()).Any();
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    return BadRequest(_result);
+                }
+
                 foreach (var item in model.ShipmentCharge)
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
@@ -358,6 +368,16 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                var isDuplicateCharge = model.ShipmentCharge.Where(x =>
+                    !string.IsNullOrEmpty(x.ClearanceNo)
+                    || !string.IsNullOrEmpty(x.ContNo) 
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.ClearanceNo, x.ContNo, x.InvoiceNo }).Where(w => w.Skip(1).Any()).Any();
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    return BadRequest(_result);
+                }
+
                 foreach (var item in model.ShipmentCharge)
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
@@ -374,6 +394,7 @@ namespace eFMS.API.Accounting.Controllers
                         HBLNo = item.HBL,
                         JobNo = item.JobId
                     };
+                    
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment);
                     if (_checkDuplicate.Status)
                     {
@@ -419,6 +440,15 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                var isDuplicateCharge = model.ShipmentCharge.Where(x =>
+                    !string.IsNullOrEmpty(x.ClearanceNo)
+                    || !string.IsNullOrEmpty(x.ContNo)
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.ClearanceNo, x.ContNo, x.InvoiceNo }).Where(w => w.Skip(1).Any()).Any();
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicated charge" };
+                    return BadRequest(_result);
+                }
                 foreach (var item in model.ShipmentCharge)
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria

@@ -1,4 +1,5 @@
 AirlineAbbrName	String	255
+CarrierNameEn	String	255
 MAWB	String	255	
 HWBNO	String	50
 MBLNO1	String	50

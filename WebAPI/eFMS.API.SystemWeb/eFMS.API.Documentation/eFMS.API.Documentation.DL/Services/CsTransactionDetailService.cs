@@ -1092,11 +1092,12 @@ namespace eFMS.API.Documentation.DL.Services
                         if (item.CreditNo != null || item.DebitNo != null || item.Soano != null)
                         {
                             isSOA = true;
+                            break;
                         }
                     }
                     if (isSOA == true)
                     {
-                        hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA]);
                     }
                     else
                     {

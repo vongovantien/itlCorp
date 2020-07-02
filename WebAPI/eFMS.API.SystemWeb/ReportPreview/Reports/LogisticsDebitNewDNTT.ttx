@@ -51,3 +51,5 @@ SOTK	String	50
 NgayDK	Date		
 CuaKhau	String	255	
 DeliveryPlace	String	255	
+CustomDate	Date	
+

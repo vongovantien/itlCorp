@@ -234,6 +234,12 @@
                                                 <input type="text" class="form-control" [(ngModel)]="charge.notes">
                                             </div>
                                         </td>
+                                        <td>
+                                            <div class="form-group "
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicatedContNo}">
+                                                <input type="text" class="form-control" [(ngModel)]="charge.contNo">
+                                            </div>
+                                        </td>
                                     </tr>
                                 </ng-container>
                                 <tr app-table-none-record *ngIf="!charges.length">

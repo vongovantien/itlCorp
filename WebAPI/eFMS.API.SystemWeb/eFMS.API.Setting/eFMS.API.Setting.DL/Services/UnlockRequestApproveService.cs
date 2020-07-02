@@ -67,10 +67,10 @@ namespace eFMS.API.Setting.DL.Services
                 unlockApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Buhead)?.EmployeeNameVn;
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
                 unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
-                unlockApproveModel.IsShowLeader = userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowManager = userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowAccountant = userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
-                unlockApproveModel.IsShowBuHead = userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowLeader = !string.IsNullOrEmpty(unlockApprove.Leader);//userBaseService.GetRoleByLevel("Leader", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowManager = !string.IsNullOrEmpty(unlockApprove.Manager);//userBaseService.GetRoleByLevel("Manager", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowAccountant = !string.IsNullOrEmpty(unlockApprove.Accountant);//userBaseService.GetRoleByLevel("Accountant", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
+                unlockApproveModel.IsShowBuHead = !string.IsNullOrEmpty(unlockApprove.Buhead);//userBaseService.GetRoleByLevel("BOD", unlockRequest?.UnlockType, unlockRequest.OfficeId) != "None" ? true : false;
             }
             else
             {
@@ -201,6 +201,13 @@ namespace eFMS.API.Setting.DL.Services
                                 unlockApprove.AccountantApr = userCurrent;
                                 unlockApprove.AccountantAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = "Accountant";
+                                if (buHeadLevel.Role == "Special")
+                                {
+                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                    unlockApprove.BuheadApr = unlockApprove.AccountantApr = userCurrent;
+                                    unlockApprove.BuheadAprDate = unlockApprove.AccountantAprDate = DateTime.Now;
+                                    unlockApprove.LevelApprove = "BOD";
+                                }
                             }
                             if (accountantLevel.Role == "Approval"
                                 && managerLevel.Role != "Approval"
@@ -235,6 +242,28 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
+                            if (buHeadLevel.Role == "Special" && (leaderLevel.Role == "None" || leaderLevel.Role == "Auto") && (managerLevel.Role == "None" || managerLevel.Role == "Auto") && (accountantLevel.Role == "None" || accountantLevel.Role == "Auto"))
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                unlockApprove.BuheadApr = userCurrent;
+                                unlockApprove.BuheadAprDate = DateTime.Now;
+                                unlockApprove.LevelApprove = "BOD";
+                                if (leaderLevel.Role != "None")
+                                {
+                                    unlockApprove.LeaderApr = userCurrent;
+                                    unlockApprove.LeaderAprDate = DateTime.Now;
+                                }
+                                if (managerLevel.Role != "None")
+                                {
+                                    unlockApprove.ManagerApr = userCurrent;
+                                    unlockApprove.ManagerAprDate = DateTime.Now;
+                                }
+                                if(accountantLevel.Role != "None")
+                                {
+                                    unlockApprove.AccountantApr = userCurrent;
+                                    unlockApprove.AccountantAprDate = DateTime.Now;
+                                }
+                            }
                         }
 
                         var sendMailApproved = true;
@@ -260,7 +289,7 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = New; Change Service Date: Update SeviceDate = New Service Date
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denied; Change Service Date: Update SeviceDate = New Service Date
 
                         }
 
@@ -308,6 +337,40 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         #region -- Info Level Approve --
+        private List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
+            //Get list user authorized of user leader
+            var userAuthorizedApprovals = userBaseService.GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId);
+
+            var userDeputies = new List<string>();
+            foreach (var userAuth in userAuthorizedApprovals)
+            {
+                var isSame = userBaseService.CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);                
+                if (isSame)
+                {
+                    userDeputies.Add(userAuth);
+                }
+            }
+            return userDeputies;
+        }
+
+        private List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            var emailUserDeputies = new List<string>();
+            foreach(var user in users)
+            {
+                var employeeIdOfUser = userBaseService.GetEmployeeIdOfUser(user);
+                var email = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    emailUserDeputies.Add(email);
+                }
+            }
+            return emailUserDeputies;
+        }
+
         public bool CheckAllLevelIsAutoOrNone(string type, Guid? officeId)
         {
             var roleLeader = userBaseService.GetRoleByLevel("Leader", type, officeId);
@@ -332,35 +395,16 @@ namespace eFMS.API.Setting.DL.Services
             var userLeader = userBaseService.GetLeaderGroup(companyId, officeId, departmentId, groupId).FirstOrDefault();
             var employeeIdOfLeader = userBaseService.GetEmployeeIdOfUser(userLeader);
 
-            switch (roleLeader)
-            {
-                case "None":
-                    result.LevelApprove = "Leader";
-                    result.Role = "None";
-                    result.UserId = userLeader;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Auto":
-                    result.LevelApprove = "Leader";
-                    result.Role = "Auto";
-                    result.UserId = userLeader;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Approval":
-                    result.LevelApprove = "Leader";
-                    result.Role = "Approval";
-                    result.UserId = userLeader;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                default:
-                    break;
-            }
+            var userDeputies = GetUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+            var emailDeputies = GetEmailUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+
+            result.LevelApprove = "Leader";
+            result.Role = roleLeader;
+            result.UserId = userLeader;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
+            result.EmailDeputies = emailDeputies;
+            
             return result;
         }
 
@@ -371,35 +415,16 @@ namespace eFMS.API.Setting.DL.Services
             var userManager = userBaseService.GetDeptManager(companyId, officeId, departmentId).FirstOrDefault();
             var employeeIdOfManager = userBaseService.GetEmployeeIdOfUser(userManager);
 
-            switch (roleManager)
-            {
-                case "None":
-                    result.LevelApprove = "Manager";
-                    result.Role = "None";
-                    result.UserId = userManager;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Auto":
-                    result.LevelApprove = "Manager";
-                    result.Role = "Auto";
-                    result.UserId = userManager;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Approval":
-                    result.LevelApprove = "Manager";
-                    result.Role = "Approval";
-                    result.UserId = userManager;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                default:
-                    break;
-            }
+            var userDeputies = GetUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+            var emailDeputies = GetEmailUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+
+            result.LevelApprove = "Manager";
+            result.Role = roleManager;
+            result.UserId = userManager;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
+            result.EmailDeputies = emailDeputies;
+            
             return result;
         }
 
@@ -410,35 +435,16 @@ namespace eFMS.API.Setting.DL.Services
             var userAccountant = userBaseService.GetAccoutantManager(companyId, officeId).FirstOrDefault();
             var employeeIdOfAccountant = userBaseService.GetEmployeeIdOfUser(userAccountant);
 
-            switch (roleAccountant)
-            {
-                case "None":
-                    result.LevelApprove = "Accountant";
-                    result.Role = "None";
-                    result.UserId = userAccountant;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Auto":
-                    result.LevelApprove = "Accountant";
-                    result.Role = "Auto";
-                    result.UserId = userAccountant;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Approval":
-                    result.LevelApprove = "Accountant";
-                    result.Role = "Approval";
-                    result.UserId = userAccountant;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                default:
-                    break;
-            }
+            var userDeputies = GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            var emailDeputies = GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+
+            result.LevelApprove = "Accountant";
+            result.Role = roleAccountant;
+            result.UserId = userAccountant;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
+            result.EmailDeputies = emailDeputies;
+            
             return result;
         }
 
@@ -449,43 +455,16 @@ namespace eFMS.API.Setting.DL.Services
             var userBuHead = userBaseService.GetBUHead(companyId, officeId).FirstOrDefault();
             var employeeIdOfBuHead = userBaseService.GetEmployeeIdOfUser(userBuHead);
 
-            switch (roleBuHead)
-            {
-                case "None":
-                    result.LevelApprove = "BOD";
-                    result.Role = "None";
-                    result.UserId = userBuHead;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Auto":
-                    result.LevelApprove = "BOD";
-                    result.Role = "Auto";
-                    result.UserId = userBuHead;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Approval":
-                    result.LevelApprove = "BOD";
-                    result.Role = "Approval";
-                    result.UserId = userBuHead;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                case "Special":
-                    result.LevelApprove = "BOD";
-                    result.Role = "Special";
-                    result.UserId = userBuHead;
-                    result.UserDeputies = new List<string>();
-                    result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
-                    result.EmailDeputies = new List<string>();
-                    break;
-                default:
-                    break;
-            }
+            var userDeputies = GetUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+            var emailDeputies = GetEmailUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+
+            result.LevelApprove = "BOD";
+            result.Role = roleBuHead;
+            result.UserId = userBuHead;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
+            result.EmailDeputies = emailDeputies;
+            
             return result;
         }
         #endregion -- Info Level Approve --
@@ -727,11 +706,10 @@ namespace eFMS.API.Setting.DL.Services
             var isShowBtnDeny = false;
 
             if (
-                        ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
-                      ||
-                        leaderLevel.UserDeputies.Contains(userCurrent.UserID))
-
-                    ) //Leader
+                 ((isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                 ||
+                 leaderLevel.UserDeputies.Contains(userCurrent.UserID))
+               ) //Leader
             {
                 if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED)
                 {
@@ -749,7 +727,7 @@ namespace eFMS.API.Setting.DL.Services
 
                     ) //Dept Manager
             {
-                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED && leaderLevel.Role != "None"))
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_LEADERAPPROVED || (leaderLevel.Role == "None" && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))
                 {
                     isShowBtnDeny = true;
                 }
@@ -764,7 +742,7 @@ namespace eFMS.API.Setting.DL.Services
                         accountantLevel.UserDeputies.Contains(currentUser.UserID))
                     ) //Accountant Manager
             {
-                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED && managerLevel.Role != "None"))
+                if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED || (managerLevel.Role == "None" && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE))
                 {
                     isShowBtnDeny = true;
                 }
@@ -780,7 +758,7 @@ namespace eFMS.API.Setting.DL.Services
                   ||
                   buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
                 )
-                && unlockRequest.StatusApproval != "New" && unlockRequest.StatusApproval != "Denied" && unlockRequest.StatusApproval != "Done"
+                && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DONE
                )
             {
                 isShowBtnDeny = true;

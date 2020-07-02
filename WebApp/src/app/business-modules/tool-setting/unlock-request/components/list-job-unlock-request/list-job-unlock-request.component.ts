@@ -15,6 +15,7 @@ export class UnlockRequestListJobComponent extends AppList implements OnInit {
     @ViewChild(UnlockRequestInputSearchJobPopupComponent, { static: false }) inputSearchJobPopup: UnlockRequestInputSearchJobPopupComponent;
     @ViewChild(UnlockRequestInputSearchSettlementAdvancePopupComponent, { static: false }) inputSearchSettlementAdvancePopup: UnlockRequestInputSearchSettlementAdvancePopupComponent;
     @Input() unlockType: CommonEnum.UnlockTypeEnum;
+    @Input() state: string = 'update';
 
     dataJobs: SetUnlockRequestJobModel[] = [];
 

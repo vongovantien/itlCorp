@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Cuakhau { get; set; }
         public string DeliveryPlace { get; set; }
         public DateTime? NgayDK { get; set; }
-            
+        public DateTime? CustomDate { get; set; }
     }
 
 
