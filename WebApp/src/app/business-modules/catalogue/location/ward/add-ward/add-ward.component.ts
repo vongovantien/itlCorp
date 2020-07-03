@@ -74,7 +74,7 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
             districtID: ['', Validators.compose([
                 Validators.required
             ])],
-            active: [],
+            active: [true],
             id: [],
         });
         this.code = this.formAddWard.controls['code'];
