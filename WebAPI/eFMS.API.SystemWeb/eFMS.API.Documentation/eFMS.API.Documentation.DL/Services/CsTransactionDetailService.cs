@@ -1372,7 +1372,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         var packageUnit = catUnitRepo.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
-                        _pkgsConts += cont.PackageQuantity + " " + packageUnit.UnitNameEn + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
+                        _pkgsConts += cont.PackageQuantity + " " + packageUnit.UnitNameEn?.ToUpper() + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
                     }         
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
