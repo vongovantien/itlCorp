@@ -224,7 +224,7 @@ namespace eFMS.API.Documentation.DL.Services
                 parameter.TotalPackages = listConts.Sum(t => t.PackageQuantity)?.ToString() + " PKG(S)";
                 result = new Crystal
                 {
-                    ReportName = "SeaShippingInstructionContFCL.rpt",
+                    ReportName = "SeaShippingInstructionCont.rpt",
                     AllowPrint = true,
                     AllowExport = true
                 };
@@ -262,6 +262,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
+                int? totalPackages = 0;
                 foreach (var item in listConts)
                 {
                     var PackageType = catUnitRepository.Get(x => x.Id == item.Key).Select(t => t.UnitNameEn).FirstOrDefault();
@@ -292,12 +293,13 @@ namespace eFMS.API.Documentation.DL.Services
                         ShippingMarkImport = string.Empty,
                         MaskNos = string.Empty
                     };
+                    totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
                 }
-                parameter.TotalPackages = listConts.Sum(t => Convert.ToInt16(t.Select(x=>x.PackageQuantity))).ToString() + " PKG(S)";
+                parameter.TotalPackages = totalPackages?.ToString() +  " PKG(S)";
                 result = new Crystal
                 {
-                    ReportName = "SeaShippingInstructionContFCL.rpt",
+                    ReportName = "SeaShippingInstructionCont.rpt",
                     AllowPrint = true,
                     AllowExport = true
                 };
