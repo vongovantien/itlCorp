@@ -875,20 +875,27 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
-                model.PaymentDueDate = model.Date?? model.Date.Value.AddDays(30);
-                var accounting = mapper.Map<AccAccountingManagement>(model);
+
+                DateTime? dueDate = null;
+                if(model.Date.HasValue)
+                {
+                    dueDate = model.Date.Value.AddDays(30);
+                }
+                //model.PaymentDueDate = model.Date ?? model.Date.Value.AddDays(30);
+                model.PaymentDueDate = dueDate;
+                AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        var hs = DataContext.Add(accounting);
+                        HandleState hs = DataContext.Add(accounting);
                         if (hs.Success)
                         {
-                            var chargesOfAcct = model.Charges;
+                            List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
                             foreach (var chargeOfAcct in chargesOfAcct)
                             {
-                                var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
+                                CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
