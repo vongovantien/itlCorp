@@ -239,6 +239,79 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
+        public Crystal PreviewLCLContShippingInstruction(CsShippingInstructionReportConstModel model)
+        {
+            if (model.CsTransactionDetails.Any())
+            {
+                var Conts = containerRepository.Get();
+                var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString())).GroupBy(x=>x.PackageTypeId);
+                if (!listConts.Any()) return null;
+                Crystal result = new Crystal();
+                var instructions = new List<SeaShippingInstruction>();
+                var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
+                string jobNo = opsTrans?.JobNo;
+                var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                var parameter = new SeaShippingInstructionParameter
+                {
+                    CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
+                    CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                    CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                    CompanyDescription = string.Empty,
+                    Contact = model.IssuedUserName ?? string.Empty,
+                    Tel = office?.Tel ?? string.Empty,
+                    Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                    DecimalNo = 2
+                };
+                foreach (var item in listConts)
+                {
+                    var PackageType = catUnitRepository.Get(x => x.Id == item.Key).Select(t => t.UnitNameEn).FirstOrDefault();
+                    var instruction = new SeaShippingInstruction
+                    {
+                        TRANSID = jobNo,
+                        Attn = model.InvoiceNoticeRecevier,
+                        ToPartner = model.SupplierName,
+                        Re = model.BookingNo,
+                        DatePackage = model.InvoiceDate,
+                        ShipperDf = model.Shipper,
+                        GoodsDelivery = model.ConsigneeDescription,
+                        NotitfyParty = model.CargoNoticeRecevier,
+                        PortofLoading = model.PolName,
+                        PortofDischarge = model.PodName,
+                        PlaceDelivery = model.PoDelivery,
+                        Vessel = model.VoyNo,
+                        Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
+                        ShippingMarks = string.Empty,
+                        Containers = "A Part Of Container",
+                        NoofPeace =  item.Sum(t => t.PackageQuantity) + " " + PackageType,
+                        SIDescription = model.GoodsDescription,
+                        GrossWeight = item.Sum(t=>t.Gw),
+                        CBM = item.Sum(t=>t.Cbm),
+                        Qty = string.Empty,
+                        RateRequest = model.Remark,
+                        Payment = model.PaymenType,
+                        ShippingMarkImport = string.Empty,
+                        MaskNos = string.Empty
+                    };
+                    instructions.Add(instruction);
+                }
+                parameter.TotalPackages = listConts.Sum(t => Convert.ToInt16(t.Select(x=>x.PackageQuantity))).ToString() + " PKG(S)";
+                result = new Crystal
+                {
+                    ReportName = "SeaShippingInstructionContFCL.rpt",
+                    AllowPrint = true,
+                    AllowExport = true
+                };
+                result.AddDataSource(instructions);
+                result.FormatType = ExportFormatType.PortableDocFormat;
+                result.SetParameter(parameter);
+                return result;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private string GetUnitNameById(short? id)
         {
             var result = string.Empty;

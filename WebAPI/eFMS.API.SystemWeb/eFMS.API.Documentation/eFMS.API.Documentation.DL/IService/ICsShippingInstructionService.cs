@@ -12,9 +12,11 @@ namespace eFMS.API.Documentation.DL.IService
         CsShippingInstructionModel GetById(Guid jobId);
         HandleState AddOrUpdate(CsShippingInstructionModel model);
         Crystal PreviewFCLShippingInstruction(CsShippingInstructionReportModel model);
+        Crystal PreviewFCLContShippingInstruction(CsShippingInstructionReportConstModel model);
+        Crystal PreviewLCLContShippingInstruction(CsShippingInstructionReportConstModel model);
         Crystal PreviewOCL(CsShippingInstructionReportModel model);
         Crystal PreviewFCLShippingInstructionByJobId(Guid jobId);
         Crystal PreviewSISummary(CsShippingInstructionReportModel model);
-        Crystal PreviewFCLContShippingInstruction(CsShippingInstructionReportConstModel model);
+
     }
 }
