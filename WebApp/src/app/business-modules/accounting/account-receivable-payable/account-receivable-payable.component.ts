@@ -29,17 +29,16 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     }
 
     ngAfterViewInit() {
-        this.dataSearch.paymentStatus = [];
+        this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
         this.invoiceListComponent.dataSearch = this.dataSearch;
         this.obhSOAListComponent.dataSearch = this.dataSearch;
 
         this.invoiceListComponent.getPagingData();
     }
 
-    onSelectTabLocation(tabname) {
+    onSelectTabLocation(tabname: string) {
         this.selectedTab = tabname;
         this.dataSearch.paymentType = this.getPaymentType();
-        // this.dataSearch.paymentStatus = [];
 
         if (tabname === 'OBH') {
             this.obhSOAListComponent.dataSearch = this.dataSearch;
@@ -73,13 +72,15 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     }
 
     requestSearchShipment() {
-        //console.log(this.dataSearch);
         this._progressRef.start();
+        this.invoiceListComponent.isLoading = true;
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
+                    this.invoiceListComponent.isLoading = false;
+
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
@@ -90,19 +91,15 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
                     } else {
                         this.obhSOAListComponent.refPaymens = res.data || [];
                         this.obhSOAListComponent.totalItems = res.totalItems;
-
-                        //console.log(this.obhSOAListComponent.refPaymens);
                     }
                 },
             );
     }
 
-    // refresh page (tab Invoice)
     handleUpdateExtendDateOfInvoice() {
         this.requestSearchShipment();
     }
 
-    // refresh page (tab OBH)
     handleUpdateExtendDateOfOBH() {
         this.requestSearchShipment();
     }

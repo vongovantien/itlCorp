@@ -165,7 +165,7 @@
                                     <i class="la la-building-o"></i>
                                 </span>
                                 <span class="m-nav__link-text m-name" *ngIf="!!selectedOffice">
-                                    {{selectedOffice.branchNameEn}}
+                                    {{selectedOffice.shortName}}
                                 </span>
                             </a>
                             <div class="dropdown-menu" style="min-width: 160px">
@@ -175,7 +175,7 @@
                                         [class.m-nav__item--active]="!!selectedOffice && selectedOffice.branchNameEn == office.branchNameEn">
                                         <a class="m-nav__link" data-toggle="modal" data-target="#change-office-modal">
                                             <span class="m-nav__link-text">
-                                                {{office.branchNameEn}}
+                                                {{office.shortName}}
                                             </span>
                                         </a>
                                     </li>
