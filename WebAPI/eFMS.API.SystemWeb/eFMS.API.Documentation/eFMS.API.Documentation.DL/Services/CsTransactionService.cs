@@ -2480,6 +2480,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataShipment = DataContext.Get(x => x.Id == Id).FirstOrDefault();
             var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id);
+            var dataContainers = csMawbcontainerRepo.Get(x => x.Mblid == dataShipment.Id);
+
             var listShipment = new List<ShimentConverPageSeaReport>();
             Crystal result = null;
             //var _currentUser = currentUser.UserName;
@@ -2512,6 +2514,15 @@ namespace eFMS.API.Documentation.DL.Services
                 obj.ContainerNo = dataShipment.PackageContainer;
                 obj.ShipmentType = _shipmentType;
                 string salesmanName = string.Empty;
+                string Container = string.Empty;
+                string ConstSealNo = string.Empty;
+                if (dataContainers.Any())
+                {
+                    foreach (var item in dataContainers)
+                    {
+                        ConstSealNo += item.ContainerNo + "/" + item.SealNo + " ";
+                    }
+                }
                 if (dataHouseBills.Any())
                 {
                     foreach (var item in dataHouseBills)
@@ -2525,7 +2536,7 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.FreightTerm = item.FreightPayment;
                         objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                         objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
-                        objInHbl.CW = item.ChargeWeight == null ? 0 : item.ChargeWeight;
+                        objInHbl.CW = item.Cbm == null ? 0 : item.Cbm;
                         objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
                         objInHbl.TransID = obj.TransID;
                         objInHbl.TransDate = obj.TransDate;
@@ -2538,8 +2549,10 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.ETA = obj.ETA;
                         objInHbl.ETD = obj.ETD;
                         objInHbl.MAWB = obj.MAWB;
-                        objInHbl.ContainerNo = obj.ContainerNo;
+                        objInHbl.ContainerNo = item.PackageContainer;
                         objInHbl.ShipmentType = obj.ShipmentType;
+                        objInHbl.Prepairedby = currentUser.UserName;
+                        Container += !string.IsNullOrEmpty(item.PackageContainer) ?   item.PackageContainer + " & " : string.Empty;
                         salesmanName += sysUserRepo.Get(x => x.Id == item.SaleManId).Select(t => t.Username)?.FirstOrDefault() + ",";
                         listShipment.Add(objInHbl);
                     }
@@ -2551,7 +2564,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if(salesmanName.Length > 0)
                 {
-                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1));
+                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1) );
+                }
+                if(Container.Length > 0)
+                {
+                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + ConstSealNo.Remove(ConstSealNo.Length -1));
                 }
             }
 
