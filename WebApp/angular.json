@@ -124,7 +124,7 @@
                         "test-en": {
                             "optimization": true,
                             "outputHashing": "none",
-                            "sourceMap": true,
+                            "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/en/",
                             "namedChunks": true,
