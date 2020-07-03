@@ -2,11 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { Store } from '@ngrx/store';
 import { IAppState, getCataloguePortState, GetCataloguePortAction } from '@store';
-import { getTransactionLocked, getTransactionPermission, ShareBusinessDIMVolumePopupComponent, GetDimensionAction, GetShipmentOtherChargeAction, getOtherChargeState, getDimensionVolumesState, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction, getTransactionDetailCsTransactionState, TransactionGetDetailAction, } from '@share-bussiness';
-import { FormGroup, AbstractControl, Validators, FormBuilder, FormControl, } from '@angular/forms';
+import { getTransactionLocked, getTransactionPermission, ShareBusinessDIMVolumePopupComponent, GetShipmentOtherChargeSuccessAction, GetDimensionSuccessAction, getTransactionDetailCsTransactionState, TransactionGetDetailAction, } from '@share-bussiness';
+import { FormGroup, AbstractControl, Validators, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
 import { formatDate, formatCurrency } from '@angular/common';
 import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
@@ -14,15 +14,13 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { ShareAirExportOtherChargePopupComponent, IDataOtherCharge } from '../../share/other-charge/air-export-other-charge.popup';
-import { SystemConstants } from 'src/constants/system.const';
+import { JobConstants, SystemConstants } from '@constants';
 
 import _merge from 'lodash/merge';
-import _cloneDeep from 'lodash/clone';
+import _cloneDeep from 'lodash/cloneDeep';
 import { Observable, throwError } from 'rxjs';
 import { map, tap, takeUntil, catchError, finalize, skip, switchMap, concatMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import * as fromShareBussiness from '../../../../share-business/store';
-import { JobConstants } from '@constants';
 
 @Component({
     selector: 'app-air-export-mawb',
@@ -173,14 +171,15 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (res: AirwayBill) => {
-                    console.log(res);
                     if (!!res) {
                         console.log("Update airwaybill");
                         this.airwaybillId = res.id;
                         this.isUpdate = true;
                         this.otherCharges = res.otherCharges;
                         this.dimensionDetails = res.dimensionDetails;
-                        console.log(this.dimensionDetails);
+                        this.totalCbm = res.cbm;
+                        this.totalHW = res.hw;
+                        this.dimVolumePopup.jobId = res.jobId;
 
                         this._store.dispatch(new GetShipmentOtherChargeSuccessAction(this.otherCharges));
                         this._store.dispatch(new GetDimensionSuccessAction(this.dimensionDetails));
@@ -267,7 +266,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             otherPayment: !!data.otherPayment ? [(this.wts || []).find(type => type.id === data.otherPayment)] : null,
             currencyId: !!data.currencyId ? [{ id: data.currencyId, text: data.currencyId }] : null,
             dimensionDetails: [],
-            rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null
+            rclass: !!data.rclass ? [(this.rClasses || []).find(type => type.id === data.rclass)] : null,
+            total: data.total != null ? parseFloat('' + data.total).toFixed(2) : null
 
         };
         this.formMAWB.patchValue(_merge(_cloneDeep(data), formValue));
@@ -458,19 +458,19 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         airwaybill.jobId = this.jobId;
 
         airwaybill.otherCharges = this.otherCharges;
-
         airwaybill.otherCharges.forEach((c: CsOtherCharge) => {
             c.jobId = this.jobId;
             c.hblId = SystemConstants.EMPTY_GUID;
         });
 
-        airwaybill.dimensionDetails = this.dimensionDetails;
-        airwaybill.dimensionDetails.forEach((d: DIM) => {
+        const dims: DIM[] = _cloneDeep(this.dimensionDetails);
+        dims.forEach((d: DIM) => {
             d.airWayBillId = this.airwaybillId || SystemConstants.EMPTY_GUID;
-            d.mblId = this.jobId;
+            d.mblid = SystemConstants.EMPTY_GUID;
         });
 
-        console.log(airwaybill);
+        airwaybill.dimensionDetails = dims;
+
         if (!!this.isUpdate) {
             this.saveMAWB(airwaybill);
         } else {
@@ -504,12 +504,14 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         const airwaybill: AirwayBill = this.getDataForm();
 
         // * Update mblId;
-        airwaybill.dimensionDetails = this.dimensionDetails;
-
-        airwaybill.dimensionDetails.forEach((d: DIM) => {
+        const dims: DIM[] = _cloneDeep(this.dimensionDetails);
+        dims.forEach((d: DIM) => {
             d.airWayBillId = SystemConstants.EMPTY_GUID;
-            d.mblId = this.jobId;
+            d.mblid = this.jobId;
+            d.hblid = SystemConstants.EMPTY_GUID;
+            d.id = SystemConstants.EMPTY_GUID;
         });
+        airwaybill.dimensionDetails = dims;
 
         return <ISyncMAWBShipment>{
             pol: airwaybill.pol,
@@ -524,6 +526,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             dimensionDetails: airwaybill.dimensionDetails,
             issuedBy: airwaybill.issuedBy,
             hw: airwaybill.hw,
+            cbm: this.totalCbm,
+            packageQty: airwaybill.packageQty,
             mawb: (airwaybill.mblno1 as string).substring(0, 3) + '-' + airwaybill.mblno3
         };
     }
@@ -920,6 +924,8 @@ interface ISyncMAWBShipment {
     pol: string;
     pod: string;
     issuedBy: string;
+    cbm: number;
+    packageQty: number;
 
     hw: number;
     chargeWeight: number;

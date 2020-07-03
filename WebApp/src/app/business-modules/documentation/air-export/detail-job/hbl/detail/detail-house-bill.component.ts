@@ -146,7 +146,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         modelUpdate.userCreated = this.hblDetail.userCreated;
 
         for (const dim of modelUpdate.dimensionDetails) {
-            dim.hblId = this.hblId;
+            dim.hblid = this.hblId;
             // dim.mblId = this.jobId;
         }
     }

@@ -288,6 +288,9 @@ namespace eFMS.API.Documentation.DL.Services
                             DimensionDetails = model.DimensionDetails,
                             FlightDate = model.FlightDate,
                             Mawb = model.Mawb,
+                            Cbm = model.Cbm,
+                            PackageQty = model.PackageQty
+
                         };
                         HandleState hsAirWayBill = UpdateCsAirWayBill(airwaybill, modelSyncAirWayBill);
                     }
@@ -2397,6 +2400,8 @@ namespace eFMS.API.Documentation.DL.Services
             shipment.Hw = model.Hw;
             shipment.GrossWeight = model.GrossWeight;
             shipment.Mawb = model.Mawb;
+            shipment.PackageQty = model.PackageQty;
+            shipment.Cbm = model.Cbm;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {

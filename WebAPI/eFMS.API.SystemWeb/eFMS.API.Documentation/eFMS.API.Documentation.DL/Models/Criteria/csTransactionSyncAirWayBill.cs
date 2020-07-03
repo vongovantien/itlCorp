@@ -19,6 +19,8 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public decimal? GrossWeight { get; set; }
         public decimal? ChargeWeight { get; set; }
         public decimal? Hw { get; set; }
+        public decimal? Cbm { get; set; }
+        public int? PackageQty { get; set; }
         public List<CsDimensionDetailModel> DimensionDetails { get; set; }
     }
 }

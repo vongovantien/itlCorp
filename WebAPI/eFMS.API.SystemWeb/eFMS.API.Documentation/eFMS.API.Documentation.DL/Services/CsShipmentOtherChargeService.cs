@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.UserModified = currentUser.UserID;
                         charge.DatetimeModified = DateTime.Now;
 
-                        var hsAddDemension = Add(charge);
+                        var hsAddDemension = Add(charge, false);
                     }
                     else
                     {
@@ -53,9 +53,11 @@ namespace eFMS.API.Documentation.DL.Services
                        
                         charge.UserModified = currentUser.UserID;
                         charge.DatetimeModified = DateTime.Now;
-                        var hsUpdateContMBL = Update(charge, x => x.Id == charge.Id);
+                        var hsUpdateContMBL = Update(charge, x => x.Id == charge.Id, false);
                     }
                 }
+                DataContext.SubmitChanges();
+
                 return new HandleState();
             }
             catch (Exception ex)
@@ -87,16 +89,18 @@ namespace eFMS.API.Documentation.DL.Services
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
 
-                        var hsAddDemension = Add(dimesion);
+                        var hsAddDemension = Add(dimesion, false);
                     }
                     else
                     {
                         dimesion.JobId = jobId;
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
-                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id, false);
                     }
                 }
+                DataContext.SubmitChanges();
+
                 return new HandleState();
             }
             catch (Exception ex)

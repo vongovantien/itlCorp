@@ -84,6 +84,8 @@ export class ShareBusinessDIMVolumePopupComponent extends PopupBase implements O
                     this.roundUp = round;
                 }
             );
+
+        this.isLocked = this._store.select<any>(fromStore.getTransactionLocked);
     }
 
     addDIM() {
