@@ -1,15 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
-import { Customer, Saleman, Partner } from '@models';
+import { Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
+
+import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { Partner, Contract } from '@models';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
-import { catchError, finalize } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
-import { Router } from '@angular/router';
+
+import { AppList } from 'src/app/app.list';
+
+import { catchError, finalize } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-commercial-agent',
@@ -21,7 +25,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     agents: Partner[] = [];
-    saleMans: Saleman[] = [];
+    saleMans: Contract[] = [];
 
     selectedAgent: Partner;
 
@@ -64,10 +68,11 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         ];
 
         this.configSearch = {
-            settingFields: this.headers.map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            settingFields: this.headers.filter(h => h.field !== 'datetimeModified').map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
         this.dataSearch = { All: '' };
+        this.dataSearch.partnerType = 'Agent';
 
         this.getPartners();
 
@@ -75,7 +80,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
-        this.dataSearch[event.field] = event.searchString;
+        this.dataSearch[event.field] = event.searchString || '';
+        this.dataSearch.partnerType = 'Agent';
 
         this.page = 1;
         this.requestList();
@@ -84,7 +90,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     getPartners() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerType: 'Agent' }, this.dataSearch))
+        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
