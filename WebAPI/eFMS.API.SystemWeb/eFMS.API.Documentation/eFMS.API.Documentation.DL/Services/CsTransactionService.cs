@@ -2568,7 +2568,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if(Container.Length > 0)
                 {
-                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + ConstSealNo.Remove(ConstSealNo.Length -1));
+                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + (ConstSealNo.Length > 0 ? ConstSealNo.Remove(ConstSealNo.Length -1) : String.Empty));
                 }
             }
 
