@@ -80,7 +80,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
-        this.dataSearch[event.field] = event.searchString || '';
+        this.dataSearch[event.field || "All"] = event.searchString || '';
         this.dataSearch.partnerType = 'Agent';
 
         this.page = 1;

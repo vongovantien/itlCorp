@@ -20,8 +20,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     partnerNameEn: AbstractControl;
     shortName: AbstractControl;
     partnerNameVn: AbstractControl;
+    internalReferenceNo: AbstractControl;
     taxCode: AbstractControl;
-    shippingCountry: AbstractControl;
+    inter: AbstractControl;
+    countryShippingId: AbstractControl;
     countryId: AbstractControl; // * Billing country
     countryName: AbstractControl;
     provinceShippingId: AbstractControl;
@@ -46,11 +48,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     billingsProvinces: ProviceModel[] = [];
     shipingsProvinces: ProviceModel[] = [];
 
-
-
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+
+    isExistedTaxcode: boolean = false;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -84,10 +86,14 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             partnerNameVn: [null, Validators.required],
             shortName: [null, Validators.required],
             taxCode: [null, Validators.compose([
-                Validators.maxLength(10),
-                Validators.minLength(8)
+                Validators.maxLength(14),
+                Validators.minLength(8),
+                Validators.required
             ])],
-            internalReferenceNo: [],
+            internalReferenceNo: [null, Validators.compose([
+                Validators.maxLength(10),
+                Validators.minLength(3)
+            ])],
             addressShippingEn: [null, Validators.required],
             addressShippingVn: [null, Validators.required],
             addressVn: [null, Validators.required],
@@ -106,7 +112,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             provinceShippingName: [],
             provinceName: [],
 
-            shippingCountry: [null, Validators.required],
+            countryShippingId: [null, Validators.required],
             provinceShippingId: [],
             countryId: [null, Validators.required],
             provinceId: [],
@@ -117,7 +123,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.partnerNameVn = this.formGroup.controls["partnerNameVn"];
         this.shortName = this.formGroup.controls["shortName"];
         this.taxCode = this.formGroup.controls["taxCode"];
-        this.shippingCountry = this.formGroup.controls["shippingCountry"];
+        this.internalReferenceNo = this.formGroup.controls["internalReferenceNo"];
+        this.countryShippingId = this.formGroup.controls["countryShippingId"];
         this.provinceShippingId = this.formGroup.controls["provinceShippingId"];
         this.countryId = this.formGroup.controls["countryId"];
         this.countryName = this.formGroup.controls["countryName"];
@@ -133,21 +140,14 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
+        console.log(data);
         switch (type) {
             case 'acRef':
                 this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
-                this.shippingCountry.setValue(data.id);
-                // this.provinceShippingId.setValue(null);
-                // this.provinceShippingName.setValue(null);
+                this.countryShippingId.setValue(data.id);
 
-                // this.shippingProvinces = [...this.initShippingProvinces.filter(x => x.countryID === data.id)];
-                // // if (this.shippingProvinces.length === 1) {
-                // //     //  this.provinceShippingId.setValue(this.shippingProvinces[0].id);
-                // // } else {
-                // //     this.provinceShippingId.setValue(null);
-                // // }
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
@@ -180,15 +180,20 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         }
     }
 
-    copyInfoShipping() {
-        this.countryId.setValue(this.shippingCountry.value);
-        this.getBillingProvince(this.shippingCountry.value);
+    copyInfoShipping(event: Event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+
+        this.countryId.setValue(this.countryShippingId.value);
+        this.getBillingProvince(this.countryShippingId.value);
 
         this.provinceId.setValue(this.provinceShippingId.value);
 
         this.formGroup.controls['zipCode'].setValue(this.formGroup.controls['zipCodeShipping'].value);
         this.formGroup.controls['addressVn'].setValue(this.formGroup.controls['addressShippingVn'].value);
         this.formGroup.controls['addressEn'].setValue(this.formGroup.controls['addressShippingEn'].value);
+
     }
 
     getShippingProvinces(countryId?: string, provinceId: string = null) {

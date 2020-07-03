@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-
+import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -9,11 +9,8 @@ import { Partner } from '@models';
 
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
-
-import { tap, switchMap, finalize, catchError, concatMap, map } from 'rxjs/operators';
+import { finalize, catchError, concatMap, map } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
-import _merge from 'lodash/merge';
-import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -24,8 +21,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
     partnerId: string;
     partner: Partner;
-
-    invalidTaxCode: string;
 
     constructor(
         protected _router: Router,
@@ -93,10 +88,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             );
     }
 
-    onSubmitData() {
-        const formBody = this.formCreate.formGroup.getRawValue();
-    }
-
     onSave() {
         this.formCreate.isSubmitted = true;
 
@@ -105,11 +96,19 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             return;
         }
 
+        if (!this.contractList.contracts.length) {
+            this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
+            return;
+        }
+
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
         modelAdd.contracts = this.contractList.contracts;
 
         modelAdd.id = this.partnerId;
         modelAdd.userCreated = this.partner.userCreated;
+        modelAdd.datetimeCreated = this.partner.datetimeCreated;
+        modelAdd.partnerType = this.partner.partnerType;
+        modelAdd.partnerGroup = this.partner.partnerGroup;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
 
         // * Update catalogue partner data.
@@ -134,30 +133,59 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     updatePartner(body: Partner) {
-        this._catalogueRepo.checkTaxCode(this.partner)
+        const bodyValidateTaxcode = {
+            id: body.id,
+            taxCode: body.taxCode,
+            internalReferenceNo: body.internalReferenceNo
+        };
+        this._catalogueRepo.checkTaxCode(bodyValidateTaxcode)
             .pipe(
-
-                switchMap((responseValidateTaxCode: any) => {
+                map((value: Partner) => {
+                    if (!!value) {
+                        if (!!body.internalReferenceNo) {
+                            this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                        } else {
+                            this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
+                        }
+                        throw new Error("TaxCode Duplicated: ");
+                    }
+                    return value;
+                }),
+                catchError((err, caught) => of(false)),
+                concatMap((responseValidateTaxCode: any) => {
                     if (!!responseValidateTaxCode) {
-                        this.setError(this.formCreate.formGroup.controls["internalReferenceNo"], { taxCode: true });
+                        return of(false);
                     }
                     return this._catalogueRepo.updatePartner(body.id, body)
                         .pipe(
                             catchError(this.catchError),
                             finalize(() => this._progressRef.complete()),
-                            concatMap((data: CommonInterface.IResult) => {
-                                if (data.status) {
-                                    this._toastService.success(data.message);
-                                    return this._catalogueRepo.getDetailPartner(body.id);
+
+                            concatMap((res: CommonInterface.IResult) => {
+                                if (res.status) {
+                                    this._toastService.success(res.message);
+                                    return this._catalogueRepo.getDetailPartner(this.partnerId);
                                 }
-                                return of({ data: null, message: 'Something getting error. Please check again!', status: false });
-                            })
+                                return of(res);
+                            }),
                         );
                 })
             )
             .subscribe(
                 (res: any) => {
                     console.log(res);
+                    if (res === false) {
+                        this.infoPopupTaxCode.show();
+                        this.formCreate.isExistedTaxcode = true;
+                        return;
+                    }
+                    if (res || res.status) {
+                        this.partner = res;
+                        console.log("detail partner:", this.partner);
+                        this.formCreate.formGroup.patchValue(res);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
                 },
                 (error: HttpErrorResponse) => {
                     console.log(error);
