@@ -220,6 +220,8 @@ export class SeaFCLExportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
+
+
                     this._router.navigate(["/home/documentation/sea-fcl-export", id]);
                 } else {
                     this.permissionPopup.show();

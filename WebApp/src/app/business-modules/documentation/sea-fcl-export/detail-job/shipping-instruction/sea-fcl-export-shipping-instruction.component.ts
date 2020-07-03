@@ -51,12 +51,14 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         this.isLocked = this._store.select(getTransactionLocked);
     }
     getHouseBills() {
+
         this.isLoading = true;
         this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
             catchError(this.catchError),
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
+
                 this.houseBills = res;
                 this.billDetail.housebills = res;
 
@@ -76,6 +78,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         }
     }
     getBillingInstruction(jobId: string) {
+        console.log("jobId: ", jobId);
+
         this._documentRepo.getShippingInstruction(jobId)
             .pipe(
                 catchError(this.catchError),
@@ -83,6 +87,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
+                    console.log("Data Billing Instruction: ", res);
+
                     this.setDataBillInstructionComponent(res);
                 },
             );
@@ -255,7 +261,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         return valid;
     }
     refresh() {
-        this.getHouseBills();
+        //this.getHouseBills();
+        this.setDataBillInstructionComponent(null);
     }
     previewSummaryReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {

@@ -231,7 +231,8 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
         return valid;
     }
     refresh() {
-        this.getHouseBills();
+        //this.getHouseBills();
+        this.setDataBillInstructionComponent(null);
     }
     previewSIReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
