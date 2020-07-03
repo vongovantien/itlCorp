@@ -126,9 +126,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
+            item.mblid = this.shipmentDetail.id;
             item.airWayBillId = null;
-            item.hblId = null;
+            item.hblid = null;
         }
         //  * Update field
         modelAdd.id = this.jobId;
@@ -332,7 +332,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
+            item.mblid = this.shipmentDetail.id;
         }
 
         //  * Update field

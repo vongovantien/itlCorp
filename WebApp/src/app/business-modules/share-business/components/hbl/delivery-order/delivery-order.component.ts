@@ -10,10 +10,11 @@ import { DocumentationRepo } from 'src/app/shared/repositories';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { catchError, takeUntil, switchMap, finalize, skip } from 'rxjs/operators';
+import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
 
 
 import * as fromShare from './../../../store';
+import { DataService } from '@services';
 @Component({
     selector: 'hbl-delivery-order',
     templateUrl: './delivery-order.component.html'
@@ -35,6 +36,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
         private _documentRepo: DocumentationRepo,
         private _store: Store<any>,
         private _ngProgress: NgProgress,
+        private _dataService: DataService,
         private _toastService: ToastrService,
     ) {
         super();
@@ -69,6 +71,15 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
                     }
                 }
             );
+
+        // *? Subscribe dataService to get podName from HBL.
+        this._dataService.currentMessage.subscribe(
+            (res: any) => {
+                if (res.podName) {
+                    this.deliveryOrder.doheader1 = res.podName;
+                }
+            }
+        );
 
 
         this.isLocked = this._store.select(fromShare.getTransactionLocked);

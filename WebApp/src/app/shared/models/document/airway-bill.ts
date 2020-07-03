@@ -43,7 +43,6 @@ export class AirwayBill {
     notify: string = null;
     issuedPlace: string = null;
     issuedDate: string = null;
-    PackageQty: number = null;
     grossWeight: number = null;
     rclass: string = null;
     rateCharge: number = null

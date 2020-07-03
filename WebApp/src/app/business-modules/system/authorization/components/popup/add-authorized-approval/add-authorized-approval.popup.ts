@@ -103,6 +103,7 @@ export class AuthorizedApprovalPopupComponent extends PopupBase {
                 (res: any) => {
                     if (!!res) {
                         this.users = res;
+                        this.users = this.users.filter(x => x.active);
                     }
                 },
             );

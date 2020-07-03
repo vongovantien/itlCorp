@@ -125,7 +125,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
+            item.mblid = this.shipmentDetail.id;
         }
         //  * Update field
         modelAdd.id = this.jobId;
@@ -324,7 +324,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
+            item.mblid = this.shipmentDetail.id;
         }
 
         //  * Update field

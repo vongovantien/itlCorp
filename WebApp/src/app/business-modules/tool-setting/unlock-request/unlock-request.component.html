@@ -36,7 +36,7 @@
                                                     (onClick)="prepareDeleteAuthorization(authorization)" type="delete">
                                                 </app-permission-button> -->
                                                 <button type="button" title="Delete"
-                                                    *ngIf="unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied'"
+                                                    *ngIf="userLogged.id === unlockRequest.requester && (unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied')"
                                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
                                                     (click)="deleteUnlockRequest(unlockRequest.id)">
                                                     <i class="la la-trash"></i>

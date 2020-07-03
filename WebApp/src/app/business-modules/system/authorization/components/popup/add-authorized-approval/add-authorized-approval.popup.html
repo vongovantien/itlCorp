@@ -87,7 +87,7 @@
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <app-switch [toggle]="status.value" (change)="changeStatus(status.value)"
-                                            (toggleChange)="status.setValue($event)">
+                                            [disabled]="!isUpdate" (toggleChange)="status.setValue($event)">
                                         </app-switch>
                                     </div>
                                 </div>

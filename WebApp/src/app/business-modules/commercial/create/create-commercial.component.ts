@@ -1,17 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+
+import { AppForm } from 'src/app/app.form';
+import { CatalogueRepo } from '@repositories';
 import { InfoPopupComponent } from '@common';
+import { Partner } from '@models';
 
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
-import { Partner } from '@models';
-import { catchError, finalize, concatMap } from 'rxjs/operators';
-import { NgProgress } from '@ngx-progressbar/core';
+
 import { of } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, finalize, concatMap } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-create-commercial',
@@ -27,7 +30,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     invalidTaxCode: string;
 
-    fileList: any[] = [];
+    fileList: File[] = [];
     type: string;
 
     constructor(
@@ -44,10 +47,8 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
 
     ngOnInit(): void {
         this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
-            console.log(result);
             this.type = result.type;
-            console.log(this.type);
-        })
+        });
     }
 
     gotoList() {

@@ -100,7 +100,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
 
         modelAdd.dimensionDetails.forEach(d => {
             d.airWayBillId = null;
-            d.hblId = null;
+            d.hblid = null;
         });
 
         if (this.isImport === true) {

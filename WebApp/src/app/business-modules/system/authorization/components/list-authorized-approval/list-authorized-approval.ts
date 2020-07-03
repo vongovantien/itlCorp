@@ -36,7 +36,7 @@ export class AuthorizedApprovalListComponent extends AppList {
     ngOnInit() {
         this.headersAuthorized = [
             { title: 'Authorizer', field: 'authorizer', sortable: true },
-            { title: 'Commssioner', field: 'commssioner', sortable: true },
+            { title: 'Commssioner', field: 'commissionerName', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Effective Date', field: 'effectiveDate', sortable: true },
             { title: 'Expiration Date', field: 'expirationDate', sortable: true },

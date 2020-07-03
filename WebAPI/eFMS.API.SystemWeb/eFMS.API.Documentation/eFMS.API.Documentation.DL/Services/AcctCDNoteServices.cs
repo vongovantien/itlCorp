@@ -705,7 +705,9 @@ namespace eFMS.API.Documentation.DL.Services
             CustomsDeclaration _clearance = null;
             if (_customClearances.Count() > 0 || _customClearances != null)
             {
-                _clearance = _customClearances.OrderByDescending(x => x.ClearanceDate)?.FirstOrDefault();
+                var orderClearance = _customClearances.OrderBy(x => x.ClearanceDate);
+                _clearance = orderClearance.FirstOrDefault();
+
             }
 
             var parameter = new AcctSOAReportParams
@@ -811,7 +813,7 @@ namespace eFMS.API.Documentation.DL.Services
                         GW = model.GW,
                         NW = null,
                         SeaCBM = model.CBM,
-                        SOTK = _clearance.ClearanceNo,
+                        SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),

@@ -3,7 +3,6 @@ using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Setting.DL.IService
 {
@@ -19,12 +18,12 @@ namespace eFMS.API.Setting.DL.IService
         SysEmployee GetEmployeeByUserId(string userId);
         bool CheckIsAccountantDept(int? deptId);
         bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId);
-        List<string> GetListUserDeputyByDept(string dept);
-        bool CheckDeputyManagerByUser(int? departmentId, string userId);
-        bool CheckDeputyAccountantByUser(int? departmentId, string userId);
         SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId);
         string GetRoleByLevel(string level, string type, Guid? officeId);
         List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer);
         bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
     }
 }
