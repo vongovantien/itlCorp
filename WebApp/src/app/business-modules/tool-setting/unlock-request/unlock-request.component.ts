@@ -5,8 +5,9 @@ import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
 import { SortService } from "@services";
 import { SettingRepo } from "@repositories";
-import { UnlockRequestResult } from "@models";
+import { UnlockRequestResult, User } from "@models";
 import { catchError, finalize, map } from "rxjs/operators";
+import { SystemConstants } from "@constants";
 
 @Component({
     selector: 'app-unlock-request',
@@ -14,7 +15,7 @@ import { catchError, finalize, map } from "rxjs/operators";
 })
 export class UnlockRequestComponent extends AppList {
     unlockRequests: UnlockRequestResult[] = [];
-
+    userLogged: User;
     constructor(
         private _router: Router,
         private _progressService: NgProgress,
@@ -28,6 +29,7 @@ export class UnlockRequestComponent extends AppList {
     }
 
     ngOnInit() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.headers = [
             { title: 'Subject', field: 'subject', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
