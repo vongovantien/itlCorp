@@ -881,19 +881,20 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     dueDate = model.Date.Value.AddDays(30);
                 }
-                //model.PaymentDueDate = model.Date ?? model.Date.Value.AddDays(30);
                 model.PaymentDueDate = dueDate;
+                model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+
                 AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        HandleState hs = DataContext.Add(accounting);
+                        HandleState hs = DataContext.Add(accounting, false);
                         if (hs.Success)
                         {
                             List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
-                            foreach (var chargeOfAcct in chargesOfAcct)
+                            foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
                             {
                                 CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
@@ -910,6 +911,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
+
                                 surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                             }
                             surchargeRepo.SubmitChanges();
@@ -931,8 +933,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                var hs = new HandleState(ex.Message);
-                return hs;
+                return new HandleState(ex.Message);
             }
         }
 
@@ -948,6 +949,12 @@ namespace eFMS.API.Accounting.DL.Services
                 accounting.TotalAmount = CaculatorTotalAmount(model);
                 accounting.UserModified = currentUser.UserID;
                 accounting.DatetimeModified = DateTime.Now;
+
+                // cập nhật lại payment status cho invoice này
+                if(accounting.Type ==AccountingConstants.ACCOUNTING_INVOICE_TYPE && accounting.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW)
+                {
+                    accounting.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                }
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
