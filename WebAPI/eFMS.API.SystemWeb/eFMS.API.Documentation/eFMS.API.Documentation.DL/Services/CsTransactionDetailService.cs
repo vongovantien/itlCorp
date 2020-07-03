@@ -1320,7 +1320,7 @@ namespace eFMS.API.Documentation.DL.Services
             var housebills = new List<SeaHBillofLadingReport>();
             string _grossWeightConts = string.Empty;
             string _cbmConts = string.Empty;
-
+            string _pkgsConts = string.Empty;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
@@ -1355,8 +1355,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status                
-                housebill.NoPieces = string.Empty; //Tạm thời để trống
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status  
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 string hbConstainers = string.Empty;
                 string markNo = string.Empty;
@@ -1371,24 +1370,26 @@ namespace eFMS.API.Documentation.DL.Services
                             hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));                            
                         }                       
                         markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
-                        _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
-                        _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _pkgsConts += cont.PackageQuantity + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
                     }         
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
-                hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
+                housebill.NoPieces = data.PackageQty + " " + _packageType; // Package Qty & Package Type of HBL
+                hbConstainers += " CONTAINER(S) S.T.C:";
                 housebill.Qty = hbConstainers?.ToUpper();
                 housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 housebill.GrossWeight = conts.Select(s => s.Gw).Sum() ?? 0;//Tổng grossweight trong list cont;
-                housebill.GrwDecimal = 2;
+                housebill.GrwDecimal = 3;
                 housebill.Unit = "KGS"; //Đang gán cứng (PKS update thành KGS)
                 housebill.CBM = conts.Select(s => s.Cbm).Sum() ?? 0;//Tổng cbm trong list cont;
-                housebill.CBMDecimal = 2;
+                housebill.CBMDecimal = 3;
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.TotalPackages = string.Empty; //NOT USE
-                housebill.OriginCode = string.Empty; //NOT USE
-                housebill.ICASNC = string.Empty; //NOT USE
+                housebill.OriginCode = countryRepository.Get(x => x.Id == data.OriginCountryId).FirstOrDefault()?.NameEn?.ToUpper(); //Point & Country  Origin
+                housebill.ICASNC = data.ForwardingAgentDescription?.ToUpper(); //Description Forwarding Agent
                 housebill.Movement = data.ServiceType?.ToUpper(); //Type of service
                 housebill.AccountingInfo = string.Empty; //NOT USE
                 housebill.SayWord = "SAY: " + data.InWord?.ToUpper(); //Inword
@@ -1472,9 +1473,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
-                    GrossWeight = data?.GrossWeight.ToString(),
-                    Measurement = data?.Cbm.ToString(),
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    GrossWeight = _grossWeightConts,//string.Format("{0:n3}", data?.GrossWeight),
+                    Measurement = _cbmConts,//string.Format("{0:n3}", data?.Cbm),
                 };
                 result.SetParameter(parameter);
             }
@@ -1483,7 +1484,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportITLFRAMEParams()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
                     GrossWeight = _grossWeightConts, //list grossweight trong list container
                     Measurement = _cbmConts, //list cbm trong list container
                     TextInfo = "RECEIVED in apparent good order and condition except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document( duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall( without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
@@ -1497,9 +1498,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
-                    GrossWeight = data?.GrossWeight.ToString(),
-                    Measurement = data?.Cbm.ToString(),
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    GrossWeight = _grossWeightConts,//string.Format("{0:n3}", data?.GrossWeight),
+                    Measurement = _cbmConts,//string.Format("{0:n3}", data?.Cbm),
                     DocumentNo = string.Empty //Tạm thời để trống
                 };
                 result.SetParameter(parameter);
@@ -1567,12 +1568,12 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.SCI = string.Empty; //NOT USE
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
-                housebill.GrwDecimal = 2; //NOT USE
+                housebill.GrwDecimal = 3; //NOT USE
                 housebill.Wlbs = data.KgIb?.ToUpper() ?? string.Empty; //KgIb
                 housebill.RateClass = data.Rclass; //R.Class
                 housebill.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight ?? 0; //CW
-                housebill.ChWDecimal = 2; //NOT USE
+                housebill.ChWDecimal = 3; //NOT USE
                 housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : ( data.RateCharge?.ToString() ?? string.Empty); //RateCharge
                 housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
