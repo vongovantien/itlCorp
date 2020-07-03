@@ -97,7 +97,11 @@ namespace eFMS.API.System.DL.Services
                               CompanyName = c.BunameVn,
                               OfficeName = o.BranchNameVn,
                               DepartmentName = depart.DeptName,
-                              Position = d.Position
+                              Position = d.Position,
+                              GroupAbbrName = g.ShortName,
+                              CompanyAbbrName = c.BunameAbbr,
+                              OfficeAbbrName = o.ShortName,
+                              DepartmentAbbrName = depart.DeptNameAbbr
                           };
 
             return results;
