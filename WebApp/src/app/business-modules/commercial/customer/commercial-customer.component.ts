@@ -83,7 +83,9 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
         this.dataSearch.partnerType = 'Customer';
-
+        if (event.field === "userCreatedName") {
+            this.dataSearch.userCreated = event.searchString;
+        }
         this.page = 1;
         this.requestList();
     }
