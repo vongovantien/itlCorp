@@ -77,7 +77,7 @@
                                                 <tr *ngFor="let sale of saleMans; let j = index;">
                                                     <td><span>{{j + 1}}</span></td>
                                                     <td>
-                                                        <span>{{sale.service | serviceName}}</span>
+                                                        <span>{{sale.saleService}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{sale.officeNameAbbr}}</span>
@@ -88,10 +88,10 @@
                                                     <td>
                                                         <span>{{sale.username}}</span>
                                                     </td>
-                                                    <td [ngClass]="sale.status ? 'text-success' : 'text-danger'">
-                                                        {{sale.status ? 'Active' : 'Inactive'}}</td>
+                                                    <td [ngClass]="sale.active ? 'text-success' : 'text-danger'">
+                                                        {{sale.active ? 'Active' : 'Inactive'}}</td>
                                                     <td>
-                                                        <span>{{sale.createDate | date: 'dd/MM/yyyy'}}</span>
+                                                        <span>{{sale.datetimeCreated | date: 'dd/MM/yyyy'}}</span>
                                                     </td>
                                                 </tr>
                                                 <tr *ngIf="saleMans.length == 0" app-table-none-record

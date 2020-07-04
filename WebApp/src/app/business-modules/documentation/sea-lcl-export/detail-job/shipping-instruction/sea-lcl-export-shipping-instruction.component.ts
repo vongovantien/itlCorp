@@ -255,6 +255,32 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 },
             );
     }
+
+    previewSIContReport() {
+        if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
+            this._toastService.warning('This shipment have not saved. please save.');
+            return;
+        }
+        this._documentRepo.previewSIContLCLReport(this.billSIComponent.shippingInstruction)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res != null) {
+
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.previewPopup.frm.nativeElement.submit();
+                                this.previewPopup.show();
+                            }, 1000);
+                        } else {
+                            this._toastService.warning('This shipment does not have any house bill ');
+                        }
+                    }
+                },
+            );
+    }
+
     previewSummaryReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');

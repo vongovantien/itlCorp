@@ -32,16 +32,25 @@
                 <div class="col-lg-4">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
-                        <label>Tax Code</label>
+                        <label required>Tax Code</label>
                         <input type="text" class="form-control" formControlName="taxCode">
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !taxCode.valid">
+                            Tax Code include 8 - 14 characters!
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-8">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || internalReferenceNo.dirty) && !internalReferenceNo.valid}">
                                 <label>Internal Reference</label>
                                 <input type="text" class="form-control" formControlName="internalReferenceNo">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && 
+                                ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
+                                ">
+                                    Internal Reference include 3 - 10 characters!
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -66,7 +75,7 @@
                         <div class="col-lg-4">
                             <div class="d-flex align-items-center justify-content-between">
                                 Billing Address
-                                <i class="la la-copy pointer" (click)="copyInfoShipping()"></i>
+                                <i class="la la-copy pointer" (click)="copyInfoShipping($event)"></i>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -96,14 +105,14 @@
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && shippingCountry.invalid}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && countryShippingId.invalid}">
                                         <label required>Country</label>
                                         <app-combo-grid-virtual-scroll
                                             (itemSelected)="onSelectDataFormInfo($event, 'shippping-country')"
-                                            [currentActiveItemId]="{ field: 'id', value: shippingCountry.value, hardValue: countryShippingName.value}"
+                                            [currentActiveItemId]="{ field: 'id', value: countryShippingId.value, hardValue: countryShippingName.value}"
                                             [selectedDisplayFields]="['nameEn']" [dataSources]="countries | async"
                                             [displayFields]="displayFieldCountry" placeholder="Select country"
-                                            (remove)="resetFormControl(shippingCountry)" [size]="15">
+                                            (remove)="resetFormControl(countryShippingId)" [size]="15">
                                         </app-combo-grid-virtual-scroll>
                                     </div>
                                 </div>

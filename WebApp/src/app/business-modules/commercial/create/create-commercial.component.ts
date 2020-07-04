@@ -13,7 +13,7 @@ import { CommercialFormCreateComponent } from '../components/form-create/form-cr
 import { CommercialContractListComponent } from '../components/contract/commercial-contract-list.component';
 
 import { of } from 'rxjs';
-import { catchError, finalize, concatMap } from 'rxjs/operators';
+import { catchError, concatMap, map } from 'rxjs/operators';
 
 
 @Component({
@@ -72,6 +72,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             return;
         }
         const modelAdd: Partner = this.formCreate.formGroup.getRawValue();
+
         modelAdd.partnerType = this.type;
         this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER;AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
@@ -80,59 +81,84 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         this.saveCustomerCommercial(modelAdd);
     }
 
-    saveCustomerCommercial(body) {
-        this._catalogueRepo.createPartner(body)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-                concatMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        if (res.data) {
-                            console.log(res.data);
-                            this._toastService.success(res.message);
-                            this.contractList.contracts.forEach(element => {
-                                if (!!element.fileList) {
-                                    this.fileList.push(element.fileList[0]);
-                                }
-                            });
-                            let i = 0;
-                            for (const obj of this.contractList.contracts) {
-                                obj.id = res.data.idsContract[i];
-                                i++;
-                            }
-                            const idsContract: any = [];
-                            this.contractList.contracts.forEach(element => {
-                                if (!!element.fileList) {
-                                    idsContract.push(element.id);
-                                }
-                            });
-                            if (this.fileList.length === 0) {
-                                if (this.type === 'Customer') {
-                                    this._router.navigate(["/home/commercial/customer"]);
-                                } else {
-                                    this._router.navigate(["/home/commercial/agent"]);
-
-                                }
-                            }
-                            return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
-                        }
+    saveCustomerCommercial(body: Partner) {
+        const bodyValidateTaxcode = {
+            id: body.id,
+            taxCode: body.taxCode,
+            internalReferenceNo: body.internalReferenceNo
+        };
+        this._catalogueRepo.checkTaxCode(bodyValidateTaxcode).pipe(
+            map((value: Partner) => {
+                if (!!value) {
+                    if (!!body.internalReferenceNo) {
+                        this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                    } else {
+                        this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                     }
-                    return of({ data: null, message: 'Something getting error. Please check again!', status: false });
+                    throw new Error("TaxCode Duplicated: ");
+                }
+                return value;
+            }),
+            catchError((err, caught) => of(false)),
+            concatMap(
+                (v) => {
+                    if (v === false) {
+                        return of(false);
+                    }
+                    // * Ngược lại không trùng TaxCode thì đi tạo Partner.
+                    return this._catalogueRepo.createPartner(body).pipe(
+                        catchError((err, caught) => this.catchError),
+                        concatMap((res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                if (res.data) {
+                                    this._toastService.success(res.message);
+                                    this.contractList.contracts.forEach(element => {
+                                        if (!!element.fileList) {
+                                            this.fileList.push(element.fileList[0]);
+                                        }
+                                    });
+
+                                    let i = 0;
+                                    for (const obj of this.contractList.contracts) {
+                                        obj.id = res.data.idsContract[i];
+                                        i++;
+                                    }
+                                    const idsContract: any = [];
+                                    this.contractList.contracts.forEach(element => {
+                                        if (!!element.fileList) {
+                                            idsContract.push(element.id);
+                                        }
+                                    });
+                                    // Nếu không có file thì return luôn.
+                                    if (this.fileList.length === 0) {
+                                        return of(true);
+                                    }
+                                    return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
+                                }
+                            }
+                        })
+                    );
                 })
-            ).subscribe(
-                (res: any) => {
+        ).subscribe(
+            (res) => {
+                if (res === false) {
+                    this.infoPopupTaxCode.show();
+                    this.formCreate.isExistedTaxcode = true;
+                    return;
+                }
+                if (res || res.status) {
                     if (this.type === 'Customer') {
                         this._router.navigate(["/home/commercial/customer"]);
                     } else {
                         this._router.navigate(["/home/commercial/agent"]);
-
                     }
-
-                },
-                (error: HttpErrorResponse) => {
-                    console.log(error);
                 }
-            );
+                console.log(res);
+            },
+            (err) => {
+                console.log(err);
+            }
+        );
     }
 }
 

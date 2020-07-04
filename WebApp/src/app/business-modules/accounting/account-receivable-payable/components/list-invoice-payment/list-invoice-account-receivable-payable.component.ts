@@ -86,13 +86,13 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
 
     getPagingData() {
         this._progressRef.start();
-
-
+        this.isLoading = true;
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
+                    this.isLoading = false;
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {

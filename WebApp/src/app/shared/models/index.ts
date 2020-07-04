@@ -20,6 +20,7 @@ export * from './catalogue//catPartnerCharge.model';
 export * from './catalogue/catChartOfAccounts.model';
 export * from './catalogue/saleman.model';
 export * from './catalogue/province.model';
+export * from './catalogue/catContract.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';

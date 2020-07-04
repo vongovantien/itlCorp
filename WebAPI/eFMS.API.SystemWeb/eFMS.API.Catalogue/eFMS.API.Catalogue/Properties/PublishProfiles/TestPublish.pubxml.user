@@ -8,4 +8,162 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>\\192.168.7.31\inetpub\efms-api\Catalogue</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Dev.json">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>06/10/2020 14:37:59</publishTime>
+    </File>
+    <File Include="appsettings.Pre-Prod.json">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="appsettings.Prod.json">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="appsettings.Staging.json">
+      <publishTime>07/03/2020 15:30:32</publishTime>
+    </File>
+    <File Include="appsettings.Test.json">
+      <publishTime>07/03/2020 15:30:32</publishTime>
+    </File>
+    <File Include="AutoMapper.dll">
+      <publishTime>11/17/2018 10:14:56</publishTime>
+    </File>
+    <File Include="AutoMapper.Extensions.Microsoft.DependencyInjection.dll">
+      <publishTime>11/18/2018 08:27:48</publishTime>
+    </File>
+    <File Include="DnsClient.dll">
+      <publishTime>05/01/2017 09:09:22</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.deps.json">
+      <publishTime>07/03/2020 15:47:28</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.DL.dll">
+      <publishTime>07/03/2020 15:46:39</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.DL.pdb">
+      <publishTime>07/03/2020 15:46:39</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.pdb">
+      <publishTime>07/03/2020 15:46:54</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.runtimeconfig.json">
+      <publishTime>07/03/2020 15:47:28</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.Service.pdb">
+      <publishTime>07/03/2020 15:46:33</publishTime>
+    </File>
+    <File Include="eFMS.API.Catalogue.xml">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="eFMS.API.Common.pdb">
+      <publishTime>07/01/2020 10:19:50</publishTime>
+    </File>
+    <File Include="eFMS.API.Infrastructure.pdb">
+      <publishTime>07/01/2020 10:21:40</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.DL.pdb">
+      <publishTime>05/20/2020 10:04:22</publishTime>
+    </File>
+    <File Include="eFMS.IdentityServer.Service.pdb">
+      <publishTime>05/20/2020 10:04:19</publishTime>
+    </File>
+    <File Include="EPPlus.Core.dll">
+      <publishTime>11/30/2017 09:51:26</publishTime>
+    </File>
+    <File Include="IdentityModel.AspNetCore.OAuth2Introspection.dll">
+      <publishTime>11/15/2018 09:53:52</publishTime>
+    </File>
+    <File Include="IdentityModel.dll">
+      <publishTime>10/02/2018 09:31:14</publishTime>
+    </File>
+    <File Include="IdentityServer4.AccessTokenValidation.dll">
+      <publishTime>11/17/2018 10:22:12</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Common.pdb">
+      <publishTime>05/14/2020 09:11:39</publishTime>
+    </File>
+    <File Include="ITL.NetCore.Connection.pdb">
+      <publishTime>05/14/2020 09:11:39</publishTime>
+    </File>
+    <File Include="LinqKit.Microsoft.EntityFrameworkCore.dll">
+      <publishTime>02/21/2018 18:21:20</publishTime>
+    </File>
+    <File Include="MongoDB.Bson.dll">
+      <publishTime>11/10/2018 00:37:54</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.Core.dll">
+      <publishTime>11/10/2018 00:38:02</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.dll">
+      <publishTime>11/10/2018 00:38:10</publishTime>
+    </File>
+    <File Include="Resources/en-US.json">
+      <publishTime>06/18/2020 11:43:14</publishTime>
+    </File>
+    <File Include="Resources/Files/ChargeImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/ChartOfAccountsImportTemplate.xlsx">
+      <publishTime>06/18/2020 11:43:14</publishTime>
+    </File>
+    <File Include="Resources/Files/CountryImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/DistrictImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/PartnerImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/PortIndexImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/ProvinceImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/VoucherTypeAccountImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/WardImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/Files/WarehouseImportTemplate.xlsx">
+      <publishTime>05/14/2020 09:11:40</publishTime>
+    </File>
+    <File Include="Resources/vi-VN.json">
+      <publishTime>06/18/2020 11:43:14</publishTime>
+    </File>
+    <File Include="runtimes/unix/lib/netcoreapp2.0/System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netcoreapp2.0/System.Diagnostics.PerformanceCounter.dll">
+      <publishTime>05/15/2018 13:29:36</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netcoreapp2.0/System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="runtimes/win/lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>05/15/2018 13:29:44</publishTime>
+    </File>
+    <File Include="System.Configuration.ConfigurationManager.dll">
+      <publishTime>05/15/2018 13:29:38</publishTime>
+    </File>
+    <File Include="System.Diagnostics.PerformanceCounter.dll">
+      <publishTime>05/15/2018 13:29:36</publishTime>
+    </File>
+    <File Include="System.Drawing.Common.dll">
+      <publishTime>11/14/2017 15:14:46</publishTime>
+    </File>
+    <File Include="System.Security.Cryptography.ProtectedData.dll">
+      <publishTime>05/15/2018 13:29:44</publishTime>
+    </File>
+    <File Include="System.Xml.XPath.XmlDocument.dll">
+      <publishTime>11/05/2016 04:57:34</publishTime>
+    </File>
+    <File Include="web.config">
+      <publishTime>07/03/2020 15:47:28</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

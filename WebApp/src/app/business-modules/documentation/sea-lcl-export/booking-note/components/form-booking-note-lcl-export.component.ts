@@ -88,7 +88,18 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
             noOfBl: [],
             pickupAt: [],
             dropoffAt: [],
-            note: [],
+            note: [`<p>Xin vui l&ograve;ng li&ecirc;n lạc 2H trước khi ra h&agrave;ng
+                    <br>Ph&iacute; CFS Tại văn ph&ograve;ng
+                    <br>Ph&iacute; THC shipper sẽ thanh to&aacute;n khi lấy chứng từ:
+                    <br>Ghi ch&uacute; kh&aacute;c:
+                    <br>- H&agrave;ng đi India Shipper phải cung cấp IEC khi gửi chi tiết HBL
+                    <br>- Kh&ocirc;ng nhận h&agrave;ng thực phẩm đi Rotterdam, Mỹ, Canada.
+                    <br>- Kh&ocirc;ng nhận h&agrave;ng h&agrave;nh l&yacute; c&aacute; nh&acirc;n đi Mỹ v&agrave; Canada.
+                    <br>- Vui l&ograve;ng gửi đầy đủ th&ocirc;ng tin AMS c&ugrave;ng l&uacute;c với chi tiết l&agrave;m Bill cho h&agrave;ng xuất đi Mỹ
+                    <br>- Kh&ocirc;ng nhận h&agrave;ng nguy hiểm.
+                    <br>- Thu ph&iacute; khai quan tại cảng đến đối với h&agrave;ng Mỹ, Canada với mức ph&iacute; 40usd/ lần điều chỉnh chi tiết h&agrave;ng h&oacute;a sau khi t&agrave;u chạy.
+                    <br>- H&agrave;ng h&oacute;a chất liệu gỗ hoặc được đ&oacute;ng trong kiện gỗ c&aacute;c loại phải c&oacute; giấy chứng nhận hun tr&ugrave;ng.
+                    <br>- Vui l&ograve;ng b&aacute;o trước đối với h&agrave;ng si&ecirc;u trường, si&ecirc;u trọng hoặc c&oacute; sự thay đổi về khối lượng</p>`],
             otherTerms: [],
 
             shipperId: [],
