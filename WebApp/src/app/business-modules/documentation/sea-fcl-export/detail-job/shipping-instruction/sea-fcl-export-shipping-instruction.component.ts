@@ -311,7 +311,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             this._toastService.warning('This shipment have not saved. please save.');
             return;
         }
-        this._documentRepo.previewSIContReport(this.billSIComponent.shippingInstruction)
+        this._documentRepo.previewSIContReport(this.billSIComponent.shippingInstruction.jobId)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

@@ -575,14 +575,14 @@ export class DocumentationRepo {
         );
     }
 
-    previewSIContReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLContShippingInstruction`, body).pipe(
+    previewSIContReport(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLContShippingInstruction/${id}`).pipe(
             map((data: any) => data)
         );
     }
 
-    previewSIContLCLReport(body: any) {
-        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewLCLContShippingInstruction`, body).pipe(
+    previewSIContLCLReport(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewLCLContShippingInstruction/${id}`).pipe(
             map((data: any) => data)
         );
     }
