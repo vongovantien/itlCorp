@@ -41,6 +41,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialEffectDate: AbstractControl;
     trialExpiredDate: AbstractControl;
     trialCreditDays: AbstractControl;
+    contractNo: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -151,7 +152,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
             officeId: [],
-            contractNo: [Validators.maxLength(50)],
+            contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [],
             contractType: [[{ id: 'Trial', text: 'Trial' }], Validators.required],
@@ -185,6 +186,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.trialEffectDate = this.formGroup.controls['trialEffectDate'];
         this.trialExpiredDate = this.formGroup.controls['trialExpiredDate'];
         this.trialCreditDays = this.formGroup.controls['trialCreditDays'];
+        this.contractNo = this.formGroup.controls['contractNo'];
 
     }
 
@@ -323,12 +325,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
-            if (this.contractType.value[0].id === this.contractTypes[1].id) {
+            if (this.contractType.value[0].id === this.contractTypes[1].id && !this.contractNo.value) {
                 this.isRequiredContractNo = true;
                 return;
             } else {
                 this.isRequiredContractNo = false;
             }
+        }
+        if (!this.saleService.value) {
+            return;
         }
         if (this.formGroup.valid) {
             this.asignValueToModel();
