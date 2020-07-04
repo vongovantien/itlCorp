@@ -26,7 +26,7 @@ const routes: Routes = [
     {
         path: 'account-receivable-payable', loadChildren: () => import('./account-receivable-payable/account-receivable-payable.module').then(m => m.AccountReceivePayableModule),
         data: {
-            name: 'Accountant Receiveable Payable'
+            name: 'Accounts Receivable'
         }
     },
     {

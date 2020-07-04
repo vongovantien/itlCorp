@@ -68,7 +68,7 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
             provinceID: ['', Validators.compose([
                 Validators.required
             ])],
-            active: [],
+            active: [true],
             id: [],
         });
         this.code = this.formAddDistrict.controls['code'];

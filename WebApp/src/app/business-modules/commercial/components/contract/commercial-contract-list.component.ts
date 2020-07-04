@@ -40,14 +40,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     ngOnInit(): void {
         this.headers = [
             { title: 'Salesman', field: 'username', sortable: true },
-            { title: 'Contract No', field: 'username', sortable: true },
-            { title: 'Contract Type', field: 'username', sortable: true },
-            { title: 'Service', field: 'username', sortable: true },
-            { title: 'Effective Date', field: 'username', sortable: true },
-            { title: 'Expired Date', field: 'username', sortable: true },
-            { title: 'Status', field: 'status', sortable: true },
-            { title: 'Office', field: 'officeName', sortable: true },
-            { title: 'Company', field: 'companyName', sortable: true },
+            { title: 'Contract No', field: 'contractNo', sortable: true },
+            { title: 'Contract Type', field: 'contractType', sortable: true },
+            { title: 'Service', field: 'saleService', sortable: true },
+            { title: 'Effective Date', field: 'trialEffectDate', sortable: true },
+            { title: 'Expired Date', field: 'trialExpiredDate', sortable: true },
+            { title: 'Status', field: 'active', sortable: true },
+            { title: 'Office', field: 'officeNameAbbr', sortable: true },
+            { title: 'Company', field: 'companyNameAbbr', sortable: true },
         ];
     }
 

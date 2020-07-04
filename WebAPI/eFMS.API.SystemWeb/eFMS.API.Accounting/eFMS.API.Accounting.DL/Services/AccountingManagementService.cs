@@ -875,20 +875,28 @@ namespace eFMS.API.Accounting.DL.Services
                 model.DepartmentId = currentUser.DepartmentId;
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
-                model.PaymentDueDate = model.Date?? model.Date.Value.AddDays(30);
-                var accounting = mapper.Map<AccAccountingManagement>(model);
+
+                DateTime? dueDate = null;
+                if(model.Date.HasValue)
+                {
+                    dueDate = model.Date.Value.AddDays(30);
+                }
+                model.PaymentDueDate = dueDate;
+                model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+
+                AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        var hs = DataContext.Add(accounting);
+                        HandleState hs = DataContext.Add(accounting, false);
                         if (hs.Success)
                         {
-                            var chargesOfAcct = model.Charges;
-                            foreach (var chargeOfAcct in chargesOfAcct)
+                            List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
+                            foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
                             {
-                                var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
+                                CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
@@ -903,6 +911,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
+
                                 surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                             }
                             surchargeRepo.SubmitChanges();
@@ -924,8 +933,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                var hs = new HandleState(ex.Message);
-                return hs;
+                return new HandleState(ex.Message);
             }
         }
 
@@ -941,6 +949,12 @@ namespace eFMS.API.Accounting.DL.Services
                 accounting.TotalAmount = CaculatorTotalAmount(model);
                 accounting.UserModified = currentUser.UserID;
                 accounting.DatetimeModified = DateTime.Now;
+
+                // cập nhật lại payment status cho invoice này
+                if(accounting.Type ==AccountingConstants.ACCOUNTING_INVOICE_TYPE && accounting.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW)
+                {
+                    accounting.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                }
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try

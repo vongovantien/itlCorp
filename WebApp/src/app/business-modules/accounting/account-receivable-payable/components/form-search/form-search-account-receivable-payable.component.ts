@@ -1,16 +1,23 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { formatDate } from '@angular/common';
 
 import { CatalogueRepo } from '@repositories';
 import { Partner } from '@models';
-import { JobConstants, SystemConstants } from '@constants';
+import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
 
 import { Observable } from 'rxjs';
-import { formatDate } from '@angular/common';
 
+enum OverDueDays {
+    All,
+    Between1_15,
+    Between16_30,
+    Between31_60,
+    Between61_90
+}
 
 @Component({
     selector: 'form-search-account-receivable-payable',
@@ -40,7 +47,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
 
     payments: CommonInterface.INg2Select[] = [
         { id: 'All', text: 'All' },
-        { id: 'Unpaid', text: 'UnPaid' },
+        { id: 'Unpaid', text: 'Unpaid' },
         { id: 'Paid A Part', text: 'Paid A Part' },
         { id: 'Paid', text: 'Paid' },
     ];
@@ -75,7 +82,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
             updatedDate: [],
             dueDate: [],
             overdueDate: [[this.overDueDays[0]]],
-            paymentStatus: [[this.payments[0]]]
+            paymentStatus: [[this.payments[1], this.payments[2]]]
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
@@ -116,8 +123,6 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
         this.onSearch.emit(body);
     }
     getSearchStatus(paymentStatus: []) {
-        console.log(paymentStatus);
-
         let strStatus = null;
         if (!!paymentStatus) {
             strStatus = [];
@@ -130,38 +135,28 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
                 }
             });
         }
-        console.log(strStatus);
-
         return strStatus;
 
     }
 
     resetSearch() {
-        this.resetKeywordSearchCombogrid();
         this.formSearch.reset();
-        this.formSearch.controls["paymentStatus"].setValue([this.payments[0]]);
-        this.onSearch.emit({ paymentStatus: [], paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
+        this.initForm();
+        this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
     }
 
     selelectedStatus(event) {
-        console.log("obj current: ", event);
-
-        const currStatus = this.formSearch.controls["paymentStatus"].value;
-        console.log("list obj current: ", currStatus);
+        const currStatus = this.paymentStatus.value;
         if (currStatus.filter(x => x.id === 'All').length > 0 && event.id !== 'All') {
-            //console.log("All: ", currStatus);
-            console.log("co vo day!");
-
             currStatus.splice(0);
             currStatus.push(event);
-            this.formSearch.controls["paymentStatus"].setValue(currStatus);
+            this.paymentStatus.setValue(currStatus);
 
         }
         if (event.id === 'All') {
             const onlyAllObj = currStatus.filter(ele => ele.id === 'All');
-            this.formSearch.controls["paymentStatus"].setValue(onlyAllObj);
+            this.paymentStatus.setValue(onlyAllObj);
         }
-        // 
 
     }
 }
@@ -183,11 +178,5 @@ export enum PaymentType {
     Invoice = 0,
     OBH = 1
 }
-enum OverDueDays {
-    All,
-    Between1_15,
-    Between16_30,
-    Between31_60,
-    Between61_90
-}
+
 

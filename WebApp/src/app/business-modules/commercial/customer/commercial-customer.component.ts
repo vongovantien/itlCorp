@@ -6,7 +6,7 @@ import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { Customer, Saleman } from '@models';
+import { Customer, Contract } from '@models';
 import { CatalogueRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { CommonEnum } from '@enums';
@@ -26,7 +26,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     customers: Customer[] = [];
-    saleMans: Saleman[] = [];
+    saleMans: Contract[] = [];
 
     selectedCustomer: Customer;
 
@@ -69,18 +69,20 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         ];
 
         this.configSearch = {
-            settingFields: this.headers.map(x => ({ "fieldName": x.field, "displayName": x.title })),
+            settingFields: this.headers.filter(h => h.field !== 'datetimeModified').map(x => ({ "fieldName": x.field, "displayName": x.title })),
             typeSearch: CommonEnum.TypeSearch.outtab
         };
 
         this.dataSearch = { All: '' };
+        this.dataSearch.partnerType = 'Customer';
         this.getPartners();
 
     }
 
     onSearch(event: CommonInterface.ISearchOption) {
         this.dataSearch = {};
-        this.dataSearch[event.field] = event.searchString;
+        this.dataSearch[event.field || "All"] = event.searchString || '';
+        this.dataSearch.partnerType = 'Customer';
 
         this.page = 1;
         this.requestList();
@@ -89,7 +91,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     getPartners() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, { partnerType: 'Customer' }, this.dataSearch))
+        this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -113,6 +115,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     resetSearch(event) {
         this.dataSearch = {};
+
         this.onSearch(event);
     }
 
@@ -133,7 +136,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             ).subscribe(
-                (res: any) => {
+                (res: boolean) => {
                     if (res) {
                         this.confirmDeletePopup.show();
                     } else {

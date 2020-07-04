@@ -51,7 +51,7 @@ export class FormCountryPopupComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            active: []
+            active: [true]
 
         });
         this.code = this.formAddCountry.controls['code'];

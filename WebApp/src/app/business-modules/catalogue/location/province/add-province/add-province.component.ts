@@ -59,7 +59,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
             country: ['', Validators.compose([
                 Validators.required
             ])],
-            active: [],
+            active: [true],
             id: [],
 
         });

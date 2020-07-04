@@ -97,6 +97,11 @@
         public static readonly string ACCOUNTING_INVOICE_TYPE = "Invoice";
         public static readonly string ACCOUNTING_INVOICE_STATUS_NEW = "New";
         public static readonly string ACCOUNTING_INVOICE_STATUS_UPDATED = "Updated Invoice";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
+        public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
+
+
 
         #endregion
     }
