@@ -151,7 +151,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
             officeId: [],
-            contractNo: [],
+            contractNo: [Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [],
             contractType: [[{ id: 'Trial', text: 'Trial' }], Validators.required],
