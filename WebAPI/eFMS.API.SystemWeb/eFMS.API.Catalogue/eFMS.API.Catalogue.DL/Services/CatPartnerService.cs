@@ -94,39 +94,37 @@ namespace eFMS.API.Catalogue.DL.Services
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
             CatPartner partner = GetModelToAdd(entity);
-            var hs = DataContext.Add(partner);
-            if (hs.Success)
-            {
-                if (entity.Contracts.Count > 0)
-                {
-                    var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
-                    contracts.ForEach(x =>
-                    {
-                        //x.Id = Guid.NewGuid();
-                        x.PartnerId = partner.Id;
-                        x.DatetimeCreated = DateTime.Now;
-                        x.UserCreated = x.UserModified = currentUser.UserID;
-                    });
-                    partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
-                    DataContext.Add(partner,false);
-                    contractRepository.Add(contracts,false);
+            var hs = new HandleState();
 
-                    //foreach (var item in entity.contracts)
-                    //{
-                    //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
-                    //    modeUploadContract.ChildId = item.Id.ToString();
-                    //    modeUploadContract.PartnerId = partner.Id;
-                    //    modeUploadContract.Files = item.File;
-                    //    UploadFileContract(modeUploadContract);
-                    //}
-                }
-           
-                DataContext.SubmitChanges();
-                contractRepository.SubmitChanges();
-                ClearCache();
-                Get();
-                SendMailCreatedSuccess(partner);
+            if (entity.Contracts.Count > 0)
+            {
+                var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
+                contracts.ForEach(x =>
+                {
+                    x.PartnerId = partner.Id;
+                    x.DatetimeCreated = DateTime.Now;
+                    x.UserCreated = x.UserModified = currentUser.UserID;
+                });
+                partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
+                DataContext.Add(partner, false);
+                contractRepository.Add(contracts, false);
+
+                //foreach (var item in entity.contracts)
+                //{
+                //    ContractFileUploadModel modeUploadContract = new ContractFileUploadModel();
+                //    modeUploadContract.ChildId = item.Id.ToString();
+                //    modeUploadContract.PartnerId = partner.Id;
+                //    modeUploadContract.Files = item.File;
+                //    UploadFileContract(modeUploadContract);
+                //}
             }
+
+            DataContext.SubmitChanges();
+            contractRepository.SubmitChanges();
+            ClearCache();
+            Get();
+            SendMailCreatedSuccess(partner);
+
             return hs;
         }
 
@@ -191,28 +189,28 @@ namespace eFMS.API.Catalogue.DL.Services
             List<SysImage> resultUrls = new List<SysImage>();
             //foreach (var file in model.Files)
             //{
-                fileName = model.Files.FileName;
-                string objectId = model.PartnerId;
-                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
-                string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
-                var sysImage = new SysImage
-                {
-                    Id = Guid.NewGuid(),
-                    Url = urlImage,
-                    Name = fileName,
-                    Folder = model.FolderName ?? "Partner",
-                    ObjectId = model.PartnerId.ToString(),
-                    ChildId = model.ChildId.ToString(),
-                    UserCreated = currentUser.UserName, //admin.
-                    UserModified = currentUser.UserName,
-                    DateTimeCreated = DateTime.Now,
-                    DatetimeModified = DateTime.Now
-                };
-                resultUrls.Add(sysImage);
-                if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
-                {
-                    list.Add(sysImage);
-                }
+            fileName = model.Files.FileName;
+            string objectId = model.PartnerId;
+            await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+            string urlImage = path + "/" + model.FolderName + "files/" + objectId + "/" + fileName;
+            var sysImage = new SysImage
+            {
+                Id = Guid.NewGuid(),
+                Url = urlImage,
+                Name = fileName,
+                Folder = model.FolderName ?? "Partner",
+                ObjectId = model.PartnerId.ToString(),
+                ChildId = model.ChildId.ToString(),
+                UserCreated = currentUser.UserName, //admin.
+                UserModified = currentUser.UserName,
+                DateTimeCreated = DateTime.Now,
+                DatetimeModified = DateTime.Now
+            };
+            resultUrls.Add(sysImage);
+            if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage && x.ChildId == model.ChildId))
+            {
+                list.Add(sysImage);
+            }
             //}
             if (list.Count > 0)
             {
@@ -226,11 +224,11 @@ namespace eFMS.API.Catalogue.DL.Services
             var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            var entity = GetModelToUpdate(model);
 
-            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = model.GroupId, DepartmentId = model.DepartmentId, OfficeId = model.OfficeId, CompanyId = model.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
+            int code = GetPermissionToUpdate(new ModelUpdate { GroupId = entity.GroupId, DepartmentId = entity.DepartmentId, OfficeId = entity.OfficeId, CompanyId = entity.CompanyId, UserCreator = model.UserCreated, Salemans = listSalemans, PartnerGroup = model.PartnerGroup }, permissionRange, null);
             if (code == 403) return new HandleState(403, "");
 
-            var entity = GetModelToUpdate(model);
             if (model.Contracts.Count > 0)
             {
                 entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
@@ -562,7 +560,7 @@ namespace eFMS.API.Catalogue.DL.Services
                          from x in prods.DefaultIfEmpty()
                          select new { user, partner, x }
                           );
-            if (criteria.All == null)
+            if (string.IsNullOrEmpty(criteria.All))
             {
                 query = query.Where(x => ((x.partner.AccountNo ?? "").IndexOf(criteria.Id ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                            && (x.partner.ShortName ?? "").IndexOf(criteria.ShortName ?? "", StringComparison.OrdinalIgnoreCase) >= 0
@@ -622,7 +620,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 DepartmentId = x.partner.DepartmentId,
                 GroupId = x.partner.GroupId,
                 OfficeId = x.partner.OfficeId,
-                Active = x.partner.Active
+                Active = x.partner.Active,
+                PartnerType = x.partner.PartnerType
+
             });
             return results;
         }
