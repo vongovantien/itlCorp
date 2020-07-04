@@ -165,8 +165,11 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal PreviewFCLContShippingInstruction(CsShippingInstructionReportConstModel model)
+        public Crystal PreviewFCLContShippingInstruction(Guid id)
         {
+            var dataShippingIntruction = DataContext.Get(x => x.JobId == id).FirstOrDefault();
+            var model = mapper.Map<CsShippingInstructionReportConstModel>(dataShippingIntruction);
+            model.CsTransactionDetails = transactionDetailService.Get(x => x.JobId == id).ToList();
             if (model.CsTransactionDetails.Any())
             {
                 var Conts = containerRepository.Get();
@@ -228,6 +231,9 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowPrint = true,
                     AllowExport = true
                 };
+                string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+                result.PathReportGenerate = _pathReportGenerate;
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
                 result.SetParameter(parameter);
@@ -239,8 +245,11 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public Crystal PreviewLCLContShippingInstruction(CsShippingInstructionReportConstModel model)
+        public Crystal PreviewLCLContShippingInstruction(Guid id)
         {
+            var dataShippingIntruction = DataContext.Get(x => x.JobId == id).FirstOrDefault();
+            var model = mapper.Map<CsShippingInstructionReportConstModel>(dataShippingIntruction);
+            model.CsTransactionDetails = transactionDetailService.Get(x => x.JobId == id).ToList();
             if (model.CsTransactionDetails.Any())
             {
                 var Conts = containerRepository.Get();
@@ -303,6 +312,9 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowPrint = true,
                     AllowExport = true
                 };
+                string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+                result.PathReportGenerate = _pathReportGenerate;
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
                 result.SetParameter(parameter);
