@@ -197,6 +197,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     charge.CreditNo = model.Code;
                                 }
                             }
+                            charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
                         }
@@ -253,6 +254,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.Cdclosed = true;
                         item.DatetimeModified = DateTime.Now;
                         item.UserModified = currentUser.UserID; // need update in the future 
+                        item.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
                         var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                     }
 
@@ -281,6 +283,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     charge.CreditNo = model.Code;
                                 }
                             }
+                            charge.ExchangeDate = model.DatetimeCreated;//Cập nhật Exchange Date equal Created Date CD Note
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
                         }
@@ -515,12 +518,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
-            var sealsNo = string.Empty;
+            var sealsContsNo = string.Empty;
             decimal? volum = 0;
             decimal? hbGw = 0;
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
             var hbConsignees = string.Empty;
+            int? totalPkgQtyHouses = 0;
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
@@ -532,12 +536,13 @@ namespace eFMS.API.Documentation.DL.Services
                         hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
                     }
                     var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
-                    if (packageUnit != null)
-                    {
-                        hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
-                    }
-                    sealsNo += !string.IsNullOrEmpty(cont.SealNo) ? cont.SealNo + ", " : "";
+                    //if (packageUnit != null)
+                    //{
+                    //    hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
+                    //}
+                    sealsContsNo += (!string.IsNullOrEmpty(cont.SealNo) || !string.IsNullOrEmpty(cont.ContainerNo)) ? (cont.ContainerNo + "/" + cont.SealNo + ", ") : "";                    
                 }
+                totalPkgQtyHouses += item.PackageQty;
                 if (conts.Count() > 0)
                 {
                     volum += conts.Sum(s => s.Cbm);
@@ -553,10 +558,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", "") : string.Empty;
-            hbPackages += ".";
-            hbPackages = hbPackages != "." ? hbPackages.Replace(", .", "") : string.Empty;
-            sealsNo += ".";
-            sealsNo = sealsNo != "." ? sealsNo.Replace(", .", "") : string.Empty;
+            //hbPackages += ".";
+            //hbPackages = hbPackages != "." ? hbPackages.Replace(", .", "") : string.Empty;
+            sealsContsNo += ".";
+            sealsContsNo = sealsContsNo != "." ? sealsContsNo.Replace(", .", "") : string.Empty;
 
             hbShippers = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ShipperId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
             hbConsignees = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
@@ -584,7 +589,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
             soaDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
             soaDetails.HbConstainers = hbConstainers; //Container Quantity
-            soaDetails.HbPackages = hbPackages; // Package Quantity
+            soaDetails.HbPackages = totalPkgQtyHouses?.ToString(); //Total Package Quantity HBLs
             soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             soaDetails.IsLocked = false;
@@ -594,7 +599,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ProductService = opsTransaction?.ProductService;
             soaDetails.ServiceMode = opsTransaction?.ServiceMode;
             soaDetails.SoaNo = String.Join(", ", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
-            soaDetails.HbSealNo = sealsNo;
+            soaDetails.HbSealNo = sealsContsNo;//SealNo/ContNo
             soaDetails.HbGrossweight = hbGw;
             soaDetails.HbShippers = hbShippers; //Shipper
             soaDetails.HbConsignees = hbConsignees; //Consignee
