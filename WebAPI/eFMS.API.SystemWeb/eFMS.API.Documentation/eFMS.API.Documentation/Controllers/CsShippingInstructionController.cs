@@ -64,6 +64,24 @@ namespace eFMS.API.Documentation.Controllers
             var result = shippingInstructionService.PreviewFCLShippingInstruction(model);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("PreviewFCLContShippingInstruction")]
+        public IActionResult PreviewFCLContShippingInstruction(CsShippingInstructionReportConstModel model)
+        {
+            var result = shippingInstructionService.PreviewFCLContShippingInstruction(model);
+            return Ok(result);
+        }
+
+
+        [HttpPost]
+        [Route("PreviewLCLContShippingInstruction")]
+        public IActionResult PreviewLCLContShippingInstruction(CsShippingInstructionReportConstModel model)
+        {
+            var result = shippingInstructionService.PreviewLCLContShippingInstruction(model);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("PreviewFCLOCL")]
         public IActionResult PreviewFCLOCL(CsShippingInstructionReportModel model)
