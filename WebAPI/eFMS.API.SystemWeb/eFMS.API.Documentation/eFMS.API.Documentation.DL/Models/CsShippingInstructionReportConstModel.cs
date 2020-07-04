@@ -7,6 +7,6 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class CsShippingInstructionReportConstModel : CsShippingInstructionModel
     {
-        public List<CsTransactionDetail> CsTransactionDetails { get; set; }
+        public List<CsTransactionDetailModel> CsTransactionDetails { get; set; }
     }
 }
