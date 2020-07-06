@@ -637,7 +637,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                     this.dataExportReport2 = res;
                     if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup3.frm.nativeElement.submit();
+                            this.exportReportPopup2.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralSISummary = res.pathReportGenerate;
