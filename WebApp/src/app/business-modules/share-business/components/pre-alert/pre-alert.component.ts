@@ -22,6 +22,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup: ExportCrystalComponent;
     @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup2: ExportCrystalComponent;
+    @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup3: ExportCrystalComponent;
     files: IShipmentAttachFile[] = [];
     jobId: string;
     hblId: string;
@@ -38,6 +39,7 @@ export class ShareBusinessReAlertComponent extends AppList {
     dataReport: Crystal = null;
     dataExportReport: Crystal = null;
     dataExportReport2: Crystal = null;
+    dataExportReport3: Crystal = null;
     attachedFile: string[] = [];
 
     sendMailButtonName: string = '';
@@ -578,10 +580,10 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport = res;
-                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                    this.dataExportReport2 = res;
+                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
+                            this.exportReportPopup2.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralMawb = res.pathReportGenerate;
@@ -632,10 +634,10 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport = res;
-                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                    this.dataExportReport2 = res;
+                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
+                            this.exportReportPopup3.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralSISummary = res.pathReportGenerate;
@@ -659,10 +661,10 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport2 = res;
-                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
+                    this.dataExportReport3 = res;
+                    if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup2.frm.nativeElement.submit();
+                            this.exportReportPopup3.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
@@ -686,10 +688,10 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport2 = res;
-                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
+                    this.dataExportReport3 = res;
+                    if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup2.frm.nativeElement.submit();
+                            this.exportReportPopup3.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
