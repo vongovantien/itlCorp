@@ -134,13 +134,13 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.exportCrystalMawbFrameToPdf();
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this.exportCrystalSIToPdf();
                 this.exportCrystalSISummaryToPdf();
+                this.exportCrystalSIToPdf();
                 this.exportCrystalSIDetailContFCL();
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.exportCrystalSIToPdf();
                 this.exportCrystalSISummaryToPdf();
+                this.exportCrystalSIToPdf();
                 this.exportCrystalSIDetailContLCL();
                 break;
             default:
@@ -598,33 +598,6 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
-    exportCrystalSIToPdf() {
-        this._progressRef.start();
-        this._documentRepo.previewSIReportByJobId(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
-            .subscribe(
-                (res: Crystal) => {
-                    this.dataExportReport = res;
-                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
-                        }, 1000);
-
-                        this.pathGeneralSI = res.pathReportGenerate;
-                        this.attachedFile.push(res.pathReportGenerate);
-                        this.isExitsSI = true;
-                        this.isCheckedSI = true;
-                    } else {
-                        this.isExitsSI = false;
-                        this.isCheckedSI = false;
-                    }
-                },
-            );
-    }
-
     exportCrystalSISummaryToPdf() {
         this._progressRef.start();
         this._documentRepo.previewSISummaryByJobId(this.jobId)
@@ -634,19 +607,46 @@ export class ShareBusinessReAlertComponent extends AppList {
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport2 = res;
-                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.exportReportPopup2.frm.nativeElement.submit();
-                        }, 1000);
-
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         this.pathGeneralSISummary = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSISummary = true;
                         this.isCheckedSISummary = true;
+
+                        if (this.exportReportPopup.frm) {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }
                     } else {
                         this.isExitsSISummary = false;
                         this.isCheckedSISummary = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalSIToPdf() {
+        this._progressRef.start();
+        this._documentRepo.previewSIReportByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport2 = res;
+                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
+                        this.pathGeneralSI = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsSI = true;
+                        this.isCheckedSI = true;
+
+                        if (this.exportReportPopup2.frm) {
+                            this.exportReportPopup2.frm.nativeElement.submit();
+                        }
+                    } else {
+                        this.isExitsSI = false;
+                        this.isCheckedSI = false;
                     }
                 },
             );
@@ -663,14 +663,14 @@ export class ShareBusinessReAlertComponent extends AppList {
                 (res: Crystal) => {
                     this.dataExportReport3 = res;
                     if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.exportReportPopup3.frm.nativeElement.submit();
-                        }, 1000);
-
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSIDetailCont = true;
                         this.isCheckedSIDetailCont = true;
+
+                        if (this.exportReportPopup3.frm) {
+                            this.exportReportPopup3.frm.nativeElement.submit();
+                        }
                     } else {
                         this.isExitsSIDetailCont = false;
                         this.isCheckedSIDetailCont = false;
@@ -690,14 +690,14 @@ export class ShareBusinessReAlertComponent extends AppList {
                 (res: Crystal) => {
                     this.dataExportReport3 = res;
                     if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.exportReportPopup3.frm.nativeElement.submit();
-                        }, 1000);
-
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSIDetailCont = true;
                         this.isCheckedSIDetailCont = true;
+
+                        if (this.exportReportPopup3.frm) {
+                            this.exportReportPopup3.frm.nativeElement.submit();
+                        }
                     } else {
                         this.isExitsSIDetailCont = false;
                         this.isCheckedSIDetailCont = false;
@@ -717,16 +717,15 @@ export class ShareBusinessReAlertComponent extends AppList {
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedMawb);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-            case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
                 break;
-            // case ChargeConstants.SLE_CODE: // Sea LCL Export
-            //     this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
-            //     this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
-            //     this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
-            //     break;
+            case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
+                break;
             default:
                 break;
         }
