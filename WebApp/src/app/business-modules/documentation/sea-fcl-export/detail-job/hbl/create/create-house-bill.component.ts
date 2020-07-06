@@ -237,8 +237,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
-            package: container.packageTypeName,
-            quantity: container.packageQuantity,
+            contName: container.description || '',
+            quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
 
@@ -276,8 +276,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
 
-    handleStringPackage(contOb: { package: string, quantity: number }) {
-        return contOb.quantity + ' ' + contOb.package + ' & ';
+    handleStringPackage(contOb: { contName: string, quantity: number }) {
+        return contOb.quantity + ' ' + contOb.contName + ' & ';
     }
 
     gotoList() {
