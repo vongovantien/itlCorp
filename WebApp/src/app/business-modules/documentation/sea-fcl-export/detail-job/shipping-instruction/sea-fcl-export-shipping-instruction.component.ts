@@ -334,6 +334,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
                     }
+                    else {
+                        this._toastService.warning('This shipment does not have any container ');
+                    }
                 },
             );
     }
