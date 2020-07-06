@@ -394,16 +394,17 @@ export class AddPartnerDataComponent extends AppList {
         //             });
         //         }
         //     }
+        // if (this.isShowSaleMan) {
+        //     if (this.contracts.length === 0) {
+        //         this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
+        //     } else {
+        //         this.onCreatePartner();
+        //     }
+        // } else {
+        //     this.onCreatePartner();
+        // }
 
-        if (this.isShowSaleMan) {
-            if (this.contracts.length === 0) {
-                this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-            } else {
-                this.onCreatePartner();
-            }
-        } else {
-            this.onCreatePartner();
-        }
+        this.onCreatePartner();
 
     }
     getFormPartnerData() {
