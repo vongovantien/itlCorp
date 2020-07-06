@@ -173,7 +173,12 @@ namespace eFMS.API.Documentation.DL.Services
             if (model.CsTransactionDetails.Any())
             {
                 var Conts = containerRepository.Get();
-                var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
+                IQueryable<CsMawbcontainer> listConts = null;
+                listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
+                if (!listConts.Any())
+                {
+                    listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.JobId.ToString()).Contains(x.Mblid.ToString()));
+                }
                 if (!listConts.Any()) return null;
                 Crystal result = new Crystal();
                 var instructions = new List<SeaShippingInstruction>();
