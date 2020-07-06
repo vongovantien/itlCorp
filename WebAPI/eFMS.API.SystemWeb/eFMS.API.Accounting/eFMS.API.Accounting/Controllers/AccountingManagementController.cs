@@ -164,6 +164,7 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
+                result.Data = null;
                 return BadRequest(result);
             }
             return Ok(result);

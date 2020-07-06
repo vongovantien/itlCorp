@@ -218,7 +218,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'Service Date', value: 'ServiceDate' },
             { title: 'Invoice Issued Date', value: 'InvoiceIssuedDate' },
         ];
-        this.selectedDateMode = this.dateModes[0];
+        this.selectedDateMode = this.dateModes[1];
 
         this.types = [
             { title: 'All', value: 'All' },
@@ -231,7 +231,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
             { title: 'Yes', value: true },
             { title: 'No', value: false }
         ];
-        this.selectedObh = this.obhs[1];
+        this.selectedObh = this.obhs[0];
         this.updateDataSearch('isOBH', this.selectedObh.value);
         this.updateDataSearch('dateType', this.selectedDateMode.value);
         this.updateDataSearch('type', this.selectedType.value);
