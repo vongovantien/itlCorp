@@ -146,7 +146,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     getService() {
-        this._catalogueRepo.getListService()
+        this._sysRepo.getListServiceByPermision()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
