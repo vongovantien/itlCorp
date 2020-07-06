@@ -499,12 +499,16 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPod.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOD = new WarehouseData
+                        if(warehouse != null)
                         {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                            result.WarehousePOD = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
+                       
                     }
                 }
 
@@ -517,21 +521,26 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPol.CountryId != null)
                     {
                         CatCountry country = catCountryRepo.Get(c => c.Id == portIndexPol.CountryId)?.FirstOrDefault();
-
-                        result.POLCountryCode = country.Code;
-                        result.POLCountryNameEn = country.NameEn;
-                        result.POLCountryNameVn = country.NameVn;
+                        if (country != null)
+                        {
+                            result.POLCountryCode = country.Code;
+                            result.POLCountryNameEn = country.NameEn;
+                            result.POLCountryNameVn = country.NameVn;
+                        }
                     }
 
                     if (portIndexPol.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOL = new WarehouseData
+                        if(warehouse != null)
                         {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                            result.WarehousePOL = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
                     }
                 }
 
@@ -1784,7 +1793,12 @@ namespace eFMS.API.Documentation.DL.Services
                     item.ArrivalHeader = null;
                     item.ArrivalFooter = null;
                     item.ArrivalDate = null;
+                   
                     item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                    if (model.TransactionType == "AI" || model.TransactionType == "AE")
+                    {
+                        item.Mawb = model.Mawb;
+                    }
                     item.Active = true;
                     item.UserCreated = transaction.UserCreated;
                     item.DatetimeCreated = DateTime.Now;
