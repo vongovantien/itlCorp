@@ -68,6 +68,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     this.partner = res;
                     console.log("detail partner:", this.partner);
                     this.formCreate.formGroup.patchValue(res);
+                    this.formCreate.getShippingProvinces(res.countryShippingId);
+                    this.formCreate.getBillingProvinces(res.countryId);
                 }
             );
     }

@@ -445,7 +445,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             customerAmount: this.selectedContract.customerAdvanceAmount,
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
-            serviceType: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
+            saleService: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
             vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null
         });
@@ -541,6 +541,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
             endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
         });
+    }
+
+    selectedService($event: any) {
+        console.log($event);
+        if ($event.id === 'All' || this.saleService.value.includes(x => x.id === 'All')) {
+            this.saleService.setValue([]);
+            this.saleService.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
+        }
+
     }
 
     close() {

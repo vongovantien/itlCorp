@@ -57,7 +57,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     gotoCreateContract() {
         this.formContractPopup.formGroup.patchValue({
-            salesmanId: null,
             officeId: null,
             contractNo: null,
             effectiveDate: null,
@@ -88,6 +87,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         if (!this.partnerId) {
             this.formContractPopup.isCreateNewCommercial = true;
         }
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.formContractPopup.salesmanId.setValue(userLogged.id);
         this.formContractPopup.show();
     }
 
