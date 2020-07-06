@@ -383,8 +383,75 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
+    // SI Detail HBL
     previewSI() {
         this._documentRepo.previewSIReportByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    // SI Summary
+    previewSISummary() {
+        this._documentRepo.previewSISummaryByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    // SI Detail (Cont) FCL
+    previewSIDetailContFCL() {
+        this._documentRepo.previewSIContReport(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    // SI Detail (Cont) LCL
+    previewSIDetailContLCL() {
+        this._documentRepo.previewSIContLCLReport(this.jobId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -508,6 +575,10 @@ export class ShareBusinessReAlertComponent extends AppList {
                     }
                 },
             );
+    }
+
+    exportCrystalSISummaryToPdf() {
+
     }
 
     //#endregion Export Report

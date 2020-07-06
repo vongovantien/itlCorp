@@ -232,7 +232,7 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowExport = true
                 };
                 string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionFCLCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
                 result.PathReportGenerate = _pathReportGenerate;
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
@@ -253,7 +253,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (model.CsTransactionDetails.Any())
             {
                 var Conts = containerRepository.Get();
-                var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString())).GroupBy(x=>x.PackageTypeId);
+                var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString())).GroupBy(x => x.PackageTypeId);
                 if (!listConts.Any()) return null;
                 Crystal result = new Crystal();
                 var instructions = new List<SeaShippingInstruction>();
@@ -292,10 +292,10 @@ namespace eFMS.API.Documentation.DL.Services
                         Etd = model.LoadingDate?.ToString("dd/MM/yyyy"),
                         ShippingMarks = string.Empty,
                         Containers = "A Part Of Container",
-                        NoofPeace =  item.Sum(t => t.PackageQuantity) + " " + PackageType,
+                        NoofPeace = item.Sum(t => t.PackageQuantity) + " " + PackageType,
                         SIDescription = model.GoodsDescription,
-                        GrossWeight = item.Sum(t=>t.Gw),
-                        CBM = item.Sum(t=>t.Cbm),
+                        GrossWeight = item.Sum(t => t.Gw),
+                        CBM = item.Sum(t => t.Cbm),
                         Qty = string.Empty,
                         RateRequest = model.Remark,
                         Payment = model.PaymenType,
@@ -305,7 +305,7 @@ namespace eFMS.API.Documentation.DL.Services
                     totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
                 }
-                parameter.TotalPackages = totalPackages?.ToString() +  " PKG(S)";
+                parameter.TotalPackages = totalPackages?.ToString() + " PKG(S)";
                 result = new Crystal
                 {
                     ReportName = "SeaShippingInstructionCont.rpt",
@@ -313,7 +313,7 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowExport = true
                 };
                 string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionLCLCont" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
                 result.PathReportGenerate = _pathReportGenerate;
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
@@ -588,5 +588,90 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+
+        public Crystal PreviewSISummaryByJobId(Guid jobId)
+        {
+            var si = GetById(jobId);
+            if (si == null)
+            {
+                return null;
+            }
+            Crystal result = new Crystal();
+            var instructions = new List<SeaShippingInstruction>();
+            var units = unitRepository.Get();
+            CsTransactionDetailCriteria criteria = new CsTransactionDetailCriteria { JobId = jobId };
+            var housebills = transactionDetailService.Query(criteria);
+            if (housebills == null) return result;
+            var total = 0;
+            var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
+
+            var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
+            var parameter = new SeaShippingInstructionParameter
+            {
+                CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
+                CompanyAddress1 = office?.AddressEn ?? DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
+                CompanyDescription = string.Empty,
+                Contact = issueBy ?? string.Empty,
+                Tel = office?.Tel ?? string.Empty,
+                Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
+                DecimalNo = 2
+            };
+            int totalPackage = 0;
+            string jobNo = opsTrans?.JobNo;
+            foreach (var item in housebills)
+            {
+                int? quantity = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.Quantity);
+                total += (int)(quantity ?? 0);
+
+                int? totalPack = containerRepository.Get(x => x.Hblid == item.Id).Sum(x => x.PackageQuantity);
+                totalPackage += (int)(totalPack ?? 0);
+            }
+            var instruction = new SeaShippingInstruction
+            {
+                TRANSID = jobNo,
+                Attn = si.InvoiceNoticeRecevier,
+                ToPartner = si.SupplierName,
+                Re = si.BookingNo,
+                DatePackage = si.InvoiceDate,
+                ShipperDf = si.Shipper,
+                GoodsDelivery = si.ConsigneeDescription,
+                NotitfyParty = si.CargoNoticeRecevier,
+                PortofLoading = si.PolName,
+                PortofDischarge = si.PodName,
+                PlaceDelivery = si.PoDelivery,
+                Vessel = si.VoyNo,
+                Etd = si.LoadingDate?.ToString("dd/MM/yyyy"),
+                ShippingMarks = string.Empty,
+                Containers = si.ContainerNote,
+                // ContSealNo = item.SealNo,
+                NoofPeace = si.PackagesNote,
+                SIDescription = si.GoodsDescription,
+                GrossWeight = si.GrossWeight,
+                CBM = si.Volume,
+                Qty = total.ToString(),
+                RateRequest = si.Remark,
+                Payment = si.PaymenType,
+                ShippingMarkImport = string.Empty,
+                MaskNos = si.ContainerSealNo
+            };
+            instructions.Add(instruction);
+            parameter.TotalPackages = totalPackage + " PKG(S)";
+            result = new Crystal
+            {
+                ReportName = "SeaShippingInstructionSummary.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
+            var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionSummary" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            result.PathReportGenerate = _pathReportGenerate;
+            result.AddDataSource(instructions);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+        }
+
     }
 }
