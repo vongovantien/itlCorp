@@ -82,7 +82,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.dataSearch = {};
         this.dataSearch[event.field || "All"] = event.searchString || '';
         this.dataSearch.partnerType = 'Agent';
-
+        if (event.field === "userCreatedName") {
+            this.dataSearch.userCreated = event.searchString;
+        }
         this.page = 1;
         this.requestList();
     }

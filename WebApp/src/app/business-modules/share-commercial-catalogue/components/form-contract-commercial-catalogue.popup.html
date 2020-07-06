@@ -72,10 +72,14 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.value[0]?.id === 'Official'}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted &&(	(contractNo.dirty && !contractNo.valid)  || ( contractType.value[0]?.id === 'Official' && !contractNo.value ))} ">
                                 <label>Contract No</label>
                                 <input type="text" class="form-control" formControlName="contractNo">
+                                <div class="form-control-feedback" *ngIf="contractNo.errors | equalError: 'maxlength'">
+                                    Contract No is required max 50 characters
+                                </div>
                             </div>
+
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group"
@@ -123,7 +127,7 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !saleService.valid}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
                                 <label required>Sale Service</label>
                                 <ng-select #sv [items]="serviceTypes" [allowClear]="true" [active]="activeServices"
                                     (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
