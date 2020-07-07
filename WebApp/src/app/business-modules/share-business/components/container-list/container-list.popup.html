@@ -118,8 +118,8 @@
                                     </td>
                                     <!--6-->
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && type === 'import' && isDuplicateContPakage }">
+                                        <div class="form-group">
+
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="container.packageQuantity" name="packageQuantity"
                                                 (ngModelChange)="onChangeDataFormTable()" min="0" integer step="1">

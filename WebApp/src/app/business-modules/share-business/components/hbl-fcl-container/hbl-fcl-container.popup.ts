@@ -83,21 +83,37 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
 
     configHeader() {
         this.headers = [
+            //1
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true, width: 200 },
+            //2
             { title: 'Cont Quantity', field: 'quantity', required: true, sortable: true },
-            { title: 'G.W', field: 'gw', sortable: true, },
-            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
-            { title: 'CBM', field: 'cbm', sortable: true, },
-            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
-            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
+            //8
             { title: 'Container No', field: 'containerNo', sortable: true, },
+            //9
             { title: 'Seal No', field: 'sealNo', sortable: true, },
-            { title: 'A Part', field: '', sortable: true, },
-            { title: 'Mark No', field: 'markNo', sortable: true, },
-            { title: 'Commodity', field: 'commodityId', sortable: true, width: 200 },
-            { title: 'Description', field: 'description', sortable: true, },
-            { title: 'N.W', field: 'nw', sortable: true, },
+            //6
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
+            //7
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
+            //3
+            { title: 'G.W', field: 'gw', sortable: true, },
+            //4
+            { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
+            //5
+            { title: 'CBM', field: 'cbm', sortable: true, },
+            //15
             { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
+            //10
+            { title: 'A Part', field: '', sortable: true, },
+            //11
+            { title: 'Mark No', field: 'markNo', sortable: true, },
+            //12
+            { title: 'Commodity', field: 'commodityId', sortable: true, width: 200 },
+            //13
+            { title: 'Description', field: 'description', sortable: true, },
+            //14
+            { title: 'N.W', field: 'nw', sortable: true, },
+
         ];
     }
 
@@ -193,6 +209,8 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                 this.isSubmitted = false;
                 this.hide();
             }
+        } else {
+            this.checkDuplicate();
         }
     }
 
@@ -217,16 +235,16 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
 
     checkDuplicate() {
         let valid: boolean = true;
+        console.log("con: ", this.initContainers);
+
         if (this.type === 'import') {
             if (
-                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageQuantity", this.initContainers)
-                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+                this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+                && this.utility.checkDuplicateInObject("sealNo", this.initContainers)
             ) {
                 this.isDuplicateContPakage = true;
                 valid = false;
-                this._toastService.warning("Cont type, Container no, Package type, Package qty is Duplicated");
+                this._toastService.warning("Container no, Seal no is Duplicated");
                 return;
             } else {
                 valid = true;
@@ -234,14 +252,12 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
             }
         } else {
             if (
-                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("quantity", this.initContainers)
-                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+                this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+                && this.utility.checkDuplicateInObject("sealNo", this.initContainers)
             ) {
                 this.isDuplicateContPakage = true;
                 valid = false;
-                this._toastService.warning("Cont type, Cont no, Package type, Cont quantity is Duplicated");
+                this._toastService.warning("Container no, Seal no is Duplicated");
                 return;
             } else {
                 valid = true;
