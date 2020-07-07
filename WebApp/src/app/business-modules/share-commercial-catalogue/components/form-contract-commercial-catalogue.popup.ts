@@ -545,7 +545,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     selectedService($event: any) {
         console.log($event);
-        if ($event.id === 'All' || this.saleService.value.includes(x => x.id === 'All')) {
+        if ($event.id === 'All' || this.saleService.value.some(x => x.id === 'All')) {
             this.saleService.setValue([]);
             this.saleService.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
         }
