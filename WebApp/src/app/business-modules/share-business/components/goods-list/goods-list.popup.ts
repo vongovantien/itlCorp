@@ -37,16 +37,27 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
 
     configHeader() {
         this.headers = [
+            //1
             { title: 'Cont Type', field: 'containerTypeId', sortable: true },
+            //2
             { title: 'Cont Quantity', field: 'quantity', sortable: true },
-            { title: 'G.W', field: 'gw', sortable: true, required: true },
-            { title: 'CBM', field: 'cbm', sortable: true, required: true },
-            { title: 'Package Type', field: 'packageTypeId', sortable: true, required: true },
-            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, required: true, width: 175 },
+            //7
             { title: 'Container No', field: 'containerNo', sortable: true, },
+            //8
             { title: 'Seal No', field: 'sealNo', sortable: true, },
+            //6
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, required: true, width: 175 },
+            //5
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, required: true },
+            //3
+            { title: 'G.W', field: 'gw', sortable: true, required: true },
+            //4
+            { title: 'CBM', field: 'cbm', sortable: true, required: true },
+            //9
             { title: 'Mark No', field: 'markNo', sortable: true, },
+            //10
             { title: 'Commodity', field: 'commodityId', sortable: true, width: 175 },
+            //11
             { title: 'Description', field: 'description', sortable: true, },
         ];
     }
@@ -122,6 +133,8 @@ export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContain
                 this.isSubmitted = false;
                 this.hide();
             }
+        } else {
+            this.checkDuplicate();
         }
     }
 

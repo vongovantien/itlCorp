@@ -90,7 +90,6 @@ export class AirExportManifestComponent extends AppList {
 
                     this.formManifest.jobId = this.jobId;
 
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
 
@@ -111,11 +110,13 @@ export class AirExportManifestComponent extends AppList {
     }
 
     refreshManifest() {
-        this.getManifest(this.jobId);
+        //this.getManifest(this.jobId);
+        this.formManifest.getShipmentDetail(this.jobId);
         this.getHblList(this.jobId);
     }
 
     onRefresh() {
+        console.log("clicked!");
         this.confirmCreatePopup.hide();
         this.refreshManifest();
     }
@@ -145,11 +146,15 @@ export class AirExportManifestComponent extends AppList {
     }
 
     getManifest(id: string) {
+        console.log("id: ", id);
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
+                console.log("response: ", res);
                 if (!!res) {
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
+                } else {
+                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
                 }
             }
         );

@@ -85,18 +85,19 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.headers = [
             { title: 'Cont Type', field: 'containerTypeId', sortable: true, required: true, width: 200 },
             { title: 'Cont Q`Ty', field: 'quantity', required: true, sortable: true },
+            { title: 'Container No', field: 'containerNo', sortable: true, },
+            { title: 'Seal No', field: 'sealNo', sortable: true, },
+            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
+            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
             { title: 'G.W', field: 'gw', sortable: true, },
             { title: 'C.W', field: 'chargeAbleWeight', sortable: true, },
             { title: 'CBM', field: 'cbm', sortable: true, },
-            { title: 'Package Quantity', field: 'packageQuantity', sortable: true, },
-            { title: 'Package Type', field: 'packageTypeId', sortable: true, },
-            { title: 'Container No', field: 'containerNo', sortable: true, },
-            { title: 'Seal No', field: 'sealNo', sortable: true, },
+            { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
             { title: 'Mark No', field: 'markNo', sortable: true, },
             { title: 'Commodity', field: 'commodityId', sortable: true, width: 200 },
             { title: 'Description', field: 'description', sortable: true, },
             { title: 'N.W', field: 'nw', sortable: true, },
-            { title: 'Unit', field: 'unitOfMeasureId', sortable: true, },
+
         ];
     }
 
@@ -190,6 +191,9 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
                 this.isSubmitted = false;
                 this.hide();
             }
+        } else {
+            console.log("clicked");
+            this.checkDuplicate();
         }
     }
 
@@ -214,37 +218,22 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
 
     checkDuplicate() {
         let valid: boolean = true;
-        if (this.type === 'import') {
-            if (
-                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageQuantity", this.initContainers)
-                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
-            ) {
-                this.isDuplicateContPakage = true;
-                valid = false;
-                this._toastService.warning("Cont type, Container no, Package type, Package qty is Duplicated");
-                return;
-            } else {
-                valid = true;
-                this.isDuplicateContPakage = false;
-            }
+        console.log("con: ", this.initContainers);
+
+        if (
+            this.utility.checkDuplicateInObject("containerNo", this.initContainers)
+            && this.utility.checkDuplicateInObject("sealNo", this.initContainers)
+
+        ) {
+            this.isDuplicateContPakage = true;
+            valid = false;
+            this._toastService.warning("Container no, Seal no is Duplicated");
+            return;
         } else {
-            if (
-                this.utility.checkDuplicateInObject("containerTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("packageTypeId", this.initContainers)
-                && this.utility.checkDuplicateInObject("quantity", this.initContainers)
-                && this.utility.checkDuplicateInObject("containerNo", this.initContainers)
-            ) {
-                this.isDuplicateContPakage = true;
-                valid = false;
-                this._toastService.warning("Cont type, Cont no, Package type, Cont quantity is Duplicated");
-                return;
-            } else {
-                valid = true;
-                this.isDuplicateContPakage = false;
-            }
+            valid = true;
+            this.isDuplicateContPakage = false;
         }
+
 
         return valid;
     }
