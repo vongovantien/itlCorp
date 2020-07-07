@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string SecondDestination { get; set; }
         public string BillType { get; set; }
         public string ArrivalNote { get; set; }
+        public string FinalDestination { get; set; }
 
     }
 

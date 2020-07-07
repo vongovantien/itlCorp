@@ -717,7 +717,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SecondDestination = detail.DosentTo2?.ToUpper(),
                 ArrivalNote = detail.ArrivalNo?.ToUpper(),
                 FlightDate = detail.Eta,
-                BillType = detail.ServiceType?.ToUpper()
+                BillType = detail.ServiceType?.ToUpper(),
+                FinalDestination = detail.FinalDestinationPlace?.ToUpper()
             };
             dataSources.Add(item);
             var result = new Crystal
