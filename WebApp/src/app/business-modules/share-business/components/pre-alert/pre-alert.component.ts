@@ -21,8 +21,6 @@ export class ShareBusinessReAlertComponent extends AppList {
     @ViewChild(ShareBusinessAddAttachmentPopupComponent, { static: false }) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
     @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup: ExportCrystalComponent;
-    @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup2: ExportCrystalComponent;
-    @ViewChild(ExportCrystalComponent, { static: false }) exportReportPopup3: ExportCrystalComponent;
     files: IShipmentAttachFile[] = [];
     jobId: string;
     hblId: string;
@@ -38,8 +36,6 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     dataReport: Crystal = null;
     dataExportReport: Crystal = null;
-    dataExportReport2: Crystal = null;
-    dataExportReport3: Crystal = null;
     attachedFile: string[] = [];
 
     sendMailButtonName: string = '';
@@ -135,13 +131,21 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 this.exportCrystalSISummaryToPdf();
-                this.exportCrystalSIToPdf();
-                this.exportCrystalSIDetailContFCL();
+                setTimeout(() => {
+                    this.exportCrystalSIToPdf();
+                }, 3000);
+                setTimeout(() => {
+                    this.exportCrystalSIDetailContFCL();
+                }, 5000);
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 this.exportCrystalSISummaryToPdf();
-                this.exportCrystalSIToPdf();
-                this.exportCrystalSIDetailContLCL();
+                setTimeout(() => {
+                    this.exportCrystalSIToPdf();
+                }, 3000);
+                setTimeout(() => {
+                    this.exportCrystalSIDetailContFCL();
+                }, 5000);
                 break;
             default:
                 break;
@@ -518,11 +522,10 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     //#region  Export Report
     exportCrystalArrivalNoticeToPdf() {
-        this._progressRef.start();
         this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); }),
+                finalize(() => { }),
             )
             .subscribe(
                 (res: Crystal) => {
@@ -545,11 +548,10 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalManifestToPdf() {
-        this._progressRef.start();
         this._documentRepo.previewAirExportManifestByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -572,18 +574,17 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalMawbFrameToPdf() {
-        this._progressRef.start();
         this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport2 = res;
-                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         setTimeout(() => {
-                            this.exportReportPopup2.frm.nativeElement.submit();
+                            this.exportReportPopup.frm.nativeElement.submit();
                         }, 1000);
 
                         this.pathGeneralMawb = res.pathReportGenerate;
@@ -599,11 +600,10 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalSISummaryToPdf() {
-        this._progressRef.start();
         this._documentRepo.previewSISummaryByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -613,10 +613,9 @@ export class ShareBusinessReAlertComponent extends AppList {
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSISummary = true;
                         this.isCheckedSISummary = true;
-
-                        if (this.exportReportPopup.frm) {
+                        setTimeout(() => {
                             this.exportReportPopup.frm.nativeElement.submit();
-                        }
+                        }, 1000);
                     } else {
                         this.isExitsSISummary = false;
                         this.isCheckedSISummary = false;
@@ -626,24 +625,22 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalSIToPdf() {
-        this._progressRef.start();
         this._documentRepo.previewSIReportByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport2 = res;
-                    if (this.dataExportReport2 !== null && this.dataExportReport2.dataSource.length > 0) {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         this.pathGeneralSI = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSI = true;
                         this.isCheckedSI = true;
-
-                        if (this.exportReportPopup2.frm) {
-                            this.exportReportPopup2.frm.nativeElement.submit();
-                        }
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
                     } else {
                         this.isExitsSI = false;
                         this.isCheckedSI = false;
@@ -653,24 +650,22 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalSIDetailContFCL() {
-        this._progressRef.start();
         this._documentRepo.previewSIContReport(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport3 = res;
-                    if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSIDetailCont = true;
                         this.isCheckedSIDetailCont = true;
-
-                        if (this.exportReportPopup3.frm) {
-                            this.exportReportPopup3.frm.nativeElement.submit();
-                        }
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
                     } else {
                         this.isExitsSIDetailCont = false;
                         this.isCheckedSIDetailCont = false;
@@ -680,24 +675,22 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     exportCrystalSIDetailContLCL() {
-        this._progressRef.start();
         this._documentRepo.previewSIContLCLReport(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
+                finalize(() => { })
             )
             .subscribe(
                 (res: Crystal) => {
-                    this.dataExportReport3 = res;
-                    if (this.dataExportReport3 !== null && this.dataExportReport3.dataSource.length > 0) {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
                         this.pathGeneralSIDetailCont = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSIDetailCont = true;
                         this.isCheckedSIDetailCont = true;
-
-                        if (this.exportReportPopup3.frm) {
-                            this.exportReportPopup3.frm.nativeElement.submit();
-                        }
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
                     } else {
                         this.isExitsSIDetailCont = false;
                         this.isCheckedSIDetailCont = false;
