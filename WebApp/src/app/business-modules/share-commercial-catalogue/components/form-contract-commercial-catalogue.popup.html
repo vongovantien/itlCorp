@@ -129,10 +129,16 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !saleService.valid || !saleService.value)}">
                                 <label required>Sale Service</label>
-                                <ng-select #sv [items]="serviceTypes" [allowClear]="true" [active]="activeServices"
-                                    (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
-                                    placeholder="Please select">
-                                </ng-select>
+                                <div class="pos-rel">
+                                    <ng-select #sv [items]="serviceTypes" (selected)="selectedService($event)"
+                                        [allowClear]="true" [active]="activeServices" (opened)="closeOtherSelects(sv)"
+                                        formControlName="saleService" [multiple]="true" placeholder="Please select">
+                                    </ng-select>
+                                    <combo-grid-icon
+                                        *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)"
+                                        (onDropdown)="openNg2Select(saleService)">
+                                    </combo-grid-icon>
+                                </div>
 
                             </div>
                         </div>
@@ -149,11 +155,19 @@
                         </div>
                         <div class="col-lg-8">
                             <div class="form-group">
-                                <label>Vas</label>
-                                <ng-select #vas [items]="vaslst" [allowClear]="true" (opened)="closeOtherSelects(vas)"
-                                    [active]="activeVas" [multiple]="true" formControlName="vas"
-                                    placeholder="Please select">
-                                </ng-select>
+                                <label>VAS</label>
+                                <div class="pos-rel">
+                                    <ng-select #vas [items]="vaslst" [allowClear]="true"
+                                        (opened)="closeOtherSelects(vas)" [active]="activeVas" [multiple]="true"
+                                        formControlName="vas" placeholder="Please select">
+                                    </ng-select>
+                                    <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)"
+                                        (onDropdown)="openNg2Select(vas)">
+                                    </combo-grid-icon>
+
+
+                                </div>
+
                             </div>
                         </div>
                     </div>

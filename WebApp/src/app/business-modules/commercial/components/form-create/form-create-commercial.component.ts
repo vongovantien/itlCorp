@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
@@ -53,6 +53,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     isExistedTaxcode: boolean = false;
+    @Input() isUpdate: boolean = false;
+
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -66,6 +68,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
         this.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.getProvinces();
+        if (this.isUpdate) {
+            this.getShippingProvinces();
+            this.getBillingProvinces();
+        }
 
         this.initForm();
     }
@@ -196,7 +202,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     }
 
-    getShippingProvinces(countryId?: string, provinceId: string = null) {
+    getShippingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
@@ -209,10 +215,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                             if (obj === undefined) {
                                 this.provinceShippingId.setValue(null);
                             }
-                        } else {
-                            this.provinceShippingId.setValue(null);
                         }
-
                     }
                 );
         } else {
@@ -220,13 +223,13 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.billingsProvinces = res;
+                        this.shipingsProvinces = res;
                     }
                 );
         }
     }
 
-    getBillingProvinces(countryId?: string, provinceId: string = null) {
+    getBillingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
@@ -238,10 +241,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                             const obj = this.billingsProvinces.find(x => x.id === provinceId);
                             if (obj === undefined) {
                                 this.provinceId.setValue(null);
-
                             }
-                        } else {
-                            this.provinceId.setValue(null);
                         }
 
                     }
