@@ -1192,7 +1192,7 @@ namespace eFMS.API.Accounting.DL.Services
             var chargeShipmentList = GetChargesShipmentByCriteria(criteria);
             var result = new ChargeShipmentResult
             {
-                ChargeShipments = chargeShipmentList.Take(30).ToList(),
+                ChargeShipments = chargeShipmentList.ToList(),
                 TotalShipment = chargeShipmentList.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count(),
                 TotalCharge = chargeShipmentList.Count(),
                 AmountDebitLocal = chargeShipmentList.Sum(x => x.AmountDebitLocal),

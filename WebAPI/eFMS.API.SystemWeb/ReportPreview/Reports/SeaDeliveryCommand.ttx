@@ -29,3 +29,4 @@ FirstDestination	String	255
 SecondDestination	String	255	
 BillType	String	255	
 ArrivalNote	String	255	
+FinalDestination	String	255	
