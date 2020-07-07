@@ -44,8 +44,8 @@ export class ShareBusinessReAlertComponent extends AppList {
     isCheckedArrivalNotice: boolean = false;
     isExitsManifest: boolean = true;
     isCheckedManifest: boolean = false;
-    isExitsMawb: boolean = true;
-    isCheckedMawb: boolean = false;
+    isExitsHawb: boolean = true;
+    isCheckedHawb: boolean = false;
     isExitsSI: boolean = true;
     isCheckedSI: boolean = false;
 
@@ -121,7 +121,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 this.exportCrystalManifestToPdf();
-                this.exportCrystalMawbFrameToPdf();
+                this.exportCrystalHawbFrameToPdf();
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 this.exportCrystalSIToPdf();
@@ -362,7 +362,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
-    previewMawb() {
+    previewHawb() {
         this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
@@ -458,7 +458,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
-    exportCrystalMawbFrameToPdf() {
+    exportCrystalHawbFrameToPdf() {
         this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
@@ -474,11 +474,11 @@ export class ShareBusinessReAlertComponent extends AppList {
 
                         this.pathGeneralMawb = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
-                        this.isExitsMawb = true;
-                        this.isCheckedMawb = true;
+                        this.isExitsHawb = true;
+                        this.isCheckedHawb = true;
                     } else {
-                        this.isExitsMawb = false;
-                        this.isCheckedMawb = false;
+                        this.isExitsHawb = false;
+                        this.isCheckedHawb = false;
                     }
                 },
             );
@@ -519,7 +519,7 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.AE_CODE: // Air Export               
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedMawb);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
