@@ -632,6 +632,11 @@ export class SystemRepo {
         );
     }
 
+    getListServiceByPermision() {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/Menu/GetListService`).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }
 

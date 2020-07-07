@@ -98,6 +98,12 @@
             <param name="officeId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.MenuController.GetListService">
+            <summary>
+            get list menus service
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysAuthorizationController">
             <summary>
             Controller Authorization

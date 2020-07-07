@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using eFMS.API.Common.Globals;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.Infrastructure.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -42,5 +42,19 @@ namespace eFMS.API.System.Controllers
             var results = menuService.GetMenus(userId, officeId);
             return Ok(results);
         }
+
+        /// <summary>
+        /// get list menus service
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetListService")]
+        [Authorize]
+        public IActionResult GetListService()
+        {
+            List<CommonData> result = menuService.GetListService();
+            return Ok(result);
+        }
+
+
     }
 }

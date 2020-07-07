@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
 using eFMS.API.System.DL.ViewModels;
 using eFMS.API.System.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
@@ -11,6 +14,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using CommonData = eFMS.API.Common.Globals.CommonData;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -18,14 +22,20 @@ namespace eFMS.API.System.DL.Services
     {
         private IContextBase<SysUserPermission> userpermissionRepository;
         private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
+        private readonly ICurrentUser currentUser;
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        public SysMenuService(IContextBase<SysMenu> repository, ICacheServiceBase<SysMenu> cacheService, IMapper mapper,
+        public SysMenuService(
+            IContextBase<SysMenu> repository, 
+            ICacheServiceBase<SysMenu> cacheService, 
+            IMapper mapper,
             IContextBase<SysUserPermission> userpermissionRepo,
+            ICurrentUser icurrentUser,
             IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, cacheService, mapper)
         {
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
+            currentUser = icurrentUser;
         }
 
         //public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
@@ -72,6 +82,52 @@ namespace eFMS.API.System.DL.Services
                         OrderNumber = x.OrderNumber,
                         SubMenus = FlatToHierarchy(data, x.Id)
                     }).OrderBy(x => x.OrderNumber).ToList();
+        }
+
+        public List<CommonData> GetListService()
+        {
+            List<CommonData> results = new List<CommonData>();
+
+            // Lấy ra Permisison của User
+            Guid? permissionId = userpermissionRepository.Get(x => x.UserId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)?.FirstOrDefault().Id;
+
+            if (permissionId != Guid.Empty)
+            {
+                IQueryable<SysUserPermissionGeneral> permissionDetails = permissionGeneralRepository
+                    .Get(x => x.UserPermissionId == permissionId && x.Access == true)
+                    .Where(p => p.MenuId.Contains("doc") || p.MenuId.Contains("ops"));
+
+                bool hasOpsService = permissionDetails.Any(x => x.MenuId.Contains("ops"));
+
+                List<string> menuIds = (permissionDetails.Where(x => x.MenuId.Contains("doc"))).Select(x => x.MenuId).ToList();
+                if(hasOpsService)
+                {
+                    menuIds.Insert(0,"ops");
+                }
+
+                if(menuIds.Count() > 0)
+                {
+                    foreach (string menuId in menuIds)
+                    {
+                        if(menuId == "ops")
+                        {
+                            results.Add(CustomData.Services.FirstOrDefault(x => x.Value == "CL"));
+                            continue;
+                        }
+                        SysMenu menuDetail = DataContext.Get(x => x.Id == menuId)?.FirstOrDefault();
+                        if(menuDetail != null)
+                        {
+                            results.Add(new CommonData
+                            {
+                                Value = CustomData.Services.FirstOrDefault(x => x.DisplayName == menuDetail.NameEn).Value,
+                                DisplayName = menuDetail.NameEn
+                            });
+                        }
+                    }
+                }
+
+            }
+            return results;
         }
     }
 }
