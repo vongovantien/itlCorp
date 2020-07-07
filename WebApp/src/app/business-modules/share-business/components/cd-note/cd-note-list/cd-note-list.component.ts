@@ -165,8 +165,10 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     //     });
     // }
 
-    onRequestCdNoteChange() {
+    onRequestCdNoteChange($event) {
         this.getListCdNote(this.idMasterBill);
+        // Show detail popup
+        this.openPopupDetail($event.jobId, $event.code);
     }
 
     onDeletedCdNote() {

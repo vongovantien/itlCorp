@@ -162,7 +162,7 @@
 
 <ops-cd-note-detail (onDeleted)="onDeletedCdNote()"></ops-cd-note-detail>
 
-<ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange()"></ops-cd-note-add-popup>
+<ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></ops-cd-note-add-popup>
 
 <confirm-popup (onSubmit)="onDeleteCdNote()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
