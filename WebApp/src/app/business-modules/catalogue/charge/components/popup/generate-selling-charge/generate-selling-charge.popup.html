@@ -31,7 +31,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event,'accountNo')"
                                     [dataSources]="chartOfAccounts"
                                     [displayFields]="configComboChartOfAccount.displayFields"
-                                    placeholder="Select Account No" (remove)="accountNo.value= null">
+                                    placeholder="Select Account No" (remove)="this.accountNo.setValue(null)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -46,7 +46,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event,'accountCode')"
                                     [dataSources]="chartOfAccounts"
                                     [displayFields]="configComboChartOfAccount.displayFields"
-                                    placeholder="Select Account No VAT" (remove)="accountNoVAT.value= null">
+                                    placeholder="Select Account No VAT" (remove)="this.accountNoVAT.setValue(null)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
