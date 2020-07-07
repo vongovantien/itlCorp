@@ -149,7 +149,8 @@
                                 <label class="form-control-label">
                                     Selling Mapping
                                 </label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="debitCharge.setValue($event.id)"
+                                <app-combo-grid-virtual-scroll
+                                    (itemSelected)="debitCharge.setValue($event.id); !!debitCharge.value ? generateSelling.setValue(false) : generateSelling.setValue(true)"
                                     [currentActiveItemId]="{ field: 'id', value: debitCharge.value}"
                                     [selectedDisplayFields]="['chargeNameEn']" [dataSources]="debitCharges | async"
                                     [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"

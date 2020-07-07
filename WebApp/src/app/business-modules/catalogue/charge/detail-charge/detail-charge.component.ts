@@ -87,6 +87,9 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
 
                 this.Charge.charge.userCreated = res.charge.userCreated;
+                if (!!this.formAddCharge.debitCharge.value) {
+                    this.formAddCharge.generateSelling.setValue(false);
+                }
             }
         });
     }
