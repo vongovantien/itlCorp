@@ -510,6 +510,13 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
+        public IQueryable<CatChartOfAccounts> QueryActiveByCompany()
+        {
+            var data = DataContext.Get(x => x.Active == true);
+            data = data.Where(x => x.CompanyId == currentUser.CompanyID);
+            return data;
+        }
+
 
     }
 }

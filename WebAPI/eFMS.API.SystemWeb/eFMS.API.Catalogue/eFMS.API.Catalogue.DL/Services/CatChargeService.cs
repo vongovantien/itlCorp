@@ -54,7 +54,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 Guid chargeId = Guid.NewGuid();
                 model.Charge.Id = chargeId;
-                model.Charge.Active = true;
+                //model.Charge.Active = true;
                 model.Charge.UserCreated = model.Charge.UserModified = currentUser.UserID;
                 model.Charge.DatetimeCreated = DateTime.Now;
 
@@ -572,7 +572,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             CompanyId = x.x.CompanyId,
                             DepartmentId = x.x.DepartmentId
                         });
-            return list;
+            return list?.OrderByDescending(x=>x.DatetimeModified);
 
         }
 
