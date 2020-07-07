@@ -85,23 +85,24 @@ export class ShareBusinessFormManifestComponent extends AppForm {
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
-                        if (this.supplier.value === null) {
-                            this.supplier.setValue(this.shipmentDetail.supplierName);
-                        }
-                        if (this.pol.value === null) {
-                            this.pol.setValue(this.shipmentDetail.pol);
-                        }
-                        if (this.pod.value === null) {
-                            this.pod.setValue(this.shipmentDetail.pod);
-                        }
-                        if (this.marksOfNationality.value === null) {
-                            this.marksOfNationality.setValue(this.defaultMarksOfNationality);
-                        }
-                        if (this.freightCharge.value === null) {
-                            if (this.shipmentDetail.paymentTerm !== null) {
-                                this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
-                            }
-                        }
+                        console.log("shipment: ", res);
+
+                        this.supplier.setValue(this.shipmentDetail.supplierName);
+
+
+                        this.pol.setValue(this.shipmentDetail.pol);
+
+
+                        this.pod.setValue(this.shipmentDetail.pod);
+
+
+                        this.marksOfNationality.setValue(this.defaultMarksOfNationality);
+
+
+                        //if (this.shipmentDetail.paymentTerm !== null) {
+                        this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                        //}
+
                         if (this.isAir) {
                             this.vesselNo.setValue(res.flightVesselName);
                         } else {
@@ -115,9 +116,9 @@ export class ShareBusinessFormManifestComponent extends AppForm {
                         } else {
                             this.date.setValue({ startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) });
                         }
-                        if (this.agent.value === null) {
-                            this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
-                        }
+
+                        this.agent.setValue('TYPE NAME OF AGENT WHO ASSEMBLED THIS MANIFEST: INDO TRANS LOGISTICS CORPORATION \nSIGNATURE OF ASSEMBLING AGENT: PHONE# OF ASSEMBLING AGENT: (84 - 8) 3948 6888 \nRECEIVED BY CUSTOMS');
+
                     }
 
                 }
@@ -137,20 +138,20 @@ export class ShareBusinessFormManifestComponent extends AppForm {
 
     updateDataToForm(res: CsManifest) {
         this.formGroup.setValue({
-            referenceNo: res.refNo,
-            supplier: res.supplier,
-            attention: res.attention,
-            marksOfNationality: res.masksOfRegistration,
-            vesselNo: res.voyNo,
+            referenceNo: !!res.refNo ? res.refNo : null,
+            supplier: !!res.supplier ? res.supplier : null,
+            attention: !!res.attention ? res.attention : null,
+            marksOfNationality: !!res.masksOfRegistration ? res.masksOfRegistration : null,
+            vesselNo: !!res.voyNo ? res.voyNo : null,
             date: !!res.invoiceDate ? { startDate: new Date(res.invoiceDate), endDate: new Date(res.invoiceDate) } : null,
             freightCharge: [<CommonInterface.INg2Select>{ id: res.paymentTerm, text: res.paymentTerm }],
-            consolidator: res.consolidator,
-            deconsolidator: res.deConsolidator,
-            weight: res.weight,
-            volume: res.volume,
-            agent: res.manifestIssuer,
-            pol: res.pol,
-            pod: res.pod
+            consolidator: !!res.consolidator ? res.consolidator : null,
+            deconsolidator: !!res.deConsolidator ? res.deConsolidator : null,
+            weight: !!res.weight ? res.weight : null,
+            volume: !!res.volume ? res.volume : null,
+            agent: !!res.manifestIssuer ? res.manifestIssuer : null,
+            pol: !!res.pol ? res.pol : null,
+            pod: !!res.pod ? res.pod : null
         });
     }
 

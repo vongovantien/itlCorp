@@ -87,6 +87,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             );
     }
     setDataBillInstructionComponent(data: any) {
+        console.log("data set: ", data);
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe(

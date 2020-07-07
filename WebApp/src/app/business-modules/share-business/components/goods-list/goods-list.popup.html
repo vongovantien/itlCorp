@@ -69,9 +69,9 @@
                                             </button>
                                         </div>
                                     </td>
+                                    <!--1-->
                                     <td>
-                                        <div class="form-group "
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage}">
+                                        <div class="form-group ">
                                             <app-combo-grid-virtual-scroll
                                                 [currentActiveItemId]="{field: 'id', value: container.containerTypeId}"
                                                 (itemSelected)="onChangeDataFormTable();container.containerTypeId = $event.id"
@@ -81,6 +81,7 @@
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </td>
+                                    <!--2-->
                                     <td>
                                         <div class="form-group" [ngClass]="{'m-form__group has-danger': 
                                             isSubmitted && ((!!container.containerNo || !!container.sealNo || !!container.markNo ) && !container.quantity)
@@ -90,22 +91,46 @@
                                                 integer min="0">
                                         </div>
                                     </td>
+                                    <!--7-->
                                     <td>
-                                        <div class=" form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !container.gw}">
-                                            <input type="number" class="form-control" [(ngModel)]="container.gw"
-                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal"
-                                                autoFormatCurrency>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!!container.duplicate && container.duplicate)}">
+                                            <input type="text" class="form-control" [(ngModel)]="container.containerNo"
+                                                (ngModelChange)="onChangeDataFormTable()" name="containerNo">
                                         </div>
                                     </td>
+                                    <!--8-->
                                     <td>
-                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
-                                            isSubmitted && !container.cbm}">
-                                            <input type="number" class="form-control" [(ngModel)]="container.cbm"
-                                                name="cbm" min="0" step=".10" (ngModelChange)="onChangeDataFormTable()"
-                                                numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!!container.duplicate && container.duplicate)}">
+                                            <input type="text" class="form-control" [(ngModel)]="container.sealNo"
+                                                name="sealNo">
                                         </div>
                                     </td>
+                                    <!--6-->
+                                    <td>
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                                                 isSubmitted && ( !container.packageQuantity )}">
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
+                                                (ngModelChange)="onChangeDataFormTable()" integer min="0" step="1">
+                                        </div>
+                                    </td>
+                                    <!--5-->
+                                    <td>
+                                        <div class="form-group "
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.packageTypeId)}">
+
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: container.packageTypeId}"
+                                                (itemSelected)="onChangeDataFormTable();container.packageTypeId = $event.id"
+                                                [selectedDisplayFields]="['unitNameEn']" [dataSources]="packageUnits"
+                                                [displayFields]="[{'field':'unitNameEn','label':'Name'}, {'field':'code','label':'Code'}]"
+                                                placeholder="Please select">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+                                    </td>
+                                    <!--
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (isDuplicateContPakage || !container.packageTypeId) }">
@@ -117,35 +142,36 @@
                                                 </option>
                                             </select>
                                         </div>
-                                    </td>
+                                    </td>-->
+                                    <!--3-->
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger':
-                                                 isSubmitted && (isDuplicateContPakage || !container.packageQuantity)}">
-                                            <input type="number" class="form-control"
-                                                [(ngModel)]="container.packageQuantity" name="packageQuantity"
-                                                (ngModelChange)="onChangeDataFormTable()" integer min="0" step="1">
+                                        <div class=" form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !container.gw}">
+                                            <input type="number" class="form-control" [(ngModel)]="container.gw"
+                                                name="gw" min="0" step=".10" numeric [decimals]="digitDecimal"
+                                                autoFormatCurrency>
                                         </div>
                                     </td>
+                                    <!--4-->
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicateContPakage }">
-                                            <input type="text" class="form-control" [(ngModel)]="container.containerNo"
-                                                (ngModelChange)="onChangeDataFormTable()" name="containerNo">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
+                                            isSubmitted && !container.cbm}">
+                                            <input type="number" class="form-control" [(ngModel)]="container.cbm"
+                                                name="cbm" min="0" step=".10" (ngModelChange)="onChangeDataFormTable()"
+                                                numeric [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" [(ngModel)]="container.sealNo"
-                                                name="sealNo">
-                                        </div>
-                                    </td>
+
+
+
+                                    <!--9-->
                                     <td>
                                         <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="container.markNo"
                                                 name="markNo">
                                         </div>
                                     </td>
+                                    <!--10-->
                                     <td>
                                         <div class="form-group">
                                             <app-combo-grid-virtual-scroll
@@ -158,6 +184,7 @@
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </td>
+                                    <!--11-->
                                     <td>
                                         <div class="form-group">
                                             <input type="text" class="form-control" [(ngModel)]="container.description"
