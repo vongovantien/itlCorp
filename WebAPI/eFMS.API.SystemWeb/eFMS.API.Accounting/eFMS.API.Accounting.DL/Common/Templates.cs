@@ -82,5 +82,10 @@ namespace eFMS.API.Accounting.DL.Common
                 public static string ListName = "Units";
             }
         }
+
+        public struct AccAdvance
+        {
+            public static string ExelImportFileName = "Voucher";
+        }
     }
 }

@@ -20,9 +20,9 @@
                             <label class="form-control-label" for="">
                                 Select single with search
                             </label>
-                            <ng-select #categorySelect [allowClear]="true" [items]="categories" [disabled]="disabled" (data)="refreshValue($event)"
-                                (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                placeholder="Select filter">
+                            <ng-select #categorySelect [allowClear]="true" [items]="categories" [disabled]="disabled"
+                                (data)="refreshValue($event)" (selected)="selected($event)" (removed)="removed($event)"
+                                (typed)="typed($event)" placeholder="Select filter">
                             </ng-select>
                         </div>
                     </div>
@@ -32,15 +32,11 @@
                                 Daterange picker
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square"
-                                    ngxDaterangepickerMd
-                                    [(ngModel)]="selectedRange"
-                                    [ranges]="ranges"
-                                    [maxDate]="maxDate"
-                                    [alwaysShowCalendars]="true"
-                                    name="daterange" 
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [(ngModel)]="selectedRange" [ranges]="ranges" [maxDate]="maxDate"
+                                    [alwaysShowCalendars]="true" name="daterange"
                                     [locale]="{applyLabel: 'ok', format: 'DD/MM/YYYY'}"
-                                    placeholder="From date - to date" readonly/>
+                                    placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -54,13 +50,15 @@
                             <label class="form-control-label" for="">
                                 Name/Code
                             </label>
-                            <input type="text" class="form-control m-input m-input--square" placeholder="" aria-autocomplete="nope"
-                                [(ngModel)]="criteria.query" (change)="criteria.query=criteria.query.trim()">
+                            <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                aria-autocomplete="nope" [(ngModel)]="criteria.query"
+                                (change)="criteria.query=criteria.query.trim()">
                         </div>
                     </div>
                 </div>
                 <div class="form-actions m--align-right">
-                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="search()">
+                    <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="search()">
                         <span>
                             <i class="la la-search"></i>
                             <span>
@@ -68,7 +66,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="resetSearch()">
+                    <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                        (click)="resetSearch()">
                         <span>
                             <i class="la la-refresh"></i>
                             <span>
@@ -93,19 +92,23 @@
                             <th class="sorting_asc">
                                 <span>No</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'name'), 'sorting_desc': (!isDesc && sortKey == 'name') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'name'), 'sorting_desc': (!isDesc && sortKey == 'name') }"
                                 (click)="sort('name')">
                                 <span>Name/Code</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'action'), 'sorting_desc': (!isDesc && sortKey == 'action') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'action'), 'sorting_desc': (!isDesc && sortKey == 'action') }"
                                 (click)="sort('action')">
                                 <span>Action</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'userUpdated'), 'sorting_desc': (!isDesc && sortKey == 'userUpdated') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'userUpdated'), 'sorting_desc': (!isDesc && sortKey == 'userUpdated') }"
                                 (click)="sort('userUpdated')">
                                 <span>User Update</span>
                             </th>
-                            <th class="sorting" [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeUpdated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeUpdated') }"
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'datetimeUpdated'), 'sorting_desc': (!isDesc && sortKey == 'datetimeUpdated') }"
                                 (click)="sort('datetimeUpdated')">
                                 <span>Update Time</span>
                             </th>
@@ -137,7 +140,8 @@
                             <td>
                                 <span>{{ log.action }}</span>
                                 <span *ngIf="log.propertyChange == null && log.action=='Update'">: nochange </span>
-                                <span *ngIf="log.propertyChange"> {{ log.propertyChange.propertyName }} : {{ log.propertyChange.newValue }} </span>
+                                <span *ngIf="log.propertyChange"> {{ log.propertyChange.propertyName }} :
+                                    {{ log.propertyChange.newValue }} </span>
                             </td>
                         </tr>
                         <!-- <tr>
@@ -163,7 +167,7 @@
                         </tr> -->
                     </tbody>
                 </table>
-                <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination>
+                <!-- <app-pagination *ngIf="pager.totalItems>0" [config]="pager" (pagerObject)="setPage($event)"></app-pagination> -->
             </div>
             <!--end: Datatable -->
         </div>

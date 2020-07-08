@@ -267,7 +267,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 AreaName = currentCulture.IetfLanguageTag == "en-US" ? x.AreaNameEN : x.AreaNameVN,
                 LocalAreaName = x.LocalAreaNameVN,
                 FlightVesselNo = x.FlightVesselNo,
-                
+
             });
         }
 
@@ -276,7 +276,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var list = QueryCriteria(criteria);
             if (list == null) return null;
             IQueryable<sp_GetCatPlace> data = null;
-            if(list == null)
+            if (list == null)
             {
                 return null;
             }
@@ -318,7 +318,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 new SqlParameter(){ ParameterName="@placeTypeID", Value = placeTypeID }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetCatPlace>(parameters);
-            
+
             return list;
         }
 
@@ -836,7 +836,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string placetype = PlaceTypeEx.GetPlaceType(criteria.PlaceType);
             var list = GetBy(placetype);
-            
+
             if (criteria.All == null)
             {
                 list = list.Where(x => ((x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1)
@@ -855,6 +855,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                     && ((x.ModeOfTransport ?? "").IndexOf(criteria.ModeOfTransport ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                     && (x.AreaNameEN ?? "").IndexOf(criteria.AreaNameEN ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.AreaNameVN ?? "").IndexOf(criteria.AreaNameVN ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                    && (x.DisplayName ?? "").IndexOf(criteria.DisplayName ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                     && (x.FlightVesselNo ?? "").Contains(criteria.FlightVesselNo ?? "", StringComparison.OrdinalIgnoreCase) == true
                                     && (x.Active == criteria.Active || criteria.Active == null)
                     )?.AsQueryable();
@@ -875,6 +876,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.AreaNameEN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.AreaNameVN ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || ((x.ModeOfTransport ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                   || ((x.DisplayName ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                    || (x.FlightVesselNo ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) == true
                                    )
                                    && (x.Active == criteria.Active || criteria.Active == null)
@@ -892,7 +894,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 return null;
             }
 
-            CatPlaceModel result =  mapper.Map<CatPlaceModel>(data);
+            CatPlaceModel result = mapper.Map<CatPlaceModel>(data);
 
             if (data.PlaceTypeId == CatPlaceTypeEnum.Warehouse.ToString())
             {
@@ -902,8 +904,8 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPortindex);
             }
-            if (data.PlaceTypeId == CatPlaceTypeEnum.Province.ToString() 
-                || data.PlaceTypeId == CatPlaceTypeEnum.District.ToString() 
+            if (data.PlaceTypeId == CatPlaceTypeEnum.Province.ToString()
+                || data.PlaceTypeId == CatPlaceTypeEnum.District.ToString()
                 || data.PlaceTypeId == CatPlaceTypeEnum.Ward.ToString())
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catLocation);
@@ -960,4 +962,4 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
     }
-} 
+}

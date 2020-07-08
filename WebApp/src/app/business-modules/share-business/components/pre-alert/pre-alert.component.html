@@ -163,18 +163,18 @@
                                 </label>
                             </ng-template>
 
-                            <ng-container *ngIf="isExitsMawb else NotMawb">
+                            <ng-container *ngIf="isExitsHawb else NotHawb">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedMawb" (change)="onChangeCheckBox()">
+                                    <input type="checkbox" [(ngModel)]="isCheckedHawb" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span><a class="pointer" (click)="previewMawb()">MAWB</a></span>
+                                <span><a class="pointer" (click)="previewHawb()">HAWB</a></span>
                             </ng-container>
-                            <ng-template #NotMawb>
+                            <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
-                                    MAWB
+                                    HAWB
                                     <span></span>
                                 </label>
                             </ng-template>
@@ -183,20 +183,58 @@
 
                     <div class="form-group m-form__group" *ngIf="serviceId === 'SFE' || serviceId === 'SLE'">
                         <div class="m-checkbox-inline">
+                            <ng-container *ngIf="isExitsSISummary else NotSISummary">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedSISummary"
+                                        (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span style='margin-right: 20px;'>
+                                    <a class="pointer" (click)="previewSISummary()">SI Summary</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotSISummary>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    SI Summary
+                                    <span></span>
+                                </label>
+                            </ng-template>
+
                             <ng-container *ngIf="isExitsSI else NotSI">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
                                     <input type="checkbox" [(ngModel)]="isCheckedSI" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span>
-                                    <a class="pointer" (click)="previewSI()">S.I</a>
+                                <span style='margin-right: 20px;'>
+                                    <a class="pointer" (click)="previewSI()">SI HBL Detail</a>
                                 </span>
                             </ng-container>
                             <ng-template #NotSI>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
-                                    S.I
+                                    SI HBL Detail
+                                    <span></span>
+                                </label>
+                            </ng-template>
+
+                            <ng-container *ngIf="isExitsSIDetailCont else NotSIDetailCont">
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;">
+                                    <input type="checkbox" [(ngModel)]="isCheckedSIDetailCont"
+                                        (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span style='margin-right: 20px;'>
+                                    <a class="pointer" (click)="previewSIDetailCont(serviceId)">SI Detail (Cont)</a>
+                                </span>
+                            </ng-container>
+                            <ng-template #NotSIDetailCont>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    SI Detail (Cont)
                                     <span></span>
                                 </label>
                             </ng-template>

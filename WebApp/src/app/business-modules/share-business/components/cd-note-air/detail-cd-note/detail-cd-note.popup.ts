@@ -7,7 +7,6 @@ import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { DomSanitizer } from "@angular/platform-browser";
-import { API_MENU } from "src/constants/api-menu.const";
 import { ModalDirective } from "ngx-bootstrap";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
@@ -47,7 +46,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
-        private api_menu: API_MENU,
     ) {
         super();
         this.requestSort = this.sortChargeCdNote;
@@ -113,7 +111,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
         const listCurrency = [];
         const listCharge = [];
         for (const currency of this.CdNoteDetail.listSurcharges.map(m => m.currencyId)) {
-            listCurrency.push(currency)
+            listCurrency.push(currency);
         }
         for (const charge of this.CdNoteDetail.listSurcharges) {
             listCharge.push(charge);
@@ -259,7 +257,6 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends PopupBase {
     }
 
     get scr() {
-        // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
         // return this.sanitizer.bypassSecurityTrustResourceUrl("http://localhost:53717");
         return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }

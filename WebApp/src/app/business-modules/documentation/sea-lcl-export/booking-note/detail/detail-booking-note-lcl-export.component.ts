@@ -166,6 +166,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                 closingTime: !!res.closingTime ? { startDate: new Date(res.closingTime), endDate: new Date(res.closingTime) } : null,
                 dateOfStuffing: !!res.dateOfStuffing ? { startDate: new Date(res.dateOfStuffing), endDate: new Date(res.dateOfStuffing) } : null,
+                bookingDate: !!res.bookingDate ? { startDate: new Date(res.bookingDate), endDate: new Date(res.bookingDate) } : null,
 
                 paymentTerm: !!res.paymentTerm ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
 
@@ -213,3 +214,4 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
         f.show();
     }
 }
+

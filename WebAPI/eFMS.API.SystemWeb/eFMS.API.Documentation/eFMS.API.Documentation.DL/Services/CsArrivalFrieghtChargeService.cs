@@ -99,14 +99,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var charges = chargeRepository.Get();
                 var units = unitRepository.Get();
-                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code })
+                var tempdata = freightCharges.Join(charges, x => x.ChargeId, y => y.Id, (x, y) => new { ArrivalFrieghtCharge = x, ChargeCode = y.Code, ChargeName = y.ChargeNameEn })
                     .Join(units, x => x.ArrivalFrieghtCharge.UnitId, y => y.Id, (x, y) => new { CsArrivalFrieghtCharge = x, UnitName = y.Code });
                 foreach (var item in tempdata)
                 {
                     var charge = item.CsArrivalFrieghtCharge.ArrivalFrieghtCharge;
                     charge.CurrencyName = charge.CurrencyId;
-                    charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeCode;
+                    charge.ChargeName = item.CsArrivalFrieghtCharge.ChargeName;
                     charge.UnitName = item.UnitName;
+                    charge.ChargeCode = item.CsArrivalFrieghtCharge.ChargeCode;
                     result.Add(charge);
                 }
             }
@@ -436,7 +437,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
                 var _podName = placeRepository.Get(x => x.Id == houseBill.Pod).FirstOrDefault()?.NameEn;
                 var _shipperName = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
-                var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
+                //var _consigneeName = partnerRepositoty.Get(x => x.Id == houseBill.ConsigneeId).FirstOrDefault()?.PartnerNameEn;
                 var _agentName = partnerRepositoty.Get(x => x.Id == houseBill.ForwardingAgentId).FirstOrDefault()?.PartnerNameEn;
 
                 var _arrivalHeader = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalHeader);
@@ -449,7 +450,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var charge = new AirImptArrivalReport();
                         charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                         charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
-                        charge.Consignee = _consigneeName?.ToUpper();  //Consignee
+                        charge.Consignee = houseBill.ConsigneeDescription?.ToUpper();//_consigneeName?.ToUpper();  //Consignee
                         charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                         charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                         charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
@@ -492,7 +493,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var charge = new AirImptArrivalReport();
                     charge.HWBNO = houseBill.Hwbno?.ToUpper(); //HWBNO
                     charge.ArrivalNo = arrival.ArrivalNo?.ToUpper(); //ArrivalNo
-                    charge.Consignee = _consigneeName?.ToUpper(); //Consignee
+                    charge.Consignee = houseBill.ConsigneeDescription?.ToUpper();//_consigneeName?.ToUpper(); //Consignee
                     charge.ReferrenceNo = houseBill.ReferenceNo?.ToUpper() ?? string.Empty;
                     charge.FlightNo = houseBill.FlightNo?.ToUpper(); //FlightNo (Arrival)
                     charge.DepartureAirport = _polName?.ToUpper(); //DepartureAirport (POL)
@@ -716,7 +717,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SecondDestination = detail.DosentTo2?.ToUpper(),
                 ArrivalNote = detail.ArrivalNo?.ToUpper(),
                 FlightDate = detail.Eta,
-                BillType = detail.ServiceType?.ToUpper()
+                BillType = detail.ServiceType?.ToUpper(),
+                FinalDestination = detail.FinalDestinationPlace?.ToUpper()
             };
             dataSources.Add(item);
             var result = new Crystal

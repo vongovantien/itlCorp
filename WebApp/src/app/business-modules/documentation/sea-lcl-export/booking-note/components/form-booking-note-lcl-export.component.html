@@ -14,10 +14,18 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-lg-2">
-                            <label>Tel</label>
+                            <label>Booking Date</label>
                         </div>
                         <div class="col-lg-10">
-                            <input type="text" class="form-control" formControlName="telFrom">
+                            <!-- <input type="text" class="form-control" formControlName="telFrom"> -->
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select date" readonly
+                                    formControlName="bookingDate" calendar
+                                    [allowRemove]="!!bookingDate.value && !!bookingDate.value.startDate"
+                                    (remove)="resetFormControl(bookingDate)" />
+                            </div>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -45,6 +53,7 @@
                         </div>
                         <div class="col-lg-10">
                             <input type="text" class="form-control" formControlName="telTo">
+
                         </div>
                     </div>
                     <div class="form-group row "
@@ -146,7 +155,8 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted && formGroup.errors | equalError:'validateEta_Etd') }">
                                 <label>ETA</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -155,13 +165,16 @@
                                         calendar [allowRemove]="!!eta.value && !!eta.value.startDate"
                                         (remove)="resetFormControl(eta)" />
                                 </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && formGroup.errors | equalError:'validateEta_Etd'">{{errorETA}}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger':(isSubmitted || pol.dirty) && !pol.valid }">
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && (!pol.value || (formGroup.errors | equalError:'invalidPort')) }">
                         <label required>POL</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [currentActiveItemId]="{ field: 'id', value: pol.value}"
@@ -172,7 +185,8 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && (formGroup.errors | equalError:'invalidPort')}">
                         <label>POD</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [currentActiveItemId]="{ field: 'id', value: pod.value}"
@@ -180,7 +194,12 @@
                             [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
                             placeholder="Select POD">
                         </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback"
+                            *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">
+                            POD must be different from POL
+                        </div>
                     </div>
+
                 </div>
                 <div class="col-lg-4">
                     <div class="row">

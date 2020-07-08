@@ -131,10 +131,13 @@ namespace eFMS.API.Documentation.DL.Services
                 report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency);
                 //Tổng amount Trước thuế của phí tick chon Kick Back
                 report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency);
-                var contInfo = GetContainer(containerData, item.Id);
-                report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                report.Qty20 = (decimal)contInfo?.Qty20;
-                report.Qty40 = (decimal)contInfo?.Qty40;
+                var contInfo = GetContainer(containerData, null, item.Hblid);
+                if(contInfo != null)
+                {
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC;
+                    report.Qty20 = (decimal)contInfo?.Qty20;
+                    report.Qty40 = (decimal)contInfo?.Qty40;
+                }
                 results.Add(report);
             }
             return results.AsQueryable();
@@ -241,10 +244,13 @@ namespace eFMS.API.Documentation.DL.Services
                 report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency);
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
                 report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
-                var contInfo = GetContainer(containerData, item.HBLID);
-                report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                report.Qty20 = (decimal)contInfo?.Qty20;
-                report.Qty40 = (decimal)contInfo?.Qty40;
+                var contInfo = GetContainer(containerData, null, item.HBLID);
+                if(contInfo != null)
+                {
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC;
+                    report.Qty20 = (decimal)contInfo?.Qty20;
+                    report.Qty40 = (decimal)contInfo?.Qty40;
+                }
                 results.Add(report);
             }
             return results.AsQueryable();
@@ -318,9 +324,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 report = new MonthlySaleReportResult();
                 var conts = containers.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
-                report.Cont40HC = (decimal)conts.Where(x => x.Code == "Cont40HC").Sum(x => x.x.Quantity);
-                report.Qty20 = (decimal)conts.Where(x => x.Code == "Cont20DC").Sum(x => x.x.Quantity);
-                report.Qty40 = (decimal)conts.Where(x => x.Code == "Cont40DC").Sum(x => x.x.Quantity);
+                report.Cont40HC = (decimal)conts.Where(x => x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                report.Qty20 = (decimal)conts.Where(x => x.Code.Contains("20") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
+                report.Qty40 = (decimal)conts.Where(x => x.Code.Contains("40") && !x.Code.Contains("HQ")).Sum(x => x.x.Quantity);
             }
             return report;
         }

@@ -137,7 +137,12 @@ export class AuthorizationAddPopupComponent extends PopupBase {
                 inactiveOn: this.authorization.inactiveOn,
                 servicesName: this.authorization.servicesName,
                 userNameAssign: '',
-                userNameAssignTo: ''
+                userNameAssignTo: '',
+                groupId: this.authorization.groupId,
+                departmentId: this.authorization.departmentId,
+                officeId: this.authorization.officeId,
+                companyId: this.authorization.companyId,
+                permission: this.authorization.permission
             };
             this.authorizationToUpdate = _authorization;
             if (this.action === "create") {
@@ -183,12 +188,12 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     }
 
     getDetail() {
-        const indexPIC = this.personInChargeList.findIndex(x => x.id == this.authorization.userId);
+        const indexPIC = this.personInChargeList.findIndex(x => x.id === this.authorization.userId);
         if (indexPIC > -1) {
             this.personInChargeActive = [this.personInChargeList[indexPIC]];
         }
 
-        const indexAP = this.authorizedPersonList.findIndex(x => x.id == this.authorization.assignTo);
+        const indexAP = this.authorizedPersonList.findIndex(x => x.id === this.authorization.assignTo);
         if (indexAP > -1) {
             this.authorizedPersonActive = [this.authorizedPersonList[indexAP]];
         }
@@ -230,6 +235,6 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.formAuthorization.reset();
         this.minDateExpired = null;
         this.minDateEffective = null;
-        //this.formAuthorization.updateValueAndValidity();
+        // this.formAuthorization.updateValueAndValidity();
     }
 }

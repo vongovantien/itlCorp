@@ -1,15 +1,8 @@
 <div class="department-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="openPopupAddAuthorization()">
-                <span>
-                    <i class="la la-plus"></i>
-                    <span>
-                        Authorization
-                    </span>
-                </span>
-            </button>
+            <app-permission-button title="Authorization" (onClick)="openPopupAddAuthorization()" type="add">
+            </app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
@@ -30,16 +23,12 @@
                                     <tr *ngFor="let authorization of authorizations; let i = index; trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
-                                                <button type="button" title="Detail"
-                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                    (click)="showDetailAuthorization(authorization)">
-                                                    <i class="la la-edit"></i>
-                                                </button>
-                                                <button type="button" [disabled]="authorization.active" title="Delete"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
-                                                    (click)="showConfirmDelete(authorization)">
-                                                    <i class="la la-trash"></i>
-                                                </button>
+                                                <app-permission-button (onClick)="viewDetail(authorization)"
+                                                    type="detail">
+                                                </app-permission-button>
+                                                <app-permission-button
+                                                    (onClick)="prepareDeleteAuthorization(authorization)" type="delete">
+                                                </app-permission-button>
                                             </div>
                                         </td>
                                         <td>{{authorization.servicesName}}</td>
@@ -91,3 +80,4 @@
 <confirm-popup [body]="'Are you sure you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteAuthorization()">
 </confirm-popup>
 <add-authorization-popup (onRequestAuthorization)="onRequestAuthorization()"></add-authorization-popup>
+<permission-403-popup></permission-403-popup>

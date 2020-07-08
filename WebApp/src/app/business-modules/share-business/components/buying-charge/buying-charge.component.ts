@@ -1,11 +1,11 @@
-import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ElementRef, ComponentRef } from '@angular/core';
+import { Component, ViewChild, Input, ViewContainerRef, ViewChildren, QueryList, ComponentRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, Customer } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -14,7 +14,7 @@ import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAct
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share, take, skip } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, share, skip, map } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -987,6 +987,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     updatePayer(charge: CsShipmentSurcharge, partner: Partner) {
         charge.paymentObjectId = !!partner ? partner.id : null;
         charge.partnerShortName = !!partner ? partner.shortName : '';
+        charge.partnerName = !!partner ? partner.partnerNameEn : '';
+
         return charge;
     }
 
@@ -1019,6 +1021,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._toastService.warning("Not found Airline/Coloader of shipment");
             }
         }
+    }
+
+    getRecentlyCharge() {
+        const body: IRecentlyCharge = {
+            currentJobId: this.shipment.id,
+            personInCharge: this.shipment.personIncharge,
+            transactionType: this.utility.getTransationType(this.shipment.transactionType),
+            shippingLine: this.shipment.coloaderId,
+
+            consigneeId: this.hbl.consigneeId,
+            pol: this.hbl.pol,
+            pod: this.hbl.pod,
+            chargeType: this.TYPE,
+            customerId: this.hbl.customerId,
+        };
+        this._documentRepo.getRecentlyCharges(body)
+            .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
+            .subscribe(
+                (charges: CsShipmentSurcharge[]) => {
+                    if (!charges.length) {
+                        this._toastService.warning("Not found recently charge");
+                        return;
+                    }
+                    if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
+                        });
+                    }
+                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+                        });
+                    }
+                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
+                        charges.forEach(c => {
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
+                        });
+                    }
+                }
+            );
     }
 
     loadDynamicComoGrid(charge: CsShipmentSurcharge, index: number) {
@@ -1115,4 +1160,16 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             //     }
         }
     }
+}
+
+interface IRecentlyCharge {
+    currentJobId: string;
+    personInCharge: string;
+    transactionType: number;
+    shippingLine: string;
+    customerId: string;
+    consigneeId: string;
+    pol: string;
+    pod: string;
+    chargeType: string; // * BUY/SELL/OBH
 }

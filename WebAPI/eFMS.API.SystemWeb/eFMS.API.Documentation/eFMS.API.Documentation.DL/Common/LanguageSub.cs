@@ -63,5 +63,7 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static readonly string MSG_NOT_EXIST_SHIPMENT = "MSG_NOT_EXIST_SHIPMENT";
         public static readonly string DO_NOT_HAVE_PERMISSION = "DO_NOT_HAVE_PERMISSION";
+        public static readonly string MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA = "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA";
+        public static readonly string MSG_HOUSEBILL_NOT_FOUND = "MSG_HOUSEBILL_NOT_FOUND";
     }
 }

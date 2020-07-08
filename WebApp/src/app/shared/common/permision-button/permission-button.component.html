@@ -5,7 +5,7 @@
             <span NoDbClick>
                 <i class="la la-upload"></i>
                 <span>
-                    {{title}}
+                    {{title || 'Import'}}
                 </span>
             </span>
         </button>
@@ -16,7 +16,7 @@
             <span>
                 <i class="la la-download"></i>
                 <span>
-                    {{title}}
+                    {{title || 'Export'}}
                 </span>
             </span>
         </button>
@@ -27,7 +27,7 @@
             <span>
                 <i class="la la-save"></i>
                 <span>
-                    {{title}}
+                    {{title || "Save"}}
                 </span>
             </span>
         </button>

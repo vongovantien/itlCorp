@@ -58,12 +58,13 @@
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
                     <ng-container>
                         <form-create-house-bill-import> </form-create-house-bill-import>
-                        <hbl-goods-summary-lcl> HBL Goods Summary </hbl-goods-summary-lcl>
+                        <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
+                        </hbl-goods-summary-lcl>
                     </ng-container>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
                     <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                        <hbl-arrival-note-sea></hbl-arrival-note-sea>
+                        <hbl-arrival-note-sea type="SLI"></hbl-arrival-note-sea>
                     </ng-container>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">

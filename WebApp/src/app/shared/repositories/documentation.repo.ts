@@ -568,6 +568,19 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewSIContReport(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLContShippingInstruction/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewSIContLCLReport(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewLCLContShippingInstruction/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     previewOCLReport(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewFCLOCL`, body).pipe(
             map((data: any) => data)
@@ -891,5 +904,25 @@ export class DocumentationRepo {
 
     getDetailCsBookingNote(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsBookingNote/${id}`);
+    }
+
+    getRecentlyCharges(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GetRecentlyCharges`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    pagingInvoiceAndCDNotes(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewSISummaryByJobId(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewSISummaryByJobId/${id}`).pipe(
+            map((data: any) => data)
+        );
     }
 }

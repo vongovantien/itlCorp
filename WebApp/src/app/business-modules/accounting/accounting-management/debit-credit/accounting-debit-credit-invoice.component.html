@@ -1,0 +1,124 @@
+<div class="acc-cd-invoice-wrapper  m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
+                    <form-search-accounting-management (onSearch)="searchInvoiceAndCDNotes($event)"
+                        (onReset)="resetSearch($event)">
+                    </form-search-accounting-management>
+                    <div class="m-portlet">
+                        <div class="m-portlet__body">
+                            <div class="m-form m--margin-bottom-10">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <ng-container
+                                            *ngIf="(menuSpecialPermission | async | specialPermission:'Voucher') || (menuSpecialPermission | async | specialPermission:'Invoice')">
+                                            <div class="dropdown m-dropdown m-dropdown--inline">
+                                                <button type="button" class="btn btn-success dropdown-toggle"
+                                                    data-toggle="dropdown">
+                                                    <i class="la la-download"></i>Issue<span class="caret"></span>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item pointer" (click)="issueVatInvoice()"
+                                                        *ngIf="menuSpecialPermission | async | specialPermission:'Invoice'">VAT
+                                                        Invoice</a>
+                                                    <a class="dropdown-item pointer" (click)="issueVoucher()"
+                                                        *ngIf="menuSpecialPermission | async | specialPermission:'Voucher'">Voucher</a>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-wrapper">
+                                <table class="table table-striped table-brand dataTable">
+                                    <thead app-table-header [headers]="headers"
+                                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                        <th class="first table-actions-col"></th>
+                                    </thead>
+                                    <tbody>
+                                        <ng-container *ngIf="!!cdNotes">
+                                            <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col" ngi>
+                                                    <div class="table-actions" *ngIf="cdNote.status === 'New'">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" [(ngModel)]="cdNote.isSelected">
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDetailCDNote(cdNote.jobId, cdNote.referenceNo)">{{cdNote.referenceNo}}</a>
+                                                </td>
+                                                <td>{{cdNote.jobNo}}</td>
+                                                <td>
+                                                    {{cdNote.hblNo}}
+                                                </td>
+                                                <td>
+                                                    {{cdNote.partnerName}}
+                                                </td>
+                                                <td>{{ cdNote.total | number: '.0-3'}}</td>
+                                                <td>{{ cdNote.currency}}</td>
+                                                <td>{{ cdNote.issuedDate | date: 'dd/MM/yyyy'}}</td>
+                                                <td class="text-success">{{ cdNote.creator}}</td>
+                                                <td>
+                                                    <ng-container [ngSwitch]="cdNote.status">
+                                                        <ng-container *ngSwitchCase="'New'">
+                                                            <span class="text-danger">{{cdNote.status}}</span>
+                                                        </ng-container>
+                                                        <ng-container *ngSwitchCase="'Issued'">
+                                                            <span class="text-info">{{cdNote.status}}</span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </td>
+                                            </tr>
+                                        </ng-container>
+                                        <tr app-table-none-record *ngIf="!isLoading && !cdNotes.length"
+                                            [colspan]="headers.length + 1">
+                                        </tr>
+                                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-nav">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="tatable__pager-size">
+                                            <div class="select-box">
+                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                                    (change)="selectPageSize(pageSize)" name="pagesize">
+                                                    <ng-container
+                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                        <div class="float-right">
+                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                                [(ngModel)]="page" [maxSize]="10">
+                                            </pagination>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab *ngIf="menuSpecialPermission | async | specialPermission:'Invoice'" heading="VAT Invoice"
+                    (selectTab)="onSelectTab('vat')" [active]="selectedTab === 'VAT'"> </tab>
+                <tab *ngIf="menuSpecialPermission | async | specialPermission:'Voucher'" heading="Voucher"
+                    (selectTab)="onSelectTab('voucher')" [active]="selectedTab === 'VOUCHER'"> </tab>
+            </tabset>
+        </div>
+    </div>
+</div>
+
+<accounting-detail-cd-note></accounting-detail-cd-note>
+
+<select-partner-popup (onSelect)="onSelectPartner()"></select-partner-popup>

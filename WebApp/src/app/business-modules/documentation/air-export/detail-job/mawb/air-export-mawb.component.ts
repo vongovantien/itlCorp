@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { CatalogueRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Customer, PortIndex, Currency, Warehouse, DIM, CsOtherCharge, AirwayBill, CsTransaction } from '@models';
-import { formatDate } from '@angular/common';
+import { formatDate, formatCurrency } from '@angular/common';
 import { InfoPopupComponent, ReportPreviewComponent, } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -215,6 +215,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         this.isUpdate = true;
                         this.otherCharges = res.otherCharges;
                         this.dimensionDetails = res.dimensionDetails;
+                        console.log(this.dimensionDetails);
 
                         this._store.dispatch(new GetShipmentOtherChargeSuccessAction(this.otherCharges));
                         this._store.dispatch(new GetDimensionSuccessAction(this.dimensionDetails));
@@ -626,17 +627,12 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     if (!!value && !!value.length) {
                         switch (value[0].id) {
                             case 'PP':
-                                if (!this.dueAgentPp.value) {
-                                    this.dueAgentCll.setValue(null);
-                                }
+                                this.updateDueAgentCarrierWithTotalAgent(this.dueAgentCll.value, this.dueCarrierCll.value);
                                 break;
                             case 'CLL':
-                                if (!this.dueAgentCll.value) {
-                                    this.dueAgentPp.setValue(null);
-                                }
+                                this.updateDueAgentCarrierWithTotalAgent(this.dueAgentPp.value, this.dueCarrierPp.value);
                                 break;
                         }
-                        this.updateDueAgentCarrierWithTotalAgent(this.otherChargedata.totalAmountAgent, this.otherChargedata.totalAmountCarrier);
                         this.updateTotalPrepaidCollect();
 
                     } else {
@@ -819,7 +815,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         // * UPDATE OTHER CHARGE TEXTAREAR.
         let text: string = '';
         this.otherChargedata.charges.forEach((i: CsOtherCharge) => {
-            text += `${i.chargeName}: ${i.amount} \n`;
+            text += `${i.chargeName}: ${formatCurrency(i.amount, 'en', '')} \n`;
         });
 
         this.formMAWB.controls["otherCharge"].setValue(text);

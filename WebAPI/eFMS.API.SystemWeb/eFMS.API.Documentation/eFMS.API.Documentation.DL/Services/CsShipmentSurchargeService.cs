@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -174,7 +175,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         listCharges = listCharges.Where(x =>
                             x.Type == DocumentConstants.CHARGE_OBH_TYPE ?
-                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo)  ?
+                            (string.IsNullOrEmpty(x.CreditNo) && !string.IsNullOrEmpty(x.DebitNo) ?
                                 string.IsNullOrEmpty(x.CreditNo) && x.PayerId == partnerId
                                 :
                                 (
@@ -190,7 +191,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         fe.Hwbno = houseBill.Hwbno;
                     });
-                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges };
+                    var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Hbltype = houseBill.Hbltype, Id = houseBill.Id, listCharges = listCharges, FlexId = houseBill.FlexId };
 
                     returnList.Add(returnObj);
                 }
@@ -224,7 +225,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     fe.Hwbno = houseBill.Hwbno;
                 });
-                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges };
+                var returnObj = new GroupChargeModel { Hwbno = houseBill.Hwbno, Id = houseBill.Id, listCharges = listCharges, FlexId = null };
 
                 returnList.Add(returnObj);
             }
@@ -263,7 +264,7 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.NameEn = item.ChargeNameEn;
                 charge.UnitCode = item.UnitCode;
                 charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);//item.RateToLocal;
-                if(charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                 {
                     charge.DebitCharge = catChargeRepository.Get(c => c.Id == charge.ChargeId).FirstOrDefault()?.DebitCharge;
                 }
@@ -436,7 +437,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsShipments = opsTransRepository.Get(x => x.Id == jobId);
             if (opsShipments.Count() == 0)
             {
-                csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();                
+                csShipment = csTransactionRepository.Get(x => x.Id == jobId)?.FirstOrDefault();
                 if (csShipment != null)
                 {
                     var houseBills = transactionDetailService.GetHouseBill(csShipment.TransactionType);
@@ -459,6 +460,72 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-        
+
+        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
+        {
+            // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
+            var transactionType = DataTypeEx.GetType(criteria.TransactionType);
+            var shipment = csTransactionRepository.Get(x => x.PersonIncharge == criteria.PersonInCharge
+                                                        && x.TransactionType == transactionType
+                                                        && x.Id != criteria.CurrentJobId)?.OrderByDescending(x => x.DatetimeCreated)?.FirstOrDefault();
+            if (shipment == null) return null;
+            if (criteria.ShippingLine != null && shipment.ColoaderId != criteria.ShippingLine)
+            {
+                return null;
+            }
+            var housebills = tranDetailRepository.Get(x => (x.Pol == criteria.POL || criteria.POL == null)
+                                                        && (x.Pod == criteria.POD || criteria.POD == null)
+                                                        && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                                        && (x.ConsigneeId == criteria.ConsigneeId || string.IsNullOrEmpty(criteria.ConsigneeId))
+                                                        && x.JobId == shipment.Id
+                                                ).Select(x => x.Id).ToList();
+            if (housebills.Count == 0) return null;
+            var charges = DataContext.Get(x => housebills.Contains(x.Hblid)
+                            && (x.Type == criteria.ChargeType || string.IsNullOrEmpty(criteria.ChargeType))
+                            && (x.IsFromShipment == true));
+
+            if (charges.Select(x => x.Id).Count() == 0) return null;
+
+            var result = (
+                from surcharge in charges
+                join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
+                join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
+                from p1 in gp.DefaultIfEmpty()
+                join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
+                from p2 in gp2.DefaultIfEmpty()
+                select new CsShipmentSurchargeDetailsModel
+                {
+                    Type = surcharge.Type,
+                    ChargeId = surcharge.ChargeId,
+                    Quantity = surcharge.Quantity,
+                    QuantityType = surcharge.QuantityType,
+                    UnitId = surcharge.UnitId,
+                    UnitPrice = surcharge.UnitPrice,
+                    CurrencyId = surcharge.CurrencyId,
+                    IncludedVat = surcharge.IncludedVat,
+                    Vatrate = surcharge.Vatrate,
+                    Total = surcharge.Total,
+                    PayerId = surcharge.PayerId,
+                    ObjectBePaid = surcharge.ObjectBePaid,
+                    PaymentObjectId = surcharge.PaymentObjectId,
+                    ExchangeDate = surcharge.ExchangeDate,
+                    Notes = surcharge.Notes,
+                    IsFromShipment = true,
+                    TypeOfFee = surcharge.TypeOfFee,
+                    KickBack = surcharge.KickBack,
+
+                    PartnerShortName = p1.ShortName,
+                    PartnerName = p1.PartnerNameEn,
+                    ReceiverShortName = p1.ShortName,
+                    ReceiverName = p1.PartnerNameEn,
+                    PayerShortName = p2.ShortName,
+                    PayerName = p2.PartnerNameEn,
+
+                    ChargeNameEn = charge.ChargeNameEn,
+                    ChargeCode = charge.Code,
+
+                });
+            return result;
+        }
     }
 }

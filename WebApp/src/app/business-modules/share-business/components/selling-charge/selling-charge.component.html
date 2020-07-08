@@ -26,7 +26,9 @@
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getStandardCharge('SELL')"
+                                    *ngIf="showSyncStandard">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
                         </div>
                         <div class="dropdown m-dropdown m-dropdown--inline">
@@ -66,34 +68,48 @@
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate"><i class="la la-copy"></i>
                                         </button>
-                                        <button type="button" (click)="deleteCharge(charge, i, 'SELL')" appLoadingButton
-                                            [state]="
-                                    !!charge.soano 
-                                    || !!charge.debitNo
-                                    || !!charge.settlementCode
-                                    || !!charge.voucherId
-                                    || !!charge.voucherIddate"
-                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Remove">
-                                            <i class="la la-trash"></i>
-                                        </button>
+                                        <ng-container *ngIf="
+                                        !charge.soano 
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate">
+                                            <button type="button" (click)="deleteCharge(charge, i, 'SELL')"
+                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                title="Remove">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </ng-container>
                                     </div>
                                 </td>
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
-                                    <input type="text" class="dropdown-toggle form-control" readonly
-                                        [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
-                                        [disabled]="isShowLoadingPartner ? 'disabled': null"
-                                        (click)="loadDynamicComoGrid(charge,i)"
-                                        [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null"
-                                        [disabled]="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true">
+                                    <ng-container
+                                        *ngIf="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true ;else partnerTemplate">
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.partnerShortName"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
+                                    </ng-container>
+                                    <ng-template #partnerTemplate>
+                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                            [(ngModel)]="charge.partnerShortName" placeholder="Partner Name"
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null"
+                                            (click)="loadDynamicComoGrid(charge,i)"
+                                            [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
+                                    </ng-template>
                                     <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                             charge.partnerShortName = null"
-                                        (onDropdown)="loadDynamicComoGrid(charge,i)"
-                                        [showDelete]="!!charge.partnerShortName"></combo-grid-icon>
-
+                                        (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName && !charge.soano 
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName && !charge.soano 
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate"></combo-grid-icon>
                                     <div class="dropdown-partner__content"
                                         [ngClass]="charge.isShowPartnerHeader ? 'visible' : 'invisibleHeader'">
                                         <div class="d-flex justify-content-end dropdown-partner__header">

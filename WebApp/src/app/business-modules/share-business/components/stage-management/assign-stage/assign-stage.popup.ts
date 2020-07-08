@@ -6,6 +6,7 @@ import { User } from 'src/app/shared/models';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
     selector: 'share-asign-stage-popup',
@@ -14,6 +15,8 @@ import { ToastrService } from 'ngx-toastr';
 export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     @Output() onAssign: EventEmitter<any> = new EventEmitter<any>();
+
+    formAssignStage: FormGroup;
 
     configStage: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -27,8 +30,22 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     selectedStage: Partial<CommonInterface.IComboGridData> = {};
     selectedStageData: any;
 
+    configUser: CommonInterface.IComboGirdConfig = {
+        placeholder: 'Please select',
+        displayFields: [
+            { field: 'username', label: 'User Name' },
+            { field: 'employeeNameVn', label: 'Full Name' },
+        ],
+        dataSource: [],
+        selectedDisplayFields: ['username'],
+    };
+    selectedUser: Partial<CommonInterface.IComboGridData> = {};
+    selectedUserData: any;
+
+
+
     users: User[] = [];
-    selectedUser: any = null;
+    // selectedUser: any = null;
 
     description: string = '';
 
@@ -41,7 +58,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         private _dataService: DataService,
         private _sysRepo: SystemRepo,
         private _operationRepo: OperationRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
     }
@@ -66,7 +83,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     getListUser() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
             this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER) || [];
-            this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
+            // this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
 
         } else {
             this._sysRepo.getListSystemUser()
@@ -76,9 +93,10 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                 )
                 .subscribe(
                     (data: any) => {
-                        this.users = data || [];
+                        // this.users = data || [];
 
-                        this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
+                        // this.users = <any>this.utility.prepareNg2SelectData(this.users, 'id', 'username');
+                        this.configUser.dataSource = data || [];
                     },
                 );
         }
@@ -86,14 +104,14 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser || !this.selectedStage.value) {
+        if (!this.selectedUser.value || !this.selectedStage.value) {
             return;
         }
         const body: IAssignStage = {
             id: "00000000-0000-0000-0000-000000000000",
             jobId: this.jobId,
             stageId: this.selectedStageData.id,
-            mainPersonInCharge: !!this.selectedUser ? this.selectedUser.id : null,
+            mainPersonInCharge: this.selectedUserData.id,
             description: this.description
         };
         this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
@@ -110,10 +128,24 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             );
     }
 
+    removeStage() {
+        this.selectedStage = {};
+    }
+
+    removeUser() {
+        this.selectedUser = {};
+    }
+
     onSelectStage(stage: any) {
         this.selectedStageData = stage;
         this.selectedStage = { field: 'stageNameEn', value: stage.stageNameEn };
     }
+
+    onSelectUser(user: any) {
+        this.selectedUserData = user;
+        this.selectedUser = { field: 'username', value: user.username };
+    }
+
 
     closePopup() {
         this.hide();
@@ -122,6 +154,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         this.description = '';
         // this.selectedUser = null;
         this.selectedStage = {};
+        this.selectedUser = {};
         this.isSubmitted = false;
     }
 }

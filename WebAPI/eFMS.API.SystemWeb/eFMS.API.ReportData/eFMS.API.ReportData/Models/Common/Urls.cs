@@ -13,6 +13,8 @@
             public const string CatUnitUrl = "/api/v1/en-US/CatUnit/query";
             public const string CatchargeUrl = "/api/v1/en-US/CatCharge/QueryExport";
             public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
+            public const string CatChartOfAccountsUrl = "/api/v1/en-US/CatChartOfAccounts/QueryExport";
+
         }
         public class CustomClearance
         {
@@ -43,7 +45,7 @@
             public const string GetDataSOAAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
             public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
             public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
-
+            public const string AccountingManagementExportUrl = "/api/v1/en-US/AccountingManagement/GetDataAcctMngtExport";
         }
 
         public class Documentation

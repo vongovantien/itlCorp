@@ -17,6 +17,8 @@ import { ApproveAdvancePaymentComponent } from '../approve-payment/advance/appro
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from "ngx-currency";
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
+import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
+import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-advance-payment.component';
 const routing: Routes = [
     {
         path: "",
@@ -28,6 +30,10 @@ const routing: Routes = [
             {
                 path: "new", component: AdvancePaymentAddNewComponent,
                 data: { name: "New", }
+            },
+            {
+
+                path: 'import-voucher', component: ImportVoucherAdvancePaymentComponent, data: { name: "Import Voucher" }
             },
             {
                 path: ":id", component: AdvancePaymentDetailComponent,
@@ -47,7 +53,9 @@ const COMPONENTS = [
     AdvancePaymentFormCreateComponent,
     AdvancePaymentListRequestComponent,
     AdvancePaymentAddRequestPopupComponent,
-    AdvancePaymentFormsearchComponent,
+    UpdatePaymentVoucherPopupComponent,
+    ImportVoucherAdvancePaymentComponent,
+    AdvancePaymentFormsearchComponent
 ];
 
 const customCurrencyMaskConfig = {

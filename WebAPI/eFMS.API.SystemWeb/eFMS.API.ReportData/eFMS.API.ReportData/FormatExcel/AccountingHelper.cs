@@ -2655,5 +2655,194 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         #endregion --- SETTLEMENT PAYMENT ---
+
+        #region --- ACCOUNTING MANAGEMENT ---
+        public Stream GenerateAccountingManagementExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataAccoutingManagementExcel(workSheet, acctMngts);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelAccoutingManagement(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 14; //Cột A
+            workSheet.Column(2).Width = 14; //Cột B
+            workSheet.Column(3).Width = 21; //Cột C
+            workSheet.Column(4).Width = 30; //Cột D
+            workSheet.Column(5).Width = 14; //Cột E
+            workSheet.Column(6).Width = 14; //Cột F
+            workSheet.Column(7).Width = 14; //Cột G
+            workSheet.Column(8).Width = 18; //Cột H
+            workSheet.Column(9).Width = 19; //Cột I
+            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(11).Width = 12; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
+            workSheet.Column(13).Width = 10; //Cột M
+            workSheet.Column(14).Width = 16; //Cột N
+            workSheet.Column(15).Width = 15; //Cột O
+            workSheet.Column(16).Width = 15; //Cột P
+            workSheet.Column(17).Width = 20; //Cột Q
+            workSheet.Column(18).Width = 20; //Cột R
+            workSheet.Column(19).Width = 20; //Cột S
+            workSheet.Column(20).Width = 20; //Cột T
+            workSheet.Column(21).Width = 15; //Cột U
+            workSheet.Column(22).Width = 30; //Cột V
+            workSheet.Column(23).Width = 16; //Cột W
+            workSheet.Column(24).Width = 14; //Cột X
+            workSheet.Column(25).Width = 18; //Cột Y
+            workSheet.Column(26).Width = 10; //Cột Z
+            workSheet.Column(27).Width = 12; //Cột AA
+            workSheet.Column(28).Width = 8; //Cột AB
+            workSheet.Column(29).Width = 10; //Cột AC
+            workSheet.Column(30).Width = 14; //Cột AD
+            workSheet.Column(31).Width = 10; //Cột AE
+            workSheet.Column(32).Width = 15; //Cột AF
+            workSheet.Column(33).Width = 12; //Cột AG
+            workSheet.Column(34).Width = 10; //Cột AH
+            workSheet.Column(35).Width = 10; //Cột AI
+            workSheet.Column(36).Width = 30; //Cột AJ
+            workSheet.Column(37).Width = 15; //Cột AK
+            workSheet.Column(38).Width = 18; //Cột AL
+            workSheet.Column(39).Width = 20; //Cột AM
+            workSheet.Column(40).Width = 25; //Cột AN
+        }
+
+        private void BindingDataAccoutingManagementExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts)
+        {
+            SetWidthColumnExcelAccoutingManagement(workSheet);
+            List<string> headers = new List<string>
+            {
+                "Ngày chứng từ", //0
+                "Số chứng từ", //1
+                "Mã chứng từ", //2
+                "Diễn giải", //3
+                "Mã khách hàng", //4
+                "TK Nợ", //5
+                "TK Có", //6
+                "Mã loại", //7
+                "Mã tiền tệ", //8
+                "Số tiền", //9
+                "Tỷ giá", //10
+                "Tiền VND", //11
+                "% VAT", //12
+                "TK Nợ VAT", //13
+                "TK Có VAT", //14
+                "Tiền VAT", //15
+                "Tiền VND VAT", //16
+                "Số hóa đơn VAT", //17
+                "Ngày hóa đơn VAT", //18
+                "Số seri VAT", //19
+                "Mặt hàng VAT", //20
+                "Tên đối tượng VAT", //21
+                "Mã số thuế ĐT VAT", //22
+                "Mã Job", //23
+                "Diễn giải", //24
+                "Đánh dấu", //25
+                "Thời hạn T/T", //26
+                "Mã BP", //27
+                "Số TK", //28
+                "Số H-B/L", //29
+                "ĐVT", //30
+                "Hình thức T/T", //31
+                "Mã ĐT CH", //32
+                "Số Lượng", //33
+                "Mã HĐ", //34
+                "Địa chỉ đối tượng VAT", //35
+                "Số M-B/L", //36
+                "Tình trạng hóa đơn", //37
+                "Email", //38
+                "Ngày phát hành E-Invoice" //39
+            };
+            int rowStart = 1;
+            for(int i = 0; i < headers.Count; i++)
+            {
+                workSheet.Cells[rowStart, i + 1].Value = headers[i];                
+                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+                     
+            rowStart += 1;
+            foreach(var item in acctMngts)
+            {               
+                workSheet.Cells[rowStart, 1].Value = item.Date; //Ngày chứng từ
+                workSheet.Cells[rowStart, 1].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[rowStart, 2].Value = item.VoucherId; //Số chứng từ 
+                workSheet.Cells[rowStart, 3].Value = item.VoucherId?.Substring(0, 2); //2 ký tự đầu của số chứng từ
+                workSheet.Cells[rowStart, 4].Value = item.ChargeName;
+                workSheet.Cells[rowStart, 5].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
+                workSheet.Cells[rowStart, 6].Value = item.AccountNo;
+                workSheet.Cells[rowStart, 7].Value = item.ContraAccount;
+                workSheet.Cells[rowStart, 8].Value = item.ChargeCode;
+                workSheet.Cells[rowStart, 9].Value = item.Currency; //Currency của phí
+
+                workSheet.Cells[rowStart, 10].Value = item.OrgAmount;
+                workSheet.Cells[rowStart, 11].Value = item.FinalExchangeRate;
+                workSheet.Cells[rowStart, 12].Value = item.AmountVnd;
+                workSheet.Cells[rowStart, 13].Value = item.Vat;
+                for(int i = 10; i < 14; i++)
+                {
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[rowStart, 14].Value = item.AccountNo;
+                workSheet.Cells[rowStart, 15].Value = item.VatAccount; //Account Debit No
+
+                workSheet.Cells[rowStart, 16].Value = item.OrgVatAmount;
+                workSheet.Cells[rowStart, 17].Value = item.VatAmountVnd;
+                for (int i = 16; i < 18; i++)
+                {
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                }
+
+                workSheet.Cells[rowStart, 18].Value = item.InvoiceNo; //Invoice No của charge
+
+                workSheet.Cells[rowStart, 19].Value = item.InvoiceDate; //Ngày hóa đơn của charge
+                workSheet.Cells[rowStart, 19].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[rowStart, 20].Value = item.Serie; //Số serie của charge
+                workSheet.Cells[rowStart, 21].Value = string.Empty; //Mặt hàng VAT (Để trống)
+                workSheet.Cells[rowStart, 22].Value = item.VatPartnerNameEn; //Partner Name En của charge
+                workSheet.Cells[rowStart, 23].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
+                workSheet.Cells[rowStart, 24].Value = item.JobNo;
+                workSheet.Cells[rowStart, 25].Value = item.Description;
+                workSheet.Cells[rowStart, 26].Value = item.IsTick ? "TRUE" : "FALSE";
+                workSheet.Cells[rowStart, 27].Value = item.PaymentTerm; //Thời hạn thanh toán
+                workSheet.Cells[rowStart, 28].Value = item.DepartmentCode;
+                workSheet.Cells[rowStart, 29].Value = item.CustomNo;
+                workSheet.Cells[rowStart, 30].Value = item.Hbl;
+                workSheet.Cells[rowStart, 31].Value = item.UnitName;
+                workSheet.Cells[rowStart, 32].Value = item.PaymentMethod;
+                workSheet.Cells[rowStart, 33].Value = item.ObhPartnerCode; //Taxcode của đối tượng OBH
+                workSheet.Cells[rowStart, 34].Value = item.Qty;
+                workSheet.Cells[rowStart, 35].Value = string.Empty; //Để trống
+                workSheet.Cells[rowStart, 36].Value = item.VatPartnerAddress;
+                workSheet.Cells[rowStart, 37].Value = item.Mbl;
+                workSheet.Cells[rowStart, 38].Value = item.StatusInvoice; //Tình trạng hóa đơn
+                workSheet.Cells[rowStart, 39].Value = item.VatPartnerEmail;
+                workSheet.Cells[rowStart, 40].Value = item.ReleaseDateEInvoice;
+                rowStart += 1;
+            }
+
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+        #endregion --- ACCOUTING MANAGEMENT ---
     }
 }

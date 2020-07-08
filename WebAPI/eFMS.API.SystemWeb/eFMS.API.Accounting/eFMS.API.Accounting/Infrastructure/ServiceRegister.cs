@@ -33,6 +33,7 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IAcctSOAService, AcctSOAService>();
             services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             services.AddTransient<IUserBaseService, UserBaseService>();
+            services.AddTransient<IAccountingManagementService, AccountingManagementService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

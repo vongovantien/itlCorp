@@ -128,6 +128,14 @@
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
 
   "EF_DISPLAYNAME_CODE": "Mã code",
-  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này"
+  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này",
   //------------end  : Commodity
+
+  //---- CHART OF ACCOUNTS
+  "MSG_CHART_CODE_EMPTY": "Account Code is not allow empty!|wrong",
+  "MSG_CHART_NAME_LOCAL_EMPTY": "Account Name Local is not allow empty!|wrong",
+  "MSG_CHART_NAME_EN_EMPTY": "Account Name En is not allow empty!|wrong",
+  "MSG_CHART_STATUS_NOT_VALID" "Status {0} not valid",
+  "MSG_CHART_CODE_EXISTED": "Account Code {0} has been existed!",
+  "MSG_CHART_CODE_DUPLICATE": "Account Code {0} has been duplicate | wrong "
 }

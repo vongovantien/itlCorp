@@ -77,10 +77,10 @@ export class CreateHouseBillComponent extends AppForm {
                                 c.mblid = SystemConstants.EMPTY_GUID;
                             });
                         }
-                        if (!this.formHouseBill.isDetail) {
-                            // * Update field inword with container data.
-                            this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
-                        }
+
+                        // * Update field inword with container data.
+                        this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
+
                     }
                 });
     }
@@ -228,13 +228,16 @@ export class CreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}/hbl/${res.data}`]);
+
                         return forkJoin([arrival, delivery]);
                     }),
+
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
-                ).subscribe(result => {
+                ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
-                    this.combackToHBLList();
                 }
                 );
         }
@@ -320,7 +323,7 @@ export class CreateHouseBillComponent extends AppForm {
             containerDetail += this.handleStringCont(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Onlys.THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
+        containerDetail += " Onlys." + "\n" + "THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
 
         return containerDetail || '';
     }

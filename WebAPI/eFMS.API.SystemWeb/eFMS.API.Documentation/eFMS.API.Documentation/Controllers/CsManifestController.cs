@@ -122,7 +122,6 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PreviewAirExportManifestByJobId")]
-        [Authorize]
         public IActionResult PreviewAirExportManifestByJobId(Guid jobId)
         {
             var result = manifestService.PreviewAirExportManifestByJobId(jobId);

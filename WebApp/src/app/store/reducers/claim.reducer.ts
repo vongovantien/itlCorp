@@ -12,6 +12,8 @@ export interface IClaimUserState extends SystemInterface.IClaimUser {
     userName: string;
     departmentId: number;
     groupId: number;
+    nameEn: string;
+    nameVn: string;
 }
 
 const initialState: IClaimUserState = {
@@ -26,6 +28,8 @@ const initialState: IClaimUserState = {
     userName: null,
     departmentId: null,
     groupId: null,
+    nameEn: null,
+    nameVn: null
 };
 
 export function claimUserReducer(state = initialState, action: ClaimUserActions): IClaimUserState {

@@ -13,7 +13,13 @@ namespace eFMS.API.System.DL.IService
 
         IQueryable<SysAuthorizationModel> Paging(SysAuthorizationCriteria criteria, int page, int size, out int rowsCount);
 
+        SysAuthorizationModel GetById(int id);
+
         SysAuthorizationModel GetAuthorizationById(int id);
+
+        int CheckDetailPermission(int id);
+
+        int CheckDeletePermission(int id);
 
         HandleState Insert(SysAuthorizationModel model);
     }

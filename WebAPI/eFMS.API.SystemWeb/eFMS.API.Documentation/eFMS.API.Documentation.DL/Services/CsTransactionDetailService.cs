@@ -15,8 +15,10 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -41,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysAuthorization> authorizationRepository;
         readonly IUserPermissionService permissionService;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IStringLocalizer stringLocalizer;
 
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
@@ -62,7 +65,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysAuthorization> authorizationRepo,
             ICsShipmentOtherChargeService oChargeService,
             IUserPermissionService perService,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IStringLocalizer<LanguageSub> localizer) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -82,6 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             authorizationRepository = authorizationRepo;
             permissionService = perService;
             sysOfficeRepo = sysOffice;
+            stringLocalizer = localizer;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -714,7 +719,14 @@ namespace eFMS.API.Documentation.DL.Services
                           ShipmentEta = tran.Eta,
                           ShipmentEtd = tran.Etd,
                           ShipmentMawb = tran.Mawb,
-                          UserCreated = detail.UserCreated
+                          UserCreated = detail.UserCreated,
+                          FirstCarrierBy = detail.FirstCarrierBy,
+                          FirstCarrierTo = detail.FirstCarrierTo,
+                          TransitPlaceBy1 = detail.TransitPlaceBy1,
+                          TransitPlaceTo1 = detail.TransitPlaceTo1,
+                          TransitPlaceBy2 = detail.TransitPlaceBy2,
+                          TransitPlaceTo2 = detail.TransitPlaceTo2,
+                          Total = detail.Total
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
@@ -1062,7 +1074,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var hbl = DataContext.Where(x => x.Id == hbId).FirstOrDefault();
                 if (hbl == null)
                 {
-                    hs = new HandleState("House Bill not found !");
+                    hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_NOT_FOUND);
                 }
                 else
                 {
@@ -1084,7 +1096,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (isSOA == true)
                     {
-                        hs = new HandleState("Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!");
+                        hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA);
                     }
                     else
                     {
@@ -1307,7 +1319,7 @@ namespace eFMS.API.Documentation.DL.Services
             var housebills = new List<SeaHBillofLadingReport>();
             string _grossWeightConts = string.Empty;
             string _cbmConts = string.Empty;
-
+            string _pkgsConts = string.Empty;
             if (data != null)
             {
                 var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
@@ -1342,8 +1354,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status                
-                housebill.NoPieces = string.Empty; //Tạm thời để trống
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status  
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 string hbConstainers = string.Empty;
                 string markNo = string.Empty;
@@ -1358,24 +1369,27 @@ namespace eFMS.API.Documentation.DL.Services
                             hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));                            
                         }                       
                         markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
-                        _grossWeightConts += (cont.Gw != null ? Math.Round(cont.Gw.Value, 3) : 0) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
-                        _cbmConts += (cont.Cbm != null ? Math.Round(cont.Cbm.Value, 3) : 0) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
+                        var packageUnit = catUnitRepo.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
+                        _pkgsConts += cont.PackageQuantity + " " + packageUnit.UnitNameEn?.ToUpper() + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
                     }         
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
-                hbConstainers += " CONTAINER(S) S.T.C: " + data.PackageQty + " " + _packageType;
+                housebill.NoPieces = data.PackageQty + " " + _packageType; // Package Qty & Package Type of HBL
+                hbConstainers += " CONTAINER(S) S.T.C:";
                 housebill.Qty = hbConstainers?.ToUpper();
                 housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
                 housebill.GrossWeight = conts.Select(s => s.Gw).Sum() ?? 0;//Tổng grossweight trong list cont;
-                housebill.GrwDecimal = 2;
+                housebill.GrwDecimal = 3;
                 housebill.Unit = "KGS"; //Đang gán cứng (PKS update thành KGS)
                 housebill.CBM = conts.Select(s => s.Cbm).Sum() ?? 0;//Tổng cbm trong list cont;
-                housebill.CBMDecimal = 2;
+                housebill.CBMDecimal = 3;
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.TotalPackages = string.Empty; //NOT USE
-                housebill.OriginCode = string.Empty; //NOT USE
-                housebill.ICASNC = string.Empty; //NOT USE
+                housebill.OriginCode = countryRepository.Get(x => x.Id == data.OriginCountryId).FirstOrDefault()?.NameEn?.ToUpper(); //Point & Country  Origin
+                housebill.ICASNC = data.ForwardingAgentDescription?.ToUpper(); //Description Forwarding Agent
                 housebill.Movement = data.ServiceType?.ToUpper(); //Type of service
                 housebill.AccountingInfo = string.Empty; //NOT USE
                 housebill.SayWord = "SAY: " + data.InWord?.ToUpper(); //Inword
@@ -1391,7 +1405,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.strDesLandCC = string.Empty; //NOT USE
                 housebill.FreightPayAt = data.PlaceFreightPay?.ToUpper(); //Freight Payable at
                 housebill.ExecutedAt = data.IssueHblplace?.ToUpper(); //Place of Issue HBL
-                housebill.ExecutedOn = data.DatetimeCreated != null ? data.DatetimeCreated.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Created Date
+                housebill.ExecutedOn = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy").ToUpper() : string.Empty; //Date of Issue HBL
                 housebill.NoofOriginBL = data.OriginBlnumber != null ? API.Common.Globals.CustomData.NumberOfOriginBls.Where(x => x.Key == data.OriginBlnumber).Select(s => s.Value).FirstOrDefault() : string.Empty; //Number of Origin B/L
                 housebill.ForCarrier = string.Empty; //Để trống
                 housebill.SeaLCL = false; //NOT USE
@@ -1459,9 +1473,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams1()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
-                    GrossWeight = data?.GrossWeight.ToString(),
-                    Measurement = data?.Cbm.ToString(),
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    GrossWeight = _grossWeightConts,//string.Format("{0:n3}", data?.GrossWeight),
+                    Measurement = _cbmConts,//string.Format("{0:n3}", data?.Cbm),
                 };
                 result.SetParameter(parameter);
             }
@@ -1470,7 +1484,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportITLFRAMEParams()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
                     GrossWeight = _grossWeightConts, //list grossweight trong list container
                     Measurement = _cbmConts, //list cbm trong list container
                     TextInfo = "RECEIVED in apparent good order and condition except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document( duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall( without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
@@ -1484,9 +1498,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var parameter = new SeaHBillofLadingReportParams2()
                 {
-                    Packages = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
-                    GrossWeight = data?.GrossWeight.ToString(),
-                    Measurement = data?.Cbm.ToString(),
+                    Packages = _pkgsConts,//data.PackageQty != null ? data.PackageQty.ToString() : string.Empty, //field Package
+                    GrossWeight = _grossWeightConts,//string.Format("{0:n3}", data?.GrossWeight),
+                    Measurement = _cbmConts,//string.Format("{0:n3}", data?.Cbm),
                     DocumentNo = string.Empty //Tạm thời để trống
                 };
                 result.SetParameter(parameter);
@@ -1509,7 +1523,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.MAWB = data.Mawb; //NOT USE
                 housebill.HWBNO = data.Hwbno?.ToUpper(); //Housebill No
                 housebill.ATTN = ReportUltity.ReplaceNullAddressDescription(data.ShipperDescription)?.ToUpper(); //ShipperName & Address
-                housebill.ISSUED = data.IssuedBy?.ToUpper(); //NOT USE
+                housebill.ISSUED = data.IssuedBy?.ToUpper();
                 housebill.ConsigneeID = data.ConsigneeId; //NOT USE
                 housebill.Consignee = ReportUltity.ReplaceNullAddressDescription(data.ConsigneeDescription)?.ToUpper(); //Consignee & Address
                 housebill.ICASNC = string.Empty; //NOT USE
@@ -1525,17 +1539,17 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
                 housebill.FirstDestination = data.FirstCarrierTo?.ToUpper();
-                housebill.FirstCarrier = data.FirstCarrierBy?.ToUpper();
+                housebill.FirstCarrier = data.FirstCarrierBy?.Substring(0,2).ToUpper(); //2 ký tự đầu
                 housebill.SecondDestination = data.TransitPlaceTo1?.ToUpper();
                 housebill.SecondCarrier = data.TransitPlaceBy1?.ToUpper();
                 housebill.ThirdDestination = data.TransitPlaceTo2?.ToUpper();
                 housebill.ThirdCarrier = data.TransitPlaceBy2?.ToUpper();
                 housebill.Currency = data.CurrencyId?.ToUpper(); //Currency
-                housebill.CHGSCode = data.Chgs?.ToUpper(); //CHGS
-                housebill.WTPP = data.WtorValpayment?.ToUpper(); //WT/VAL là PP
-                housebill.WTCLL = data.WtorValpayment?.ToUpper(); //WT/VAL là CLL
-                housebill.ORPP = data.OtherPayment?.ToUpper(); //Other Là PP
-                housebill.ORCLL = data.OtherPayment?.ToUpper(); //Other Là CLL
+                housebill.CHGSCode = data.Chgs?.Trim().ToUpper() ?? string.Empty; //CHGS
+                housebill.WTPP = data.WtorValpayment == "PP" ? "PP" : string.Empty; //WT/VAL là PP
+                housebill.WTCLL = data.WtorValpayment == "CLL" ? "CLL" : string.Empty; //WT/VAL là CLL
+                housebill.ORPP = data.OtherPayment == "PP" ? "PP" : string.Empty; //Other Là PP
+                housebill.ORCLL = data.OtherPayment == "CLL" ? "CLL" : string.Empty; //Other Là CLL
                 housebill.DlvCarriage = data.Dclrca?.ToUpper(); //DCLR-CA
                 housebill.DlvCustoms = data.Dclrcus?.ToUpper(); //DCLR-CUS
                 if (dataPOD != null)
@@ -1554,14 +1568,14 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.SCI = string.Empty; //NOT USE
                 housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
-                housebill.GrwDecimal = 2; //NOT USE
-                housebill.Wlbs = data.KgIb?.ToUpper(); //KgIb
-                housebill.RateClass = string.Empty; //NOT USE
+                housebill.GrwDecimal = 3; //NOT USE
+                housebill.Wlbs = data.KgIb?.ToUpper() ?? string.Empty; //KgIb
+                housebill.RateClass = data.Rclass; //R.Class
                 housebill.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight ?? 0; //CW
-                housebill.ChWDecimal = 2; //NOT USE
-                housebill.Rchge = data.RateCharge != null ? data.RateCharge.ToString() : string.Empty; //RateCharge
-                housebill.Ttal = data.Total != null ? data.Total.ToString() : string.Empty;
+                housebill.ChWDecimal = 3; //NOT USE
+                housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : ( data.RateCharge?.ToString() ?? string.Empty); //RateCharge
+                housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
                 housebill.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
                 housebill.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
@@ -1585,7 +1599,14 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExecutedAt = data.IssueHbldate != null ? data.IssueHbldate.Value.ToString("dd MMM, yyyy")?.ToUpper() : string.Empty; //Issue At
                 housebill.Signature = string.Empty; //NOT USE
                 var dimHbl = dimensionDetailService.Get(x => x.Hblid == hblId);
-                string _dimensions = string.Join("\r\n", dimHbl.Select(s => (int)s.Length + "*" + (int)s.Width + "*" + (int)s.Height + "*" + (int)s.Package));
+                string _dimensions = string.Join("\r\n", dimHbl.Select(s =>
+                        (s.Length % 1 == 0 ? string.Format("{0:n0}", s.Length) : string.Format("{0:n}", s.Length))
+                        + "*"
+                        + (s.Width % 1 == 0 ? string.Format("{0:n0}", s.Width) : string.Format("{0:n}", s.Width))
+                        + "*"
+                        + (s.Height % 1 == 0 ? string.Format("{0:n0}", s.Height) : string.Format("{0:n}", s.Height))
+                        + "*"
+                        + string.Format("{0:n0}", s.Package)));
                 housebill.Dimensions = _dimensions; //Dim (Cộng chuỗi theo Format L*W*H*PCS, mỗi dòng cách nhau bằng enter)
                 housebill.ShipPicture = null; //NOT USE
                 housebill.PicMarks = string.Empty; //Gán rỗng

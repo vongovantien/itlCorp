@@ -23,8 +23,12 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPlace> catPlaceRepo;
         readonly IContextBase<SysUser> sysUserRepo;
         private readonly ICurrentUser currentUser;
+        readonly IStringLocalizer stringLocalizer;
+
         readonly IContextBase<CatCountry> countryRepo;
-        public CsBookingNoteService(IStringLocalizer<LanguageSub> localizer, IMapper mapper,
+        public CsBookingNoteService(
+            IStringLocalizer<LanguageSub> localizer,
+            IMapper mapper,
             IContextBase<CsBookingNote> repository,
             IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace,
@@ -32,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser user,
             IContextBase<CatCountry> catCountry) : base(repository, mapper)
         {
+            stringLocalizer = localizer;
             catPartnerRepo = catPartner;
             catPlaceRepo = catPlace;
             sysUserRepo = sysUser;
@@ -44,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             var bookingObj = DataContext.First(x => x.Id == model.Id);
             if (bookingObj == null)
             {
-                return new HandleState("BookingNote not found !");
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
             }
             var booking = mapper.Map<CsBookingNote>(model);
             booking.UserModified = currentUser.UserID;
@@ -55,8 +60,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    var hs = DataContext.Update(booking, x => x.Id == booking.Id);
-                    bk.Commit();
+                    HandleState hs = DataContext.Update(booking, x => x.Id == booking.Id);
+                    if(hs.Success)
+                    {
+                        bk.Commit();
+                        return hs;
+                    }
                     return hs;
 
                 }
@@ -193,7 +202,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<CsBookingNoteModel> GetBookingNote()
         {
-            var lstBookingNotes = DataContext.Get();
+            IQueryable<CsBookingNote> lstBookingNotes = DataContext.Get();
             IQueryable<CsBookingNoteModel> query = null;
             if (lstBookingNotes == null) return null;
             var lstShipper = catPartnerRepo.Get(x => x.PartnerGroup.Contains("SHIPPER") || x.PartnerGroup.Contains("CUSTOMER"));
@@ -237,7 +246,8 @@ namespace eFMS.API.Documentation.DL.Services
                         CreatedDate = bookingNote.CreatedDate,
                         PlaceOfDelivery = bookingNote.PlaceOfDelivery,
                         ShipperDescription = bookingNote.ShipperDescription,
-                        ConsigneeDescription = bookingNote.ConsigneeDescription
+                        ConsigneeDescription = bookingNote.ConsigneeDescription,
+                        DatetimeModified = bookingNote.DatetimeModified
                     };
             return query;
         }
@@ -288,7 +298,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.BookingID = data.BookingNo?.ToUpper();
             bookingNote.TransID = data.Id.ToString();
             bookingNote.LotNo = string.Empty; //NOT USE
-            bookingNote.DateMaking = null; //NOT USE
+            bookingNote.DateMaking = data.BookingDate; //Booking Date
             bookingNote.Revision = data.Revision?.ToUpper();
             bookingNote.Attn = data.To?.ToUpper();
             bookingNote.PartnerID = string.Empty; //NOT USE

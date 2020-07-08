@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { Params } from '@angular/router';
 
@@ -24,13 +24,17 @@ import * as fromStore from '../../store';
 export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShipmentGoodSummaryComponent implements OnInit {
 
     @ViewChild(ShareBussinessGoodsListPopupComponent, { static: false }) goodsImportPopup: ShareBussinessGoodsListPopupComponent;
+    @Output() onSelectQty: EventEmitter<any> = new EventEmitter<any>();
 
     packageQty: number = null;
+
+
 
     containerDescription: string = '';
 
     packages: Unit[] = [];
     selectedPackage: any;
+    selectedPackageName: string = '';
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -110,6 +114,15 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         this.isSave = true;
         this.containers = containers;
         this.updateData(containers);
+    }
+
+    onChangePackge() {
+        if ((this.containers == null || this.containers.length === 0) && !!this.packageQty && !!this.selectedPackage) {
+            const packageObj = this.packages.find(x => x.id == this.selectedPackage);
+            this.onSelectQty.emit({ 'package': packageObj.code, 'quantity': this.packageQty });
+        } else if ((this.containers == null || this.containers.length === 0) && this.packageQty == null && !!this.selectedPackage) {
+            this.onSelectQty.emit({ 'package': null, 'quantity': null });
+        }
     }
 
     updateData(containers: Container[] | any) {

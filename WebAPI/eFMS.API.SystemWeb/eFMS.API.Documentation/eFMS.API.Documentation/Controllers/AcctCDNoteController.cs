@@ -5,6 +5,7 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,13 +87,18 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult Delete(Guid cdNoteId)
         {
             var hs = cdNoteServices.DeleteCDNote(cdNoteId);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
+                result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 return BadRequest(result);
             }
-            return Ok(result);
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Delete);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
         }
 
         [HttpGet]
@@ -157,6 +163,23 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewAirCdNote(PreviewCdNoteCriteria criteria)
         {
             var result = cdNoteServices.PreviewAir(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get invoice - cd note
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Paging")]
+        [Authorize]
+        public IActionResult Paging(CDNoteCriteria criteria, int page, int size)
+        {
+            var data = cdNoteServices.Paging(criteria, page, size, out int rowsCount);
+            var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
     }

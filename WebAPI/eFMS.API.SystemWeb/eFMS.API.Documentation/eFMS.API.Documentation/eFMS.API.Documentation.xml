@@ -53,6 +53,15 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.Paging(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria,System.Int32,System.Int32)">
+            <summary>
+            get invoice - cd note
+            </summary>
+            <param name="criteria"></param>
+            <param name="page"></param>
+            <param name="size"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             
@@ -435,6 +444,13 @@
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GroupByListHBNotExists(eFMS.API.Documentation.DL.Models.Criteria.GroupByListHBCriteria)">
             <summary>
             get list of surcharge not exists in cd note by house bill and partner id
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetRecentlyCharges(eFMS.API.Documentation.DL.Models.RecentlyChargeCriteria)">
+            <summary>
+            get recently charges
             </summary>
             <param name="criteria"></param>
             <returns></returns>

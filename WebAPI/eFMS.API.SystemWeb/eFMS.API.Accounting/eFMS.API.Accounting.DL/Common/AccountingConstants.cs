@@ -40,8 +40,8 @@
         #endregion -- ADVANCE TYPE --
 
         #region -- DEPARTMENT CODE --
-        public static readonly string DEPT_CODE_ACCOUNTANT = "Accountant";
-        public static readonly string DEPT_CODE_OPS = "OPS";
+        public static readonly string DEPT_CODE_ACCOUNTANT = "FA-01";
+        public static readonly string DEPT_CODE_OPS = "LOGISTIC-01";
         #endregion -- DEPARTMENT CODE --
 
         #region -- INFO COMPANY --
@@ -92,5 +92,12 @@
 
         #endregion
 
+        #region ACOUNTING MANAGEMENT
+        public static readonly string ACCOUNTING_VOUCHER_TYPE = "Voucher";
+        public static readonly string ACCOUNTING_INVOICE_TYPE = "Invoice";
+        public static readonly string ACCOUNTING_INVOICE_STATUS_NEW = "New";
+        public static readonly string ACCOUNTING_INVOICE_STATUS_UPDATED = "Updated Invoice";
+
+        #endregion
     }
 }

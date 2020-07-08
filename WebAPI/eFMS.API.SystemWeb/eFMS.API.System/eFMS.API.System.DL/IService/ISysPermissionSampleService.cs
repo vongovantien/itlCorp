@@ -15,6 +15,8 @@ namespace eFMS.API.System.DL.IService
     public interface ISysPermissionSampleService : IRepositoryBase<SysPermissionSample, SysPermissionSampleModel>
     {
         IQueryable<SysPermissionSampleModel> Query(SysPermissionGeneralCriteria criteria);
+        IQueryable<SysPermissionSampleModel> Paging(SysPermissionGeneralCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
+
         SysPermissionSampleModel GetBy(Guid? id);
         HandleState Update(SysPermissionSampleModel entity);
         HandleState Delete(Guid id);

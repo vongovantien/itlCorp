@@ -19,7 +19,7 @@ export class AppComboGridIconComponent implements OnInit {
         this.isShowDelete = isShowDelete;
     }
 
-    @Input() set ShowDropdown(isShowDropdown: boolean) {
+    @Input() set showDropdown(isShowDropdown: boolean) {
         this.isShowDropdown = isShowDropdown;
     }
 

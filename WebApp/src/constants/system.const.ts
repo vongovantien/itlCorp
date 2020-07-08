@@ -122,6 +122,16 @@ export class SystemConstants {
         TIME_MASK: [/\d/, /\d/, ':', /\d/, /\d/],
         DATE_MASK: [/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
         DATETIME_MASK: [/\d/, /\d/, ':', /\d/, /\d/, ' ', /\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
-        NUMERIC: /[^0-9.]+/g
+        NUMERIC: /[^0-9.]+/g,
+        LINE: /(?:\r\n|\r|\n|\\n|\\r)/g,
     };
+
+    public static HTTP_CODE = {
+        BAD_REQUEST: 400,
+        UNAUTHORIZED: 401,
+        FORBIDDEN: 403,
+        NOT_FOUND: 404,
+        EXISTED: 409,
+    };
+
 }

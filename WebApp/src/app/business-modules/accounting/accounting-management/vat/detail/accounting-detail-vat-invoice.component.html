@@ -1,0 +1,46 @@
+<div class="create-booking-note-page">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body"
+                [ngStyle]="{'font-style': (accountingManagement.status !== 'New' ? 'italic' : '')}">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h3>Edit Invoice</h3>
+                    <div>
+                        <div class="c-button-actions">
+                            <ng-container *ngIf="accountingManagement.status === 'New'">
+                                <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveInvoice()">
+                                </app-permission-button>
+                            </ng-container>
+                            <app-default-button [buttonSetting]="cancelButtonSetting"
+                                (onClick)="confirmCancelPopup.show()">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <form-create-vat-invoice update=true></form-create-vat-invoice>
+
+                <div class="row m--margin-top-20">
+                    <div class="col-md-6">
+                        <span>Created: {{accountingManagement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                        <span class="text-success">{{accountingManagement.userNameCreated}}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span>Modified: {{accountingManagement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                        </span> <span class="text-success">{{accountingManagement.userNameModified}}</span>
+                    </div>
+                </div>
+
+                <list-charge-accounting-management></list-charge-accounting-management>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<info-popup [body]="invalidFormText"></info-popup>
+
+<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>

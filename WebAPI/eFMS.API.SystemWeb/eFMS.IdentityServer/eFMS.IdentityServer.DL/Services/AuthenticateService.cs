@@ -75,94 +75,53 @@ namespace eFMS.IdentityServer.DL.Services
             bool isAuthenticated = false;
             SysUserLevel userLevel = null;
             PermissionInfo info = null;
-            var sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
+
+            SysUser sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
+
             if (sysUser == null)
             {
                 modelReturn = null;
                 return -2;
             }
-            if (sysUser.IsLdap == true)
+            if(sysUser.IsLdap == true)
             {
-                // Nếu có sysUser có password LDAP.
-                if (sysUser.PasswordLdap != null)
+                // Check username are login using LDAP.
+                isAuthenticated = CheckLdapInfo(username, password, out ldapInfo);
+                if (isAuthenticated)
                 {
-                    isAuthenticated = CheckLdapInfo(username, password, out ldapInfo);
-                    // Check password - passwordLDAP.
-                    if (isAuthenticated && BCrypt.Net.BCrypt.Verify(password, sysUser.PasswordLdap))
-                    {
-                        if (!ValidateCompany(sysUser.Id, companyId))
-                        {
-                            modelReturn = null;
-                            return -3;
-                        }
-                        if (!ValidateOffice(sysUser.Id))
-                        {
-                            modelReturn = null;
-                            return -4;
-                        }
-
-                        userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
-                        info = new PermissionInfo
-                        {
-                            OfficeID = userLevel.OfficeId,
-                            DepartmentID = (Int16)userLevel.DepartmentId,
-                            GroupID = userLevel.GroupId,
-                            CompanyID = userLevel.CompanyId
-                        };
-                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
-
-                        modelReturn.companyId = companyId;
-                        LogUserLogin(sysUser, companyId);
-
-                        return 1;
-                    }
-                    else
+                    if (!ValidateCompany(sysUser.Id, companyId))
                     {
                         modelReturn = null;
-                        return -2;
+                        return -3;
                     }
+                    if (!ValidateOffice(sysUser.Id))
+                    {
+                        modelReturn = null;
+                        return -4;
+                    }
+                    SysUserLevel levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
+                    HandleState hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
+
+                    userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
+                    info = new PermissionInfo
+                    {
+                        OfficeID = userLevel.OfficeId,
+                        DepartmentID = userLevel.DepartmentId != null ? (Int16)userLevel.DepartmentId : (Int16)0,
+                        GroupID = userLevel.GroupId,
+                        CompanyID = userLevel.CompanyId
+                    };
+
+                    modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
+                    modelReturn.companyId = companyId;
+
+                    LogUserLogin(sysUser, companyId);
+
+                    return 1;
                 }
                 else
                 {
-                    // Check username are login using LDAP.
-                    isAuthenticated = CheckLdapInfo(username, password,out ldapInfo);
-
-                    if (isAuthenticated && sysUser.PasswordLdap == null)
-                    {
-                        if (!ValidateCompany(sysUser.Id, companyId))
-                        {
-                            modelReturn = null;
-                            return -3;
-                        }
-                        if (!ValidateOffice(sysUser.Id))
-                        {
-                            modelReturn = null;
-                            return -4;
-                        }
-                        var levelOffice = userLevelRepository.Get(lv => lv.UserId == sysUser.Id && lv.OfficeId != null)?.FirstOrDefault();
-                        var hs = UpdateUserInfoFromLDAP(ldapInfo, sysUser, password);
-
-                        userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
-                        info = new PermissionInfo
-                        {
-                            OfficeID = userLevel.OfficeId,
-                            DepartmentID = (Int16)userLevel.DepartmentId,
-                            GroupID = userLevel.GroupId,
-                            CompanyID = userLevel.CompanyId
-                        };
-                        modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
-
-                        modelReturn.companyId = companyId;
-                        LogUserLogin(sysUser, companyId);
-
-                        return 1;
-                    }
-
-                    if (!isAuthenticated)
-                    {
-                        modelReturn = null;
-                        return -2;
-                    }
+                    modelReturn = null;
+                    return -2;
                 }
             }
             else
@@ -179,18 +138,19 @@ namespace eFMS.IdentityServer.DL.Services
                         modelReturn = null;
                         return -4;
                     }
-                    
+
                     userLevel = detectSwitchOfficeDeptGroup(sysUser.Id, companyId, permissionInfo);
                     info = new PermissionInfo
                     {
                         OfficeID = userLevel.OfficeId,
-                        DepartmentID = (Int16)userLevel.DepartmentId,
+                        DepartmentID = userLevel.DepartmentId != null ? (Int16)userLevel.DepartmentId : (Int16)0,
                         GroupID = userLevel.GroupId,
                         CompanyID = userLevel.CompanyId
                     };
-                    modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
 
+                    modelReturn = SetLoginReturnModel(sysUser, userLevel, info);
                     modelReturn.companyId = companyId;
+
                     LogUserLogin(sysUser, companyId);
 
                     return 1;
@@ -202,9 +162,6 @@ namespace eFMS.IdentityServer.DL.Services
                     return -2;
                 }
             }
-
-            modelReturn = null;
-            return -2;
         }
 
         private SysUserLevel detectSwitchOfficeDeptGroup(string userId, Guid companyId, PermissionInfo permissionInfo)
@@ -261,12 +218,16 @@ namespace eFMS.IdentityServer.DL.Services
 
         private LoginReturnModel SetLoginReturnModel(SysUser user, SysUserLevel levelOffice, PermissionInfo permissionInfo)
         {
-            var employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
-            var userInfo = new LoginReturnModel();
+            SysEmployee employee = employeeRepository.Get(x => x.Id == user.EmployeeId)?.FirstOrDefault();
+            LoginReturnModel userInfo = new LoginReturnModel();
+
             userInfo.userName = user.Username;
             userInfo.email = employee?.Email;
             userInfo.idUser = user.Id;
             userInfo.status = true;
+            userInfo.NameEn = employee.EmployeeNameEn;
+            userInfo.NameVn = employee.EmployeeNameVn;
+
             userInfo.message = "Login successfull !";
 
             if (permissionInfo == null)
@@ -318,7 +279,7 @@ namespace eFMS.IdentityServer.DL.Services
             employee.EmployeeNameEn = sysEmployee.EmployeeNameEn;
             employee.Email = sysEmployee.Email;
 
-            user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(password);
+            // user.PasswordLdap = BCrypt.Net.BCrypt.HashPassword(password);
 
             DataContext.Update(user, x => x.Id == user.Id);
             var hs = employeeRepository.Update(sysEmployee, x => x.Id == employee.Id);
@@ -337,7 +298,7 @@ namespace eFMS.IdentityServer.DL.Services
                 UserId = user.Id,
                 WorkPlaceId = workplaceId
             };
-            userLogService.Add(userLog);
+            HandleState hs = userLogService.Add(userLog);
         }
 
         private Boolean ValidateCompany(string userId, Guid companyId)

@@ -47,7 +47,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string TransactionType { get; set; }
         public string CurrentStatus { get; set; }
         public DateTime? LockedDate { get; set; }
-        public string LockedLog { get; set; }
+        public DateTime? LastDateUnLocked { get; set; }
+        public string UnLockedLog { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? FlightDate { get; set; }
         public decimal? Hwconstant { get; set; }

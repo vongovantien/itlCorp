@@ -30,6 +30,7 @@ import isUUID from 'validator/lib/isUUID';
 
 import { forkJoin } from 'rxjs';
 import { DataService } from '@services';
+import groupBy from 'lodash/groupBy';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -82,6 +83,31 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
 
                         this.containers = action.payload;
+                    }
+                });
+        this._actionStoreSubject
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (action: fromShareBussiness.ContainerAction) => {
+                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
+                        this.containers = action.payload;
+
+                        if (!!this.containers) {
+                            this.containers.forEach(c => {
+                                c.id = c.mblid = SystemConstants.EMPTY_GUID;
+                            });
+                        }
+                        if (this.containers.length === 0) {
+                            const packageName = this.hblGoodsSummaryComponent.packages.find(x => x.id == this.hblGoodsSummaryComponent.selectedPackage).code;
+                            const data = { 'package': packageName, 'quantity': this.hblGoodsSummaryComponent.packageQty };
+                            this.formHouseBill.formGroup.controls["inWord"].setValue(this.handleStringPackage(data));
+                        }
+                        if (this.containers.length > 0) {
+                            // * Update field inword with container data.
+                            this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
+                        }
                     }
                 });
     }
@@ -227,7 +253,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
-                    mergeMap((res: any) => {
+                    mergeMap((res: CommonInterface.IResult) => {
                         const dateNotice = {
                             arrivalFirstNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice && !!this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalFirstNotice.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(), 'yyyy-MM-dd', 'en'),
                             arrivalSecondNotice: !!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice && <any>!!this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate ? formatDate(this.arrivalNoteComponent.hblArrivalNote.arrivalSecondNotice.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -239,16 +265,67 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}/hbl/${res.data}`]);
+
                         return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(result => {
                     this._toastService.success(result[0].message, '');
-                    this.combackToHBLList();
                 }
                 );
         }
+    }
+
+    selectedPackage($event: any) {
+        const data = $event;
+        if (!data.quantity) {
+            this.formHouseBill.formGroup.controls["inWord"].setValue(null);
+            return;
+        }
+        this.formHouseBill.formGroup.controls["inWord"].setValue(this.handleStringPackage(data));
+    }
+
+    updateInwordField(containers: Container[]) {
+        console.log(containers);
+
+        if (!containers.length) {
+            return null;
+        }
+
+        let containerDetail = '';
+
+        const contObject = (containers || []).map((container: Container) => ({
+            package: container.packageTypeName,
+            quantity: container.packageQuantity,
+        }));
+
+        const contData = [];
+        for (const keyName of Object.keys(groupBy(contObject, 'package'))) {
+            contData.push({
+                package: keyName,
+                quantity: groupBy(contObject, 'package')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+        for (const item of contData) {
+
+            containerDetail += this.handleStringPackage(item);
+            if (contData.length > 1) {
+                containerDetail += " AND ";
+            }
+        }
+
+        if (contData.length > 1) {
+            containerDetail = containerDetail.substring(0, containerDetail.length - 5);
+        }
+
+        return containerDetail;
+    }
+
+    handleStringPackage(contOb: { package: string, quantity: number }) {
+        return `${this.utility.convertNumberToWords(contOb.quantity)}${contOb.package}`;
     }
 
     onsubmitData() {

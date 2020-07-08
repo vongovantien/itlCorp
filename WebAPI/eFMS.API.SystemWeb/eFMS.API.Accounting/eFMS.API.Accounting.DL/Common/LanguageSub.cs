@@ -134,5 +134,36 @@ namespace eFMS.API.Accounting.DL.Common
         //#region Name field
         //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
         //#endregion
+        #region voucher advance payment
+        public static readonly string MSG_ADVANCE_NO_EMPTY = "MSG_ADVANCE_NO_EMPTY";
+        public static readonly string MSG_ADVANCE_NO_NOT_EXIST = "MSG_ADVANCE_NO_NOT_EXIST";
+        public static readonly string MSG_VOUCHER_NO_EMPTY = "MSG_VOUCHER_NO_EMPTY";
+        public static readonly string MSG_VOUCHER_DATE_EMPTY = "MSG_VOUCHER_DATE_EMPTY";
+        public static readonly string MSG_ADVANCE_NO_DUPLICATE = "MSG_ADVANCE_NO_DUPLICATE";
+        public static readonly string MSG_VOUCHER_DATE_NOT_VALID = "MSG_VOUCHER_DATE_NOT_VALID";
+        public static readonly string MSG_ADVANCE_NO_NOT_APPROVAL = "MSG_ADVANCE_NO_NOT_APPROVAL";
+        #endregion
+
+        #region voucher advance payment
+        public static readonly string MSG_VOUCHER_ID_EMPTY = "MSG_VOUCHER_ID_EMPTY";
+        public static readonly string MSG_VOUCHER_ID_NOT_EXIST = "MSG_VOUCHER_ID_NOT_EXIST";
+        public static readonly string MSG_VOUCHER_ID_DUPLICATE = "MSG_VOUCHER_ID_DUPLICATE";
+        public static readonly string MSG_INVOICE_DATE_NOT_EMPTY = "MSG_INVOICE_DATE_NOT_EMPTY";
+        public static readonly string MSG_SERIE_NO_NOT_EMPTY = "MSG_SERIE_NO_NOT_EMPTY";
+        public static readonly string MSG_INVOICE_NO_NOT_EMPTY = "MSG_INVOICE_NO_NOT_EMPTY";
+        public static readonly string MSG_SERIE_NO_DUPLICATE = "MSG_SERIE_NO_DUPLICATE";
+        public static readonly string MSG_INVOICE_DUPLICATE = "MSG_INVOICE_DUPLICATE";
+        public static readonly string MSG_VOUCHER_ID_DUPLICATE_ROW = "MSG_VOUCHER_ID_DUPLICATE_ROW";
+
+        public static readonly string MSG_INVOICE_NO_EXISTED = "MSG_INVOICE_NO_EXISTED";
+        public static readonly string MSG_SERIE_NO_EXISTED = "MSG_SERIE_NO_EXISTED";
+
+
+
+
+
+
+        #endregion
+
     }
 }

@@ -1,10 +1,10 @@
-import range from 'lodash/range'
+import range from 'lodash/range';
 import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class PagingService {
     getPager(totalItems: number, currentPage: number = 1, pageSize: number = 10, totalPageBtn = 5) {
         // calculate total pages
-        let totalPages = Math.ceil(totalItems / pageSize);
+        const totalPages = Math.ceil(totalItems / pageSize);
 
         let startPage: number, endPage: number;
 
@@ -22,8 +22,7 @@ export class PagingService {
 
                 if (totalPageBtn % 2 == 0) {
                     startPage = currentPage - (Math.floor(totalPageBtn / 2) - 1);
-                }
-                else {
+                } else {
                     startPage = currentPage - (Math.floor(totalPageBtn / 2));
                 }
                 endPage = currentPage + (Math.floor(totalPageBtn / 2));
@@ -31,24 +30,12 @@ export class PagingService {
         }
 
         // calculate start and end item indexes
-        let startIndex = (currentPage - 1) * pageSize;
-        let endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize - 1, totalItems - 1);
 
         // create an array of pages to ng-repeat in the pager control
-        let pages = range(startPage, endPage + 1);
+        const pages = range(startPage, endPage + 1);
 
-        // return object with all pager properties required by the view
-        let returnObj = {
-            totalItems: totalItems,
-            currentPage: currentPage,
-            pageSize: pageSize,
-            totalPages: totalPages,
-            startPage: startPage,
-            endPage: endPage,
-            startIndex: startIndex,
-            endIndex: endIndex,
-            pages: pages
-        };
         return {
             totalItems: totalItems,
             currentPage: currentPage,

@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from 'src/app/app.list';
-import { ArrivalFreightCharge, User } from 'src/app/shared/models';
+import { ArrivalFreightCharge, User, Charge } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -16,6 +16,7 @@ import { catchError, finalize, takeUntil, tap, switchMap } from 'rxjs/operators'
 
 import * as fromShareBussiness from './../../../store';
 import { getSellingSurChargeState } from './../../../store';
+import { ChargeConstants } from 'src/constants/charge.const';
 
 
 @Component({
@@ -25,6 +26,15 @@ import { getSellingSurChargeState } from './../../../store';
 })
 
 export class ShareBusinessArrivalNoteComponent extends AppList {
+    @Input() set type(t: string) {
+        this._transationType = t;
+    }
+
+    get type() {
+        return this._transationType;
+    }
+
+    private _transationType: string = ChargeConstants.SFI_CODE;
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -72,6 +82,14 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                             this.hblArrivalNote = res;
                             this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : { startDate: new Date(), endDate: new Date() };
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
+                        } else {
+                            this.hblArrivalNote.arrivalHeader = `
+                            <p><strong>The following documents are requested against the Delivery Order (Thủ tục y&ecirc;u cầu khi nhận D/O)</strong><br>☑☐&nbsp; &nbsp;Giấy giới thiệu<br>Pls pick-up DO after vessel&#39;s arrival 1 day. Thks! ( Vui l&ograve;ng nhận DO sau ng&agrave;y t&agrave;u
+                            cập 1 ng&agrave;y)<br><u><strong>PLS PICK-UP DO AT (Li&ecirc;n hệ nhận D/O:)</strong></u><br><strong><em>C&ocirc;ng ty cổ phần giao nhận v&agrave; vận chuyển In Do Trần<br>52 - 54 - 56 Trường Sơn,
+                            Phường 2, Quận T&acirc;n B&igrave;nh, TP. HCM, Việt Nam</em></strong><br><u><strong>Giờ l&agrave;m việc:<br></strong></u><strong>S&aacute;ng: 8.00 - 12.00/Chiều: 13.30 -
+                            17.30</strong></p><p><br></p>
+                            `;
+
                         }
                     }
                 }
@@ -130,10 +148,10 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
     setDefaultHeadeFooter() {
         const body: IArrivalDefault = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            transactionType: (this.type === ChargeConstants.SLI_CODE) ? CommonEnum.TransactionTypeEnum.SeaLCLImport : CommonEnum.TransactionTypeEnum.SeaFCLImport,
             userDefault: this.userLogged.id,
             arrivalFooter: this.hblArrivalNote.arrivalFooter,
-            arrivalHeader: this.hblArrivalNote.arrivalHeader
+            arrivalHeader: this.hblArrivalNote.arrivalHeader,
         };
 
         this._progressRef.start();
@@ -225,10 +243,10 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
 
 export interface IArrivalDefault {
-    transactionType: number;
     userDefault: string;
     arrivalHeader: string;
     arrivalFooter: string;
+    transactionType: number;
 }
 
 export interface IArrivalFreightChargeDefault {

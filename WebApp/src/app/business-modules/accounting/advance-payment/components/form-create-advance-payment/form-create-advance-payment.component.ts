@@ -2,11 +2,13 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { User, Currency } from 'src/app/shared/models';
 import { DataService } from 'src/app/shared/services';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
+
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
 
 @Component({
     selector: 'adv-payment-form-create',
@@ -80,20 +82,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.department = this.formCreate.controls['department'];
         this.paymentMethod = this.formCreate.controls['paymentMethod'];
 
-        this.requestDate.valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDate = value;
-                setTimeout(() => {
-                    this.deadLine.setValue({
-                        startDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9)),
-                        endDate: new Date(new Date(value).setDate(new Date(value).getDate() + 9))
-                    });
-                }, 100);
-            });
     }
 
     onUpdateRequestDate(value: { startDate: any; endDate: any }) {

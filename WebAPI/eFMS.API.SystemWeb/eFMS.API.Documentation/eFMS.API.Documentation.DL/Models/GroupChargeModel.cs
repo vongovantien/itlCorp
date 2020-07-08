@@ -9,5 +9,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Hbltype { get; set; }
         public Guid Id { get; set; }
         public List<CsShipmentSurchargeDetailsModel> listCharges { get; set; }
+        public string FlexId { get; set; }
     }
 }

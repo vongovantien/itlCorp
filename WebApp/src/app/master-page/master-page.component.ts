@@ -1,11 +1,9 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Store } from '@ngrx/store';
 import { Office } from '@models';
 
 import { environment } from 'src/environments/environment';
-import { IAppState } from '../store/reducers';
 import { SystemConstants } from 'src/constants/system.const';
 import { RSAHelper } from 'src/helper/RSAHelper';
 import { CookieService } from 'ngx-cookie-service';
@@ -14,8 +12,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
 
 import crypto_js from 'crypto-js';
 import { Subject } from 'rxjs';
-import { JwtService } from '@services';
-import { HeaderComponent } from './header/header.component';
 
 @Component({
     selector: 'app-master-page',
@@ -23,7 +19,6 @@ import { HeaderComponent } from './header/header.component';
 })
 export class MasterPageComponent implements OnInit {
 
-    @ViewChild(HeaderComponent, { static: false }) headerComponent: HeaderComponent;
 
     selectedOffice: Office;
     selectedDepartGroup: SystemInterface.IDepartmentGroup;
@@ -37,13 +32,11 @@ export class MasterPageComponent implements OnInit {
     ngUnsubscribe: Subject<number> = new Subject();
 
     constructor(
-        private _jwtService: JwtService,
         private oauthService: OAuthService,
         private http: HttpClient,
         private cookieService: CookieService,
         private _toastService: ToastrService,
         private _spinner: NgxSpinnerService,
-        private _store: Store<IAppState>
     ) {
 
     }
@@ -85,6 +78,8 @@ export class MasterPageComponent implements OnInit {
     }
 
     logout() {
+        this.cookieService.delete("__p");
+        this.cookieService.delete("__u");
         this.oauthService.logoutUrl = window.location.origin + '/#/login';
         if (this.oauthService.hasValidAccessToken()) {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
@@ -171,13 +166,11 @@ export class MasterPageComponent implements OnInit {
 
                             if (this.isChangeDepartgroup) {
                                 localStorage.setItem(SystemConstants.ISCHANGE_DEPT_GROUP, JSON.stringify(true));
-                                // this._toastService.info(userInfo.userName.toUpperCase(), "Change Department - Group Success");
                             } else {
                                 localStorage.setItem(SystemConstants.ISCHANGE_OFFICE, JSON.stringify(true));
-                                // this._toastService.info(userInfo.userName.toUpperCase(), "Change Office Success");
                             }
-
-
+                        }).catch((error) => {
+                            this._spinner.hide();
                         });
                 } else {
                     throw new Error("Not found login information");
@@ -202,3 +195,4 @@ export class MasterPageComponent implements OnInit {
         return bytes.toString(crypto_js.enc.Utf8);
     }
 }
+

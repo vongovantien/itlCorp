@@ -87,7 +87,7 @@ namespace eFMS.API.Catalogue.DL.Common
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId != currentUser.GroupId && model.DepartmentId == currentUser.DepartmentId)
+                    if (model.GroupId != currentUser.GroupId && model.DepartmentId != currentUser.DepartmentId)
                     {
                         code = 403;
                     }

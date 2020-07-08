@@ -22,7 +22,6 @@ export class Group {
     nameUserModified: string = '';
 
     constructor(data?: any) {
-        console.log(data);
         const self = this;
         for (const key in data) {
             if (self.hasOwnProperty(key)) {

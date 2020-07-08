@@ -10,23 +10,6 @@
                 </span>
             </span>
         </button>
-        <!-- <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="exportExcelSOA()">
-            <span>
-                <i class="la la-upload"></i>
-                <span>
-                    export
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
-            <span>
-                <i class="la la-upload"></i>
-                <span>
-                    export bravo
-                </span>
-            </span>
-        </button> -->
         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
             <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
                 aria-controls="dropdown-nested">
@@ -39,7 +22,15 @@
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Standard</a></li>
             </ul>
         </div>
-
+        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+            (click)="previewAccountStatementFull(soa.soano)">
+            <span>
+                <i class="la la-eye"></i>
+                <span>
+                    Preview
+                </span>
+            </span>
+        </button>
 
 
     </div>
@@ -51,7 +42,7 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
-                        <span class="m--font-bolder">SOA no:</span>
+                        <span class="m--font-bolder">SOA No:</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.soano}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
@@ -112,6 +103,11 @@
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Note:</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.note}}</span>
+                    </div>
+                    <div class="col-lg-4  m--margin-bottom-10">
+                        <span class="m--font-bolder">Type:</span>
+                        <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
+                        <!-- <span class="m--font-brand m--margin-left-5">{{soa.type}}</span> -->
                     </div>
                 </div>
             </div>
@@ -185,6 +181,9 @@
                             <td>
                                 <span>{{charge.currency}}</span>
                             </td>
+                            <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                <span>{{charge.cdNote}}</span>
+                            </td>
                             <td>
                                 <span>{{charge.invoiceNo}}</span>
                             </td>
@@ -222,3 +221,7 @@
         </button>
     </div>
 </div>
+
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

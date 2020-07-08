@@ -43,5 +43,10 @@ namespace eFMS.API.Documentation.Service.Models
         public string TrackingTransportBill { get; set; }
         public DateTime? TrackingTransportDate { get; set; }
         public string FlexId { get; set; }
+        public string Status { get; set; }
+        public short? GroupId { get; set; }
+        public int? DepartmentId { get; set; }
+        public Guid? OfficeId { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

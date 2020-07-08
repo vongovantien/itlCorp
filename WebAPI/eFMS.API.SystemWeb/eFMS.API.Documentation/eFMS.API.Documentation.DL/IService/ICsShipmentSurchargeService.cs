@@ -21,5 +21,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<HousbillProfit> GetShipmentTotalProfit(Guid jobId);
         HandleState DeleteMultiple(List<Guid> listId);
         HandleState AddAndUpate(List<CsShipmentSurchargeModel> list);
+        IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
     }
 }

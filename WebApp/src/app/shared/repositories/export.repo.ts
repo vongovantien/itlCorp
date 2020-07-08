@@ -3,9 +3,8 @@ import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { HttpHeaders } from '@angular/common/http';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ExportRepo {
     constructor(private _api: ApiService) {
     }
@@ -260,5 +259,20 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportChartOfAccounts(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportChartOfAccounts`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
+    exportAccountingManagement(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement`, body).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 }
 

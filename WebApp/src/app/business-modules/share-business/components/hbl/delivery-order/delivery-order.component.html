@@ -19,12 +19,10 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                 placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                [alwaysShowCalendars]="true" [(ngModel)]="deliveryOrder.deliveryOrderPrintedDate" />
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                [alwaysShowCalendars]="true" [(ngModel)]="deliveryOrder.deliveryOrderPrintedDate"
+                                calendar [allowRemove]="deliveryOrder.deliveryOrderPrintedDate"
+                                (remove)="deliveryOrder.deliveryOrderPrintedDate = null" />
+
                         </div>
                     </div>
                 </div>

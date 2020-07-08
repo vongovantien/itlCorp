@@ -64,6 +64,24 @@ namespace eFMS.API.Documentation.Controllers
             var result = shippingInstructionService.PreviewFCLShippingInstruction(model);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("PreviewFCLContShippingInstruction/{JobId}")]
+        public IActionResult PreviewFCLContShippingInstruction(Guid JobId)
+        {
+            var result = shippingInstructionService.PreviewFCLContShippingInstruction(JobId);
+            return Ok(result);
+        }
+
+
+        [HttpPost]
+        [Route("PreviewLCLContShippingInstruction/{JobId}")]
+        public IActionResult PreviewLCLContShippingInstruction(Guid JobId)
+        {
+            var result = shippingInstructionService.PreviewLCLContShippingInstruction(JobId);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("PreviewFCLOCL")]
         public IActionResult PreviewFCLOCL(CsShippingInstructionReportModel model)
@@ -78,6 +96,14 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewFCLShippingInstructionByJobId(Guid jobId)
         {
             var result = shippingInstructionService.PreviewFCLShippingInstructionByJobId(jobId);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("PreviewSISummaryByJobId/{jobId}")]
+        public IActionResult PreviewSISummaryByJobId(Guid jobId)
+        {
+            var result = shippingInstructionService.PreviewSISummaryByJobId(jobId);
             return Ok(result);
         }
     }

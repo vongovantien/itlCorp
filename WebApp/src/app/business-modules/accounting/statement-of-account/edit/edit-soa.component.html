@@ -6,7 +6,7 @@
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
-                        <span class="m--font-bolder">SOA no:</span>
+                        <span class="m--font-bolder">SOA No:</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.soano}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
@@ -19,9 +19,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 m--margin-bottom-10">
+                    <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Total Amount:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.totalAmount | negativeNumber}}</span>
+                        <span class="m--font-brand m--margin-left-5"
+                            *ngIf="soa.totalAmount > 0 else negativeNumber">{{soa.totalAmount | number: '.0-3'}}</span>
+                        <ng-template #negativeNumber class="m--font-brand m--margin-left-5">
+                            <span class="m--font-brand m--margin-left-5">
+                                ({{soa.totalAmount | abs | number: '.0-3'}})
+                            </span>
+                        </ng-template>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Total Shipment:</span>
@@ -176,13 +182,16 @@
                                 <span>{{charge.customNo}}</span>
                             </td>
                             <td>
-                                <span>{{charge.debit}}</span>
+                                <span>{{charge.debit | number: '.0-3'}}</span>
                             </td>
                             <td>
-                                <span>{{charge.credit}}</span>
+                                <span>{{charge.credit | number: '.0-3'}}</span>
                             </td>
                             <td>
                                 <span>{{charge.currency}}</span>
+                            </td>
+                            <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                <span>{{charge.cdNote}}</span>
                             </td>
                             <td>
                                 <span>{{charge.invoiceNo}}</span>

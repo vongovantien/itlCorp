@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { SystemConstants } from 'src/constants/system.const';
 import { JobConstants } from '@constants';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-booking-note-lcl-export',
@@ -33,6 +34,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     placeOfStuffing: AbstractControl;
     contact: AbstractControl;
     bookingNo: AbstractControl;
+    bookingDate: AbstractControl;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
@@ -52,7 +54,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     ngOnInit() {
         this.shipppers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.SHIPPER, CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.consignees = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CONSIGNEE]);
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.INLAND_SEA, active: true });
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA, active: true });
 
         this.initForm();
     }
@@ -61,7 +63,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
         const userLogged: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
         this.formGroup = this._fb.group({
-            from: [userLogged.preferred_username, Validators.required], // * Default english name
+            from: [userLogged.nameEn, Validators.required], // * Default english name
             telFrom: [],
             to: [null, Validators.required],
             telTo: [],
@@ -98,9 +100,11 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
             closingTime: [],
             etd: [null, Validators.required],
             eta: [],
+            bookingDate: [{ startDate: new Date(), endDate: new Date() }],
+
 
             paymentTerm: [],
-        });
+        }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.shipperId = this.formGroup.controls['shipperId'];
         this.consigneeId = this.formGroup.controls['consigneeId'];
@@ -118,6 +122,7 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
         this.contact = this.formGroup.controls['contact'];
         this.placeOfStuffing = this.formGroup.controls['placeOfStuffing'];
         this.bookingNo = this.formGroup.controls['bookingNo'];
+        this.bookingDate = this.formGroup.controls['bookingDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {

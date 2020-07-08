@@ -17,11 +17,14 @@ export * from './catalogue/commonity-group.model';
 export * from './catalogue/country.model';
 export * from './catalogue/ware-house.model';
 export * from './catalogue//catPartnerCharge.model';
+export * from './catalogue/catChartOfAccounts.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
 export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
+export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel, AccAccountingManagementResult } from './accouting/accounting-management';
+export * from './accouting/cdnoteview.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
@@ -38,6 +41,7 @@ export * from './document/arrival-freight-charge';
 export * from './document/csOtherCharge';
 export * from './document/airway-bill';
 export * from './document/csBookingnote';
+export * from './document/arrival-note-hbl';
 
 export * from './tool-setting/tariff';
 export * from './tool-setting/ecus-connection';

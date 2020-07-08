@@ -157,6 +157,7 @@ export class AirExportManifestComponent extends AppList {
 
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
+        this.getTotalWeight();
         if (this.formManifest.formGroup.valid) {
 
             this._progressRef.start();

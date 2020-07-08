@@ -12,5 +12,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
         public string RequesterName { get; set; }
+        public List<string> advancePaymentIds { get; set; }
     }
 }

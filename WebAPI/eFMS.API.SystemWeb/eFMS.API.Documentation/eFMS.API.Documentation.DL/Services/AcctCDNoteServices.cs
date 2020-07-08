@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
+using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -13,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -37,6 +41,8 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysOffice> sysOfficeRepo;
         ICsShipmentSurchargeService surchargeService;
         ICsTransactionDetailService transactionDetailService;
+        IContextBase<CustomsDeclaration> customsDeclarationRepository;
+
         //IOpsTransactionService opsTransactionService;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -59,6 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             ICsShipmentSurchargeService surcharge,
             ICsTransactionDetailService transDetailService,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
             //IOpsTransactionService opsTransService
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
@@ -84,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             transactionDetailService = transDetailService;
             //opsTransactionService = opsTransService;
             currencyExchangeService = currencyExchange;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -156,6 +164,11 @@ namespace eFMS.API.Documentation.DL.Services
                 model.Code = CreateCode(model.Type, model.TransactionTypeEnum);
                 model.UserCreated = currentUser.UserID;
                 model.DatetimeCreated = DateTime.Now;
+                model.Status = TermData.CD_NOTE_NEW;
+                model.GroupId = currentUser.GroupId;
+                model.OfficeId = currentUser.OfficeID;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.CompanyId = currentUser.CompanyID;
                 var hs = DataContext.Add(model, false);
 
                 if (hs.Success)
@@ -216,8 +229,12 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
-                cdNote = mapper.Map<AcctCdnote>(model);
-                var stt = DataContext.Update(cdNote, x => x.Id == cdNote.Id, false);
+                var entity = mapper.Map<AcctCdnote>(model);
+                entity.GroupId = model.GroupId;
+                entity.DepartmentId = model.DepartmentId;
+                entity.OfficeId = model.OfficeId;
+                entity.CompanyId = model.CompanyId;
+                var stt = DataContext.Update(entity, x => x.Id == cdNote.Id, false);
                 if (stt.Success)
                 {
                     var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
@@ -546,7 +563,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var countries = countryRepository.Get().ToList();
             soaDetails.PartnerNameEn = partner?.PartnerNameEn;
-            soaDetails.PartnerShippingAddress = partner?.AddressShippingEn;
+            soaDetails.PartnerShippingAddress = partner?.AddressEn; //Billing Address Name En
             soaDetails.PartnerTel = partner?.Tel;
             soaDetails.PartnerTaxcode = partner?.TaxCode;
             soaDetails.PartnerId = partner?.Id;
@@ -594,19 +611,15 @@ namespace eFMS.API.Documentation.DL.Services
                 var cdNote = DataContext.Where(x => x.Id == idSoA).FirstOrDefault();
                 if (cdNote == null)
                 {
-                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND].Value);
+                    hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND]);
                 }
                 else
                 {
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    var isOtherSOA = false;
-                    foreach (var item in charges)
-                    {
-                        isOtherSOA |= (item.Soano != null || item.PaySoano != null);
-                    }
+                    var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
                     if (isOtherSOA == true)
                     {
-                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA].Value);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);                        
                     }
                     else
                     {
@@ -614,28 +627,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (hs.Success)
                         {
                             foreach (var item in charges)
-                            {
-                                //-to contiue
-                                //item.Cdno = null;
-                                //if(item.Type == "BUY")
-                                //{
-                                //    item.CreditNo = null;
-                                //}
-                                //else if(item.Type == "BUY")
-                                //{
-                                //    item.DebitNo = null;
-                                //}
-                                //else
-                                //{
-                                //    if(item.DebitNo == cdNote.Code)
-                                //    {
-                                //        item.DebitNo = null;
-                                //    }
-                                //    if(item.CreditNo == cdNote.Code)
-                                //    {
-                                //        item.CreditNo = null;
-                                //    }
-                                //}
+                            {                            
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
@@ -685,7 +677,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                hs = new HandleState(ex.Message);
+                hs = new HandleState((object)ex.Message);
             }
             return hs;
         }
@@ -708,6 +700,15 @@ namespace eFMS.API.Documentation.DL.Services
             var _swiftAccs = officeOfUser?.SwiftCode ?? string.Empty;
             var _accsUsd = officeOfUser?.BankAccountUsd ?? string.Empty;
             var _accsVnd = officeOfUser?.BankAccountVnd ?? string.Empty;
+
+            IQueryable<CustomsDeclaration> _customClearances = customsDeclarationRepository.Get(x => x.JobNo == model.JobNo);
+            CustomsDeclaration _clearance = null;
+            if (_customClearances.Count() > 0 || _customClearances != null)
+            {
+                var orderClearance = _customClearances.OrderBy(x => x.ClearanceDate);
+                _clearance = orderClearance.FirstOrDefault();
+
+            }
 
             var parameter = new AcctSOAReportParams
             {
@@ -812,13 +813,14 @@ namespace eFMS.API.Documentation.DL.Services
                         GW = model.GW,
                         NW = null,
                         SeaCBM = model.CBM,
-                        SOTK = "N/A",
+                        SOTK = _clearance?.ClearanceNo,
                         NgayDK = null,
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),
                         TransDate = null,
                         Unit = item.CurrencyId,
-                        UnitPieaces = "N/A"
+                        UnitPieaces = "N/A",
+                        CustomDate = _clearance?.ClearanceDate
                     };
                     listSOA.Add(acctCDNo);
                 }
@@ -1212,5 +1214,172 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
         #endregion -- PREVIEW CD NOTE --        
+
+        private IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AcctCdnote, bool>> perQuery = GetQueryPermission(rangeSearch, _user);
+            Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
+                                            && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
+                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
+            if (criteria.IssuedDate != null)
+            {
+                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+            }
+            if(perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
+            var results = DataContext.Get(query);
+            if (results == null) return results;
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            {
+                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                results = results.Where(x => refNos.Contains(x.Code));
+            }
+            return results;
+        }
+
+        private Expression<Func<AcctCdnote, bool>> GetQueryPermission(PermissionRange rangeSearch, ICurrentUser user)
+        {
+            Expression<Func<AcctCdnote, bool>> perQuery = null;
+            switch (rangeSearch)
+            {
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    perQuery = x => x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Group:
+                    perQuery = x => (x.GroupId == user.GroupId && x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Department:
+                    perQuery = x => (x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Office:
+                    perQuery = x => (x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+                case PermissionRange.Company:
+                    perQuery = x => x.CompanyId == user.CompanyID
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+            }
+            return perQuery;
+        }
+
+        public List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        {
+            List<CDNoteModel> results = null;
+            var data = Query(criteria);
+            if(data == null) { rowsCount = 0; return results; }
+            var cdNotes = Query(criteria)?.OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
+            {
+                ReferenceNo = x.Code,
+                PartnerId = x.PartnerId,
+                Id = x.Id,
+                IssuedDate = x.DatetimeCreated,
+                Creator = x.UserCreated,
+                JobId = x.JobId,
+            })?.ToList();
+
+            rowsCount = cdNotes.Count;
+            if (rowsCount == 0)
+            {
+                return results;
+            }
+            var cdNotesGroupByCurrency = surchargeRepository.Get(x => cdNotes.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
+                .Select(x => new 
+                {
+                    ReferenceNo = string.IsNullOrEmpty(x.DebitNo) ? x.CreditNo : x.DebitNo,
+                    HBLNo = x.Hblno,
+                    Currency = x.CurrencyId,
+                    x.Total,
+                    x.VoucherId,
+                    x.InvoiceNo,
+                    x.Type
+                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency,
+                    ReferenceNo = x.Key.ReferenceNo,
+                    HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
+                    Total = x.Sum(y => y.Total),
+                    Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId))? "Issued Voucher": "New"
+                });
+            cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
+            
+            rowsCount = cdNotesGroupByCurrency.Count();
+            if (size > 0)
+            {
+                if (page < 1)
+                {
+                    page = 1;
+                }
+                cdNotesGroupByCurrency = cdNotesGroupByCurrency.Skip((page - 1) * size).Take(size);
+                results = GetCDNotes(cdNotes, cdNotesGroupByCurrency);
+            }
+            return results;
+        }
+
+        private IQueryable<CDNoteModel> GetByStatus(string status, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
+        {
+            switch (status)
+            {
+                case "Issued Invoice":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.IssuedStatus == "Issued Invoice");
+                    break;
+                case "Issued Voucher":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.IssuedStatus == "Issued Voucher");
+                    break;
+                case "New":
+                    cdNotesGroupByCurrency = cdNotesGroupByCurrency.Where(x => x.Status == "New");
+                    break;
+            }
+            return cdNotesGroupByCurrency;
+        }
+
+        private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
+        {
+            var data = (from cd in cdNotes
+                     join charge in cdNotesGroupByCurrency on cd.ReferenceNo equals charge.ReferenceNo
+                     join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id
+                     join creator in sysUserRepo.Get() on cd.Creator equals creator.Id
+                     select new CDNoteModel
+                     {
+                         Id = cd.Id,
+                         JobId = cd.JobId,
+                         PartnerId = partner.Id,
+                         PartnerName = partner.PartnerNameEn,
+                         ReferenceNo = cd.ReferenceNo,
+                         Total = charge.Total,
+                         Currency = charge.Currency,
+                         IssuedDate = cd.IssuedDate,
+                         Creator = creator.Username,
+                         HBLNo = charge.HBLNo,
+                         Status = charge.Status
+                     })?.AsQueryable();
+            var results = new List<CDNoteModel>();
+            foreach (var item in data)
+            {
+                var ops = opstransRepository.Get(op => op.Id == item.JobId).FirstOrDefault();
+                if (ops != null)
+                {
+                    item.JobNo = ops.JobNo;
+                }
+                else
+                {
+                    var cs = cstransRepository.Get(trans => trans.Id == item.JobId).FirstOrDefault();
+                    if (cs != null)
+                    {
+                        item.JobNo = cs.JobNo;
+                    }
+                }
+                results.Add(item);
+            }
+            return results;
+        }
     }
 }

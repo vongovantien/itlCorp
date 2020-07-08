@@ -12,13 +12,14 @@ import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetail
 import { SystemConstants } from 'src/constants/system.const';
 
 import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 import { NINE } from '@angular/cdk/keycodes';
+import { formatCurrency } from '@angular/common';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -190,8 +191,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 .subscribe(
                     (hbl: HouseBill) => {
                         if (!!hbl && hbl.id && hbl.id !== SystemConstants.EMPTY_GUID) {
-                            // this.totalCBM = hbl.cbm;
-                            // this.totalHeightWeight = hbl.hw;
                             this.jobId = hbl.jobId;
                             this.hblId = hbl.id;
                             this.hwconstant = hbl.hwConstant;
@@ -213,10 +212,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.updateHeightWeight(this.dims);
                         this.formCreate.get('dimensionDetails')
                             .valueChanges
-                            .pipe(
-                                // debounceTime(500),
-                                // distinctUntilChanged(),
-                            )
                             .subscribe(changes => {
                                 this.updateHeightWeight(changes);
                             });
@@ -226,9 +221,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             this.shipmenttype.setValue([this.shipmentTypes.find(sm => sm.id === 'Freehand')]);
             this.rclass.setValue([this.rClasses.find(sm => sm.id === 'Q')]);
             this.asArranged.setValue(false);
+
             const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
             const currenctUser = JSON.parse(claim)["officeId"];
-            this.getDetailOffice(currenctUser);
+
             // * get detail shipment from store.
             this._store.select(getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
@@ -254,19 +250,27 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         }
                     ),
                     mergeMap(
-                        () => this._documentationRepo.getAirwayBill(this.jobId)
+                        () => forkJoin([
+                            this._documentationRepo.getAirwayBill(this.jobId),
+                            this._systemRepo.getLocationOfficeById(currenctUser),
+                        ])
                     ))
                 .subscribe(
-                    (air: AirwayBill) => {
-                        this.airwayBill = air;
-                        this.forwardingAgentId.setValue(this.airwayBill.consigneeId);
-                        this.formCreate.controls['transitPlaceTo1'].setValue(this.airwayBill.transitPlaceTo1);
-                        this.formCreate.controls['transitPlaceTo1'].setValue(this.airwayBill.transitPlaceTo1);
-                        this.formCreate.controls['firstCarrierTo'].setValue(this.airwayBill.firstCarrierTo);
-                        this.formCreate.controls['transitPlaceBy1'].setValue(this.airwayBill.transitPlaceBy1);
-                        this.formCreate.controls['transitPlaceTo2'].setValue(this.airwayBill.transitPlaceTo2);
-                        this.formCreate.controls['transitPlaceBy2'].setValue(this.airwayBill.transitPlaceBy2);
-                        this.formCreate.controls['forwardingAgentDescription'].setValue(this.airwayBill.consigneeDescription);
+                    ([airwaybill, fesponseOfficeLocation]) => {
+                        if (!!airwaybill) {
+                            this.airwayBill = airwaybill;
+                            this.forwardingAgentId.setValue(this.airwayBill.consigneeId);
+                            this.formCreate.controls['transitPlaceTo1'].setValue(this.airwayBill.transitPlaceTo1);
+                            this.formCreate.controls['transitPlaceTo1'].setValue(this.airwayBill.transitPlaceTo1);
+                            this.formCreate.controls['firstCarrierTo'].setValue(this.airwayBill.firstCarrierTo);
+                            this.formCreate.controls['transitPlaceBy1'].setValue(this.airwayBill.transitPlaceBy1);
+                            this.formCreate.controls['transitPlaceTo2'].setValue(this.airwayBill.transitPlaceTo2);
+                            this.formCreate.controls['transitPlaceBy2'].setValue(this.airwayBill.transitPlaceBy2);
+                            this.formCreate.controls['forwardingAgentDescription'].setValue(this.airwayBill.consigneeDescription);
+                        }
+                        if (fesponseOfficeLocation.status) {
+                            this.issueHblplace.setValue(fesponseOfficeLocation.data);
+                        }
                     }
                 );
         }
@@ -504,21 +508,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         return strDescription;
     }
 
-    getDetailOffice(id: string) {
-        this._systemRepo.getLocationOfficeById(id)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this.issueHblplace.setValue(res.data);
-                    }
-                },
-            );
-
-    }
-
     createDIMItem(): FormGroup {
         return this._fb.group(new DIM({
             height: [null, Validators.min(0)],
@@ -532,15 +521,10 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     addDIM() {
         this.selectedIndexDIM = -1;
         (this.formCreate.controls.dimensionDetails as FormArray).push(this.createDIMItem());
-        // this.dims.push(new DIM({
-        //     mblId: this.jobId,
-        //     hblId: this.hblId
-        // }));
     }
 
     deleteDIM(index: number) {
         (this.formCreate.get('dimensionDetails') as FormArray).removeAt(index);
-        // this.dims.splice(index, 1);
         this.calculateHWDimension(this.formCreate.get('dimensionDetails').value || []);
     }
 
@@ -561,9 +545,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     calculateHWDimension(dims: DIM[]) {
         if (!!dims.length) {
-            // for (const item of dims) {
             this.updateHeightWeight(dims);
-            // }
         } else {
             this.totalCBM = this.totalHeightWeight = 0;
         }
@@ -657,7 +639,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     }
                 }
             );
-
     }
 
     onChargeWeightChange() {
@@ -723,7 +704,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.isUpdateOtherCharge = true;
         let text: string = '';
         data.charges.forEach((i: CsOtherCharge) => {
-            text += `${i.chargeName}: ${i.amount} \n`;
+            text += `${i.chargeName}: ${formatCurrency(i.amount, 'en', '')} \n`;
         });
 
         this.formCreate.controls["otherCharge"].setValue(text);

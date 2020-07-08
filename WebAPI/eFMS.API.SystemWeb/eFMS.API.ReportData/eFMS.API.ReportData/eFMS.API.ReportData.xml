@@ -78,6 +78,13 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingManagement(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteria)">
+            <summary>
+            Export accounting management
+            </summary>
+            <param name="criteria">List Voucher or Invoices</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -169,11 +176,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportChartOfAccounts(eFMS.API.ReportData.Models.CatChartOfAccountsCriteria)">
+            <summary>
+            Export Chart Of Accounts
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.CatalogueController.ExportCustomClearance(eFMS.API.ReportData.Models.CustomsDeclarationCriteria)">
             <summary>
             export Custom Clearance
             </summary>
             <returns></returns>
+            
         </member>
         <member name="T:eFMS.API.ReportData.Controllers.DocumentationController">
             <summary>

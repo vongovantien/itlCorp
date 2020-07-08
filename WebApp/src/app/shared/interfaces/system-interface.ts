@@ -11,6 +11,8 @@ namespace SystemInterface {
         officeId: string;
         departmentId: number;
         groupId: number;
+        nameEn: string;
+        nameVn: string;
     }
 
     export interface IDepartmentGroup {
@@ -30,7 +32,7 @@ namespace SystemInterface {
         list: string;
         import: boolean;
         export: boolean;
-        speacialActions: any[];
+        speacialActions: ISpecialAction[];
         allowAdd: boolean;
         [name: string]: any;
 
@@ -42,4 +44,11 @@ namespace SystemInterface {
         token_type: string;
         refresh_token: string;
     }
+
+    export interface ISpecialAction {
+        action: string;
+        isAllow: boolean;
+    }
+
 }
+

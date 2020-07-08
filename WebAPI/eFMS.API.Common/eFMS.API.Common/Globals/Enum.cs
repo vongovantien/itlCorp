@@ -171,6 +171,8 @@
         sysUserManagement,
         tcon1,
         tcon2,
-        tool2
+        tool2,
+        catChartOfAccounts,
+        accManagement
     }
 }

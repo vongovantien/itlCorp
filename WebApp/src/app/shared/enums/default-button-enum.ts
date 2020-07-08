@@ -53,7 +53,7 @@ export const CancelDefaultButton: ButtonAttributeSetting = {
 
 export const ResetDefaultButton: ButtonAttributeSetting = {
     titleButton: "reset",
-    classStyle: "btn btn-block btn-default m-btn--square m-btn--icon m-btn--uppercase",
+    classStyle: "btn btn-default m-btn--square m-btn--icon m-btn--uppercase",
     icon: "la la-refresh"
 };
 

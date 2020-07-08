@@ -205,9 +205,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckAllowConvertJob([FromBody]List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-            var hs = transactionService.CheckAllowConvertJob(list);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            var result = transactionService.CheckAllowConvertJob(list);
             return Ok(result);
         }
 
@@ -233,28 +231,6 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        ///// <summary>
-        ///// convert multi clearances to multi jobs
-        ///// </summary>
-        ///// <param name="list"></param>
-        ///// <returns></returns>
-        //[HttpPost("ConvertExistedClearancesToJobs")]
-        //[Authorize]
-        //public IActionResult ConvertExistedClearancesToJobs([FromBody]List<OpsTransactionClearanceModel> list)
-        //{
-        //    currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
-        //    var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-        //    if (permissionRange == PermissionRange.None) return Forbid();
-        //    HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
-        //    var message = HandleError.GetMessage(hs, Crud.Insert);
-        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
-        //    if (!hs.Success)
-        //    {
-        //        return BadRequest(result);
-        //    }
-        //    return Ok(result);
-        //}
-
         /// <summary>
         /// convert multi clearances to multi jobs
         /// </summary>
@@ -268,13 +244,16 @@ namespace eFMS.API.Documentation.Controllers
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return Forbid();
             HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
             {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Exception.Message?.ToString() };
                 return BadRequest(result);
             }
-            return Ok(result);
+            else
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+                return Ok(result);
+            }
         }
 
         /// <summary>

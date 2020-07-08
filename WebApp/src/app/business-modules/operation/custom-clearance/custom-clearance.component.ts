@@ -181,7 +181,11 @@ export class CustomClearanceComponent extends AppList {
                             if (res.status) {
                                 this.confirmConvertPopup.show();
                             } else {
-                                this.canNotAllowActionPopup.show();
+                                if (res.data === 403) {
+                                    this._toastrService.error(res.message, '', { enableHtml: true });
+                                } else {
+                                    this.canNotAllowActionPopup.show();
+                                }
                             }
                         },
                     );

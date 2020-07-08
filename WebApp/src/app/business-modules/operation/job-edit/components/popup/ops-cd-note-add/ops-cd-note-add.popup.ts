@@ -112,7 +112,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
-            { field: 'id', label: 'Partner ID' },
+            { field: 'accountNo', label: 'Partner ID' },
             { field: 'shortName', label: 'Partner ABBR' },
             { field: 'partnerNameEn', label: 'Partner Name' },
             { field: 'taxCode', label: 'Tax Code' },
@@ -328,7 +328,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
 
     formatNumberCurrency(input: number) {
         return input.toLocaleString(
-            undefined, // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: 3 }
         );
     }

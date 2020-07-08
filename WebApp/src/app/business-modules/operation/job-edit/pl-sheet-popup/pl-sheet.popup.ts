@@ -8,7 +8,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ToastrService } from 'ngx-toastr';
 import { DomSanitizer } from '@angular/platform-browser';
-import { API_MENU } from 'src/constants/api-menu.const';
 import { ModalDirective } from 'ngx-bootstrap';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -35,7 +34,6 @@ export class PlSheetPopupComponent extends PopupBase {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private sanitizer: DomSanitizer,
-        private api_menu: API_MENU,
         private _dataService: DataService
     ) {
         super();
@@ -92,8 +90,6 @@ export class PlSheetPopupComponent extends PopupBase {
     }
 
     get scr() {
-        // http://localhost:51830/Default.aspx       
-        // return this.sanitizer.bypassSecurityTrustResourceUrl(this.api_menu.Report);
         return this.sanitizer.bypassSecurityTrustResourceUrl(`${environment.HOST.REPORT}`);
     }
 

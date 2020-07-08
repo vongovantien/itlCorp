@@ -4,7 +4,7 @@ import { environment } from "src/environments/environment";
 import { catchError, map } from "rxjs/operators";
 import { throwError, Observable } from "rxjs";
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AccountingRepo {
 
     private VERSION: string = 'v1';
@@ -89,6 +89,38 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+
+    updateVoucherAdvancePayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UpdatePaymentVoucher`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkExistedVoucherInAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/CheckExistedVoucherInAdvance`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    upLoadVoucherAdvanceFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/UploadFile`, files, "uploadedFile");
+    }
+
+    downloadVoucherAdvanceFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/downloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importVoucherAdvance(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AcctAdvancePayment/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 
     // add new advance payment with payment request
     addNewAdvancePayment(body: any = {}): Observable<any> {
@@ -375,6 +407,118 @@ export class AccountingRepo {
             .pipe(
                 map((data: any) => data)
             );
+    }
+
+    previewAccountStatementFull(soaNo: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/PreviewAccountStatementFull`, {}, { soaNo: soaNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteAcctMngt(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckAllowDelete/`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteAcctMngt(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getChargeSellForInvoiceByCriteria(criteria: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetChargeSellForInvoiceByCriteria`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getChargeForVoucherByCriteria(criteria: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetChargeForVoucherByCriteria`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getListAcctMngt(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addNewAcctMgnt(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateAcctMngt(body: any = {}): Observable<any> {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/Update`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    generateVoucherId() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateVoucherId`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getDetailAcctMngt(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GetById`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    generateInvoiceNoTemp() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateInvoiceNoTemp`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkVoucherIdExist(voucherId: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckVoucherIdExist?voucherId=${voucherId}&acctId=${acctId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkInvoiceNoTempSerieExist(invoiceNoTemp: string, serie: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckInvoiceNoTempSerieExist?invoiceNoTemp=${invoiceNoTemp}&serie=${serie}&acctId=${acctId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    downLoadVatInvoiceImportTemplate() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/DownLoadVatInvoiceTemplate`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    uploadVatInvoiceImportFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/uploadVatInvoiceImportTemplate`, files, "uploadedFile");
+    }
+
+    importVatInvoice(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ImportVatInvoice`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkDetailAcctMngtPermission(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckPermission/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
     }
 }
 

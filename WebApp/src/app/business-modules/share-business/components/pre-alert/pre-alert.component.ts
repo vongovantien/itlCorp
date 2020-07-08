@@ -44,15 +44,21 @@ export class ShareBusinessReAlertComponent extends AppList {
     isCheckedArrivalNotice: boolean = false;
     isExitsManifest: boolean = true;
     isCheckedManifest: boolean = false;
-    isExitsMawb: boolean = true;
-    isCheckedMawb: boolean = false;
+    isExitsHawb: boolean = true;
+    isCheckedHawb: boolean = false;
     isExitsSI: boolean = true;
     isCheckedSI: boolean = false;
+    isExitsSISummary: boolean = true;
+    isCheckedSISummary: boolean = false;
+    isExitsSIDetailCont: boolean = true;
+    isCheckedSIDetailCont: boolean = false;
 
     pathGeneralArrivalNotice: string = '';
     pathGeneralManifest: string = '';
     pathGeneralMawb: string = '';
     pathGeneralSI: string = '';
+    pathGeneralSISummary: string = '';
+    pathGeneralSIDetailCont: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -121,13 +127,25 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 this.exportCrystalManifestToPdf();
-                this.exportCrystalMawbFrameToPdf();
+                this.exportCrystalHawbFrameToPdf();
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this.exportCrystalSIToPdf();
+                this.exportCrystalSISummaryToPdf();
+                setTimeout(() => {
+                    this.exportCrystalSIToPdf();
+                }, 3000);
+                setTimeout(() => {
+                    this.exportCrystalSIDetailContFCL();
+                }, 5000);
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this.exportCrystalSIToPdf();
+                this.exportCrystalSISummaryToPdf();
+                setTimeout(() => {
+                    this.exportCrystalSIToPdf();
+                }, 3000);
+                setTimeout(() => {
+                    this.exportCrystalSIDetailContFCL();
+                }, 5000);
                 break;
             default:
                 break;
@@ -271,8 +289,12 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     getInfoMailHBLAirImport(hblId: string) {
+        this._progressRef.start();
         this._documentRepo.getInfoMailHBLAirImport(hblId)
-            .pipe(catchError(this.catchError))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
             .subscribe(
                 (res: EmailContent) => {
                     this.formMail.setValue({
@@ -287,8 +309,12 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     getInfoMailHBLAirExport(hblId: string) {
+        this._progressRef.start();
         this._documentRepo.getInfoMailHBLAirExport(hblId)
-            .pipe(catchError(this.catchError))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
             .subscribe(
                 (res: EmailContent) => {
                     this.formMail.setValue({
@@ -303,8 +329,12 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     getInfoMailSISeaExport(jobId: string) {
+        this._progressRef.start();
         this._documentRepo.getInfoMailSISeaExport(jobId)
-            .pipe(catchError(this.catchError))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
             .subscribe(
                 (res: EmailContent) => {
                     this.formMail.setValue({
@@ -321,10 +351,11 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     //#region Preview Report
     previewArrivalNotice() {
+        this._progressRef.start();
         this._documentRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: 'VND' })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -342,10 +373,11 @@ export class ShareBusinessReAlertComponent extends AppList {
     }
 
     previewManifest() {
+        this._progressRef.start();
         this._documentRepo.previewAirExportManifestByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -362,11 +394,12 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
-    previewMawb() {
+    previewHawb() {
+        this._progressRef.start();
         this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -383,11 +416,13 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
+    // SI Detail HBL
     previewSI() {
+        this._progressRef.start();
         this._documentRepo.previewSIReportByJobId(this.jobId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._progressRef.complete(); })
             )
             .subscribe(
                 (res: Crystal) => {
@@ -402,6 +437,86 @@ export class ShareBusinessReAlertComponent extends AppList {
                     }
                 },
             );
+    }
+
+    // SI Summary
+    previewSISummary() {
+        this._progressRef.start();
+        this._documentRepo.previewSISummaryByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    // SI Detail (Cont) FCL
+    previewSIDetailContFCL() {
+        this._progressRef.start();
+        this._documentRepo.previewSIContReport(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    // SI Detail (Cont) LCL
+    previewSIDetailContLCL() {
+        this._progressRef.start();
+        this._documentRepo.previewSIContLCLReport(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._progressRef.complete(); })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (this.dataReport !== null && this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data charge to display preview');
+                    }
+                },
+            );
+    }
+
+    previewSIDetailCont(serviceType) {
+        switch (serviceType) {
+            case ChargeConstants.SFE_CODE:
+                this.previewSIDetailContFCL();
+                break;
+            case ChargeConstants.SLE_CODE:
+                this.previewSIDetailContLCL();
+                break;
+        }
     }
     //#endregion Preview Report
 
@@ -458,7 +573,7 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
-    exportCrystalMawbFrameToPdf() {
+    exportCrystalHawbFrameToPdf() {
         this._documentRepo.previewHouseAirwayBillLastest(this.hblId, 'LASTEST_ITL_FRAME')
             .pipe(
                 catchError(this.catchError),
@@ -474,11 +589,36 @@ export class ShareBusinessReAlertComponent extends AppList {
 
                         this.pathGeneralMawb = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
-                        this.isExitsMawb = true;
-                        this.isCheckedMawb = true;
+                        this.isExitsHawb = true;
+                        this.isCheckedHawb = true;
                     } else {
-                        this.isExitsMawb = false;
-                        this.isCheckedMawb = false;
+                        this.isExitsHawb = false;
+                        this.isCheckedHawb = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalSISummaryToPdf() {
+        this._documentRepo.previewSISummaryByJobId(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        this.pathGeneralSISummary = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsSISummary = true;
+                        this.isCheckedSISummary = true;
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+                    } else {
+                        this.isExitsSISummary = false;
+                        this.isCheckedSISummary = false;
                     }
                 },
             );
@@ -494,14 +634,13 @@ export class ShareBusinessReAlertComponent extends AppList {
                 (res: Crystal) => {
                     this.dataExportReport = res;
                     if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
-                        setTimeout(() => {
-                            this.exportReportPopup.frm.nativeElement.submit();
-                        }, 1000);
-
                         this.pathGeneralSI = res.pathReportGenerate;
                         this.attachedFile.push(res.pathReportGenerate);
                         this.isExitsSI = true;
                         this.isCheckedSI = true;
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
                     } else {
                         this.isExitsSI = false;
                         this.isCheckedSI = false;
@@ -510,6 +649,55 @@ export class ShareBusinessReAlertComponent extends AppList {
             );
     }
 
+    exportCrystalSIDetailContFCL() {
+        this._documentRepo.previewSIContReport(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        this.pathGeneralSIDetailCont = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsSIDetailCont = true;
+                        this.isCheckedSIDetailCont = true;
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+                    } else {
+                        this.isExitsSIDetailCont = false;
+                        this.isCheckedSIDetailCont = false;
+                    }
+                },
+            );
+    }
+
+    exportCrystalSIDetailContLCL() {
+        this._documentRepo.previewSIContLCLReport(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataExportReport = res;
+                    if (this.dataExportReport !== null && this.dataExportReport.dataSource.length > 0) {
+                        this.pathGeneralSIDetailCont = res.pathReportGenerate;
+                        this.attachedFile.push(res.pathReportGenerate);
+                        this.isExitsSIDetailCont = true;
+                        this.isCheckedSIDetailCont = true;
+                        setTimeout(() => {
+                            this.exportReportPopup.frm.nativeElement.submit();
+                        }, 1000);
+                    } else {
+                        this.isExitsSIDetailCont = false;
+                        this.isCheckedSIDetailCont = false;
+                    }
+                },
+            );
+    }
     //#endregion Export Report
 
     onChangeCheckBox() {
@@ -519,13 +707,17 @@ export class ShareBusinessReAlertComponent extends AppList {
                 break;
             case ChargeConstants.AE_CODE: // Air Export               
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
-                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedMawb);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSISummary, this.isCheckedSISummary);
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSI, this.isCheckedSI);
+                this.UpdateAttachFileByPathGeneralReport(this.pathGeneralSIDetailCont, this.isCheckedSIDetailCont);
                 break;
             default:
                 break;

@@ -73,9 +73,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
                         console.log(this.containers);
                         // * Update field inword with container data.
-                        if (!this.formCreateHBLComponent.isUpdate) {
-                            this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
-                        }
+                        this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
                 });
     }
@@ -228,7 +226,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.gotoList();
+                        this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}/hbl/${res.data}`]);
                     } else {
                     }
                 }
@@ -239,8 +237,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
-            package: container.packageTypeName,
-            quantity: container.packageQuantity,
+            contName: container.description || '',
+            quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
 
@@ -270,7 +268,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
-        containerDetail += " Container Only. SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
+        containerDetail += " Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
     }
 
@@ -278,8 +276,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
 
-    handleStringPackage(contOb: { package: string, quantity: number }) {
-        return contOb.quantity + ' ' + contOb.package + ' & ';
+    handleStringPackage(contOb: { contName: string, quantity: number }) {
+        return contOb.quantity + ' ' + contOb.contName + ' & ';
     }
 
     gotoList() {
