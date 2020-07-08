@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.Controllers
             if (!ModelState.IsValid) return BadRequest();
             var hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);

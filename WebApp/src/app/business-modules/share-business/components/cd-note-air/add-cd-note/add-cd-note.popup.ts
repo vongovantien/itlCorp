@@ -295,7 +295,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
-                                    this.onRequest.emit();
+                                    this.onRequest.emit(res.data);
                                     this.closePopup();
                                 } else {
                                     this._toastService.error(res.message);
