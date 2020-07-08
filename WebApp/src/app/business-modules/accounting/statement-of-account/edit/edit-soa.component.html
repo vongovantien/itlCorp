@@ -13,9 +13,13 @@
                         <span class="m--font-bolder">Partner Name:</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.partnerName}}</span>
                     </div>
-                    <div class="col-lg-4 m--margin-bottom-10">
+                    <div class="col-lg-4 m--margin-bottom-10" [ngSwitch]="soa.status">
                         <span class="m--font-bolder">Status:</span>
-                        <span class="m--font-danger m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'New'" class="text-danger m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Done'" class="text-success m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Issued Invoice'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Issued Voucher'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchDefault class="text-primary m--margin-left-5">{{soa.status}}</span>
                     </div>
                 </div>
                 <div class="row">
@@ -103,7 +107,8 @@
                     </div>
                     <div class="col-lg-6 m--align-right">
                         <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                            (click)="removeCharge()">
+                            (click)="removeCharge()"
+                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -113,7 +118,8 @@
                         </button>
                         <button type="button"
                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
-                            (click)="addMoreCharge()">
+                            (click)="addMoreCharge()"
+                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -129,7 +135,8 @@
                     <thead>
                         <tr>
                             <th>
-                                <label class="m-checkbox">
+                                <label class="m-checkbox"
+                                    *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
                                     <input type="checkbox" [(ngModel)]="isCheckAllCharge"
                                         (change)="checkUncheckAllCharge()">
                                     <span></span>
@@ -156,7 +163,8 @@
                             *ngFor="let charge of soa.chargeShipments | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn">
                             <td class="table-actions-col">
                                 <div class="table-actions">
-                                    <label class="m-checkbox">
+                                    <label class="m-checkbox"
+                                        *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
                                         <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
                                             value="{{charge}}" [(ngModel)]="charge.isSelected" name="{{charge.code}}">
                                         <span></span>
@@ -222,7 +230,8 @@
 
     <div class="form-actions m--align-center">
         <div class="c-button-actions">
-            <app-permission-button type="save" title="Save" (onClick)="updateSOA()">
+            <app-permission-button type="save" title="Save" (onClick)="updateSOA()"
+                *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
             </app-permission-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
             </app-default-button>

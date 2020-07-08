@@ -2,7 +2,8 @@
     <div class="c-button-actions">
         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
-            [queryParams]="{ no: soa.soano, currency: 'VND' }">
+            [queryParams]="{ no: soa.soano, currency: 'VND' }"
+            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
             <span>
                 <i class="la la-edit"></i>
                 <span>
@@ -60,9 +61,13 @@
                         <span class="m--margin-left-5"
                             [ngClass]="soa.status === 'Done' ? 'm--font-success' : 'm--font-danger'">{{soa.partnerName}}</span>
                     </div>
-                    <div class="col-lg-4 m--margin-bottom-10">
+                    <div class="col-lg-4 m--margin-bottom-10" [ngSwitch]="soa.status">
                         <span class="m--font-bolder">Status:</span>
-                        <span class="m--font-danger m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'New'" class="text-danger m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Done'" class="text-success m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Issued Invoice'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchCase="'Issued Voucher'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                        <span *ngSwitchDefault class="text-primary m--margin-left-5">{{soa.status}}</span>
                     </div>
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Currency:</span>

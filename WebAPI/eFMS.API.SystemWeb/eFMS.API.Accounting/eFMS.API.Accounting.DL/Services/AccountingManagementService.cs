@@ -41,6 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         private readonly IContextBase<SysEmployee> employeeRepo;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IContextBase<AcctSoa> soaRepo;
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -61,7 +62,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPlace> place,
             IContextBase<AcctSettlementPayment> settlementPayment,
             IStringLocalizer<AccountingLanguageSub> localizer,
-            IContextBase<SysEmployee> employee) : base(repository, mapper)
+            IContextBase<SysEmployee> employee,
+            IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
             currencyExchangeService = exchangeService;
@@ -81,6 +83,7 @@ namespace eFMS.API.Accounting.DL.Services
             settlementPaymentRepo = settlementPayment;
             employeeRepo = employee;
             stringLocalizer = localizer;
+            soaRepo = soa;
         }
 
         #region --- DELETE ---
@@ -111,7 +114,11 @@ namespace eFMS.API.Accounting.DL.Services
                             item.DatetimeModified = DateTime.Now;
                             item.UserModified = currentUser.UserID;
                             surchargeRepo.Update(item, x => x.Id == item.Id, false);
+
+                            UpdateStatusSoaAfterDeleteAcctMngt(data.Type, item);
                         }
+
+                        soaRepo.SubmitChanges();                       
                         surchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
@@ -668,7 +675,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            UnitName = uni.UnitNameVn,
                                            UnitPrice = sur.UnitPrice,
                                            Mbl = ops.Mblno,
-                                           SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                           SoaNo = sur.PaySoano,
                                            SettlementCode = sett.SettlementNo,
                                            AcctManagementId = sur.AcctManagementId,
                                            RequesterId = sett.Requester
@@ -722,7 +729,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                UnitName = uni.UnitNameVn,
                                                UnitPrice = sur.UnitPrice,
                                                Mbl = cst.Mawb,
-                                               SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
+                                               SoaNo = sur.PaySoano,
                                                SettlementCode = sett.SettlementNo,
                                                AcctManagementId = sur.AcctManagementId,
                                                RequesterId = sett.Requester
@@ -886,7 +893,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
 
-
                 model.ServiceType = GetTransactionType(jobNoGrouped);
 
                 AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
@@ -899,7 +905,6 @@ namespace eFMS.API.Accounting.DL.Services
                         if (hs.Success)
                         {
                             List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
-
 
                             foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
                             {
@@ -920,8 +925,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.UserModified = currentUser.UserID;
 
                                 surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+
+                                var soa = soaRepo.Get(x => x.Soano == charge.Soano || x.Soano == charge.PaySoano).FirstOrDefault();
+                                if (soa != null)
+                                {
+                                    //Cập nhật status cho SOA: Issued Invoice, Issued Voucher
+                                    UpdateStatusSOA(soa, accounting.Type);
+                                }
                             }
                             surchargeRepo.SubmitChanges();
+                            soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1011,8 +1024,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
                                 surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+
+                                var soa = soaRepo.Get(x => x.Soano == charge.Soano || x.Soano == charge.PaySoano).FirstOrDefault();
+                                if (soa != null)
+                                {
+                                    //Cập nhật status cho SOA: Issued Invoice, Issued Voucher
+                                    UpdateStatusSOA(soa, accounting.Type);
+                                }
                             }
                             surchargeRepo.SubmitChanges();
+                            soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1033,6 +1054,64 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var hs = new HandleState(ex.Message);
                 return hs;
+            }
+        }
+
+        private void UpdateStatusSOA(AcctSoa soa, string typeAcctMngt)
+        {
+            soa.UserModified = currentUser.UserID;
+            soa.DatetimeModified = DateTime.Now;
+            if (typeAcctMngt == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+            {
+                soa.Status = AccountingConstants.STATUS_SOA_ISSUED_VOUCHER;
+            }
+            if (typeAcctMngt == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+            {
+                soa.Status = AccountingConstants.STATUS_SOA_ISSUED_INVOICE;
+            }
+            if (string.IsNullOrEmpty(typeAcctMngt))
+            {
+                soa.Status = "New";
+            }
+            soaRepo.Update(soa, x => x.Id == soa.Id, false);
+        }
+
+        private void UpdateStatusSoaAfterDeleteAcctMngt(string typeAcctMngt, CsShipmentSurcharge charge)
+        {
+            if (typeAcctMngt == AccountingConstants.ADVANCE_TYPE_INVOICE)
+            {
+                var soa = soaRepo.Get(x => x.Soano == charge.Soano || x.Soano == charge.PaySoano).FirstOrDefault();
+                if (soa != null)
+                {
+                    //Tồn tại Voucher thì update Status là Issued Voucher
+                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && !string.IsNullOrEmpty(charge.VoucherId))
+                    {
+                        UpdateStatusSOA(soa, AccountingConstants.ACCOUNTING_VOUCHER_TYPE);
+                    }
+                    else
+                    {
+                        //Cập nhật status là NEW cho SOA
+                        UpdateStatusSOA(soa, null);
+                    }
+                }
+            }
+
+            if (typeAcctMngt == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+            {
+                var soa = soaRepo.Get(x => x.Soano == charge.Soano || x.Soano == charge.PaySoano).FirstOrDefault();
+                if (soa != null)
+                {
+                    //Tồn tại Invoice thì update Status là Issued Invoice
+                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && !string.IsNullOrEmpty(charge.InvoiceNo))
+                    {
+                        UpdateStatusSOA(soa, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
+                    }
+                    else
+                    {
+                        //Cập nhật status là NEW cho SOA
+                        UpdateStatusSOA(soa, null);
+                    }
+                }
             }
         }
 

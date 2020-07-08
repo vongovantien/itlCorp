@@ -55,7 +55,9 @@
                                             class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate"><i class="la la-copy"></i>
                                         </button>
-                                        <ng-container *ngIf="!charge.soano
+                                        <ng-container *ngIf="
+                                        !charge.soano
+                                        && !charge.paySoano
                                         && !charge.creditNo
                                         && !charge.debitNo
                                         && !charge.settlementCode
@@ -84,7 +86,8 @@
                                             [disabled]="isShowLoadingPartner ? 'disabled': null">
                                         <combo-grid-icon (onDelete)="charge.payerId = null; 
                                             charge.payerShortName = null" [showDelete]="!!charge.payerName 
-                                        && !charge.soano
+                                        && !charge.soano 
+                                        && !charge.paySoano
                                         && !charge.creditNo
                                         && !charge.debitNo
                                         && !charge.settlementCode
@@ -126,6 +129,7 @@
                                             charge.receiverName = null" (onDropdown)="loadDynamicComoGrid(charge,i)"
                                             [showDelete]="!!charge.receiverName 
                                         && !charge.soano
+                                        && !charge.paySoano
                                         && !charge.creditNo
                                         && !charge.debitNo
                                         && !charge.settlementCode
@@ -311,8 +315,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control"
-                                        [(ngModel)]="charge.soano ? charge.soano : charge.paySoano" disabled>
+                                    <input type="text" class="form-control" disabled
+                                        [value]="(!!charge.paySoano ? charge.paySoano + ' /' : '_/') + (!!charge.soano ? charge.soano : '_ ')">
                                 </div>
                             </td>
                             <td>
