@@ -286,10 +286,12 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
 
     setDefaultHeadeFooter() {
         const body: IArrivalDefault = {
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            transactionType: CommonEnum.TransactionTypeEnum.AirImport,
             userDefault: this.userLogged.id,
             arrivalFooter: this.hblArrivalNote.arrivalFooter,
-            arrivalHeader: this.hblArrivalNote.arrivalHeader
+            arrivalHeader: this.hblArrivalNote.arrivalHeader,
+            type: CommonEnum.TransactionTypeEnum.AirImport,
+
         };
 
         this._progressRef.start();

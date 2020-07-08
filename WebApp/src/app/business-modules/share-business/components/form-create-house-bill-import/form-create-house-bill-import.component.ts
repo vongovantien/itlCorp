@@ -190,7 +190,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                         }
 
                         // this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
-                        this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
+                        // this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
 
                     }
                 );

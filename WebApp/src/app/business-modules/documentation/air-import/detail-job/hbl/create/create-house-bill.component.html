@@ -21,11 +21,8 @@
             <tab heading="Arrival Notice" [active]="activeTab === 'arrival'">
                 <arrival-note-air></arrival-note-air>
             </tab>
-            <tab heading="Authorize Letter" (selectTab)="onSelectTabAL()" [active]="activeTab === 'authorize'">
-                <ng-container>
-                    <hbl-delivery-order [isAir]="true">
-                    </hbl-delivery-order>
-                </ng-container>
+            <tab heading="Authorize Letter" [active]="activeTab === 'authorize'">
+                <hbl-delivery-order [isAir]="true"> </hbl-delivery-order>
             </tab>
         </tabset>
     </div>

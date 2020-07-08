@@ -235,6 +235,9 @@ namespace eFMS.API.Documentation.DL.Services
                 var arrivalHeaderDefault = data;
                 arrivalHeaderDefault.ArrivalHeader = model.ArrivalHeader;
                 arrivalHeaderDefault.ArrivalFooter = model.ArrivalFooter;
+                arrivalHeaderDefault.UserModified = currentUser.UserID;
+                arrivalHeaderDefault.DatetimeModified = DateTime.Now;
+
                 result = arrivalDeliveryDefaultRepository.Update(arrivalHeaderDefault, x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
             }
             else
@@ -244,7 +247,9 @@ namespace eFMS.API.Documentation.DL.Services
                     ArrivalHeader = model.ArrivalHeader,
                     ArrivalFooter = model.ArrivalFooter,
                     UserDefault = model.UserDefault,
-                    TransactionType = model.TransactionType
+                    TransactionType = model.TransactionType,
+                    UserModified = currentUser.UserID,
+                    DatetimeModified = DateTime.Now
                 };
                 result = arrivalDeliveryDefaultRepository.Add(arrivalHeaderDefault);
             }
@@ -623,26 +628,32 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model)
         {
+            HandleState result = new HandleState();
+
             model.TransactionType = DataTypeEx.GetType(model.Type);
-            var result = new HandleState();
-            var data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
-            if (data != null)
+            IQueryable<CsArrivalAndDeliveryDefault> data = arrivalDeliveryDefaultRepository.Get(x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
+            if (data.Count() > 0 && data != null)
             {
-                var doDefault = data.FirstOrDefault();
+                CsArrivalAndDeliveryDefault doDefault = data.FirstOrDefault();
                 doDefault.Doheader1 = model.Doheader1;
                 doDefault.Doheader2 = model.Doheader2;
                 doDefault.Dofooter = model.Dofooter;
+                doDefault.UserModified = currentUser.UserID;
+                doDefault.DatetimeModified = DateTime.Now;
+
                 result = arrivalDeliveryDefaultRepository.Update(doDefault, x => x.UserDefault == model.UserDefault && x.TransactionType == model.TransactionType);
             }
             else
             {
-                var doDefault = new CsArrivalAndDeliveryDefault
+                CsArrivalAndDeliveryDefault doDefault = new CsArrivalAndDeliveryDefault
                 {
                     Doheader1 = model.Doheader1,
                     Doheader2 = model.Doheader2,
                     Dofooter = model.Dofooter,
                     UserDefault = model.UserDefault,
-                    TransactionType = model.TransactionType
+                    TransactionType = model.TransactionType,
+                    UserModified = currentUser.UserID,
+                    DatetimeModified = DateTime.Now
                 };
                 result = arrivalDeliveryDefaultRepository.Add(doDefault);
             }
