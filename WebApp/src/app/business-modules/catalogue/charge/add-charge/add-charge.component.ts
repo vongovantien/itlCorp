@@ -125,7 +125,7 @@ export class AddChargeComponent extends AppPage {
             chargeDefault.type = 'Công Nợ';
             chargeDefault.creditAccountNo = data.accountNo;
             chargeDefault.debitVat = data.accountNoVAT;
-            this.ChargeToAdd.listChargeDefaultAccount.push(chargeDefault);
+            !!chargeDefault.creditAccountNo || !!chargeDefault.debitVat ? this.ChargeToAdd.listChargeDefaultAccount.push(chargeDefault) : this.ChargeToAdd.listChargeDefaultAccount = [];
             this._catalogueRepo.addCharge(this.ChargeToAdd)
                 .pipe(
                     catchError(this.catchError),

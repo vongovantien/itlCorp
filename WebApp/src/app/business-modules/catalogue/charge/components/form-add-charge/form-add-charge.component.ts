@@ -207,7 +207,8 @@ export class FormAddChargeComponent extends AppForm {
             type: [<CommonInterface.INg2Select>{ id: res.charge.type, text: res.charge.type }],
             service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }],
             debitCharge: res.charge.debitCharge,
-            chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null
+            chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null,
+            active: res.charge.active
         });
         setTimeout(() => {
             const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);

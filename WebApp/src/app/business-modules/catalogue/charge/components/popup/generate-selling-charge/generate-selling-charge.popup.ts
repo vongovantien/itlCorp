@@ -68,6 +68,7 @@ export class GenerateSellingChargePopupComponent extends PopupBase {
     }
 
     onSave() {
+        this.isSubmitted = true;
         if (!this.chargeCode.value) {
             return;
         }
@@ -80,6 +81,10 @@ export class GenerateSellingChargePopupComponent extends PopupBase {
             console.log(body);
             this.onCreatSellingCharge.emit(body);
         }
+    }
+
+    onRemove() {
+
     }
 
 
