@@ -173,6 +173,14 @@ namespace eFMS.API.Documentation.DL.Services
             model.CsTransactionDetails = transactionDetailService.Get(x => x.JobId == id).ToList();
             if (model.CsTransactionDetails.Any())
             {
+                var partners = partnerRepository.Get();
+                var places = placeRepository.Get();
+                var users = userRepository.Get();
+                model.IssuedUserName = users?.FirstOrDefault(x => x.Id == model.IssuedUser)?.Username;
+                model.SupplierName = partners?.FirstOrDefault(x => x.Id == model.Supplier)?.PartnerNameEn;
+                model.ConsigneeName = partners?.FirstOrDefault(x => x.Id == model.ConsigneeId)?.PartnerNameEn;
+                model.PolName = places?.FirstOrDefault(x => x.Id == model.Pol)?.NameEn;
+                model.PodName = places?.FirstOrDefault(x => x.Id == model.Pod)?.NameEn;
                 var Conts = containerRepository.Get();
                 IQueryable<CsMawbcontainer> listConts = null;
                 listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString()));
@@ -259,6 +267,14 @@ namespace eFMS.API.Documentation.DL.Services
             model.CsTransactionDetails = transactionDetailService.Get(x => x.JobId == id).ToList();
             if (model.CsTransactionDetails.Any())
             {
+                var partners = partnerRepository.Get();
+                var places = placeRepository.Get();
+                var users = userRepository.Get();
+                model.IssuedUserName = users?.FirstOrDefault(x => x.Id == model.IssuedUser)?.Username;
+                model.SupplierName = partners?.FirstOrDefault(x => x.Id == model.Supplier)?.PartnerNameEn;
+                model.ConsigneeName = partners?.FirstOrDefault(x => x.Id == model.ConsigneeId)?.PartnerNameEn;
+                model.PolName = places?.FirstOrDefault(x => x.Id == model.Pol)?.NameEn;
+                model.PodName = places?.FirstOrDefault(x => x.Id == model.Pod)?.NameEn;
                 var Conts = containerRepository.Get();
                 var listConts = Conts.Where(x => model.CsTransactionDetails.Select(t => t.Id.ToString()).Contains(x.Hblid.ToString())).GroupBy(x => x.PackageTypeId);
                 if (!listConts.Any()) return null;
