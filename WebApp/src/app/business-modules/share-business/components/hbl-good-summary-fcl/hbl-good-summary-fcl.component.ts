@@ -83,6 +83,9 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             .subscribe(
                 (containers: Container[]) => {
                     this.containers = containers;
+                    this.containers.forEach((c: Container) => {
+                        this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+                    });
                 }
             );
 
@@ -101,8 +104,8 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
                         this.commodities = res.commodity;
                         this.description = res.desOfGoods;
                         this.selectedPackage = res.packageType;
-                        this.containerDescription = res.contSealNo;
                         this.packageQty = res.packageQty;
+
                     }
                 }
             );
