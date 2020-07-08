@@ -9,12 +9,13 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { ChargeImportComponent } from './charge-import/charge-import.component';
 import { ChargeImportAccountVoucherComponent } from './charge-import-account-voucher/charge-import-account-voucher.component';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule, ModalModule } from 'ngx-bootstrap';
 import { FormSearchChargeComponent } from './components/form-search-charge/form-search-charge.component';
 import { AddChargeComponent } from './add-charge/add-charge.component';
 import { DetailChargeComponent } from './detail-charge/detail-charge.component';
 import { FormAddChargeComponent } from './components/form-add-charge/form-add-charge.component';
 import { VoucherListComponent } from './components/voucher-list/voucher-list.component';
+import { GenerateSellingChargePopupComponent } from './components/popup/generate-selling-charge/generate-selling-charge.popup';
 
 const routing: Routes = [
     {
@@ -54,6 +55,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         RouterModule.forChild(routing),
         ReactiveFormsModule,
+        ModalModule.forRoot(),
     ],
     exports: [],
     declarations: [
@@ -64,7 +66,8 @@ const routing: Routes = [
         AddChargeComponent,
         DetailChargeComponent,
         FormAddChargeComponent,
-        VoucherListComponent
+        VoucherListComponent,
+        GenerateSellingChargePopupComponent
     ],
     providers: [],
 })

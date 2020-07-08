@@ -13,6 +13,8 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatChartOfAccountsService : IRepositoryBaseCache<CatChartOfAccounts, CatChartOfAccountsModel>
     {
         IQueryable<CatChartOfAccounts> Query(CatChartOfAccountsCriteria criteria);
+        IQueryable<CatChartOfAccounts> QueryActiveByCompany();
+
         IQueryable<CatChartOfAccounts> Paging(CatChartOfAccountsCriteria criteria, int page, int size, out int rowsCount);
 
         //HandleState Add(CatChartOfAccounts model);

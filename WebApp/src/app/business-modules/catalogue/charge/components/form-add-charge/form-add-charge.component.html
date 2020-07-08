@@ -149,11 +149,13 @@
                                 <label class="form-control-label">
                                     Selling Mapping
                                 </label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="debitCharge.setValue($event.id)"
+                                <app-combo-grid-virtual-scroll
+                                    (itemSelected)="debitCharge.setValue($event.id); !!debitCharge.value ? generateSelling.setValue(false) : generateSelling.setValue(true)"
                                     [currentActiveItemId]="{ field: 'id', value: debitCharge.value}"
                                     [selectedDisplayFields]="['chargeNameEn']" [dataSources]="debitCharges | async"
                                     [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"
-                                    placeholder="Select charge" (remove)="resetFormControl(debitCharge)">
+                                    placeholder="Select charge"
+                                    (remove)="resetFormControl(debitCharge); generateSelling.setValue(false) ">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -167,6 +169,25 @@
                                 </ng-select>
                             </div>
 
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label class="form-control-label"> Active </label>
+                                <div class="m-checkbox-inline">
+                                    <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)">
+                                    </app-switch>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2" *ngIf="isShowMappingSelling ">
+                            <div class="form-group">
+                                <label class="form-control-label"> Generate Selling </label>
+                                <div class="m-checkbox-inline">
+                                    <app-switch [toggle]="generateSelling.value" [disabled]="!!debitCharge.value"
+                                        (toggleChange)="generateSelling.setValue($event)">
+                                    </app-switch>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
