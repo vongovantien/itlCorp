@@ -110,8 +110,6 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     getPayments(refId: string) {
-
-
         this._accountingRepo.getPaymentByrefId(refId)
             .pipe(
                 catchError(this.catchError)
