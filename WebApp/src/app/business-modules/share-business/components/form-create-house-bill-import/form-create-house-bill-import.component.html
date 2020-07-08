@@ -41,7 +41,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmited && !saleMan.value }">
-                                <label class="form-control-label">Salesman In Charge</label>
+                                <label class="form-control-label" required>Salesman In Charge</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'saleman')"
                                     [currentActiveItemId]="{ field: 'id', value: saleMan.value}"
                                     [selectedDisplayFields]="['username']" [dataSources]="saleMans | async"
