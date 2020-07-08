@@ -188,7 +188,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                                     this.formCreate.patchValue({ packageType: [this.ngDataUnit.find(u => u.id === +shipment.packageType)] });
                                 }
                             }, 500);
-                            this._dataService.setDataService("podName", !!shipment.warehousePOD ? shipment.warehousePOD.nameVn : "");
                         }
                     }
                 );
