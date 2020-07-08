@@ -242,7 +242,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.formCreate = this._fb.group({
             // * Combogrid
             customer: [null, Validators.required],
-            saleMan: [],
+            saleMan: [null, Validators.required],
             shipper: [null, Validators.required],
             consignee: [null],
             notifyParty: [],
