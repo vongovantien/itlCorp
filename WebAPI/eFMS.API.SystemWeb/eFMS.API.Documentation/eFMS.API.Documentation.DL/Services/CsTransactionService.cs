@@ -578,6 +578,7 @@ namespace eFMS.API.Documentation.DL.Services
         private OfficeData GetOfficeOfCreator(Guid? officeId)
         {
             SysOffice office = sysOfficeRepository.Get(x => x.Id == officeId)?.FirstOrDefault();
+            if (office == null) return new OfficeData();
             var creatorOffice = new OfficeData
             {
                 NameEn = office.BranchNameEn,
