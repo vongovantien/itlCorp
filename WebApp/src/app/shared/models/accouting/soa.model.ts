@@ -18,7 +18,7 @@ export class SOA {
     userModified: string = '';
     userNameCreated: string = '';
     userNameModified: string = '';
-    
+
     amountBalanceUSD: number = 0;
     amountCreditLocal: number = 0;
     amountCreditUSD: number = 0;
@@ -34,6 +34,7 @@ export class SOA {
     obh: boolean = false;
     customer: string = '';
     commodityGroupId: any = null;
+    paymentStatus: string = '';
 
     constructor(data?: any) {
         const self = this;
