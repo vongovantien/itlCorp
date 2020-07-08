@@ -69,6 +69,19 @@
                                                 <td
                                                     [ngClass]="invoice.status !== 'New' ? 'text-success' : 'text-danger'">
                                                     {{invoice.status}}</td>
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
+                                                </td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !invoices.length"

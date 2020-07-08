@@ -29,6 +29,9 @@ export class AccAccountingManagement {
     datetimeCreated: string = null;
     userModified: string = null;
     datetimeModified: string = null;
+    serviceType: string = null;
+    paymentStatus: string = null;
+    paymentDueDate: string = null;
 
     constructor(object?: any) {
         const self = this;

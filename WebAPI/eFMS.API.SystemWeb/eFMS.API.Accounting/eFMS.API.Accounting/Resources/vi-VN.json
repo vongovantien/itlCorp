@@ -15,7 +15,6 @@
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
   "MSG_NAME_EN_EXISTED": "Name EN has been existed",
   "MSG_NAME_LOCAL_EXISTED": "Name VN has been existed",
-
   //------------start: partner data
   "MSG_PARTNER_TAXCODE_EMPTY": "Tax code is not allow empty!|wrong",
   "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type and greater than 0!|wrong",
@@ -41,7 +40,6 @@
   "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND": "Shipping address local is not allow empty. Please check again!|wrong",
   "MSG_PARTNER_WORKPLACE_NOT_FOUND": "Workplace '{0}' is not found!|wrong",
   //------------end  : partner data
-
   //------------start: place
   "MSG_PLACE_NAME_EN_EMPTY": "NameEn is not allow empty!|wrong",
   "MSG_PLACE_NAME_LOCAL_EMPTY": "NameVn is not allow empty!|wrong",
@@ -58,9 +56,7 @@
   "MSG_PLACE_PORTINDEX_MODE_NOT_FOUND": "Mode of transport {0} is not found!|wrong",
   "MSG_PLACE_PORTINDEX_AREA_NOT_FOUND": "Area '{0}' is not found!|wrong",
   "MSG_PLACE_ADDRESS_EMPTY": "Address is not allow empty!|wrong",
-
   //------------end  : place
-
   //------------start: Charge Default
   "MSG_CHARGE_DEFAULT_CODE_EMPTY": "Charge code is not allow to empty!|wrong",
   "MSG_CHARGE_DEFAULT_CODE_NOT_FOUND": "The charge with code {0} not found !|wrong",
@@ -68,7 +64,6 @@
   "MSG_CHARGE_DEFAULT_ACCOUNT_DEBIT_EMPTY": "Account debit no. is not allow to empty!|wrong",
   "MSG_CHARGE_DEFAULT_ACCOUNT_CREDIT_EMPTY": "Account credit no. is not allow to empty!|wrong",
   //------------end  : ChargeDefault
-
   //------------start: Charge,
   "MSG_CHARGE_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_CHARGE_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
@@ -82,8 +77,6 @@
   "MSG_CHARGE_UNIT_EMPTY": "Unit is not allow empty!|wrong",
   "MSG_CHARGE_UNIT_NOT_FOUND": "Unit not found!|wrong",
   //------------end  : Charge
-
-
   //------------start: Commodity
   "MSG_COMMOIDITY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_COMMOIDITY_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
@@ -96,7 +89,6 @@
   "EF_COMMOIDITY_DISPLAYNAME_NAMEEN": "Name EN",
   "EF_COMMOIDITY_DISPLAYNAME_GROUP": "Group",
   //------------end  : Commodity
-
   //------------start: COUNTRY
   "MSG_COUNTRY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_COUNTRY_NAME_LOCAL_EMPTY": "Name Local is not allow empty!|wrong",
@@ -108,19 +100,15 @@
   "EF_COMMOIDITY_DISPLAYNAME_NAMEEN": "Tên tiếng Anh",
   "EF_COMMOIDITY_DISPLAYNAME_GROUP": "Nhóm",
   //------------end  : Commodity
-
   //------------start: STAGE
   "MSG_STAGE_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",
   "MSG_STAGE_CODE_EMPTY": "Name Local is not allow empty!|wrong",
   "MSG_STAGE_EXISTED": "Code {0} has been existed!|wrong",
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
-
   "EF_DISPLAYNAME_CODE": "Mã code",
   //------------end  : Commodity
-
   "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện hành động này",
-
   "MSG_VOUCHER_ID_EMPTY": "VoucherId is not allow empty!",
   "MSG_VOUCHER_ID_NOT_EXIST": "VoucherId {0} is not existed!",
   "MSG_VOUCHER_ID_DUPLICATE": "VoucherId {0} has been duplicated!",
@@ -132,7 +120,6 @@
   "MSG_VOUCHER_ID_DUPLICATE_ROW": "VoucherId {0} has been duplicated row!",
   "MSG_SERIE_NO_EXISTED": "Serie No {0} has been existed in another voucher!",
   "MSG_INVOICE_NO_EXISTED": "Invoice No {0} has been existed in another voucher!",
-
   // ------------start: INVOICE PAYMENT
   "MSG_INVOICENO_ACCOUNTING_PAYMENT_EMPTY": "Invoice No không được để trống",
   "MSG_SERIENO_ACCOUNTING_PAYMENT_EMPTY": "Serie No không được để trống",
@@ -142,5 +129,6 @@
   "MSG_PAIDDATE_ACCOUNTING_PAYMENT_EMPTY": "Paid Date không được để trống",
   "MSG_PAIDDATE_ACCOUNTING_PAYMENT_INVALID": "Paid Date không hợp lệ",
   "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY": "Payment Type không được để trống",
-  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type không hợp lệ"
+  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type không hợp lệ",
+  "MSG_VOUCHER_ID_HAD_PAYMENT": "VoucherId {0} đã được thanh toán"
 }

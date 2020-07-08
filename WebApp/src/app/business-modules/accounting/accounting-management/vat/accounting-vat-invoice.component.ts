@@ -59,6 +59,8 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
             { title: 'Issued Date', field: 'datetimeCreated', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+
         ];
         this.dataSearch = {
             typeOfAcctManagement: 'Invoice'
