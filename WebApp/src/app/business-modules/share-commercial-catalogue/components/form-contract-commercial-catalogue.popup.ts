@@ -13,6 +13,7 @@ import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
+import { cloneDeep } from 'lodash';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -28,6 +29,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isRequiredContractNo: boolean = false;
     isCreateNewCommercial: boolean = false;
     isDuplicateContract: boolean = false;
+    statusContract: boolean = false;
 
     salesmanId: AbstractControl;
     companyId: AbstractControl;
@@ -143,6 +145,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe((value: any) => {
                 this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
+
     }
 
 
@@ -448,15 +451,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             saleService: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
             vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null
+
         });
     }
 
 
     asignValueToModel() {
-        this.selectedContract = new Contract();
+        // this.selectedContract = new Contract();
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
         }
+        this.selectedContract.active = this.statusContract;
         this.selectedContract.saleManId = this.salesmanId.value;
         this.selectedContract.companyId = this.companyId.value;
         this.selectedContract.officeId = this.officeId.value;
@@ -491,6 +496,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.trialCreditDays.setValue(this.expiredDate.value.startDate.diff(this.effectiveDate.value.startDate, 'days'));
             }
         }
+        if (this.contractType.value[0].id !== 'Official') {
+            this.formGroup.controls['paymentTerm'].setValue(null);
+            this.formGroup.controls['creditLimitRate'].setValue(null);
+        }
+
+
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
@@ -504,18 +515,28 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.creditRate = this.formGroup.controls['creditRate'].value;
         this.selectedContract.description = this.formGroup.controls['description'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
-
         this.selectedContract.partnerId = this.partnerId;
+
     }
 
     activeInactiveContract(id: string) {
+        this._progressRef.start();
         this._catalogueRepo.activeInactiveContract(id, this.partnerId)
-            .pipe(catchError(this.catchError))
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+            }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.selectedContract.active = !this.selectedContract.active;
-                        this._toastService.success(res.message);
+                        this.statusContract = this.selectedContract.active;
+                        let message = '';
+                        if (!this.selectedContract.active) {
+                            message = 'Inactive success !!'
+                        } else {
+                            message = 'Active success !!';
+                        }
+                        this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
 
                     } else {
@@ -544,12 +565,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     selectedService($event: any) {
-        console.log($event);
-        if ($event.id === 'All' || this.saleService.value.some(x => x.id === 'All')) {
+        if ($event.id === 'All' || (!!this.saleService.value && this.saleService.value.some(x => x.id === 'All'))) {
             this.saleService.setValue([]);
             this.saleService.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
         }
+    }
 
+    selectedVas($event: any) {
+        if ($event.id === 'All' || (!!this.vas.value && this.vas.value.some(x => x.id === 'All'))) {
+            this.vas.setValue([]);
+            this.vas.setValue([<CommonInterface.INg2Select>{ id: $event.id, text: $event.text }]);
+        }
     }
 
     close() {

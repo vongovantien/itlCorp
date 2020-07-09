@@ -166,14 +166,14 @@ namespace eFMS.API.Catalogue.Controllers
             bool existed = false;
             if (model.Id != Guid.Empty)
             {
-                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && model.ContractNo != null))
+                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && !string.IsNullOrEmpty(model.ContractNo)))
                 {
                     existed = true;
                 }
             }
             else
             {
-                existed = catContractService.Any(x => x.ContractNo == model.ContractNo && model.ContractNo != null);
+                existed = catContractService.Any(x => x.ContractNo == model.ContractNo && !string.IsNullOrEmpty( model.ContractNo));
             }
             messageDuplicate = existed == true ? "Contract no has been existed!" : string.Empty;
             return messageDuplicate;
