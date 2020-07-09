@@ -19,12 +19,18 @@ export class AccountingConstants {
     public static ISSUE_TYPE = {
         INVOICE: 'Invoice',
         VOUCHER: 'Voucher',
-    }
+    };
 
     public static STATUS_CD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
         { id: 'New', text: 'New' },
         { id: 'Issued Invoice', text: 'Issued Invoice' },
         { id: 'Issued Voucher', text: 'Issued Voucher' },
     ];
+
+    public static PAYMENT_STATUS = {
+        PAID: 'Paid',
+        PAID_A_PART: 'Paid A Part',
+        UNPAID: 'Unpaid'
+    };
 
 }

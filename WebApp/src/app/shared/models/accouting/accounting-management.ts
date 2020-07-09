@@ -32,6 +32,7 @@ export class AccAccountingManagement {
     serviceType: string = null;
     paymentStatus: string = null;
     paymentDueDate: string = null;
+    totalExchangeRate: number = null;
 
     constructor(object?: any) {
         const self = this;

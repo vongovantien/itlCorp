@@ -1391,7 +1391,7 @@ namespace eFMS.API.Accounting.DL.Services
                             item.IsValid = false;
                         }
                         // Voucher ID đã thanh toán hết
-                        if (invoices.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                        if (invoices.Any(x => x.VoucherId == item.VoucherId && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
                         {
                             item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_HAD_PAYMENT, item.VoucherId];
                             item.IsValid = false;
