@@ -1539,7 +1539,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
                 housebill.FirstDestination = data.FirstCarrierTo?.ToUpper();
-                housebill.FirstCarrier = data.FirstCarrierBy?.Substring(0,2).ToUpper(); //2 ký tự đầu
+                housebill.FirstCarrier = !string.IsNullOrEmpty(data.FirstCarrierBy) ? data.FirstCarrierBy.Substring(0,2).ToUpper() : string.Empty; //2 ký tự đầu
                 housebill.SecondDestination = data.TransitPlaceTo1?.ToUpper();
                 housebill.SecondCarrier = data.TransitPlaceBy1?.ToUpper();
                 housebill.ThirdDestination = data.TransitPlaceTo2?.ToUpper();
