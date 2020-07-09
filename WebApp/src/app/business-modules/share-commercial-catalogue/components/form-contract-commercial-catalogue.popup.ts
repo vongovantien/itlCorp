@@ -343,7 +343,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             if (isRequestApproval) {
                 this.selectedContract.isRequestApproval = true;
             }
-            console.log(this.selectedContract);
             if (!this.isUpdate && !this.isCreateNewCommercial) {
                 this._catalogueRepo.createContract(this.selectedContract)
                     .pipe(catchError(this.catchError))
