@@ -170,7 +170,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                             sailingDate: !!this.shipmmentDetail.etd ? { startDate: new Date(this.shipmmentDetail.etd), endDate: new Date(this.shipmmentDetail.etd) } : null,
                             issueHblplace: !!this.shipmmentDetail.creatorOffice ? this.shipmmentDetail.creatorOffice.location : null,
                             onBoardStatus: this.setDefaultOnboard(this.shipmmentDetail.polName, this.shipmmentDetail.polCountryNameEn, this.shipmmentDetail.etd),
-                            forwardingAgentDescription: !!this.shipmmentDetail.creatorOffice ? this.shipmmentDetail.creatorOffice.nameEn : null,
+                            forwardingAgentDescription: this.setDefaultForwardingAgent(this.shipmmentDetail),
                             goodsDeliveryDescription: this.setDefaultAgentData(this.shipmmentDetail),
                             moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? [{ id: "FCL/FCL-CY/CY", text: "FCL/FCL-CY/CY" }] : [{ id: "LCL/LCL-CY/CY", text: "LCL/LCL-CY/CY" }],
                             originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail),
@@ -230,6 +230,12 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     setDefaultOnboard(polName: string, country: string, etd: string) {
         return `SHIPPED ON BOARD \n${polName}, ${country} \n${formatDate(etd, 'mediumDate', 'en')}`;
+    }
+
+    setDefaultForwardingAgent(shipment: CsTransaction) {
+        if (!!shipment.creatorOffice) {
+            return `${this.getDescription(shipment.creatorOffice.nameEn, shipment.creatorOffice.addressEn, shipment.creatorOffice.tel, shipment.creatorOffice.fax)}\nEmail: ${shipment.groupEmail}`;
+        }
     }
 
     initForm() {

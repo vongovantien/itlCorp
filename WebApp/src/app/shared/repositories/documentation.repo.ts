@@ -919,4 +919,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewSISummaryByJobId(id: string) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewSISummaryByJobId/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }
