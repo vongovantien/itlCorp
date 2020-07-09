@@ -336,6 +336,14 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     agentName += "\n" + agent.Tel;
                 }
+                if (!string.IsNullOrEmpty(agent.Fax))
+                {
+                    agentName += "\n" + agent.Fax;
+                }
+                if (!string.IsNullOrEmpty(agent.Email))
+                {
+                    agentName += "\n" + agent.Email;
+                }
             }
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
@@ -413,6 +421,14 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!string.IsNullOrEmpty(agent.Tel))
                 {
                     agentName += "\n" + agent.Tel;
+                }
+                if (!string.IsNullOrEmpty(agent.Fax))
+                {
+                    agentName += "\n" + agent.Fax;
+                }
+                if (!string.IsNullOrEmpty(agent.Email))
+                {
+                    agentName += "\n" + agent.Email;
                 }
             }
 
