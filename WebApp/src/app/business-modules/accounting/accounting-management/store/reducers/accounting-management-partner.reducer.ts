@@ -32,7 +32,22 @@ const accountingManagementPartnerReducer = createReducer(
     })),
     on(accountingManagementActions.SelectRequester, (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => {
         return { ...state, charges: payload.charges, ...payload };
-    })
+    }),
+    on(accountingManagementActions.UpdateChargeList, (state: IAccountingManagementPartnerState, payload: { charges: ChargeOfAccountingManagementModel[] }) => {
+        return { ...state, charges: [...payload.charges] };
+    }),
+    on(accountingManagementActions.UpdateExchangeRate, (state: IAccountingManagementPartnerState, payload: accountingManagementActions.ISyncExchangeRate) => {
+        if (!!state.charges.length) {
+            state.charges.forEach(c => {
+                c.exchangeRate = payload.exchangeRate;
+            });
+        }
+        return {
+            ...state, charges: state.charges
+        };
+    }),
+
+
 );
 
 export function reducer(state: any | undefined, action: Action) {

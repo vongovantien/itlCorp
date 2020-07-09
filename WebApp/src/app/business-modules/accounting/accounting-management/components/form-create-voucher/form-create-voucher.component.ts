@@ -8,10 +8,11 @@ import { CatalogueRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
 import { CommonEnum } from '@enums';
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, UpdateExchangeRate } from '../../store';
 
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     totalAmount: AbstractControl;
     currency: AbstractControl;
     voucherType: AbstractControl;
+    totalExchangeRate: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -54,6 +56,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
+        private _toast: ToastrService
     ) {
         super();
     }
@@ -100,6 +103,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             partnerAddress: [],
             description: [],
             attachDocInfo: [],
+            totalExchangeRate: [],
 
             voucherId: [null, Validators.required],
             date: [{ startDate: new Date(), endDate: new Date() }],
@@ -122,6 +126,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
         this.voucherType = this.formGroup.controls['voucherType'];
+        this.totalExchangeRate = this.formGroup.controls['totalExchangeRate'];
     }
 
 
@@ -135,6 +140,16 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
                 break;
             default:
                 break;
+        }
+    }
+
+    syncExchangeRateCharge() {
+        console.log(this.totalExchangeRate.value);
+        if (!!this.totalExchangeRate.value) {
+            this._store.dispatch(
+                UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }
+                ));
+            this._toast.success("Exchange Rate synced successfully");
         }
     }
 }

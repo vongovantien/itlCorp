@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { AccAccountingManagementModel } from '@models';
+import { SystemConstants } from '@constants';
 
-import { IAccountingManagementState } from '../../store';
+import { IAccountingManagementState, UpdateChargeList } from '../../store';
+import { AccountingManagementCreateVATInvoiceComponent } from '../create/accounting-create-vat-invoice.component';
 
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _merge from 'lodash/merge';
-import { SystemConstants } from '@constants';
-import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-accounting-detail-vat-invoice',
@@ -86,8 +87,9 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
-        this.listChargeComponent.charges = res.charges;
-        this.listChargeComponent.updateTotalAmount();
+        this._store.dispatch(UpdateChargeList({ charges: res.charges }));
+        // this.listChargeComponent.charges = res.charges;
+        // this.listChargeComponent.updateTotalAmount();
 
         if (this.accountingManagement.status !== 'New') {
             this.listChargeComponent.isReadOnly = true;
@@ -104,6 +106,11 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
             this._toastService.warning("VAT Invoice don't have any charge in this period, Please check it again!");
             return;
         }
+
+        if (!this.checkValidateExchangeRate()) {
+            this._toastService.warning(this.invalidUpdateExchangeRate);
+            return;
+        }
         this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.vatInvoiceId)
             .pipe(
                 switchMap(
@@ -113,6 +120,8 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                             return of({ data: null, message: 'Voucher ID has been existed', status: false });
                         } else {
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
+                            console.log(modelAdd);
+
                             modelAdd.charges = [...this.listChargeComponent.charges];
 
                             //  * Update field
