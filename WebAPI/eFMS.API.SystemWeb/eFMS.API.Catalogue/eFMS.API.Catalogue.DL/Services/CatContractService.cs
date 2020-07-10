@@ -355,7 +355,7 @@ namespace eFMS.API.Catalogue.DL.Services
                   "eFMS System </div>");
             }
     
-            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com" }, null, null);
+            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com","luis.quang@itlvn.com" }, null, null);
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)

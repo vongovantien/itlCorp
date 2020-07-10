@@ -76,7 +76,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             creditRate: null,
             description: null,
             vas: null,
-            saleService: null
+            saleService: null,
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;
@@ -87,8 +87,15 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         if (!this.partnerId) {
             this.formContractPopup.isCreateNewCommercial = true;
         }
+        this.formContractPopup.selectedContract = new Contract();
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.formContractPopup.salesmanId.setValue(userLogged.id);
+        this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
+        this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+        this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
+        this.formContractPopup.trialEffectDate.setValue(null);
+        this.formContractPopup.trialExpiredDate.setValue(null);
+
         this.formContractPopup.show();
     }
 
@@ -96,6 +103,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.isUpdate = true;
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
+
         this.indexlstContract = index;
         if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
             this.formContractPopup.getFileContract();
@@ -105,6 +113,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                         this.selectedContract = res;
                         this.formContractPopup.idContract = this.selectedContract.id;
                         this.formContractPopup.selectedContract = res;
+                        this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
                         this.formContractPopup.pachValueToFormContract();
                         this.formContractPopup.show();
                     }

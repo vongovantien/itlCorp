@@ -276,10 +276,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             if (data == null) return null;
-            var surcharges = surchargeRepository.Get(x => x.Type == "OBH" 
+            var surcharges = surchargeRepository.Get(x => x.Type == "OBH"
                                                         && !string.IsNullOrEmpty(x.Soano)
-                                                        && (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos == null)
-                                                        && (criteria.ReferenceNos.Contains(x.Hblno) || criteria.ReferenceNos == null));
+                                                        && (
+                                                        (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos == null)
+                                                        || (criteria.ReferenceNos.Contains(x.Hblno) || criteria.ReferenceNos == null)
+                                                        || (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null))
+                                                        );
+
             var dataJoin = (from soa in data
                            join charge in surcharges on soa.Soano equals charge.Soano
                            select new { soa, TotalOBH = charge.Total });
