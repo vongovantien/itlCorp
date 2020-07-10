@@ -3,8 +3,6 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
-import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
@@ -15,6 +13,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+import { PaymentModel, AccountingPaymentModel } from '@models';
 
 
 
@@ -196,7 +195,7 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getPayments(this.selectedPayment.refId);
+                        this.getPayments(this.selectedPayment.refNo);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
