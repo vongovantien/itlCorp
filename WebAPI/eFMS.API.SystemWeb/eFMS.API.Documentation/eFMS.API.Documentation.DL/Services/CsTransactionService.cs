@@ -338,6 +338,7 @@ namespace eFMS.API.Documentation.DL.Services
                 airwaybill.ChargeWeight = model.ChargeWeight;
                 airwaybill.GrossWeight = model.GrossWeight;
                 airwaybill.Hw = model.Hw;
+                airwaybill.PackageQty = model.PackageQty;
 
                 airwaybill.DatetimeModified = DateTime.Now;
                 airwaybill.UserModified = currentUser.UserID;
