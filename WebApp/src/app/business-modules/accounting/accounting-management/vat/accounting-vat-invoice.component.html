@@ -44,7 +44,8 @@
                                             <tr *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <ng-container *ngIf="invoice.paymentStatus !== 'Paid'">
+                                                        <ng-container
+                                                            *ngIf="!invoice.paymentStatus || invoice.paymentStatus == 'Unpaid'">
                                                             <app-permission-button
                                                                 (onClick)="prepareDeleteInvoice(invoice)" type="delete">
                                                             </app-permission-button>
