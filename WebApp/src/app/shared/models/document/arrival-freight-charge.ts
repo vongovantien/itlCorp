@@ -21,7 +21,7 @@ export class ArrivalFreightCharge extends BaseModel {
 
     isShow: boolean = true;
     isFull: boolean = true;
-    isTick: boolean = false;
+    isTick: boolean = true;
 
     // Custom.
     isShowCharge: boolean = false;
