@@ -361,7 +361,7 @@ namespace eFMS.API.Documentation.DL.Services
                         ShipperName = item.ShipperDescription?.ToUpper(),
                         Consignees = item.ConsigneeDescription?.ToUpper(),
                         Description = item.DesOfGoods,
-                        FirstDest = item.FirstCarrierBy?.ToUpper(),
+                        FirstDest = item.PODName,
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
                         Notify = item.NotifyPartyDescription?.ToUpper(),

@@ -250,7 +250,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             route: shipment.route,
                             warehouseId: shipment.warehouseId,
                             issuedBy: shipment.issuedBy,
-                            mblno1: shipment.coloaderCode,
+                            mblno1: !!shipment.mawb ? shipment.mawb.slice(0, 3) : null,
                             mblno2: shipment.polCode,
                             mblno3: !!shipment.mawb ? shipment.mawb.slice(-7) : null,
                             rclass: [this.rClasses.find(sm => sm.id === 'Q')]

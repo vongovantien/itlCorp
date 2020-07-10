@@ -18,7 +18,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
-import { NINE } from '@angular/cdk/keycodes';
 import { formatCurrency } from '@angular/common';
 
 @Component({
@@ -244,7 +243,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
                                     flightNo: shipment.flightVesselName,
                                     warehouseId: shipment.warehouseId,
-                                    firstCarrierBy: shipment.flightVesselName
+                                    firstCarrierBy: shipment.flightVesselName,
+                                    freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
                                 });
                             }
                         }
@@ -345,8 +345,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             freightPayment: [],
             currencyId: [],
             originBlnumber: [],
-            wtorValpayment: [],
-            otherPayment: [],
+            wtorValpayment: [[this.wts[0]]],
+            otherPayment: [[this.wts[0]]],
             shipmenttype: [],
             // * Date
             etd: [],
