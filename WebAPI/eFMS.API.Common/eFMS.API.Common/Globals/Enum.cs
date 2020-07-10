@@ -174,7 +174,9 @@
         tool2,
         catChartOfAccounts,
         accManagement,
-        settingUnlockRequest
+        settingUnlockRequest,
+        commercialCustomer,
+        commercialAgent
     }
     public enum UnlockTypeEnum
     {
