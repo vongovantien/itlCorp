@@ -242,5 +242,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
         }
     }
+
+    handleObserver() {
+        return {
+            next: (val) => console.log(val),
+            error: (err) => console.log(err),
+            complete: () => console.log('complete'),
+        };
+    }
 }
 

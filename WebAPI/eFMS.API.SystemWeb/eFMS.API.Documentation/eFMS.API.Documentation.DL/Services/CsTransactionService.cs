@@ -478,16 +478,22 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.ColoaderId != null)
                 {
                     CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
-                    result.SupplierName = coloaderPartner.ShortName;
-                    result.ColoaderCode = coloaderPartner.CoLoaderCode;
-                    result.RoundUpMethod = coloaderPartner.RoundUpMethod;
-                    result.ApplyDim = coloaderPartner.ApplyDim;
+                    if(coloaderPartner != null)
+                    {
+                        result.SupplierName = coloaderPartner.ShortName;
+                        result.ColoaderCode = coloaderPartner.CoLoaderCode;
+                        result.RoundUpMethod = coloaderPartner.RoundUpMethod;
+                        result.ApplyDim = coloaderPartner.ApplyDim;
+                    }
                 }
                 if (result.AgentId != null)
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
-                    result.AgentName = agent.PartnerNameEn;
-                    result.AgentData = GetAgent(agent);
+                    if(agent != null)
+                    {
+                        result.AgentName = agent.PartnerNameEn;
+                        result.AgentData = GetAgent(agent);
+                    }
                 }
 
                 if (result.Pod != null)
@@ -499,12 +505,15 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPod.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOD = new WarehouseData
+                        if(warehouse != null)
                         {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                            result.WarehousePOD = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
                     }
                 }
 
@@ -526,12 +535,16 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPol.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOL = new WarehouseData
+                        if(warehouse != null)
                         {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                            result.WarehousePOL = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
+                       
                     }
                 }
 
@@ -2330,7 +2343,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.ForwardingAgentId = model.AgentId;
                             hbl.WarehouseNotice = model.WarehouseId;
                             hbl.Route = model.Route;
-
+                            hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
                             hbl.ForwardingAgentDescription = agentDescription;
 
