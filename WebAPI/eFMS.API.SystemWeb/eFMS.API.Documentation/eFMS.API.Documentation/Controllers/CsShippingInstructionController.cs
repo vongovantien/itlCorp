@@ -98,5 +98,13 @@ namespace eFMS.API.Documentation.Controllers
             var result = shippingInstructionService.PreviewFCLShippingInstructionByJobId(jobId);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("PreviewSISummaryByJobId/{jobId}")]
+        public IActionResult PreviewSISummaryByJobId(Guid jobId)
+        {
+            var result = shippingInstructionService.PreviewSISummaryByJobId(jobId);
+            return Ok(result);
+        }
     }
 }
