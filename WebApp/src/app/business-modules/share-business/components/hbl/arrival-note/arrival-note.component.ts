@@ -266,7 +266,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                         this.hblArrivalNote.csArrivalFrieghtCharges.forEach(c => {
                             c.isShow = true;
                             c.isFull = true;
-                            c.isTick = false;
+                            c.isTick = true;
                         });
                     } else {
                         this._toastService.warning("Not found selling charge!");
