@@ -18,7 +18,7 @@ import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { catchError, takeUntil, switchMap, finalize, tap, skip } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
 
@@ -316,7 +316,8 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         const body: IArrivalFreightChargeDefault = {
             userDefault: this.userLogged.id,
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
-            csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges
+            csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges,
+            type: CommonEnum.TransactionTypeEnum.AirImport,
         };
 
         this._progressRef.start();

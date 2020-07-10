@@ -321,20 +321,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             return;
         }
         const modelAdd = this.onSubmitData();
-        modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
-
-        for (const item of modelAdd.dimensionDetails) {
-            item.mblid = this.shipmentDetail.id;
-        }
-
-        //  * Update field
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
 
         const bodySyncData: DocumentationInterface.IDataSyncHBL = {
             flightVesselName: modelAdd.flightVesselName,
@@ -346,28 +332,26 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             agentId: modelAdd.agentId,
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
-            route: modelAdd.route
+            route: modelAdd.route,
+            MblNo: modelAdd.mawb
+
         };
 
         this._progressRef.start();
-        forkJoin([
-            this._documenRepo.updateCSTransaction(modelAdd),
-            this._documentRepo.syncHBL(this.jobId, bodySyncData)
-        ]).pipe(
-            catchError(this.catchError),
-            finalize(() => {
-                this._progressRef.complete();
-            })
-        ).subscribe(
-            (respone: CommonInterface.IResult[] = []) => {
-                respone.forEach(r => {
-                    if (r[0].status) {
-                        this._toastService.success(r[0].message);
+        this._documentRepo.syncHBL(this.jobId, bodySyncData)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
                     } else {
-                        this._toastService.error(r[0].message);
+                        this._toastService.error(r.message);
                     }
-                });
-            },
-        );
+                },
+            );
     }
 }
