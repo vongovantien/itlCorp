@@ -338,6 +338,7 @@ namespace eFMS.API.Documentation.DL.Services
                 airwaybill.ChargeWeight = model.ChargeWeight;
                 airwaybill.GrossWeight = model.GrossWeight;
                 airwaybill.Hw = model.Hw;
+                airwaybill.PackageQty = model.PackageQty;
 
                 airwaybill.DatetimeModified = DateTime.Now;
                 airwaybill.UserModified = currentUser.UserID;
@@ -478,16 +479,22 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.ColoaderId != null)
                 {
                     CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
-                    result.SupplierName = coloaderPartner.ShortName;
-                    result.ColoaderCode = coloaderPartner.CoLoaderCode;
-                    result.RoundUpMethod = coloaderPartner.RoundUpMethod;
-                    result.ApplyDim = coloaderPartner.ApplyDim;
+                    if(coloaderPartner != null)
+                    {
+                        result.SupplierName = coloaderPartner.ShortName;
+                        result.ColoaderCode = coloaderPartner.CoLoaderCode;
+                        result.RoundUpMethod = coloaderPartner.RoundUpMethod;
+                        result.ApplyDim = coloaderPartner.ApplyDim;
+                    }
                 }
                 if (result.AgentId != null)
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
-                    result.AgentName = agent.PartnerNameEn;
-                    result.AgentData = GetAgent(agent);
+                    if(agent != null)
+                    {
+                        result.AgentName = agent.PartnerNameEn;
+                        result.AgentData = GetAgent(agent);
+                    }
                 }
 
                 if (result.Pod != null)
@@ -2344,7 +2351,7 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.ForwardingAgentId = model.AgentId;
                             hbl.WarehouseNotice = model.WarehouseId;
                             hbl.Route = model.Route;
-
+                            hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
                             hbl.ForwardingAgentDescription = agentDescription;
 

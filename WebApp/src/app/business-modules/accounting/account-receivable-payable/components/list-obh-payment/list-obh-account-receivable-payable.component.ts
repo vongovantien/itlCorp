@@ -1,20 +1,20 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingPaymentModel } from 'src/app/shared/models/accouting/accounting-payment.model';
-import { AccountingRepo, ExportRepo } from '@repositories';
-import { PaymentModel } from 'src/app/shared/models/accouting/payment.model';
-import { SortService } from '@services';
+import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { SystemConstants } from 'src/constants/system.const';
 import { ToastrService } from 'ngx-toastr';
+
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { SortService } from '@services';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
+import { PaymentModel, AccountingPaymentModel } from '@models';
+import { SystemConstants } from '@constants';
 
 import { catchError, finalize } from 'rxjs/operators';
 
 import { AccountReceivablePayableUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
-import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'list-obh-account-receivable-payable',
@@ -198,7 +198,7 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
                         this._toastService.success(res.message, '');
 
 
-                        this.getPayments(this.selectedPayment.refId);
+                        this.getPayments(this.selectedPayment.refNo);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }

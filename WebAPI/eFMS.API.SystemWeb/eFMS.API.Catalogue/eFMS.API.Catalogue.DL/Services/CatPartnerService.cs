@@ -308,7 +308,19 @@ namespace eFMS.API.Catalogue.DL.Services
                 return null;
             }
             var salemans = contractRepository.Get().ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (criteria.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
             {
@@ -406,7 +418,19 @@ namespace eFMS.API.Catalogue.DL.Services
                 return null;
             }
             var salemans = contractRepository.Get().ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (criteria.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             switch (rangeSearch)
             {
@@ -487,6 +511,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     break;
             }
+            if(data== null)
+            {
+                rowsCount = 0;
+                return null;
+            }
 
             rowsCount = data.Select(x => x.Id).Count();
             if (rowsCount == 0)
@@ -508,7 +537,19 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
             var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (detail.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             int code = GetPermissionToUpdate(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange, 1);
             return code;
@@ -518,7 +559,19 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var detail = Get(x => x.Id == id).FirstOrDefault();
             var salemans = contractRepository.Get(x => x.PartnerId == id).ToList();
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+            ICurrentUser _user = null;
+            switch (detail.PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             int code = GetPermissionToDelete(new ModelUpdate { GroupId = detail.GroupId, OfficeId = detail.OfficeId, CompanyId = detail.CompanyId, DepartmentId = detail.DepartmentId, UserCreator = detail.UserCreated, Salemans = salemans, PartnerGroup = detail.PartnerGroup }, permissionRange);
             return code;

@@ -72,6 +72,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
 
         this._activedRoute.params
             .pipe(
+                takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
                     if (p.hblId) {
                         this.hblid = p.hblId;
@@ -88,9 +89,10 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
                     // * Update HBL ArrivalNote model from dataDefault.
                     this.hblArrivalNote.arrivalHeader = data.arrivalHeader;
                     this.hblArrivalNote.arrivalFooter = data.arrivalFooter;
+                    this.hblArrivalNote.csArrivalFrieghtCharges = data.csArrivalFrieghtCharges || [];
 
                     if (!data.arrivalNo) {
-                        return this._store.select(getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));
+                        return this._store.select(getTransactionDetailCsTransactionState);
                     } else {
                         this.hblArrivalNote.arrivalNo = data.arrivalNo;
                         this.hblArrivalNote.arrivalFirstNotice = !!data.arrivalFirstNotice ? {
@@ -212,6 +214,8 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
             userDefault: this.userLogged.id,
             transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
             csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges,
+            type: this.utility.getTransationType(this._transationType),
+
         };
 
         this._progressRef.start();
@@ -289,4 +293,5 @@ export interface IArrivalFreightChargeDefault {
     transactionType: number;
     userDefault: string;
     csArrivalFrieghtChargeDefaults: ArrivalFreightCharge[];
+    type: any;
 }

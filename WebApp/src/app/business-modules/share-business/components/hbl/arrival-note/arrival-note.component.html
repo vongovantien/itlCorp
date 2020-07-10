@@ -16,12 +16,9 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                 placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                [alwaysShowCalendars]="true" [(ngModel)]="hblArrivalNote.arrivalFirstNotice" />
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                [alwaysShowCalendars]="true" [(ngModel)]="hblArrivalNote.arrivalFirstNotice" calendar
+                                [allowRemove]="!!hblArrivalNote.arrivalFirstNotice"
+                                (remove)="hblArrivalNote.arrivalFirstNotice = null" />
                         </div>
                     </div>
                 </div>
@@ -32,12 +29,9 @@
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                 placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
-                                [alwaysShowCalendars]="true" [(ngModel)]="hblArrivalNote.arrivalSecondNotice" />
-                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                <span>
-                                    <i class="la la-calendar"></i>
-                                </span>
-                            </span>
+                                [alwaysShowCalendars]="true" [(ngModel)]="hblArrivalNote.arrivalSecondNotice" calendar
+                                [allowRemove]="!!hblArrivalNote.arrivalSecondNotice"
+                                (remove)="hblArrivalNote.arrivalSecondNotice = null" />
                         </div>
                     </div>
                 </div>
@@ -49,13 +43,13 @@
                             Freight Charge
                         </h3>
                         <div *ngIf="!(isLocked | async)" class="c-button-actions">
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--uppercase"
                                 (click)="syncSellingCharge()">
                                 <span><i class="la la-save"></i>
                                     <span> Sync Selling </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-info m-btn--pill m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultFreightCharge()">
                                 <span><i class="la la-save"></i>
                                     <span> Set Default </span>
@@ -129,7 +123,7 @@
                             Header
                         </h3>
                         <div *ngIf="!(isLocked | async)">
-                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-info m-btn--pill m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>
                                     <span> Set Default </span>
@@ -153,7 +147,7 @@
                             Footer
                         </h3>
                         <div *ngIf="!(isLocked | async)">
-                            <button type="button" class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-info m-btn--pill m-btn--icon m-btn--uppercase"
                                 (click)="setDefaultHeadeFooter()">
                                 <span><i class="la la-save"></i>
                                     <span> Set Default </span>

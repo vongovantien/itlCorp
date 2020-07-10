@@ -28,6 +28,8 @@ export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
 export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel, AccAccountingManagementResult } from './accouting/accounting-management';
 export * from './accouting/cdnoteview.model';
+export * from './accouting/payment.model';
+export * from './accouting/accounting-payment.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
