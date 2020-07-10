@@ -1474,6 +1474,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  UserCreated = ucreate.Username,
                                  DatetimeModified = s.DatetimeModified,
                                  UserModified = umodifies.Username,
+                                 PaymentStatus = s.PaymentStatus
                              };
             //Sort Array sẽ nhanh hơn
             resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
