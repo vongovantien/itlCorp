@@ -96,7 +96,7 @@ namespace eFMSWindowService
                                 string body = headerBody + tableBody + footerBody;
                                 var jobs = data.Where(x => x.OfficeID == item.BranchID);
                                 List<string> toEmails = item.Email.Split(';').Where(x => x != null).ToList();
-                                if(toEmails.Count > 0)
+                                if(toEmails.Count > 0 && shipments.Count() > 0)
                                 {
                                     var s = SendMailHelper.Send(subject, body, toEmails);
                             }

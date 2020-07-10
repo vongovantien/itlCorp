@@ -25,6 +25,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> cstransRepository;
         private readonly IContextBase<CatUnit> catUnitRepository;
         private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<SysEmployee> employeeRepository;
+
         readonly ICsTransactionDetailService transactionDetailService;
 
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository,
@@ -37,6 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> cstransRepo,
             IContextBase<CatUnit> catUnitRepo,
             IContextBase<SysOffice> officeRepo,
+            IContextBase<SysEmployee> employeeRepo,
             ICsTransactionDetailService transDetailService) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
@@ -48,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
             catUnitRepository = catUnitRepo;
             officeRepository = officeRepo;
             transactionDetailService = transDetailService;
+            employeeRepository = employeeRepo;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -92,6 +96,7 @@ namespace eFMS.API.Documentation.DL.Services
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
 
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            string Tel = GetTelPersonalIncharge(model.JobId);
             var parameter = new SeaShippingInstructionParameter
             {
                 CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -99,7 +104,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = model.IssuedUserName ?? string.Empty,
-                Tel = office?.Tel ?? string.Empty,
+                Tel = Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
@@ -194,6 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
                 var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                string Tel = GetTelPersonalIncharge(id);
                 var parameter = new SeaShippingInstructionParameter
                 {
                     CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -201,7 +207,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                     CompanyDescription = string.Empty,
                     Contact = model.IssuedUserName ?? string.Empty,
-                    Tel = office?.Tel ?? string.Empty,
+                    Tel = Tel ?? string.Empty,
                     Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
@@ -283,6 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
                 string jobNo = opsTrans?.JobNo;
                 var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+                string Tel = GetTelPersonalIncharge(id);
                 var parameter = new SeaShippingInstructionParameter
                 {
                     CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -290,7 +297,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                     CompanyDescription = string.Empty,
                     Contact = model.IssuedUserName ?? string.Empty,
-                    Tel = office?.Tel ?? string.Empty,
+                    Tel = Tel ?? string.Empty,
                     Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                     DecimalNo = 2
                 };
@@ -453,6 +460,7 @@ namespace eFMS.API.Documentation.DL.Services
             var opsTrans = cstransRepository.Get(x => x.Id == jobId).FirstOrDefault();
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
+            string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
             {
                 CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -460,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = issueBy ?? string.Empty,
-                Tel = office?.Tel ?? string.Empty,
+                Tel = Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
@@ -549,6 +557,7 @@ namespace eFMS.API.Documentation.DL.Services
             var opsTrans = cstransRepository.Get(x => x.Id == model.JobId).FirstOrDefault();
 
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
+            string Tel = GetTelPersonalIncharge(model.JobId);
             var parameter = new SeaShippingInstructionParameter
             {
                 CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -556,7 +565,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = model.IssuedUserName ?? string.Empty,
-                Tel = office?.Tel ?? string.Empty,
+                Tel = Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
@@ -630,6 +639,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var office = officeRepository.Get(x => x.Id == opsTrans.CompanyId).FirstOrDefault();
             var issueBy = userRepository.Get(x => x.Id == si.IssuedUser).FirstOrDefault()?.Username;
+            string Tel = GetTelPersonalIncharge(jobId);
             var parameter = new SeaShippingInstructionParameter
             {
                 CompanyName = (office?.BranchNameEn) ?? DocumentConstants.COMPANY_NAME,
@@ -637,7 +647,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress2 = office?.AddressVn ?? DocumentConstants.COMPANY_ADDRESS2,
                 CompanyDescription = string.Empty,
                 Contact = issueBy ?? string.Empty,
-                Tel = office?.Tel ?? string.Empty,
+                Tel = Tel ?? string.Empty,
                 Website = office?.Website ?? DocumentConstants.COMPANY_WEBSITE,
                 DecimalNo = 2
             };
@@ -695,6 +705,16 @@ namespace eFMS.API.Documentation.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+
+        private string GetTelPersonalIncharge(Guid jobId)
+        {
+            var CreatorJob = cstransRepository.Get(x => x.Id == jobId).Select(t => t.UserCreated)?.FirstOrDefault();
+            string EmployeeId = userRepository.Get(x => x.Id == CreatorJob).Select(t => t.EmployeeId)?.FirstOrDefault();
+            string Tel = employeeRepository.Get(x => x.Id == EmployeeId).Select(t => t.Tel)?.FirstOrDefault();
+            return Tel;
+        }
+
+
 
     }
 }
