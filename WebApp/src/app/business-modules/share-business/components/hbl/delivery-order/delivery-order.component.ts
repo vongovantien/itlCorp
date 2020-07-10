@@ -53,7 +53,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
         this._activedRoute.params
             .pipe(
-                // takeUntil(this.ngUnsubscribe),
+                takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
                     if (p.hblId) {
                         this.hblid = p.hblId;
@@ -74,7 +74,7 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
 
                     if (!data.deliveryOrderNo) {
                         // ! Select Store chỗ nào thì takeUntil để tranh memoryLeak
-                        return this._store.select(fromShare.getTransactionDetailCsTransactionState).pipe(takeUntil(this.ngUnsubscribe));
+                        return this._store.select(fromShare.getTransactionDetailCsTransactionState);
                     } else {
                         this.deliveryOrder.deliveryOrderNo = data.deliveryOrderNo;
                         this.deliveryOrder.deliveryOrderPrintedDate = {
