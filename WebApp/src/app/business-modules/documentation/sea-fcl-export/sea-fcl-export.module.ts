@@ -48,14 +48,18 @@ const routing: Routes = [
                 data: { name: "Manifest", },
             },
             {
-                path: 'si', component: SeaFclExportShippingInstructionComponent, data: {
-                    name: "Shipping Instructions",
-                }
-            },
-            {
-                path: 'send-si', component: ShareBusinessReAlertComponent, data: {
-                    name: "Shipping Instruction (S.I)", serviceId: ChargeConstants.SFE_CODE
-                }
+                path: 'si',
+                data: { name: "Shipping Instructions", },
+                children: [
+                    {
+                        path: '', component: SeaFclExportShippingInstructionComponent, data: { name: "" }
+                    },
+                    {
+                        path: 'send-si', component: ShareBusinessReAlertComponent, data: {
+                            name: "Send S.I", serviceId: ChargeConstants.SFE_CODE
+                        }
+                    },
+                ]
             },
         ]
     },

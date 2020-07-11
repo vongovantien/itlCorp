@@ -30,12 +30,17 @@ const routing: Routes = [
         data: { name: 'New House Bill ', path: ':id', level: 5 }
     },
     {
-        path: ':hblId', component: AirImportDetailHBLComponent,
+        path: ':hblId',
         data: { name: 'House Bill Detail', path: ':id', level: 5 },
-    },
-    {
-        path: ':hblId/arrivalnotice', component: ShareBusinessReAlertComponent,
-        data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.AI_CODE },
+        children: [
+            {
+                path: '', component: AirImportDetailHBLComponent, data: { name: "" }
+            },
+            {
+                path: 'arrivalnotice', component: ShareBusinessReAlertComponent,
+                data: { name: "Arrival Notice", level: 6, serviceId: ChargeConstants.AI_CODE },
+            },
+        ]
     },
 ];
 
