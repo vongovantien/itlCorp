@@ -13,6 +13,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { EmailContent } from 'src/app/shared/models/document/emailContent';
 import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
+import { Router } from '@angular/router';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -65,7 +66,8 @@ export class ShareBusinessReAlertComponent extends AppList {
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _store: Store<IAppState>,
-        private _fb: FormBuilder) {
+        private _fb: FormBuilder,
+        private _router: Router) {
         super();
         this._progressRef = this._ngProgressService.ref();
     }
@@ -734,6 +736,25 @@ export class ShareBusinessReAlertComponent extends AppList {
             if (idxOf === -1) {
                 this.attachedFile.push(pathGeneral);
             }
+        }
+    }
+
+    cancelPreAlert() {
+        switch (this.serviceId) {
+            case ChargeConstants.AI_CODE: // Air Import
+                this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.hblId}`]);
+                break;
+            case ChargeConstants.AE_CODE: // Air Export
+                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                break;
+            case ChargeConstants.SFE_CODE: // Sea FCL Export
+                this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/si`]);
+                break;
+            case ChargeConstants.SLE_CODE: // Sea LCL Export
+                this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/si`]);
+                break;
+            default:
+                break;
         }
     }
 }
