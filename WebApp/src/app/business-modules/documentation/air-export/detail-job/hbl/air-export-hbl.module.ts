@@ -35,16 +35,21 @@ const routing: Routes = [
         data: { name: 'New House Bill', path: ':id', level: 5, transactionType: CommonEnum.TransactionTypeEnum.AirExport }
     },
     {
-        path: ':hblId', component: AirExportDetailHBLComponent,
-        data: { name: 'House Bill Detail', path: ':id', level: 5 }
+        path: ':hblId',
+        data: { name: 'House Bill Detail', path: ':id', level: 5 },
+        children: [
+            {
+                path: '', component: AirExportDetailHBLComponent, data: { name: "" }
+            },
+            {
+                path: 'manifest', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.AE_CODE },
+            }
+        ],
     },
     {
         path: ':hblId/separate', component: SeparateHouseBillComponent,
         data: { name: "Separate Hawb", path: ":id", level: 6 },
-    },
-    {
-        path: ':hblId/manifest', component: ShareBusinessReAlertComponent,
-        data: { name: "Pre Alert", level: 7, serviceId: ChargeConstants.AE_CODE },
     },
 ];
 
