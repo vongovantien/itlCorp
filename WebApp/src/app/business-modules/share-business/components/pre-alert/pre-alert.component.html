@@ -12,8 +12,8 @@
                 <div class="row">
                     <div class="col-md-1">
                         <div class="form-group">
-                            <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="sendMail()">
+                            <button *ngIf="(isLocked | async) === false"
+                                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="sendMail()">
                                 <i class="fa fa-envelope fa-2x" aria-hidden="true"></i>
                                 <span style="margin-top: 5px;">{{sendMailButtonName}}</span>
                             </button>
@@ -98,8 +98,8 @@
         <div class="col-lg-6"></div>
         <div class="col-lg-6 m--align-right">
             <div class="">
-                <button style="float:right" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="showPopup()">
+                <button *ngIf="(isLocked | async) === false" style="float:right"
+                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="showPopup()">
                     <span>
                         <i class="la la-plus"></i>
                         <span>

@@ -13,7 +13,8 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { EmailContent } from 'src/app/shared/models/document/emailContent';
 import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
-import { Router } from '@angular/router';
+import { Router, Params } from '@angular/router';
+import * as fromShareBussiness from '@share-bussiness';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -80,13 +81,17 @@ export class ShareBusinessReAlertComponent extends AppList {
             map(([params, qParams]) => ({ ...params, ...qParams })),
             take(1)
         ).subscribe(
-            (params: any) => {
+            (params: Params) => {
                 if (params.jobId) {
                     this.jobId = params.jobId;
                     this.hblId = params.hblId;
                     this.serviceId = params.serviceId;
                     this.exportFileCrystalToPdf(params.serviceId);
                     this.getContentMail(params.serviceId, params.hblId, params.jobId);
+
+                    // Is Locked Shipment?
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
                 }
             }
         );
