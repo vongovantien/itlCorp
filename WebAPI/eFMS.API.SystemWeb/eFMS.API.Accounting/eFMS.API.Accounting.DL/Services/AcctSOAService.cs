@@ -112,6 +112,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (isExistObhDebitCharge)
                 {
                     model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                    DateTime? dueDate = null;
+
+                    dueDate = model.DatetimeCreated.Value.AddDays(30);
+                    model.PaymentDueDate = dueDate;
                 }
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -243,6 +247,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.OfficeId = soaCurrent.OfficeId;
                         soa.CompanyId = soaCurrent.CompanyId;
 
+                       
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                        && model.Surcharges.Any(c => c.surchargeId == x.Id && c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
@@ -250,6 +255,11 @@ namespace eFMS.API.Accounting.DL.Services
                         if (isExistObhDebitCharge)
                         {
                             soa.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+
+                            DateTime? dueDate = null;
+                            dueDate = soaCurrent.DatetimeCreated.Value.AddDays(30);
+
+                            soa.PaymentDueDate = dueDate;
                         }
                         else
                         {
@@ -1662,7 +1672,8 @@ namespace eFMS.API.Accounting.DL.Services
                                  Customer = s.Customer,
                                  DateType = s.DateType,
                                  CreatorShipment = s.CreatorShipment,
-                                 PaymentStatus = s.PaymentStatus
+                                 PaymentStatus = s.PaymentStatus,
+                                 PaymentDueDate = s.PaymentDueDate
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)
