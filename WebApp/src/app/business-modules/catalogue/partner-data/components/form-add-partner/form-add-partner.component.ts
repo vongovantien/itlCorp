@@ -2,11 +2,13 @@ import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, shareReplay } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
-import { Partner } from 'src/app/shared/models';
+import { Partner, CountryModel, ProviceModel } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
+import { JobConstants } from '@constants';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
     selector: 'form-add-partner',
@@ -19,14 +21,28 @@ export class FormAddPartnerComponent extends AppForm {
     @ViewChild(PartnerOtherChargePopupComponent, { static: false }) otherChargePopup: PartnerOtherChargePopupComponent;
 
     @Output() requireSaleman = new EventEmitter<boolean>();
-    @Input() isUpdate: true;
+    @Input() isUpdate: false;
+    //
+    displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
+    displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
+
     parentCustomers: any[] = [];
     partnerGroups: any[] = [];
-    countries: any[] = [];
+    countries: any[];
     shippingProvinces: any[] = [];
     billingProvinces: any[] = [];
     workPlaces: any[] = [];
     isExistedTaxcode: boolean = false;
+
+    nations: Observable<CountryModel[]>;
+    billingsProvinces: ProviceModel[] = [];
+    shipingsProvinces: ProviceModel[] = [];
+    provinces: Observable<ProviceModel[]>;
+    //
+    shippingCountryName: string;
+    billingCountryName: string;
+    shippingProvinceName: string;
+    billingProvinceName: string;
 
     partnerForm: FormGroup;
     isSubmitted: boolean = false;
@@ -66,6 +82,10 @@ export class FormAddPartnerComponent extends AppForm {
     coLoaderCode: AbstractControl;
     roundUp: AbstractControl;
     applyDim: AbstractControl;
+    //
+    billingEmail: AbstractControl;
+    billingPhone: AbstractControl;
+    //
     groups: string = '';
 
     roundMethods: CommonInterface.INg2Select[] = [
@@ -88,6 +108,23 @@ export class FormAddPartnerComponent extends AppForm {
     }
     ngOnInit() {
         this.initForm();
+        this.getCountryProvince();
+        console.log("isUpdate: ", this.isUpdate);
+        if (this.isUpdate) {
+            this.getShippingProvinces();
+            this.getBillingProvinces();
+        }
+        console.log("counttry: ", this.shippingCountry.value);
+    }
+    getCountryProvince() {
+        this.nations = this._catalogueRepo.getCountry();
+        this._catalogueRepo.getProvinces()
+            .subscribe(
+                (provinces: ProviceModel[]) => {
+                    this.billingProvinces = this.shippingProvinces = provinces;
+                }
+            );
+
     }
     onChange(event: any, type: string) {
         switch (type) {
@@ -106,6 +143,7 @@ export class FormAddPartnerComponent extends AppForm {
                 break;
         }
     }
+
     removed(event, type: string) {
         switch (type) {
             case 'shippingCountry':
@@ -123,6 +161,7 @@ export class FormAddPartnerComponent extends AppForm {
                 break;
         }
     }
+
     checkRequireSaleman(): boolean {
 
         if (this.groups.includes("ALL") || this.groups.includes("CUSTOMER")) {
@@ -131,6 +170,7 @@ export class FormAddPartnerComponent extends AppForm {
             return false;
         }
     }
+
     getBillingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
@@ -156,13 +196,14 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
+
     getShippingProvinces(countryId?: number, provinceId: string = null) {
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.shippingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.shippingProvinces = res;
                         if (!!provinceId) {
                             const obj = this.shippingProvinces.find(x => x.id === provinceId);
                             if (obj === undefined) {
@@ -177,12 +218,13 @@ export class FormAddPartnerComponent extends AppForm {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.shippingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.shippingProvinces = res;
                     }
                 );
         }
 
     }
+
     initForm() {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
@@ -229,6 +271,10 @@ export class FormAddPartnerComponent extends AppForm {
             billingAddressLocal: [null, Validators.compose([
                 FormValidators.required
             ])],
+            //thien
+            billingEmail: [null],
+            billingPhone: [null],
+            //
             partnerContactPerson: [null],
             partnerContactNumber: [null],
             partnerContactFaxNo: [null],
@@ -281,6 +327,9 @@ export class FormAddPartnerComponent extends AppForm {
         this.note = this.partnerForm.controls['note'];
         this.applyDim = this.partnerForm.controls['applyDim'];
         this.roundUp = this.partnerForm.controls['roundUp'];
+        //
+        this.billingEmail = this.partnerForm.controls['billingEmail'];
+        this.billingPhone = this.partnerForm.controls['billingPhone'];
     }
 
     onSelectDataFormInfo(data: any) {
@@ -288,6 +337,20 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     setFormData(partner: Partner) {
+        //set Name Country
+        this.shippingCountryName = partner.countryShippingName;
+        this.billingCountryName = partner.countryName;
+        //set Name Province
+        this.shippingProvinceName = partner.provinceShippingName;
+        this.billingProvinceName = partner.provinceName;
+
+
+
+        // this.shippingCountryId = partner.countryShippingId;
+        // this.billingCountryId = partner.countryId;
+        // console.log("shipping Id: ", this.shippingProvinceName);
+        // console.log("billing Id: ", this.billingProvinceName);
+
         console.log(partner);
         const isShowSaleMan = this.checkRequireSaleman();
         this.requireSaleman.emit(isShowSaleMan);
@@ -321,7 +384,6 @@ export class FormAddPartnerComponent extends AppForm {
         }
         this.isPublic = partner.public;
 
-        console.log(this.isPublic);
         this.partnerForm.setValue({
             partnerAccountNo: partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
@@ -331,16 +393,26 @@ export class FormAddPartnerComponent extends AppForm {
             partnerAccountRef: partner.parentId,
             taxCode: partner.taxCode,
             partnerGroup: partnerGroupActives,
-            shippingCountry: shippingCountryActive,
-            shippingProvince: shippingProvinceActive,
+            //shippingCountry: shippingCountryActive,
+            shippingCountry: partner.countryShippingId,
+            //shippingProvince: shippingProvinceActive,
+            shippingProvince: partner.provinceShippingId,
+
             zipCodeShipping: partner.zipCodeShipping,
             shippingAddressEN: partner.addressShippingEn,
             shippingAddressVN: partner.addressShippingVn,
-            billingCountry: billingCountryActive,
-            billingProvince: billingProvinceActive,
+            // billingCountry: billingCountryActive,
+            billingCountry: partner.countryId,
+            //billingProvince: billingProvinceActive,
+            billingProvince: partner.provinceId,
+
             billingZipcode: partner.zipCode,
             billingAddressEN: partner.addressEn,
             billingAddressLocal: partner.addressVn,
+            //
+            billingEmail: partner.billingEmail,
+            billingPhone: partner.billingPhone,
+            //
             partnerContactPerson: partner.contactPerson,
             partnerContactNumber: partner.tel,
             partnerContactFaxNo: partner.fax,
@@ -358,7 +430,10 @@ export class FormAddPartnerComponent extends AppForm {
             roundUp: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
             applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }]
         });
+
+        console.log(this.partnerForm.value);
     }
+
     getPartnerGroupActives(arg0: string[]): any {
         const partnerGroupActives = [];
         if (arg0.length > 0) {
@@ -389,5 +464,7 @@ export class FormAddPartnerComponent extends AppForm {
         this.billingZipcode.setValue(this.zipCodeShipping.value);
         this.billingAddressEN.setValue(this.shippingAddressEN.value);
         this.billingAddressLocal.setValue(this.shippingAddressVN.value);
+        //
+
     }
 }

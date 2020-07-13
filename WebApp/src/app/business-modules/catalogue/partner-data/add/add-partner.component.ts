@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -19,6 +19,7 @@ import { Company } from '@models';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { SystemConstants } from '@constants';
+import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -32,6 +33,7 @@ export class AddPartnerDataComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
 
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
@@ -73,6 +75,7 @@ export class AddPartnerDataComponent extends AppList {
         private _sortService: SortService,
         private toastr: ToastrService,
         private _systemRepo: SystemRepo,
+        private _cd: ChangeDetectorRef,
         private _toastService: ToastrService
     ) {
         super();
@@ -87,6 +90,7 @@ export class AddPartnerDataComponent extends AppList {
 
         this.getComboboxData();
         this.initHeaderSalemanTable();
+
         this.route.queryParams.subscribe(prams => {
             if (prams.partnerType !== undefined) {
                 this.partnerType = Number(prams.partnerType);
@@ -96,7 +100,13 @@ export class AddPartnerDataComponent extends AppList {
                 }
             }
         });
-        this.getDataCombobox();
+        // this.getDataCombobox();
+
+    }
+    ngAfterViewInit() {
+        this.contractList.isActiveNewContract = false;
+        this.formPartnerComponent.isUpdate = false;
+        this._cd.detectChanges();
     }
 
     initHeaderSalemanTable() {
@@ -207,6 +217,7 @@ export class AddPartnerDataComponent extends AppList {
         this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
         this.confirmDeleteJobPopup.show();
     }
+
     getDataCombobox() {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),

@@ -20,6 +20,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     contracts: Contract[] = [];
+    //
+    isActiveNewContract: boolean = true;
+    //
     selectedContract: Contract = new Contract();
     indexToRemove: number = 0;
     indexlstContract: number = null;
@@ -90,6 +93,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.formContractPopup.salesmanId.setValue(userLogged.id);
         this.formContractPopup.show();
+    }
+
+    handleSearchContract($event: any) {
+        console.log("keyword: ", $event.target.value);
     }
 
     getDetailContract(id: string, index: number) {

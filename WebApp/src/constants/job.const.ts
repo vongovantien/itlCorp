@@ -151,6 +151,7 @@ export class JobConstants {
             { field: 'nameEn', label: 'Name EN' },
         ],
         COMBOGRID_CITY_PROVINCE: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'code', label: 'City Code' },
             { field: 'name_EN', label: 'Name' },
         ]
     };

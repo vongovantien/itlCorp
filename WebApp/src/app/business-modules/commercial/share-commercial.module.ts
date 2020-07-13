@@ -14,7 +14,7 @@ import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/sh
     declarations: [
         CommercialCreateComponent,
         CommercialFormCreateComponent,
-        CommercialContractListComponent,
+        //CommercialContractListComponent,
         CommercialDetailComponent
     ],
     imports: [

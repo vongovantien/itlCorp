@@ -1,5 +1,5 @@
 
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -21,6 +21,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
+import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 
 
 @Component({
@@ -38,6 +39,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(CommercialContractListComponent, { static: false }) listContract: CommercialContractListComponent;
 
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
@@ -83,7 +85,8 @@ export class PartnerDetailComponent extends AppList {
         private toastr: ToastrService,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _cd: ChangeDetectorRef,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -95,6 +98,7 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
@@ -106,6 +110,10 @@ export class PartnerDetailComponent extends AppList {
         this.getDataCombobox();
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
+    }
+    ngAfterViewInit() {
+        this.formPartnerComponent.isUpdate = false;
+        this._cd.detectChanges();
     }
 
     RequireSaleman(partnerGroup: string): boolean {
@@ -493,6 +501,9 @@ export class PartnerDetailComponent extends AppList {
         this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
         this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
         this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
+        //
+        this.partner.billingEmail = this.formPartnerComponent.billingEmail.value;
+        this.partner.billingPhone = this.formPartnerComponent.billingPhone.value;
     }
     trimInputForm(formBody: any) {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameENFull, formBody.nameENFull);
@@ -516,6 +527,9 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountAddress, formBody.partnerBankAccountAddress);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerSwiftCode, formBody.partnerSwiftCode);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.note, formBody.note);
+        //
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingEmail, formBody.billingEmail);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingPhone, formBody.billingPhone);
     }
 
     updatePartner() {
@@ -605,7 +619,10 @@ export class PartnerDetailComponent extends AppList {
             )
             .subscribe(
                 (res: any[]) => {
-                    this.contracts = res || [];
+                    this.listContract.contracts = res || [];
+                    this.listContract.isActiveNewContract = false;
+                    // this.contracts = res || [];
+
                 }
             );
     }
