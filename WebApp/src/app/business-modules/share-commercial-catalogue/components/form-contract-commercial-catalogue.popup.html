@@ -172,178 +172,187 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="alert-block__heading font-weight-bold collapse-toggle " data-toggle="collapse"
-                                data-target="#data-form-contact">
-                                Credit Term Info
-                                <i class="la la-angle-up m--margin-right-5 float-right"></i>
+                    <ng-container>
+                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && contractType.value[0].id ==='Official')">
+                            <div class="col-lg-12">
+                                <div class="alert-block__heading font-weight-bold collapse-toggle "
+                                    data-toggle="collapse" data-target="#data-form-contact">
+                                    Credit Term Info
+                                    <i class="la la-angle-up m--margin-right-5 float-right"></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row collapse show" id="data-form-contact">
-                        <ng-container *ngIf="contractType.value[0]?.id !== 'Official'">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Trial Credit Limit
-                                    </label>
-                                    <input type="number" min="0"
-                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                        class="form-control" formControlName="trialCreditLimit">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Trial Credit Days
-                                    </label>
-                                    <input type="number" min="0" (change)="onChageTrialCreditDays()"
-                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                        class="form-control" formControlName="trialCreditDays">
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Trial Effective Date
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input
+                        <div class="row collapse show" id="data-form-contact">
+                            <ng-container *ngIf="isUpdate">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Trial Credit Limit
+                                        </label>
+                                        <input type="number" min="0"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                            type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                            (datesUpdated)="onUpdateTrialEffectiveDate($event)"
-                                            formControlName="trialEffectDate" readonly />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
+                                            class="form-control" formControlName="trialCreditLimit">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Trial Credit Days
+                                        </label>
+                                        <input type="number" min="0" (change)="onChageTrialCreditDays()"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            class="form-control" formControlName="trialCreditDays">
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Trial Effective Date
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                                type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                (datesUpdated)="onUpdateTrialEffectiveDate($event)"
+                                                formControlName="trialEffectDate" readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
                                             </span>
-                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label>Trial Expired Date
+                                        </label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input
+                                                [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                                type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
+                                                readonly />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && contractType.value[0].id ==='Official')">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Payment Term</label>
+                                        <input type="number" min="0" class="form-control" formControlName="paymentTerm">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Credit Limit</label>
+                                        <input min="0" type="number" class="form-control" formControlName="creditLimit">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Credit Limited Rate</label>
+                                        <input min="0"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            type="number" class="form-control" formControlName="creditLimitRate">
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-container *ngIf="isUpdate">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Credit Amount</label>
+                                        <input min="0" type="number" disabled class="form-control"
+                                            formControlName="creditAmount">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Billing Amount</label>
+                                        <input min="0" type="number" disabled class="form-control"
+                                            formControlName="billingAmount">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Paid Amount</label>
+                                        <input min="0" type="number" disabled class="form-control"
+                                            formControlName="paidAmount">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>UnPaid Amount</label>
+                                        <input type="number" disabled class="form-control"
+                                            formControlName="unpaidAmount">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Customer Advance Amount</label>
+                                        <input min="0"
+                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
+                                            type="number" class="form-control" formControlName="customerAmount">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label>Credit Rate</label>
+                                        <input min="0" type="number" class="form-control" formControlName="creditRate">
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && contractType.value[0].id ==='Official')">
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea class="form-control" cols="30" rows="5"
+                                        formControlName="description"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Contract File</label>
+                                    <input style="display:none" type="file" #file (change)="handleFileInput($event)">
+                                    <div class="form-group ">
+                                        <button (click)="file.click()" type="button"
+                                            class=" btn btn-success m-btn--square m-btn--icon m-btn--uppercase margin-right-10">
+                                            <span>
+                                                <i class="la la-plus"></i>
+                                                <span>
+                                                    Attach Files
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <ng-container
+                                            *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
+                                            <span class="text-underline text-primary">
+                                                {{ !!fileList ? fileList[0].name : null}}
+                                            </span>
+                                        </ng-container>
+                                        <ng-container *ngIf="!isLoading && !!files && isUpdate">
+                                            <a [href]="files.url" target="_blank" [title]="files.name"
+                                                download>{{files.name}}</a>
+                                        </ng-container>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Trial Expired Date
-                                    </label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                            type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                            formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
-                                            readonly />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </ng-container>
-                        <ng-container *ngIf="contractType.value[0]?.id === 'Official'">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Payment Term</label>
-                                    <input type="number" min="0" class="form-control" formControlName="paymentTerm">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Credit Limit</label>
-                                    <input min="0" type="number" class="form-control" formControlName="creditLimit">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Credit Limited Rate</label>
-                                    <input min="0"
-                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                        type="number" class="form-control" formControlName="creditLimitRate">
-                                </div>
-                            </div>
-                        </ng-container>
-                        <ng-container *ngIf="contractType.value[0]?.id !== 'Official'">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Credit Amount</label>
-                                    <input min="0" type="number" disabled class="form-control"
-                                        formControlName="creditAmount">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Billing Amount</label>
-                                    <input min="0" type="number" disabled class="form-control"
-                                        formControlName="billingAmount">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Paid Amount</label>
-                                    <input min="0" type="number" disabled class="form-control"
-                                        formControlName="paidAmount">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>UnPaid Amount</label>
-                                    <input type="number" disabled class="form-control" formControlName="unpaidAmount">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Customer Advance Amount</label>
-                                    <input min="0"
-                                        [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
-                                        type="number" class="form-control" formControlName="customerAmount">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Credit Rate</label>
-                                    <input min="0" type="number" class="form-control" formControlName="creditRate">
-                                </div>
-                            </div>
-                        </ng-container>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="form-group">
-                                <label>Description</label>
-                                <textarea class="form-control" cols="30" rows="5"
-                                    formControlName="description"></textarea>
-                            </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Contract File</label>
-                                <input style="display:none" type="file" #file (change)="handleFileInput($event)">
-                                <div class="form-group ">
-                                    <button (click)="file.click()" type="button"
-                                        class=" btn btn-success m-btn--square m-btn--icon m-btn--uppercase margin-right-10">
-                                        <span>
-                                            <i class="la la-plus"></i>
-                                            <span>
-                                                Attach Files
-                                            </span>
-                                        </span>
-                                    </button>
-                                    <ng-container
-                                        *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
-                                        <span class="text-underline text-primary">
-                                            {{ !!fileList ? fileList[0].name : null}}
-                                        </span>
-                                    </ng-container>
-                                    <ng-container *ngIf="!isLoading && !!files && isUpdate">
-                                        <a [href]="files.url" target="_blank" [title]="files.name"
-                                            download>{{files.name}}</a>
-                                    </ng-container>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </ng-container>
+
+
+
+
                     <ng-container *ngIf="isUpdate && !isCreateNewCommercial">
                         <div class="row">
                             <div class="col-6">
@@ -370,7 +379,7 @@
                     </span>
                 </button>
                 <button (click)="onSubmit(true)"
-                    *ngIf="((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !isCreateNewCommercial && !selectedContract.active) && this.partnerId != null   "
+                    *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) && this.partnerId != null) || (!isCreateNewCommercial && !isUpdate)   "
                     class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                     <span>
                         <i class="la la-send"></i>
