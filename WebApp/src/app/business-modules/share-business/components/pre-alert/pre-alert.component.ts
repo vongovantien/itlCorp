@@ -41,17 +41,17 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     sendMailButtonName: string = '';
     serviceId: string = '';
-    isExitsArrivalNotice: boolean = true;
+    isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
-    isExitsManifest: boolean = true;
+    isExitsManifest: boolean = false;
     isCheckedManifest: boolean = false;
-    isExitsHawb: boolean = true;
+    isExitsHawb: boolean = false;
     isCheckedHawb: boolean = false;
-    isExitsSI: boolean = true;
+    isExitsSI: boolean = false;
     isCheckedSI: boolean = false;
-    isExitsSISummary: boolean = true;
+    isExitsSISummary: boolean = false;
     isCheckedSISummary: boolean = false;
-    isExitsSIDetailCont: boolean = true;
+    isExitsSIDetailCont: boolean = false;
     isCheckedSIDetailCont: boolean = false;
 
     pathGeneralArrivalNotice: string = '';
