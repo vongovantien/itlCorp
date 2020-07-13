@@ -3,7 +3,7 @@
         <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
             [queryParams]="{ no: soa.soano, currency: 'VND' }"
-            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
             <span>
                 <i class="la la-edit"></i>
                 <span>
