@@ -111,7 +111,9 @@ export class AirExportManifestComponent extends AppList {
 
     refreshManifest() {
         //this.getManifest(this.jobId);
+
         this.formManifest.getShipmentDetail(this.jobId);
+
         this.getHblList(this.jobId);
     }
 
