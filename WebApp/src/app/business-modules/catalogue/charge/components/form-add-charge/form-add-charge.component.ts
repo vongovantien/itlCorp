@@ -5,7 +5,7 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import { Observable } from 'rxjs';
-import { Charge } from '@models';
+import { Charge, ChartOfAccounts } from '@models';
 import { CommonEnum } from '@enums';
 
 @Component({
@@ -14,7 +14,6 @@ import { CommonEnum } from '@enums';
 })
 
 export class FormAddChargeComponent extends AppForm {
-
     @Input() isUpdate: boolean = false;
 
     formGroup: FormGroup;
@@ -30,13 +29,14 @@ export class FormAddChargeComponent extends AppForm {
     service: AbstractControl;
     debitCharge: AbstractControl;
     chargeGroup: AbstractControl;
-
+    active: AbstractControl;
+    generateSelling: AbstractControl;
 
     ngDataUnit: any = [];
     ngDataCurrentcyUnit: any = [];
     activeServices: any = [];
     ngDataChargeGroup: any = [];
-
+    chartOfAccounts: ChartOfAccounts[] = [];
 
     Charge: CatChargeToAddOrUpdate = null;
     serviceTypeId: string = '';
@@ -78,7 +78,6 @@ export class FormAddChargeComponent extends AppForm {
         this.getCurrency();
         this.getChargeGroup();
         this.initForm();
-
         this.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
     }
 
@@ -94,7 +93,10 @@ export class FormAddChargeComponent extends AppForm {
             type: [null, Validators.required],
             service: [null, Validators.required],
             debitCharge: [],
-            chargeGroup: []
+            chargeGroup: [],
+            active: [true],
+            generateSelling: [true]
+
         });
 
         this.code = this.formGroup.controls["code"];
@@ -108,8 +110,8 @@ export class FormAddChargeComponent extends AppForm {
         this.service = this.formGroup.controls["service"];
         this.debitCharge = this.formGroup.controls["debitCharge"];
         this.chargeGroup = this.formGroup.controls["chargeGroup"];
-
-
+        this.active = this.formGroup.controls["active"];
+        this.generateSelling = this.formGroup.controls["generateSelling"];
         this.type.valueChanges
             .subscribe(
                 (value: CommonInterface.INg2Select[]) => {
@@ -124,7 +126,6 @@ export class FormAddChargeComponent extends AppForm {
             );
     }
 
-
     checkValidateForm() {
         let valid: boolean = true;
         this.setError(this.service);
@@ -135,7 +136,6 @@ export class FormAddChargeComponent extends AppForm {
 
         return valid;
     }
-
 
     addCharge() {
         this.isSubmitted = true;
@@ -167,12 +167,14 @@ export class FormAddChargeComponent extends AppForm {
                 this.ngDataChargeGroup = chargeGroup.map(x => ({ text: x.name, id: x.id }));
 
                 if (this.isUpdate === false) {
-                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup[6].id, text: this.ngDataChargeGroup[6].text }]);
+                    this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: this.ngDataChargeGroup.find(x => x.text === 'Other').id, text: 'Other' }]);
 
                 }
             }
         });
     }
+
+
 
     getCurrentActiveService(ChargeService: any) {
         const listService = ChargeService.split(";");
@@ -205,7 +207,8 @@ export class FormAddChargeComponent extends AppForm {
             type: [<CommonInterface.INg2Select>{ id: res.charge.type, text: res.charge.type }],
             service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }],
             debitCharge: res.charge.debitCharge,
-            chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null
+            chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null,
+            active: res.charge.active
         });
         setTimeout(() => {
             const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);
@@ -215,8 +218,5 @@ export class FormAddChargeComponent extends AppForm {
             this.currency.setValue([<CommonInterface.INg2Select>{ id: res.charge.currencyId, text: itemCurrency.text }]);
             !!res.charge.chargeGroup ? this.chargeGroup.setValue([<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: itemChargeGroup.text }]) : null;
         }, 200);
-      
-       
-
     }
 }

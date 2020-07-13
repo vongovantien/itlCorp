@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-lg-12 m--margin-top-20">
                     <div class="table-wrapper">
-                        <table class="table table-striped table-brand dataTable" id="obh-payment-table">
+                        <table class="table table-hover table-brand dataTable" id="obh-payment-table">
                             <thead app-table-header [headers]="headers"
                                 (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                 <th class="first table-actions-col">
@@ -76,55 +76,45 @@
                                             <td>{{item.extendDays}}</td>
                                             <td>{{ item.extendNote }}</td>
                                         </tr>
-
-                                        <tr class="collapse-panel-row">
-                                            <td colspan="14">
-                                                <div class="detail-panel-block collapse" id="id-00{{(i+1)}}"
-                                                    data-parent="#obh-payment-table">
-                                                    <div class="table-inside-block">
-                                                        <perfect-scrollbar style="max-height: 180px">
-                                                            <table class="table table-secondary dataTable">
-                                                                <thead app-table-header [headers]="paymentHeaders"
-                                                                    (onClick)="sortPayment($event.sortField, $event.order)">
-                                                                    <th class="m--w-50 first table-actions-col">
-                                                                        Actions
-                                                                    </th>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <ng-container *ngIf="!!payments.length">
-                                                                        <tr
-                                                                            *ngFor="let payment of payments; let j = index; trackBy: trackByFn">
-                                                                            <td class="table-actions-col">
-                                                                                <div class="table-actions">
-                                                                                    <button
-                                                                                        (click)="showConfirmDelete(payment, j)"
-                                                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
-                                                                                        <i class="la la-trash"></i>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </td>
-                                                                            <td>{{ payment.paymentNo }}</td>
-                                                                            <td>{{ payment.paymentAmount| number: '.0-3'  }}
-                                                                            </td>
-                                                                            <td>{{ payment.balance| number: '.0-3' }}
-                                                                            </td>
-                                                                            <td>{{ payment.currencyId }}</td>
-                                                                            <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
-                                                                            </td>
-                                                                            <td>{{ payment.paymentType }}</td>
-                                                                            <td>{{ payment.userModifiedName }}</td>
-                                                                            <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}
-                                                                            </td>
-                                                                        </tr>
-                                                                    </ng-container>
-                                                                    <tr app-table-none-record *ngIf="!payments.length">
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </perfect-scrollbar>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                        <tr class="collapse-panel-row" app-table-collapse-row [id]="'id-00' + (i + 1)"
+                                            [parentId]="'#obh-payment-table'">
+                                            <table class="table table-secondary dataTable">
+                                                <thead app-table-header [headers]="paymentHeaders"
+                                                    (onClick)="sortPayment($event.sortField, $event.order)">
+                                                    <th class="m--w-50 first table-actions-col">
+                                                        Action
+                                                    </th>
+                                                </thead>
+                                                <tbody>
+                                                    <ng-container *ngIf="!!payments.length">
+                                                        <tr
+                                                            *ngFor="let payment of payments; let j = index; trackBy: trackByFn">
+                                                            <td class="table-actions-col">
+                                                                <div class="table-actions">
+                                                                    <button (click)="showConfirmDelete(payment, j)"
+                                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                                        <i class="la la-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td>{{ payment.paymentNo }}</td>
+                                                            <td>{{ payment.paymentAmount| number: '.0-3'  }}
+                                                            </td>
+                                                            <td>{{ payment.balance| number: '.0-3' }}
+                                                            </td>
+                                                            <td>{{ payment.currencyId }}</td>
+                                                            <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
+                                                            </td>
+                                                            <td>{{ payment.paymentType }}</td>
+                                                            <td>{{ payment.userModifiedName }}</td>
+                                                            <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}
+                                                            </td>
+                                                        </tr>
+                                                    </ng-container>
+                                                    <tr app-table-none-record *ngIf="!payments.length">
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </tr>
                                     </ng-container>
                                 </ng-container>

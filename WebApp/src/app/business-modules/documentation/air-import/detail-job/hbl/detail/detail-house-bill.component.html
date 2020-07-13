@@ -55,14 +55,10 @@
                 <air-import-hbl-form-create [isUpdate]="true"> </air-import-hbl-form-create>
             </tab>
             <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
-                <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                    <arrival-note-air></arrival-note-air>
-                </ng-container>
+                <arrival-note-air></arrival-note-air>
             </tab>
             <tab heading="Authorize Letter" (selectTab)="onSelectTab('AUTHORIZE')">
-                <ng-container *ngIf="selectedTab === 'AUTHORIZE'">
-                    <hbl-delivery-order [isAir]="true"></hbl-delivery-order>
-                </ng-container>
+                <hbl-delivery-order [isAir]="true"></hbl-delivery-order>
             </tab>
         </tabset>
     </div>

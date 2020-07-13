@@ -1,5 +1,4 @@
 namespace DocumentationInterface {
-
     export interface IDataSyncHBL {
         flightVesselName?: string;
         etd: string;
@@ -12,4 +11,6 @@ namespace DocumentationInterface {
         warehouseId?: string;
         [name: string]: any;
     }
+
+
 }

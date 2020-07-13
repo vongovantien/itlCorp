@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { AccountReceivablePayableListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-receivable-payable.component';
 import { AccountReceivablePayableListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-receivable-payable.component';
 import { PaymentType } from './components/form-search/form-search-account-receivable-payable.component';
@@ -19,7 +19,9 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     selectedTab: TAB | string = "INVOICE";
 
-    constructor(private _ngProgessSerice: NgProgress,
+    constructor(
+        private _ngProgessSerice: NgProgress,
+        private _cd: ChangeDetectorRef,
         private _accountingRepo: AccountingRepo) {
         super();
         this._progressRef = this._ngProgessSerice.ref();
@@ -34,6 +36,8 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.obhSOAListComponent.dataSearch = this.dataSearch;
 
         this.invoiceListComponent.getPagingData();
+        this._cd.detectChanges();
+
     }
 
     onSelectTabLocation(tabname: string) {
@@ -73,13 +77,13 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     requestSearchShipment() {
         this._progressRef.start();
-        this.invoiceListComponent.isLoading = true;
+        // this.invoiceListComponent.isLoading = true;
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.invoiceListComponent.isLoading = false;
+                    // this.invoiceListComponent.isLoading = false;
 
                 })
             ).subscribe(

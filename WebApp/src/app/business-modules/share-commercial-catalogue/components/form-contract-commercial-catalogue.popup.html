@@ -72,7 +72,7 @@
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted &&(	(contractNo.dirty && !contractNo.valid)  || ( contractType.value[0]?.id === 'Official' && !contractNo.value ))} ">
+                                [ngClass]="{'m-form__group has-danger': (contractNo.dirty && !contractNo.valid)  || ( contractType.value[0]?.id === 'Official' && !contractNo.value )} ">
                                 <label>Contract No</label>
                                 <input type="text" class="form-control" formControlName="contractNo">
                                 <div class="form-control-feedback" *ngIf="contractNo.errors | equalError: 'maxlength'">
@@ -158,8 +158,9 @@
                                 <label>VAS</label>
                                 <div class="pos-rel">
                                     <ng-select #vas [items]="vaslst" [allowClear]="true"
-                                        (opened)="closeOtherSelects(vas)" [active]="activeVas" [multiple]="true"
-                                        formControlName="vas" placeholder="Please select">
+                                        (selected)="selectedVas($event)" (opened)="closeOtherSelects(vas)"
+                                        [active]="activeVas" [multiple]="true" formControlName="vas"
+                                        placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)"
                                         (onDropdown)="openNg2Select(vas)">
@@ -186,7 +187,7 @@
                                 <div class="form-group">
                                     <label>Trial Credit Limit
                                     </label>
-                                    <input type="number"
+                                    <input type="number" min="0"
                                         [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                         class="form-control" formControlName="trialCreditLimit">
                                 </div>
@@ -195,7 +196,7 @@
                                 <div class="form-group">
                                     <label>Trial Credit Days
                                     </label>
-                                    <input type="number" (change)="onChageTrialCreditDays()"
+                                    <input type="number" min="0" (change)="onChageTrialCreditDays()"
                                         [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                         class="form-control" formControlName="trialCreditDays">
                                 </div>
@@ -251,13 +252,13 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Credit Limit</label>
-                                    <input type="number" class="form-control" formControlName="creditLimit">
+                                    <input min="0" type="number" class="form-control" formControlName="creditLimit">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Credit Limited Rate</label>
-                                    <input
+                                    <input min="0"
                                         [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                         type="number" class="form-control" formControlName="creditLimitRate">
                                 </div>
@@ -267,19 +268,22 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Credit Amount</label>
-                                    <input type="number" disabled class="form-control" formControlName="creditAmount">
+                                    <input min="0" type="number" disabled class="form-control"
+                                        formControlName="creditAmount">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Billing Amount</label>
-                                    <input type="number" disabled class="form-control" formControlName="billingAmount">
+                                    <input min="0" type="number" disabled class="form-control"
+                                        formControlName="billingAmount">
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Paid Amount</label>
-                                    <input type="number" disabled class="form-control" formControlName="paidAmount">
+                                    <input min="0" type="number" disabled class="form-control"
+                                        formControlName="paidAmount">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -291,7 +295,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Customer Advance Amount</label>
-                                    <input
+                                    <input min="0"
                                         [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                         type="number" class="form-control" formControlName="customerAmount">
                                 </div>
@@ -299,7 +303,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Credit Rate</label>
-                                    <input type="number" class="form-control" formControlName="creditRate">
+                                    <input min="0" type="number" class="form-control" formControlName="creditRate">
                                 </div>
                             </div>
                         </ng-container>
@@ -343,12 +347,14 @@
                     <ng-container *ngIf="isUpdate && !isCreateNewCommercial">
                         <div class="row">
                             <div class="col-6">
-                                Created by: <span class="text-success">{{selectedContract.userCreatedName}}</span>
-                                {{selectedContract.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                Created:
+                                {{selectedContract.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
+                                    class="text-success">{{selectedContract.userCreatedName}}</span>
                             </div>
                             <div class="col-6">
-                                Modified by: <span class="text-success">{{selectedContract.userModifiedName}}</span>
-                                {{selectedContract.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                Modified:
+                                {{selectedContract.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
+                                    class="text-success">{{selectedContract.userModifiedName}}</span>
                             </div>
                         </div>
                     </ng-container>

@@ -59,6 +59,8 @@
 
         #region -- STATUS SOA --
         public static readonly string STATUS_SOA_NEW = "New";
+        public static readonly string STATUS_SOA_ISSUED_INVOICE = "Issued Invoice";
+        public static readonly string STATUS_SOA_ISSUED_VOUCHER = "Issued Voucher";
         #endregion -- STATUS SOA --
 
         public static readonly string CURRENCY_LOCAL = "VND";
@@ -100,8 +102,7 @@
         public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
-
-
+       
 
         #endregion
     }

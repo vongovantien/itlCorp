@@ -12,6 +12,7 @@ export class ShareBussinessDateTimeModifiedComponent implements OnInit {
     @Input() timeModified: string;
     @Input() userModified: string;
 
+    @Input() col: number = 4;
     constructor() { }
 
     ngOnInit() { }

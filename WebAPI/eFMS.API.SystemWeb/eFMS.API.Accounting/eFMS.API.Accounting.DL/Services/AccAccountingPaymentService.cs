@@ -234,10 +234,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AcctSoa, bool>> perQuery = GetQueryOBHPermission(rangeSearch, _user);
             Expression<Func<AcctSoa, bool>> query = x => (x.Customer == criteria.PartnerId || criteria.PartnerId == null)
-                                                      && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null);
+                                                      && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null)
+                                                      && !string.IsNullOrEmpty(x.PaymentStatus);
             if (criteria.PaymentStatus.Count > 0)
             {
-                query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "") || criteria.PaymentStatus == null);
+                query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus));
             }
             if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
@@ -275,10 +276,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             if (data == null) return null;
-            var surcharges = surchargeRepository.Get(x => x.Type == "OBH" 
+            var surcharges = surchargeRepository.Get(x => x.Type == "OBH"
                                                         && !string.IsNullOrEmpty(x.Soano)
-                                                        && (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos == null)
-                                                        && (criteria.ReferenceNos.Contains(x.Hblno) || criteria.ReferenceNos == null));
+                                                        && (
+                                                        (criteria.ReferenceNos.Contains(x.Mblno) || criteria.ReferenceNos == null)
+                                                        || (criteria.ReferenceNos.Contains(x.Hblno) || criteria.ReferenceNos == null)
+                                                        || (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null))
+                                                        );
+
             var dataJoin = (from soa in data
                            join charge in surcharges on soa.Soano equals charge.Soano
                            select new { soa, TotalOBH = charge.Total });
@@ -292,7 +297,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IssuedDate = x.soa.DatetimeCreated,
                 DueDate = x.soa.PaymentDueDate,
                 OverdueDays = (DateTime.Today > x.soa.PaymentDueDate.Value.Date) ? (DateTime.Today - x.soa.PaymentDueDate.Value.Date).Days : 0,
-                Status = x.soa.PaymentStatus?? "Unpaid",
+                Status = x.soa.PaymentStatus,
                 ExtendDays = x.soa.PaymentExtendDays,
                 ExtendNote = x.soa.PaymentNote
             });

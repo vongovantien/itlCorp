@@ -42,20 +42,50 @@
 
                             </td>
                             <td>
-                                <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
-                                    type="number" [(ngModel)]="item.debitAccountNo" [name]="'debitAccountNo'+index" />
+                                <!-- <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
+                                    type="number" [(ngModel)]="item.debitAccountNo" [name]="'debitAccountNo'+index" /> -->
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'accountCode', value:item.debitAccountNo}"
+                                    [selectedDisplayFields]="configComboChartOfAccount.selectedDisplayFields"
+                                    (itemSelected)="item.debitAccountNo = $event.accountCode"
+                                    [dataSources]="chartOfAccounts"
+                                    [displayFields]="configComboChartOfAccount.displayFields"
+                                    placeholder="Select Account Debit No" (remove)="item.debitAccountNo = null">
+                                </app-combo-grid-virtual-scroll>
                             </td>
                             <td>
-                                <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
-                                    type="number" [(ngModel)]="item.creditAccountNo" [name]="'creditAccountNo'+index" />
+                                <!-- <input integer minlength="3" maxlength="7" class="form-control m-input m-input--square"
+                                    type="number" [(ngModel)]="item.creditAccountNo" [name]="'creditAccountNo'+index" /> -->
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'accountCode', value:item.creditAccountNo}"
+                                    [selectedDisplayFields]="configComboChartOfAccount.selectedDisplayFields"
+                                    (itemSelected)="item.creditAccountNo = $event.accountCode"
+                                    [dataSources]="chartOfAccounts"
+                                    [displayFields]="configComboChartOfAccount.displayFields"
+                                    placeholder="Select Account Credit No" (remove)="item.creditAccountNo = null">
+                                </app-combo-grid-virtual-scroll>
                             </td>
                             <td>
-                                <input class="form-control m-input m-input--square" [(ngModel)]="item.debitVat"
-                                    [name]="'debitVat'+index" />
+                                <!-- <input class="form-control m-input m-input--square" [(ngModel)]="item.debitVat"
+                                    [name]="'debitVat'+index" /> -->
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'accountCode', value:item.debitVat}"
+                                    [selectedDisplayFields]="configComboChartOfAccount.selectedDisplayFields"
+                                    (itemSelected)="item.debitVat = $event.accountCode" [dataSources]="chartOfAccounts"
+                                    [displayFields]="configComboChartOfAccount.displayFields"
+                                    placeholder="Select Account Debit No(VAT)" (remove)="item.debitVat = null">
+                                </app-combo-grid-virtual-scroll>
                             </td>
                             <td>
-                                <input class="form-control m-input m-input--square" [(ngModel)]="item.creditVat"
-                                    [name]="'creditVat'+index" />
+                                <!-- <input class="form-control m-input m-input--square" [(ngModel)]="item.creditVat"
+                                    [name]="'creditVat'+index" /> -->
+                                <app-combo-grid-virtual-scroll
+                                    [currentActiveItemId]="{field:'accountCode', value:item.creditVat}"
+                                    [selectedDisplayFields]="configComboChartOfAccount.selectedDisplayFields"
+                                    (itemSelected)="item.creditVat = $event.accountCode" [dataSources]="chartOfAccounts"
+                                    [displayFields]="configComboChartOfAccount.displayFields"
+                                    placeholder="Select Account Crebit No(VAT)" (remove)="item.creditVat = null">
+                                </app-combo-grid-virtual-scroll>
                             </td>
 
                         </tr>

@@ -5,7 +5,7 @@ import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { IAccountingManagementState } from '../../store';
+import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccAccountingManagementModel } from '@models';
 
 import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
@@ -79,8 +79,11 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     }
 
     updateChargeList(res: AccAccountingManagementModel) {
-        this.listChargeComponent.charges = res.charges;
-        this.listChargeComponent.updateTotalAmount();
+        // this.listChargeComponent.charges = res.charges;
+        // this.listChargeComponent.updateTotalAmount();
+
+        this._store.dispatch(UpdateChargeList({ charges: res.charges }));
+
     }
 
     onSubmitSaveVoucher() {
@@ -92,6 +95,11 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         }
         if (!this.listChargeComponent.charges.length) {
             this._toastService.warning("VAT Invoice don't have any charge in this period, Please check it again!");
+            return;
+        }
+
+        if (!this.checkValidateExchangeRate()) {
+            this._toastService.warning(this.invalidUpdateExchangeRate);
             return;
         }
 

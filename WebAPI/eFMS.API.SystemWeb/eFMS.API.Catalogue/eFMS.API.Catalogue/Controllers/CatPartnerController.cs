@@ -126,6 +126,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult Get(string id)
         {
             var data = catPartnerService.GetDetail(id);

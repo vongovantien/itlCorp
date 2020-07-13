@@ -56,15 +56,20 @@ const routing: Routes = [
                 data: { name: "Manifest", },
             },
             {
-                path: 'si', component: SeaLclExportShippingInstructionComponent, data: {
-                    name: "Shipping Instructions",
-                }
+                path: 'si',
+                data: { name: "Shipping Instructions", },
+                children: [
+                    {
+                        path: '', component: SeaLclExportShippingInstructionComponent, data: { name: "" }
+                    },
+                    {
+                        path: 'send-si', component: ShareBusinessReAlertComponent, data: {
+                            name: "Send S.I", serviceId: ChargeConstants.SLE_CODE
+                        }
+                    },
+                ]
             },
-            {
-                path: 'send-si', component: ShareBusinessReAlertComponent, data: {
-                    name: "Shipping Instruction (S.I)", serviceId: ChargeConstants.SLE_CODE
-                }
-            },
+
         ]
     },
 

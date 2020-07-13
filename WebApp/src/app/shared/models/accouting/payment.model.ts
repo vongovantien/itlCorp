@@ -1,6 +1,7 @@
 export class PaymentModel {
     id: string = '00000000-0000-0000-0000-000000000000';
     refId: string = '';
+    refNo: string = null;
     paymentNo: string = '';
     paymentAmount: number = 0;
     balance: number = 0;

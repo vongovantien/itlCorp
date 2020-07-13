@@ -4,7 +4,7 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>Edit Voucher</h3>
+                    <h3>{{accountingManagement.voucherId}}</h3>
                     <div>
                         <div class="c-button-actions">
                             <app-permission-button type="save" title="Save" (onClick)="onSubmitSaveVoucher()">
@@ -21,16 +21,10 @@
 
                 <form-create-voucher></form-create-voucher>
 
-                <div class="row m--margin-top-20">
-                    <div class="col-md-6">
-                        <span>Created: {{accountingManagement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
-                        <span class="text-success">{{accountingManagement.userNameCreated}}</span>
-                    </div>
-                    <div class="col-md-6">
-                        <span>Modified: {{accountingManagement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
-                        </span> <span class="text-success">{{accountingManagement.userNameModified}}</span>
-                    </div>
-                </div>
+                <date-time-modified col="6" [timeCreated]="accountingManagement.datetimeCreated"
+                    [userCreated]="accountingManagement.userNameCreated"
+                    [timeModified]="accountingManagement.datetimeModified"
+                    [userModified]="accountingManagement.userNameModified"></date-time-modified>
 
                 <list-charge-accounting-management type="voucher"></list-charge-accounting-management>
 

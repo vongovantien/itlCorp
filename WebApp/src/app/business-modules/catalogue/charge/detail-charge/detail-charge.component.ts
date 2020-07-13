@@ -59,7 +59,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         protected router: Router,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
-        protected _progressService: NgProgress, ) {
+        protected _progressService: NgProgress,) {
         super(router, _catalogueRepo, _toastService, _progressService);
     }
 
@@ -87,6 +87,9 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
 
                 this.Charge.charge.userCreated = res.charge.userCreated;
+                if (!!this.formAddCharge.debitCharge.value) {
+                    this.formAddCharge.generateSelling.setValue(false);
+                }
             }
         });
     }
@@ -99,6 +102,13 @@ export class DetailChargeComponent extends AddChargeComponent {
         }
         if (this.voucherList.validatateDefaultAcountLine()) {
             const modeltoUpdate = this.onsubmitData();
+            if (this.formAddCharge.isShowMappingSelling && !this.formAddCharge.debitCharge.value && this.formAddCharge.generateSelling.value === true) {
+                this.popupGenerateSelling.chargeCode.setValue(this.formAddCharge.code.value.replace(this.formAddCharge.code.value.substring(0, 1), "S"));
+                this.popupGenerateSelling.accountNo.setValue(null);
+                this.popupGenerateSelling.accountNoVAT.setValue(null);
+                this.popupGenerateSelling.show();
+                return;
+            }
             if (modeltoUpdate !== null) {
                 modeltoUpdate.charge.id = this.id;
                 modeltoUpdate.charge.userCreated = this.Charge.charge.userCreated;

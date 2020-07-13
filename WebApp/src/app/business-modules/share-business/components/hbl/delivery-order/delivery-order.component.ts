@@ -3,18 +3,20 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from 'src/app/app.form';
-import { DeliveryOrder, User, CsTransactionDetail } from 'src/app/shared/models';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { SystemConstants } from 'src/constants/system.const';
-
-import { catchError, takeUntil, switchMap, finalize } from 'rxjs/operators';
-
-
-import * as fromShare from './../../../store';
+import { DeliveryOrder, User, CsTransaction } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { CommonEnum } from '@enums';
+import { SystemConstants, ChargeConstants } from '@constants';
+import { IAppState } from '@store';
 import { DataService } from '@services';
+
+import { catchError, takeUntil, switchMap, finalize, map, concatMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import * as fromShare from './../../../store';
+
 @Component({
     selector: 'hbl-delivery-order',
     templateUrl: './delivery-order.component.html'
@@ -22,22 +24,23 @@ import { DataService } from '@services';
 
 export class ShareBusinessDeliveryOrderComponent extends AppForm {
     @Input() isAir: boolean = false;
+    @Input() set type(t: string) { this._type = t; }
+
+    get type() { return this._type; }
+
+    private _type: string = ChargeConstants.SFI_CODE; // ? SLI
 
     deliveryOrder: DeliveryOrder = new DeliveryOrder();
-
-    header: string = '';
-    footer: string = '';
-
     userLogged: User;
     hblid: string;
-    hblDetail: CsTransactionDetail = null;
 
     constructor(
         private _documentRepo: DocumentationRepo,
-        private _store: Store<any>,
+        private _store: Store<IAppState>,
         private _ngProgress: NgProgress,
         private _dataService: DataService,
         private _toastService: ToastrService,
+        private _activedRoute: ActivatedRoute
     ) {
         super();
         this._progressRef = this._ngProgress.ref();
@@ -47,53 +50,88 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
     ngOnInit() {
         // * Get User logged.
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this._store.select(fromShare.getDetailHBlState)
-            .pipe(
-                catchError(this.catchError),
-                takeUntil(this.ngUnsubscribe),
-                switchMap((hblDetail: CsTransactionDetail) => {
-                    this.hblid = hblDetail.id;
-                    return this._documentRepo.getDeliveryOrder(hblDetail.id || SystemConstants.EMPTY_GUID, CommonEnum.TransactionTypeEnum.SeaFCLImport);
 
-                }) // * Get deliveryOrder info.
-            )
-            .subscribe(
-                (res: any) => {
-                    if (!!res && res.hblid !== SystemConstants.EMPTY_GUID) {
-                        this.deliveryOrder = new DeliveryOrder(res);
+        this._activedRoute.params
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((p: Params) => {
+                    if (p.hblId) {
+                        this.hblid = p.hblId;
+                    } else {
+                        this.hblid = SystemConstants.EMPTY_GUID;
+                    }
+                    return of(this.hblid);
+                }),
+                // * Get data delivery order
+                switchMap((p) => {
+                    return this._documentRepo.getDeliveryOrder(this.hblid, this.utility.getTransationType(this._type));
+                }),
+                concatMap((data: DeliveryOrder) => {
+                    // * Update deliveryOrder model from dataDefault.
+                    this.deliveryOrder.dofooter = data.dofooter;
+                    this.deliveryOrder.doheader2 = data.doheader2;
+                    this.deliveryOrder.doheader1 = data.doheader1;
+
+                    if (!data.deliveryOrderNo) {
+                        // ! Select Store chỗ nào thì takeUntil để tranh memoryLeak
+                        return this._store.select(fromShare.getTransactionDetailCsTransactionState);
+                    } else {
+                        this.deliveryOrder.deliveryOrderNo = data.deliveryOrderNo;
                         this.deliveryOrder.deliveryOrderPrintedDate = {
-                            startDate: !!this.deliveryOrder.deliveryOrderPrintedDate ? new Date(this.deliveryOrder.deliveryOrderPrintedDate) : null,
-                            endDate: !!this.deliveryOrder.deliveryOrderPrintedDate ? new Date(this.deliveryOrder.deliveryOrderPrintedDate) : null,
+                            startDate: new Date(data.deliveryOrderPrintedDate),
+                            endDate: new Date(data.deliveryOrderPrintedDate),
                         };
 
-                        this.deliveryOrder.userDefault = this.userLogged.id;
-                        this.deliveryOrder.transactionType = CommonEnum.TransactionTypeEnum.SeaFCLImport;
+                        return of(this.deliveryOrder);
+                    }
+                }),
+                map((res: CsTransaction | DeliveryOrder | any) => {
+                    // * If res are DeliveryOrder object
+                    if (res.hasOwnProperty("doheader1")) {
+                        return res;
+                    }
+
+                    // * Update field from shipment
+                    this.deliveryOrder.doheader1 = this.generateDoHeader(res, this.isAir);
+                    this.deliveryOrder.deliveryOrderNo = res.jobNo + "-" + this.generateDeliveryOrderNo(this.isAir);
+                    this.deliveryOrder.deliveryOrderPrintedDate = {
+                        startDate: new Date(),
+                        endDate: new Date()
+                    };
+
+                    if (this.isAir) {
+                        this.deliveryOrder.subAbbr = !!res.warehousePOD ? res.warehousePOD.nameAbbr : null;
+                    }
+
+                    return new DeliveryOrder(this.deliveryOrder);
+                })
+            )
+            .subscribe((res) => { console.log("subscribe", res); });
+
+        // *? Subscribe dataService to get podName from HBL.
+        this._dataService.currentMessage
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: { [key: string]: any }) => {
+                    console.log(res);
+                    if (res.podName) {
+                        this.deliveryOrder.doheader1 = res.podName;
                     }
                 }
             );
 
-        // *? Subscribe dataService to get podName from HBL.
-        this._dataService.currentMessage.subscribe(
-            (res: any) => {
-                if (res.podName) {
-                    this.deliveryOrder.doheader1 = res.podName;
-                }
-            }
-        );
-
-
         this.isLocked = this._store.select(fromShare.getTransactionLocked);
     }
+
     setDefaultHeadeFooter() {
         const body: IDefaultHeaderFooter = {
-            transactionType: '' + CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            type: this.utility.getTransationType(this._type),
             userDefault: this.userLogged.id,
             doheader1: this.deliveryOrder.doheader1,
             doheader2: this.deliveryOrder.doheader2,
             dofooter: this.deliveryOrder.dofooter,
             subAbbr: this.deliveryOrder.subAbbr
         };
-
         this._progressRef.start();
         this._documentRepo.setDefaultHeaderFooterDeliveryOrder(body)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -131,11 +169,24 @@ export class ShareBusinessDeliveryOrderComponent extends AppForm {
             );
     }
 
+    generateDeliveryOrderNo(isAir: boolean) {
+        if (isAir) {
+            return "AL01";
+        }
+        return "D01";
+    }
+
+    generateDoHeader(shipment: CsTransaction, isAir: boolean) {
+        if (isAir) {
+            return shipment.warehousePOD ? shipment.warehousePOD.nameVn : null;
+        }
+        return shipment.podName;
+    }
 }
 
 
 interface IDefaultHeaderFooter {
-    transactionType: any;
+    type: CommonEnum.TransactionTypeEnum;
     userDefault: string;
     doheader1: string;
     doheader2: string;

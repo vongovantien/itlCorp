@@ -3,6 +3,8 @@ import { AppList } from 'src/app/app.list';
 
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
+import { ChartOfAccounts } from '@models';
+import { CatalogueRepo } from '@repositories';
 
 
 @Component({
@@ -27,7 +29,13 @@ export class VoucherListComponent extends AppList implements OnInit {
     isSameVoucherType: boolean = false;
     isSubmitted: boolean = false;
 
-    constructor() {
+    chartOfAccounts: ChartOfAccounts[] = [];
+
+    configComboChartOfAccount: Partial<CommonInterface.IComboGirdConfig> = {};
+
+
+
+    constructor(private _catalogueRepo: CatalogueRepo) {
         super();
     }
 
@@ -40,6 +48,14 @@ export class VoucherListComponent extends AppList implements OnInit {
             { title: 'Account Debit No (VAT)', field: '', sortable: false },
             { title: 'Account Crebit No (VAT)', field: '', sortable: false },
         ];
+        this.configComboChartOfAccount = Object.assign({}, this.configComoBoGrid, {
+            displayFields: [
+                { field: 'accountCode', label: 'Account No' },
+                { field: 'accountNameLocal', label: 'Account Local Name' },
+            ]
+        }, { selectedDisplayFields: ['accountCode'], });
+        this.getChartOfAccountsActive();
+
     }
 
     removeDefaultAccount(index) {
@@ -116,5 +132,14 @@ export class VoucherListComponent extends AppList implements OnInit {
 
         }
     }
+
+    getChartOfAccountsActive() {
+        this._catalogueRepo.getChartOfAccountsActive().subscribe((res: any) => {
+            if (!!res) {
+                this.chartOfAccounts = res;
+            }
+        });
+    }
+
 
 }

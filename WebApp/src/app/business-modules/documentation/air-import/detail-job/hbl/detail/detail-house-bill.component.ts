@@ -30,8 +30,7 @@ enum HBL_TAB {
 })
 export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent implements OnInit {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
-    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+
     hblId: string;
 
     hblDetail: any;

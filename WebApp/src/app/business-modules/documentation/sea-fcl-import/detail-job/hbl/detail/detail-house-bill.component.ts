@@ -6,7 +6,6 @@ import { ToastrService } from 'ngx-toastr';
 import { CreateHouseBillComponent } from '../create/create-house-bill.component';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
 
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -15,7 +14,6 @@ import { ShareBussinessShipmentGoodSummaryComponent } from 'src/app/business-mod
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 
@@ -32,11 +30,7 @@ enum HBL_TAB {
 })
 export class DetailHouseBillComponent extends CreateHouseBillComponent {
 
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
     @ViewChild(ShareBussinessShipmentGoodSummaryComponent, { static: false }) shipmentGoodSummaryComponent: ShareBussinessShipmentGoodSummaryComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
-    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
     hblId: string;

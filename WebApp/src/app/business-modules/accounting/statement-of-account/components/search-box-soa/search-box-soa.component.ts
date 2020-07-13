@@ -94,9 +94,11 @@ export class StatementOfAccountSearchComponent extends AppPage {
     getStatus() {
         this.statusSOA = [
             { title: 'New', name: 'New' },
-            { title: 'Request Confirmed', name: 'RequestConfirmed' },
+            { title: 'Issued Voucher', name: 'Issued Voucher' },
+            { title: 'Issued Invoice', name: 'Issued Invoice' },
+            { title: 'Request Confirmed', name: 'Request Confirmed' },
             { title: 'Confirmed ', name: 'Confirmed ' },
-            { title: 'Need Revise', name: 'NeedRevise' },
+            { title: 'Need Revise', name: 'Need Revise' },
             { title: 'Done', name: 'Done' },
         ];
         // this.selectedStatus = this.statusSOA[0];

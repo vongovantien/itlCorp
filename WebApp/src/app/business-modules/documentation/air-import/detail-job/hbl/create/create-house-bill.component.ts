@@ -7,17 +7,17 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { HouseBill, DeliveryOrder, CsTransaction, HBLArrivalNote } from '@models';
+import { HouseBill } from '@models';
 
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction, getTransactionDetailCsTransactionState } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction } from '@share-bussiness';
 
 import { forkJoin } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 
-import { catchError, finalize, skip, takeUntil, mergeMap } from 'rxjs/operators';
+import { catchError, finalize, mergeMap } from 'rxjs/operators';
 
 
 @Component({
@@ -34,7 +34,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
 
     jobId: string;
-    shipmentDetail: CsTransaction;
     selectedHbl: any = {};
     isImport: boolean = false;
 
@@ -61,46 +60,12 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.jobId = param.jobId;
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-                    this.getDetailShipment();
 
                     this.permissionShipments = this._store.select(getTransactionPermission);
                 } else {
                     this.gotoList();
                 }
             });
-    }
-
-    getDetailShipment() {
-        this._store.select(getTransactionDetailCsTransactionState)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-                skip(1),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: CsTransaction) => {
-                    if (!!res) {
-                        this.shipmentDetail = res;
-                        const objArrival = {
-                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
-                            arrivalFirstNotice: new Date()
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
-
-                        const objDelivery = {
-                            deliveryOrderNo: this.shipmentDetail.jobNo + "-AL01",
-                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
-
-                            // *  AUTO GENERATE SENT TO (1) WITH WAREHOUSENAME FROM POD
-                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null,
-                            subAbbr: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameAbbr : null
-                        };
-                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-
-                    }
-                },
-            );
     }
 
     onImport(selectedData: any) {
@@ -245,10 +210,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 });
         }
-    }
-
-    onSelectTabAL() {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey("podName") || "";
     }
 
     gotoList() {

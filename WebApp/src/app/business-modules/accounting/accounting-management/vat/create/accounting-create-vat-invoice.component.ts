@@ -28,6 +28,8 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
     @ViewChild(AccountingManagementListChargeComponent, { static: false }) listChargeComponent: AccountingManagementListChargeComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
 
+    invalidUpdateExchangeRate: string = 'You can only adjust the exchange rate increase or decrease by 1% compared to the general exchange rate!';
+
     constructor(
         protected _toastService: ToastrService,
         protected _accountingRepo: AccountingRepo,
@@ -53,6 +55,11 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
             return;
         }
 
+        if (!this.checkValidateExchangeRate()) {
+            this._toastService.warning(this.invalidUpdateExchangeRate);
+            return;
+        }
+
         const modelAdd: AccAccountingManagementModel = this.onSubmitData();
         modelAdd.type = AccountingConstants.ISSUE_TYPE.INVOICE;
 
@@ -68,6 +75,19 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
         let valid: boolean = true;
         if (!this.formCreateComponent.formGroup.valid) {
             valid = false;
+        }
+        return valid;
+    }
+
+    checkValidateExchangeRate() {
+        let valid: boolean = true;
+        if (this.formCreateComponent.totalExchangeRate.value != null) {
+            const exchangeRate = +this.formCreateComponent.totalExchangeRate.value;
+            const validRangeExchangeRate: number[] = [
+                (exchangeRate + exchangeRate * 0.01) as number,
+                (exchangeRate - exchangeRate * 0.01) as number
+            ];
+            valid = this.listChargeComponent.charges.every(c => c.exchangeRate <= validRangeExchangeRate[0] && c.exchangeRate >= validRangeExchangeRate[1]);
         }
         return valid;
     }

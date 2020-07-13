@@ -1,9 +1,5 @@
 <div class="vat-invoice-wrapper  m-animate-fade-in">
-    <app-sub-header>
-        <div class="c-button-actions">
-
-        </div>
-    </app-sub-header>
+    <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
@@ -48,9 +44,11 @@
                                             <tr *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <app-permission-button (onClick)="prepareDeleteInvoice(invoice)"
-                                                            type="delete">
-                                                        </app-permission-button>
+                                                        <ng-container *ngIf="invoice.paymentStatus !== 'Paid'">
+                                                            <app-permission-button
+                                                                (onClick)="prepareDeleteInvoice(invoice)" type="delete">
+                                                            </app-permission-button>
+                                                        </ng-container>
                                                     </div>
                                                 </td>
                                                 <td class="text-primary pointer">
@@ -69,6 +67,19 @@
                                                 <td
                                                     [ngClass]="invoice.status !== 'New' ? 'text-success' : 'text-danger'">
                                                     {{invoice.status}}</td>
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
+                                                </td>
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!isLoading && !invoices.length"

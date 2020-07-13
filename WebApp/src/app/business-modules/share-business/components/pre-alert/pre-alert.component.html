@@ -1,7 +1,7 @@
 <div class="pre-alert-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()"></app-default-button>
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="cancelPreAlert()"></app-default-button>
         </div>
     </app-sub-header>
 </div>
@@ -163,18 +163,18 @@
                                 </label>
                             </ng-template>
 
-                            <ng-container *ngIf="isExitsMawb else NotMawb">
+                            <ng-container *ngIf="isExitsHawb else NotHawb">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedMawb" (change)="onChangeCheckBox()">
+                                    <input type="checkbox" [(ngModel)]="isCheckedHawb" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
-                                <span><a class="pointer" (click)="previewMawb()">MAWB</a></span>
+                                <span><a class="pointer" (click)="previewHawb()">HAWB</a></span>
                             </ng-container>
-                            <ng-template #NotMawb>
+                            <ng-template #NotHawb>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
-                                    MAWB
+                                    HAWB
                                     <span></span>
                                 </label>
                             </ng-template>

@@ -53,6 +53,14 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(data);
         }
 
+        [HttpGet("QueryActiveByCompany")]
+        [Authorize]
+        public IActionResult QueryActiveByCompany()
+        {
+            var data = catChartAccountsService.QueryActiveByCompany();
+            return Ok(data);
+        }
+
         [HttpPost]
         [Route("Paging")]
         [Authorize]

@@ -12,6 +12,7 @@ import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountingConstants } from '@constants';
 
 
 @Component({
@@ -59,6 +60,8 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
             { title: 'Issued Date', field: 'datetimeCreated', sortable: true },
             { title: 'Creator', field: 'creatorName', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+
         ];
         this.dataSearch = {
             typeOfAcctManagement: 'Invoice'
@@ -132,6 +135,9 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
     }
 
     prepareDeleteInvoice(invoice: AccAccountingManagementResult) {
+        if (invoice.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID) {
+            return;
+        }
         this._accountingRepo.checkAllowDeleteAcctMngt(invoice.id)
             .subscribe(
                 (res: boolean) => {

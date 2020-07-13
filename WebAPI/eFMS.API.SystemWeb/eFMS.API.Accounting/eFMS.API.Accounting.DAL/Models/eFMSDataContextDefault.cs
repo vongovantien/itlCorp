@@ -112,6 +112,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.TotalExchangeRate).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)

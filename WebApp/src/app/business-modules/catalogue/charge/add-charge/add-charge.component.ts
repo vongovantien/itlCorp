@@ -3,12 +3,16 @@ import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catCharg
 import { Router } from '@angular/router';
 import { FormAddChargeComponent } from '../components/form-add-charge/form-add-charge.component';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, tap, concatMap } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { VoucherListComponent } from '../components/voucher-list/voucher-list.component';
 import { SystemConstants } from 'src/constants/system.const';
+import { GenerateSellingChargePopupComponent } from '../components/popup/generate-selling-charge/generate-selling-charge.popup';
+import { CatChargeDefaultAccount } from 'src/app/shared/models/catalogue/catChargeDefaultAccount.model';
+import { CommonEnum } from '@enums';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'add-charge',
@@ -19,6 +23,7 @@ export class AddChargeComponent extends AppPage {
 
     @ViewChild(FormAddChargeComponent, { static: false }) formAddCharge: FormAddChargeComponent;
     @ViewChild(VoucherListComponent, { static: false }) voucherList: VoucherListComponent;
+    @ViewChild(GenerateSellingChargePopupComponent, { static: false }) popupGenerateSelling: GenerateSellingChargePopupComponent;
 
     constructor(
         protected router: Router,
@@ -36,6 +41,7 @@ export class AddChargeComponent extends AppPage {
     }
 
     onsubmitData() {
+        this.ChargeToAdd = new CatChargeToAddOrUpdate();
         this.ChargeToAdd.charge.code = this.formAddCharge.code.value;
         this.ChargeToAdd.charge.chargeNameEn = this.formAddCharge.nameEn.value;
         this.ChargeToAdd.charge.chargeNameVn = this.formAddCharge.nameVn.value;
@@ -45,7 +51,7 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.vatrate = this.formAddCharge.vat.value;
         this.ChargeToAdd.charge.debitCharge = this.formAddCharge.debitCharge.value;
         this.ChargeToAdd.charge.chargeGroup = this.formAddCharge.chargeGroup.value != null && this.formAddCharge.chargeGroup.value.length > 0 ? this.formAddCharge.chargeGroup.value[0].id : null;
-
+        this.ChargeToAdd.charge.active = this.formAddCharge.active.value;
         let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value[0].id;
         if (this.formAddCharge.service.value !== null) {
@@ -71,6 +77,7 @@ export class AddChargeComponent extends AppPage {
     addCharge() {
         this.formAddCharge.isSubmitted = true;
         this.voucherList.isSubmitted = true;
+
         if (this.formAddCharge.service.value == null) {
             this.formAddCharge.requiredService = true;
             return;
@@ -82,6 +89,13 @@ export class AddChargeComponent extends AppPage {
         }
         if (this.formAddCharge.checkValidateForm() && this.voucherList.validatateDefaultAcountLine()) {
             this.onsubmitData();
+            if (this.formAddCharge.isShowMappingSelling && !this.formAddCharge.debitCharge.value && this.formAddCharge.generateSelling.value === true) {
+                this.popupGenerateSelling.chargeCode.setValue(this.formAddCharge.code.value.replace(this.formAddCharge.code.value.substring(0, 1), "S"));
+                this.popupGenerateSelling.accountNo.setValue(null);
+                this.popupGenerateSelling.accountNoVAT.setValue(null);
+                this.popupGenerateSelling.show();
+                return;
+            }
             this._catalogueRepo.addCharge(this.ChargeToAdd)
                 .pipe(
                     catchError(this.catchError),
@@ -97,6 +111,45 @@ export class AddChargeComponent extends AppPage {
                         }
                     }
                 );
+        }
+
+    }
+
+    addSellingCharge(data: any) {
+        this.ChargeToAdd = this.onsubmitData();
+        if (!!data) {
+            this.ChargeToAdd.charge.code = data.chargeCode;
+            this.ChargeToAdd.charge.type = 'DEBIT';
+            this.ChargeToAdd.listChargeDefaultAccount = [];
+            const chargeDefault = new CatChargeDefaultAccount();
+            chargeDefault.type = 'Công Nợ';
+            chargeDefault.creditAccountNo = data.accountNo;
+            chargeDefault.debitVat = data.accountNoVAT;
+            !!chargeDefault.creditAccountNo || !!chargeDefault.debitVat ? this.ChargeToAdd.listChargeDefaultAccount.push(chargeDefault) : this.ChargeToAdd.listChargeDefaultAccount = [];
+            this._catalogueRepo.addCharge(this.ChargeToAdd)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete()),
+                    concatMap((res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.formAddCharge.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
+                            return this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
+                        }
+                        return of({ data: null, message: 'Something getting error. Please check again!', status: false });
+                    })
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (!!res) {
+                            this._toastService.success('Create Selling Charge Success!!', '');
+                            this.formAddCharge.debitCharge.setValue(res[0].id);
+                            this.popupGenerateSelling.hide();
+                        } else {
+                            this._toastService.error(res.message, '');
+                        }
+                    }
+                );
+
         }
 
     }

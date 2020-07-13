@@ -190,7 +190,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
                         }
 
                         // this._dataService.setDataService("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
-                        this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
+                        // this._dataService.setData("podName", !!this.shipmentDetail.podName ? this.shipmentDetail.podName : "");
 
                     }
                 );
@@ -238,7 +238,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     initForm() {
         this.formGroup = this._fb.group({
             customer: [null, Validators.required],
-            saleMan: [],
+            saleMan: [null, Validators.required],
             shipper: [],
             consignee: [null, Validators.required],
             notifyParty: [],

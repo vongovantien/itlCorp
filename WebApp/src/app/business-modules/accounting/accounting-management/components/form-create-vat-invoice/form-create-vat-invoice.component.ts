@@ -2,17 +2,18 @@ import { Component, OnInit, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
 
 import { CatalogueRepo, AccountingRepo } from '@repositories';
-import { JobConstants, AccountingConstants } from '@constants';
+import { AccountingConstants } from '@constants';
 import { ChartOfAccounts, Partner } from '@models';
 import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, UpdateExchangeRate } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
-import { map, debounceTime, takeUntil } from 'rxjs/operators';
+import { map, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
     selector: 'form-create-vat-invoice',
@@ -33,7 +34,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
     partnerId: AbstractControl;
     personalName: AbstractControl;
-
+    totalExchangeRate: AbstractControl;
     voucherId: AbstractControl;
     date: AbstractControl;
     invoiceNoTempt: AbstractControl;
@@ -66,7 +67,8 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
-        private _accountingRepo: AccountingRepo
+        private _accountingRepo: AccountingRepo,
+        private _toast: ToastrService
     ) {
         super();
     }
@@ -108,6 +110,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             partnerAddress: [],
             description: [],
             attachDocInfo: [],
+            totalExchangeRate: [],
 
             voucherId: [null, Validators.required],
             date: [{ startDate: new Date(), endDate: new Date() }],
@@ -131,12 +134,14 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
         this.status = this.formGroup.controls['status'];
+        this.totalExchangeRate = this.formGroup.controls['totalExchangeRate'];
 
 
         if (!this.update) {
             this.invoiceNoTempt.valueChanges
                 .pipe(
-                    debounceTime(400)
+                    debounceTime(400),
+                    distinctUntilChanged()
                 )
                 .subscribe(
                     (res) => {
@@ -172,4 +177,16 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                 }
             );
     }
+
+    syncExchangeRateCharge() {
+        console.log(this.totalExchangeRate.value);
+        if (!!this.totalExchangeRate.value) {
+            this._store.dispatch(
+                UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }
+                ));
+            this._toast.success("Exchange Rate synced successfully");
+        }
+    }
+
+
 }
