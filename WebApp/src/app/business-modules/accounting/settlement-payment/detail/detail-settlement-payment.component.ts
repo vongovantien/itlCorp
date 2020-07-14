@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
-import { Currency, Surcharge } from 'src/app/shared/models';
+import { Surcharge } from 'src/app/shared/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -10,10 +10,11 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 import { ReportPreviewComponent } from 'src/app/shared/common';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-settlement-payment-detail',
-    templateUrl: './detail-settlement-payment.component.html'
+    templateUrl: './detail-settlement-payment.component.html',
 })
 
 export class SettlementPaymentDetailComponent extends AppPage {
@@ -21,6 +22,7 @@ export class SettlementPaymentDetailComponent extends AppPage {
     @ViewChild(SettlementListChargeComponent, { static: false }) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -200,10 +202,19 @@ export class SettlementPaymentDetailComponent extends AppPage {
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
+                    this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+                    (this.componentRef.instance as ReportPreviewComponent).data = res;
+
                     setTimeout(() => {
-                        this.previewPopup.show();
+                        this.componentRef.instance.frm.nativeElement.submit();
+                        this.componentRef.instance.show();
                     }, 1000);
+
+                    this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+                        (v: any) => {
+                            this.subscription.unsubscribe();
+                            this.reportContainerRef.viewContainerRef.clear();
+                        });
 
                 },
             );

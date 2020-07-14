@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, ViewChildren, QueryList, Output, EventEmitter, ViewContainerRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
@@ -21,6 +21,7 @@ import { BehaviorSubject } from 'rxjs';
 import { timeoutD } from '@decorators';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -38,6 +39,7 @@ export class SettlementListChargeComponent extends AppList {
     @ViewChild(SettlementChargeFromShipmentPopupComponent, { static: false }) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
@@ -376,15 +378,13 @@ export class SettlementListChargeComponent extends AppList {
                     (res: any) => {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
                     },
                 );
+            return;
         }
         if (data.type === "OPS") {
             this._documenRepo.previewPL(data.shipmentId, currency)
@@ -392,48 +392,59 @@ export class SettlementListChargeComponent extends AppList {
                     (res: any) => {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
                     },
                 );
+            return;
         }
-
         if (data.typeService === "OPS") {
             this._documenRepo.previewPL(data.shipmentId, currency)
                 .subscribe(
                     (res: any) => {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
                     },
                 );
+            return;
         } else {
             this._documenRepo.previewSIFPLsheet(data.shipmentId, data.hblid, currency)
                 .subscribe(
                     (res: any) => {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.previewPopup.frm.nativeElement.submit();
-                                this.previewPopup.show();
-                            }, 1000);
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
                     },
                 );
+            return;
         }
+
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        setTimeout(() => {
+            this.componentRef.instance.frm.nativeElement.submit();
+            this.componentRef.instance.show();
+        }, 1000);
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.reportContainerRef.viewContainerRef.clear();
+            });
 
     }
 }
