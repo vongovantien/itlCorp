@@ -1,0 +1,45 @@
+TransID	String	50	
+TransDate 	DateTime		
+HWBNO	String	50	
+MAWB	String	50	
+PartnerName	String	50	
+ContactName	String	150	
+ShipmentType	String	255	
+NominationParty	String	255	
+Nominated	Boolean		
+POL	String	255	
+POD	String	255	
+Commodity	String	255	
+Volumne	String	255	
+Carrier	String	255	
+Agent	String	255	
+ATTN	String	255	
+Consignee	String	255	
+ContainerNo	String	255	
+OceanVessel	String	255	
+LocalVessel	String	255	
+FlightNo	String	255	
+SeaImpVoy	String	255	
+LoadingDate	String	255	
+ArrivalDate	String	255	
+Notes	String	255	
+Finished	Boolean		
+SalesManager	String	150	
+Prepairedby	String	255	
+DocsManager	String	255	
+PlaceDelivery	String	255	
+DestETA	String	255	
+DocsReleaseDate	String	255	
+DetailNotes	String	255	
+BKGNo	String	50	
+NoPieces	String	150	
+FreightTerm	String	255	
+GW	Number		
+CW	Number		
+UnitW	String	50	
+CBM	Number		
+ShipmentSource	String	255	
+Vessel	String	255
+ETD	DateTime
+ETA	DateTime
+
