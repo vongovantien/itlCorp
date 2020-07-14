@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Catalogue.DL.Models;
+using System;
 using System.Collections.Generic;
 
 namespace eFMS.API.Catalogue.Models
@@ -61,12 +62,16 @@ namespace eFMS.API.Catalogue.Models
         public string InternalReferenceNo { get; set; }
         public string CoLoaderCode { get; set; }
         public string WorkPhoneEx { get; set; }
-        public List<CatSaleManEditModel> SaleMans { get; set; }
+        public List<CatContractModel> Contracts { get; set; }
         public short? GroupId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public string RoundUpMethod { get; set; }
         public string ApplyDim { get; set; }
+        public List<string> idsContract { get; set; }
+        public string PartnerType { get; set; }
+        public string BillingPhone { get; set; }
+        public string BillingEmail { get; set; }
 
 
 

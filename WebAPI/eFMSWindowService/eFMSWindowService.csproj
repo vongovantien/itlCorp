@@ -12,7 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>\\192.168.0.120\\inetpub\efms-api\WindowService\</PublishUrl>
+    <PublishUrl>\\192.168.7.31\\inetpub\efms-api\WindowService\</PublishUrl>
     <Install>false</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -85,6 +85,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoLockShipmentService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="AutoLockShipmentService.Designer.cs">
+      <DependentUpon>AutoLockShipmentService.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\FileHelper.cs" />
+    <Compile Include="Helpers\SendMailHelper.cs" />
+    <Compile Include="Models\catDepartment.cs">
+      <DependentUpon>eFMSModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\eFMSModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -100,11 +111,20 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>eFMSModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\sp_GetShipmentInThreeDayToSendARDept_Result.cs">
+      <DependentUpon>eFMSModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SendMailToARDepartmentService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SendMailToARDepartmentService.Designer.cs">
+      <DependentUpon>SendMailToARDepartmentService.cs</DependentUpon>
     </Compile>
     <Compile Include="UpdateCurrentStatusOfJobService.cs">
       <SubType>Component</SubType>
@@ -161,6 +181,7 @@
   <ItemGroup>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -175,5 +196,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

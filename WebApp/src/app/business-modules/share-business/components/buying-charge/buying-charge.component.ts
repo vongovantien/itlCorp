@@ -527,6 +527,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 } else {
                     chargeItem.quantity = this.calculateContainer(this.containers, CommonEnum.QUANTITY_TYPE.CBM);
                 }
+
+                chargeItem = this.updateUnitSurcharge(chargeItem, 'CBM');
                 break;
             case CommonEnum.QUANTITY_TYPE.CONT:
                 chargeItem.quantity = this.calculateContainer(this.containers, 'quantity');
@@ -618,6 +620,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             // * Reset duplicate flag charge, invoice.
             charge.duplicateCharge = false;
             charge.duplicateInvoice = false;
+            if (this.checkSpecialCaseCharge(charge)) {
+                break;
+            }
             if (
                 !charge.paymentObjectId
                 || !charge.chargeId
@@ -635,6 +640,16 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
 
         return valid;
+    }
+
+    checkSpecialCaseCharge(charge: CsShipmentSurcharge) {
+        console.log(this.TYPE)
+        return !!charge.soano
+            || !!charge.creditNo
+            || !!charge.debitNo
+            || !!charge.settlementCode
+            || !!charge.voucherId
+            || !!charge.voucherIddate;
     }
 
     checkDuplicateInObject(propertyName: string | number, inputArray: { map: (arg0: (item: any) => void) => void; }): any {

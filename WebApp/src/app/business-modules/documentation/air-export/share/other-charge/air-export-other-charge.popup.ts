@@ -3,7 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { CsOtherCharge } from '@models';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { getOtherChargeState } from '@share-bussiness';
+import { getOtherChargeState, getTransactionLocked } from '@share-bussiness';
 import { skip, takeUntil } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -50,6 +50,8 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
                     }
                 }
             );
+
+        this.isLocked = this._store.select(getTransactionLocked);
     }
 
     closePopup() {
@@ -129,6 +131,6 @@ export class ShareAirExportOtherChargePopupComponent extends PopupBase implement
 
 export interface IDataOtherCharge {
     charges: CsOtherCharge[];
-    totalAmountAgent: any;
-    totalAmountCarrier: any;
+    totalAmountAgent: number;
+    totalAmountCarrier: number;
 }

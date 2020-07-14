@@ -4,10 +4,34 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="eFMSTestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="eFMSTestModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="catDepartment">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="varchar" MaxLength="50" />
+          <Property Name="DeptName" Type="nvarchar" MaxLength="1600" />
+          <Property Name="DeptNameEn" Type="nvarchar(max)" />
+          <Property Name="DeptNameAbbr" Type="nvarchar(max)" />
+          <Property Name="Description" Type="nvarchar" MaxLength="4000" />
+          <Property Name="BranchID" Type="uniqueidentifier" />
+          <Property Name="DeptType" Type="varchar" MaxLength="50" />
+          <Property Name="Email" Type="nvarchar" MaxLength="150" />
+          <Property Name="UserCreated" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeCreated" Type="datetime" />
+          <Property Name="UserModified" Type="varchar" MaxLength="50" />
+          <Property Name="DatetimeModified" Type="datetime" />
+          <Property Name="Active" Type="bit" />
+          <Property Name="InactiveOn" Type="datetime" />
+        </EntityType>
         <Function Name="sp_AutoUpdateExchangeRate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="sp_GetShipmentInThreeDayToSendARDept" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="sp_GetShipmentToAutoLock" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <Function Name="sp_QueryAndUpdateCurrentStatusOfJob" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
-        <EntityContainer Name="eFMSTestModelStoreContainer" />
+        <EntityContainer Name="eFMSTestModelStoreContainer">
+          <EntitySet Name="catDepartment" EntityType="Self.catDepartment" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
@@ -15,7 +39,42 @@
         <EntityContainer Name="eFMSTestEntities" annotation:LazyLoadingEnabled="true">
           <FunctionImport Name="sp_QueryAndUpdateCurrentStatusOfJob" ReturnType="Collection(Int32)" />
           <FunctionImport Name="sp_AutoUpdateExchangeRate" />
+          <EntitySet Name="catDepartments" EntityType="eFMSTestModel.catDepartment" />
+          <FunctionImport Name="sp_GetShipmentInThreeDayToSendARDept" ReturnType="Collection(eFMSTestModel.sp_GetShipmentInThreeDayToSendARDept_Result)" />
         </EntityContainer>
+        <EntityType Name="catDepartment">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DeptName" Type="String" MaxLength="1600" FixedLength="false" Unicode="true" />
+          <Property Name="DeptNameEn" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="DeptNameAbbr" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="BranchID" Type="Guid" />
+          <Property Name="DeptType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="UserCreated" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeCreated" Type="DateTime" Precision="3" />
+          <Property Name="UserModified" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DatetimeModified" Type="DateTime" Precision="3" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="InactiveOn" Type="DateTime" Precision="3" />
+        </EntityType>
+        <ComplexType Name="sp_GetShipmentInThreeDayToSendARDept_Result">
+          <Property Type="Guid" Name="ID" Nullable="false" />
+          <Property Type="String" Name="JobNo" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="PartnerName" Nullable="true" MaxLength="4000" />
+          <Property Type="String" Name="MAWB" Nullable="true" MaxLength="800" />
+          <Property Type="String" Name="HWBNo" Nullable="true" MaxLength="200" />
+          <Property Type="DateTime" Name="ETD" Nullable="true" Precision="23" />
+          <Property Type="DateTime" Name="ETA" Nullable="true" Precision="23" />
+          <Property Type="String" Name="CustomerID" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="FreightPayment" Nullable="true" MaxLength="20" />
+          <Property Type="Guid" Name="OfficeID" Nullable="true" />
+          <Property Type="String" Name="OfficeName" Nullable="true" MaxLength="50" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -24,6 +83,44 @@
         <EntityContainerMapping StorageEntityContainer="eFMSTestModelStoreContainer" CdmEntityContainer="eFMSTestEntities">
           <FunctionImportMapping FunctionImportName="sp_QueryAndUpdateCurrentStatusOfJob" FunctionName="eFMSTestModel.Store.sp_QueryAndUpdateCurrentStatusOfJob" />
           <FunctionImportMapping FunctionImportName="sp_AutoUpdateExchangeRate" FunctionName="eFMSTestModel.Store.sp_AutoUpdateExchangeRate" />
+          <EntitySetMapping Name="catDepartments">
+            <EntityTypeMapping TypeName="eFMSTestModel.catDepartment">
+              <MappingFragment StoreEntitySet="catDepartment">
+                <ScalarProperty Name="InactiveOn" ColumnName="InactiveOn" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="DatetimeModified" ColumnName="DatetimeModified" />
+                <ScalarProperty Name="UserModified" ColumnName="UserModified" />
+                <ScalarProperty Name="DatetimeCreated" ColumnName="DatetimeCreated" />
+                <ScalarProperty Name="UserCreated" ColumnName="UserCreated" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="DeptType" ColumnName="DeptType" />
+                <ScalarProperty Name="BranchID" ColumnName="BranchID" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="DeptNameAbbr" ColumnName="DeptNameAbbr" />
+                <ScalarProperty Name="DeptNameEn" ColumnName="DeptNameEn" />
+                <ScalarProperty Name="DeptName" ColumnName="DeptName" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="sp_GetShipmentInThreeDayToSendARDept" FunctionName="eFMSTestModel.Store.sp_GetShipmentInThreeDayToSendARDept">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="eFMSTestModel.sp_GetShipmentInThreeDayToSendARDept_Result">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="JobNo" ColumnName="JobNo" />
+                <ScalarProperty Name="PartnerName" ColumnName="PartnerName" />
+                <ScalarProperty Name="MAWB" ColumnName="MAWB" />
+                <ScalarProperty Name="HWBNo" ColumnName="HWBNo" />
+                <ScalarProperty Name="ETD" ColumnName="ETD" />
+                <ScalarProperty Name="ETA" ColumnName="ETA" />
+                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
+                <ScalarProperty Name="FreightPayment" ColumnName="FreightPayment" />
+                <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+                <ScalarProperty Name="OfficeName" ColumnName="OfficeName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

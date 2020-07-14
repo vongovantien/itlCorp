@@ -30,5 +30,10 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public DateTime? PaymentDueDate { get; set; }
+        public string PaymentStatus { get; set; }
+        public int? PaymentExtendDays { get; set; }
+        public string PaymentNote { get; set; }
+        public DateTime? PaymentDatetimeUpdated { get; set; }
     }
 }

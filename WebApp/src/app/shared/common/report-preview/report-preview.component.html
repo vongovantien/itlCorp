@@ -1,6 +1,6 @@
-<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog" [ngClass]="data.isLandscape === true ? 'modal-xl' : 'modal-lg'" role="document">
-        <div class="modal-content" [ngClass]="data.isLandscape === true ? '' : 'modal-lg__width'">
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal" (onHide)="onHide()">
+    <div class="modal-dialog" [ngClass]="!!data && data.isLandscape === true ? 'modal-xl' : 'modal-lg'" role="document">
+        <div class="modal-content" [ngClass]="!!data && data.isLandscape === true ? '' : 'modal-lg__width'">
             <div class="modal-header">
                 <h5 class="modal-title">Preview</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hide()">

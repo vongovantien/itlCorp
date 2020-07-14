@@ -239,6 +239,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     checkValidate() {
         let valid: boolean = true;
         for (const charge of this.charges) {
+            if (this.checkSpecialCaseCharge(charge)) {
+                break;
+            }
             if (
                 !charge.paymentObjectId
                 || !charge.payerId

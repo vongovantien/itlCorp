@@ -66,9 +66,11 @@
                         </div>
                     </ng-container>
                 </ng-container>
-                <a title="Add" class="pointer" (click)="addOtherCharge()">
-                    <i class="fa fa-plus-circle fa-2x text-success"></i>
-                </a>
+                <ng-container *ngIf="!(isLocked | async)">
+                    <a title="Add" class="pointer" (click)="addOtherCharge()">
+                        <i class="fa fa-plus-circle fa-2x text-success"></i>
+                    </a>
+                </ng-container>
                 <div
                     class="row pt-2  mt-2 align-items-center pb-2 d-flex justify-content-around align-items-center font-weight-bold">
                     <div>
@@ -84,8 +86,10 @@
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
-                                <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSave()">
-                                </app-default-button>
+                                <ng-container *ngIf="!(isLocked | async)">
+                                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="onSave()">
+                                    </app-default-button>
+                                </ng-container>
 
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="closePopup()">
                                 </app-default-button>

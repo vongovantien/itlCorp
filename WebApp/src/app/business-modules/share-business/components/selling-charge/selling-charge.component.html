@@ -84,8 +84,13 @@
                                 </td>
                             </ng-container>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.partnerShortName }">
+                                <div class="form-group col-md-12 dropdown-partner" [ngClass]="{'m-form__group has-danger': isSubmitted 
+                                && !charge.partnerShortName 
+                                && !charge.soano 
+                                    && !charge.debitNo
+                                    && !charge.settlementCode
+                                    && !charge.voucherId
+                                    && !charge.voucherIddate}">
                                     <ng-container
                                         *ngIf="!!charge.debitNo || !charge.isFromShipment || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" readonly

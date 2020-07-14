@@ -1,4 +1,5 @@
 import { PermissionPartner } from "./permissionPartner";
+import { Contract } from "./catContract.model";
 
 export class Partner {
     id: string = '';
@@ -61,11 +62,14 @@ export class Partner {
     applyDim: string = '';
 
     saleManRequests: SaleManRequest[] = [];
-    saleMans: SaleManRequest[] = [];
+    contracts: Contract[] = [];
+
+    partnerType: string = '';
 
     permission: PermissionPartner = new PermissionPartner();
 
-
+    countryShippingName: string = null;
+    countryName: string = null;
 
     constructor(data?: any) {
         const self = this;

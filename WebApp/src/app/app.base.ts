@@ -38,6 +38,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     isShowUpdate: boolean = true;
     permissionShipments: Observable<PermissionShipment>;
     permissionHblDetail: Observable<PermissionHouseBill>;
+    menuSpecialPermission: Observable<SystemInterface.ISpecialAction[]>;
 
 
     _isShowAutoComplete = new BehaviorSubject<boolean>(false);
@@ -240,6 +241,14 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
             return componentRef;
 
         }
+    }
+
+    handleObserver() {
+        return {
+            next: (val) => console.log(val),
+            error: (err) => console.log(err),
+            complete: () => console.log('complete'),
+        };
     }
 }
 

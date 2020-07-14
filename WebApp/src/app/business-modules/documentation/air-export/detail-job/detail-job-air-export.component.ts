@@ -10,7 +10,7 @@ import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/commo
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { DIM, CsTransaction } from '@models';
 
-import { combineLatest, of, forkJoin } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
@@ -126,9 +126,9 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
 
         for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
+            item.mblid = this.shipmentDetail.id;
             item.airWayBillId = null;
-            item.hblId = null;
+            item.hblid = null;
         }
         //  * Update field
         modelAdd.id = this.jobId;
@@ -302,20 +302,23 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     onLockShipment() {
         this.confirmLockPopup.hide();
 
-        const modelAdd = this.onSubmitData();
-
-        //  * Update field
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.isLocked = true;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
-
-
-        this.saveJob(modelAdd);
+        this._progressRef.start();
+        this._documenRepo.LockCsTransaction(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 
     onSyncHBL() {
@@ -326,20 +329,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             return;
         }
         const modelAdd = this.onSubmitData();
-        modelAdd.dimensionDetails = this.formCreateComponent.dimensionDetails;
-
-        for (const item of modelAdd.dimensionDetails) {
-            item.mblId = this.shipmentDetail.id;
-        }
-
-        //  * Update field
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
 
         const bodySyncData: DocumentationInterface.IDataSyncHBL = {
             flightVesselName: modelAdd.flightVesselName,
@@ -351,27 +340,28 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             agentId: modelAdd.agentId,
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
-            route: modelAdd.route
+            route: modelAdd.route,
+            MblNo: modelAdd.mawb
         };
 
         this._progressRef.start();
-        forkJoin([
-            this._documenRepo.updateCSTransaction(modelAdd),
-            this._documentRepo.syncHBL(this.jobId, bodySyncData)
-        ]).pipe(
-            catchError(this.catchError),
-            finalize(() => {
-                this._progressRef.complete();
-            })
-        ).subscribe(
-            (r: CommonInterface.IResult[] = []) => {
-                if (r[1].status) {
-                    this._toastService.success(r[1].message);
-                } else {
-                    this._toastService.error(r[1].message);
-                }
-            },
-        );
+        this._documentRepo.syncHBL(this.jobId, bodySyncData)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
+
+
 }
 

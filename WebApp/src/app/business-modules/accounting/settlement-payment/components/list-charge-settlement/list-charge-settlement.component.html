@@ -76,7 +76,9 @@
                             [isOpen]="openAllCharge" class="m--margin-bottom-20">
                             <shipment-item #headingShipmentGroup accordion-heading [data]="item"
                                 (onClick)="onClickHeadingShipment($event)"
-                                (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"></shipment-item>
+                                (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"
+                                (onPrintPlUSD)="previewPLsheet($event,'USD')"
+                                (onPrintPlVND)="previewPLsheet($event, 'VND')"></shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
                                 (onClickSurcharge)="openSurchargeDetail($event,null,'update')"
@@ -124,6 +126,17 @@
                                                         <i class="la la-copy"></i>
                                                     </a>
                                                 </ng-container>
+                                            </span>
+                                            <span class="dropdown m-dropdown m-dropdown--inline">
+                                                <i class="la la-file-text" data-toggle="dropdown"></i>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item pointer"
+                                                        (click)="previewPLsheet(surcharge,'USD')">Preview PL with
+                                                        USD</a>
+                                                    <a class="dropdown-item pointer"
+                                                        (click)="previewPLsheet(surcharge,'VND')">Preview PL with
+                                                        VND</a>
+                                                </div>
                                             </span>
                                         </div>
                                     </td>
@@ -179,3 +192,9 @@
     (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
 
 <charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
+
+<!-- <ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container> -->
+
+<ng-template inject></ng-template>

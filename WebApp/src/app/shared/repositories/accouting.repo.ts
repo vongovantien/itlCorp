@@ -520,6 +520,79 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    upLoadInvoicePaymentFile(files: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UploadInvoicePaymentFile`, files, "uploadedFile");
+    }
+
+    downloadInvoicePaymentFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/DownloadInvoicePaymentExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    downloadOBHPaymentFile() {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/DownloadOBHPaymentExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    importInvoicePayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportInvoicePayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    importOBHPayment(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/ImportSOAOBHPayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getOBHPaymentImport(body: any) {
+        return this._api.postFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingPayment/UploadOBHPaymentFile`, body, 'file').pipe(
+            map((data: any) => data)
+        );
+    }
+
+    paymentPaging(page: number, size: number, body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getPaymentByrefId(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getInvoiceExtendedDate(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateExtendDate(body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/UpdateExtendDate`, body).pipe(
+            map((data: any) => data)
+        )
+    }
+
+    deletePayment(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/` + id)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getOBHSOAExtendedDate(refId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetOBHSOAExtendedDate`, { id: refId }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

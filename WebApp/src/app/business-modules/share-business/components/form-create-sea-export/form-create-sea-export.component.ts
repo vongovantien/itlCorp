@@ -14,7 +14,7 @@ import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
-import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getCatalogueCarrierLoadingState, getCatalogueAgentLoadingState, getCataloguePortLoadingState } from '@store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, } from '@store';
 import { FormValidators } from '@validators';
 import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { AppComboGridComponent } from '@common';
@@ -28,7 +28,7 @@ import { DataService } from '@services';
 export class ShareBussinessFormCreateSeaExportComponent extends AppForm implements OnInit {
 
     @ViewChild(InjectViewContainerRefDirective, { static: false }) private bookingNoteContainerRef: InjectViewContainerRefDirective;
-    @Input() set type(t: string) { console.log(t); this._type = t; }
+    @Input() set type(t: string) { this._type = t; }
 
     get type() { return this._type; }
 
@@ -78,10 +78,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
     userLogged: User;
 
-    isLoadingPort: Observable<boolean>;
-    isLoadingAgent: Observable<boolean>;
-    isLoadingCarrier: Observable<boolean>;
-
     constructor(
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
@@ -105,10 +101,6 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
         this.ports = this._store.select(getCataloguePortState);
         this.listUsers = this._systemRepo.getListSystemUser();
 
-        this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
-        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
-        this.isLoadingCarrier = this._store.select(getCatalogueCarrierLoadingState);
-
         this.getUserLogged();
 
         if (this.type === ChargeConstants.SLE_CODE) {
@@ -130,7 +122,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                     res.eta = null;
                                 }
                             });
-                            this.formGroup.setValue({
+                            this.formGroup.patchValue({
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
@@ -138,7 +130,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
                                 mbltype: !!res.mbltype ? [this.ladingTypes.find(type => type.id === res.mbltype)] : null,
                                 typeOfService: !!res.typeOfService ? [{ id: res.typeOfService, text: res.typeOfService }] : null,
-                                term: !!res.shipmentType ? [{ id: res.paymentTerm, text: res.paymentTerm }] : null,
+                                term: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
 
                                 coloader: res.coloaderId,
@@ -272,7 +264,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
             this.subscription = ((this.componentRef.instance) as AppComboGridComponent<csBookingNote>).onClick.subscribe(
                 (bookingNote: csBookingNote) => {
 
-                    const formData: IBookingNoteFormData = {
+                    const formData: ISyncBookingNoteFormData = {
                         bookingNo: bookingNote.bookingNo,
                         eta: !!bookingNote.eta ? { startDate: new Date(bookingNote.eta), endDate: new Date(bookingNote.eta) } : null,
                         etd: !!bookingNote.etd ? { startDate: new Date(bookingNote.etd), endDate: new Date(bookingNote.etd) } : null,
@@ -303,7 +295,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
     }
 }
 
-interface IBookingNoteFormData {
+interface ISyncBookingNoteFormData {
     bookingNo: string;
     eta: any;
     etd: any;

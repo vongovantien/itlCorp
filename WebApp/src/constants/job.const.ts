@@ -122,10 +122,20 @@ export class JobConstants {
             { id: '0', text: 'Zero (0)' },
             { id: 1, text: 'One (1)' },
             { id: 2, text: 'Two (2)' },
-            { id: 3, text: 'Three (3)' }]
+            { id: 3, text: 'Three (3)' }
+        ],
+        RCLASS: <CommonInterface.INg2Select[]>[
+            { id: 'M', text: 'M' },
+            { id: 'N', text: 'N' },
+            { id: 'Q', text: 'Q' }
+        ],
+        WT: <CommonInterface.INg2Select[]>[
+            { id: 'PP', text: 'PP' },
+            { id: 'CLL', text: 'CLL' }
+        ]
     };
 
-    public static CONFIG = {
+    public static readonly CONFIG = {
         COMBOGRID_PARTNER: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'shortName', label: 'Name ABBR' },
             { field: 'partnerNameEn', label: 'Name EN' },
@@ -139,6 +149,9 @@ export class JobConstants {
         COMBOGRID_COUNTRY: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'code', label: 'Country Code' },
             { field: 'nameEn', label: 'Name EN' },
+        ],
+        COMBOGRID_CITY_PROVINCE: <CommonInterface.IComboGridDisplayField[]>[
+            { field: 'name_EN', label: 'Name' },
         ]
     };
 

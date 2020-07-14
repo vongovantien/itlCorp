@@ -30,9 +30,9 @@ const accountingManagementPartnerReducer = createReducer(
     on(accountingManagementActions.InitPartner, () => ({
         ...initialState,
     })),
-    on(accountingManagementActions.SelectRequester, (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => ({
-        ...state, charges: payload.charges, ...payload
-    })),
+    on(accountingManagementActions.SelectRequester, (state: IAccountingManagementPartnerState, payload: PartnerOfAcctManagementResult) => {
+        return { ...state, charges: payload.charges, ...payload };
+    })
 );
 
 export function reducer(state: any | undefined, action: Action) {

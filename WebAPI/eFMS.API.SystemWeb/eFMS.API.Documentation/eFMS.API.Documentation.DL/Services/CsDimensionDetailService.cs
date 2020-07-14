@@ -67,16 +67,19 @@ namespace eFMS.API.Documentation.DL.Services
                         dimesion.AirWayBillId = airbillId;
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
-                        var hsAddDemension = Add(dimesion);
+                        var hsAddDemension = Add(dimesion, false);
                     }
                     else
                     {
                         dimesion.AirWayBillId = airbillId;
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
-                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id, false);
                     }
                 }
+
+                DataContext.SubmitChanges();
+
                 return new HandleState();
             }
             catch (Exception ex)
@@ -145,16 +148,18 @@ namespace eFMS.API.Documentation.DL.Services
                         dimesion.Mblid = masterId;
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
-                        var hsAddDemension = Add(dimesion);
+                        var hsAddDemension = Add(dimesion, false);
                     }
                     else
                     {
                         dimesion.Mblid = masterId;
                         dimesion.UserModified = currentUser.UserID;
                         dimesion.DatetimeModified = DateTime.Now;
-                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id);
+                        var hsUpdateContMBL = Update(dimesion, x => x.Id == dimesion.Id, false);
                     }
                 }
+                DataContext.SubmitChanges();
+
                 return new HandleState();
             }
             catch (Exception ex)

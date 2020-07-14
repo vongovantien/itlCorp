@@ -5,6 +5,7 @@ namespace eFMS.API.Documentation.Service.Models
 {
     public partial class CsArrivalFrieghtChargeDefault
     {
+        public Guid Id { get; set; }
         public string TransactionType { get; set; }
         public string UserDefault { get; set; }
         public string Description { get; set; }

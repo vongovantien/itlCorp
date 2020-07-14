@@ -9,7 +9,7 @@ import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/commo
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 
 import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, take, finalize } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -41,6 +41,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     shipmentDetail: CsTransaction;
     dataReport: any = null;
+    confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, ETA, MBL, Vessel, Voy, POL, POD, Booking No to House Bill?<span>`;
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
@@ -245,6 +246,24 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             );
     }
 
+    previewShipmentCoverPage() {
+        this._documenRepo.previewShipmentCoverPage(this.jobId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
     gotoList() {
         this._router.navigate(["home/documentation/sea-fcl-export"]);
     }
@@ -317,20 +336,58 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     onLockShipment() {
         this.confirmLockPopup.hide();
 
+        this._progressRef.start();
+        this._documentRepo.LockCsTransaction(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
+    }
+
+    onSyncHBL() {
+        this.formCreateComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
         const modelAdd = this.onSubmitData();
-        modelAdd.csMawbcontainers = this.containers;
 
-        //  * Update field
-        modelAdd.csMawbcontainers = this.containers;
-        modelAdd.id = this.jobId;
-        modelAdd.branchId = this.shipmentDetail.branchId;
-        modelAdd.transactionType = this.shipmentDetail.transactionType;
-        modelAdd.jobNo = this.shipmentDetail.jobNo;
-        modelAdd.datetimeCreated = this.shipmentDetail.datetimeCreated;
-        modelAdd.userCreated = this.shipmentDetail.userCreated;
-        modelAdd.isLocked = true;
-        modelAdd.currentStatus = this.shipmentDetail.currentStatus;
+        const bodySyncData: DocumentationInterface.IDataSyncHBL = {
+            flightVesselName: modelAdd.flightVesselName,
+            etd: modelAdd.etd,
+            eta: modelAdd.eta,
+            pol: modelAdd.pol,
+            pod: modelAdd.pod,
+            bookingNo: modelAdd.bookingNo,
+            voyNo: modelAdd.voyNo
+        };
 
-        this.saveJob(modelAdd);
+        this._progressRef.start();
+        this._documentRepo.syncHBL(this.jobId, bodySyncData)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 }

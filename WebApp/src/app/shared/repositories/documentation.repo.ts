@@ -531,6 +531,12 @@ export class DocumentationRepo {
         );
     }
 
+    previewShipmentCoverPage(jobId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/PreviewShipmentCoverPage`, { id: jobId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     previewSeaImportManifest(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsManifest/PreviewSeaImportManifest`, body).pipe(
             map((data: any) => data)
@@ -916,6 +922,27 @@ export class DocumentationRepo {
             page: '' + page,
             size: '' + size
         }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    syncShipmentByAirWayBill(jobId: string, body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/SyncShipmentByAirWayBill/${jobId}`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    LockCsTransaction(jobId: string) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockCsTransaction/${jobId}`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    lockOpsTransaction(jobId: string) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/LockOpsTransaction/${jobId}`, {}).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

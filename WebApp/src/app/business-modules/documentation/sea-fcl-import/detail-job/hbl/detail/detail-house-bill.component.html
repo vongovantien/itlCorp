@@ -52,20 +52,14 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="HBL Detail" (selectTab)="onSelectTab('DETAIL')">
-                    <ng-container>
-                        <form-create-house-bill-import [isDetail]="true"> </form-create-house-bill-import>
-                        <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
-                    </ng-container>
+                    <form-create-house-bill-import [isDetail]="true"> </form-create-house-bill-import>
+                    <hbl-goods-summary-fcl>HBL Goods Summary</hbl-goods-summary-fcl>
                 </tab>
                 <tab heading="Arrival Notice" (selectTab)="onSelectTab('ARRIVAL')" [active]="selectedTab === 'ARRIVAL'">
-                    <ng-container *ngIf="selectedTab === 'ARRIVAL'">
-                        <hbl-arrival-note-sea></hbl-arrival-note-sea>
-                    </ng-container>
+                    <hbl-arrival-note-sea></hbl-arrival-note-sea>
                 </tab>
                 <tab heading="Delivery Order (D/O)" (selectTab)="onSelectTab('DELIVERY')">
-                    <ng-container *ngIf="selectedTab === 'DELIVERY'">
-                        <hbl-delivery-order></hbl-delivery-order>
-                    </ng-container>
+                    <hbl-delivery-order></hbl-delivery-order>
                 </tab>
             </tabset>
         </div>

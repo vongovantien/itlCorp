@@ -30,5 +30,6 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public int? DepartmentId { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
+        public string PartnerType { get; set; }
     }
 }

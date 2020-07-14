@@ -5,32 +5,31 @@ import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { Container } from 'src/app/shared/models/document/container.model';
-import { SystemConstants } from 'src/constants/system.const';
-import { ShareBusinessFormCreateHouseBillImportComponent } from 'src/app/business-modules/share-business/components/form-create-house-bill-import/form-create-house-bill-import.component';
+import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
+import { Container, CsTransaction } from '@models';
+import { SystemConstants } from '@constants';
+import { DataService } from '@services';
+
 import {
+    ShareBusinessFormCreateHouseBillImportComponent,
     ShareBusinessArrivalNoteComponent,
     ShareBusinessDeliveryOrderComponent,
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryLCLComponent,
-    getTransactionPermission
-} from 'src/app/business-modules/share-business';
-import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
-import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
+    getTransactionPermission,
+} from '@share-bussiness';
 
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap, skip, finalize } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-
-
-import { forkJoin } from 'rxjs';
-import { DataService } from '@services';
 import groupBy from 'lodash/groupBy';
+
+
+
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -81,17 +80,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
-
-                        this.containers = action.payload;
-                    }
-                });
-        this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (action: fromShareBussiness.ContainerAction) => {
-                    if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.containers = action.payload;
 
                         if (!!this.containers) {
@@ -134,9 +122,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
         this.importHouseBillPopup.show();
     }
 
-    getShipmentDetail() {
-    }
-
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
     }
@@ -144,11 +129,9 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     ngAfterViewInit() {
         this._store.dispatch(new fromShareBussiness.GetDetailHBLSuccessAction({}));
 
-        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote();
-        this.deliveryComponent.deliveryOrder = new DeliveryOrder();
         this.hblGoodsSummaryComponent.initContainer();
-        this.getDetailShipment();
         this.hblGoodsSummaryComponent.description = "AS PER BILL";
+
         this.formHouseBill.notifyPartyDescription.setValue("SAME AS CONSIGNEE");
         this.formHouseBill.type = 'SLI';
         this._cd.detectChanges();
@@ -208,40 +191,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     showCreatePpoup() {
         this.confirmCreatePopup.show();
-    }
-
-    getDetailShipment() {
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-                skip(1),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: CsTransaction) => {
-                    if (!!res) {
-                        this.shipmentDetail = res;
-                        const objArrival = {
-                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
-                            arrivalFirstNotice: new Date()
-                        };
-
-                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(
-                            objArrival
-                        );
-                        const objDelivery = {
-                            deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
-                            deliveryOrderPrintedDate: {
-                                startDate: new Date(),
-                                endDate: new Date()
-                            },
-                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
-                        };
-                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-                    }
-                },
-            );
     }
 
     combackToHBLList() {
@@ -389,10 +338,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             dosentTo2: null,
         };
         return body;
-    }
-
-    onSelectTabDO(event) {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey("podName") || "";
     }
 }
 

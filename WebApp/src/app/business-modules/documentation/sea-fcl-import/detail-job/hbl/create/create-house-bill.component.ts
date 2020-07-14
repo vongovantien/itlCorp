@@ -16,8 +16,7 @@ import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
-import { DeliveryOrder, CsTransaction } from 'src/app/shared/models';
+import { CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
@@ -44,7 +43,6 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
 
     jobId: string = '';
-    shipmentDetail: CsTransaction;
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
@@ -96,7 +94,6 @@ export class CreateHouseBillComponent extends AppForm {
 
                 this.permissionShipments = this._store.select(getTransactionPermission);
 
-                this.getDetailShipment();
             } else {
                 this.combackToHBLList();
             }
@@ -121,36 +118,6 @@ export class CreateHouseBillComponent extends AppForm {
 
         this._cd.detectChanges();
 
-    }
-
-    getDetailShipment() {
-        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
-                skip(1),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                (res: CsTransaction) => {
-                    if (!!res) {
-                        this.shipmentDetail = res;
-
-                        const objArrival = {
-                            arrivalNo: this.shipmentDetail.jobNo + "-A01",
-                            arrivalFirstNotice: new Date()
-                        };
-                        this.arrivalNoteComponent.hblArrivalNote = new HBLArrivalNote(objArrival);
-
-                        const objDelivery = {
-                            deliveryOrderNo: this.shipmentDetail.jobNo + "-D01",
-                            deliveryOrderPrintedDate: { startDate: new Date(), endDate: new Date() },
-                            doheader1: !!this.shipmentDetail.warehousePOD ? this.shipmentDetail.warehousePOD.nameVn : null
-                        };
-                        this.deliveryComponent.deliveryOrder = new DeliveryOrder(objDelivery);
-                    }
-                },
-            );
     }
 
     checkValidateForm() {
@@ -330,10 +297,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     handleStringCont(contOb: { contName: string, quantity: number }) {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
-    }
-
-    onSelectTabDO() {
-        this.deliveryComponent.deliveryOrder.doheader1 = this._dataService.getDataByKey('podName') || "";
     }
 }
 

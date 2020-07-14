@@ -6,10 +6,13 @@ import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { PaginationModule, ModalModule, TabsModule } from 'ngx-bootstrap';
 import { AuthorizationComponent } from './authorization.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { AuthorizationAddPopupComponent } from './components/popup/add-authorization/add-authorization.popup';
+import { AuthorizedApprovalFormSearchComponent } from './components/form-search-authorized-approval/form-search-authorized-approval.component';
+import { AuthorizedApprovalListComponent } from './components/list-authorized-approval/list-authorized-approval';
+import { AuthorizedApprovalPopupComponent } from './components/popup/add-authorized-approval/add-authorized-approval.popup';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -39,12 +42,16 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         NgxDaterangepickerMd,
         ModalModule.forRoot(),
+        TabsModule.forRoot()
     ],
     exports: [],
     declarations: [
         AuthorizationComponent,
         AuthorizationFormSearchComponent,
-        AuthorizationAddPopupComponent
+        AuthorizationAddPopupComponent,
+        AuthorizedApprovalFormSearchComponent,
+        AuthorizedApprovalListComponent,
+        AuthorizedApprovalPopupComponent
     ],
     providers: [],
 })

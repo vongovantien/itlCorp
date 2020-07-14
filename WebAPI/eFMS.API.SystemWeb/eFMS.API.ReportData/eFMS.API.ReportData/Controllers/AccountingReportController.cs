@@ -8,6 +8,7 @@ using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
+using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -84,7 +85,7 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
-
+        
 
         /// <summary>
         /// Export Settlement Payment
@@ -137,7 +138,28 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
-
+        /// <summary>
+        /// Export Advance Payment with each Request.
+        /// </summary>
+        /// <param name="accountingPaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportAccountingPayment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingPayment(AccountingPaymentCriteria accountingPaymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var accountingPaymentsAPI = await HttpServiceExtension.PostAPI(accountingPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.InvoicePaymentUrl, accessToken);
+            var accountingPayments = accountingPaymentsAPI.Content.ReadAsAsync<List<AccountingPaymentModel>>();
+            var stream = accountingPaymentCriteria.PaymentType == PaymentType.Invoice ?
+                new AccountingHelper().GenerateInvoicePaymentShipmentExcel(accountingPayments.Result) :
+                new AccountingHelper().GenerateOBHPaymentShipmentExcel(accountingPayments.Result);
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, 
+                accountingPaymentCriteria.PaymentType == PaymentType.Invoice ? 
+                "Invoice Payment List.xlsx":"OBH Payment List.xlsx");
+            return fileContent;
+        }
         /// <summary>
         /// Export detail advance payment
         /// </summary>
@@ -303,6 +325,7 @@ namespace eFMS.API.ReportData.Controllers
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS.xlsx");
             return fileContent;
         }
+        
 
     }
 }

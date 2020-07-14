@@ -18,6 +18,9 @@ export * from './catalogue/country.model';
 export * from './catalogue/ware-house.model';
 export * from './catalogue//catPartnerCharge.model';
 export * from './catalogue/catChartOfAccounts.model';
+export * from './catalogue/saleman.model';
+export * from './catalogue/province.model';
+export * from './catalogue/catContract.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -25,6 +28,8 @@ export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
 export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel, AccAccountingManagementResult } from './accouting/accounting-management';
 export * from './accouting/cdnoteview.model';
+export * from './accouting/payment.model';
+export * from './accouting/accounting-payment.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
@@ -59,10 +64,14 @@ export * from './system/department';
 export * from './system/userlevel';
 export * from './system/userGroup.model';
 export * from './system/group';
+export * from './system/lock-shipment-setting';
+export * from './system/flow-setting';
 
 export * from './report/crystal.model';
 
 export * from './system/authorization';
+
+export * from './tool-setting/unlock-request';
 
 
 

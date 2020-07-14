@@ -1,9 +1,10 @@
+import { SystemConstants } from "@constants";
 export class Surcharge {
     chargeId: string = '';
     chargeName: string = '';
     chargeCode: string = '';
     clearanceNo: string = '';
-    contNo: number = 0;
+    contNo: string = '';
     currencyId: string = '';
     hbl: string = '';
     invoiceDate: any = null;
@@ -23,7 +24,7 @@ export class Surcharge {
     unitPrice: number = 0;
     vatrate: number = 0;
     settlementCode: string = '';
-    id: string = "00000000-0000-0000-0000-000000000000";
+    id: string = SystemConstants.EMPTY_GUID;
     surchargeId: string = '';
     isSelected: boolean = false;
     hblid: string = '';
@@ -45,6 +46,9 @@ export class Surcharge {
     mblno: string = null;
     hblno: string = null;
     advanceNo: string = null;
+
+    shipmentId: string = SystemConstants.EMPTY_GUID; // * Id trong OpsTransation,CsTransation.
+    typeService: string = null; // * "DOC | OPS"
 
     // * Custom
     obhId: string = null;

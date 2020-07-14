@@ -349,7 +349,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     }
 
     getShipment() {
-        this._documentRepo.getShipmentNotLocked()
+        this._documentRepo.getShipmentAssginPIC() // ! getShipmentNotLocked deprecated
             .pipe(
                 catchError(this.catchError)
             )

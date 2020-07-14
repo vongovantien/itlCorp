@@ -491,7 +491,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     HBL = opst.Hwbno,
                                     MBL = opst.Mblno,
                                     CurrencyShipment = settle.SettlementCurrency,
-                                    TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                    TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                    ShipmentId = opst.Id,
+                                    Type = "OPS"
                                 };
             var dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id
@@ -507,12 +509,15 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = cstd.Hwbno,
                                    MBL = cst.Mawb,
                                    CurrencyShipment = settle.SettlementCurrency,
-                                   TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency)
+                                   TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                   HblId = cstd.Id,
+                                   ShipmentId = cst.Id,
+                                   Type = "DOC"
                                };
             var dataQuery = dataOperation.Union(dataDocument);
 
             var dataGroup = dataQuery.ToList()
-                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment })
+                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment,x.HblId, x.Type, x.ShipmentId })
                         .Select(x => new ShipmentSettlement
                         {
                             SettlementNo = x.Key.SettlementNo,
@@ -520,7 +525,10 @@ namespace eFMS.API.Accounting.DL.Services
                             HBL = x.Key.HBL,
                             MBL = x.Key.MBL,
                             CurrencyShipment = x.Key.CurrencyShipment,
-                            TotalAmount = x.Sum(su => su.TotalAmount)
+                            TotalAmount = x.Sum(su => su.TotalAmount),
+                            HblId = x.Key.HblId,
+                            Type = x.Key.Type,
+                            ShipmentId = x.Key.ShipmentId
                         });
 
             var shipmentSettlement = new List<ShipmentSettlement>();
@@ -534,7 +542,10 @@ namespace eFMS.API.Accounting.DL.Services
                     HBL = item.HBL,
                     TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
-                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL)
+                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL),
+                    HblId = item.HblId,
+                    ShipmentId = item.ShipmentId,
+                    Type = item.Type
                 }
                 );
             }
@@ -710,7 +721,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = sur.AdvanceNo
+                                    AdvanceNo = sur.AdvanceNo,
+                                    ShipmentId = opst.Id,
+                                    TypeService = "OPS"
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -758,7 +771,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = sur.AdvanceNo
+                                   AdvanceNo = sur.AdvanceNo,
+                                   ShipmentId = cst.Id,
+                                   TypeService = "DOC"
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
@@ -1091,9 +1106,12 @@ namespace eFMS.API.Accounting.DL.Services
                                x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1123,9 +1141,12 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -2999,22 +3020,19 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (var item in settlePayments)
                     {
                         var settle = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
-                        if (settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
+                        settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
+                        settle.UserModified = currentUser.UserName;
+                        settle.DatetimeModified = DateTime.Now;
+                        var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
+                        settle.LockedLog = item.LockedLog + log + ";";
+                        var hs = DataContext.Update(settle, x => x.Id == item.Id);
+                        var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
+                        foreach (var approve in approveSettles)
                         {
-                            settle.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
-                            settle.UserModified = currentUser.UserName;
-                            settle.DatetimeModified = DateTime.Now;
-                            var log = item.SettlementNo + " has been opened at " + string.Format("{0:HH:mm:ss tt}", DateTime.Now) + " on " + DateTime.Now.ToString("dd/MM/yyyy") + " by " + "admin";
-                            settle.LockedLog = item.LockedLog + log + ";";
-                            var hs = DataContext.Update(settle, x => x.Id == item.Id);
-                            var approveSettles = acctApproveSettlementRepo.Get(x => x.SettlementNo == item.SettlementNo);
-                            foreach (var approve in approveSettles)
-                            {
-                                approve.IsDeputy = true;
-                                approve.UserModified = currentUser.UserID;
-                                approve.DateModified = DateTime.Now;
-                                acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
-                            }
+                            approve.IsDeputy = true;
+                            approve.UserModified = currentUser.UserID;
+                            approve.DateModified = DateTime.Now;
+                            acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
                         }
                     }
                     trans.Commit();

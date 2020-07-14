@@ -41,7 +41,7 @@ export abstract class AppForm extends AppPage {
     confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
     errorETA: string = 'ETA must be greater than or equal ETD';
-    confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route to HAWB ?<span>`;
+    confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
 
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();

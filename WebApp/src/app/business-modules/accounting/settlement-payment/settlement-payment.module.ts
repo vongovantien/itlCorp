@@ -27,6 +27,7 @@ import { SettlementFormCopyPopupComponent } from './components/popup/copy-settle
 import { SettlementTableListChargePopupComponent } from './components/popup/table-list-charge/table-list-charge.component';
 import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
+import { ReportPreviewComponent } from '@common';
 
 const routing: Routes = [
     {
@@ -106,6 +107,9 @@ const customCurrencyMaskConfig = {
         SettlementPaymentDetailComponent,
         ApporveSettlementPaymentComponent,
         ...COMPONENT
+    ],
+    entryComponents: [
+        ReportPreviewComponent
     ],
     providers: [],
 })

@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         readonly IContextBase<CatUnit> catUnitRepo;
         readonly IContextBase<CatCommodity> catCommodityRepo;
-        readonly IContextBase<CatSaleman> catSalemanRepo;
+        readonly IContextBase<CatContract> catContractRepo;
         readonly ICsMawbcontainerService containerService;
         readonly IContextBase<CsTransactionDetail> csTransactionDetailRepo;
         readonly IContextBase<CsShipmentSurcharge> surchareRepository;
@@ -55,7 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<CatUnit> catUnit,
             IContextBase<CatCommodity> catCommodity,
-            IContextBase<CatSaleman> catSaleman,
+            IContextBase<CatContract> catContract,
             IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
@@ -76,7 +76,7 @@ namespace eFMS.API.Documentation.DL.Services
             catUnitRepo = catUnit;
             catCommodityRepo = catCommodity;
             surchareRepository = surchareRepo;
-            catSalemanRepo = catSaleman;
+            catContractRepo = catContract;
             containerService = contService;
             shipmentOtherChargeService = oChargeService;
             csTransactionDetailRepo = csTransactiondetail;
@@ -353,7 +353,7 @@ namespace eFMS.API.Documentation.DL.Services
             var details = DataContext.Get(x => x.JobId == criteria.JobId);
             var partners = catPartnerRepo.Get();
             var places = catPlaceRepo.Get();
-            var salemans = catSalemanRepo.Get();
+            var salemans = catContractRepo.Get();
             var query = (from detail in details
                          join customer in partners on detail.CustomerId equals customer.Id into detailCustomers
                          from y in detailCustomers.DefaultIfEmpty()
@@ -1092,11 +1092,12 @@ namespace eFMS.API.Documentation.DL.Services
                         if (item.CreditNo != null || item.DebitNo != null || item.Soano != null)
                         {
                             isSOA = true;
+                            break;
                         }
                     }
                     if (isSOA == true)
                     {
-                        hs = new HandleState(DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA);
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA]);
                     }
                     else
                     {

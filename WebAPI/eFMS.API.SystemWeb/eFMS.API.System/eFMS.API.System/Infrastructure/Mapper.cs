@@ -24,6 +24,15 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysPermissionSampleGeneral, SysPermissionSampleGeneralModel>();
             CreateMap<SysPermissionSampleSpecial, SysPermissionSampleSpecialModel>();
             CreateMap<SysAuthorization, SysAuthorizationModel>();
+            CreateMap<SysAuthorizedApproval, SysAuthorizedApprovalModel>();
+            CreateMap<SysMenu, MenuUserModel>();
+            CreateMap<SysUserPermission, SysUserPermissionModel>();
+            CreateMap<SysPermissionSample, SysUserPermissionModel>();
+            CreateMap<SysUserPermissionGeneral, SysUserPermissionGeneralModel>();
+            CreateMap<SysCompany, SysCompanyModel>();
+            CreateMap<SysUser, SysUserModel>();
+            CreateMap<SysSettingFlow, SysSettingFlowModel>();
+            CreateMap<SetLockingDateShipment, SetLockingDateShipmentModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
@@ -31,23 +40,20 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysEmployeeModel, SysEmployee>();
             CreateMap<SysPermissionSampleModel, SysPermissionSample>();
             CreateMap<SysPermissionSampleGeneralModel, SysPermissionSampleGeneral>();
-            CreateMap<SysUser, SysUserModel>();
             CreateMap<SysEmployee, SysEmployeeModel>();
             CreateMap<SysPermissionSampleGeneralViewModel, SysPermissionSampleGeneral>();
             CreateMap<SysPermissionSampleSpecialModel, SysPermissionSampleSpecial>();
-            CreateMap<SysMenu, MenuUserModel>();
-            CreateMap<SysUserPermission, SysUserPermissionModel>();
-            CreateMap<SysPermissionSample, SysUserPermissionModel>();
-            CreateMap<SysUserPermissionGeneral, SysUserPermissionGeneralModel>();
-            CreateMap<SysCompany, SysCompanyModel>();
-
             CreateMap<UserPermissionSpecialAction, SysUserPermissionSpecial>();
-
             CreateMap<PermissionSpecialAction, SysPermissionSampleSpecial>();
-
-
             CreateMap<SysUserPermissionEditModel, SysUserPermission>();
-
+            CreateMap<CatDepartmentModel, CatDepartment>();
+            CreateMap<SysAuthorizationModel, SysAuthorization>();
+            CreateMap<SysEmployeeModel, SysEmployee>();
+            CreateMap<SysUserLevelModel, SysUserLevel>();
+            CreateMap<SysUserModel, SysUser>();
+            CreateMap<SysUserPermissionGeneralModel, SysUserPermissionGeneral>();
+            CreateMap<SysSettingFlowModel,SysSettingFlow >();
+            CreateMap<SetLockingDateShipmentModel, SetLockingDateShipment>();
 
         }
     }

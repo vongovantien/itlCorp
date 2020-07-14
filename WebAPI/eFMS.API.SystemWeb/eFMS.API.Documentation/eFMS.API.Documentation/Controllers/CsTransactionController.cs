@@ -11,6 +11,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -413,6 +414,54 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var result = csTransactionService.SyncHouseBills(id, model);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("SyncShipmentByAirWayBill/{id}")]
+        public IActionResult SyncShipmentByAirWayBill(Guid id, csTransactionSyncAirWayBill model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            HandleState hs = csTransactionService.SyncShipmentByAirWayBill(id, model);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("LockCsTransaction/{id}")]
+        [Authorize]
+        public IActionResult LockCsTransaction(Guid id)
+        {
+            HandleState hs = csTransactionService.LockCsTransaction(id);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// preview air document release
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Authorize]
+        [Route("PreviewShipmentCoverPage")]
+        public IActionResult PreviewShipmentCoverPage(Guid id)
+        {
+            var result = csTransactionService.PreviewShipmentCoverPage(id);
             return Ok(result);
         }
 

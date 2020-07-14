@@ -65,8 +65,21 @@
                             [userCreated]="shipmentDetail.userNameCreated"
                             [timeModified]="shipmentDetail.datetimeModified"
                             [userModified]="shipmentDetail.userNameModified">
+
+                            <ng-container *ngIf="!shipmentDetail.isLocked">
+                                <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">
+                                    <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase"
+                                        type="button" (click)="confirmSyncHBL.show()">
+                                        <span><i class="la la-refresh"></i>
+                                            <span> Sync to HBL </span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </ng-container>
                         </date-time-modified>
+
                     </ng-container>
+
                 </form-create-sea-export>
 
                 <shipment-good-summary type="export"> Shipment Goods Summary </shipment-good-summary>
@@ -98,6 +111,9 @@
         <li class="m-nav-sticky__item">
             <a title="Preview Shipping Instruction" [routerLink]="['./si']">SI</a>
         </li>
+        <li class="m-nav-sticky__item">
+            <a title="Preview Shipment Cover Page" style="cursor: pointer;" (click)="previewShipmentCoverPage()">CP</a>
+        </li>
     </ul>
 </div>
 
@@ -114,6 +130,10 @@
 
 <confirm-popup #confirmDeleteJob [body]="'You you sure you want to delete this Job'" [title]="'Alert'"
     [labelConfirm]="'Yes'" (onSubmit)="onDeleteJob()"></confirm-popup>
+
+<confirm-popup #confirmSyncHBL (onSubmit)="confirmSyncHBL.hide(); onSyncHBL()" [body]="confirmSyncHBLText"
+    title="Sync HAWB" [labelConfirm]="'Yes'">
+</confirm-popup>
 
 <confirm-popup #confirmLockShipment (onSubmit)="onLockShipment()" [body]="'Do you want to lock this shipment ?'"
     [labelConfirm]="'Yes'"></confirm-popup>

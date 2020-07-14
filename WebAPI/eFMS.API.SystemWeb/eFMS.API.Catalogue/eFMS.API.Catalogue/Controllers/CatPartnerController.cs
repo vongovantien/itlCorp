@@ -126,6 +126,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet("{id}")]
+        [Authorize]
         public IActionResult Get(string id)
         {
             var data = catPartnerService.GetDetail(id);
@@ -167,12 +168,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost("CheckTaxCode")]
-        public IActionResult CheckTaxCode(CatPartnerEditModel model)
+        public IActionResult CheckTaxCode(CatPartnerValidateTaxCodeModel model)
         {
             string refNo = model.InternalReferenceNo == null ? "" : model.InternalReferenceNo.Trim().ToLower();
             if (string.IsNullOrEmpty(model.Id))
             {
-                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower()
                                                     && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0)
@@ -181,11 +182,11 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                var result = catPartnerService.Get(x => x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id 
                                                       && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
-                                                      || refNo.Length == 0)
-                            )?.FirstOrDefault();
+                                                      || refNo.Length == 0))
+                            ?.FirstOrDefault();
                 return Ok(result);
             }
         }
@@ -216,10 +217,18 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
+            List<string> idsContract = null;
+            if(model.Contracts.Count() > 0)
+            {
+                
+                model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
+                idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
+                model.idsContract = idsContract;
+            }
             var partner = mapper.Map<CatPartnerModel>(model);
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -298,20 +307,29 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id.Length == 0)
             {
-                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
+                if(model.AccountNo != null)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    }
                 }
             }
             else
             {
-                if (catPartnerService.Any(x => x.AccountNo == model.AccountNo && x.Id != id))
+                if (model.AccountNo != null)
                 {
-                    message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    if (catPartnerService.Any(x => x.AccountNo == model.AccountNo && x.Id != id))
+                    {
+                        message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+                    }
                 }
+               
             }
             return message;
         }
+
+       
 
         /// <summary>
         /// import list partner

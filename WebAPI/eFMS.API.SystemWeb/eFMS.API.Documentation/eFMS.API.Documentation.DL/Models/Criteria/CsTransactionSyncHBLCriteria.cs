@@ -15,6 +15,9 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string IssuedBy;
         public string WarehouseId;
         public string Route;
+        public string BookingNo;
+        public string MblNo;
+        public string VoyNo;
 
     }
 }

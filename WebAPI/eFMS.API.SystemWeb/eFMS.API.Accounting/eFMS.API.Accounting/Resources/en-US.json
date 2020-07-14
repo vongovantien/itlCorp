@@ -135,7 +135,16 @@
   "MSG_INVOICE_NO_EXISTED": "Invoice No {0} has been existed in another voucher!",
   //------------end  : VOUCHER
 
-  "DO_NOT_HAVE_PERMISSION": "Do not have permission"
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission",
 
-
+  // ------------start: INVOICE PAYMENT
+  "MSG_INVOICENO_ACCOUNTING_PAYMENT_EMPTY": "Invoice No not allow empty",
+  "MSG_SERIENO_ACCOUNTING_PAYMENT_EMPTY": "Serie No not allow empty",
+  "MSG_PARTNER_ACCOUNTING_PAYMENT_EMPTY": "Partner ID not allow empty",
+  "MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY": "Payment Amount not allow empty",
+  "MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_MUST_BE_NUMBER": "Payment Amount must be a number",
+  "MSG_PAIDDATE_ACCOUNTING_PAYMENT_EMPTY": "Paid Date not allow empty",
+  "MSG_PAIDDATE_ACCOUNTING_PAYMENT_INVALID": "Paid Date invalid",
+  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY": "Payment Type not allow empty",
+  "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type invalid"
 }

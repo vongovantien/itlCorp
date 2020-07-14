@@ -593,6 +593,13 @@
             Sync HBL with id
             </summary>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.PreviewShipmentCoverPage(System.Guid)">
+            <summary>
+            preview air document release
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
             <summary>
             preview proof

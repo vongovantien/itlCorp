@@ -24,7 +24,9 @@
   <ItemGroup>
     <Compile Remove="Common\LanguageSub.cs" />
     <Compile Remove="IService\ICatCurrencyService.cs" />
+    <Compile Remove="IService\ICategoryLogService.cs" />
     <Compile Remove="Services\CatCurrencyService.cs" />
+    <Compile Remove="Services\CategoryLogService.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -163,7 +163,7 @@ export class CatalogueRepo {
     }
 
     getSalemanIdByPartnerId(partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleman/GetSalemanIdByPartnerId/${partnerId}`).pipe(
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetSalemanIdByPartnerId/${partnerId}`).pipe(
             map((res: any) => {
                 return res;
             })
@@ -293,16 +293,42 @@ export class CatalogueRepo {
 
     }
 
-    getListSaleman(partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/GetBy`, { partnerId: partnerId })
+    getListContract(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetBy`, { partnerId: partnerId })
             .pipe(
                 map((data: any) => data)
             );
     }
 
-    deleteSaleman(id: string, partnerId: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatSaleMan/${id}/${partnerId}`).pipe(
+    uploadFileContract(partnerId: string, contractId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFile/${partnerId}/${contractId}`, body, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+    uploadFileMoreContract(contractIds: string, partnerId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/UploadFileMoreContract/${partnerId}/${contractIds}`, body, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
+
+    deleteContract(id: string, partnerId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/${id}/${partnerId}`).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getContractFilesAttach(partnerId: string, contractId) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetFileAttachsContract`, { partnerId: partnerId, contractId: contractId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteContractFilesAttach(fileId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/DeleteContractAttachedFile/${fileId}`).pipe(
             map((data: any) => data)
         );
     }
@@ -486,7 +512,18 @@ export class CatalogueRepo {
         );
     }
 
+    getDetailContract(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/GetById/`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     createPartner(body: any = {}) {
+        // const formData = new FormData();
+        // for (let i = 0; i < body.contracts.length; i++) {
+        //     formData.append("Contracts[" + i + "].saleManId", body.contracts[i].saleManId)
+        // }
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/Add`, body).pipe(
             map((data: any) => data)
         );
@@ -520,6 +557,25 @@ export class CatalogueRepo {
         );
     }
 
+    createContract(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateContract(body: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    activeInactiveContract(id: string, partnerId: string) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}/${partnerId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     checkExistedSaleman(body: any = {}) {
         // const body = { service: service, office: office };
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/CheckExisted`, body).pipe(
@@ -546,13 +602,13 @@ export class CatalogueRepo {
 
     getListSaleManDetail(body?: any) {
         if (!!body) {
-            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan/Query`, body).pipe(
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/Query`, body).pipe(
                 map((res: any) => {
                     return res;
                 })
             );
         } else {
-            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatSaleMan`).pipe(
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract`).pipe(
                 map((data: any) => data)
             );
         }

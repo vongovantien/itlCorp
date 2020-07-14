@@ -7,14 +7,12 @@ import { ToastrService } from 'ngx-toastr';
 import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-create-house-bill.component';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import { ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBussinessHBLGoodSummaryLCLComponent, getDetailHBlPermissionState } from 'src/app/business-modules/share-business';
 import isUUID from 'validator/lib/isUUID';
 import { DataService } from '@services';
 import { ChargeConstants } from 'src/constants/charge.const';
@@ -23,7 +21,6 @@ enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
     DELIVERY = 'DELIVERY'
-
 }
 
 @Component({
@@ -32,13 +29,7 @@ enum HBL_TAB {
 })
 export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHouseBillComponent {
 
-    @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(ShareBusinessFormCreateHouseBillImportComponent, { static: false }) formHouseBill: ShareBusinessFormCreateHouseBillImportComponent;
-    @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent, { static: false }) hblGoodsSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
-    @ViewChild(ShareBusinessArrivalNoteComponent, { static: false }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
-    @ViewChild(ShareBusinessDeliveryOrderComponent, { static: false }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-
 
     hblId: string;
     containers: Container[] = [];

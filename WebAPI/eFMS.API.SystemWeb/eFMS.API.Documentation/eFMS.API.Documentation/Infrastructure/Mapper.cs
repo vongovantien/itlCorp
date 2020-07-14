@@ -14,11 +14,9 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsTransactionDetail, CsTransactionDetailModel>();
             CreateMap<CsMawbcontainer, CsMawbcontainerModel>();
             CreateMap<CsTransaction, CsTransactionModel>();
-            //CreateMap<CsTransactionDetail, CsTransactionDetailReport>();
             CreateMap<CsManifest, CsManifestModel>();
             CreateMap<CsShippingInstruction, CsShippingInstructionModel>();
             CreateMap<OpsTransaction, OpsTransactionModel>();
-            //CreateMap<sp_GetOpsTransaction, OpsTransactionModel>();
             CreateMap<CsArrivalFrieghtCharge, CsArrivalFrieghtChargeModel>();
             CreateMap<CsTransactionDetailAddManifest, CsTransactionDetail>();
             CreateMap<CsTransactionDetail, CsTransactionDetailAddManifest>();
@@ -26,36 +24,35 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<SysImage, SysImageModel>();
             CreateMap<CsAirWayBill, CsAirWayBillModel>().ForMember(x => x.DimensionDetails, opt => opt.Ignore())
                 .ForMember(x => x.OtherCharges, opt => opt.Ignore());
+            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
+            CreateMap<CsBookingNote, CsBookingNoteEditModel>();
+            CreateMap<CsBookingNote, CsBookingNoteModel>();
+            CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
+            CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
+            CreateMap<AcctCdnote, AcctCdnoteModel>();
+            CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
+
+            //map to entity model
             CreateMap<CsAirWayBillModel, CsAirWayBill>();
-
-
             CreateMap<CsTransactionEditModel, CsTransaction>();
             CreateMap<CsTransactionDetailModel, CsTransactionDetail>();
             CreateMap<CsMawbcontainerModel, CsMawbcontainer>();
-            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
             CreateMap<CsManifestEditModel, CsManifest>();
             CreateMap<CsShippingInstructionModel, CsShippingInstruction>();
             CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
             CreateMap<CsBookingNoteEditModel, CsBookingNote>();
             CreateMap<CsBookingNote, CsBookingNoteEditModel>();
             CreateMap<CsBookingNote, CsBookingNoteModel>();
-
             CreateMap<CsShippingInstruction, CsShippingInstructionReportConstModel>();
-
-
             CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
-
             CreateMap<CsShipmentSurchargeModel, CsShipmentSurcharge>();
-
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
-
-            CreateMap<spc_GetSurchargeByHouseBill, CsShipmentSurchargeDetailsModel>();
-
-            CreateMap<AcctCdnote, AcctCdnoteModel>();
-
             CreateMap<CsDimensionDetailModel, CsDimensionDetail>();
-            
-            CreateMap<CatCurrencyExchange, CatCurrencyExchangeModel>();
+            CreateMap<AcctCdnoteModel, AcctCdnote>();
+            CreateMap<CsArrivalFrieghtChargeModel, CsArrivalFrieghtCharge>();
+            CreateMap<CsMawbcontainerModel, CsMawbcontainer>();
+            CreateMap<CsShipmentOtherChargeModel, CsShipmentOtherCharge>();
+            CreateMap<OpsTransactionModel, OpsTransaction>();
         }
     }
 }

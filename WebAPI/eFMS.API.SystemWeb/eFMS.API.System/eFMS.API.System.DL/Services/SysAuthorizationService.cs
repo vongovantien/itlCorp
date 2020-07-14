@@ -250,12 +250,15 @@ namespace eFMS.API.System.DL.Services
 
         public SysAuthorizationModel GetById(int id)
         {
-            var data = new SysAuthorizationModel();
-            var authoriza = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            SysAuthorizationModel data = new SysAuthorizationModel();
+            SysAuthorization authoriza = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (authoriza != null)
             {
                 data = mapper.Map<SysAuthorizationModel>(authoriza);
                 data.ServicesName = GetServiceNameOfAuthorization(data.Services);
+                data.UserCreatedName = userRepository.Where(x => x.Id == data.UserCreated)?.FirstOrDefault().Username;
+                data.UserModifiedName = userRepository.Where(x => x.Id == data.UserModified)?.FirstOrDefault().Username;
+
             }
             return data;
         }

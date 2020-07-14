@@ -66,5 +66,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? CompanyId { get; set; }
         public string RoundUpMethod { get; set; }
         public string ApplyDim { get; set; }
+        public string BillingPhone { get; set; }
+        public string BillingEmail { get; set; }
+        public string PartnerType { get; set; }
     }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ApiService } from '../services';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
+import { IdentityRepo } from './identity.repo';
 
 @Injectable({ providedIn: 'root' })
 export class SettingRepo {
@@ -53,5 +54,94 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    getJobToUnlockRequest(criteria: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GetJobToUnlockRequest`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    addNewUnlockRequest(body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateUnlockRequest(body: any = {}) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Update`, body)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getListUnlockRequest(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteUnlockRequest(id: string) {
+        return this._api.delete(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/Delete`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailUnlockRequest(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GetById`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkExistVoucherInvoiceOfSettlementAdvance(criteria: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/CheckExistVoucherInvoiceOfSettlementAdvance`, criteria)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    getInfoApproveUnlockRequest(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/GetInfoApproveUnlockRequest`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHistoryDenied(id: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/GetHistoryDenied`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    sendRequestUnlock(body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/SaveAndSendRequest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    approveUnlockRequest(id: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/UpdateApprove`, {}, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    deniedApproveUnlockRequest(id: string, comment: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/DeniedApprove`, {}, { id: id, comment: comment })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    cancelRequestUnlockRequest(id: string) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequestApprove/CancelRequest`, {}, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 }
+
+
 

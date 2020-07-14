@@ -173,6 +173,16 @@
         tcon2,
         tool2,
         catChartOfAccounts,
-        accManagement
+        accManagement,
+        settingUnlockRequest,
+        commercialCustomer,
+        commercialAgent
+    }
+    public enum UnlockTypeEnum
+    {
+        SHIPMENT = 1,
+        ADVANCE = 2,
+        SETTLEMENT = 3,
+        CHANGESERVICEDATE = 4
     }
 }

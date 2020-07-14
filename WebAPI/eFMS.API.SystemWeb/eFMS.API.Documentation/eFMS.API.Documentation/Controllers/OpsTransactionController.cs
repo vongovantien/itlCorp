@@ -269,5 +269,21 @@ namespace eFMS.API.Documentation.Controllers
             var result = transactionService.PreviewFormPLsheet(jobId, currency);
             return Ok(result);
         }
+
+        [HttpPut("LockOpsTransaction/{id}")]
+        [Authorize]
+        public IActionResult LockOpsTransaction(Guid id)
+        {
+            HandleState hs = transactionService.LockOpsTransaction(id);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

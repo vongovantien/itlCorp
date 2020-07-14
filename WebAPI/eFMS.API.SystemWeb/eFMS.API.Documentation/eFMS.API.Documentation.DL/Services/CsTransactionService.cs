@@ -264,51 +264,101 @@ namespace eFMS.API.Documentation.DL.Services
                     transaction.LockedDate = DateTime.Now;
                 }
             }
-            var airwaybill = airwaybillRepository.Get(x => x.JobId == model.Id)?.FirstOrDefault();
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            try
             {
-                try
+                var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id, false);
+                if (hsTrans.Success)
                 {
-                    var hsTrans = DataContext.Update(transaction, x => x.Id == transaction.Id);
-                    if (hsTrans.Success)
+                    var airwaybill = airwaybillRepository.Get(x => x.JobId == model.Id)?.FirstOrDefault();
+
+                    if (airwaybill != null)
                     {
-                        if(airwaybill != null)
+                        csTransactionSyncAirWayBill modelSyncAirWayBill = new csTransactionSyncAirWayBill
                         {
-                            airwaybill.IssuedBy = model.IssuedBy;
-                            airwaybill.DatetimeModified = DateTime.Now;
-                            airwaybill.UserModified = currentUser.UserID;
-                            var hsAirwayBill = airwaybillRepository.Update(airwaybill, x => x.Id == airwaybill.Id);
-                        }
-                        if (model.CsMawbcontainers != null)
-                        {
-                            var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);
-                        }
-                        else
-                        {
-                            var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Mblid == model.Id);
-                        }
-                        if (model.DimensionDetails != null)
-                        {
-                            var hsdimensions = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, transaction.Id);
-                        }
-                        else
-                        {
-                            var hsContainerDetele = dimensionDetailService.Delete(x => x.Mblid == model.Id);
-                        }
+                            Etd = model.Etd,
+                            Eta = model.Etd,
+                            Pol = model.Pol,
+                            Pod = model.Pod,
+                            FlightNo = model.FlightVesselName,
+                            IssuedBy = model.IssuedBy,
+                            WarehouseId = model.WarehouseId,
+                            ChargeWeight = model.ChargeWeight,
+                            GrossWeight = model.GrossWeight,
+                            Hw = model.Hw,
+                            DimensionDetails = model.DimensionDetails,
+                            FlightDate = model.FlightDate,
+                            Mawb = model.Mawb,
+                            Cbm = model.Cbm,
+                            PackageQty = model.PackageQty
+
+                        };
+                        HandleState hsAirWayBill = UpdateCsAirWayBill(airwaybill, modelSyncAirWayBill);
                     }
-                    trans.Commit();
-                    return hsTrans;
+                    if (model.CsMawbcontainers != null)
+                    {
+                        var hscontainers = containerService.UpdateMasterBill(model.CsMawbcontainers, transaction.Id);
+                    }
+                    else
+                    {
+                        var hsContainerDetele = csMawbcontainerRepo.Delete(x => x.Mblid == model.Id);
+                    }
+                    if (model.DimensionDetails != null)
+                    {
+                        var hsdimensions = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, transaction.Id);
+                    }
+                    else
+                    {
+                        var hsContainerDetele = dimensionDetailService.Delete(x => x.Mblid == model.Id);
+                    }
+                    DataContext.SubmitChanges();
                 }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
+
+                return hsTrans;
             }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        private HandleState UpdateCsAirWayBill(CsAirWayBill airwaybill, csTransactionSyncAirWayBill model)
+        {
+            HandleState result = new HandleState();
+
+            if (airwaybill != null)
+            {
+                airwaybill.IssuedBy = model.IssuedBy;
+                airwaybill.Pol = model.Pol;
+                airwaybill.Pod = model.Pod;
+                airwaybill.Eta = model.Eta;
+                airwaybill.Etd = model.Etd;
+                airwaybill.FlightNo = model.FlightNo;
+                airwaybill.FlightDate = model.FlightDate;
+                airwaybill.WarehouseId = model.WarehouseId;
+                airwaybill.ChargeWeight = model.ChargeWeight;
+                airwaybill.GrossWeight = model.GrossWeight;
+                airwaybill.Hw = model.Hw;
+                airwaybill.PackageQty = model.PackageQty;
+
+                airwaybill.DatetimeModified = DateTime.Now;
+                airwaybill.UserModified = currentUser.UserID;
+
+                result = airwaybillRepository.Update(airwaybill, x => x.Id == airwaybill.Id, false);
+                if (model.DimensionDetails != null)
+                {
+
+                    List<CsDimensionDetailModel> dimCsAirWaybill = model.DimensionDetails;
+                    foreach (var item in dimCsAirWaybill)
+                    {
+                        item.Mblid = null;
+                    }
+                    HandleState dimAirWayBill = dimensionDetailService.UpdateAirWayBill(dimCsAirWaybill, airwaybill.Id);
+                }
+                airwaybillRepository.SubmitChanges();
+                return result;
+            }
+            return result;
+
         }
 
         #endregion -- INSERT & UPDATE --
@@ -429,16 +479,22 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.ColoaderId != null)
                 {
                     CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
-                    result.SupplierName = coloaderPartner.PartnerNameEn;
-                    result.ColoaderCode = coloaderPartner.CoLoaderCode;
-                    result.RoundUpMethod = coloaderPartner.RoundUpMethod;
-                    result.ApplyDim = coloaderPartner.ApplyDim;
+                    if(coloaderPartner != null)
+                    {
+                        result.SupplierName = coloaderPartner.ShortName;
+                        result.ColoaderCode = coloaderPartner.CoLoaderCode;
+                        result.RoundUpMethod = coloaderPartner.RoundUpMethod;
+                        result.ApplyDim = coloaderPartner.ApplyDim;
+                    }
                 }
                 if (result.AgentId != null)
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
-                    result.AgentName = agent.PartnerNameEn;
-                    result.AgentData = GetAgent(agent);
+                    if(agent != null)
+                    {
+                        result.AgentName = agent.PartnerNameEn;
+                        result.AgentData = GetAgent(agent);
+                    }
                 }
 
                 if (result.Pod != null)
@@ -450,11 +506,15 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPod.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOD = new WarehouseData {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                        if(warehouse != null)
+                        {
+                            result.WarehousePOD = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
                     }
                 }
 
@@ -464,7 +524,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.POLCode = portIndexPol.Code;
                     result.POLName = portIndexPol.NameEn;
 
-                    if(portIndexPol.CountryId != null)
+                    if (portIndexPol.CountryId != null)
                     {
                         CatCountry country = catCountryRepo.Get(c => c.Id == portIndexPol.CountryId)?.FirstOrDefault();
 
@@ -476,12 +536,16 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPol.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
-                        result.WarehousePOL = new WarehouseData
+                        if(warehouse != null)
                         {
-                            NameEn = warehouse.NameEn,
-                            NameVn = warehouse.NameEn,
-                            NameAbbr = warehouse.DisplayName,
-                        };
+                            result.WarehousePOL = new WarehouseData
+                            {
+                                NameEn = warehouse.NameEn,
+                                NameVn = warehouse.NameEn,
+                                NameAbbr = warehouse.DisplayName,
+                            };
+                        }
+                       
                     }
                 }
 
@@ -489,11 +553,11 @@ namespace eFMS.API.Documentation.DL.Services
                 result.UserNameCreated = sysUserRepo.Get(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepo.Get(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
 
-                if(result.OfficeId != null)
+                if (result.OfficeId != null)
                 {
                     result.CreatorOffice = GetOfficeOfCreator(result.OfficeId);
                 }
-                if(result.GroupId != null)
+                if (result.GroupId != null)
                 {
                     var group = groupRepository.Get(x => x.Id == result.GroupId).FirstOrDefault();
                     result.GroupEmail = group != null ? group.Email : string.Empty;
@@ -527,7 +591,8 @@ namespace eFMS.API.Documentation.DL.Services
                 Location = office.Location,
                 AddressEn = office.AddressEn,
                 Tel = office.Tel,
-                Fax = office.Fax
+                Fax = office.Fax,
+                Email = office.Email
             };
             return creatorOffice;
         }
@@ -1993,11 +2058,11 @@ namespace eFMS.API.Documentation.DL.Services
                     surcharges.AddRange(surcharge);
 
                     CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Hblid = housebill.Id };
-                    var containerList = containerService.Query(contCriteria);                    
+                    var containerList = containerService.Query(contCriteria);
                     if (containerList.Count() > 0)
                     {
                         _containerNoList += (!string.IsNullOrEmpty(_containerNoList) ? "\r\n" : "") + String.Join("\r\n", containerList.Select(x => !string.IsNullOrEmpty(x.ContainerNo) || !string.IsNullOrEmpty(x.SealNo) ? x.ContainerNo + "/" + x.SealNo : string.Empty));
-                }
+                    }
                 }
 
                 if (surcharges.Count > 0)
@@ -2254,38 +2319,70 @@ namespace eFMS.API.Documentation.DL.Services
                 var shipment = DataContext.Get(x => x.Id == JobId).FirstOrDefault();
                 if (shipment == null) return null;
 
-                if (shipment.TransactionType != DocumentConstants.AE_SHIPMENT && shipment.TransactionType != DocumentConstants.AI_SHIPMENT)
-                    return null;
-                // Lấy ds HBL
-                var housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
+                List<CsTransactionDetail> housebills = csTransactionDetailRepo.Get(x => x.JobId == JobId).ToList();
 
-                if (housebills.Count() == 0)
+                if (shipment.TransactionType == DocumentConstants.AE_SHIPMENT || shipment.TransactionType == DocumentConstants.AI_SHIPMENT)
                 {
-                    return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
+                    if (housebills.Count() == 0)
+                    {
+                        return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
+                    }
+                    else
+                    {
+                        foreach (var hbl in housebills)
+                        {
+                            hbl.UserModified = currentUser.UserID;
+                            hbl.DatetimeModified = DateTime.Now;
+
+                            hbl.FlightNo = model.FlightVesselName;
+                            hbl.Eta = model.Eta;
+                            hbl.Etd = model.Etd;
+                            hbl.Pod = model.Pod;
+                            hbl.Pol = model.Pol;
+                            hbl.IssuedBy = model.IssuedBy;
+                            hbl.FlightDate = model.FlightDate;
+                            hbl.ForwardingAgentId = model.AgentId;
+                            hbl.WarehouseNotice = model.WarehouseId;
+                            hbl.Route = model.Route;
+                            hbl.Mawb = model.MblNo;
+                            string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
+                            hbl.ForwardingAgentDescription = agentDescription;
+
+                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
+                        }
+                        csTransactionDetailRepo.SubmitChanges();
+
+                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    }
                 }
                 else
                 {
-                    foreach (var hbl in housebills)
+                    if (housebills.Count() == 0)
                     {
-                        hbl.FlightNo = model.FlightVesselName;
-                        hbl.UserModified = currentUser.UserID;
-                        hbl.Eta = model.Eta;
-                        hbl.Etd = model.Etd;
-                        hbl.Pod = model.Pod;
-                        hbl.Pol = model.Pol;
-                        hbl.IssuedBy = model.IssuedBy;
-                        hbl.FlightDate = model.FlightDate;
-                        hbl.ForwardingAgentId = model.AgentId;
-                        hbl.WarehouseNotice = model.WarehouseId;
-                        hbl.Route = model.Route;
-
-                        string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
-                        hbl.ForwardingAgentDescription = agentDescription;
-
-                        csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id);
+                        return new ResultHandle { Status = false, Message = "Not found housebill", Data = null };
                     }
+                    else
+                    {
+                        foreach (var hbl in housebills)
+                        {
+                            hbl.UserModified = currentUser.UserID;
+                            hbl.DatetimeModified = DateTime.Now;
 
-                    return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                            hbl.Eta = model.Eta;
+                            hbl.Etd = model.Etd;
+                            hbl.Pod = model.Pod;
+                            hbl.Pol = model.Pol;
+
+                            hbl.CustomsBookingNo = model.BookingNo;
+                            hbl.Mawb = model.MblNo;
+                            hbl.OceanVoyNo = model.FlightVesselName + " - " + model.VoyNo;
+
+                            csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
+                        }
+                        csTransactionDetailRepo.SubmitChanges();
+
+                        return new ResultHandle { Status = true, Message = "Sync House Bill " + String.Join(", ", housebills.Select(s => s.Hwbno).Distinct()) + " successfully!", Data = housebills.Select(s => s.Hwbno).Distinct() };
+                    }
                 }
             }
             catch (Exception ex)
@@ -2294,7 +2391,227 @@ namespace eFMS.API.Documentation.DL.Services
                 return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }
+
+        public HandleState SyncShipmentByAirWayBill(Guid JobId, csTransactionSyncAirWayBill model)
+        {
+            CsTransaction shipment = DataContext.Where(x => x.Id == JobId)?.FirstOrDefault();
+            if (shipment == null)
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+            }
+
+            shipment.UserModified = currentUser.UserID;
+            shipment.DatetimeModified = DateTime.Now;
+
+            shipment.Etd = model.Etd;
+            shipment.Eta = model.Eta;
+            shipment.Pol = model.Pol;
+            shipment.Pod = model.Pod;
+            shipment.IssuedBy = model.IssuedBy;
+            shipment.WarehouseId = model.WarehouseId;
+            shipment.FlightDate = model.FlightDate;
+            shipment.FlightVesselName = model.FlightNo;
+            shipment.ChargeWeight = model.ChargeWeight;
+            shipment.Hw = model.Hw;
+            shipment.GrossWeight = model.GrossWeight;
+            shipment.Mawb = model.Mawb;
+            shipment.PackageQty = model.PackageQty;
+            shipment.Cbm = model.Cbm;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    HandleState hsTrans = DataContext.Update(shipment, x => x.Id == JobId);
+                    if (hsTrans.Success)
+                    {
+                        if (model.DimensionDetails != null)
+                        {
+                            HandleState hsdimensions = dimensionDetailService.UpdateMasterBill(model.DimensionDetails, JobId);
+                        }
+                        else
+                        {
+                            HandleState hsContainerDetele = dimensionDetailService.Delete(x => x.Mblid == JobId);
+                        }
+                    }
+                    trans.Commit();
+                    return hsTrans;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        public HandleState LockCsTransaction(Guid jobId)
+        {
+            CsTransaction job = DataContext.First(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled);
+            if (job == null)
+            {
+                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
+
+            }
+            if (job.IsLocked == true)
+            {
+                return new HandleState("Shipment has been locked !");
+            }
+            HandleState hs = new HandleState();
+
+            job.UserModified = currentUser.UserID;
+            job.DatetimeModified = DateTime.Now;
+            job.IsLocked = true;
+            job.LockedDate = DateTime.Now;
+            job.LockedUser = currentUser.UserName;
+
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    hs = DataContext.Update(job, x => x.Id == jobId);
+
+                    trans.Commit();
+                    return hs;
+
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+        #region preview
+        public Crystal PreviewShipmentCoverPage(Guid Id)
+        {
+            var dataShipment = DataContext.Get(x => x.Id == Id).FirstOrDefault();
+            var dataHouseBills = csTransactionDetailRepo.Get(x => x.JobId == dataShipment.Id);
+            var dataContainers = csMawbcontainerRepo.Get(x => x.Mblid == dataShipment.Id);
+
+            var listShipment = new List<ShimentConverPageSeaReport>();
+            Crystal result = null;
+            //var _currentUser = currentUser.UserName;
+            if (dataShipment != null)
+            {
+                var obj = new ShimentConverPageSeaReport();
+                obj.TransID = dataShipment.JobNo;
+                obj.TransDate = dataShipment.ServiceDate;
+                var _containerNoList = string.Empty;
+                CsMawbcontainerCriteria contCriteria = new CsMawbcontainerCriteria { Mblid = dataShipment.Id };
+                var _shipmentType = GetShipmentTypeForPreviewPL(dataShipment.TransactionType);
+                if (!string.IsNullOrEmpty(dataShipment.AgentId))
+                {
+                    obj.Agent = obj.NominationParty = catPartnerRepo.Get(x => x.Id == dataShipment.AgentId).Select(x => x.PartnerNameEn).FirstOrDefault()?.ToUpper();
+                }
+                obj.ShipmentSource = dataShipment.ShipmentType;
+                obj.Vessel = dataShipment.FlightVesselName;
+                if (!string.IsNullOrEmpty(dataShipment.ColoaderId))
+                {
+                    obj.Carrier = catPartnerRepo.Get(x => x.Id == dataShipment.ColoaderId).Select(x => x.PartnerNameEn).FirstOrDefault()?.ToUpper();
+                }
+                if (dataShipment.Pol != Guid.Empty)
+                {
+                    obj.POL = catPlaceRepo.Get(x => x.Id == dataShipment.Pol).Select(x => x.NameEn)?.FirstOrDefault();
+                }
+                obj.POD = catPlaceRepo.Get(x => x.Id == dataShipment.Pod).Select(x => x.NameEn)?.FirstOrDefault();
+                obj.ETA = dataShipment.Eta;
+                obj.ETD = dataShipment.Etd;
+                obj.MAWB = dataShipment.Mawb;
+                obj.ContainerNo = dataShipment.PackageContainer;
+                obj.ShipmentType = _shipmentType;
+                string salesmanName = string.Empty;
+                string Container = string.Empty;
+                string ConstSealNo = string.Empty;
+                if (dataContainers.Any())
+                {
+                    foreach (var item in dataContainers)
+                    {
+                        ConstSealNo += item.ContainerNo + "/" + item.SealNo + " ";
+                    }
+                }
+                if (dataHouseBills.Any())
+                {
+                    foreach (var item in dataHouseBills)
+                    {
+                        var objInHbl = new ShimentConverPageSeaReport();
+                        var shipper = catPartnerRepo.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn.ToUpper();
+                        var consignee = catPartnerRepo.Get(x => x.Id == item.ConsigneeId).FirstOrDefault()?.PartnerNameEn.ToUpper();
+                        objInHbl.HWBNO = item.Hwbno;
+                        objInHbl.ATTN = shipper?.ToUpper();
+                        objInHbl.Consignee = consignee?.ToUpper();
+                        objInHbl.FreightTerm = item.FreightPayment;
+                        objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
+                        objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
+                        objInHbl.CW = item.Cbm == null ? 0 : item.Cbm;
+                        objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
+                        objInHbl.TransID = obj.TransID;
+                        objInHbl.TransDate = obj.TransDate;
+                        objInHbl.Agent = obj.Agent;
+                        objInHbl.ShipmentSource = obj.ShipmentSource;
+                        objInHbl.Vessel = obj.Vessel;
+                        objInHbl.Carrier = obj.Carrier;
+                        objInHbl.POL = obj.POL;
+                        objInHbl.POD = obj.POD;
+                        objInHbl.ETA = obj.ETA;
+                        objInHbl.ETD = obj.ETD;
+                        objInHbl.MAWB = obj.MAWB;
+                        objInHbl.ContainerNo = item.PackageContainer;
+                        objInHbl.ShipmentType = obj.ShipmentType;
+                        objInHbl.Prepairedby = currentUser.UserName;
+                        Container += !string.IsNullOrEmpty(item.PackageContainer) ?   item.PackageContainer + " & " : string.Empty;
+                        salesmanName += sysUserRepo.Get(x => x.Id == item.SaleManId).Select(t => t.Username)?.FirstOrDefault() + ",";
+                        listShipment.Add(objInHbl);
+                    }
+                    
+                }
+                else
+                {
+                    listShipment.Add(obj);
+                }
+                if(salesmanName.Length > 0)
+                {
+                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1) );
+                }
+                if(Container.Length > 0)
+                {
+                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + (ConstSealNo.Length > 0 ? ConstSealNo.Remove(ConstSealNo.Length -1) : String.Empty));
+                }
+            }
+
+            var parameter = new ShimentConverPageSeaReportParams();
+            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyDescription = string.Empty;
+            parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
+            parameter.Website = DocumentConstants.COMPANY_WEBSITE;
+            parameter.Contact = string.Empty;//Get user name login
+            parameter.DecimalNo = 0; // set 0  temporary
+            parameter.HBLList = string.Empty;
+
+            result = new Crystal
+            {
+                ReportName = "ShipmentCoverPage.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(listShipment);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
+
+        }
     }
+    #endregion
+
 }
 
 

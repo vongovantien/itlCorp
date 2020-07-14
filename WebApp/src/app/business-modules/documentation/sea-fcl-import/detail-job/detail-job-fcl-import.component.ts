@@ -279,22 +279,60 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     onLockShipment() {
         this.confirmLockShipmentPopup.hide();
 
-        const modelUpdate = this.onSubmitData();
-
-        //  * Update field
-        modelUpdate.csMawbcontainers = this.containers;
-        modelUpdate.id = this.jobId;
-        modelUpdate.branchId = this.fclImportDetail.branchId;
-        modelUpdate.transactionType = this.fclImportDetail.transactionType;
-        modelUpdate.jobNo = this.fclImportDetail.jobNo;
-        modelUpdate.datetimeCreated = this.fclImportDetail.datetimeCreated;
-        modelUpdate.userCreated = this.fclImportDetail.userCreated;
-        modelUpdate.isLocked = true;
-        modelUpdate.currentStatus = this.fclImportDetail.currentStatus;
-
-        this.updateJob(modelUpdate);
+        this._progressRef.start();
+        this._documenRepo.LockCsTransaction(this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
     }
 
+    onSyncHBL() {
+        this.formCreateComponent.isSubmitted = true;
+        if (!this.checkValidateForm()) {
+            this.infoPopup.show();
+            return;
+        }
+        const modelAdd = this.onSubmitData();
+
+        const bodySyncData: DocumentationInterface.IDataSyncHBL = {
+            flightVesselName: modelAdd.flightVesselName,
+            etd: modelAdd.etd,
+            eta: modelAdd.eta,
+            pol: modelAdd.pol,
+            pod: modelAdd.pod,
+            bookingNo: modelAdd.bookingNo,
+            voyNo: modelAdd.voyNo
+        };
+
+        this._progressRef.start();
+        this._documenRepo.syncHBL(this.jobId, bodySyncData)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this._progressRef.complete();
+                })
+            ).subscribe(
+                (r: CommonInterface.IResult) => {
+                    if (r.status) {
+                        this._toastService.success(r.message);
+                    } else {
+                        this._toastService.error(r.message);
+                    }
+                },
+            );
+    }
     showDuplicateConfirm() {
         this.confirmDuplicatePopup.show();
     }
@@ -314,6 +352,24 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     previewPLsheet(currency: string) {
         const hblid = "00000000-0000-0000-0000-000000000000";
         this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    previewShipmentCoverPage() {
+        this._documenRepo.previewShipmentCoverPage(this.jobId)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
