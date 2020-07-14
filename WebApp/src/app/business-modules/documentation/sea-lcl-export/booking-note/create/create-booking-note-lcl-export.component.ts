@@ -65,6 +65,10 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
             bookingDate: !!form.bookingDate && !!form.bookingDate.startDate ? formatDate(form.bookingDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
             paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
+            pol: form.pol,
+            pod: form.pod,
+            shipperId: form.shipperId,
+            consigneeId: form.consigneeId,
 
         };
         const bookingNote: csBookingNote = new csBookingNote(Object.assign(_merge(form, formData)));
