@@ -1390,11 +1390,11 @@ namespace eFMS.API.Accounting.DL.Services
                             item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_NOT_EXIST, item.VoucherId];
                             item.IsValid = false;
                         }
-                    // Voucher ID đã thanh toán hết
-                    if (invoices.Any(x => 
-                    x.VoucherId == item.VoucherId 
-                    && !string.IsNullOrEmpty(x.PaymentStatus) 
-                    && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID))
+                        // Voucher ID đã thanh toán hết
+                        if (invoices.Any(x => 
+                        x.VoucherId == item.VoucherId 
+                        && !string.IsNullOrEmpty(x.PaymentStatus) 
+                        && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID))
                         {
                             item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_HAD_PAYMENT, item.VoucherId];
                             item.IsValid = false;
