@@ -12,7 +12,7 @@ export class SeaLCLExportBookingNoteFormSearchComponent extends AppForm {
     configSearch: any;
     defaultSetting: any = { fieldName: 'All', displayName: 'All' };
     settingFields: any[] = [this.defaultSetting];
-    dateFromTo: any;
+    dateFromTo: any = { startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1), endDate: new Date() };
     searchObject: any = {
         field: "",
         displayName: "",

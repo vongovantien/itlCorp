@@ -13,7 +13,7 @@
                                 </app-permission-button>
                             </ng-container>
                             <app-default-button [buttonSetting]="cancelButtonSetting"
-                                (onClick)="confirmCancelPopup.show()">
+                                (onClick)="accountingManagement.status !== 'New' ? gotoList() : confirmCancelPopup.show()">
                             </app-default-button>
                         </div>
                     </div>

@@ -16,6 +16,7 @@ export class AuthorizationAddPopupComponent extends PopupBase {
     @Output() onRequestAuthorization: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild('confirmUpdatePopup', { static: false }) confirmUpdatePopup: ConfirmPopupComponent;
     @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild('confirmChangeStatus', { static: false }) confirmChangeStatusPopup: ConfirmPopupComponent;
 
     formAuthorization: FormGroup;
     authorization: Authorization = new Authorization();
@@ -249,4 +250,16 @@ export class AuthorizationAddPopupComponent extends PopupBase {
         this.minDateEffective = null;
         // this.formAuthorization.updateValueAndValidity();
     }
-}
+
+    changeStatus($event: Event) {
+        if (this.action !== 'create' && this.authorizationActive.value) {
+            this.confirmChangeStatusPopup.show();
+            $event.preventDefault();
+        }
+    }
+
+    onCnfirmChangeStatus() {
+        this.confirmChangeStatusPopup.hide();
+        this.authorizationActive.setValue(!this.authorizationActive.value);
+    }
+};
