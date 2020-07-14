@@ -479,7 +479,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.ColoaderId != null)
                 {
                     CatPartner coloaderPartner = catPartnerRepo.Where(x => x.Id == result.ColoaderId)?.FirstOrDefault();
-                    if(coloaderPartner != null)
+                    if (coloaderPartner != null)
                     {
                         result.SupplierName = coloaderPartner.ShortName;
                         result.ColoaderCode = coloaderPartner.CoLoaderCode;
@@ -490,7 +490,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (result.AgentId != null)
                 {
                     CatPartner agent = catPartnerRepo.Get().FirstOrDefault(x => x.Id == result.AgentId);
-                    if(agent != null)
+                    if (agent != null)
                     {
                         result.AgentName = agent.PartnerNameEn;
                         result.AgentData = GetAgent(agent);
@@ -506,7 +506,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPod.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPod.WarehouseId)?.FirstOrDefault();
-                        if(warehouse != null)
+                        if (warehouse != null)
                         {
                             result.WarehousePOD = new WarehouseData
                             {
@@ -515,7 +515,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 NameAbbr = warehouse.DisplayName,
                             };
                         }
-                       
+
                     }
                 }
 
@@ -539,7 +539,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (portIndexPol.WarehouseId != null)
                     {
                         CatPlace warehouse = catPlaceRepo.Get(x => x.Id == portIndexPol.WarehouseId)?.FirstOrDefault();
-                        if(warehouse != null)
+                        if (warehouse != null)
                         {
                             result.WarehousePOL = new WarehouseData
                             {
@@ -1766,10 +1766,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
                 dimensionDetails.AddRange(masterDimensionDetails);
             }
-            if (model.TransactionType == "AI" || model.TransactionType == "AE")
-            {
-                detailTrans = detailTrans.Where(x => x.JobId == model.Id && x.ParentId == null);
-            }
+
             if (detailTrans != null)
             {
                 int countDetail = csTransactionDetailRepo.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
@@ -1784,6 +1781,8 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 freightCharges = new List<CsArrivalFrieghtCharge>();
                 surcharges = new List<CsShipmentSurcharge>();
+                string hawbCurrentMax = GetMaxHAWB();
+
                 foreach (var item in detailTrans)
                 {
                     var oldHouseId = item.Id;
@@ -1801,9 +1800,17 @@ namespace eFMS.API.Documentation.DL.Services
                     item.ArrivalHeader = null;
                     item.ArrivalFooter = null;
                     item.ArrivalDate = null;
-                   
-                    item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
-                    if (model.TransactionType == "AI" || model.TransactionType == "AE")
+
+                    if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                    {
+                        item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
+                        hawbCurrentMax = item.Hwbno;
+                    }
+                    else
+                    {
+                        item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
+                    }
+                    if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
                     {
                         item.Mawb = model.Mawb;
                     }
@@ -1855,6 +1862,47 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return new ResultHandle { Status = false, Message = ex.Message };
             }
+        }
+
+        public string GetMaxHAWB()
+        {
+            var hblNos = csTransactionDetailRepo.Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
+               .OrderByDescending(o => o.DatetimeCreated)
+               .ThenByDescending(o => o.Hwbno)
+               .Select(s => s.Hwbno);
+            int count = 0;
+            List<int> oders = new List<int>();
+            foreach (var hbl in hblNos)
+            {
+                string _hbl = hbl;
+                _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
+                Int32.TryParse(_hbl, out count);
+                oders.Add(count);
+               
+            }
+            int maxCurrentOder = oders.Max();
+            maxCurrentOder -= 1;
+            return GenerateID.GenerateHBLNo(maxCurrentOder);
+        }
+        public string GenerateAirHBLNo(string hawb)
+        {
+            string hblNo = string.Empty;
+
+            string _hbl = hawb;
+            _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
+            int count = int.Parse(_hbl);
+            //Reset về 0
+            if (count == 9999)
+            {
+                count = 0;
+            }
+            hblNo = GenerateID.GenerateHBLNo(count);
+            return hblNo;
+        }
+
+        private bool isNumeric(string n)
+        {
+            return int.TryParse(n, out int _);
         }
 
         private CsTransaction GetDefaultJob(CsTransactionEditModel model)
@@ -2574,23 +2622,23 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.ContainerNo = item.PackageContainer;
                         objInHbl.ShipmentType = obj.ShipmentType;
                         objInHbl.Prepairedby = currentUser.UserName;
-                        Container += !string.IsNullOrEmpty(item.PackageContainer) ?   item.PackageContainer + " & " : string.Empty;
+                        Container += !string.IsNullOrEmpty(item.PackageContainer) ? item.PackageContainer + " & " : string.Empty;
                         salesmanName += sysUserRepo.Get(x => x.Id == item.SaleManId).Select(t => t.Username)?.FirstOrDefault() + ",";
                         listShipment.Add(objInHbl);
                     }
-                    
+
                 }
                 else
                 {
                     listShipment.Add(obj);
                 }
-                if(salesmanName.Length > 0)
+                if (salesmanName.Length > 0)
                 {
-                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1) );
+                    listShipment.ForEach(x => x.ContactName = salesmanName.Remove(salesmanName.Length - 1));
                 }
-                if(Container.Length > 0)
+                if (Container.Length > 0)
                 {
-                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + (ConstSealNo.Length > 0 ? ConstSealNo.Remove(ConstSealNo.Length -1) : String.Empty));
+                    listShipment.ForEach(x => x.ContainerNo = Container.Remove(Container.Length - 2) + (ConstSealNo.Length > 0 ? ConstSealNo.Remove(ConstSealNo.Length - 1) : String.Empty));
                 }
             }
 

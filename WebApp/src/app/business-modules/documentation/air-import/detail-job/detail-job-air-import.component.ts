@@ -15,6 +15,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -51,7 +52,8 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress
+        private _ngProgressService: NgProgress,
+        private _spinner: NgxSpinnerService
 
 
     ) {
@@ -144,21 +146,20 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     duplicateJob(body: any) {
+        this._spinner.show();
         this._documenRepo.importCSTransaction(body)
             .pipe(
-                catchError(this.catchError)
+                catchError(this.catchError),
+                finalize(() => this._spinner.hide())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        // * get detail & container list.
                         this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
-                        this.ACTION = 'SHIPMENT';
-                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
+                        this.ACTION = null;
                     } else {
                         this._toastService.error(res.message);
                     }

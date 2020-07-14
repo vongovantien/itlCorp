@@ -108,7 +108,7 @@
                     <div class="col-lg-6 m--align-right">
                         <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
                             (click)="removeCharge()"
-                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                             <span>
                                 <i class="la la-trash"></i>
                                 <span>
@@ -119,7 +119,7 @@
                         <button type="button"
                             class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
                             (click)="addMoreCharge()"
-                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+                            *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                             <span>
                                 <i class="la la-plus"></i>
                                 <span>
@@ -136,7 +136,7 @@
                         <tr>
                             <th>
                                 <label class="m-checkbox"
-                                    *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+                                    *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                                     <input type="checkbox" [(ngModel)]="isCheckAllCharge"
                                         (change)="checkUncheckAllCharge()">
                                     <span></span>
@@ -164,7 +164,7 @@
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox"
-                                        *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+                                        *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                                         <input type="checkbox" (change)="onChangeCheckBoxCharge($event)"
                                             value="{{charge}}" [(ngModel)]="charge.isSelected" name="{{charge.code}}">
                                         <span></span>
@@ -231,7 +231,7 @@
     <div class="form-actions m--align-center">
         <div class="c-button-actions">
             <app-permission-button type="save" title="Save" (onClick)="updateSOA()"
-                *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid Apart'">
+                *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
             </app-permission-button>
             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
             </app-default-button>

@@ -192,6 +192,23 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             .subscribe(
                 (res: any[]) => {
                     this.contracts = res || [];
+                    console.log(this.contracts);
+                    this.contracts.forEach(element => {
+                        if (element.saleService.includes(';')) {
+
+                            // element.saleService = element.saleService.replace(';', '; ');
+                            // const data = element.saleService.replace(';', ' ');
+                            const arr = element.saleService.split(';');
+                            element.saleService = '';
+                            console.log(arr);
+                            arr.forEach(item => {
+                                element.saleService += item + '; ';
+                            });
+                            if (element.saleService.charAt(element.saleService.length - 2) === ';') {
+                                element.saleService = element.saleService.substr(0, element.saleService.length - 2);
+                            }
+                        }
+                    });
                 }
             );
     }

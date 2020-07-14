@@ -13,7 +13,8 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { EmailContent } from 'src/app/shared/models/document/emailContent';
 import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
-import { Router } from '@angular/router';
+import { Router, Params } from '@angular/router';
+import * as fromShareBussiness from '@share-bussiness';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -41,17 +42,17 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     sendMailButtonName: string = '';
     serviceId: string = '';
-    isExitsArrivalNotice: boolean = true;
+    isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
-    isExitsManifest: boolean = true;
+    isExitsManifest: boolean = false;
     isCheckedManifest: boolean = false;
-    isExitsHawb: boolean = true;
+    isExitsHawb: boolean = false;
     isCheckedHawb: boolean = false;
-    isExitsSI: boolean = true;
+    isExitsSI: boolean = false;
     isCheckedSI: boolean = false;
-    isExitsSISummary: boolean = true;
+    isExitsSISummary: boolean = false;
     isCheckedSISummary: boolean = false;
-    isExitsSIDetailCont: boolean = true;
+    isExitsSIDetailCont: boolean = false;
     isCheckedSIDetailCont: boolean = false;
 
     pathGeneralArrivalNotice: string = '';
@@ -80,13 +81,17 @@ export class ShareBusinessReAlertComponent extends AppList {
             map(([params, qParams]) => ({ ...params, ...qParams })),
             take(1)
         ).subscribe(
-            (params: any) => {
+            (params: Params) => {
                 if (params.jobId) {
                     this.jobId = params.jobId;
                     this.hblId = params.hblId;
                     this.serviceId = params.serviceId;
                     this.exportFileCrystalToPdf(params.serviceId);
                     this.getContentMail(params.serviceId, params.hblId, params.jobId);
+
+                    // Is Locked Shipment?
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                    this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
                 }
             }
         );
