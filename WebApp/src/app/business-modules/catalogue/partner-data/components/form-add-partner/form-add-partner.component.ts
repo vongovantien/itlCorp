@@ -9,6 +9,7 @@ import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
 import { JobConstants } from '@constants';
 import { forkJoin, Observable } from 'rxjs';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
     selector: 'form-add-partner',
@@ -21,7 +22,7 @@ export class FormAddPartnerComponent extends AppForm {
     @ViewChild(PartnerOtherChargePopupComponent, { static: false }) otherChargePopup: PartnerOtherChargePopupComponent;
 
     @Output() requireSaleman = new EventEmitter<boolean>();
-    @Input() isUpdate: false;
+    @Input() isUpdate: boolean = false;
     //
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
@@ -39,8 +40,8 @@ export class FormAddPartnerComponent extends AppForm {
     shipingsProvinces: ProviceModel[] = [];
     provinces: Observable<ProviceModel[]>;
     //
-    shippingCountryName: string;
-    billingCountryName: string;
+    countryShippingIdName: string;
+    countryIdName: string;
     shippingProvinceName: string;
     billingProvinceName: string;
 
@@ -48,39 +49,39 @@ export class FormAddPartnerComponent extends AppForm {
     isSubmitted: boolean = false;
     partnerAccountNo: AbstractControl;
     internalReferenceNo: AbstractControl;
-    nameENFull: AbstractControl;
-    nameLocalFull: AbstractControl;
+    partnerNameEn: AbstractControl;
+    partnerNameVn: AbstractControl;
     shortName: AbstractControl;
     partnerAccountRef: AbstractControl;
 
     taxCode: AbstractControl;
     partnerGroup: AbstractControl;
-    shippingCountry: AbstractControl;
-    shippingProvince: AbstractControl;
+    countryShippingId: AbstractControl;
+    provinceShippingId: AbstractControl;
     zipCodeShipping: AbstractControl;
-    shippingAddressEN: AbstractControl;
-    shippingAddressVN: AbstractControl;
-    billingCountry: AbstractControl;
-    billingProvince: AbstractControl;
-    billingZipcode: AbstractControl;
-    billingAddressEN: AbstractControl;
-    billingAddressLocal: AbstractControl;
-    partnerContactPerson: AbstractControl;
-    partnerContactNumber: AbstractControl;
-    partnerContactFaxNo: AbstractControl;
-    employeeWorkPhone: AbstractControl;
-    employeeEmail: AbstractControl;
-    partnerWebsite: AbstractControl;
-    partnerbankAccountNo: AbstractControl;
-    partnerBankAccountName: AbstractControl;
-    partnerBankAccountAddress: AbstractControl;
-    partnerSwiftCode: AbstractControl;
-    partnerWorkPlace: AbstractControl;
+    addressShippingEn: AbstractControl;
+    addressShippingVn: AbstractControl;
+    countryId: AbstractControl;
+    provinceId: AbstractControl;
+    zipCode: AbstractControl;
+    addressEn: AbstractControl;
+    addressVn: AbstractControl;
+    contactPerson: AbstractControl;
+    tel: AbstractControl;
+    fax: AbstractControl;
+    workPhoneEx: AbstractControl;
+    email: AbstractControl;
+
+    bankAccountNo: AbstractControl;
+    bankAccountName: AbstractControl;
+    bankAccountAddress: AbstractControl;
+    swiftCode: AbstractControl;
+
     active: AbstractControl;
     note: AbstractControl;
-    isPublic: boolean = false;
+    public: boolean = false;
     coLoaderCode: AbstractControl;
-    roundUp: AbstractControl;
+    roundUpMethod: AbstractControl;
     applyDim: AbstractControl;
     //
     billingEmail: AbstractControl;
@@ -114,7 +115,7 @@ export class FormAddPartnerComponent extends AppForm {
             this.getShippingProvinces();
             this.getBillingProvinces();
         }
-        console.log("counttry: ", this.shippingCountry.value);
+        console.log("counttry: ", this.countryShippingId.value);
     }
     getCountryProvince() {
         this.nations = this._catalogueRepo.getCountry();
@@ -128,16 +129,58 @@ export class FormAddPartnerComponent extends AppForm {
     }
     onChange(event: any, type: string) {
         switch (type) {
-            case 'shippingCountry':
-                this.getShippingProvinces(event.id, !!this.shippingProvince.value && this.shippingProvince.value.length > 0 ? this.shippingProvince.value[0].id : null);
-                console.log(this.shippingCountry.value)
-                console.log(this.shippingProvince.value);
+            case 'countryShippingId':
+                this.getShippingProvinces(event.id, !!this.provinceShippingId.value && this.provinceShippingId.value.length > 0 ? this.provinceShippingId.value[0].id : null);
+
+
                 break;
-            case 'billingCountry':
-                this.getBillingProvinces(event.id, !!this.billingProvince.value && this.billingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
+            case 'countryId':
+                this.getBillingProvinces(event.id, !!this.provinceId.value && this.provinceId.value.length > 0 ? this.provinceId.value[0].id : null);
                 break;
             case 'category':
-                this.groups = this.groups + ";" + event.id;
+                console.log("this.groups before: ", this.partnerGroup.value);
+                //if(this.groups === '' ){
+                //}
+                //this.groups = this.groups + ";" + event.id;
+                console.log("event: ", event);
+
+                //let index = [...this.partnerGroup.value].findIndex(e => e.id === 'ALL');
+
+                // có ALL thì về rỗng và set item hiện tại
+                if (event.id === 'ALL') {
+
+                    let temp = [{ text: event.text, id: event.id }];
+                    this.partnerGroup.setValue([...temp]);
+                }
+                // không có ALL có 3 TH:
+                //TH1: Array không có ALL và Event không = ALL
+                //TH2: Array có ALL và Event không = ALL
+                //TH3: ... cần thêm length để check
+                else {
+                    let index = [...this.partnerGroup.value].findIndex(e => e.id === 'ALL');
+                    let length = [...this.partnerGroup.value].length;
+                    if (index >= 0) {
+                        if (length < 2) {
+                            console.log(2);
+                            let cloneArray = this.partnerGroup.value.filter(e => e.id !== 'ALL');
+                            cloneArray.push({ text: event.text, id: event.id });
+                            this.partnerGroup.setValue([...cloneArray]);
+                        }
+                        else {
+                            console.log("clicked");
+                            let cloneArray = this.partnerGroup.value.filter(e => e.id !== 'ALL');
+                            this.partnerGroup.setValue([...cloneArray]);
+                        }
+                    }
+                    else {
+                        console.log(3);
+                        let newCloneArray = this.partnerGroup.value.map((e) => { return { id: e.id, text: e.text } });
+                        this.partnerGroup.setValue(newCloneArray);
+                    }
+                }
+
+
+                console.log("this.groups after: ", this.partnerGroup.value);
                 const isShowSaleMan = this.checkRequireSaleman();
                 this.requireSaleman.emit(isShowSaleMan);
                 break;
@@ -146,13 +189,13 @@ export class FormAddPartnerComponent extends AppForm {
 
     removed(event, type: string) {
         switch (type) {
-            case 'shippingCountry':
+            case 'countryShippingId':
                 this.getShippingProvinces();
-                this.partnerForm.controls['shippingProvince'].setValue([]);
+                this.partnerForm.controls['provinceShippingId'].setValue([]);
                 break;
-            case 'billingCountry':
+            case 'countryId':
                 this.getBillingProvinces();
-                this.partnerForm.controls['billingProvince'].setValue([]);
+                this.partnerForm.controls['provinceId'].setValue([]);
                 break;
             case 'category':
                 this.groups = this.groups.replace(event.id, '');
@@ -164,7 +207,7 @@ export class FormAddPartnerComponent extends AppForm {
 
     checkRequireSaleman(): boolean {
 
-        if (this.groups.includes("ALL") || this.groups.includes("CUSTOMER")) {
+        if (!!this.groups && (this.groups.includes("ALL") || this.groups.includes("CUSTOMER"))) {
             return true;
         } else {
             return false;
@@ -172,16 +215,20 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     getBillingProvinces(countryId?: number, provinceId: string = null) {
+        console.log("co vo", provinceId);
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.billingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        //this.billingProvinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.billingProvinces = res;
                         if (!!provinceId) {
                             const obj = this.billingProvinces.find(x => x.id === provinceId);
+                            console.log(obj)
                             if (obj === undefined) {
-                                this.billingProvince.setValue(null);
+                                console.log('clicked')
+                                this.provinceId.setValue(null);
                             }
                         }
                     }
@@ -198,6 +245,8 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     getShippingProvinces(countryId?: number, provinceId: string = null) {
+        console.log("co vo", provinceId);
+
         if (countryId) {
             this._catalogueRepo.getProvincesBycountry(countryId)
                 .pipe(catchError(this.catchError), finalize(() => { }))
@@ -205,12 +254,14 @@ export class FormAddPartnerComponent extends AppForm {
                     (res) => {
                         this.shippingProvinces = res;
                         if (!!provinceId) {
+
                             const obj = this.shippingProvinces.find(x => x.id === provinceId);
+                            console.log(obj)
                             if (obj === undefined) {
-                                this.shippingProvince.setValue(null);
+                                console.log('clicked')
+                                this.provinceShippingId.setValue(null);
                             }
                         }
-
                     }
                 );
         } else {
@@ -229,10 +280,10 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
             internalReferenceNo: [null],
-            nameENFull: [null, Validators.compose([
+            partnerNameEn: [null, Validators.compose([
                 FormValidators.required,
             ])],
-            nameLocalFull: [null, Validators.compose([
+            partnerNameVn: [null, Validators.compose([
                 FormValidators.required,
             ])],
             shortName: [null, Validators.compose([
@@ -245,134 +296,174 @@ export class FormAddPartnerComponent extends AppForm {
             partnerGroup: [null, Validators.compose([
                 Validators.required
             ])],
-            shippingCountry: [null, Validators.compose([
+            countryShippingId: [null, Validators.compose([
                 Validators.required
             ])],
-            shippingProvince: [null, Validators.compose([
+            provinceShippingId: [null, Validators.compose([
                 Validators.required
             ])],
             zipCodeShipping: [null],
-            shippingAddressEN: [null, Validators.compose([
+            addressShippingEn: [null, Validators.compose([
                 FormValidators.required
             ])],
-            shippingAddressVN: [null, Validators.compose([
+            addressShippingVn: [null, Validators.compose([
                 FormValidators.required
             ])],
-            billingCountry: [null, Validators.compose([
+            countryId: [null, Validators.compose([
                 Validators.required
             ])],
-            billingProvince: [null, Validators.compose([
+            provinceId: [null, Validators.compose([
                 Validators.required
             ])],
-            billingZipcode: [null],
-            billingAddressEN: [null, Validators.compose([
+            zipCode: [null],
+            addressEn: [null, Validators.compose([
                 FormValidators.required
             ])],
-            billingAddressLocal: [null, Validators.compose([
+            addressVn: [null, Validators.compose([
                 FormValidators.required
             ])],
             //thien
             billingEmail: [null],
             billingPhone: [null],
             //
-            partnerContactPerson: [null],
-            partnerContactNumber: [null],
-            partnerContactFaxNo: [null],
-            employeeWorkPhone: [null],
-            employeeEmail: [null],
-            partnerWebsite: [null],
-            partnerbankAccountNo: [null],
-            partnerBankAccountName: [null],
-            partnerBankAccountAddress: [null],
-            partnerSwiftCode: [null],
-            partnerWorkPlace: [null],
+            contactPerson: [null],
+            tel: [null],
+            fax: [null],
+            workPhoneEx: [null],
+            email: [null],
+
+            bankAccountNo: [null],
+            bankAccountName: [null],
+            bankAccountAddress: [null],
+            swiftCode: [null],
+
             active: [true],
             note: [null],
             coLoaderCode: [null],
             applyDim: [null],
-            roundUp: [null]
+            roundUpMethod: [null]
         });
 
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
-        this.nameENFull = this.partnerForm.controls['nameENFull'];
-        this.nameLocalFull = this.partnerForm.controls['nameLocalFull'];
+        this.partnerNameEn = this.partnerForm.controls['partnerNameEn'];
+        this.partnerNameVn = this.partnerForm.controls['partnerNameVn'];
         this.shortName = this.partnerForm.controls['shortName'];
         this.partnerAccountRef = this.partnerForm.controls['partnerAccountRef'];
         this.taxCode = this.partnerForm.controls['taxCode'];
         this.partnerGroup = this.partnerForm.controls['partnerGroup'];
-        this.shippingCountry = this.partnerForm.controls['shippingCountry'];
-        this.shippingProvince = this.partnerForm.controls['shippingProvince'];
+        this.countryShippingId = this.partnerForm.controls['countryShippingId'];
+        this.provinceShippingId = this.partnerForm.controls['provinceShippingId'];
         this.zipCodeShipping = this.partnerForm.controls['zipCodeShipping'];
-        this.shippingAddressEN = this.partnerForm.controls['shippingAddressEN'];
-        this.shippingAddressVN = this.partnerForm.controls['shippingAddressVN'];
-        this.billingCountry = this.partnerForm.controls['billingCountry'];
-        this.billingProvince = this.partnerForm.controls['billingProvince'];
-        this.billingZipcode = this.partnerForm.controls['billingZipcode'];
-        this.billingAddressEN = this.partnerForm.controls['billingAddressEN'];
-        this.billingAddressLocal = this.partnerForm.controls['billingAddressLocal'];
-        this.partnerContactPerson = this.partnerForm.controls['partnerContactPerson'];
-        this.partnerContactNumber = this.partnerForm.controls['partnerContactNumber'];
-        this.partnerContactFaxNo = this.partnerForm.controls['partnerContactFaxNo'];
-        this.employeeWorkPhone = this.partnerForm.controls['employeeWorkPhone'];
-        this.employeeEmail = this.partnerForm.controls['employeeEmail'];
-        this.partnerWebsite = this.partnerForm.controls['partnerWebsite'];
-        this.partnerbankAccountNo = this.partnerForm.controls['partnerbankAccountNo'];
-        this.partnerBankAccountName = this.partnerForm.controls['partnerBankAccountName'];
-        this.partnerBankAccountAddress = this.partnerForm.controls['partnerBankAccountAddress'];
-        this.partnerSwiftCode = this.partnerForm.controls['partnerSwiftCode'];
-        this.partnerWorkPlace = this.partnerForm.controls['partnerWorkPlace'];
+        this.addressShippingEn = this.partnerForm.controls['addressShippingEn'];
+        this.addressShippingVn = this.partnerForm.controls['addressShippingVn'];
+        this.countryId = this.partnerForm.controls['countryId'];
+        this.provinceId = this.partnerForm.controls['provinceId'];
+        this.zipCode = this.partnerForm.controls['zipCode'];
+        this.addressEn = this.partnerForm.controls['addressEn'];
+        this.addressVn = this.partnerForm.controls['addressVn'];
+        this.contactPerson = this.partnerForm.controls['contactPerson'];
+        this.tel = this.partnerForm.controls['tel'];
+        this.fax = this.partnerForm.controls['fax'];
+        this.workPhoneEx = this.partnerForm.controls['workPhoneEx'];
+        this.email = this.partnerForm.controls['email'];
+
+        this.bankAccountNo = this.partnerForm.controls['bankAccountNo'];
+        this.bankAccountName = this.partnerForm.controls['bankAccountName'];
+        this.bankAccountAddress = this.partnerForm.controls['bankAccountAddress'];
+        this.swiftCode = this.partnerForm.controls['swiftCode'];
+
         this.active = this.partnerForm.controls['active'];
         this.coLoaderCode = this.partnerForm.controls['coLoaderCode'];
         this.note = this.partnerForm.controls['note'];
         this.applyDim = this.partnerForm.controls['applyDim'];
-        this.roundUp = this.partnerForm.controls['roundUp'];
+        this.roundUpMethod = this.partnerForm.controls['roundUpMethod'];
         //
         this.billingEmail = this.partnerForm.controls['billingEmail'];
         this.billingPhone = this.partnerForm.controls['billingPhone'];
     }
 
-    onSelectDataFormInfo(data: any) {
+    /*onSelectDataFormInfo(data: any) {
         this.partnerAccountRef.setValue(data.id);
+    }*/
+    onSelectDataFormInfo(data: any, type: string) {
+
+        switch (type) {
+            case 'acRef':
+                this.partnerAccountRef.setValue(data.id);
+                break;
+            case 'shippping-country':
+                //console.log(data.nameVn, type);
+                this.countryShippingId.setValue(data.id);
+                this.shippingProvinceName = null;
+                //set value bat ky khac null.
+                this.provinceShippingId.setValue(data.id);
+                this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
+                break;
+            case 'shippping-city':
+                this.provinceShippingId.setValue(data.id);
+                break;
+            case 'billing-country':
+                //console.log(data.nameVn, type);
+                this.countryId.setValue(data.id);
+                //
+                this.billingProvinceName = null;
+                //set value bat ky khac null.
+                this.provinceId.setValue(data.id);
+                // this.getBillingProvince(data.id);
+                this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
+                break;
+            case 'billing-city':
+                this.provinceId.setValue(data.id);
+
+                break;
+            default:
+                break;
+        }
     }
 
     setFormData(partner: Partner) {
         //set Name Country
-        this.shippingCountryName = partner.countryShippingName;
-        this.billingCountryName = partner.countryName;
+        this.countryShippingIdName = partner.countryShippingName;
+        this.countryIdName = partner.countryName;
         //set Name Province
         this.shippingProvinceName = partner.provinceShippingName;
         this.billingProvinceName = partner.provinceName;
 
+        if (partner.countryId && partner.countryShippingId) {
+            this.getShippingProvinces(partner.countryShippingId);
+            this.getBillingProvinces(partner.countryId);
+        }
+        //console.log('shipping province: ', this.shippingProvince.value);
+        //console.log('billing province: ', this.billingProvince.value);
+        //
 
-
-        // this.shippingCountryId = partner.countryShippingId;
-        // this.billingCountryId = partner.countryId;
+        // this.countryShippingIdId = partner.countryShippingId;
+        // this.countryIdId = partner.countryId;
         // console.log("shipping Id: ", this.shippingProvinceName);
         // console.log("billing Id: ", this.billingProvinceName);
 
-        console.log(partner);
+        console.log("partner: ", partner);
         const isShowSaleMan = this.checkRequireSaleman();
         this.requireSaleman.emit(isShowSaleMan);
-        const partnerGroupActives = this.getPartnerGroupActives(partner.partnerGroup.split(';'));
+        const partnerGroupActives = !!partner.partnerGroup ? this.getPartnerGroupActives(partner.partnerGroup.split(';')) : null;
         let index = -1;
         let parentCustomerActive = [];
         let workPlaceActive = [];
-        let billingCountryActive = [];
-        let shippingCountryActive = [];
+        let countryIdActive = [];
+        let countryShippingIdActive = [];
         let billingProvinceActive = [];
         let shippingProvinceActive = [];
         index = this.parentCustomers.findIndex(x => x.id === partner.parentId);
         if (index > -1) { parentCustomerActive = [this.parentCustomers[index]]; }
-        index = this.workPlaces.findIndex(x => x.id === partner.workPlaceId);
-        if (index > -1) { workPlaceActive = [this.workPlaces[index]]; }
+
         index = this.countries.findIndex(x => x.id === partner.countryId);
         if (index > - 1) {
-            billingCountryActive = [this.countries[index]];
+            countryIdActive = [this.countries[index]];
         }
         index = this.countries.findIndex(x => x.id === partner.countryShippingId);
         if (index > -1) {
-            shippingCountryActive = [this.countries[index]];
+            countryShippingIdActive = [this.countries[index]];
         }
         index = this.billingProvinces.findIndex(x => x.id === partner.provinceId);
         if (index > -1) {
@@ -382,56 +473,57 @@ export class FormAddPartnerComponent extends AppForm {
         if (index > -1) {
             shippingProvinceActive = [this.shippingProvinces[index]];
         }
-        this.isPublic = partner.public;
+        this.public = partner.public;
 
         this.partnerForm.setValue({
             partnerAccountNo: partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
-            nameENFull: partner.partnerNameEn,
-            nameLocalFull: partner.partnerNameVn,
+            partnerNameEn: partner.partnerNameEn,
+            partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
             partnerAccountRef: partner.parentId,
             taxCode: partner.taxCode,
             partnerGroup: partnerGroupActives,
-            //shippingCountry: shippingCountryActive,
-            shippingCountry: partner.countryShippingId,
+            //countryShippingId: countryShippingIdActive,
+            countryShippingId: partner.countryShippingId,
             //shippingProvince: shippingProvinceActive,
-            shippingProvince: partner.provinceShippingId,
+            provinceShippingId: partner.provinceShippingId,
+
 
             zipCodeShipping: partner.zipCodeShipping,
-            shippingAddressEN: partner.addressShippingEn,
-            shippingAddressVN: partner.addressShippingVn,
-            // billingCountry: billingCountryActive,
-            billingCountry: partner.countryId,
+            addressShippingEn: partner.addressShippingEn,
+            addressShippingVn: partner.addressShippingVn,
+            // countryId: countryIdActive,
+            countryId: partner.countryId,
             //billingProvince: billingProvinceActive,
-            billingProvince: partner.provinceId,
+            provinceId: partner.provinceId,
 
-            billingZipcode: partner.zipCode,
-            billingAddressEN: partner.addressEn,
-            billingAddressLocal: partner.addressVn,
+            zipCode: partner.zipCode,
+            addressEn: partner.addressEn,
+            addressVn: partner.addressVn,
             //
             billingEmail: partner.billingEmail,
             billingPhone: partner.billingPhone,
             //
-            partnerContactPerson: partner.contactPerson,
-            partnerContactNumber: partner.tel,
-            partnerContactFaxNo: partner.fax,
-            employeeWorkPhone: partner.workPhoneEx,
-            employeeEmail: partner.email,
-            partnerWebsite: partner.website,
-            partnerbankAccountNo: partner.bankAccountNo,
-            partnerBankAccountName: partner.bankAccountName,
-            partnerBankAccountAddress: partner.bankAccountAddress,
-            partnerSwiftCode: partner.swiftCode,
-            partnerWorkPlace: workPlaceActive,
+            contactPerson: partner.contactPerson,
+            tel: partner.tel,
+            fax: partner.fax,
+            workPhoneEx: partner.workPhoneEx,
+            email: partner.email,
+
+            bankAccountNo: partner.bankAccountNo,
+            bankAccountName: partner.bankAccountName,
+            bankAccountAddress: partner.bankAccountAddress,
+            swiftCode: partner.swiftCode,
+
             active: partner.active === null ? false : partner.active,
             note: partner.note,
             coLoaderCode: partner.coLoaderCode,
-            roundUp: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
+            roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
             applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }]
         });
 
-        console.log(this.partnerForm.value);
+        //console.log(this.partnerForm.value);
     }
 
     getPartnerGroupActives(arg0: string[]): any {
@@ -458,12 +550,12 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     copyShippingAddress() {
-        this.billingCountry.setValue(this.shippingCountry.value);
-        this.billingProvince.setValue(this.shippingProvince.value);
-        this.getBillingProvinces(!!this.shippingCountry.value && this.shippingCountry.value.length > 0 ? this.shippingCountry.value[0].id : null, !!this.billingProvince.value && this.shippingProvince.value.length > 0 ? this.billingProvince.value[0].id : null);
-        this.billingZipcode.setValue(this.zipCodeShipping.value);
-        this.billingAddressEN.setValue(this.shippingAddressEN.value);
-        this.billingAddressLocal.setValue(this.shippingAddressVN.value);
+        this.countryId.setValue(this.countryShippingId.value);
+        this.provinceId.setValue(this.provinceShippingId.value);
+        this.getBillingProvinces(!!this.countryShippingId.value && this.countryShippingId.value.length > 0 ? this.countryShippingId.value[0].id : null, !!this.provinceId.value && this.provinceShippingId.value.length > 0 ? this.provinceId.value[0].id : null);
+        this.zipCode.setValue(this.zipCodeShipping.value);
+        this.addressEn.setValue(this.addressShippingEn.value);
+        this.addressVn.setValue(this.addressShippingVn.value);
         //
 
     }

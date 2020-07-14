@@ -20,6 +20,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
+import _merge from 'lodash/merge';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -295,7 +296,7 @@ export class AddPartnerDataComponent extends AppList {
                 (res) => {
                     if (res) {
                         this.formPartnerComponent.partnerForm.controls['employeeWorkPhone'].setValue(res.tel);
-                        this.formPartnerComponent.partnerForm.controls['employeeEmail'].setValue(res.email);
+                        this.formPartnerComponent.partnerForm.controls['email'].setValue(res.email);
                     }
                 }
             );
@@ -373,17 +374,20 @@ export class AddPartnerDataComponent extends AppList {
         //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
         //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
         // });
-        this.partner.contracts = this.contracts;
-        this.getFormPartnerData();
-        console.log(this.partner);
-        if (this.partner.countryId == null || this.partner.provinceId == null
-            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
+        if (!this.formPartnerComponent.partnerForm.valid) {
             return;
         }
+        this.getFormPartnerData();
+        // if (this.partner.countryId == null || this.partner.provinceId == null
+        //     || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
+        //     return;
+        // }
 
-        this.formPartnerComponent.partnerWorkPlace.setErrors(null);
+
+
+
         this.formPartnerComponent.applyDim.setErrors(null);
-        this.formPartnerComponent.roundUp.setErrors(null);
+        this.formPartnerComponent.roundUpMethod.setErrors(null);
         // if (!this.contracts.length) {
         //     this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
         //     return;
@@ -415,11 +419,13 @@ export class AddPartnerDataComponent extends AppList {
         //     this.onCreatePartner();
         // }
 
-        this.onCreatePartner();
+        //this.onCreatePartner();
 
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
+        console.log("formBody: ", formBody);
+
         this.trimInputForm(formBody);
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
@@ -433,67 +439,95 @@ export class AddPartnerDataComponent extends AppList {
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
         }
-        this.partner.partnerNameVn = this.formPartnerComponent.nameLocalFull.value;
-        this.partner.partnerNameEn = this.formPartnerComponent.nameENFull.value;
-        this.partner.contactPerson = this.formPartnerComponent.partnerContactPerson.value;
-        this.partner.addressVn = this.formPartnerComponent.billingAddressLocal.value;
-        this.partner.addressEn = this.formPartnerComponent.billingAddressEN.value;
-        this.partner.addressShippingVn = this.formPartnerComponent.shippingAddressVN.value;
-        this.partner.addressShippingEn = this.formPartnerComponent.shippingAddressEN.value;
-        this.partner.shortName = this.formPartnerComponent.shortName.value;
-        this.partner.tel = this.formPartnerComponent.partnerContactNumber.value;
-        this.partner.fax = this.formPartnerComponent.partnerContactFaxNo.value;
-        this.partner.taxCode = this.formPartnerComponent.taxCode.value;
-        this.partner.email = this.formPartnerComponent.employeeEmail.value;
-        this.partner.website = this.formPartnerComponent.partnerWebsite.value;
-        this.partner.bankAccountNo = this.formPartnerComponent.partnerbankAccountNo.value;
-        this.partner.bankAccountName = this.formPartnerComponent.partnerBankAccountName.value;
-        this.partner.bankAccountAddress = this.formPartnerComponent.partnerBankAccountAddress.value;
-        this.partner.note = this.formPartnerComponent.note.value;
-        this.partner.public = this.formPartnerComponent.isPublic;
-        this.partner.workPhoneEx = this.formPartnerComponent.employeeWorkPhone.value;
-        this.partner.countryId = !!formBody.billingCountry && !!formBody.billingCountry.length ? formBody.billingCountry[0].id : null;
-        this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
-        this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
-        this.partner.provinceShippingId = !!formBody.shippingProvince && !!formBody.shippingProvince.length ? formBody.shippingProvince[0].id : null;
-        this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
-        this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
-        this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
-        this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
-        this.partner.swiftCode = this.formPartnerComponent.partnerSwiftCode.value;
-        this.partner.active = this.formPartnerComponent.active.value;
-        this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
-        this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
-        this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
-        this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
+        //
+        const cloneObject = {
+            countryId: formBody.countryId,
+            provinceId: formBody.provinceId,
+            countryShippingId: formBody.countryShippingId,
+            provinceShippingId: formBody.provinceShippingId,
+            parentId: formBody.partnerAccountRef,
+
+            roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
+            applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            partnerGroup: this.partner.partnerGroup,
+            id: this.partner.id,
+        };
+        console.log("formBody: ", formBody);
+        console.log("clone: ", cloneObject);
+        const mergeObj = Object.assign(_merge(formBody, cloneObject));
+        //merge clone & this.partner.
+        const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
+
+
+        console.log("merge2: ", mergeObjPartner);
+
+        //
+        this.onCreatePartner(mergeObjPartner);
+
+
+
+        // this.partner.partnerNameVn = this.formPartnerComponent.nameLocalFull.value;
+        // this.partner.partnerNameEn = this.formPartnerComponent.nameENFull.value;
+        // this.partner.contactPerson = this.formPartnerComponent.partnerContactPerson.value;
+        // this.partner.addressVn = this.formPartnerComponent.billingAddressLocal.value;
+        // this.partner.addressEn = this.formPartnerComponent.billingAddressEN.value;
+        // this.partner.addressShippingVn = this.formPartnerComponent.shippingAddressVN.value;
+        // this.partner.addressShippingEn = this.formPartnerComponent.shippingAddressEN.value;
+        // this.partner.shortName = this.formPartnerComponent.shortName.value;
+        // this.partner.tel = this.formPartnerComponent.partnerContactNumber.value;
+        // this.partner.fax = this.formPartnerComponent.partnerContactFaxNo.value;
+        // this.partner.taxCode = this.formPartnerComponent.taxCode.value;
+        // this.partner.email = this.formPartnerComponent.email.value;
+        // this.partner.website = this.formPartnerComponent.website.value;
+        // this.partner.bankAccountNo = this.formPartnerComponent.partnerbankAccountNo.value;
+        // this.partner.bankAccountName = this.formPartnerComponent.partnerBankAccountName.value;
+        // this.partner.bankAccountAddress = this.formPartnerComponent.partnerBankAccountAddress.value;
+        // this.partner.note = this.formPartnerComponent.note.value;
+        // this.partner.public = this.formPartnerComponent.isPublic;
+        // this.partner.workPhoneEx = this.formPartnerComponent.employeeWorkPhone.value;
+        // this.partner.countryId = !!formBody.billingCountry && !!formBody.billingCountry.length ? formBody.billingCountry[0].id : null;
+        // this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
+        // this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
+        // this.partner.provinceShippingId = !!formBody.shippingProvince && !!formBody.shippingProvince.length ? formBody.shippingProvince[0].id : null;
+        // this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
+        // this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
+        // this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
+        // this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
+        // this.partner.swiftCode = this.formPartnerComponent.partnerSwiftCode.value;
+        // this.partner.active = this.formPartnerComponent.active.value;
+        // this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
+        // this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
+        // this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
+        // this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
+        // this.partner.partnerType = 'Supplier';
     }
 
     trimInputForm(formBody) {
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameENFull, formBody.nameENFull);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameLocalFull, formBody.nameLocalFull);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerNameEn, formBody.partnerNameEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerNameVn, formBody.partnerNameVn);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shortName, formBody.shortName);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.taxCode, formBody.taxCode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingAddressEN, formBody.billingAddressEN);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingAddressLocal, formBody.billingAddressLocal);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingZipcode, formBody.billingZipcode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shippingAddressEN, formBody.shippingAddressEN);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shippingAddressVN, formBody.shippingAddressVN);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressEn, formBody.addressEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressVn, formBody.addressVn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.zipCode, formBody.zipCode);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressShippingEn, formBody.addressShippingEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressShippingVn, formBody.addressShippingVn);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.zipCodeShipping, formBody.zipCodeShipping);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.internalReferenceNo, formBody.internalReferenceNo);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.coLoaderCode, formBody.coLoaderCode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactPerson, formBody.partnerContactPerson);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactNumber, formBody.partnerContactNumber);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactFaxNo, formBody.partnerContactFaxNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerWebsite, formBody.partnerWebsite);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerbankAccountNo, formBody.partnerbankAccountNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountName, formBody.partnerbankAccountNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountAddress, formBody.partnerBankAccountAddress);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerSwiftCode, formBody.partnerSwiftCode);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.contactPerson, formBody.contactPerson);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.tel, formBody.tel);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.fax, formBody.fax);
+
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountNo, formBody.bankAccountNo);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountName, formBody.bankAccountNo);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountAddress, formBody.bankAccountAddress);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.swiftCode, formBody.swiffCode);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.note, formBody.note);
     }
 
-    onCreatePartner() {
-        this._catalogueRepo.checkTaxCode(this.partner)
+    onCreatePartner(body: any) {
+        this._catalogueRepo.checkTaxCode(body)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -501,20 +535,20 @@ export class AddPartnerDataComponent extends AppList {
                         console.log(res);
                         this.formPartnerComponent.isExistedTaxcode = true;
                         console.log(this.formPartnerComponent.internalReferenceNo);
-                        if (this.partner.internalReferenceNo !== null) {
+                        if (body.internalReferenceNo !== null) {
                             this.deleteMessage = `This Parnter is existed, please you check again!`;
                         } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                         }
                         this.confirmTaxcode.show();
                     } else {
-                        this.onSave();
+                        this.onSave(body);
                     }
                 },
             );
     }
-    onSave() {
-        this._catalogueRepo.createPartner(this.partner)
+    onSave(body: any) {
+        this._catalogueRepo.createPartner(body)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

@@ -66,14 +66,11 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
 
             paymentTerm: !!form.paymentTerm && !!form.paymentTerm.length ? form.paymentTerm[0].id : null,
 
-            pol: form.pol,
-            pod: form.pod,
-            shipperId: form.shipperId,
-            consigneeId: form.consigneeId,
         };
         const bookingNote: csBookingNote = new csBookingNote(Object.assign(_merge(form, formData)));
 
         return bookingNote;
+
     }
 
     saveBookingNote(model: csBookingNote) {
