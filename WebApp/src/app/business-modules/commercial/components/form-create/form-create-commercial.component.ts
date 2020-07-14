@@ -153,6 +153,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'shippping-country':
                 this.countryShippingId.setValue(data.id);
+                //
+                //set value random != null, vì event change trong combogrid , a Thương viết pure component
+                this.provinceShippingId.setValue(data.id);
 
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
@@ -161,7 +164,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'billing-country':
                 this.countryId.setValue(data.id);
-
+                //set value random != null, vì event change trong combogrid , a Thương viết pure component
+                this.provinceId.setValue(data.id);
                 // this.getBillingProvince(data.id);
                 this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
