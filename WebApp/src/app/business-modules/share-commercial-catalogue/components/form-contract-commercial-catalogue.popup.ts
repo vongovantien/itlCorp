@@ -25,6 +25,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
     isCreateNewCommercial: boolean = false;

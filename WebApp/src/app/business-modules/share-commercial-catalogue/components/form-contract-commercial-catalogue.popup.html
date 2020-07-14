@@ -371,35 +371,39 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center">
-                <button (click)="onSubmit()"
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                    <span>
-                        <i class="la la-save"></i>
-                        <span> Save </span>
-                    </span>
-                </button>
-                <button (click)="onSubmit(true)"
-                    *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) && this.partnerId != null) || (!isCreateNewCommercial && !isUpdate)   "
-                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                    <span>
-                        <i class="la la-send"></i>
-                        <span> Request Approval </span>
-                    </span>
-                </button>
-                <button (click)="activeInactiveContract(selectedContract.id)"
-                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                    <span>
-                        <span> Active </span>
-                    </span>
-                </button>
-                <button (click)="activeInactiveContract(selectedContract.id)"
-                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
-                    <span>
-                        <span> Inactive </span>
-                    </span>
-                </button>
+                <ng-container *ngIf="openOnPartner === false">
+                    <button (click)="onSubmit()"
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-save"></i>
+                            <span> Save </span>
+                        </span>
+                    </button>
+                    <button (click)="onSubmit(true)"
+                        *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) && this.partnerId != null) || (!isCreateNewCommercial && !isUpdate)   "
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-send"></i>
+                            <span> Request Approval </span>
+                        </span>
+                    </button>
+                    <button (click)="activeInactiveContract(selectedContract.id)"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <span> Active </span>
+                        </span>
+                    </button>
+                    <button (click)="activeInactiveContract(selectedContract.id)"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                        class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <span> Inactive </span>
+                        </span>
+                    </button>
+                </ng-container>
+
+
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
             </div>
         </div>
