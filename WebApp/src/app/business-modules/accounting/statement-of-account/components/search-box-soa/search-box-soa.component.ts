@@ -140,6 +140,7 @@ export class StatementOfAccountSearchComponent extends AppPage {
             soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
             soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.id : null,
             soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
+            CurrencyLocal: "VND"
         };
         this.onSearch.emit(body);
     }
@@ -153,6 +154,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.selectedRange = null;
         this.selectedCurrency = null;
         // ? search again!
-        this.onSearch.emit({});
+        this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
     }
 }
