@@ -363,7 +363,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 note: this.note,
                 serviceTypeId: !!this.selectedService.length ? this.mapServiceId(this.selectedService[0].id) : this.mapServiceId('All'),
                 commodityGroupId: !!this.commodity ? this.commodity.id : null,
-                strServices: this.selectedService[0].id === 'All' ? '' : this.selectedService.map(service => service.id).toString(),
+                strServices: this.selectedService[0].id === 'All' ? this.services.filter(service => service.id !== 'All').map(service => service.id).toString() : this.selectedService.map(service => service.id).toString(),
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
