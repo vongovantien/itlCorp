@@ -216,6 +216,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.FlightNoRowTwo = hb.FlightNoRowTwo;
                     model.ContactPerson = hb.ContactPerson;
                     model.ClosingTime = hb.ClosingTime;
+                    model.ManifestRefNo = hb.ManifestRefNo;
                     var isUpdateDone = Update(model, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
