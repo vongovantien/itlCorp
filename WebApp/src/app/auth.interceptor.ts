@@ -58,7 +58,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (error instanceof TimeoutError) {
                     message = "Request time out";
                 }
-                this._toastService.error(message, error.statusText);
+                this._toastService.error(message);
                 return throwError(error);
             })
         );

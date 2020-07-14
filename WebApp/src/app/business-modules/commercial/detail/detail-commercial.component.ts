@@ -154,8 +154,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     return value;
                 }),
                 catchError((err, caught) => of(false)),
-                concatMap((responseValidateTaxCode: any) => {
-                    if (!!responseValidateTaxCode) {
+                concatMap((responseValidateTaxCode: boolean) => {
+                    if (responseValidateTaxCode === false) {
                         return of(false);
                     }
                     return this._catalogueRepo.updatePartner(body.id, body)
