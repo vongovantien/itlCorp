@@ -1,5 +1,5 @@
 
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -9,11 +9,11 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, map } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of, combineLatest } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
@@ -21,6 +21,8 @@ import { SystemConstants } from 'src/constants/system.const';
 import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
+import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
+import _merge from 'lodash/merge';
 
 
 @Component({
@@ -38,6 +40,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(CommercialContractListComponent, { static: false }) listContract: CommercialContractListComponent;
 
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
@@ -83,7 +86,9 @@ export class PartnerDetailComponent extends AppList {
         private toastr: ToastrService,
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _cd: ChangeDetectorRef,
+        private _activedRoute: ActivatedRoute,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -95,6 +100,7 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
@@ -106,6 +112,25 @@ export class PartnerDetailComponent extends AppList {
         this.getDataCombobox();
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
+    }
+    ngAfterViewInit() {
+        this.formPartnerComponent.isUpdate = true;
+
+        this._cd.detectChanges();
+    }
+
+
+    getDetailCustomer(partnerId: string) {
+        this._catalogueRepo.getDetailPartner(partnerId)
+            .subscribe(
+                (res: Partner) => {
+                    this.partner = res;
+                    console.log("detail partner:", this.partner);
+                    //this.formPartnerComponent.formGroup.patchValue(res);
+                    this.formPartnerComponent.getShippingProvinces(res.countryShippingId);
+                    this.formPartnerComponent.getBillingProvinces(res.countryId);
+                }
+            );
     }
 
     RequireSaleman(partnerGroup: string): boolean {
@@ -422,27 +447,37 @@ export class PartnerDetailComponent extends AppList {
     onSubmit() {
         // this.partner.saleMans = this.saleMandetail;
         this.formPartnerComponent.isSubmitted = true;
+
+        //const formBody = this.formPartnerComponent.partnerForm.getRawValue();
+        //console.log(formBody);
+        if (!this.formPartnerComponent.partnerForm.valid) {
+            return;
+        }
         this.getFormPartnerData();
+        console.log("this.partner: ", this.partner);
+
         // this.partner.saleMans.forEach(element => {
         //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
         //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
         // });
-        if (this.partner.countryId == null || this.partner.provinceId == null
-            || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
-            return;
-        }
+        // if (this.partner.countryId == null || this.partner.provinceId == null
+        //     || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
+        //     return;
+        // }
 
-        this.formPartnerComponent.partnerWorkPlace.setErrors(null);
-        this.formPartnerComponent.applyDim.setErrors(null);
-        this.formPartnerComponent.roundUp.setErrors(null);
-        if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id;
-            if (this.contracts.length === 0) {
-                this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-                return;
-            }
-            this.updatePartner();
-        }
+        // this.formPartnerComponent.partnerWorkPlace.setErrors(null);
+        // this.formPartnerComponent.applyDim.setErrors(null);
+        // this.formPartnerComponent.roundUp.setErrors(null);
+
+        // if (this.formPartnerComponent.partnerForm.valid) {
+        //     this.partner.accountNo = this.partner.id;
+        //     if (this.contracts.length === 0) {
+        //         this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
+        //         return;
+        //     }
+        //     this.updatePartner();
+        // }
+        //this.updatePartner();
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
@@ -459,25 +494,64 @@ export class PartnerDetailComponent extends AppList {
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }
         }
-        this.partner.partnerNameVn = this.formPartnerComponent.nameLocalFull.value;
+        const cloneObject = {
+            countryId: formBody.countryId,
+            provinceId: formBody.provinceId,
+            countryShippingId: formBody.countryShippingId,
+            provinceShippingId: formBody.provinceShippingId,
+            parentId: formBody.partnerAccountRef,
+
+            roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
+            applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            partnerGroup: this.partner.partnerGroup,
+            id: this.partner.id,
+        };
+        console.log("formBody: ", formBody);
+        console.log("clone: ", cloneObject);
+        const mergeObj = Object.assign(_merge(formBody, cloneObject));
+        //merge clone & this.partner.
+        const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
+
+
+        console.log("merge2: ", mergeObjPartner);
+        //
+        this.updatePartner(mergeObjPartner);
+
+        /*this.partner.partnerNameVn = this.formPartnerComponent.nameLocalFull.value;
         this.partner.partnerNameEn = this.formPartnerComponent.nameENFull.value;
+        //
         this.partner.contactPerson = this.formPartnerComponent.partnerContactPerson.value;
+        //
         this.partner.addressVn = this.formPartnerComponent.billingAddressLocal.value;
+        //
         this.partner.addressEn = this.formPartnerComponent.billingAddressEN.value;
+        //
         this.partner.addressShippingVn = this.formPartnerComponent.shippingAddressVN.value;
+        //
         this.partner.addressShippingEn = this.formPartnerComponent.shippingAddressEN.value;
+        //
         this.partner.shortName = this.formPartnerComponent.shortName.value;
+        //
         this.partner.tel = this.formPartnerComponent.partnerContactNumber.value;
+        //
         this.partner.fax = this.formPartnerComponent.partnerContactFaxNo.value;
         this.partner.taxCode = this.formPartnerComponent.taxCode.value;
+        //
         this.partner.email = this.formPartnerComponent.employeeEmail.value;
+        //
         this.partner.website = this.formPartnerComponent.partnerWebsite.value;
+        //
         this.partner.bankAccountNo = this.formPartnerComponent.partnerbankAccountNo.value;
+        //
         this.partner.bankAccountName = this.formPartnerComponent.partnerBankAccountName.value;
+        //
         this.partner.bankAccountAddress = this.formPartnerComponent.partnerBankAccountAddress.value;
         this.partner.note = this.formPartnerComponent.note.value;
+        //
         this.partner.public = this.formPartnerComponent.isPublic;
+        //
         this.partner.workPhoneEx = this.formPartnerComponent.employeeWorkPhone.value;
+        //
         this.partner.countryId = !!formBody.billingCountry && !!formBody.billingCountry.length ? formBody.billingCountry[0].id : null;
         this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
         this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
@@ -485,41 +559,50 @@ export class PartnerDetailComponent extends AppList {
         this.partner.parentId = !!formBody.partnerAccountRef && !!formBody.partnerAccountRef.length ? formBody.partnerAccountRef[0].id : null;
         this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
         this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
+        //
         this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
         this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
+        //
         this.partner.swiftCode = this.formPartnerComponent.partnerSwiftCode.value;
         this.partner.active = this.formPartnerComponent.active.value;
         this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
         this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
+        //
         this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
         this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
+        //
+        this.partner.billingEmail = this.formPartnerComponent.billingEmail.value;
+        this.partner.billingPhone = this.formPartnerComponent.billingPhone.value;*/
     }
     trimInputForm(formBody: any) {
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameENFull, formBody.nameENFull);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.nameLocalFull, formBody.nameLocalFull);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerNameEn, formBody.partnerNameEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerNameVn, formBody.partnerNameVn);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shortName, formBody.shortName);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.taxCode, formBody.taxCode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingAddressEN, formBody.billingAddressEN);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingAddressLocal, formBody.billingAddressLocal);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingZipcode, formBody.billingZipcode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shippingAddressEN, formBody.shippingAddressEN);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.shippingAddressVN, formBody.shippingAddressVN);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressEn, formBody.addressEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressVn, formBody.addressVn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.zipCode, formBody.zipCode);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressShippingEn, formBody.addressShippingEn);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.addressShippingVn, formBody.addressShippingVn);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.zipCodeShipping, formBody.zipCodeShipping);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.internalReferenceNo, formBody.internalReferenceNo);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.coLoaderCode, formBody.coLoaderCode);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactPerson, formBody.partnerContactPerson);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactNumber, formBody.partnerContactNumber);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerContactFaxNo, formBody.partnerContactFaxNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerWebsite, formBody.partnerWebsite);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerbankAccountNo, formBody.partnerbankAccountNo);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountName, formBody.partnerBankAccountName);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerBankAccountAddress, formBody.partnerBankAccountAddress);
-        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerSwiftCode, formBody.partnerSwiftCode);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.contactPerson, formBody.contactPerson);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.tel, formBody.tel);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.fax, formBody.fax);
+
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountNo, formBody.bankAccountNo);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountName, formBody.bankAccountName);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountAddress, formBody.bankAccountAddress);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.swiftCode, formBody.swiftCode);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.note, formBody.note);
+        //
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingEmail, formBody.billingEmail);
+        this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingPhone, formBody.billingPhone);
     }
 
-    updatePartner() {
-        this._catalogueRepo.checkTaxCode(this.partner)
+    updatePartner(body: any) {
+        this._catalogueRepo.checkTaxCode(body)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
@@ -529,15 +612,15 @@ export class PartnerDetailComponent extends AppList {
                         this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                         this.confirmTaxcode.show();
                     } else {
-                        this.onSave();
+                        this.onSave(body);
                     }
                 },
             );
     }
-    onSave() {
+    onSave(body: any) {
 
         this._progressRef.start();
-        this._catalogueRepo.updatePartner(this.partner.id, this.partner)
+        this._catalogueRepo.updatePartner(body.id, body)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -605,7 +688,10 @@ export class PartnerDetailComponent extends AppList {
             )
             .subscribe(
                 (res: any[]) => {
-                    this.contracts = res || [];
+                    this.listContract.contracts = res || [];
+                    this.listContract.isActiveNewContract = false;
+                    // this.contracts = res || [];
+
                 }
             );
     }
@@ -694,36 +780,5 @@ export class PartnerDetailComponent extends AppList {
             );
     }
 
-    gotoCreateContract() {
-        this.formContractPopup.formGroup.patchValue({
-            salesmanId: null,
-            officeId: null,
-            contractNo: null,
-            effectiveDate: null,
-            expiredDate: null,
-            paymentTerm: null,
-            creditLimit: null,
-            creditLimitRate: null,
-            trialCreditLimit: null,
-            trialCreditDays: null,
-            trialEffectDate: null,
-            trialExpiredDate: null,
-            creditAmount: null,
-            billingAmount: null,
-            paidAmount: null,
-            unpaidAmount: null,
-            customerAmount: null,
-            creditRate: null,
-            description: null,
-            vas: null,
-            saleService: null
-        });
-        this.formContractPopup.files = null;
-        this.formContractPopup.fileList = null;
-        this.formContractPopup.isUpdate = false;
-        this.formContractPopup.isSubmitted = false;
-        this.formContractPopup.partnerId = this.partner.id;
-        this.indexlstContract = null;
-        this.formContractPopup.show();
-    }
+
 }

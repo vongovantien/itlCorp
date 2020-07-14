@@ -35,7 +35,9 @@ export class Partner {
     receiveEtaemail: true;
     showInDashboard: true;
     provinceId: string = '';
+    provinceName: string = '';
     provinceShippingId: string = '';
+    provinceShippingName: string = ''
     parentId: string = '';
     percentCredit: number = 0;
     alertPercentCreditEmail: boolean = false;
@@ -60,6 +62,9 @@ export class Partner {
     workPhoneEx: string = '';
     roundUpMethod: string = '';
     applyDim: string = '';
+    //
+    billingEmail: string = '';
+    billingPhone: string = '';
 
     saleManRequests: SaleManRequest[] = [];
     contracts: Contract[] = [];
