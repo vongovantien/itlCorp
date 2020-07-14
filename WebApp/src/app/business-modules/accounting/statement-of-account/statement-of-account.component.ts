@@ -101,6 +101,7 @@ export class StatementOfAccountComponent extends AppList {
     }
 
     getSOAs(data: any = {}) {
+        this.page = 1;
         this.isLoading = true;
         this._progressRef.start();
         this._accoutingRepo
