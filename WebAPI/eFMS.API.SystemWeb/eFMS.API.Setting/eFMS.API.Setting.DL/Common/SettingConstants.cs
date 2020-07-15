@@ -19,5 +19,16 @@ namespace eFMS.API.Setting.DL.Common
         public static readonly short SpecialGroup = 11;
         public static readonly string PositionManager = "Manager-Leader";
         public static readonly string DeptTypeAccountant = "ACCOUNTANT";
+
+        public static readonly string ROLE_NONE = "None";
+        public static readonly string ROLE_APPROVAL = "Approval";
+        public static readonly string ROLE_AUTO = "Auto";
+        public static readonly string ROLE_SPECIAL = "Special";
+
+        public static readonly string LEVEL_LEADER = "Leader";
+        public static readonly string LEVEL_MANAGER = "Manager";
+        public static readonly string LEVEL_ACCOUNTANT = "Accountant";
+        public static readonly string LEVEL_BOD = "BOD";
+        
     }
 }
