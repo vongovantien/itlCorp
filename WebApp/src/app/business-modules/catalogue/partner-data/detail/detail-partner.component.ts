@@ -435,14 +435,7 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.partnerWorkPlace.setErrors(null);
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUp.setErrors(null);
-        if (this.formPartnerComponent.partnerForm.valid) {
-            this.partner.accountNo = this.partner.id;
-            if (this.contracts.length === 0) {
-                this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-                return;
-            }
-            this.updatePartner();
-        }
+        this.updatePartner();
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
