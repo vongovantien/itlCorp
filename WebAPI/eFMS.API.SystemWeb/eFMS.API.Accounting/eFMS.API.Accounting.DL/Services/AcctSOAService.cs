@@ -105,6 +105,10 @@ namespace eFMS.API.Accounting.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
 
+                DateTime? dueDate = null;
+                dueDate = model.DatetimeCreated.Value.AddDays(30);
+                model.PaymentDueDate = dueDate;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -231,6 +235,10 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.DepartmentId = soaCurrent.DepartmentId;
                         soa.OfficeId = soaCurrent.OfficeId;
                         soa.CompanyId = soaCurrent.CompanyId;
+
+                        DateTime? dueDate = null;
+                        dueDate = soa.DatetimeCreated.Value.AddDays(30);
+                        soa.PaymentDueDate = dueDate;
 
                         //Update các thông tin của SOA
                         var hs = DataContext.Update(soa, x => x.Id == soa.Id);
@@ -1634,7 +1642,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  ServiceTypeId = s.ServiceTypeId,
                                  Customer = s.Customer,
                                  DateType = s.DateType,
-                                 CreatorShipment = s.CreatorShipment
+                                 CreatorShipment = s.CreatorShipment,
+                                 PaymentStatus = s.PaymentStatus,
+                                 PaymentDueDate = s.PaymentDueDate
                              };
             var result = resultData.FirstOrDefault();
             if (result != null)
