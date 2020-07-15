@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -759,15 +760,12 @@ namespace eFMS.API.Setting.DL.Services
         public HandleState UpdateApproval(Guid id)
         {
             var userCurrent = currentUser.UserID;
-
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var unlockRequest = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault();
-
                     if (unlockRequest == null) return new HandleState("Not found unlock request");
-
                     var approve = DataContext.Get(x => x.UnlockRequestId == unlockRequest.Id && x.IsDeny == false).FirstOrDefault();
 
                     if (approve == null)
@@ -845,6 +843,11 @@ namespace eFMS.API.Setting.DL.Services
                                             approve.BuheadAprDate = DateTime.Now;
                                             approve.LevelApprove = "BOD";
                                         }
+                                        if (buHeadLevel.Role == "None")
+                                        {
+                                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                            approve.LevelApprove = "Leader";
+                                        }
                                     }
                                 }
                             }
@@ -903,6 +906,11 @@ namespace eFMS.API.Setting.DL.Services
                                         approve.BuheadAprDate = DateTime.Now;
                                         approve.LevelApprove = "BOD";
                                     }
+                                    if (buHeadLevel.Role == "None")
+                                    {
+                                        unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                        approve.LevelApprove = "Manager";
+                                    }
                                 }
                             }
                             else
@@ -947,6 +955,11 @@ namespace eFMS.API.Setting.DL.Services
                                     approve.BuheadApr = buHeadLevel.UserId;
                                     approve.BuheadAprDate = DateTime.Now;
                                     approve.LevelApprove = "BOD";
+                                }
+                                if (buHeadLevel.Role == "None")
+                                {
+                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                    approve.LevelApprove = "Accountant";
                                 }
                             }
                             else
@@ -1007,7 +1020,7 @@ namespace eFMS.API.Setting.DL.Services
                         sendMailApproved = SendMailApprove(unlockRequest, DateTime.Now);
                         if (sendMailApproved)
                         {
-                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denid; Change Service Date: Update SeviceDate = New Service Date
+                            //Set: Shipment isLocked = False; Advance & Settlement: Status Approval = Denied; Change Service Date: Update SeviceDate = New Service Date
                             var requestJobs = unlockRequestJobRepo.Get(x => x.UnlockRequestId == unlockRequest.Id).Select(s => s.Job).ToList();
                             UpdatedUnlockRequest(unlockRequest.Id, unlockRequest.UnlockType, requestJobs, unlockRequest.NewServiceDate);
                         }
@@ -1251,6 +1264,10 @@ namespace eFMS.API.Setting.DL.Services
                             && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                             && unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                         {
+                            if (unlockRequest.StatusApproval == SettingConstants.STATUS_APPROVAL_DONE)
+                            {
+                                return new HandleState("Unlock request approved");
+                            }
                             return new HandleState("Unlock request approving");
                         }
 
@@ -1316,25 +1333,45 @@ namespace eFMS.API.Setting.DL.Services
             var dataJob = string.Empty;
             if (dataOps != null && dataOps.Count > 0)
             {
+                StringBuilder dataOpsJob = new StringBuilder();
                 foreach (var item in dataOps)
                 {
                     string _serviceDate = item.ServiceDate != null ? item.ServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
                     string _newServiceDate = unlockRequest.NewServiceDate != null ? unlockRequest.NewServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-                    dataJob += "<tr><td style='border: 1px solid #dddddd; width: 40%;'>" + item.JobNo + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _serviceDate + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _newServiceDate + "</td></tr>";
+                    dataOpsJob.Append("<tr>");
+                    dataOpsJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 40%;'>{0}</td>", item.JobNo);
+                    dataOpsJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 30%;'>{0}</td>", _serviceDate);
+                    dataOpsJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 30%;'>{0}</td>", _newServiceDate);
+                    dataOpsJob.Append("</tr>");
                 }
+                dataJob += dataOpsJob.ToString();
             }
             if (dataDoc != null && dataDoc.Count > 0)
             {
+                StringBuilder dataDocJob = new StringBuilder();
                 foreach (var item in dataDoc)
                 {
                     string _serviceDate = item.ServiceDate != null ? item.ServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
                     string _newServiceDate = unlockRequest.NewServiceDate != null ? unlockRequest.NewServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-                    dataJob += "<tr><td style='border: 1px solid #dddddd; width: 40%;'>" + item.JobNo + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _serviceDate + "</td><td style='border: 1px solid #dddddd; width: 30%;'>" + _newServiceDate + "</td></tr>";
+                    dataDocJob.Append("<tr>");
+                    dataDocJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 40%;'>{0}</td>", item.JobNo);
+                    dataDocJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 30%;'>{0}</td>", _serviceDate);
+                    dataDocJob.AppendFormat("<td style='border: 1px solid #dddddd; width: 30%;'>{0}</td>", _newServiceDate);
+                    dataDocJob.Append("</tr>");
                 }
+                dataJob += dataDocJob.ToString();
             }
 
-            var result = "<table style='width: 100%; border: 1px solid #dddddd;border-collapse: collapse;'><tr><td style='border: 1px solid #dddddd; font-weight: bold;'>JobID</td><td style='border: 1px solid #dddddd; font-weight: bold;'>Service Date</td><td style='border: 1px solid #dddddd; font-weight: bold;'>New Service Date</td></tr>" + dataJob + "</table>";
-            return result;
+            StringBuilder tableResult = new StringBuilder();
+            tableResult.Append("<table style='width: 100%; border: 1px solid #dddddd;border-collapse: collapse;'>");
+            tableResult.Append("<tr>");
+            tableResult.Append("<td style='border: 1px solid #dddddd; font-weight: bold;'>JobID</td>");
+            tableResult.Append("<td style='border: 1px solid #dddddd; font-weight: bold;'>Service Date</td>");
+            tableResult.Append("<td style='border: 1px solid #dddddd; font-weight: bold;'>New Service Date</td>");
+            tableResult.Append("</tr>");
+            tableResult.AppendFormat("{0}", dataJob);
+            tableResult.Append("</table>");
+            return tableResult.ToString();
         }
 
         private bool SendMailSuggestUnlockShipment(SetUnlockRequest unlockRequest, string userReciver, string mailUserReciver, List<string> mailUsersDeputy)
