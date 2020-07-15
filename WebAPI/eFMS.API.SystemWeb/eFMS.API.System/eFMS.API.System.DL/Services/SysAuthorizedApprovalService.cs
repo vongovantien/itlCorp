@@ -221,7 +221,11 @@ namespace eFMS.API.System.DL.Services
                            UserModified = author.UserModified,
                            DatetimeCreated = author.DatetimeCreated,
                            DatetimeModified = author.DatetimeModified,
-                           Description = author.Description
+                           Description = author.Description,
+                           CompanyId = author.CompanyId,
+                           OfficeId = author.OfficeId,
+                           DepartmentId = author.DepartmentId,
+                           GroupId = author.GroupId
 
                        };
             var dataFor = data.ToList();
