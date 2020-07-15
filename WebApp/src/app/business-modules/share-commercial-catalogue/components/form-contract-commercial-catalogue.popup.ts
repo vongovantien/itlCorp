@@ -25,6 +25,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
     isCreateNewCommercial: boolean = false;
@@ -137,14 +138,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe((value: any) => {
                 this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
-        this.formGroup.get("trialEffectDate").valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
-            });
+        if (!!this.trialEffectDate.value) {
+            this.formGroup.get("trialEffectDate").valueChanges
+                .pipe(
+                    distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                    map((data: any) => data.startDate)
+                )
+                .subscribe((value: any) => {
+                    this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+                });
+
+        }
 
     }
 

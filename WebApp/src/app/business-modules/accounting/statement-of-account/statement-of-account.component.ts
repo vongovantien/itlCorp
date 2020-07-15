@@ -62,6 +62,9 @@ export class StatementOfAccountComponent extends AppList {
                 sortable: true
             }
         ];
+        this.dataSearch = {
+            CurrencyLocal: "VND"
+        };
         this.getSOAs();
     }
 
@@ -96,18 +99,24 @@ export class StatementOfAccountComponent extends AppList {
                 });
 
                 // * search SOA when success.
-                this.getSOAs();
+                this.onSearchSoa(this.dataSearch);
             });
     }
 
-    getSOAs(data: any = {}) {
+    onSearchSoa(data: any) {
+        this.page = 1;
+        this.dataSearch = data;
+        this.getSOAs();
+    }
+
+    getSOAs() {
         this.isLoading = true;
         this._progressRef.start();
         this._accoutingRepo
             .getListSOA(
                 this.page,
                 this.pageSize,
-                Object.assign(data, { CurrencyLocal: "VND" })
+                Object.assign({}, this.dataSearch)
             )
             .pipe(
                 catchError(this.catchError),

@@ -141,7 +141,8 @@ export class StatementOfAccountSearchComponent extends AppPage {
             soaToDateCreate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
             soaStatus: !!this.selectedStatus ? this.selectedStatus.name : null,
             soaCurrency: !!this.selectedCurrency ? this.selectedCurrency.id : null,
-            soaUserCreate: !!this.currentUser ? this.currentUser.username : null,
+            soaUserCreate: !!this.currentUser ? this.currentUser.id : null,
+            CurrencyLocal: "VND"
         };
         this.onSearch.emit(body);
     }
@@ -155,6 +156,6 @@ export class StatementOfAccountSearchComponent extends AppPage {
         this.selectedRange = null;
         this.selectedCurrency = null;
         // ? search again!
-        this.onSearch.emit({});
+        this.onSearch.emit(<any>{ CurrencyLocal: "VND" });
     }
 }

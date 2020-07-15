@@ -4,7 +4,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from '@repositories';
 import { CountryModel, ProviceModel, Partner, Customer } from '@models';
-import { JobConstants } from '@constants';
+import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { Observable } from 'rxjs';
@@ -94,6 +94,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             taxCode: [null, Validators.compose([
                 Validators.maxLength(14),
                 Validators.minLength(8),
+                // Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
                 Validators.required
             ])],
             internalReferenceNo: [null, Validators.compose([
@@ -146,17 +148,13 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log(data);
         switch (type) {
             case 'acRef':
                 this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
                 this.countryShippingId.setValue(data.id);
-                //
-                //set value random != null, vì event change trong combogrid , a Thương viết pure component
                 this.provinceShippingId.setValue(data.id);
-
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
@@ -164,14 +162,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 break;
             case 'billing-country':
                 this.countryId.setValue(data.id);
-                //set value random != null, vì event change trong combogrid , a Thương viết pure component
                 this.provinceId.setValue(data.id);
-                // this.getBillingProvince(data.id);
                 this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
             case 'billing-city':
                 this.provinceId.setValue(data.id);
-
                 break;
             default:
                 break;
@@ -184,7 +179,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
         this.billingProvinces = [...this.initbillingProvinces.filter(x => x.countryID === countryId)];
         if (this.billingProvinces.length === 1) {
-            // this.provinceId.setValue(this.billingProvinces[0].id);
+            this.provinceId.setValue(this.billingProvinces[0].id);
         } else {
             this.provinceId.setValue(null);
         }
@@ -240,7 +235,6 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 .subscribe(
                     (res) => {
                         this.billingsProvinces = res;
-                        console.log(this.billingsProvinces);
                         if (!!provinceId) {
                             const obj = this.billingsProvinces.find(x => x.id === provinceId);
                             if (obj === undefined) {
