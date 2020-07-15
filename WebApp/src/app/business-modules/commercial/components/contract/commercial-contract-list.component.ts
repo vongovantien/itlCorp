@@ -19,6 +19,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
+    @Input() openOnPartner: boolean = false;
     contracts: Contract[] = [];
     //
     isActiveNewContract: boolean = true;
@@ -110,6 +111,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.isUpdate = true;
         this.formContractPopup.partnerId = this.partnerId;
         this.formContractPopup.selectedContract.id = id;
+        this.formContractPopup.openOnPartner = this.openOnPartner;
 
         this.indexlstContract = index;
         if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
