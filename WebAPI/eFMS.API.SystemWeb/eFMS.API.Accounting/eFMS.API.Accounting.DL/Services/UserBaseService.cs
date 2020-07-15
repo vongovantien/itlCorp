@@ -127,7 +127,14 @@ namespace eFMS.API.Accounting.DL.Services
             Dictionary<string, string> listUsers = new Dictionary<string, string> {
                  { "7569a3ec-7d1c-41a6-9b02-79f7d13f0dc8", AccountingConstants.DEPT_CODE_OPS },//User ủy quyền cho dept OPS
                  { "bc34e764-2fc3-4d7c-9d5e-7c6dc56a208f", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "5983f430-dc42-4276-8997-4c1fec1fa739", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
+                 { "5983f430-dc42-4276-8997-4c1fec1fa739", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+
+                 { "9945b553-1461-4cdd-8686-be4894736f58", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "3b46e144-469f-46b0-b514-0efd181ed840", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "81a2abcf-3b1a-4892-909d-604c23667b7d", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "197f66bf-f0a1-4449-9c25-a202ae50e8f9", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "ce7a4c55-a52c-4d55-8fed-e60ba68d75e5", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
+                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
