@@ -1294,6 +1294,14 @@ namespace eFMS.API.Accounting.DL.Services
                         vatInvoice.UserModified = currentUser.UserID;
                         vatInvoice.DatetimeModified = DateTime.Now;
 
+                        DateTime? dueDate = null;
+                        if (vatInvoice.Date.HasValue)
+                        {
+                            dueDate = vatInvoice.Date.Value.AddDays(30);
+                        }
+                        vatInvoice.PaymentDueDate = dueDate;
+                        vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
+
                         IQueryable<CsShipmentSurcharge> surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == vatInvoice.Id);
 
                         if (surchargeOfAcctCurrent != null)
