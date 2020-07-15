@@ -15,6 +15,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { getTransactionPermission, getTransactionLocked } from './../../../../share-business/store';
 import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
 import _groupBy from 'lodash/groupBy';
+import { getWeek } from 'ngx-bootstrap/chronos/units/week';
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
@@ -116,7 +117,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                 }
             );
     }
-    getContainers() {
+    calculateGoodInfo() {
         if (this.houseBills != null) {
             // let desOfGoods = '';
             const lstPackages = [];
@@ -150,7 +151,36 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             this.billSIComponent.shippingInstruction.packagesNote = packages;
             this.billSIComponent.shippingInstruction.containerNote = containerNotes;
             this.billSIComponent.shippingInstruction.containerSealNo = contSealNos;
+            //
+            this.setFormRefresh({
+                grossWeight: gw,
+                volume: volumn,
+                packagesNote: packages,
+                containerNote: containerNotes,
+                containerSealNo: contSealNos
+            })
         }
+    }
+    setFormRefresh(res: any) {
+        this.billSIComponent.formSI.patchValue({
+            grossWeight: res.grossWeight,
+            cbm: res.volume,
+            packages: res.packagesNote,
+            sumContainers: res.containerNote,
+            contSealNo: res.containerSealNo,
+        });
+    }
+    getContainers() {
+        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; }),
+        ).subscribe(
+            (res: any) => {
+                this.houseBills = res;
+                this.calculateGoodInfo();
+            },
+        );
+
     }
     getContSealNo(containers: any) {
         let contSealNos = '';
