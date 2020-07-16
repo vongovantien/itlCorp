@@ -3538,5 +3538,24 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+
+        public bool CheckIsLockedShipment(string jobNo)
+        {
+            var isLocked = false;
+            var opsJobs = opsTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+            if (opsJobs != null)
+            {
+                isLocked = true;
+            }
+            else
+            {
+                var docJobs = csTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+                if (docJobs != null)
+                {
+                    isLocked = true;
+                }
+            }
+            return isLocked;
+        }
     }
 }
