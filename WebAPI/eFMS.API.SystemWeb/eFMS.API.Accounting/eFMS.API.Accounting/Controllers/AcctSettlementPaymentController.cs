@@ -285,6 +285,14 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                //Check Duplicate phí
+                var isDuplicateCharge = CheckDuplicateCharge(model);
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    return BadRequest(_result);
+                }
+
                 foreach (var item in model.ShipmentCharge)
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
@@ -358,6 +366,14 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                //Check Duplicate phí
+                var isDuplicateCharge = CheckDuplicateCharge(model);
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    return BadRequest(_result);
+                }
+
                 foreach (var item in model.ShipmentCharge)
                 {
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
@@ -419,8 +435,24 @@ namespace eFMS.API.Accounting.Controllers
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
+                //Check Duplicate phí
+                var isDuplicateCharge = CheckDuplicateCharge(model);
+                if (isDuplicateCharge)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate charge" };
+                    return BadRequest(_result);
+                }
+
                 foreach (var item in model.ShipmentCharge)
                 {
+                    // Check Job Is Locked
+                    var isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
+                    if (isLockedJob)
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = item.JobId + " have been locked. You not allow save and send request." };
+                        return BadRequest(_result);
+                    }
+
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
                     {
                         SurchargeID = item.Id,
@@ -697,5 +729,21 @@ namespace eFMS.API.Accounting.Controllers
                 return Ok(_result);
             }
         }
+
+        private bool CheckDuplicateCharge(CreateUpdateSettlementModel model)
+        {
+            var duplicateCharges = model.ShipmentCharge.Where(x =>
+                       !string.IsNullOrEmpty(x.ClearanceNo)
+                    || !string.IsNullOrEmpty(x.ContNo)
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ClearanceNo, x.ContNo, x.InvoiceNo }).ToList();
+            foreach (var charge in duplicateCharges)
+            {
+                if (charge.Count() > 1)
+                {                    
+                    return true;
+                }
+            }
+            return false;
+        }        
     }
 }

@@ -1091,9 +1091,12 @@ namespace eFMS.API.Accounting.DL.Services
                                x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -1123,9 +1126,12 @@ namespace eFMS.API.Accounting.DL.Services
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            && (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            && (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            && (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
+                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
+                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
+                            && x.ClearanceNo == criteria.CustomNo
+                            && x.InvoiceNo == criteria.InvoiceNo
+                            && x.ContNo == criteria.ContNo
                     );
 
                     var isExists = surChargeExists.Select(s => s.Id).Any();
@@ -3519,6 +3525,25 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public bool CheckIsLockedShipment(string jobNo)
+        {
+            var isLocked = false;
+            var opsJobs = opsTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+            if (opsJobs != null)
+            {
+                isLocked = true;
+            }
+            else
+            {
+                var docJobs = csTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+                if (docJobs != null)
+                {
+                    isLocked = true;
+                }
+            }
+            return isLocked;
         }
     }
 }
