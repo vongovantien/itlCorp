@@ -45,7 +45,7 @@
                     <tbody>
                         <ng-container *ngIf="!!contracts.length">
                             <tr *ngFor="let item of contracts | filter : keyword :['username', 'contractNo',
-                             'contractType', 'saleService', 'officeNameAbbr', 'companyNameAbbr'] ; let i = index;">
+                             'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button (click)="getDetailContract(item.id,i)"
