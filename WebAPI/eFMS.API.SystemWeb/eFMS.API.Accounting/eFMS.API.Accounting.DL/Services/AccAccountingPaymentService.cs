@@ -237,7 +237,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                       && (criteria.ReferenceNos.Contains(x.Soano) || criteria.ReferenceNos == null);
             if (criteria.PaymentStatus.Count > 0)
             {
-                query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null);
+                query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "Unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null);
             }
             if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
