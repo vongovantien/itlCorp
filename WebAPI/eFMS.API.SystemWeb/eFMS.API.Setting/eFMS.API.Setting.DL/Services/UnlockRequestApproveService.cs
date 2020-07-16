@@ -146,6 +146,7 @@ namespace eFMS.API.Setting.DL.Services
                         string _accountant = null;
                         string _bhHead = null;
 
+                        
                         var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(unlockRequest.UnlockType, unlockRequest.OfficeId);
                         if (isAllLevelAutoOrNone)
                         {
@@ -181,6 +182,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailUsersDeputy = leaderLevel.EmailDeputies;
                             }
                         }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                        }
 
                         if (managerLevel.Role == SettingConstants.ROLE_AUTO || managerLevel.Role == SettingConstants.ROLE_APPROVAL)
                         {
@@ -199,6 +204,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = managerLevel.EmailUser;
                                 mailUsersDeputy = managerLevel.EmailDeputies;
                             }
+                        }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                         }
 
                         if (accountantLevel.Role == SettingConstants.ROLE_AUTO || accountantLevel.Role == SettingConstants.ROLE_APPROVAL)
@@ -229,6 +238,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = accountantLevel.EmailUser;
                                 mailUsersDeputy = accountantLevel.EmailDeputies;
                             }
+                        }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                         }
 
                         if (buHeadLevel.Role == SettingConstants.ROLE_AUTO || buHeadLevel.Role == SettingConstants.ROLE_APPROVAL || buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
@@ -276,6 +289,10 @@ namespace eFMS.API.Setting.DL.Services
                                     unlockApprove.AccountantAprDate = DateTime.Now;
                                 }
                             }
+                        }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                         }
 
                         var sendMailApproved = true;
