@@ -132,7 +132,7 @@ export class JobConstants {
         WT: <CommonInterface.INg2Select[]>[
             { id: 'PP', text: 'PP' },
             { id: 'CLL', text: 'CLL' }
-        ]
+        ],
         SHIPMENTMODES: <CommonInterface.INg2Select[]>[
             { id: "Internal", text: "Internal" },
             { id: "External", text: "External" }
