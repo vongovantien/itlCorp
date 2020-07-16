@@ -120,18 +120,20 @@ export class PartnerDetailComponent extends AppList {
     }
 
 
-    getDetailCustomer(partnerId: string) {
-        this._catalogueRepo.getDetailPartner(partnerId)
-            .subscribe(
-                (res: Partner) => {
-                    this.partner = res;
-                    console.log("detail partner:", this.partner);
-                    //this.formPartnerComponent.formGroup.patchValue(res);
-                    this.formPartnerComponent.getShippingProvinces(res.countryShippingId);
-                    this.formPartnerComponent.getBillingProvinces(res.countryId);
-                }
-            );
-    }
+    // getDetailCustomer(partnerId: string) {
+    //     this._catalogueRepo.getDetailPartner(partnerId)
+    //         .subscribe(
+    //             (res: Partner) => {
+    //                 this.partner = res;
+    //                 console.log("detail partner:", this.partner);
+    //                 //this.formPartnerComponent.formGroup.patchValue(res);
+    //                 this.formPartnerComponent.getShippingProvinces(res.countryShippingId);
+    //                 this.formPartnerComponent.getBillingProvinces(res.countryId);
+    //                 console.log("flag: ", this.formPartnerComponent.activePartner);
+
+    //             }
+    //         );
+    // }
 
     RequireSaleman(partnerGroup: string): boolean {
         if (partnerGroup != null) {
@@ -158,6 +160,8 @@ export class PartnerDetailComponent extends AppList {
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
                         // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         this.formPartnerComponent.setFormData(this.partner);
+                        //
+                        this.formPartnerComponent.activePartner = this.partner.active;
                     }
                 }
             );
@@ -352,6 +356,7 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.workPlaces = workPlaces.map(x => ({ "text": x.code + ' - ' + x.branchNameEn, "id": x.id }));
                     this.getParnerDetails();
 
+
                     // * Update other charge.
                     this.formPartnerComponent.otherChargePopup.initCharges = partnerCharge || [];
                     this.formPartnerComponent.otherChargePopup.charges = partnerCharge || [];
@@ -456,28 +461,6 @@ export class PartnerDetailComponent extends AppList {
         this.getFormPartnerData();
         console.log("this.partner: ", this.partner);
 
-        // this.partner.saleMans.forEach(element => {
-        //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
-        //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
-        // });
-        // if (this.partner.countryId == null || this.partner.provinceId == null
-        //     || this.partner.countryShippingId == null || this.partner.provinceShippingId == null) {
-        //     return;
-        // }
-
-        // this.formPartnerComponent.partnerWorkPlace.setErrors(null);
-        // this.formPartnerComponent.applyDim.setErrors(null);
-        // this.formPartnerComponent.roundUp.setErrors(null);
-
-        // if (this.formPartnerComponent.partnerForm.valid) {
-        //     this.partner.accountNo = this.partner.id;
-        //     if (this.contracts.length === 0) {
-        //         this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
-        //         return;
-        //     }
-        //     this.updatePartner();
-        // }
-        //this.updatePartner();
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
@@ -512,67 +495,9 @@ export class PartnerDetailComponent extends AppList {
         //merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
 
-
         console.log("merge2: ", mergeObjPartner);
         //
         this.updatePartner(mergeObjPartner);
-
-        /*this.partner.partnerNameVn = this.formPartnerComponent.nameLocalFull.value;
-        this.partner.partnerNameEn = this.formPartnerComponent.nameENFull.value;
-        //
-        this.partner.contactPerson = this.formPartnerComponent.partnerContactPerson.value;
-        //
-        this.partner.addressVn = this.formPartnerComponent.billingAddressLocal.value;
-        //
-        this.partner.addressEn = this.formPartnerComponent.billingAddressEN.value;
-        //
-        this.partner.addressShippingVn = this.formPartnerComponent.shippingAddressVN.value;
-        //
-        this.partner.addressShippingEn = this.formPartnerComponent.shippingAddressEN.value;
-        //
-        this.partner.shortName = this.formPartnerComponent.shortName.value;
-        //
-        this.partner.tel = this.formPartnerComponent.partnerContactNumber.value;
-        //
-        this.partner.fax = this.formPartnerComponent.partnerContactFaxNo.value;
-        this.partner.taxCode = this.formPartnerComponent.taxCode.value;
-        //
-        this.partner.email = this.formPartnerComponent.employeeEmail.value;
-        //
-        this.partner.website = this.formPartnerComponent.partnerWebsite.value;
-        //
-        this.partner.bankAccountNo = this.formPartnerComponent.partnerbankAccountNo.value;
-        //
-        this.partner.bankAccountName = this.formPartnerComponent.partnerBankAccountName.value;
-        //
-        this.partner.bankAccountAddress = this.formPartnerComponent.partnerBankAccountAddress.value;
-        this.partner.note = this.formPartnerComponent.note.value;
-        //
-        this.partner.public = this.formPartnerComponent.isPublic;
-        //
-        this.partner.workPhoneEx = this.formPartnerComponent.employeeWorkPhone.value;
-        //
-        this.partner.countryId = !!formBody.billingCountry && !!formBody.billingCountry.length ? formBody.billingCountry[0].id : null;
-        this.partner.countryShippingId = !!formBody.shippingCountry && formBody.shippingCountry.length ? formBody.shippingCountry[0].id : null;
-        this.partner.provinceId = !!formBody.billingProvince && !!formBody.billingProvince.length ? formBody.billingProvince[0].id : null;
-        this.partner.provinceShippingId = !!formBody.shippingProvince && !!formBody.shippingProvince.length ? formBody.shippingProvince[0].id : null;
-        this.partner.parentId = !!formBody.partnerAccountRef && !!formBody.partnerAccountRef.length ? formBody.partnerAccountRef[0].id : null;
-        this.partner.parentId = this.formPartnerComponent.partnerAccountRef.value;
-        this.partner.workPlaceId = !!formBody.partnerWorkPlace && !!formBody.partnerWorkPlace.length ? formBody.partnerWorkPlace[0].id : null;
-        //
-        this.partner.zipCode = this.formPartnerComponent.billingZipcode.value;
-        this.partner.zipCodeShipping = this.formPartnerComponent.zipCodeShipping.value;
-        //
-        this.partner.swiftCode = this.formPartnerComponent.partnerSwiftCode.value;
-        this.partner.active = this.formPartnerComponent.active.value;
-        this.partner.internalReferenceNo = this.formPartnerComponent.internalReferenceNo.value;
-        this.partner.coLoaderCode = this.formPartnerComponent.coLoaderCode.value;
-        //
-        this.partner.roundUpMethod = !!this.formPartnerComponent.roundUp.value ? this.formPartnerComponent.roundUp.value[0].id : null;
-        this.partner.applyDim = !!this.formPartnerComponent.applyDim.value ? this.formPartnerComponent.applyDim.value[0].id : null;
-        //
-        this.partner.billingEmail = this.formPartnerComponent.billingEmail.value;
-        this.partner.billingPhone = this.formPartnerComponent.billingPhone.value;*/
     }
     trimInputForm(formBody: any) {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.partnerNameEn, formBody.partnerNameEn);

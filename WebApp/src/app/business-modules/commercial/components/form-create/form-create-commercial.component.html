@@ -56,6 +56,11 @@
                                 ">
                                     Internal Reference include 3 - 10 characters!
                                 </div>
+                                <!---->
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && internalReferenceNo.errors  | equalError:'pattern'">
+                                    Internal Reference invalid
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-6">

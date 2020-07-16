@@ -7,9 +7,11 @@ import { SalemanPopupComponent } from '../saleman-popup.component';
 import { Partner, CountryModel, ProviceModel } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
-import { JobConstants } from '@constants';
+import { JobConstants, SystemConstants } from '@constants';
 import { forkJoin, Observable } from 'rxjs';
 import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'form-add-partner',
@@ -26,6 +28,9 @@ export class FormAddPartnerComponent extends AppForm {
     //
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
+
+    //
+    menuSpecialPermission: Observable<any[]>;
 
     parentCustomers: any[] = [];
     partnerGroups: any[] = [];
@@ -78,6 +83,9 @@ export class FormAddPartnerComponent extends AppForm {
     swiftCode: AbstractControl;
 
     active: AbstractControl;
+    //
+    activePartner: boolean = false;
+    //
     note: AbstractControl;
     public: boolean = false;
     coLoaderCode: AbstractControl;
@@ -103,11 +111,16 @@ export class FormAddPartnerComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IAppState>
     ) {
         super();
     }
     ngOnInit() {
+        //
+        //this.activePartner = this.active.value;
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        //
         this.initForm();
         this.getCountryProvince();
         console.log("isUpdate: ", this.isUpdate);
@@ -279,8 +292,14 @@ export class FormAddPartnerComponent extends AppForm {
     initForm() {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
-            internalReferenceNo: [null],
+            internalReferenceNo: [null, Validators.compose([
+                Validators.maxLength(10),
+                Validators.minLength(3),
+                // Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
+            ])],
             partnerNameEn: [null, Validators.compose([
+
                 FormValidators.required,
             ])],
             partnerNameVn: [null, Validators.compose([
@@ -291,7 +310,11 @@ export class FormAddPartnerComponent extends AppForm {
             ])],
             partnerAccountRef: [],
             taxCode: [null, Validators.compose([
-                FormValidators.required
+                Validators.maxLength(14),
+                Validators.minLength(8),
+                // Validators.pattern(SystemConstants.CPATTERN.NOT_WHITE_SPACE),
+                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
+                Validators.required
             ])],
             partnerGroup: [null, Validators.compose([
                 Validators.required
@@ -325,6 +348,7 @@ export class FormAddPartnerComponent extends AppForm {
             //thien
             billingEmail: [null],
             billingPhone: [null],
+
             //
             contactPerson: [null],
             tel: [null],
@@ -337,13 +361,15 @@ export class FormAddPartnerComponent extends AppForm {
             bankAccountAddress: [null],
             swiftCode: [null],
 
-            active: [true],
+            active: [false],
             note: [null],
             coLoaderCode: [null],
             applyDim: [null],
             roundUpMethod: [null]
         });
+        //
 
+        //
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
         this.partnerNameEn = this.partnerForm.controls['partnerNameEn'];
@@ -381,6 +407,8 @@ export class FormAddPartnerComponent extends AppForm {
         //
         this.billingEmail = this.partnerForm.controls['billingEmail'];
         this.billingPhone = this.partnerForm.controls['billingPhone'];
+        //
+        this.activePartner = this.active.value;
     }
 
     /*onSelectDataFormInfo(data: any) {

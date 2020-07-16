@@ -100,7 +100,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             ])],
             internalReferenceNo: [null, Validators.compose([
                 Validators.maxLength(10),
-                Validators.minLength(3)
+                Validators.minLength(3),
+                Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
             ])],
             addressShippingEn: [null, Validators.required],
             addressShippingVn: [null, Validators.required],
