@@ -19,7 +19,7 @@
                                     [selectedDisplayFields]="['jobId','mbl','hbl']" [dataSources]="shipments"
                                     [displayFields]="configShipmentDisplayFields"
                                     [placeholder]="'Please Select Shipment'"
-                                    (remove)="resetFormControl(shipment); charges = []">
+                                    (remove)="resetFormControl(shipment); charges = []" [disabled]="isUpdate">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>

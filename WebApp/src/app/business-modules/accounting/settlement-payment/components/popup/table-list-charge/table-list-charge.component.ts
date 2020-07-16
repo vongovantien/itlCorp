@@ -386,7 +386,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
+    onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string,) {
         let partner: Partner;
         switch (type) {
             case 'partner-type':

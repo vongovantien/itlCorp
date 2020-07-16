@@ -19,6 +19,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
 import { timeoutD } from '@decorators';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'settle-payment-list-charge',
@@ -116,14 +117,25 @@ export class SettlementListChargeComponent extends AppList {
                 this.surcharges = [...this.surcharges];
             }
         } else {
-            for (const i of charges) {
+            const chargeWithNoId: Surcharge[] = charges.filter(x => x.id === null || x.id === SystemConstants.EMPTY_GUID);
+            const chargeWithId: Surcharge[] = charges.filter(x => x.id !== null && x.id !== SystemConstants.EMPTY_GUID);
+
+            for (const i of chargeWithId) {
                 const indexChargeUpdating: number = this.surcharges.findIndex(item => item.hblid === i.hblid && item.id === i.id);
                 if (indexChargeUpdating !== -1) {
                     this.updateSurchargeWithIndex(indexChargeUpdating, i);
-                } else {
-                    this.surcharges = [...this.surcharges, i];
                 }
             }
+            // * Nếu có thêm charge mới
+            if (chargeWithNoId.length) {
+                // * Xóa những charge mới thêm từ trước
+                const chargeWithNoIdCurrent: Surcharge[] = this.surcharges.filter(x => x.id === null || x.id === SystemConstants.EMPTY_GUID);
+                if (chargeWithNoIdCurrent.length) {
+                    this.surcharges = this.surcharges.filter(x => x.id !== null && x.id !== SystemConstants.EMPTY_GUID);
+                }
+                this.surcharges = [...this.surcharges, ...chargeWithNoId];
+            }
+
         }
     }
 
@@ -351,6 +363,9 @@ export class SettlementListChargeComponent extends AppList {
                     this.tableListChargePopup.isUpdate = true;
                     this.tableListChargePopup.show();
                 }
+            } else {
+                // * Not found shipment in list PIC
+                this._toastService.warning("Please check again!", 'Not found shipment');
             }
         }
     }
