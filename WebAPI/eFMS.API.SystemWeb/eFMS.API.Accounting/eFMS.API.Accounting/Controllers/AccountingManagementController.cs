@@ -257,6 +257,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("GetById")]
+        [Authorize]
         public IActionResult GetDetailById(Guid id)
         {
             var statusCode = accountingService.CheckDetailPermission(id);
