@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from '@repositories';
-import { CountryModel, ProviceModel, Partner, Customer } from '@models';
+import { CountryModel, ProviceModel, Partner } from '@models';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
@@ -209,7 +209,6 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 .subscribe(
                     (res) => {
                         this.shipingsProvinces = res;
-                        console.log(this.shipingsProvinces);
                         if (!!provinceId) {
                             const obj = this.shipingsProvinces.find(x => x.id === provinceId);
                             if (obj === undefined) {

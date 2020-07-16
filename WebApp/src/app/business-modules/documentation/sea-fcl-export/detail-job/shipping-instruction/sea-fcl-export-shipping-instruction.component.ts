@@ -15,7 +15,6 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { getTransactionPermission, getTransactionLocked } from './../../../../share-business/store';
 import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
 import _groupBy from 'lodash/groupBy';
-import { getWeek } from 'ngx-bootstrap/chronos/units/week';
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
@@ -79,8 +78,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         }
     }
     getBillingInstruction(jobId: string) {
-        console.log("jobId: ", jobId);
-
         this._documentRepo.getShippingInstruction(jobId)
             .pipe(
                 catchError(this.catchError),
@@ -88,8 +85,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
-                    console.log("Data Billing Instruction: ", res);
-
                     this.setDataBillInstructionComponent(res);
                 },
             );
@@ -291,7 +286,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         return valid;
     }
     refresh() {
-        //this.getHouseBills();
         this.setDataBillInstructionComponent(null);
     }
     previewSummaryReport() {
