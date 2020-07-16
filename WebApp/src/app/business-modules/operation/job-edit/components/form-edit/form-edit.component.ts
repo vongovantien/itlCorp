@@ -2,13 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { ShareBussinessContainerListPopupComponent, IShareBussinessState } from '@share-bussiness';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, Commodity } from '@models';
+import { OpsTransaction, Customer, PortIndex, Warehouse, User } from '@models';
 import { Observable } from 'rxjs';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCataloguePackageAction, getCataloguePackageState } from '@store';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
+import { JobConstants } from '@constants';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -52,9 +54,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     containerDescription: AbstractControl;
     packageTypeId: AbstractControl;
 
-    productServices: CommonInterface.INg2Select[];
-    serviceModes: CommonInterface.INg2Select[];
-    shipmentModes: CommonInterface.INg2Select[];
+    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
+    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     carries: Observable<Customer[]>;
@@ -62,18 +65,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     warehouses: Observable<Warehouse[]>;
     salesmans: Observable<User[]>;
     commodityGroups: CommonInterface.INg2Select[];
-    packageTypes: any[];
+    packageTypes: any[] = [];
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name Abbr' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
+
     displayFieldWarehouse: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Code' },
         { field: 'nameEn', label: 'Warehouse Name' },
@@ -96,6 +92,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this._store.dispatch(new GetCatalogueCarrierAction());
         this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCatalogueWarehouseAction({ placeType: CommonEnum.PlaceTypeEnum.Warehouse }));
+        this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.salesmans = this._systemRepo.getSystemUsers();
@@ -104,11 +101,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.agents = this._store.select(getCatalogueAgentState);
         this.warehouses = this._store.select(getCatalogueWarehouseState);
 
-
         this.getListPackageTypes();
         this.getCommodityGroup();
         this.initForm();
     }
+
     setFormValue() {
         this.formEdit.patchValue({
             jobNo: this.opsTransaction.jobNo,
@@ -140,48 +137,56 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         });
 
 
-        setTimeout(() => {
+        if (this.opsTransaction.productService) {
+            const productService = this.productServices.find(type => type.id === this.opsTransaction.productService);
+            if (!!productService) { this.formEdit.controls['productService'].setValue([productService]); }
+        }
+        if (this.opsTransaction.serviceMode != null) {
+            const serviceMode = this.serviceModes.find(type => type.id === this.opsTransaction.serviceMode);
+            if (!!serviceMode) { this.formEdit.controls['serviceMode'].setValue([serviceMode]); }
+        }
+        if (this.opsTransaction.shipmentMode != null) {
+            const shipmentMode = this.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode);
+            if (!!shipmentMode) { this.formEdit.controls['shipmentMode'].setValue([shipmentMode]); }
+        }
+        if (!!this.opsTransaction.commodityGroupId) {
+            const commodityGroup = this.commodityGroups.find(group => group.id === this.opsTransaction.commodityGroupId);
+            if (!!commodityGroup) { this.formEdit.controls['commodityGroupId'].setValue([commodityGroup]); }
+        }
 
-            if (this.opsTransaction.productService) {
-                const productService = this.productServices.find(type => type.id === this.opsTransaction.productService);
-                if (!!productService) { this.formEdit.controls['productService'].setValue([productService]); }
-            }
-            if (this.opsTransaction.serviceMode != null) {
-                const serviceMode = this.serviceModes.find(type => type.id === this.opsTransaction.serviceMode);
-                if (!!serviceMode) { this.formEdit.controls['serviceMode'].setValue([serviceMode]); }
-            }
-            if (this.opsTransaction.shipmentMode != null) {
-                const shipmentMode = this.shipmentModes.find(type => type.id === this.opsTransaction.shipmentMode);
-                if (!!shipmentMode) { this.formEdit.controls['shipmentMode'].setValue([shipmentMode]); }
-            }
-            if (!!this.opsTransaction.commodityGroupId) {
-                const commodityGroup = this.commodityGroups.find(group => group.id === this.opsTransaction.commodityGroupId);
-                if (!!commodityGroup) { this.formEdit.controls['commodityGroupId'].setValue([commodityGroup]); }
-            }
-
-            if (!!this.opsTransaction.packageTypeId) {
-                const packageType = this.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId);
-                if (!!packageType) { this.formEdit.controls['packageTypeId'].setValue([packageType]); }
-            }
-        }, 30);
+        if (!!this.opsTransaction.packageTypeId) {
+            const packageType = this.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId);
+            if (!!packageType) { this.formEdit.controls['packageTypeId'].setValue([packageType]); }
+        }
     }
 
     getCommodityGroup() {
         this._store.select(getCatalogueCommodityGroupState)
+            .pipe(map(data => this.utility.prepareNg2SelectData((data || []), 'id', 'groupNameEn')))
             .subscribe(
                 ((data: any) => {
-                    this.commodityGroups = this.utility.prepareNg2SelectData(data, 'id', 'groupNameEn');
+                    this.commodityGroups = data;
+
+                    if (!!this.opsTransaction && !!this.opsTransaction.commodityGroupId) {
+                        const commodityGroup = this.commodityGroups.find(group => group.id === this.opsTransaction.commodityGroupId);
+                        if (!!commodityGroup) { this.formEdit.controls['commodityGroupId'].setValue([commodityGroup]); }
+                    }
                 })
             );
     }
 
     getListPackageTypes() {
-        this._store.dispatch(new GetCataloguePackageAction());
-        const units = this._store.select(getCataloguePackageState);
-        const a = units.subscribe(res => {
-            this.packageTypes = this.utility.prepareNg2SelectData(res, 'id', 'unitNameEn');
-        });
+        this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE })
+            .pipe(map(data => this.utility.prepareNg2SelectData((data || []), 'id', 'unitNameEn')))
+            .subscribe(data => {
+                this.packageTypes = data;
+                if (!!this.opsTransaction && this.opsTransaction.packageTypeId) {
+                    const packageType = this.packageTypes.find(type => type.id === this.opsTransaction.packageTypeId);
+                    if (!!packageType) { this.formEdit.controls['packageTypeId'].setValue([packageType]); }
+                }
+            });
     }
+
     initForm() {
         this.formEdit = this._fb.group({
             jobNo: [null, Validators.required],

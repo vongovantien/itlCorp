@@ -122,7 +122,27 @@ export class JobConstants {
             { id: '0', text: 'Zero (0)' },
             { id: 1, text: 'One (1)' },
             { id: 2, text: 'Two (2)' },
-            { id: 3, text: 'Three (3)' }]
+            { id: 3, text: 'Three (3)' }
+        ],
+        SHIPMENTMODES: <CommonInterface.INg2Select[]>[
+            { id: "Internal", text: "Internal" },
+            { id: "External", text: "External" }
+        ],
+        SERVICEMODES: <CommonInterface.INg2Select[]>[
+            { id: "Export", text: "Export" },
+            { id: "Import", text: "Import" }
+        ],
+        PRODUCTSERVICE: <CommonInterface.INg2Select[]>[
+            { id: "SeaFCL", text: "SeaFCL" },
+            { id: "SeaLCL", text: "SeaLCL" },
+            { id: "Air", text: "Air" },
+            { id: "Trucking", text: "Trucking" },
+            { id: "Crossborder", text: "Crossborder" },
+            { id: "Warehouse", text: "Warehouse" },
+            { id: "Railway", text: "Railway" },
+            { id: "Express", text: "Express" },
+            { id: "Other", text: "Other" }
+        ],
     };
 
     public static CONFIG = {
