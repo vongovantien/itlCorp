@@ -108,7 +108,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 }
             );
     }
-    getGoods() {
+    calculateGoodInfo() {
         if (this.houseBills != null) {
             const lstPackages = [];
             let containerNotes = '';
@@ -131,12 +131,41 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
                 }
             });
             const packages = this.getPackages(lstPackages);
-            this.billSIComponent.shippingInstruction.grossWeight = gw;
-            this.billSIComponent.shippingInstruction.volume = volumn;
-            this.billSIComponent.shippingInstruction.packagesNote = packages;
-            this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER";
-            this.billSIComponent.shippingInstruction.containerSealNo = "";
+            //this.billSIComponent.shippingInstruction.grossWeight = gw;
+            //this.billSIComponent.shippingInstruction.volume = volumn;
+            //this.billSIComponent.shippingInstruction.packagesNote = packages;
+            //this.billSIComponent.shippingInstruction.containerNote = "A PART Of CONTAINER";
+            //this.billSIComponent.shippingInstruction.containerSealNo = "";
+            this.setFormRefresh({
+                containerSealNo: "",
+                containerNote: "A PART Of CONTAINER",
+                packagesNote: packages,
+                grossWeight: gw,
+                volume: volumn,
+            })
         }
+    }
+
+    setFormRefresh(res) {
+        this.billSIComponent.formSI.patchValue({
+            contSealNo: res.containerSealNo,
+            sumContainers: res.containerNote,
+            packages: res.packagesNote,
+            gw: res.grossWeight,
+            cbm: res.volume
+        });
+    }
+    getGoods() {
+        this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
+            catchError(this.catchError),
+            finalize(() => { this.isLoading = false; }),
+        ).subscribe(
+            (res: any) => {
+                this.houseBills = res;
+                this.calculateGoodInfo();
+            },
+        );
+
     }
     getPackages(lstPackages: any[]): string {
         const t = _groupBy(lstPackages, "package");
