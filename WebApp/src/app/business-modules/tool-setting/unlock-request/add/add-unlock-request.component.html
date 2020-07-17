@@ -45,7 +45,7 @@
                                     Unlock Type
                                 </label>
                                 <ng-select formControlName="unlockType" [allowClear]="false" [items]="unlockTypeList"
-                                    (selected)="selectedUnlockType($event)">
+                                    (selected)="getUnlockTypeEnumAndSetValue($event)">
                                 </ng-select>
                             </div>
                         </div>
