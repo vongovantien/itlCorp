@@ -68,8 +68,8 @@
                                 </app-combo-grid-virtual-scroll> -->
                                 <div class="pos-rel">
                                     <ng-select #of [items]="offices" [allowClear]="true" [active]="activeOffice"
-                                        (opened)="closeOtherSelects(officeId)" formControlName="officeId"
-                                        [multiple]="true" placeholder="Please select">
+                                        (opened)="closeOtherSelects(of)" formControlName="officeId" [multiple]="true"
+                                        placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon
                                         *ngIf="!officeId.value || (!!officeId.value && !officeId.value.length)"
