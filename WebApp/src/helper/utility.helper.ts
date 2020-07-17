@@ -174,4 +174,6 @@ export class UtilityHelper {
             [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
         ]).get(type)[0];
     }
+    findDuplicates = (arr: any) => arr.filter((item: any, index: number) => arr.indexOf(item) != index);
+
 }

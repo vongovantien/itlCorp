@@ -52,6 +52,7 @@ export class Surcharge {
 
     // * Custom
     obhId: string = null;
+    isDuplicate: boolean = false;
 
     constructor(object?: any) {
         const self = this;
