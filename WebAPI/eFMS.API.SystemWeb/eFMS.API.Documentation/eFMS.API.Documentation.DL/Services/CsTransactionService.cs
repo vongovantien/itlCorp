@@ -276,7 +276,7 @@ namespace eFMS.API.Documentation.DL.Services
                         csTransactionSyncAirWayBill modelSyncAirWayBill = new csTransactionSyncAirWayBill
                         {
                             Etd = model.Etd,
-                            Eta = model.Etd,
+                            Eta = model.Eta,
                             Pol = model.Pol,
                             Pod = model.Pod,
                             FlightNo = model.FlightVesselName,
