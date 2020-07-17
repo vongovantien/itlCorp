@@ -124,6 +124,7 @@ export class SystemConstants {
         DATETIME_MASK: [/\d/, /\d/, ':', /\d/, /\d/, ' ', /\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/],
         NUMERIC: /[^0-9.]+/g,
         LINE: /(?:\r\n|\r|\n|\\n|\\r)/g,
+        GUID: /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/g
     };
 
     public static HTTP_CODE = {

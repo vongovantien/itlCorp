@@ -160,4 +160,7 @@ export class UtilityHelper {
             [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
         ]).get(type)[0];
     }
+
+    findDuplicates = (arr: any) => arr.filter((item: any, index: number) => arr.indexOf(item) != index);
+
 }
