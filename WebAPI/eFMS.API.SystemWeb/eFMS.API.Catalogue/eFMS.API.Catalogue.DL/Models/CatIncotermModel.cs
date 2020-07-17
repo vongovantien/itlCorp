@@ -7,5 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatIncotermModel: CatIncoterm
     {
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
     }
 }
