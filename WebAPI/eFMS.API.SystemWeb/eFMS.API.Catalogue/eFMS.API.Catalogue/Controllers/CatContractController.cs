@@ -330,9 +330,9 @@ namespace eFMS.API.Catalogue.Controllers
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid id,string partnerId)
+        public IActionResult ActiveInactiveContract(Guid id,string partnerId,[FromBody]SalesmanCreditModel credit)
         {
-            var hs = catContractService.ActiveInActiveContract(id, partnerId);
+            var hs = catContractService.ActiveInActiveContract(id, partnerId,credit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h5 class="modal-title" style="margin-right:10px;">
-                        {{isUpdate == false ? 'Create Contract Info' : 'Customer - Contract Info'}}
+                        {{isUpdate == false ? 'Create Agreement Info' : 'Customer - Agreement Info'}}
                     </h5>
                     <ng-container *ngIf="!!this.selectedContract">
                         <ng-container *ngIf="this.selectedContract.active else inactive">
@@ -58,14 +58,25 @@
                         <div class="col-lg-4">
                             <div class="form-group">
                                 <label>Office</label>
-                                <app-combo-grid-virtual-scroll
+                                <!-- <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{ field: 'id', value: officeId.value}"
                                     (itemSelected)="onSelectedDataFormInfo($event,'office')"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="offices"
                                     (remove)="resetFormControl('office')"
                                     [displayFields]="[{field: 'shortName', label: 'Abbr Name'}, { field: 'branchNameEn', label: 'Name EN' }]"
                                     [height]="200" placeholder="Select Office">
-                                </app-combo-grid-virtual-scroll>
+                                </app-combo-grid-virtual-scroll> -->
+                                <div class="pos-rel">
+                                    <ng-select #of [items]="offices" [allowClear]="true" [active]="activeOffice"
+                                        (opened)="closeOtherSelects(officeId)" formControlName="officeId"
+                                        [multiple]="true" placeholder="Please select">
+                                    </ng-select>
+                                    <combo-grid-icon
+                                        *ngIf="!officeId.value || (!!officeId.value && !officeId.value.length)"
+                                        (onDropdown)="openNg2Select(officeId)">
+                                    </combo-grid-icon>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -118,7 +129,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
-                                <label required>Contract Type</label>
+                                <label required>Agreement Type</label>
                                 <ng-select #ct [items]="contractTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(ct)" formControlName="contractType"
                                     placeholder="Please select">
@@ -270,7 +281,7 @@
                             <ng-container *ngIf="isUpdate">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label>Credit Amount</label>
+                                        <label>Debit Amount</label>
                                         <input min="0" type="number" disabled class="form-control"
                                             formControlName="creditAmount">
                                     </div>
@@ -306,7 +317,7 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label>Credit Rate</label>
+                                        <label>Debit Rate</label>
                                         <input min="0" type="number" class="form-control" formControlName="creditRate">
                                     </div>
                                 </div>
@@ -409,3 +420,6 @@
         </div>
     </div>
 </div>
+<popup-salesman-credit-limit (onRequest)="onSalesmanCreditRequest($event)">
+
+</popup-salesman-credit-limit>

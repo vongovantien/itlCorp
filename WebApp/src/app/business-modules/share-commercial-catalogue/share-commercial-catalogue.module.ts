@@ -9,10 +9,12 @@ import { CommonComponentModule } from "src/app/shared/common/common.module";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
 import { FormContractCommercialPopupComponent } from "./components/form-contract-commercial-catalogue.popup";
 import { CommercialContractListComponent } from "../commercial/components/contract/commercial-contract-list.component";
+import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popup/salesman-credit-limit.popup";
 
 const COMPONENTS = [
     FormContractCommercialPopupComponent,
     CommercialContractListComponent,
+    SalesmanCreditLimitPopupComponent
 ]
 @NgModule({
     declarations: [
