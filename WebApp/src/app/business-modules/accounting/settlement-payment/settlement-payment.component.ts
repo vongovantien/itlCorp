@@ -264,6 +264,7 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     hidePopupRequester() {
+        this._router.navigate(["home/accounting/management/voucher/new"]);
         this.selectRequesterPopup.hide();
     }
 
