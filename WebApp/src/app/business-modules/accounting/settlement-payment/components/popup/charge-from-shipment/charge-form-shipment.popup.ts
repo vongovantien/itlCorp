@@ -9,8 +9,8 @@ import cloneDeep from 'lodash/cloneDeep';
     templateUrl: './charge-form-shipment.popup.html',
     styles: [`
         .charge-from-shipment .table-wrapper{
-                height: 500px;
-                max-height: 750px;
+                height: 400px;
+                max-height: 550px;
         }
     `]
 })
