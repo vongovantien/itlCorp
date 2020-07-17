@@ -6,7 +6,9 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo, ExportRepo } from '@repositories';
+import { InjectViewContainerRefDirective } from '@directives';
 import { AppPage } from 'src/app/app.base';
+import { timeoutD } from '@decorators';
 
 import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
@@ -14,7 +16,6 @@ import { SettlementFormCreateComponent } from '../../settlement-payment/componen
 
 import { finalize, catchError } from 'rxjs/operators';
 import { switchMap, tap } from 'rxjs/operators';
-import { timeoutD } from '@decorators';
 
 
 @Component({
@@ -30,6 +31,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
     @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
+
+    @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
+
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -195,19 +199,23 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     this.dataReport = res;
 
-                    this.showPreview();
-                    // setTimeout(() => {
-                    //     this.previewPopup.frm.nativeElement.submit();
-                    //     this.previewPopup.show();
-                    // }, 1000);
+                    this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+                    (this.componentRef.instance as ReportPreviewComponent).data = res;
 
+                    this.showPreview();
+
+                    this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+                        (v: any) => {
+                            this.subscription.unsubscribe();
+                            this.reportContainerRef.viewContainerRef.clear();
+                        });
                 },
             );
     }
     @timeoutD(1000)
     showPreview() {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     exportSettlementPayment(language: string) {
