@@ -82,7 +82,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 CatContractModel saleman = mapper.Map<CatContractModel>(item.sale);
                 SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.CompanyId)?.FirstOrDefault();
-                SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.OfficeId)?.FirstOrDefault();
+                //SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.OfficeId)?.FirstOrDefault();
                 if (company != null)
                 {
                     saleman.CompanyNameAbbr = company.BunameAbbr;
@@ -90,12 +90,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.CompanyNameVn = company.BunameVn;
                 }
 
-                if (office != null)
-                {
-                    saleman.OfficeNameEn = office.BranchNameEn;
-                    saleman.OfficeNameAbbr = office.ShortName;
-                    saleman.OfficeNameVn = office.BranchNameVn;
-                }
+                //if (office != null)
+                //{
+                //    saleman.OfficeNameEn = office.BranchNameEn;
+                //    saleman.OfficeNameAbbr = office.ShortName;
+                //    saleman.OfficeNameVn = office.BranchNameVn;
+                //}
 
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
@@ -187,7 +187,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                            (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
-                           && (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
+                           //&& (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
                            && (x.contract.Active == criteria.Status || criteria.Status == null)
                            );
             }
@@ -195,7 +195,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.Where(x =>
                             (x.contract.CompanyId == criteria.Company || criteria.Company == Guid.Empty)
-                            || (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
+                            //|| (x.contract.OfficeId == criteria.Office || criteria.Office == Guid.Empty)
                             || (x.contract.Active == criteria.Status || criteria.Status == null)
                             || (x.contract.PartnerId == criteria.PartnerId)
                             );

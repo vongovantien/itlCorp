@@ -808,7 +808,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var salesman = new CatContract
                     {
                         Id = Guid.NewGuid(),
-                        OfficeId = item.OfficeId,
+                        //OfficeId = item.OfficeId,
                         CompanyId = item.CompanyId,
                         SaleManId = item.SalePersonId,
                         PaymentMethod = item.PaymentTerm,
