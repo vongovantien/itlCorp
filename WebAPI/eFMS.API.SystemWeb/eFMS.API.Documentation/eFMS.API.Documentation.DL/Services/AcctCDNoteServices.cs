@@ -492,7 +492,7 @@ namespace eFMS.API.Documentation.DL.Services
                     HBList.Add(hb);
                 }
 
-                HBList = HBList.Distinct().ToList().OrderBy(x => x?.Hwbno).ToList();
+                HBList = HBList.Distinct().ToList().OrderByDescending(x => x?.Hwbno).ToList();
             }
             var hbOfLadingNo = string.Empty;
             var mbOfLadingNo = string.Empty;
@@ -500,7 +500,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (transaction != null)
             {
                 soaDetails.MbLadingNo = transaction?.Mawb;
-                hbOfLadingNo = string.Join(", ", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
+                hbOfLadingNo = string.Join(", ", HBList.Select(x => x.Hwbno).Distinct());
                 soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
@@ -521,6 +521,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
             var hbConsignees = string.Empty;
+            var sealsContsNo = string.Empty;
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
@@ -531,13 +532,25 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
                     }
-                    var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
-                    if (packageUnit != null)
+
+                    //Đối với service là Sea FCL (Import & Export)
+                    if (transaction.TransactionType.Contains("SF"))
                     {
-                        hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
+                        var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
+                        if (packageUnit != null)
+                        {
+                            hbPackages += (cont.Quantity + "x" + contUnit.UnitNameEn + " (" + cont.PackageQuantity + " " + packageUnit.UnitNameEn + "); ");
+                        }
                     }
-                    sealsNo += !string.IsNullOrEmpty(cont.SealNo) ? cont.SealNo + ", " : "";
+                    sealsContsNo += (!string.IsNullOrEmpty(cont.ContainerNo) || !string.IsNullOrEmpty(cont.SealNo)) ? (cont.ContainerNo + "/" + cont.SealNo + ", ") : "";
                 }
+
+                // Đối với các Service là OPS hoặc các service khác Sea FCL thì lấy package qty & package type theo Housebill
+                if (!transaction.TransactionType.Contains("SF") || opsTransaction != null)
+                {
+                    hbPackages += item.PackageQty + " " + unitRepository.Get(x => x.Id == item.PackageType).FirstOrDefault()?.UnitNameEn + "; ";
+                }
+
                 if (conts.Count() > 0)
                 {
                     volum += conts.Sum(s => s.Cbm);
@@ -554,9 +567,9 @@ namespace eFMS.API.Documentation.DL.Services
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", "") : string.Empty;
             hbPackages += ".";
-            hbPackages = hbPackages != "." ? hbPackages.Replace(", .", "") : string.Empty;
-            sealsNo += ".";
-            sealsNo = sealsNo != "." ? sealsNo.Replace(", .", "") : string.Empty;
+            hbPackages = hbPackages != "." ? hbPackages.Replace("; .", "") : string.Empty;
+            sealsContsNo += ".";
+            sealsContsNo = sealsContsNo != "." ? sealsContsNo.Replace(", .", "") : string.Empty;
 
             hbShippers = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ShipperId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
             hbConsignees = String.Join(", ", partnerRepositoty.Get(x => HBList.Select(s => s.ConsigneeId).Contains(x.Id)).Select(s => s.PartnerNameEn).Distinct().ToList());
@@ -594,7 +607,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.ProductService = opsTransaction?.ProductService;
             soaDetails.ServiceMode = opsTransaction?.ServiceMode;
             soaDetails.SoaNo = String.Join(", ", charges.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct()); ;
-            soaDetails.HbSealNo = sealsNo;
+            soaDetails.HbSealNo = sealsContsNo;//SealNo/ContNo
             soaDetails.HbGrossweight = hbGw;
             soaDetails.HbShippers = hbShippers; //Shipper
             soaDetails.HbConsignees = hbConsignees; //Consignee
