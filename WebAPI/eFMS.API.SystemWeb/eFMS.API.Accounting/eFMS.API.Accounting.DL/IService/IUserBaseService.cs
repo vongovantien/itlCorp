@@ -10,8 +10,10 @@ namespace eFMS.API.Accounting.DL.IService
     {
         string GetLeaderIdOfUser(string userId);
         CatDepartment GetInfoDeptOfUser(int? departmentId);
+        List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId);
         List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId);
         List<string> GetAccoutantManager(Guid? companyId, Guid? officeId);
+        List<string> GetBUHead(Guid? companyId, Guid? officeId);
         string GetBUHeadId(string idBranch);
         string GetEmployeeIdOfUser(string userId);
         SysEmployee GetEmployeeByEmployeeId(string employeeId);

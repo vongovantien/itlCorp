@@ -11,10 +11,10 @@
         public static readonly string STATUS_APPROVAL_NEW = "New";
         public static readonly string STATUS_APPROVAL_DENIED = "Denied";
         public static readonly string STATUS_APPROVAL_DONE = "Done";
-        public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "LeaderApproved";
-        public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "DepartmentManagerApproved";
-        public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "AccountantManagerApproved";
-        public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "RequestApproval";
+        public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "Leader Approved";
+        public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "Department Manager Approved";
+        public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "Accountant Manager Approved";
+        public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "Request Approval";
         #endregion -- STATUS APPROVAL --
 
         #region -- TYPE CHARGE --
