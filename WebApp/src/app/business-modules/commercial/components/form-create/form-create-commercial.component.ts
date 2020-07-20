@@ -153,8 +153,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 this.parentId.setValue(data.id);
                 break;
             case 'shippping-country':
+
                 this.countryShippingId.setValue(data.id);
                 this.provinceShippingId.setValue(data.id);
+
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
@@ -191,7 +193,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         event.stopPropagation();
 
         this.countryId.setValue(this.countryShippingId.value);
-        this.getBillingProvince(this.countryShippingId.value);
+        //a thương gọi hàm thiếu s nha!
+        this.getBillingProvinces(this.countryShippingId.value);
 
         this.provinceId.setValue(this.provinceShippingId.value);
 
@@ -207,10 +210,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
+
                         this.shipingsProvinces = res;
-                        console.log(this.shipingsProvinces);
                         if (!!provinceId) {
                             const obj = this.shipingsProvinces.find(x => x.id === provinceId);
+
                             if (obj === undefined) {
                                 this.provinceShippingId.setValue(null);
                             }
