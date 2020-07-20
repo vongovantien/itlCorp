@@ -6,6 +6,18 @@
         <div class="c-button-actions">
             <app-permission-button title="add new" [routerLink]="['/home/commercial/customer/new']">
             </app-permission-button>
+            <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
+                <app-permission-button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Import"
+                    type="import">
+                </app-permission-button>
+                <div class="dropdown-menu" aria-labelledby="">
+                    <a routerLink="/home/commercial/customer/import" class="dropdown-item"
+                        href="javascript:void(0)">Import
+                        Customer</a>
+                    <a routerLink="/home/catalogue/charge/import-account-voucher" class="dropdown-item"
+                        href="javascript:void(0)">Import Contract</a>
+                </div>
+            </div>
             <app-permission-button title="Export" (onClick)="export()" type="export"></app-permission-button>
         </div>
     </div>

@@ -547,6 +547,13 @@ export class CatalogueRepo {
         );
     }
 
+    downloadCommercialExcel(type: string) {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcelCommercial/${type}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     updatePartner(id: string, body: any = {}) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/` + id, body).pipe(
             map((data: any) => data)

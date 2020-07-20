@@ -36,6 +36,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ServiceId { get; set; }
         public string ServiceSalemanDefaultError { get; set; }
         public string OfficeSalemanDefault { get; set; }
+        public string AcReference { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public string OfficeSalemanDefaultError { get; set; }
