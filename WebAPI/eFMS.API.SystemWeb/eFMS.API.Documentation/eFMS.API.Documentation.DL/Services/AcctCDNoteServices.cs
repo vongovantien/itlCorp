@@ -599,7 +599,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
             soaDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
             soaDetails.HbConstainers = hbConstainers; //Container Quantity
-            soaDetails.HbPackages = hbPackages;
+            soaDetails.HbPackages = hbPackages; // Package Quantity
             soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             soaDetails.IsLocked = false;
