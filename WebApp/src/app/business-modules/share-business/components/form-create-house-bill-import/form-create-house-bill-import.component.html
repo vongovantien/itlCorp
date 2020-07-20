@@ -197,7 +197,8 @@
                                 </label>
 
                                 <ng-select [items]="hbOfladingTypesString" placeholder="select"
-                                    formControlName="hbOfladingType" [allowClear]="true">
+                                    (selected)="selectedHblType($event)" formControlName="hbOfladingType"
+                                    [allowClear]="true">
                                 </ng-select>
                                 <div class="form-control-feedback"
                                     *ngIf="(hbltype.dirty && !hbltype.valid) || (isSubmited && !hbltype.valid)">
