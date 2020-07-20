@@ -43,9 +43,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="service">inject interface ICatPartnerService</param>
         /// <param name="iMapper">inject interface IMapper</param>
         /// <param name="hostingEnvironment"></param>
-        public CatPartnerController(IStringLocalizer<LanguageSub> localizer, 
-            ICatPartnerService service, 
-            IMapper iMapper, 
+        public CatPartnerController(IStringLocalizer<LanguageSub> localizer,
+            ICatPartnerService service,
+            IMapper iMapper,
             IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
@@ -182,7 +182,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id 
+                var result = catPartnerService.Get(x => !string.IsNullOrEmpty(x.TaxCode) && !string.IsNullOrEmpty(model.TaxCode) && x.TaxCode.Trim() == model.TaxCode.Trim().ToLower() && x.Id != model.Id
                                                       && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0))
@@ -331,24 +331,24 @@ namespace eFMS.API.Catalogue.Controllers
 
 
 
-        ///// <summary>
-        ///// import list partner
-        ///// </summary>
-        ///// <param name="data"></param>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("import")]
-        //[Authorize]
-        //public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
-        //{
-        //    var hs = catPartnerService.Import(data);
-        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
-        //    if (!hs.Success)
-        //    {
-        //        return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
-        //    }
-        //    return Ok(result);
-        //}
+        /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
+        {
+            var hs = catPartnerService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
 
         /// <summary>
         /// download file excel from server
@@ -369,88 +369,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
         }
-
-        /// <summary>
-        /// download file excel from server
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("DownloadExcelCommercial/{type}")]
-        public async Task<ActionResult> DownloadExcelCommercial(string type)
-        {
-            string fileName = type == "Customer" ? Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExelImportEx : string.Empty;
-            string templateName = _hostingEnvironment.ContentRootPath;
-            var result = await new FileHelper().ExportExcel(templateName, fileName);
-            if (result != null)
-            {
-                return result;
-            }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-            }
-        }
-
-        /// <summary>
-        /// read data from file excel
-        /// </summary>
-        /// <param name="uploadedFile"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("UploadFileCustomerAgent")]
-        public IActionResult UploadFileCustomerAgent(IFormFile uploadedFile)
-        {
-            var file = new FileHelper().UploadExcel(uploadedFile);
-            if (file != null)
-            {
-                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
-                int rowCount = worksheet.Dimension.Rows;
-                int colCount = worksheet.Dimension.Columns;
-                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
-                List<CatPartnerImportModel> list = new List<CatPartnerImportModel>();
-                for (int row = 2; row <= rowCount; row++)
-                {
-                    var partner = new CatPartnerImportModel
-                    {
-                        IsValid = true,
-                        ShortName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                        PartnerNameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
-                        PartnerNameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                        TaxCode = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        InternalReferenceNo = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        ContactPerson = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                        Tel = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        Fax = worksheet.Cells[row, 8].Value?.ToString().Trim(),
-                        AddressEn = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        AddressVn = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        CityShipping = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        CountryShipping = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        ZipCodeShipping = worksheet.Cells[row, 13].Value?.ToString().Trim(),
-                        AddressShippingEn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
-                        AddressShippingVn = worksheet.Cells[row, 15].Value?.ToString().Trim(),
-                        CityBilling = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        CountryBilling = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        ZipCode = worksheet.Cells[row, 18].Value?.ToString().Trim(),
-                        Email = worksheet.Cells[row, 19].Value?.ToString().Trim(),
-                        SaleManName = worksheet.Cells[row, 20].Value?.ToString().Trim(),
-                        AcReference = worksheet.Cells[row, 21].Value?.ToString(),
-                        BankAccountNo = worksheet.Cells[row, 22].Value?.ToString().Trim(),
-                        BankAccountName = worksheet.Cells[row, 23].Value?.ToString().Trim(),
-                        SwiftCode = worksheet.Cells[row, 24].Value?.ToString().Trim(),
-                        BankAccountAddress = worksheet.Cells[row, 25].Value?.ToString().Trim(),
-                        Note = worksheet.Cells[row, 26].Value?.ToString().Trim(),
-                        BillingPhone = worksheet.Cells[row, 27].Value?.ToString().Trim(),
-                        BillingEmail = worksheet.Cells[row, 28].Value?.ToString().Trim(),
-                    };
-                    list.Add(partner);
-                }
-                var data = catPartnerService.CheckValidImport(list);
-                var totalValidRows = data.Count(x => x.IsValid == true);
-                var results = new { data, totalValidRows };
-                return Ok(results);
-            }
-            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
-        }
-
 
         /// <summary>
         /// read data from file excel
