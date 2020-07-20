@@ -292,16 +292,16 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        ///// <summary>
-        ///// get department
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpGet]
-        //[Route("GetDepartments")]
-        //public IActionResult GetDepartments()
-        //{
-        //    return Ok(catPartnerService.GetDepartments());
-        //}
+        /// <summary>
+        /// get department
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetDepartments")]
+        public IActionResult GetDepartments()
+        {
+            return Ok(catPartnerService.GetDepartments());
+        }
         private string CheckExist(string id, CatPartnerEditModel model)
         {
             string message = string.Empty;
