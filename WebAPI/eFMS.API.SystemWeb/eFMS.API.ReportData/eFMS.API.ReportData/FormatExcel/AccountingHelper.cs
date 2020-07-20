@@ -329,7 +329,6 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 
                 "Reference No",
-               
                 "Partner Name",
                 "Invoice Amount",
                 "Currency",
