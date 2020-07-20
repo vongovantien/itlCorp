@@ -61,7 +61,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -417,6 +417,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(16, 8)");
 
+                entity.Property(e => e.CreditRate).HasColumnType("decimal(16, 8)");
+
                 entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(16, 8)");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -433,7 +435,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+                entity.Property(e => e.OfficeId)
+                    .HasColumnName("OfficeID")
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(16, 8)");
 

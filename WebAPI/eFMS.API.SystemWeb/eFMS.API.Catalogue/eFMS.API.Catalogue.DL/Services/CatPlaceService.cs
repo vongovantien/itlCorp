@@ -130,7 +130,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<vw_catProvince> GetProvinces(short? countryId)
         {
-            var data = GetProvinces().Where(x => x.CountryID == countryId || countryId == null).ToList();
+            var data = GetProvinces().Where(x => x.CountryID == countryId || countryId == null).Where(y => y.Active == true).ToList();
             return data;
         }
 
