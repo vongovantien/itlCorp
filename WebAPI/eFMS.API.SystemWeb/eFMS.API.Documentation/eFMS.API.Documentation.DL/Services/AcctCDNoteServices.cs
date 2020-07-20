@@ -515,13 +515,12 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var hbConstainers = string.Empty;
             var hbPackages = string.Empty;
-            var sealsNo = string.Empty;
+            var sealsContsNo = string.Empty;
             decimal? volum = 0;
             decimal? hbGw = 0;
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
-            var hbConsignees = string.Empty;
-            var sealsContsNo = string.Empty;
+            var hbConsignees = string.Empty;            
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
