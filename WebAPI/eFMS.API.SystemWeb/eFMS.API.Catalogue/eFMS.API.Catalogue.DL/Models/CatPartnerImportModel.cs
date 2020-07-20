@@ -13,7 +13,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string CityShipping { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
-        public string ACReference { get; set; }
         public string Profile { get; set; }
         public string PartnerNameEnError { get; set; }
         public string AcReferenceError { get; set; }
