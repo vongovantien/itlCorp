@@ -523,8 +523,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? hbGw = 0;
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
-            var hbConsignees = string.Empty;
-            var sealsContsNo = string.Empty;
+            var hbConsignees = string.Empty;            
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
@@ -600,7 +599,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
             soaDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
             soaDetails.HbConstainers = hbConstainers; //Container Quantity
-            soaDetails.HbPackages = hbPackages;
+            soaDetails.HbPackages = hbPackages; // Package Quantity
             soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             soaDetails.IsLocked = false;
