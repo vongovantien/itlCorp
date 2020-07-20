@@ -84,6 +84,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.CompanyId)?.FirstOrDefault();
                 //var arrToQuery = saleman.OfficeId.ToArray();
                 //SysOffice office = sysOfficeRepository.Get(x => arrToQuery.Contains(x.Id))?.FirstOrDefault();
+                //SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.OfficeId)?.FirstOrDefault();
                 if (company != null)
                 {
                     saleman.CompanyNameAbbr = company.BunameAbbr;

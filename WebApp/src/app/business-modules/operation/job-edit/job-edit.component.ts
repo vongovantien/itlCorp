@@ -15,7 +15,7 @@ import { DocumentationRepo } from 'src/app/shared/repositories/documentation.rep
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
 
-import { catchError, finalize, takeUntil, map } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../share-business/store';
 import _groupBy from 'lodash/groupBy';
@@ -24,7 +24,6 @@ import { formatDate } from '@angular/common';
 import { CommonEnum } from '@enums';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { AppForm } from 'src/app/app.form';
-import { getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -42,6 +41,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     @ViewChild(JobManagementFormEditComponent, { static: false }) editForm: JobManagementFormEditComponent;
     @ViewChild('addOpsForm', { static: false }) formOps: NgForm;
     @ViewChild('notAllowUpdate', { static: false }) infoPoup: InfoPopupComponent;
+
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
 
@@ -51,18 +51,13 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     hblid: string = '';
 
     deleteMessage: string = '';
-    commodityGroups = null;
 
-    packageTypes: any[];
-    productServices: CommonInterface.INg2Select[];
-    serviceModes: CommonInterface.INg2Select[];
-    shipmentModes: CommonInterface.INg2Select[];
+
 
     constructor(
         private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
         private router: Router,
-        private _catalogueRepo: CatalogueRepo,
         private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _router: Router,
@@ -76,11 +71,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
-        this.getShipmentCommonData();
-        this._store.dispatch(new GetCatalogueCommodityGroupAction());
 
-
-        this.getListPackageTypes();
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
@@ -293,11 +284,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.containerPopup.show();
     }
 
-    getListPackageTypes() {
-        this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE }).toPromise().then(data => {
-            this.packageTypes = this.utility.prepareNg2SelectData(data, 'id', 'unitNameEn');
-        });
-    }
     getShipmentDetails(id: any) {
         this._documentRepo.getDetailShipment(id)
             .pipe(
@@ -310,11 +296,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                     if (this.opsTransaction != null) {
                         this.getListContainersOfJob();
                         if (this.opsTransaction != null) {
-
-                            this.editForm.shipmentModes = this.shipmentModes;
-                            this.editForm.serviceModes = this.serviceModes;
-                            this.editForm.productServices = this.productServices;
-                            this.editForm.packageTypes = this.packageTypes;
                             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
                             this.editForm.opsTransaction = this.opsTransaction;
                             const hbl = new CsTransactionDetail(this.opsTransaction);
@@ -352,13 +333,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
             );
     }
 
-    getShipmentCommonData() {
-        this._documentRepo.getOPSShipmentCommonData().toPromise().then((response: any) => {
-            this.productServices = this.utility.prepareNg2SelectData(response.productServices, 'value', 'displayName');
-            this.serviceModes = this.utility.prepareNg2SelectData(response.serviceModes, 'value', 'displayName');
-            this.shipmentModes = this.utility.prepareNg2SelectData(response.shipmentModes, 'value', 'displayName');
-        });
-    }
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
             this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.opsTransaction.hblid }));

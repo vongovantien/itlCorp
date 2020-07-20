@@ -412,13 +412,13 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.MAWB = houserBill != null ? houserBill.Mawb?.ToUpper() : string.Empty;
+            parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.Contact = _currentUser;
             parameter.DecimalNo = 3;
             parameter.CurrDecimalNo = 0;
-            parameter.Day = arrival != null ? arrival.ArrivalFirstNotice?.ToString("dd") : string.Empty;
-            parameter.Month = arrival != null ? arrival.ArrivalFirstNotice?.ToString("MM") : string.Empty;
-            parameter.Year = arrival != null ? arrival.ArrivalFirstNotice?.ToString("yyyy") : string.Empty;
+            parameter.Day = arrival != null ? (arrival.ArrivalFirstNotice?.ToString("dd") ?? string.Empty) : string.Empty;
+            parameter.Month = arrival != null ? (arrival.ArrivalFirstNotice?.ToString("MM") ?? string.Empty) : string.Empty;
+            parameter.Year = arrival != null ? (arrival.ArrivalFirstNotice?.ToString("yyyy") ?? string.Empty) : string.Empty;
             result = new Crystal
             {
                 ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "SeaArrivalNotes.rpt" : "SeaArrivalNotesOG.rpt",
@@ -541,7 +541,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
-            parameter.MAWB = houseBill != null ? houseBill.Mawb?.ToUpper() : string.Empty;
+            parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             parameter.CompanyName = DocumentConstants.COMPANY_NAME;
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;

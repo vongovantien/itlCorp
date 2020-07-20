@@ -476,8 +476,13 @@ namespace eFMS.API.Accounting.DL.Services
 
             var settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return null;
-            //Quy đổi tỉ giá theo ngày Request Date
+            //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                var maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             var dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
@@ -1267,7 +1272,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var charge in model.ShipmentCharge)
                 {
-                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == model.Settlement.RequestDate.Value.Date).ToList();
+                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == model.Settlement.RequestDate.Value.Date).ToList();
+                    if (currencyExchange.Count == 0)
+                    {
+                        var maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                        currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                    }
                     var rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, charge.CurrencyId, model.Settlement.SettlementCurrency);
                     amount += charge.Total * rate;
                 }
@@ -3537,6 +3547,25 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public bool CheckIsLockedShipment(string jobNo)
+        {
+            var isLocked = false;
+            var opsJobs = opsTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+            if (opsJobs != null)
+            {
+                isLocked = true;
+            }
+            else
+            {
+                var docJobs = csTransactionRepo.Get(x => x.JobNo == jobNo && x.IsLocked == true).FirstOrDefault();
+                if (docJobs != null)
+                {
+                    isLocked = true;
+                }
+            }
+            return isLocked;
         }
     }
 }

@@ -495,7 +495,7 @@ namespace eFMS.API.Documentation.DL.Services
                     HBList.Add(hb);
                 }
 
-                HBList = HBList.Distinct().ToList().OrderBy(x => x?.Hwbno).ToList();
+                HBList = HBList.Distinct().ToList().OrderByDescending(x => x?.Hwbno).ToList();
             }
             var hbOfLadingNo = string.Empty;
             var mbOfLadingNo = string.Empty;
@@ -503,7 +503,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (transaction != null)
             {
                 soaDetails.MbLadingNo = transaction?.Mawb;
-                hbOfLadingNo = string.Join(", ", HBList.OrderByDescending(x => x.Hwbno).Select(x => x.Hwbno).Distinct());
+                hbOfLadingNo = string.Join(", ", HBList.Select(x => x.Hwbno).Distinct());
                 soaDetails.HbLadingNo = hbOfLadingNo;
             }
             else
@@ -523,8 +523,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? hbGw = 0;
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
-            var hbConsignees = string.Empty;
-            int? totalPkgQtyHouses = 0;
+            var hbConsignees = string.Empty;            
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
@@ -535,14 +534,25 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         hbConstainers += (cont.Quantity + "x" + contUnit.UnitNameEn + ", ");
                     }
-                    var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
-                    //if (packageUnit != null)
-                    //{
-                    //    hbPackages += (cont.Quantity + "x" + packageUnit.UnitNameEn + ", ");
-                    //}
-                    sealsContsNo += (!string.IsNullOrEmpty(cont.SealNo) || !string.IsNullOrEmpty(cont.ContainerNo)) ? (cont.ContainerNo + "/" + cont.SealNo + ", ") : "";                    
+
+                    //Đối với service là Sea FCL (Import & Export)
+                    if (transaction.TransactionType.Contains("SF"))
+                    {
+                        var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
+                        if (packageUnit != null)
+                        {
+                            hbPackages += (cont.Quantity + "x" + contUnit.UnitNameEn + " (" + cont.PackageQuantity + " " + packageUnit.UnitNameEn + "); ");
+                        }
+                    }
+                    sealsContsNo += (!string.IsNullOrEmpty(cont.ContainerNo) || !string.IsNullOrEmpty(cont.SealNo)) ? (cont.ContainerNo + "/" + cont.SealNo + ", ") : "";
                 }
-                totalPkgQtyHouses += item.PackageQty;
+
+                // Đối với các Service là OPS hoặc các service khác Sea FCL thì lấy package qty & package type theo Housebill
+                if (!transaction.TransactionType.Contains("SF") || opsTransaction != null)
+                {
+                    hbPackages += item.PackageQty + " " + unitRepository.Get(x => x.Id == item.PackageType).FirstOrDefault()?.UnitNameEn + "; ";
+                }
+
                 if (conts.Count() > 0)
                 {
                     volum += conts.Sum(s => s.Cbm);
@@ -558,8 +568,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", "") : string.Empty;
-            //hbPackages += ".";
-            //hbPackages = hbPackages != "." ? hbPackages.Replace(", .", "") : string.Empty;
+            hbPackages += ".";
+            hbPackages = hbPackages != "." ? hbPackages.Replace("; .", "") : string.Empty;
             sealsContsNo += ".";
             sealsContsNo = sealsContsNo != "." ? sealsContsNo.Replace(", .", "") : string.Empty;
 
@@ -589,7 +599,7 @@ namespace eFMS.API.Documentation.DL.Services
             soaDetails.Vessel = transaction != null ? transaction.FlightVesselName : opsTransaction.FlightVessel;
             soaDetails.VesselDate = transaction != null ? transaction.FlightDate : null;
             soaDetails.HbConstainers = hbConstainers; //Container Quantity
-            soaDetails.HbPackages = totalPkgQtyHouses?.ToString(); //Total Package Quantity HBLs
+            soaDetails.HbPackages = hbPackages; // Package Quantity
             soaDetails.Etd = transaction != null ? transaction.Etd : opsTransaction.ServiceDate;
             soaDetails.Eta = transaction != null ? transaction.Eta : opsTransaction.FinishDate;
             soaDetails.IsLocked = false;

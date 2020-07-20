@@ -20,7 +20,7 @@ import { CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 
-import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission } from '@share-bussiness';
+import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission, getTransactionDetailCsTransactionState } from '@share-bussiness';
 import { DataService } from '@services';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -79,6 +79,14 @@ export class CreateHouseBillComponent extends AppForm {
                         // * Update field inword with container data.
                         this.formHouseBill.formGroup.controls["inWord"].setValue(this.updateInwordField(this.containers));
 
+                    }
+                });
+        this._store.select(getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+            .subscribe(
+                (shipment: CsTransaction) => {
+                    if (!!shipment.desOfGoods) {
+                        this.hblGoodSummaryComponent.description = shipment.desOfGoods;
                     }
                 });
     }

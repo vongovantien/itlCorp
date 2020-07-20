@@ -134,7 +134,7 @@ namespace eFMS.API.Accounting.DL.Services
                  { "81a2abcf-3b1a-4892-909d-604c23667b7d", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
                  { "197f66bf-f0a1-4449-9c25-a202ae50e8f9", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
                  { "ce7a4c55-a52c-4d55-8fed-e60ba68d75e5", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
+                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT } //User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();

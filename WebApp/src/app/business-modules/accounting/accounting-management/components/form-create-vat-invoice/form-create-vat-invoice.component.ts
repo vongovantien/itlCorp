@@ -2,15 +2,15 @@ import { Component, OnInit, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
 
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { AccountingConstants } from '@constants';
 import { ChartOfAccounts, Partner } from '@models';
 import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
+import { DataService } from '@services';
 
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, UpdateExchangeRate } from '../../store';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
 import { map, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
@@ -62,13 +62,12 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     listCurrency: Observable<CommonInterface.INg2Select[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
-
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
         private _accountingRepo: AccountingRepo,
-        private _toast: ToastrService
+        private _dataService: DataService
     ) {
         super();
     }
@@ -179,14 +178,9 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     }
 
     syncExchangeRateCharge() {
-        console.log(this.totalExchangeRate.value);
         if (!!this.totalExchangeRate.value) {
-            this._store.dispatch(
-                UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }
-                ));
-            this._toast.success("Exchange Rate synced successfully");
+            this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
         }
     }
-
 
 }

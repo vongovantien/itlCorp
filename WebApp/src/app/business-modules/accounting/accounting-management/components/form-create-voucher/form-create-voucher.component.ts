@@ -1,18 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { JobConstants, AccountingConstants } from '@constants';
+import { AccountingConstants } from '@constants';
 import { Partner, ChartOfAccounts } from '@models';
 
 import { CatalogueRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
 import { CommonEnum } from '@enums';
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, UpdateExchangeRate } from '../../store';
+import { DataService } from '@services';
+
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -56,7 +57,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
-        private _toast: ToastrService
+        private _dataService: DataService
+
     ) {
         super();
     }
@@ -75,8 +77,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             .subscribe(
                 (res: IAccountingManagementPartnerState) => {
                     if (!!res.partnerId) {
-                        if (!this.formGroup.controls['partnerId'].value) {
-                            this.formGroup.controls['partnerId'].setValue(res.partnerId);
+                        if (!this.partnerId.value) {
+                            this.partnerId.setValue(res.partnerId);
                             if (!this.formGroup.controls['personalName'].value) {
                                 this.formGroup.controls['personalName'].setValue(res.partnerName);
                             }
@@ -144,12 +146,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     }
 
     syncExchangeRateCharge() {
-        console.log(this.totalExchangeRate.value);
         if (!!this.totalExchangeRate.value) {
-            this._store.dispatch(
-                UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }
-                ));
-            this._toast.success("Exchange Rate synced successfully");
+            this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
         }
     }
 }
