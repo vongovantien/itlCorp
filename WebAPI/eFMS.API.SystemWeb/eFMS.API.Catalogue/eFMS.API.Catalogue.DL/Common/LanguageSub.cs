@@ -10,6 +10,8 @@
 
         #region Partner
         public static readonly string MSG_PARTNER_TAXCODE_EMPTY = "MSG_PARTNER_TAXCODE_EMPTY";
+        public static readonly string MSG_PARTNER_INTERNAL_REFERENCENO_INVALID = "MSG_PARTNER_INTERNAL_REFERENCENO_INVALID";
+
         public static readonly string MSG_PARTNER_TAXCODE_NOT_NUMBER = "MSG_PARTNER_TAXCODE_NOT_NUMBER";
         public static readonly string MSG_PARTNER_TAXCODE_EXISTED = "MSG_PARTNER_TAXCODE_EXISTED";
         public static readonly string MSG_PARTNER_TAXCODE_DUPLICATED = "MSG_PARTNER_TAXCODE_DUPLICATED";
@@ -38,6 +40,9 @@
         public static readonly string MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND = "MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND";
         public static readonly string MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND = "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND";
         public static readonly string MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND = "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND";
+        public static readonly string MSG_PARTNER_AC_REFERENCE_NOT_FOUND = "MSG_PARTNER_AC_REFERENCE_NOT_FOUND";
+
+
         public static readonly string MSG_PARTNER_WORKPLACE_NOT_FOUND = "MSG_PARTNER_WORKPLACE_NOT_FOUND";
         #endregion
 

@@ -18,6 +18,7 @@
 
   //------------start: partner data
   "MSG_PARTNER_TAXCODE_EMPTY": "Tax code is not allow empty!",
+  "MSG_PARTNER_INTERNAL_REFERENCENO_INVALID": "Internal Reference '{0}' is invalid",
   "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type and greater than 0!",
   "MSG_PARTNER_TAXCODE_EXISTED": "Tax code '{0}' has been existed!",
   "MSG_PARTNER_TAXCODE_INVALID": "Tax code '{0}' is invalid",

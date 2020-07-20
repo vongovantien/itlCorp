@@ -540,6 +540,11 @@ export class CatalogueRepo {
     upLoadPartnerFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFile`, files, "uploadedFile");
     }
+
+    upLoadCustomerAgentFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFileCustomerAgent`, files, "uploadedFile");
+    }
+
     downloadPartnerExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcel`).pipe(
             catchError((error) => throwError(error)),

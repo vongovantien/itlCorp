@@ -19,6 +19,8 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount);
         List<DepartmentPartner> GetDepartments();
         List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list);
+        List<CatPartnerImportModel> CheckValidCustomerAgentImport(List<CatPartnerImportModel> list);
+
         HandleState Import(List<CatPartnerImportModel> data);
         HandleState Delete(string id);
         HandleState Update(CatPartnerModel model);

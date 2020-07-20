@@ -205,7 +205,7 @@ namespace eFMS.API.Catalogue.Controllers
             if (!ModelState.IsValid) return BadRequest();
             if (!String.IsNullOrEmpty(model.InternalReferenceNo))
             {
-               model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
+                model.AccountNo = model.TaxCode + "." + model.InternalReferenceNo;
             }
             else
             {
@@ -218,9 +218,9 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             List<string> idsContract = null;
-            if(model.Contracts.Count() > 0)
+            if (model.Contracts.Count() > 0)
             {
-                
+
                 model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
                 idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
                 model.idsContract = idsContract;
@@ -292,22 +292,22 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// get department
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("GetDepartments")]
-        public IActionResult GetDepartments()
-        {
-            return Ok(catPartnerService.GetDepartments());
-        }
+        ///// <summary>
+        ///// get department
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[Route("GetDepartments")]
+        //public IActionResult GetDepartments()
+        //{
+        //    return Ok(catPartnerService.GetDepartments());
+        //}
         private string CheckExist(string id, CatPartnerEditModel model)
         {
             string message = string.Empty;
             if (id.Length == 0)
             {
-                if(model.AccountNo != null)
+                if (model.AccountNo != null)
                 {
                     if (catPartnerService.Any(x => x.AccountNo == model.AccountNo))
                     {
@@ -324,31 +324,31 @@ namespace eFMS.API.Catalogue.Controllers
                         message = stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
                     }
                 }
-               
+
             }
             return message;
         }
 
-       
 
-        /// <summary>
-        /// import list partner
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("import")]
-        [Authorize]
-        public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
-        {
-            var hs = catPartnerService.Import(data);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
-            if (!hs.Success)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
-            }
-            return Ok(result);
-        }
+
+        ///// <summary>
+        ///// import list partner
+        ///// </summary>
+        ///// <param name="data"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //[Route("import")]
+        //[Authorize]
+        //public IActionResult Import([FromBody] List<CatPartnerImportModel> data)
+        //{
+        //    var hs = catPartnerService.Import(data);
+        //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+        //    if (!hs.Success)
+        //    {
+        //        return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+        //    }
+        //    return Ok(result);
+        //}
 
         /// <summary>
         /// download file excel from server

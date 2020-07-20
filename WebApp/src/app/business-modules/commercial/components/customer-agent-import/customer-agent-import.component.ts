@@ -46,19 +46,22 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
-        this._catalogueRepo.upLoadPartnerFile(file.target['files'])
+        this._catalogueRepo.upLoadCustomerAgentFile(file.target['files'])
             .pipe(
                 finalize(() => {
                     this._progressRef.complete();
                 })
             )
             .subscribe((response: any) => {
-                this.data = response.data;
-                this.pager.totalItems = this.data.length;
-                this.totalValidRows = response.totalValidRows;
-                this.totalRows = this.data.length;
-                this.pager.currentPage = 1;
-                this.pagingData(this.data);
+                if (!!response) {
+                    this.data = response.data;
+                    this.pager.totalItems = this.data.length;
+                    this.totalValidRows = response.totalValidRows;
+                    this.totalRows = this.data.length;
+                    this.pager.currentPage = 1;
+                    this.pagingData(this.data);
+                }
+
             }, () => {
             });
     }

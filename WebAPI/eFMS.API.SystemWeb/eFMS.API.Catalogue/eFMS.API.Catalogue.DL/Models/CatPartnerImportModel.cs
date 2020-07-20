@@ -16,9 +16,11 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ACReference { get; set; }
         public string Profile { get; set; }
         public string PartnerNameEnError { get; set; }
+        public string AcReferenceError { get; set; }
         public string PartnerNameVnError { get; set; }
         public string ShortNameError { get; set; }
         public string TaxCodeError { get; set; }
+        public string InternalReferenceNoError { get; set; }
         public string PartnerGroupError { get; set; }
         public string ContactPersonError { get; set; }
         public string TelError { get; set; }
