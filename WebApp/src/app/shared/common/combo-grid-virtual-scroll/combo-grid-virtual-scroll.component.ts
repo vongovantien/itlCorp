@@ -136,6 +136,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     setDataSource(data: any[]) {
+
+
         if (!!data && data.length > 0) {
             // * ? initializing the eventkey manager here
             this.keyboardEventsManager = new ListKeyManager(this.listItems);
@@ -154,6 +156,11 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.displaySelectedStr = activeItemData.hardValue;
                 }
             }
+        }
+        //thien
+        else {
+            this.DataSources = data;
+            this.ConstDataSources = cloneDeep(data);
         }
     }
 
