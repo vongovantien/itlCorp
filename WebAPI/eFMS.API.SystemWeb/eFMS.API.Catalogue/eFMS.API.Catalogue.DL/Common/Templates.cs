@@ -69,6 +69,12 @@
             }
         }
 
+        public struct CatContract
+        {
+            public static string ExelImportFileName = "CustomerContract";
+        }
+
+
 
         public struct CatSaleMan
         {

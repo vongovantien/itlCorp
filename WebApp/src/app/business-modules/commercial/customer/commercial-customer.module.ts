@@ -7,6 +7,7 @@ import { ShareCommercialModule } from '../share-commercial.module';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 import { CommercialDetailComponent } from '../detail/detail-commercial.component';
 import { CustomerAgentImportComponent } from '../components/customer-agent-import/customer-agent-import.component';
+import { ContractImportComponent } from '../components/contract/import/contract-import.component';
 
 const routing: Routes = [
     {
@@ -22,8 +23,12 @@ const routing: Routes = [
                 path: 'import', component: CustomerAgentImportComponent, data: { name: "Import", level: 3 }
             },
             {
+                path: 'importContract', component: ContractImportComponent, data: { name: "Import Contract", level: 3 }
+            },
+            {
                 path: ':partnerId', component: CommercialDetailComponent, data: { name: 'View/Edit Customer' }
             },
+
 
         ]
     }

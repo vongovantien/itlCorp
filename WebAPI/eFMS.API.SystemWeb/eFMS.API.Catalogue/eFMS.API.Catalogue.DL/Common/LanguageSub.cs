@@ -38,12 +38,44 @@
         public static readonly string MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND = "MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND";
         public static readonly string MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND = "MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND";
         public static readonly string MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND = "MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND";
+
         public static readonly string MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND = "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND";
         public static readonly string MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND = "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND";
         public static readonly string MSG_PARTNER_AC_REFERENCE_NOT_FOUND = "MSG_PARTNER_AC_REFERENCE_NOT_FOUND";
 
 
         public static readonly string MSG_PARTNER_WORKPLACE_NOT_FOUND = "MSG_PARTNER_WORKPLACE_NOT_FOUND";
+        #endregion
+
+        #region COntract
+        public static readonly string MSG_CONTRACT_PARTNER_ID_EMPTY = "MSG_CONTRACT_PARTNER_ID_EMPTY";
+        public static readonly string MSG_CONTRACT_PARTNER_ID_NOT_FOUND = "MSG_CONTRACT_PARTNER_ID_NOT_FOUND";
+        public static readonly string MSG_CONTRACT_AGREEMENT_TYPE_EMPTY = "MSG_CONTRACT_AGREEMENT_TYPE_EMPTY";
+        public static readonly string MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND = "MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND";
+        public static readonly string MSG_CONTRACTNO_EMPTY = "MSG_CONTRACTNO_EMPTY";
+        public static readonly string MSG_SALE_SERVICE_EMPTY = "MSG_SALE_SERVICE_EMPTY";
+        public static readonly string MSG_CONTRACT_COMPANY_EMPTY = "MSG_CONTRACT_COMPANY_EMPTY";
+        public static readonly string MSG_CONTRACT_COMPANY_NOT_FOUND = "MSG_CONTRACT_COMPANY_NOT_FOUND";
+
+        public static readonly string MSG_CONTRACT_OFFICE_EMPTY = "MSG_CONTRACT_OFFICE_EMPTY";
+        public static readonly string MSG_CONTRACT_OFFICE_NOT_FOUND = "MSG_CONTRACT_OFFICE_NOT_FOUND";
+        public static readonly string MSG_CONTRACT_PAYMENT_METHOD_EMPTY = "MSG_CONTRACT_PAYMENT_METHOD_EMPTY";
+        public static readonly string MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND = "MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND";
+        public static readonly string MSG_CONTRACT_SALESMAN_NOT_FOUND = "MSG_CONTRACT_SALESMAN_NOT_FOUND";
+        public static readonly string MSG_CONTRACT_ACTIVE_NOT_FOUND = "MSG_CONTRACT_ACTIVE_NOT_FOUND";
+
+        public static readonly string MSG_CONTRACT_EFFECTIVE_DATE_EMPTY = "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY";
+        public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";
+        public static readonly string MSG_CONTRACT_CREDIT_LIMIT_EMPTY = "MSG_CONTRACT_CREDIT_LIMIT_EMPTY";
+        public static readonly string MSG_CONTRACT_PAYMENT_TERM_EMPTY = "MSG_CONTRACT_PAYMENT_TERM_EMPTY";
+
+
+
+
+
+
+
+
         #endregion
 
         #region

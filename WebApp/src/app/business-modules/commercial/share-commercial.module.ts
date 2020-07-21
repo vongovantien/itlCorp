@@ -12,13 +12,15 @@ import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/sh
 import { ModalModule, PaginationModule } from 'ngx-bootstrap';
 import { SelectModule } from 'ng2-select';
 import { CustomerAgentImportComponent } from './components/customer-agent-import/customer-agent-import.component';
+import { ContractImportComponent } from './components/contract/import/contract-import.component';
 
 @NgModule({
     declarations: [
         CommercialCreateComponent,
         CommercialFormCreateComponent,
         CommercialDetailComponent,
-        CustomerAgentImportComponent
+        CustomerAgentImportComponent,
+        ContractImportComponent
     ],
     imports: [
         CommonModule,

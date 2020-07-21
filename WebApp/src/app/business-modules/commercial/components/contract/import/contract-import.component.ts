@@ -1,23 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppPage } from 'src/app/app.base';
-import { finalize, catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { CatalogueRepo } from '@repositories';
-import { PagingService, SortService } from '@services';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
-import { PAGINGSETTING } from 'src/constants/paging.const';
 import { InfoPopupComponent } from '@common';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { PAGINGSETTING } from 'src/constants/paging.const';
+import { PagingService, SortService } from '@services';
+import { CatalogueRepo } from '@repositories';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-customer-agent-import',
-    templateUrl: 'customer-agent-import.component.html'
+    selector: 'app-contract-import',
+    templateUrl: 'contract-import.component.html',
 })
 
-export class CustomerAgentImportComponent extends AppPage implements OnInit {
-
+export class ContractImportComponent extends AppPage implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) importAlert: InfoPopupComponent;
     data: any[];
     pagedItems: any[] = [];
@@ -48,7 +47,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
-        this._catalogueRepo.upLoadCustomerAgentFile(file.target['files'])
+        this._catalogueRepo.upLoadContractFile(file.target['files'])
             .pipe(
                 finalize(() => {
                     this._progressRef.complete();
@@ -94,7 +93,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
         } else {
             const data = this.data.filter(x => x.isValid);
             this._progressRef.start();
-            this._catalogueRepo.importCustomerAgent(data, 'Customer')
+            this._catalogueRepo.importContract(data)
                 .pipe(
                     finalize(() => {
                         this._progressRef.complete();
@@ -151,11 +150,11 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
     }
 
     downloadSample() {
-        this._catalogueRepo.downloadCommercialExcel('Customer')
+        this._catalogueRepo.downloadContractExcel()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.downLoadFile(res, "application/ms-excel", "CustomerImportTemplate.xlsx");
+                    this.downLoadFile(res, "application/ms-excel", "ContractImportTemplate.xlsx");
                 },
             );
     }

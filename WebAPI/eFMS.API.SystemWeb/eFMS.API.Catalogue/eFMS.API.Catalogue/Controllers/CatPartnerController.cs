@@ -351,6 +351,26 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("importCustomerAgent/{type}")]
+        [Authorize]
+        public IActionResult ImportCustomerAgent([FromBody] List<CatPartnerImportModel> data,string type)
+        {
+            var hs = catPartnerService.ImportCustomerAgent(data,type);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
         /// download file excel from server
         /// </summary>
         /// <returns></returns>
@@ -466,12 +486,15 @@ namespace eFMS.API.Catalogue.Controllers
                         AddressVn = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         CityBilling = worksheet.Cells[row, 11].Value?.ToString().Trim(),
                         CountryBilling = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        ZipCodeShipping = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        ZipCode = worksheet.Cells[row, 13].Value?.ToString().Trim(),
+
                         AddressShippingEn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
                         AddressShippingVn = worksheet.Cells[row, 15].Value?.ToString().Trim(),
                         CityShipping = worksheet.Cells[row, 16].Value?.ToString().Trim(),
                         CountryShipping = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        ZipCode = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        ZipCodeShipping = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+
+
                         Email = worksheet.Cells[row, 19].Value?.ToString().Trim(),
                         SaleManName = worksheet.Cells[row, 20].Value?.ToString().Trim(),
                         AcReference = worksheet.Cells[row, 21].Value?.ToString(),

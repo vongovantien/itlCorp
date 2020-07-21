@@ -865,6 +865,73 @@ namespace eFMS.API.Catalogue.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+
+        public HandleState ImportCustomerAgent(List<CatPartnerImportModel> data, string type)
+        {
+            try
+            {
+                var partners = new List<CatPartner>();
+                var salesmans = new List<CatContract>();
+                foreach (var item in data)
+                {
+                    DateTime? inactiveDate = DateTime.Now ;
+                    var partner = mapper.Map<CatPartner>(item);
+                    partner.UserCreated = currentUser.UserID;
+                    partner.DatetimeModified = DateTime.Now;
+                    partner.DatetimeCreated = DateTime.Now;
+                 
+                    partner.Id = Guid.NewGuid().ToString();
+                    partner.AccountNo = partner.TaxCode;
+                    if (!string.IsNullOrEmpty(item.AccountNo) && !string.IsNullOrEmpty(item.InternalReferenceNo))
+                    {
+                        partner.AccountNo = item.AccountNo + "." + item.InternalReferenceNo;
+                    }
+                    partner.Active = true;
+                    partner.InactiveOn = inactiveDate;
+                    partner.CompanyId = currentUser.CompanyID;
+                    partner.OfficeId = currentUser.OfficeID;
+                    partner.GroupId = currentUser.GroupId;
+                    partner.DepartmentId = currentUser.DepartmentId;
+                    partner.PartnerGroup = type == "Customer" ? "Customer" : "Customer;Agent";
+                    partner.PartnerType = type == "Customer" ? "Customer" : "Agent";
+                    partner.ParentId = DataContext.Get(x=>x.AccountNo == item.AcReference).Select(x=>x.Id)?.FirstOrDefault();
+                    partner.SalePersonId = sysUserRepository.Get(x => x.Username == item.SaleManName).Select(x=>x.Id).FirstOrDefault();
+                    partners.Add(partner);
+                }
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(partners);
+                        if (hs.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        ClearCache();
+                        Get();
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
             var partners = Get().ToList();
@@ -1100,9 +1167,10 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 if (!string.IsNullOrEmpty(item.AcReference))
                 {
-                    if (!partners.Any(x => x.Id == item.AcReference))
+                    if (!partners.Any(x => x.AccountNo?.ToLower() == item.AcReference?.ToLower()))
                     {
                         item.AcReferenceError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_AC_REFERENCE_NOT_FOUND], item.AcReference);
+                        item.IsValid = false;
                     }
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameEn))
