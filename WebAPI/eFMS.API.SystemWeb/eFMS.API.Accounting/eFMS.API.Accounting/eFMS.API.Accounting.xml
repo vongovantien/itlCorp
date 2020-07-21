@@ -181,13 +181,6 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
-            <summary>
-            get list advance payment by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
-            <returns></returns>
-        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceNo(System.String)">
             <summary>
             Get Group Requests by AdvanceNo

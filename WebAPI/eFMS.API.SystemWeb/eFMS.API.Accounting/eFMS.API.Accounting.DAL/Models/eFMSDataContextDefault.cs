@@ -42,10 +42,12 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
         public virtual DbSet<OpsStageAssigned> OpsStageAssigned { get; set; }
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
+        public virtual DbSet<SysAuthorizedApproval> SysAuthorizedApproval { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
 
@@ -343,7 +345,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LeaderApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LevelApprove).HasMaxLength(50);
 
                 entity.Property(e => e.Manager)
                     .HasMaxLength(50)
@@ -410,7 +418,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LeaderApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LevelApprove).HasMaxLength(50);
 
                 entity.Property(e => e.Manager)
                     .HasMaxLength(50)
@@ -2473,6 +2487,51 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
+            modelBuilder.Entity<SysAuthorizedApproval>(entity =>
+            {
+                entity.ToTable("sysAuthorizedApproval");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Authorizer)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Commissioner)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ExpirationDate).HasColumnType("datetime");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<SysCompany>(entity =>
             {
                 entity.ToTable("sysCompany");
@@ -2841,6 +2900,52 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
+            });
+
+            modelBuilder.Entity<SysSettingFlow>(entity =>
+            {
+                entity.ToTable("sysSettingFlow");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Accountant)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Bod)
+                    .HasColumnName("BOD")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Flow)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Leader)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Manager)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Type).HasMaxLength(100);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysUser>(entity =>

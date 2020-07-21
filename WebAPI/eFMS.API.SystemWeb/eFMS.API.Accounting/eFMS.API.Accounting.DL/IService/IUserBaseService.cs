@@ -22,5 +22,13 @@ namespace eFMS.API.Accounting.DL.IService
         List<string> GetListUserDeputyByDept(string dept);
         bool CheckDeputyManagerByUser(int? departmentId, string userId);
         bool CheckDeputyAccountantByUser(int? departmentId, string userId);
+        bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId);
+        SysSettingFlow GetSettingFlowApproval(string type, Guid? officeId);
+        string GetRoleByLevel(string level, string type, Guid? officeId);
+        List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer);
+        bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
+        bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
     }
 }

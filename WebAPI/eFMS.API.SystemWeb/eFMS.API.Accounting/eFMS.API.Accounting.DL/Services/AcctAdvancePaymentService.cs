@@ -21,6 +21,7 @@ using eFMS.API.Accounting.DL.Models.ExportResults;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -88,9 +89,11 @@ namespace eFMS.API.Accounting.DL.Services
             stringLocalizer = localizer;
         }
 
+        #region --- LIST & PAGING ---
+
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = QueryDataPermission(criteria);
+            var data = GetDatas(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -112,187 +115,203 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
-        private IQueryable<AcctAdvancePayment> GetAdvancesPermission()
+        private PermissionRange GetPermissionRangeOfRequester()
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
             PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (_permissionRange == PermissionRange.None) return null;
-
-            IQueryable<AcctAdvancePayment> advances = null;
-            switch (_permissionRange)
-            {
-                case PermissionRange.None:
-                    break;
-                case PermissionRange.All:
-                    advances = DataContext.Get();
-                    break;
-                case PermissionRange.Owner:
-                    advances = DataContext.Get(x => x.UserCreated == _user.UserID);
-                    break;
-                case PermissionRange.Group:
-                    advances = DataContext.Get(x => x.GroupId == _user.GroupId
-                                                 && x.DepartmentId == _user.DepartmentId
-                                                 && x.OfficeId == _user.OfficeID
-                                                 && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Department:
-                    advances = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
-                                                 && x.OfficeId == _user.OfficeID
-                                                 && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Office:
-                    advances = DataContext.Get(x => x.OfficeId == _user.OfficeID
-                                                 && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Company:
-                    advances = DataContext.Get(x => x.CompanyId == _user.CompanyID);
-                    break;
-            }
-            return advances;
+            return _permissionRange;
         }
 
-        private IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria, IQueryable<AcctAdvancePayment> advances)
+        private Expression<Func<AcctAdvancePayment, bool>> ExpressionQuery(AcctAdvancePaymentCriteria criteria)
         {
-            if (advances == null) return null;
-            var request = acctAdvanceRequestRepo.Get();
-            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.IsDeputy == false);
-            var user = sysUserRepo.Get();
-
-            var isManagerDeputy = false;
-            var isAccountantDeputy = false;
-            if (!string.IsNullOrEmpty(criteria.Requester))
+            Expression<Func<AcctAdvancePayment, bool>> query = q => true;
+            if (criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue)
             {
-                isManagerDeputy = userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, criteria.Requester);
-                isAccountantDeputy = userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, criteria.Requester);
+                //Convert RequestDate về date nếu RequestDate có value
+                query = query.And(x => 
+                                   x.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
+                                && x.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo));
             }
 
-            List<string> refNo = new List<string>();
+            if (!string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All"))
+            {
+                query = query.And(x => x.StatusApproval == criteria.StatusApproval);
+            }
+
+            if (criteria.AdvanceModifiedDateFrom.HasValue && criteria.AdvanceModifiedDateTo.HasValue)
+            {
+                //Convert DatetimeModified về date nếu DatetimeModified có value
+                query = query.And(x => 
+                                   x.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
+                                && x.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All"))
+            {
+                query = query.And(x => x.PaymentMethod == criteria.PaymentMethod);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All"))
+            {
+                query = query.And(x => x.AdvanceCurrency == criteria.CurrencyID);
+            }
+            return query;
+        }
+        
+        private IQueryable<AcctAdvancePayment> GetDataAdvancePayment()
+        {
+            var permissionRangeRequester = GetPermissionRangeOfRequester();
+            var advancePayments = DataContext.Get();
+            var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
+            var data = from advancePayment in advancePayments
+                       join advancePaymentApr in advancePaymentAprs on advancePayment.AdvanceNo equals advancePaymentApr.AdvanceNo into advancePaymentApr2
+                       from advancePaymentApr in advancePaymentApr2.DefaultIfEmpty()
+                       select new { advancePayment, advancePaymentApr };
+            var result = data.Where(x =>
+                (
+                    permissionRangeRequester == PermissionRange.None ? false : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == currentUser.UserID && x.advancePaymentApr.Requester == currentUser.UserID : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Group ? (x.advancePayment.GroupId == currentUser.GroupId
+                                                                        && x.advancePayment.DepartmentId == currentUser.DepartmentId
+                                                                        && x.advancePayment.OfficeId == currentUser.OfficeID
+                                                                        && x.advancePayment.CompanyId == currentUser.CompanyID
+                                                                        && x.advancePaymentApr.Requester == currentUser.UserID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Department ? (x.advancePayment.DepartmentId == currentUser.DepartmentId
+                                                                              && x.advancePayment.OfficeId == currentUser.OfficeID
+                                                                              && x.advancePayment.CompanyId == currentUser.CompanyID
+                                                                              && x.advancePaymentApr.Requester == currentUser.UserID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Office ? (x.advancePayment.OfficeId == currentUser.OfficeID
+                                                                          && x.advancePayment.CompanyId == currentUser.CompanyID
+                                                                          && x.advancePaymentApr.Requester == currentUser.UserID) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Company ? x.advancePayment.CompanyId == currentUser.CompanyID && x.advancePaymentApr.Requester == currentUser.UserID : true
+                )
+                ||
+                (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
+                  || x.advancePaymentApr.LeaderApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy("Advance", x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                )
+                && x.advancePayment.GroupId == currentUser.GroupId
+                && x.advancePayment.DepartmentId == currentUser.DepartmentId
+                && x.advancePayment.OfficeId == currentUser.OfficeID
+                && x.advancePayment.CompanyId == currentUser.CompanyID
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                ) //LEADER AND DEPUTY OF LEADER
+                ||
+                (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
+                  || x.advancePaymentApr.ManagerApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy("Advance", x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  )
+                && x.advancePayment.GroupId == currentUser.GroupId
+                && x.advancePayment.DepartmentId == currentUser.DepartmentId
+                && x.advancePayment.OfficeId == currentUser.OfficeID
+                && x.advancePayment.CompanyId == currentUser.CompanyID
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                ) //MANANER AND DEPUTY OF MANAGER
+                ||
+                (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
+                  || x.advancePaymentApr.AccountantApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy("Advance", x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  )
+                && x.advancePayment.GroupId == currentUser.GroupId
+                && x.advancePayment.DepartmentId == currentUser.DepartmentId
+                && x.advancePayment.OfficeId == currentUser.OfficeID
+                && x.advancePayment.CompanyId == currentUser.CompanyID
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
+                ||
+                (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
+                  || x.advancePaymentApr.BuheadApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy("Advance", x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  )
+                && x.advancePayment.GroupId == currentUser.GroupId
+                && x.advancePayment.DepartmentId == currentUser.DepartmentId
+                && x.advancePayment.OfficeId == currentUser.OfficeID
+                && x.advancePayment.CompanyId == currentUser.CompanyID
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                && (!string.IsNullOrEmpty(x.advancePaymentApr.Accountant) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
+                ) //BOD AND DEPUTY OF BOD                
+            ).Select(s => s.advancePayment);
+            return result;
+        }
+
+        private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
+        {
+            IQueryable<AcctAdvanceRequest> advanceRequests = null;
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from ad in advances
-                         join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
-                         from re in re2.DefaultIfEmpty()
-                         where
-                         (
-                             criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
-                             (
-                                 (
-                                        (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.AdvanceNo) : true)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Hbl) : true)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.Mbl) : true)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.CustomNo) : true)
-                                     || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(re.JobId) : true)
-                                 )
-                             )
-                             :
-                             (
-                                 true
-                             )
-                          )
-                         select ad.AdvanceNo).ToList();
+                advanceRequests = acctAdvanceRequestRepo.Get(x =>
+                                        criteria.ReferenceNos.Contains(x.AdvanceNo)
+                                     || criteria.ReferenceNos.Contains(x.Hbl)
+                                     || criteria.ReferenceNos.Contains(x.Mbl)
+                                     || criteria.ReferenceNos.Contains(x.CustomNo)
+                                     || criteria.ReferenceNos.Contains(x.JobId)
+                                     );
+
             }
 
-            var data = from ad in advances
-                       join u in user on ad.Requester equals u.Id into u2
-                       from u in u2.DefaultIfEmpty()
-                       join re in request on ad.AdvanceNo equals re.AdvanceNo into re2
-                       from re in re2.DefaultIfEmpty()
-                       join apr in approveAdvance on ad.AdvanceNo equals apr.AdvanceNo into apr2
-                       from apr in apr2.DefaultIfEmpty()
-                       where
-                         (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(ad.AdvanceNo) : true
-                         )
-                         &&
-                         (
-                            !string.IsNullOrEmpty(criteria.Requester) ?
-                            (
-                                    (ad.Requester == criteria.Requester && currentUser.GroupId != 11)
-                                || (currentUser.GroupId == 11
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
-                                    && apr.Manager == criteria.Requester
-                                    && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (currentUser.GroupId == 11
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == true
-                                    && apr.Accountant == criteria.Requester
-                                    && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (currentUser.GroupId == 11
-                                    && apr.ManagerApr == criteria.Requester
-                                    && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (apr.AccountantApr == criteria.Requester
-                                    && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                                || (isManagerDeputy && ad.DepartmentId == currentUser.DepartmentId && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED))
-                                || (isAccountantDeputy && (ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && ad.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL))
-                            )
-                            :
-                                true
-                         )
-                         &&
-                         (
-                            criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue ?
-                                //Convert RequestDate về date nếu RequestDate có value
-                                ad.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
-                                && ad.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
-                            :
-                                true
-                         )
-                         &&
-                         (
-                            !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
-                                ad.StatusApproval == criteria.StatusApproval
-                            :
-                                true
-                         )
-                         &&
-                         (
-                            criteria.AdvanceModifiedDateFrom.HasValue && criteria.AdvanceModifiedDateTo.HasValue ?
-                                //Convert DatetimeModified về date nếu DatetimeModified có value
-                                ad.DatetimeModified.Value.Date >= (criteria.AdvanceModifiedDateFrom.HasValue ? criteria.AdvanceModifiedDateFrom.Value.Date : criteria.AdvanceModifiedDateFrom)
-                                && ad.DatetimeModified.Value.Date <= (criteria.AdvanceModifiedDateTo.HasValue ? criteria.AdvanceModifiedDateTo.Value.Date : criteria.AdvanceModifiedDateTo)
-                            :
-                                true
-                         )
-                         &&
-                         (
-                           !string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All") ?
-                                re.StatusPayment == criteria.StatusPayment
-                           :
-                                true
-                         )
-                         &&
-                         (
-                           !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
-                                ad.PaymentMethod == criteria.PaymentMethod
-                           :
-                                true
-                          )
-                          &&
-                         (
-                           !string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All") ?
-                                ad.AdvanceCurrency == criteria.CurrencyID
-                           :
-                                true
-                          )
+            if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
+            {
+                advanceRequests = acctAdvanceRequestRepo.Get(x => x.StatusPayment == criteria.StatusPayment);
+            }
 
+            if (advanceRequests != null)
+            {
+                advancePayments = advancePayments.Join(advanceRequests, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) => u);
+            }
+
+            return advancePayments;
+        }
+
+        private IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
+        {
+            var queryAdvancePayment = ExpressionQuery(criteria);
+            var dataAdvancePayments = GetDataAdvancePayment();
+            if (dataAdvancePayments == null) return null;
+            var advancePayments = dataAdvancePayments.Where(queryAdvancePayment);
+            advancePayments = QueryWithAdvanceRequest(advancePayments, criteria);
+
+            if (advancePayments == null) return null;
+            var requestAdvances = acctAdvanceRequestRepo.Get();
+            var users = sysUserRepo.Get();
+            
+            var data = from advancePayment in advancePayments
+                       join user in users on advancePayment.Requester equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       join requestAdvance in requestAdvances on advancePayment.AdvanceNo equals requestAdvance.AdvanceNo into requestAdvances2
+                       from requestAdvance in requestAdvances2.DefaultIfEmpty()                       
                        select new AcctAdvancePaymentResult
                        {
-                           Id = ad.Id,
-                           AdvanceNo = ad.AdvanceNo,
-                           AdvanceNote = ad.AdvanceNote,
-                           AdvanceCurrency = ad.AdvanceCurrency,
-                           Requester = ad.Requester,
-                           RequesterName = u.Username,
-                           RequestDate = ad.RequestDate,
-                           DeadlinePayment = ad.DeadlinePayment,
-                           UserCreated = ad.UserCreated,
-                           DatetimeCreated = ad.DatetimeCreated,
-                           UserModified = ad.UserModified,
-                           DatetimeModified = ad.DatetimeModified,
-                           StatusApproval = ad.StatusApproval,
-                           PaymentMethod = ad.PaymentMethod,
-                           Amount = re.Amount,
-                           VoucherNo = ad.VoucherNo,
-                           VoucherDate = ad.VoucherDate
+                           Id = advancePayment.Id,
+                           AdvanceNo = advancePayment.AdvanceNo,
+                           AdvanceNote = advancePayment.AdvanceNote,
+                           AdvanceCurrency = advancePayment.AdvanceCurrency,
+                           Requester = advancePayment.Requester,
+                           RequesterName = user.Username,
+                           RequestDate = advancePayment.RequestDate,
+                           DeadlinePayment = advancePayment.DeadlinePayment,
+                           UserCreated = advancePayment.UserCreated,
+                           DatetimeCreated = advancePayment.DatetimeCreated,
+                           UserModified = advancePayment.UserModified,
+                           DatetimeModified = advancePayment.DatetimeModified,
+                           StatusApproval = advancePayment.StatusApproval,
+                           PaymentMethod = advancePayment.PaymentMethod,
+                           Amount = requestAdvance.Amount,
+                           VoucherNo = advancePayment.VoucherNo,
+                           VoucherDate = advancePayment.VoucherDate
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -341,21 +360,7 @@ namespace eFMS.API.Accounting.DL.Services
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
-
-        private IQueryable<AcctAdvancePaymentResult> QueryDataPermission(AcctAdvancePaymentCriteria criteria)
-        {
-            var advances = GetAdvancesPermission();
-            var data = GetDatas(criteria, advances);
-            return data;
-        }
-
-        public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
-        {
-            var advances = GetAdvancesPermission();
-            var data = GetDatas(criteria, advances);
-            return data;
-        }
-
+        
         public string GetAdvanceStatusPayment(string advanceNo)
         {
             var requestTmp = acctAdvanceRequestRepo.Get();
@@ -370,6 +375,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             return result;
         }
+
+        #endregion --- LIST & PAGING ---
 
         public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo)
         {
@@ -1052,7 +1059,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             string managerName = string.Empty;
             string accountantName = string.Empty;
-            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
             if (approveAdvance != null)
             {
                 managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : userBaseService.GetEmployeeByUserId(approveAdvance.Manager)?.EmployeeNameVn;
@@ -1238,7 +1245,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             string managerName = string.Empty;
             string accountantName = string.Empty;
-            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
             if (approveAdvance != null)
             {
                 managerName = string.IsNullOrEmpty(approveAdvance.Manager) ? null : userBaseService.GetEmployeeByUserId(approveAdvance.Manager)?.EmployeeNameVn;
@@ -1475,14 +1482,14 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (sendMailResult)
                         {
-                            var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                            var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == acctApprove.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                             if (checkExistsApproveByAdvanceNo == null) //Insert AcctApproveAdvance
                             {
                                 acctApprove.Id = Guid.NewGuid();
                                 acctApprove.RequesterAprDate = DateTime.Now;
                                 acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
                                 acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
-                                acctApprove.IsDeputy = false;
+                                acctApprove.IsDeny = false;
                                 var hsAddApproveAdvance = acctApproveAdvanceRepo.Add(acctApprove);
                             }
                             else //Update AcctApproveAdvance by AdvanceNo
@@ -1521,7 +1528,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState result = new HandleState("Not allow approve/deny");
 
             //Lấy ra Advance Approval dựa vào advanceNo
-            var acctApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
+            var acctApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == false).FirstOrDefault();
             if (acctApprove == null)
             {
                 result = new HandleState("Not found advance approval by AdvanceNo is " + advanceNo);
@@ -1555,12 +1562,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 //Manager Department Approve
                 var managerOfUserRequester = userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault();
-                var isDeputyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
+                var IsDenyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
                 if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
                     && _userCurrent.UserID == managerOfUserRequester)
-                        || isDeputyManager)
+                        || IsDenyManager)
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1596,12 +1603,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 var accountantOfUser = userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault();
-                var isDeputyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
+                var IsDenyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
                 if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
                     && _userCurrent.UserID == accountantOfUser)
-                    || isDeputyAccountant
+                    || IsDenyAccountant
                     )
                 {
                     //Check group DepartmentManager đã được Approve chưa
@@ -1667,12 +1674,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Manager Department Approve
                 var managerOfUserRequester = userBaseService.GetDeptManager(advance.CompanyId, advance.OfficeId, advance.DepartmentId).FirstOrDefault();
-                var isDeputyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
+                var IsDenyManager = userBaseService.CheckDeputyManagerByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là dept manager hoặc có phải là user được ủy quyền duyệt (Manager Dept) hay không
                 if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId) == false
                     && _userCurrent.UserID == managerOfUserRequester)
-                    || isDeputyManager)
+                    || IsDenyManager)
                 {
                     //Kiểm tra User Approve có thuộc cùng dept với User Requester hay
                     //Nếu không cùng thì không cho phép Approve (đối với Dept Manager)
@@ -1711,12 +1718,12 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Accountant Approve
                 var accountantOfUser = userBaseService.GetAccoutantManager(advance.CompanyId, advance.OfficeId).FirstOrDefault();
-                var isDeputyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
+                var IsDenyAccountant = userBaseService.CheckDeputyAccountantByUser(_userCurrent.DepartmentId, _userCurrent.UserID);
                 //Kiểm tra user có phải là Accountant Manager hoặc có phải là user được ủy quyền duyệt (Accoutant) hay không
                 if ((_userCurrent.GroupId == AccountingConstants.SpecialGroup
                     && userBaseService.CheckIsAccountantDept(_userCurrent.DepartmentId)
                     && _userCurrent.UserID == accountantOfUser)
-                    || isDeputyAccountant)
+                    || IsDenyAccountant)
                 {
                     //Check group DepartmentManager đã được Approve chưa
                     if (!string.IsNullOrEmpty(acctApprove.Manager)
@@ -1761,7 +1768,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (advance == null) return new HandleState("Not found Advance Payment");
 
-                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
 
                     if (approve == null)
                     {
@@ -1904,7 +1911,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (advance == null) return new HandleState("Not found Advance Payment");
 
-                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                    var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
                     {
                         if (acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Any() == false)
@@ -1988,7 +1995,7 @@ namespace eFMS.API.Accounting.DL.Services
                         approve.UserModified = userCurrent;
                         approve.DateModified = DateTime.Now;
                         approve.Comment = comment;
-                        approve.IsDeputy = true;
+                        approve.IsDeny = true;
                         var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
 
                         //Cập nhật lại advance status của Advance Payment
@@ -2206,8 +2213,8 @@ namespace eFMS.API.Accounting.DL.Services
         private bool CheckUserInApproveAdvanceAndDeptApproved(ICurrentUser userCurrent, AcctApproveAdvanceModel approveAdvance)
         {
             var isApproved = false;
-            var isDeputyManage = userBaseService.CheckDeputyManagerByUser(userCurrent.DepartmentId, userCurrent.UserID);
-            var isDeputyAccoutant = userBaseService.CheckDeputyAccountantByUser(userCurrent.DepartmentId, userCurrent.UserID);
+            var IsDenyManage = userBaseService.CheckDeputyManagerByUser(userCurrent.DepartmentId, userCurrent.UserID);
+            var IsDenyAccoutant = userBaseService.CheckDeputyAccountantByUser(userCurrent.DepartmentId, userCurrent.UserID);
 
             // 1 user vừa có thể là Requester, Manager Dept, Accountant Dept nên khi check Approved cần phải dựa vào group
             // Group 11 chính là group Manager
@@ -2236,7 +2243,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && (userCurrent.UserID == approveAdvance.Manager
                     || userCurrent.UserID == approveAdvance.ManagerApr))
 
-                    || isDeputyManage) //Dept Manager
+                    || IsDenyManage) //Dept Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)).Any();
@@ -2251,7 +2258,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && (userCurrent.UserID == approveAdvance.Accountant
                     || userCurrent.UserID == approveAdvance.AccountantApr))
 
-                    || isDeputyAccoutant)//Accountant Manager
+                    || IsDenyAccoutant)//Accountant Manager
             {
                 isApproved = true;
                 var isDeptWaitingApprove = DataContext.Get(x => x.AdvanceNo == approveAdvance.AdvanceNo && (x.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && x.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)).Any();
@@ -2280,7 +2287,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var userCurrent = currentUser.UserID;
 
-            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeputy == false).FirstOrDefault();
+            var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == false).FirstOrDefault();
             var aprAdvanceMap = new AcctApproveAdvanceModel();
 
             if (approveAdvance != null)
@@ -2411,7 +2418,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var approveAdvances = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo);
                             foreach (var approve in approveAdvances)
                             {
-                                approve.IsDeputy = true;
+                                approve.IsDeny = true;
                                 approve.UserModified = currentUser.UserID;
                                 approve.DateModified = DateTime.Now;
                                 acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
@@ -2470,7 +2477,7 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion -- Advance Amount & Sayword --
 
             #region -- Info Manager, Accoutant & Department --
-            var _advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+            var _advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeny == false).FirstOrDefault();
             string _manager = string.Empty;
             string _accountant = string.Empty;
             if (_advanceApprove != null)
@@ -2643,14 +2650,14 @@ namespace eFMS.API.Accounting.DL.Services
                             return new HandleState("Advance payment approving");
                         }
 
-                        var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
+                        var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                         //Cập nhật lại approve advance
                         if (approve != null)
                         {
                             approve.UserModified = userCurrent;
                             approve.DateModified = DateTime.Now;
                             approve.Comment = "RECALL";
-                            approve.IsDeputy = true;
+                            approve.IsDeny = true;
                             var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
                         }
 

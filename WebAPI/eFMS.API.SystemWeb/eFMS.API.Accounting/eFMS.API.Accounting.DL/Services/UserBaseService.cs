@@ -18,8 +18,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
-        //readonly IContextBase<SysSettingFlow> settingFlowRepo;
-        //readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
+        readonly IContextBase<SysSettingFlow> settingFlowRepo;
+        readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
 
         public UserBaseService(
             IContextBase<SysUser> repository, 
@@ -28,13 +28,17 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysGroup> sysGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysEmployee> sysEmployee,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysSettingFlow> settingFlow,
+            IContextBase<SysAuthorizedApproval> authourizedApproval) : base(repository, mapper)
         {
             sysUserLevelRepo = sysUserLevel;
             sysGroupRepo = sysGroup;
             catDepartmentRepo = catDepartment;
             sysEmployeeRepo = sysEmployee;
             sysOfficeRepo = sysOffice;
+            settingFlowRepo = settingFlow;
+            authourizedApprovalRepo = authourizedApproval;
         }
 
         private int? GetGroupIdOfUser(string userId)
@@ -206,44 +210,43 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
 
-        #region --- SETTING FLOW UNLOCK ---
-        //public SysSettingFlow GetSettingFlowUnlock(string type, Guid? officeId)
-        //{
-        //    type = (type == "Change Service Date") ? "Shipment" : type;
-        //    var settingFlow = settingFlowRepo.Get(x => x.Flow == "Unlock" && x.Type == type && x.OfficeId == officeId).FirstOrDefault();
-        //    return settingFlow;
-        //}
+        #region --- SETTING FLOW APPROVAL ---
+        public SysSettingFlow GetSettingFlowApproval(string type, Guid? officeId)
+        {
+            var settingFlow = settingFlowRepo.Get(x => x.Flow == "Approval" && x.Type == type && x.OfficeId == officeId).FirstOrDefault();
+            return settingFlow;
+        }
 
-        //public string GetRoleByLevel(string level, string type, Guid? officeId)
-        //{
-        //    var role = string.Empty;
-        //    switch (level)
-        //    {
-        //        case "Leader":
-        //            role = GetSettingFlowUnlock(type, officeId)?.Leader;
-        //            break;
-        //        case "Manager":
-        //            role = GetSettingFlowUnlock(type, officeId)?.Manager;
-        //            break;
-        //        case "Accountant":
-        //            role = GetSettingFlowUnlock(type, officeId)?.Accountant;
-        //            break;
-        //        case "BOD":
-        //            role = GetSettingFlowUnlock(type, officeId)?.Bod;
-        //            break;
-        //        default:
-        //            break;
-        //    }
-        //    return role;
-        //}
-        #endregion --- SETTING FLOW UNLOCK ---
+        public string GetRoleByLevel(string level, string type, Guid? officeId)
+        {
+            var role = string.Empty;
+            switch (level)
+            {
+                case "Leader":
+                    role = GetSettingFlowApproval(type, officeId)?.Leader;
+                    break;
+                case "Manager":
+                    role = GetSettingFlowApproval(type, officeId)?.Manager;
+                    break;
+                case "Accountant":
+                    role = GetSettingFlowApproval(type, officeId)?.Accountant;
+                    break;
+                case "BOD":
+                    role = GetSettingFlowApproval(type, officeId)?.Bod;
+                    break;
+                default:
+                    break;
+            }
+            return role;
+        }
+        #endregion --- SETTING FLOW APPROVAL ---
 
         #region --- AUTHORIZED APPROVAL ---
-        //public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
-        //{
-        //    var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
-        //    return userAuthorizedApprovals;
-        //}
+        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
+        {
+            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
+            return userAuthorizedApprovals;
+        }
         #endregion  --- AUTHORIZED APPROVAL ---
 
         #region -- DEPUTY USER --
@@ -265,46 +268,44 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        //public List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
-        //{
-        //    var userDeputies = new List<string>();
-        //    if (string.IsNullOrEmpty(userId)) return userDeputies;
-        //    var _typeAuthApr = (type == "Change Service Date") ? "Shipment" : type;
-        //    //Get list user authorized of user
-        //    var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(_typeAuthApr, userId);
+        public List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var userDeputies = new List<string>();
+            if (string.IsNullOrEmpty(userId)) return userDeputies;
+            //Get list user authorized of user
+            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId);
+            foreach (var userAuth in userAuthorizedApprovals)
+            {
+                var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
+                if (isSame)
+                {
+                    userDeputies.Add(userAuth);
+                }
+            }
+            return userDeputies;
+        }
 
-        //    foreach (var userAuth in userAuthorizedApprovals)
-        //    {
-        //        var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
-        //        if (isSame)
-        //        {
-        //            userDeputies.Add(userAuth);
-        //        }
-        //    }
-        //    return userDeputies;
-        //}
+        public List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            var emailUserDeputies = new List<string>();
+            foreach (var user in users)
+            {
+                var employeeIdOfUser = GetEmployeeIdOfUser(user);
+                var email = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    emailUserDeputies.Add(email);
+                }
+            }
+            return emailUserDeputies;
+        }
 
-        //public List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
-        //{
-        //    var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
-        //    var emailUserDeputies = new List<string>();
-        //    foreach (var user in users)
-        //    {
-        //        var employeeIdOfUser = GetEmployeeIdOfUser(user);
-        //        var email = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
-        //        if (!string.IsNullOrEmpty(email))
-        //        {
-        //            emailUserDeputies.Add(email);
-        //        }
-        //    }
-        //    return emailUserDeputies;
-        //}
-
-        //public bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
-        //{
-        //    var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
-        //    return deputies.Any();
-        //}
+        public bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            return deputies.Any();
+        }
 
         #endregion -- DEPUTY USER --
     }
