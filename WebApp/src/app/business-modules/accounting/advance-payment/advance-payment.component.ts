@@ -29,9 +29,6 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
 
-
-
-
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -47,14 +44,9 @@ export class AdvancePaymentComponent extends AppList {
 
     menuSpecialPermission: Observable<any[]>;
 
-
     checkAll = false;
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
-
-
-
-
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -85,8 +77,8 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusApproval', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Description', field: 'advanceNote', sortable: true },
-            { title: 'VoucherNo', field: 'voucherNo', sortable: true },
-            { title: 'VoucherDate', field: 'voucherDate', sortable: true },
+            { title: 'Voucher No', field: 'voucherNo', sortable: true },
+            { title: 'Voucher Date', field: 'voucherDate', sortable: true },
         ];
 
         this.headerGroupRequest = [

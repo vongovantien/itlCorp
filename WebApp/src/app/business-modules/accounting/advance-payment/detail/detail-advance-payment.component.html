@@ -14,19 +14,19 @@
                 <div>
                     <adv-payment-list-request [state]="actionList"></adv-payment-list-request>
                 </div>
-                <div class="row height-row-12">
+                <div class="row height-row-12" *ngIf="!!advancePayment">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
                                 <ng-container
-                                    *ngIf="!!advancePayment && (advancePayment.statusApproval == 'Denied' || advancePayment.statusApproval === 'New')">
+                                    *ngIf="(advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied') && advancePayment.isRequester">
                                     <app-permission-button type="save" title="Save" (onClick)="updateAdvPayment()">
                                     </app-permission-button>
                                     <app-permission-button type="save-and-send" title="Save & Send Request"
                                         (onClick)="sendRequest()"></app-permission-button>
                                 </ng-container>
                                 <button
-                                    *ngIf="!!approveInfo && !approveInfo.isManager && !!advancePayment && advancePayment.statusApproval === 'RequestApproval'"
+                                    *ngIf="advancePayment.statusApproval === 'Request Approval' && advancePayment.isRequester"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Recall" (click)="recall()">
                                     <span>

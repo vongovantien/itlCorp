@@ -434,21 +434,24 @@ namespace eFMS.API.Setting.DL.Services
                 (
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.unlockRequest.UserCreated == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.unlockRequest.UserCreated == currentUser.UserID && x.unlockRequest.Requester == currentUser.UserID : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.unlockRequest.GroupId == currentUser.GroupId
                                                                         && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                                                                         && x.unlockRequest.OfficeId == currentUser.OfficeID
-                                                                        && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                                                                        && x.unlockRequest.CompanyId == currentUser.CompanyID
+                                                                        && x.unlockRequest.Requester == currentUser.UserID) : true
                     &&
                     permissionRangeRequester == PermissionRange.Department ? (x.unlockRequest.DepartmentId == currentUser.DepartmentId
                                                                               && x.unlockRequest.OfficeId == currentUser.OfficeID
-                                                                              && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                                                                              && x.unlockRequest.CompanyId == currentUser.CompanyID
+                                                                              && x.unlockRequest.Requester == currentUser.UserID) : true
                     &&
                     permissionRangeRequester == PermissionRange.Office ? (x.unlockRequest.OfficeId == currentUser.OfficeID
-                                                                          && x.unlockRequest.CompanyId == currentUser.CompanyID) : true
+                                                                          && x.unlockRequest.CompanyId == currentUser.CompanyID
+                                                                          && x.unlockRequest.Requester == currentUser.UserID) : true
                     &&
-                    permissionRangeRequester == PermissionRange.Company ? x.unlockRequest.CompanyId == currentUser.CompanyID : true
+                    permissionRangeRequester == PermissionRange.Company ? x.unlockRequest.CompanyId == currentUser.CompanyID && x.unlockRequest.Requester == currentUser.UserID : true
                 )
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Leader == currentUser.UserID
@@ -467,7 +470,7 @@ namespace eFMS.API.Setting.DL.Services
                   || x.unlockRequestApr.ManagerApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Manager, null, x.unlockRequest.DepartmentId, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                && x.unlockRequest.GroupId == currentUser.GroupId
+                // && x.unlockRequest.GroupId == currentUser.GroupId
                 && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
@@ -480,8 +483,8 @@ namespace eFMS.API.Setting.DL.Services
                   || x.unlockRequestApr.AccountantApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                && x.unlockRequest.GroupId == currentUser.GroupId
-                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                // && x.unlockRequest.GroupId == currentUser.GroupId
+                // && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
@@ -494,8 +497,8 @@ namespace eFMS.API.Setting.DL.Services
                   || x.unlockRequestApr.BuheadApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Buhead ?? null, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                && x.unlockRequest.GroupId == currentUser.GroupId
-                && x.unlockRequest.DepartmentId == currentUser.DepartmentId
+                // && x.unlockRequest.GroupId == currentUser.GroupId
+                // && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW

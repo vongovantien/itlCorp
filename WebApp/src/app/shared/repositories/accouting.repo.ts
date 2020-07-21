@@ -593,6 +593,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getHistoryDeniedAdvancePayment(advanceNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetHistoryDeniedAdvancePayment`, { advanceNo: advanceNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
