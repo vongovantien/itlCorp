@@ -79,8 +79,7 @@
             </div>
             <div class="row m--margin-top-20">
                 <div class="col-lg-12">
-                    <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0" data-toggle="collapse"
-                        data-target="#data-contact">
+                    <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
                         <div class="col-lg-4">Shipping Address</div>
                         <div class="col-lg-4">
                             <div class="d-flex align-items-center justify-content-between">
@@ -90,7 +89,9 @@
                         </div>
                         <div class="col-lg-4">
                             Contact Info
-                            <i class="la la-angle-up m--margin-right-5 float-right"></i>
+                            <span class="collapse-toggle" data-toggle="collapse" data-target="#data-contact">
+                                <i class="la la-angle-up m--margin-right-5 float-right" data-toggle="collapse"
+                                    data-target="#data-contact"></i></span>
                         </div>
                     </div>
                     <div class="row collapse show" id="data-contact">
@@ -133,7 +134,7 @@
                                             (itemSelected)="onSelectDataFormInfo($event, 'shippping-city')"
                                             [currentActiveItemId]="{ field: 'id', value: provinceShippingId.value}"
                                             [selectedDisplayFields]="['name_EN']" [dataSources]="shipingsProvinces"
-                                            [displayFields]="displayFieldCity" placeholder="Select country"
+                                            [displayFields]="displayFieldCity" placeholder="Select city"
                                             (remove)="resetFormControl(provinceShippingId)" [size]="15">
                                         </app-combo-grid-virtual-scroll>
                                     </div>
