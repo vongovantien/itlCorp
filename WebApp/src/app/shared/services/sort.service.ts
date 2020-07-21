@@ -5,6 +5,9 @@ import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class SortService {
     sort(items: any[], property: string, isDesc: boolean) {
+        console.log("items: ", items);
+        console.log("property: ", property);
+        console.log("isDesc: ", isDesc);
         if (isDesc) {
             return orderBy(items, [item => (item[property] === null ? null : this.prepareStringToSort(item[property]))], ['asc']);
         } else {
