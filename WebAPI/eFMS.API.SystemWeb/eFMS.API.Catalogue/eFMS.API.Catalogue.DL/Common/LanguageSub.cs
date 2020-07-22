@@ -68,6 +68,8 @@
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";
         public static readonly string MSG_CONTRACT_CREDIT_LIMIT_EMPTY = "MSG_CONTRACT_CREDIT_LIMIT_EMPTY";
         public static readonly string MSG_CONTRACT_PAYMENT_TERM_EMPTY = "MSG_CONTRACT_PAYMENT_TERM_EMPTY";
+        public static readonly string MSG_CONTRACT_CONTRACT_NO_DUPLICATE = "MSG_CONTRACT_CONTRACT_NO_DUPLICATE";
+
 
 
 

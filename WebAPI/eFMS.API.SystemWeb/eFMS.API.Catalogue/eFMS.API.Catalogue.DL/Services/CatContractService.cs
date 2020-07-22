@@ -305,9 +305,27 @@ namespace eFMS.API.Catalogue.DL.Services
                     contract.DatetimeCreated = DateTime.Now;
                     contract.ExpiredDate = !string.IsNullOrEmpty(item.ExpireDate) ? Convert.ToDateTime(item.ExpireDate) : (DateTime?)null;
                     contract.EffectiveDate = !string.IsNullOrEmpty(item.EffectDate) ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null;
-                
+                    contract.TrialCreditDays = !string.IsNullOrEmpty( item.PaymentTermTrialDay) ? Convert.ToInt16(item.PaymentTermTrialDay) : (int?)null;
                     contract.CompanyId = sysCompanyRepository.Get(x => x.Code == item.Company).Select(t => t.Id)?.FirstOrDefault();
-                    contract.OfficeId = item.Office;
+                    var arrOffice = item.Office.Split(";").ToArray();
+                    string officeStr = string.Empty;
+                    if(arrOffice.Length > 1)
+                    {
+                        var dataOffice = sysOfficeRepository.Get().ToList();
+                        foreach (var office in dataOffice.GroupBy(x=>x.Code))
+                        {
+                            foreach (var o in arrOffice)
+                            {
+                                if (o == office.Key)
+                                {
+                                    officeStr += office.Select(t=>t.Id)?.FirstOrDefault() + ";";
+                                }
+                            }
+                        }
+                    }
+                 
+
+                    contract.OfficeId = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Get(x=>x.Code == arrOffice[0].ToString()).Select(t=>t.Id.ToString())?.FirstOrDefault() ;
                     contract.SaleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id)?.FirstOrDefault();
                     contract.CreditLimit = !string.IsNullOrEmpty(item.CreditLimited)? Convert.ToDecimal(item.CreditLimited): (Decimal?)null;
                     if (contract.ContractType == "Trial")
@@ -414,6 +432,15 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
                     }
                 }
+                if (!string.IsNullOrEmpty(item.ContractNo))
+                {
+                    var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
+                    if(DataContext.Any(x=>x.PartnerId == customerId && x.ContractNo == item.ContractNo))
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE],item.ContractNo);
+                        item.IsValid = false;
+                    }
+                }
 
                 if(string.IsNullOrEmpty(item.SaleService))
                 {
@@ -431,13 +458,15 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
                     item.IsValid = false;
                 }
+                var officeArr = item.Office.Split(";").ToArray();
 
                 if (string.IsNullOrEmpty(item.Office))
                 {
                     item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_EMPTY]);
                     item.IsValid = false;
                 }
-                else if (!sysOfficeRepository.Any(x => x.Code == item.Office))
+
+                else if (!sysOfficeRepository.Any(x => officeArr.Contains(x.Code)))
                 {
                     item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_NOT_FOUND],item.Office);
                     item.IsValid = false;
