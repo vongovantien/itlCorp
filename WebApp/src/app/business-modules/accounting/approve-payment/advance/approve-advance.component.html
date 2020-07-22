@@ -19,16 +19,24 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
+                <div class="row">
+                    <div class="col-12 m--align-right m--margin-bottom-10">
+                        <a *ngIf="!!approveInfo" class="text-underline pointer" (click)="showInfoDenied()">Denied
+                            Comments:
+                            {{approveInfo.numOfDeny}}</a>
+                    </div>
+                </div>
                 <ng-container *ngIf="!!approveInfo">
                     <process-approve [approveInfo]="approveInfo"></process-approve>
                 </ng-container>
                 <div class="row height-row-12">
                     <div class="col-12">
-                        <div class="text-center m--margin-top-20" *ngIf="!!approveInfo">
+                        <div class="text-center m--margin-top-20" *ngIf="!!advancePayment">
                             <div class="c-button-actions">
                                 <button
                                     class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                    title="Approve" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
+                                    title="Approve" (click)="showModalApprove()"
+                                    *ngIf="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied' && advancePayment.statusApproval !== 'Done' && advancePayment.isManager && !advancePayment.isApproved">
                                     <span>
                                         <i class="la la-save"></i>
                                         <span>
@@ -38,9 +46,7 @@
                                 </button>
                                 <button
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                    title="Deny"
-                                    *ngIf="!approveInfo.isApproved || (approveInfo.isManager && (approveInfo.statusApproval === 'RequestApproval' || approveInfo.statusApproval === 'DepartmentManagerApproved'))"
-                                    (click)="showDenyPopup()">
+                                    title="Deny" *ngIf="advancePayment.isShowBtnDeny" (click)="showDenyPopup()">
                                     <span>
                                         <i class="la la-times"></i>
                                         <span>
@@ -49,7 +55,7 @@
                                     </span>
                                 </button>
                                 <button
-                                    *ngIf="!approveInfo.isManager && approveInfo.statusApproval === 'RequestApproval'"
+                                    *ngIf="advancePayment.statusApproval === 'Request Approval' && advancePayment.isRequester"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Recall" (click)="recall()">
                                     <span>
@@ -128,3 +134,5 @@
 
 <confirm-popup #confirmApprovePopup (onSubmit)="onApprove()" [body]="'Do you want to approve this advance payment?'"
     [labelConfirm]="'Yes'"></confirm-popup>
+
+<history-denied-popup></history-denied-popup>

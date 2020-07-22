@@ -71,22 +71,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-
-        /// <summary>
-        /// get list advance payment by conditions
-        /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("QueryData")]
-        [Authorize]
-
-        public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
-        {
-            var data = acctAdvancePaymentService.QueryData(criteria);
-            return Ok(data);
-        }
-
+        
         /// <summary>
         /// Get Group Requests by AdvanceNo
         /// </summary>
@@ -447,24 +432,32 @@ namespace eFMS.API.Accounting.Controllers
                 //    }
                 //}
             }
-
-            //Check exist thông tin Manager, Accountant của User requester
-            AcctApproveAdvanceModel advanceAppr = new AcctApproveAdvanceModel
-            {
-                Requester = model.Requester
-            };
-            var isExistsManager = acctAdvancePaymentService.CheckExistsInfoManagerOfRequester(advanceAppr);
-            if (!isExistsManager.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = isExistsManager.Exception.Message };
-                return BadRequest(_result);
-            }
-
+            
             HandleState hs;
+            var message = string.Empty;
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow("Advance", currentUser.OfficeID);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval("Advance", currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.AddAdvancePayment(model);
+                message = HandleError.GetMessage(hs, Crud.Insert);
                 if (hs.Code == 403)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -478,28 +471,58 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
 
+                var advancePaymentCurrent = acctAdvancePaymentService.Get(x => x.Id == model.Id).FirstOrDefault();
+                #region -- Check Exist Advance Payment --
+                if (advancePaymentCurrent == null)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Not found advance payment" };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Advance Payment --
+
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow("Advance", advancePaymentCurrent.OfficeId);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval("Advance", advancePaymentCurrent.GroupId, advancePaymentCurrent.DepartmentId, advancePaymentCurrent.OfficeId, advancePaymentCurrent.CompanyId);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
+                #region -- Check Advance Payment Approving --
                 if (!model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
                     return BadRequest(_result);
                 }
+                #endregion -- Check Advance Payment Approving --
 
                 model.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
+                message = HandleError.GetMessage(hs, Crud.Update);
                 if (hs.Code == 403)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
             }
 
-            var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (hs.Success)
             {
                 AcctApproveAdvanceModel approve = new AcctApproveAdvanceModel
                 {
                     AdvanceNo = model.AdvanceNo,
-                    Requester = model.Requester
+                    Requester = model.Requester,
+                    RequesterAprDate = DateTime.Now
                 };
                 var resultInsertUpdateApprove = acctAdvancePaymentService.InsertOrUpdateApprovalAdvance(approve);
                 if (!resultInsertUpdateApprove.Success)
@@ -780,6 +803,12 @@ namespace eFMS.API.Accounting.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
-
+        [HttpGet]
+        [Route("GetHistoryDeniedAdvancePayment")]
+        public IActionResult GetHistoryDeniedAdvance(string advanceNo)
+        {
+            var data = acctAdvancePaymentService.GetHistoryDeniedAdvance(advanceNo);
+            return Ok(data);
+        }
     }
 }

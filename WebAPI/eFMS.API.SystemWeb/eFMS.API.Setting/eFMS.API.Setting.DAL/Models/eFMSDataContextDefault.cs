@@ -162,7 +162,13 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LeaderApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LevelApprove).HasMaxLength(50);
 
                 entity.Property(e => e.Manager)
                     .HasMaxLength(50)
@@ -229,7 +235,13 @@ namespace eFMS.API.Setting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.LeaderApr)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LeaderAprDate).HasColumnType("datetime");
+
+                entity.Property(e => e.LevelApprove).HasMaxLength(50);
 
                 entity.Property(e => e.Manager)
                     .HasMaxLength(50)

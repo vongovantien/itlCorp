@@ -91,7 +91,7 @@ export class AdvancePaymentDetailComponent extends AppPage {
                         requester: this.advancePayment.requester,
                         requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
                         paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
-                        department: this.advancePayment.department,
+                        statusApproval: this.advancePayment.statusApproval,
                         deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                         note: this.advancePayment.advanceNote,
                         currency: this.advancePayment.advanceCurrency
@@ -123,7 +123,6 @@ export class AdvancePaymentDetailComponent extends AppPage {
             const body = {
                 advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
                 requester: this.formCreateComponent.requester.value || 'Admin',
-                department: this.formCreateComponent.department.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
                 advanceCurrency: this.formCreateComponent.currency.value || 'VND',
                 requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -192,7 +191,6 @@ export class AdvancePaymentDetailComponent extends AppPage {
         const body = {
             advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
             requester: this.formCreateComponent.requester.value || 'Admin',
-            department: this.formCreateComponent.department.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
             advanceCurrency: this.formCreateComponent.currency.value || 'VND',
             requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,

@@ -197,14 +197,14 @@
 
                         <div class="col-lg-4">
                             <div class="form-group"
-                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !term.value }">
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && term.value.length <= 0 }">
                                 <label class="form-control-label" for="">
                                     Payment Type <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [allowClear]="true" [items]="termTypes" placeholder="Please selected"
                                     formControlName="term">
                                 </ng-select>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && !term.value">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && term.value.length <= 0">
                                     Payment Type is required
                                 </div>
                             </div>

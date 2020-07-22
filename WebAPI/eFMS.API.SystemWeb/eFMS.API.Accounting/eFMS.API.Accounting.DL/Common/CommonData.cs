@@ -47,10 +47,10 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly List<CommonData> StatusApproveAdvance = new List<CommonData>
         {
             new CommonData { Value = "New", DisplayName = "New" },
-            new CommonData { Value = "RequestApproval", DisplayName = "Request Approval" },
-            new CommonData { Value = "LeaderApproved", DisplayName = "Leader Approved" },
-            new CommonData { Value = "DepartmentManagerApproved", DisplayName = "Department Manager Approved" },
-            new CommonData { Value = "AccountantManagerApproved", DisplayName = "Accountant Manager Approved" },
+            new CommonData { Value = "Request Approval", DisplayName = "Request Approval" },
+            new CommonData { Value = "Leader Approved", DisplayName = "Leader Approved" },
+            new CommonData { Value = "Department Manager Approved", DisplayName = "Department Manager Approved" },
+            new CommonData { Value = "Accountant Manager Approved", DisplayName = "Accountant Manager Approved" },
             new CommonData { Value = "Done", DisplayName = "Done" },
             new CommonData { Value = "Denied", DisplayName = "Denied" }
         };

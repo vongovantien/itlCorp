@@ -11,6 +11,7 @@ import { AdvancePaymentFormCreateComponent } from '../../advance-payment/compone
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 
 @Component({
     selector: 'app-approve-advance',
@@ -24,6 +25,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDenyPopup', { static: false }) confirmDenyPopup: ConfirmPopupComponent;
     @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
+    @ViewChild(HistoryDeniedPopupComponent, { static: false }) historyDeniedPopup: HistoryDeniedPopupComponent;
 
     idAdvPayment: string = '';
     advancePayment: AdvancePayment;
@@ -73,7 +75,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                             requester: this.advancePayment.requester,
                             requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
                             paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
-                            department: this.advancePayment.department,
+                            statusApproval: this.advancePayment.statusApproval,
                             deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                             note: this.advancePayment.advanceNote,
                             currency: this.advancePayment.advanceCurrency
@@ -121,7 +123,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, 'Approve Is Successfull');
-                        this.getInfoApprove(this.advancePayment.advanceNo);
+                        this.getDetail(this.advancePayment.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -149,7 +151,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, ' Deny Is Successfull');
-                        this.getInfoApprove(this.advancePayment.advanceNo);
+                        this.getDetail(this.advancePayment.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -222,11 +224,16 @@ export class ApproveAdvancePaymentComponent extends AppPage {
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, 'Recall Is Successfull');
-                        this.getInfoApprove(this.advancePayment.advanceNo);
+                        this.getDetail(this.advancePayment.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
                 },
             );
+    }
+
+    showInfoDenied() {
+        this.historyDeniedPopup.getDeniedComment('Advance', this.advancePayment.advanceNo);
+        this.historyDeniedPopup.show();
     }
 }
