@@ -908,6 +908,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
+                                    charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -978,6 +979,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     surchargeOfAcct.InvoiceNo = null;
                                     surchargeOfAcct.InvoiceDate = null;
+                                    surchargeOfAcct.SeriesNo = null;
                                 }
                                 surchargeOfAcct.DatetimeModified = DateTime.Now;
                                 surchargeOfAcct.UserModified = currentUser.UserID;
@@ -1000,6 +1002,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
+                                    charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -1212,6 +1215,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.StatusInvoice = _statusInvoice; //Tình trạng hóa đơn (Dùng cho Invoice)
                     item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
                     item.ReleaseDateEInvoice = null;
+                    item.Vat = item.Vat ?? 0;
 
                     data.Add(item);
                 }
