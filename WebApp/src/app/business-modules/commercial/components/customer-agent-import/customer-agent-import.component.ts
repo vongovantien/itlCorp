@@ -157,7 +157,7 @@ export class CustomerAgentImportComponent extends AppPage implements OnInit {
     }
 
     downloadSample() {
-        this._catalogueRepo.downloadCommercialExcel('Customer')
+        this._catalogueRepo.downloadCommercialExcel()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

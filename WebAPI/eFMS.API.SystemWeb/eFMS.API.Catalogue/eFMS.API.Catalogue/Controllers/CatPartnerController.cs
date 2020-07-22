@@ -391,6 +391,26 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcelCommercial")]
+        public async Task<ActionResult> DownloadExcelCommercial()
+        {
+            string fileName = Templates.CatPartner.ExelImportCommercialCustomerFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
         /// read data from file excel
         /// </summary>
         /// <param name="uploadedFile"></param>
