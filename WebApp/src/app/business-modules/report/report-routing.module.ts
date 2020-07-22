@@ -31,7 +31,7 @@ const routes: Routes = [
   },
   {
     path: 'sheet-debit-report', loadChildren: () => import('./sheet-debit-report/sheet-debit-report.module').then(m => m.SheetDebitReportModule),
-    data: { name: 'Sheet Debit Report' }
+    data: { name: 'Accountant Report' }
   },
 ];
 
