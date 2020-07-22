@@ -327,6 +327,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
+        this.setError(this.officeId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
