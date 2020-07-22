@@ -11,10 +11,10 @@
         public static readonly string STATUS_APPROVAL_NEW = "New";
         public static readonly string STATUS_APPROVAL_DENIED = "Denied";
         public static readonly string STATUS_APPROVAL_DONE = "Done";
-        public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "LeaderApproved";
-        public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "DepartmentManagerApproved";
-        public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "AccountantManagerApproved";
-        public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "RequestApproval";
+        public static readonly string STATUS_APPROVAL_LEADERAPPROVED = "Leader Approved";
+        public static readonly string STATUS_APPROVAL_DEPARTMENTAPPROVED = "Department Manager Approved";
+        public static readonly string STATUS_APPROVAL_ACCOUNTANTAPPRVOVED = "Accountant Manager Approved";
+        public static readonly string STATUS_APPROVAL_REQUESTAPPROVAL = "Request Approval";
         #endregion -- STATUS APPROVAL --
 
         #region -- TYPE CHARGE --
@@ -102,8 +102,18 @@
         public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
-       
+
 
         #endregion
+
+        public static readonly string ROLE_NONE = "None";
+        public static readonly string ROLE_APPROVAL = "Approval";
+        public static readonly string ROLE_AUTO = "Auto";
+        public static readonly string ROLE_SPECIAL = "Special";
+
+        public static readonly string LEVEL_LEADER = "Leader";
+        public static readonly string LEVEL_MANAGER = "Manager";
+        public static readonly string LEVEL_ACCOUNTANT = "Accountant";
+        public static readonly string LEVEL_BOD = "BOD";
     }
 }

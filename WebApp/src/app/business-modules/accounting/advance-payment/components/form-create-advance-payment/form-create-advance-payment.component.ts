@@ -29,7 +29,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     requester: AbstractControl;
     requestDate: AbstractControl;
     paymentMethod: AbstractControl;
-    department: AbstractControl;
+    statusApproval: AbstractControl;
     deadLine: AbstractControl;
     note: AbstractControl;
     currency: AbstractControl;
@@ -59,7 +59,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.formCreate = this._fb.group({
             advanceNo: [{ value: null, disabled: true }],
             requester: [{ value: null, disabled: true }],
-            department: [],
+            statusApproval: ['New'],
             requestDate: [{
                 startDate: new Date(),
                 endDate: new Date(),
@@ -79,7 +79,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.deadLine = this.formCreate.controls['deadLine'];
         this.currency = this.formCreate.controls['currency'];
         this.note = this.formCreate.controls['note'];
-        this.department = this.formCreate.controls['department'];
+        this.statusApproval = this.formCreate.controls['statusApproval'];
         this.paymentMethod = this.formCreate.controls['paymentMethod'];
 
     }

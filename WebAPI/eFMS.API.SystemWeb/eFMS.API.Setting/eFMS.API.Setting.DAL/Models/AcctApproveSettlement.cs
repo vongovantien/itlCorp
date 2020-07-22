@@ -10,6 +10,7 @@ namespace eFMS.API.Setting.Service.Models
         public string Requester { get; set; }
         public DateTime? RequesterAprDate { get; set; }
         public string Leader { get; set; }
+        public string LeaderApr { get; set; }
         public DateTime? LeaderAprDate { get; set; }
         public string Manager { get; set; }
         public string ManagerApr { get; set; }
@@ -25,6 +26,7 @@ namespace eFMS.API.Setting.Service.Models
         public string UserModified { get; set; }
         public DateTime? DateModified { get; set; }
         public string Comment { get; set; }
-        public bool? IsDeputy { get; set; }
+        public bool? IsDeny { get; set; }
+        public string LevelApprove { get; set; }
     }
 }
