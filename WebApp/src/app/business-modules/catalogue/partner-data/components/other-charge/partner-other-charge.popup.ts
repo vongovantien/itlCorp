@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { finalize, catchError } from 'rxjs/operators';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { SortService } from '@services';
 
 @Component({
     selector: 'partner-other-charge-popup',
@@ -46,8 +47,10 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
+        private _sortService: SortService,
     ) {
         super();
+        this.requestSort = this.sortOtherCharge;
     }
 
     ngOnInit(): void {
@@ -60,8 +63,8 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
             ]
         }, { selectedDisplayFields: ['chargeNameEn'], });
         this.headers = [
-            { title: 'Charge Name', field: 'chargeId', sortable: true, width: 200 },
-            { title: 'Quantity', field: 'quantity', sortable: true, width: 200 },
+            { title: 'Charge Name', field: 'chargeId', sortable: true, width: 150 },
+            { title: 'Quantity', field: 'quantity', sortable: true, width: 150 },
             { title: 'Unit', field: 'unitId', sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
@@ -87,7 +90,14 @@ export class PartnerOtherChargePopupComponent extends PopupBase implements OnIni
             }
         });
     }
-
+    //
+    sortOtherCharge(sortField: string, order: boolean) {
+        if (sortField === "quantity") {
+            sortField = "quantityType";
+        }
+        this.initCharges = this._sortService.sort(this.initCharges, sortField, order);
+    }
+    //
     getCharge() {
         const serviceTypeId: string = `${ChargeConstants.AI_CODE};${ChargeConstants.AE_CODE}`;
         this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId })
