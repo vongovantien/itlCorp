@@ -10,6 +10,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from '@constants';
 import { SortService } from '@services';
+import { SelectComponent } from 'ng2-select';
 
 @Component({
     selector: 'commercial-contract-list',
