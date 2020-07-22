@@ -9,7 +9,7 @@ import { PagingService, SortService } from '@services';
 import { CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-contract-import',
@@ -27,6 +27,7 @@ export class ContractImportComponent extends AppPage implements OnInit {
     pager: PagerSetting = PAGINGSETTING;
     isDesc = true;
     sortKey: string;
+    type: string = '';
 
     constructor(
         private pagingService: PagingService,
@@ -34,6 +35,7 @@ export class ContractImportComponent extends AppPage implements OnInit {
         private _catalogueRepo: CatalogueRepo,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
+        protected _activeRoute: ActivatedRoute,
         private _router: Router) {
         super();
         this._progressRef = this._progressService.ref();
@@ -41,6 +43,10 @@ export class ContractImportComponent extends AppPage implements OnInit {
 
     ngOnInit() {
         this.pager.totalItems = 0;
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            this.type = result.type;
+            console.log(this.type);
+        });
     }
 
     chooseFile(file: Event) {
@@ -160,6 +166,11 @@ export class ContractImportComponent extends AppPage implements OnInit {
     }
 
     close() {
-        this._router.navigate([`home/commercial/customer`]);
+        if (this.type === 'Customer') {
+            this._router.navigate([`/home/commercial/customer`]);
+
+        } else {
+            this._router.navigate([`/home/commercial/agent`]);
+        }
     }
 }

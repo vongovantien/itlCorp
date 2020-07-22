@@ -306,6 +306,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     contract.ExpiredDate = !string.IsNullOrEmpty(item.ExpireDate) ? Convert.ToDateTime(item.ExpireDate) : (DateTime?)null;
                     contract.EffectiveDate = !string.IsNullOrEmpty(item.EffectDate) ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null;
                     contract.TrialCreditDays = !string.IsNullOrEmpty( item.PaymentTermTrialDay) ? Convert.ToInt16(item.PaymentTermTrialDay) : (int?)null;
+                    contract.PaymentTerm = contract.TrialCreditDays;
                     contract.CompanyId = sysCompanyRepository.Get(x => x.Code == item.Company).Select(t => t.Id)?.FirstOrDefault();
                     var arrOffice = item.Office.Split(";").ToArray();
                     string officeStr = string.Empty;
@@ -323,14 +324,14 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                         }
                     }
-                 
-
                     contract.OfficeId = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Get(x=>x.Code == arrOffice[0].ToString()).Select(t=>t.Id.ToString())?.FirstOrDefault() ;
                     contract.SaleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id)?.FirstOrDefault();
                     contract.CreditLimit = !string.IsNullOrEmpty(item.CreditLimited)? Convert.ToDecimal(item.CreditLimited): (Decimal?)null;
                     if (contract.ContractType == "Trial")
                     {
                         contract.TrialCreditLimited = contract.CreditLimit;
+                        contract.TrialEffectDate = contract.EffectiveDate;
+                        contract.TrialExpiredDate = contract.ExpiredDate;
                         contract.TrialCreditDays = contract.PaymentTerm;
                     }
                     contract.CreditLimitRate = !string.IsNullOrEmpty(item.CreditLimitedRated) ? Convert.ToInt32(item.CreditLimitedRated) : (int?)null;
@@ -437,7 +438,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     if(DataContext.Any(x=>x.PartnerId == customerId && x.ContractNo == item.ContractNo))
                     {
-                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE],item.ContractNo);
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED],item.ContractNo);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.ContractNo == item.ContractNo) > 1)
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
                         item.IsValid = false;
                     }
                 }

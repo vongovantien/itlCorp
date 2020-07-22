@@ -70,7 +70,7 @@
   "MSG_CONTRACT_CREDIT_LIMIT_EMPTY": "Credit Limit is not allow empty with agreement type Trial or Official!",
   "MSG_CONTRACT_PAYMENT_TERM_EMPTY": "Payment term is not allow empty with agreement type Trial or Official!",
   "MSG_CONTRACT_CONTRACT_NO_DUPLICATE": "Contract No {0} has been duplicate!|wrong",
-
+  "MSG_CONTRACT_CONTRACT_NO_EXISTED": "Contract No {0} has been existed!|wrong",
 
 
 
