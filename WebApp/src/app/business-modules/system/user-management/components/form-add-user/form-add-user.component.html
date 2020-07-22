@@ -142,6 +142,49 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Limit
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square"
+                                formControlName="creditLimit" placeholder="Please Enter Credit Limit">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Credit Rate
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square" formControlName="creditRate"
+                                placeholder="Please Enter Credit Rate">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">LDAP</label>
+                                    <div class="m-checkbox-inline">
+                                        <app-switch [toggle]="ldap.value" (toggleChange)="ldap.setValue($event)">
+                                        </app-switch>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6" *ngIf="isDetail">
+                                <div class="form-group m--align-right">
+                                    <label></label>
+                                    <div class="c-btn-form-group">
+                                        <button (click)="resetPassword(SelectedUser.id)"
+                                            class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">Reset
+                                            Password</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="col-lg-4">
+                        <div class="form-group">
                             <label class="form-control-label">LDAP</label>
                             <div class="m-checkbox-inline">
                                 <app-switch [toggle]="ldap.value" (toggleChange)="ldap.setValue($event)">
@@ -162,9 +205,9 @@
                         </div>
 
 
-                    </div>
+                    </div>-->
                 </div>
-                <div class="row" *ngIf="isDetail">
+                <div class="row m--margin-top-10" *ngIf="isDetail">
                     <div class="col-6">
                         Created: {{SelectedUser.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
                             class="text-success">{{SelectedUser.userCreated}}</span>
