@@ -3,6 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { PartnerOfAcctManagementResult } from '@models';
 import { Store } from '@ngrx/store';
 import { SelectRequester, IAccountingManagementState } from '../../accounting-management/store';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'select-requester-popup',
@@ -17,7 +18,8 @@ export class ShareAccountingManagementSelectRequesterPopupComponent extends Popu
     selectedRequester: PartnerOfAcctManagementResult;
 
     constructor(
-        private _store: Store<IAccountingManagementState>
+        private _store: Store<IAccountingManagementState>,
+        private _router: Router
     ) {
         super();
     }
@@ -31,7 +33,6 @@ export class ShareAccountingManagementSelectRequesterPopupComponent extends Popu
     onSubmitSelectPartner() {
         if (!!this.selectedRequester) {
             this._store.dispatch(SelectRequester(this.selectedRequester));
-            this.hide();
             this.onSelect.emit(this.selectedRequester);
         }
     }

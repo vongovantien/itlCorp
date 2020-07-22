@@ -18,6 +18,9 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatDepartment> catDepartmentRepo;
         readonly IContextBase<SysEmployee> sysEmployeeRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
+        readonly IContextBase<SysSettingFlow> settingFlowRepo;
+        readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
+
         public UserBaseService(
             IContextBase<SysUser> repository, 
             IMapper mapper,
@@ -25,13 +28,17 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysGroup> sysGroup,
             IContextBase<CatDepartment> catDepartment,
             IContextBase<SysEmployee> sysEmployee,
-            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
+            IContextBase<SysOffice> sysOffice,
+            IContextBase<SysSettingFlow> settingFlow,
+            IContextBase<SysAuthorizedApproval> authourizedApproval) : base(repository, mapper)
         {
             sysUserLevelRepo = sysUserLevel;
             sysGroupRepo = sysGroup;
             catDepartmentRepo = catDepartment;
             sysEmployeeRepo = sysEmployee;
             sysOfficeRepo = sysOffice;
+            settingFlowRepo = settingFlow;
+            authourizedApprovalRepo = authourizedApproval;
         }
 
         private int? GetGroupIdOfUser(string userId)
@@ -63,6 +70,18 @@ namespace eFMS.API.Accounting.DL.Services
             return deptOfUser;
         }
 
+        #region -- LEADER, MANAGER, ACCOUNTANT, BOD --
+        public List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId)
+        {
+            var leaders = sysUserLevelRepo.Get(x => x.Position == AccountingConstants.PositionManager
+                                                    && x.GroupId == groupId
+                                                    && x.DepartmentId == departmentId
+                                                    && x.DepartmentId != null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+            return leaders;
+        }
+
         public List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId)
         {
             var managers = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
@@ -86,6 +105,17 @@ namespace eFMS.API.Accounting.DL.Services
                                                     .Select(s => s.UserId).ToList();
             return accountants;
         }
+
+        public List<string> GetBUHead(Guid? companyId, Guid? officeId)
+        {
+            var buHeads = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
+                                                    && x.Position == AccountingConstants.PositionManager
+                                                    && x.DepartmentId == null
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+            return buHeads;
+        }
+        #endregion -- LEADER, MANAGER, ACCOUNTANT, BOD --
 
         //Lấy ra BUHeadId của BUHead
         public string GetBUHeadId(string idBranch)
@@ -134,7 +164,7 @@ namespace eFMS.API.Accounting.DL.Services
                  { "81a2abcf-3b1a-4892-909d-604c23667b7d", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
                  { "197f66bf-f0a1-4449-9c25-a202ae50e8f9", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
                  { "ce7a4c55-a52c-4d55-8fed-e60ba68d75e5", AccountingConstants.DEPT_CODE_ACCOUNTANT },//User ủy quyền cho dept Accountant
-                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT }//User ủy quyền cho dept Accountant
+                 { "850e6069-b5ea-4ab4-8864-a2332237b148", AccountingConstants.DEPT_CODE_ACCOUNTANT } //User ủy quyền cho dept Accountant
             };
             var list = listUsers.ToList();
             var deputy = listUsers.Where(x => x.Value == dept).Select(x => x.Key).ToList();
@@ -165,5 +195,118 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        public bool CheckIsBOD(int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var isBod = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
+                                                    && x.DepartmentId == null
+                                                    && x.OfficeId != null
+                                                    && x.CompanyId != null
+                                                    && x.DepartmentId == departmentId
+                                                    && x.OfficeId == officeId
+                                                    && x.CompanyId == companyId
+                                                    ).Select(s => s.UserId).Any();
+            return isBod;
+        }
+
+
+        #region --- SETTING FLOW APPROVAL ---
+        public SysSettingFlow GetSettingFlowApproval(string type, Guid? officeId)
+        {
+            var settingFlow = settingFlowRepo.Get(x => x.Flow == "Approval" && x.Type == type && x.OfficeId == officeId).FirstOrDefault();
+            return settingFlow;
+        }
+
+        public string GetRoleByLevel(string level, string type, Guid? officeId)
+        {
+            var role = string.Empty;
+            switch (level)
+            {
+                case "Leader":
+                    role = GetSettingFlowApproval(type, officeId)?.Leader;
+                    break;
+                case "Manager":
+                    role = GetSettingFlowApproval(type, officeId)?.Manager;
+                    break;
+                case "Accountant":
+                    role = GetSettingFlowApproval(type, officeId)?.Accountant;
+                    break;
+                case "BOD":
+                    role = GetSettingFlowApproval(type, officeId)?.Bod;
+                    break;
+                default:
+                    break;
+            }
+            return role;
+        }
+        #endregion --- SETTING FLOW APPROVAL ---
+
+        #region --- AUTHORIZED APPROVAL ---
+        public List<string> GetAuthorizedApprovalByTypeAndAuthorizer(string type, string authorizer)
+        {
+            var userAuthorizedApprovals = authourizedApprovalRepo.Get(x => x.Type == type && x.Authorizer == authorizer && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).Select(x => x.Commissioner).ToList();
+            return userAuthorizedApprovals;
+        }
+        #endregion  --- AUTHORIZED APPROVAL ---
+
+        #region -- DEPUTY USER --
+        public bool CheckUserSameLevel(string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var result = false;
+            if (groupId != null && departmentId != null && officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.GroupId == groupId && x.DepartmentId == departmentId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            if (departmentId != null && officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.DepartmentId == departmentId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            if (officeId != null && companyId != null)
+            {
+                return sysUserLevelRepo.Get(x => x.UserId == userId && x.OfficeId == officeId && x.CompanyId == companyId).Any();
+            }
+            return result;
+        }
+
+        public List<string> GetUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var userDeputies = new List<string>();
+            if (string.IsNullOrEmpty(userId)) return userDeputies;
+            //Get list user authorized of user
+            var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId);
+            foreach (var userAuth in userAuthorizedApprovals)
+            {
+                var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
+                if (isSame)
+                {
+                    userDeputies.Add(userAuth);
+                }
+            }
+            return userDeputies;
+        }
+
+        public List<string> GetEmailUsersDeputyByCondition(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var users = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            var emailUserDeputies = new List<string>();
+            foreach (var user in users)
+            {
+                var employeeIdOfUser = GetEmployeeIdOfUser(user);
+                var email = GetEmployeeByEmployeeId(employeeIdOfUser)?.Email;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    emailUserDeputies.Add(email);
+                }
+            }
+            return emailUserDeputies;
+        }
+
+        public bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            return deputies.Any();
+        }
+
+        #endregion -- DEPUTY USER --
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, mergeMap, distinctUntilChanged, map } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
@@ -13,7 +13,7 @@ import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { cloneDeep } from 'lodash';
+import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/popup/salesman-credit-limit.popup';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -25,6 +25,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    @ViewChild(SalesmanCreditLimitPopupComponent, { static: false }) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
+
     openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
@@ -55,19 +57,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     users: User[] = [];
     companies: Company[] = [];
-    offices: Office[] = [];
+    offices: CommonInterface.INg2Select[] = [];
     contracts: Contract[] = [];
     activeServices: any = [];
     activeVas: any = [];
-
+    activeOffice: any = [];
 
     selectedContract: Contract = new Contract();
 
     idContract: string = SystemConstants.EMPTY_GUID;
 
-
     indexDetailContract: number = null;
-
 
     fileToUpload: File = null;
     fileList: any = null;
@@ -76,12 +76,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     menuSpecialPermission: Observable<any[]>;
 
-
-
     contractTypes: CommonInterface.INg2Select[] = [
         { id: "Trial", text: "Trial" },
         { id: "Official", text: "Official" },
-        { id: "Guarantee", text: "Guarantee" },
+        { id: "Guaranteed", text: "Guaranteed" },
         { id: "Cash", text: "Cash" }
     ];
     serviceTypes: CommonInterface.INg2Select[] = [
@@ -151,8 +149,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
 
     }
-
-
 
     initForm() {
         this.formGroup = this._fb.group({
@@ -235,7 +231,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: Office[]) => {
-                    this.offices = res;
+                    if (!!res) {
+                        this.offices = this.utility.prepareNg2SelectData(res || [], 'id', 'shortName');
+                    }
                 },
             );
     }
@@ -380,7 +378,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     );
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
-                this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
+                // this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
                 this.selectedContract.fileList = this.fileList;
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
@@ -425,14 +423,30 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         return activeVasList;
     }
 
+    getCurrentActiveOffice(Office: any) {
+        const listOffice = Office.split(";");
+        const activeOfficeList: any = [];
+        listOffice.forEach(item => {
+            const element = this.offices.find(x => x.id === item);
+            if (element !== undefined) {
+                const activeOffice = element;
+                activeOfficeList.push(activeOffice);
+            }
+        });
+        return activeOfficeList;
+    }
+
+
     pachValueToFormContract() {
         this.activeServices = this.getCurrentActiveService(this.selectedContract.saleService);
         this.activeVas = this.getCurrentActiveVas(this.selectedContract.vas);
+        if (!!this.selectedContract.officeId) {
+            this.activeOffice = this.getCurrentActiveOffice(this.selectedContract.officeId);
+        }
         this.setError(this.saleService);
         this.formGroup.patchValue({
             salesmanId: !!this.selectedContract.saleManId ? this.selectedContract.saleManId : null,
             companyId: !!this.selectedContract.companyId ? this.selectedContract.companyId : null,
-            officeId: !!this.selectedContract.officeId ? this.selectedContract.officeId : null,
             contractNo: this.selectedContract.contractNo,
             effectiveDate: !!this.selectedContract.effectiveDate ? { startDate: new Date(this.selectedContract.effectiveDate), endDate: new Date(this.selectedContract.effectiveDate) } : null,
             expiredDate: !!this.selectedContract.expiredDate ? { startDate: new Date(this.selectedContract.expiredDate), endDate: new Date(this.selectedContract.expiredDate) } : null,
@@ -453,6 +467,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             description: this.selectedContract.description,
             saleService: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
             vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
+            officeId: !!this.selectedContract.officeId ? [<CommonInterface.INg2Select>{ id: this.selectedContract.officeId, text: '' }] : null,
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null
 
         });
@@ -477,6 +492,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.saleService = services;
         const vass = this.vas.value ? (this.vas.value.length > 0 ? this.vas.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.vas = vass;
+        const offices = this.officeId.value ? (this.officeId.value.length > 0 ? this.officeId.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
+        this.selectedContract.officeId = offices;
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value[0].id : null;
         this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
@@ -518,8 +535,30 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     activeInactiveContract(id: string) {
+        if (this.contractType.value[0].id === 'Guaranteed'
+            && (this.formGroup.controls['creditLimit'].value === 0
+                || !this.formGroup.controls['creditLimit'].value
+                && this.statusContract === false)) {
+            this.salesmanCreditLimitPopup.show();
+            return;
+        }
+        this.processActiveInActiveContract(id);
+    }
+
+    onSalesmanCreditRequest($event: any) {
+        const data = $event;
+        console.log(data);
+        if (!!data.creditRate || data.creditLimit) {
+            this.processActiveInActiveContract(this.selectedContract.id, true, data);
+            this.selectedContract.creditLimit = data.creditLimit;
+            this.selectedContract.creditLimitRate = data.creditRate;
+
+        }
+    }
+
+    processActiveInActiveContract(id: string, salesmanCreditRequest?: boolean, bodyCredit?: any) {
         this._progressRef.start();
-        this._catalogueRepo.activeInactiveContract(id, this.partnerId)
+        this._catalogueRepo.activeInactiveContract(id, this.partnerId, bodyCredit)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
             }))
@@ -535,7 +574,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             message = 'Active success !!';
                         }
                         this._toastService.success(message);
+                        if (salesmanCreditRequest) {
+                            this.formGroup.controls['creditLimit'].setValue(this.selectedContract.creditLimit);
+                            this.formGroup.controls['creditLimitRate'].setValue(this.selectedContract.creditLimitRate);
+                        }
                         this.onRequest.emit(this.selectedContract);
+
 
                     } else {
                         this._toastService.error(res.message);

@@ -146,6 +146,7 @@ namespace eFMS.API.Setting.DL.Services
                         string _accountant = null;
                         string _bhHead = null;
 
+                        
                         var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(unlockRequest.UnlockType, unlockRequest.OfficeId);
                         if (isAllLevelAutoOrNone)
                         {
@@ -181,6 +182,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailUsersDeputy = leaderLevel.EmailDeputies;
                             }
                         }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                        }
 
                         if (managerLevel.Role == SettingConstants.ROLE_AUTO || managerLevel.Role == SettingConstants.ROLE_APPROVAL)
                         {
@@ -199,6 +204,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = managerLevel.EmailUser;
                                 mailUsersDeputy = managerLevel.EmailDeputies;
                             }
+                        }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                         }
 
                         if (accountantLevel.Role == SettingConstants.ROLE_AUTO || accountantLevel.Role == SettingConstants.ROLE_APPROVAL)
@@ -229,6 +238,10 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = accountantLevel.EmailUser;
                                 mailUsersDeputy = accountantLevel.EmailDeputies;
                             }
+                        }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                         }
 
                         if (buHeadLevel.Role == SettingConstants.ROLE_AUTO || buHeadLevel.Role == SettingConstants.ROLE_APPROVAL || buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
@@ -277,6 +290,10 @@ namespace eFMS.API.Setting.DL.Services
                                 }
                             }
                         }
+                        else
+                        {
+                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                        }
 
                         var sendMailApproved = true;
                         var sendMailSuggest = true;
@@ -323,7 +340,7 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             checkExistsApproveByUnlockRequestId.UserModified = userCurrent;
                             checkExistsApproveByUnlockRequestId.DatetimeModified = DateTime.Now;
-                            var hsUpdateApprove = DataContext.Update(checkExistsApproveByUnlockRequestId, x => x.Id == checkExistsApproveByUnlockRequestId.Id);
+                            var hsUpdateApprove = DataContext.Update(checkExistsApproveByUnlockRequestId, x => x.Id == checkExistsApproveByUnlockRequestId.Id, false);
                         }
 
                         opsTransactionRepo.SubmitChanges();
@@ -1222,7 +1239,7 @@ namespace eFMS.API.Setting.DL.Services
                     unlockRequest.DatetimeModified = approve.DatetimeModified = DateTime.Now;
 
                     var hsUpdateUnlockRequest = unlockRequestRepo.Update(unlockRequest, x => x.Id == unlockRequest.Id, false);
-                    var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id);
+                    var hsUpdateApprove = DataContext.Update(approve, x => x.Id == approve.Id, false);
 
                     unlockRequestRepo.SubmitChanges();
                     DataContext.SubmitChanges();
@@ -1834,8 +1851,8 @@ namespace eFMS.API.Setting.DL.Services
                 adv.DatetimeModified = DateTime.Now;
                 advancePaymentRepo.Update(adv, x => x.Id == adv.Id, false);
 
-                var aprAdv = approveAdvanceRepo.Get(x => x.AdvanceNo == adv.AdvanceNo && x.IsDeputy == false).FirstOrDefault();
-                aprAdv.IsDeputy = true;
+                var aprAdv = approveAdvanceRepo.Get(x => x.AdvanceNo == adv.AdvanceNo && x.IsDeny == false).FirstOrDefault();
+                aprAdv.IsDeny = true;
                 aprAdv.Comment = "UNLOCK REQUEST ADVANCE";
                 approveAdvanceRepo.Update(aprAdv, x => x.Id == aprAdv.Id, false);
             }
@@ -1851,8 +1868,8 @@ namespace eFMS.API.Setting.DL.Services
                 settle.DatetimeModified = DateTime.Now;
                 settlementPaymentRepo.Update(settle, x => x.Id == settle.Id, false);
 
-                var aprSettle = approveSettlementRepo.Get(x => x.SettlementNo == settle.SettlementNo && x.IsDeputy == false).FirstOrDefault();
-                aprSettle.IsDeputy = true;
+                var aprSettle = approveSettlementRepo.Get(x => x.SettlementNo == settle.SettlementNo && x.IsDeny == false).FirstOrDefault();
+                aprSettle.IsDeny = true;
                 aprSettle.Comment = "UNLOCK REQUEST SETTLEMENT";
                 approveSettlementRepo.Update(aprSettle, x => x.Id == aprSettle.Id, false);
             }

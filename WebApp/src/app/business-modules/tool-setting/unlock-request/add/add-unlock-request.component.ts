@@ -84,27 +84,35 @@ export class UnlockRequestAddNewComponent extends AppForm {
         this.requester.setValue(this.userLogged.preferred_username);
     }
 
-    getUnlockTypeEnum(type: string) {
+    getUnlockTypeEnumAndSetValueField(type: string) {
         switch (type) {
             case "Shipment":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.SHIPMENT;
+                this.subject.setValue("Unlock Shipment");
+                this.generalReason.setValue(this.tableDefault);
                 break;
             case "Advance":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.ADVANCE;
+                this.subject.setValue("Unlock Advance");
+                this.generalReason.setValue(null);
                 break;
             case "Settlement":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.SETTEMENT;
+                this.subject.setValue("Unlock Settlement");
+                this.generalReason.setValue(null);
                 break;
             case "Change Service Date":
                 this.unlockTypeEnum = CommonEnum.UnlockTypeEnum.CHANGESERVICEDATE;
+                this.subject.setValue("Unlock Change Service Date");
+                this.generalReason.setValue(this.tableDefault);
                 break;
             default:
                 break;
         }
     }
 
-    selectedUnlockType(e: SelectItem) {
-        this.getUnlockTypeEnum(e.id);
+    getUnlockTypeEnumAndSetValue(e: SelectItem) {
+        this.getUnlockTypeEnumAndSetValueField(e.id);
         this.listJobComponent.dataJobs = [];
     }
 

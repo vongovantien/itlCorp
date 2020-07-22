@@ -578,8 +578,8 @@ export class CatalogueRepo {
         );
     }
 
-    activeInactiveContract(id: string, partnerId: string) {
-        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}/${partnerId}`).pipe(
+    activeInactiveContract(id: string, partnerId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}/${partnerId}`, body).pipe(
             map((data: any) => data)
         );
     }

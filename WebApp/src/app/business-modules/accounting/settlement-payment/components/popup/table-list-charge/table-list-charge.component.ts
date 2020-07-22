@@ -497,6 +497,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
 
         if (!this.checkDuplicate()) {
+            this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         }
 
@@ -526,7 +527,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             }
         }
 
-        // TODO: check id in list has valid guid. to defind update or create.
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
@@ -591,23 +591,27 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     checkDuplicate() {
         let valid: boolean = true;
-        if (this.checkDuplicateInObject("chargeId", this.charges)
-            && this.checkDuplicateInObject("invoiceNo", this.charges)
-            && this.checkDuplicateInObject("contNo", this.charges)
-        ) {
-            this.isDuplicateChargeCode = true;
-            this.isDuplicateInvoice = true;
-            this.isDuplicatedContNo = true;
+        const chargeIdInvoiceGroup = this.charges.map(c => c.chargeId + c.invoiceNo);   // * charge + Invoice
+        const isDup: boolean = new Set(chargeIdInvoiceGroup).size !== chargeIdInvoiceGroup.length;
 
+        if (isDup) {
+            const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeIdInvoiceGroup))];
+            const chargeMatchId: any[] = arrayDuplicates.map((c: string) => c.match(SystemConstants.CPATTERN.GUID));
+
+            const chargeIds: string[] = [].concat.apply([], chargeMatchId);
+
+            this.charges.forEach((c: Surcharge) => {
+                if (chargeIds.includes(c.chargeId)) {
+                    c.isDuplicate = true;
+                } else {
+                    c.isDuplicate = false;
+                }
+            });
             valid = false;
-            this._toastService.warning("The Charge code, ContNo and InvoiceNo is duplicated");
-            return;
         } else {
             valid = true;
-            this.isDuplicateChargeCode = false;
-            this.isDuplicateInvoice = false;
-            this.isDuplicatedContNo = false;
         }
+
         return valid;
     }
 

@@ -568,4 +568,13 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
         this.isLoading = true;
         this.saleMans = this._systemRepo.getListSystemUser();
     }
+
+    selectedHblType($event: any) {
+        const selectedHblType = $event;
+        if (selectedHblType.id === "Original") {
+            this.originBLNumber.setValue(this.numberOfOrigins[2]);
+        } else {
+            this.originBLNumber.setValue(this.numberOfOrigins[0]);
+        }
+    }
 }

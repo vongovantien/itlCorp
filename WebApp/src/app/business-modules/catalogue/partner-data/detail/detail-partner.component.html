@@ -50,11 +50,6 @@
 </form>
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
-<confirm-popup #popupDeleteContract (onSubmit)="onDeleteContract()" body="You want to delete this contract ?"
-    [labelConfirm]="'Ok'">
-</confirm-popup>
-<confirm-popup #popupDeleteSaleman (onSubmit)="onDeleteSaleman()" [body]="deleteMessage" [labelConfirm]="'Ok'">
-</confirm-popup>
 <confirm-popup #popupDeletePartner (onSubmit)="onDelete()" [body]="deleteMessage" [labelConfirm]="'Ok'">
 </confirm-popup>
 <info-popup [body]="deleteMessage"></info-popup>

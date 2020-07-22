@@ -54,7 +54,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             const body = {
                 advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
                 requester: this.formCreateComponent.requester.value || 'Admin',
-                department: this.formCreateComponent.department.value || '',
+                // statusApproval: this.formCreateComponent.statusApproval.value || '',
                 paymentMethod: this.formCreateComponent.paymentMethod.value.value,
                 advanceCurrency: this.formCreateComponent.currency.value || 'VND',
                 requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
@@ -96,7 +96,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         const body = {
             advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
             requester: this.formCreateComponent.requester.value || 'Admin',
-            department: this.formCreateComponent.department.value || '',
+            // statusApproval: this.formCreateComponent.statusApproval.value || '',
             paymentMethod: this.formCreateComponent.paymentMethod.value.value,
             advanceCurrency: this.formCreateComponent.currency.value || 'VND',
             requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),

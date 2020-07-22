@@ -73,5 +73,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState RecallRequest(Guid settlementId);
 
+        bool CheckIsLockedShipment(string jobNo);
+
     }
 }

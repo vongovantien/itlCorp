@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { SortService } from '@services';
+import { SortService, DataService } from '@services';
 import { ConfirmPopupComponent } from '@common';
 import { timeoutD } from '@decorators';
 import { ChargeOfAccountingManagementModel } from '@models';
@@ -96,7 +96,8 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     constructor(
         private _sortService: SortService,
         private _store: Store<IAccountingManagementState>,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _dataService: DataService,
     ) {
         super();
         this.requestSort = this.sortCharges;
@@ -117,6 +118,22 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                     }
                 }
             );
+
+        this._dataService.currentMessage.pipe(
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (res: { [key: string]: any }) => {
+                console.log(res);
+                if (res.generalExchangeRate) {
+                    if (!!this.charges.length) {
+                        this.charges.forEach(c => {
+                            c.exchangeRate = res.generalExchangeRate;
+                        });
+                        this._toastService.success("Exchange Rate synced successfully");
+                    }
+                }
+            }
+        );
     }
 
     sortCharges(sort: string) {

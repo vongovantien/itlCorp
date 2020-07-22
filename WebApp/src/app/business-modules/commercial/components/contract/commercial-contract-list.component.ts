@@ -38,7 +38,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.requestSort = this.sortLocal;
-
     }
 
     ngOnInit(): void {
@@ -50,7 +49,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Effective Date', field: 'trialEffectDate', sortable: true },
             { title: 'Expired Date', field: 'trialExpiredDate', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
-            { title: 'Office', field: 'officeNameAbbr', sortable: true },
+            { title: 'Office', field: 'officeNameEn', sortable: true },
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
         ];
     }
@@ -103,10 +102,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.show();
     }
 
-    handleSearchContract($event: any) {
-        console.log("keyword: ", $event.target.value);
-    }
-
     getDetailContract(id: string, index: number) {
         this.formContractPopup.isUpdate = true;
         this.formContractPopup.partnerId = this.partnerId;
@@ -119,12 +114,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
                 .subscribe(
                     (res: Contract) => {
-                        this.selectedContract = res;
-                        this.formContractPopup.idContract = this.selectedContract.id;
-                        this.formContractPopup.selectedContract = res;
-                        this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
-                        this.formContractPopup.pachValueToFormContract();
-                        this.formContractPopup.show();
+                        if (!!res) {
+                            this.selectedContract = res;
+                            this.formContractPopup.idContract = this.selectedContract.id;
+                            this.formContractPopup.selectedContract = res;
+                            this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
+                            this.formContractPopup.pachValueToFormContract();
+                            this.formContractPopup.show();
+                        }
                     }
                 );
         } else {
@@ -197,12 +194,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     console.log(this.contracts);
                     this.contracts.forEach(element => {
                         if (element.saleService.includes(';')) {
-
-                            // element.saleService = element.saleService.replace(';', '; ');
-                            // const data = element.saleService.replace(';', ' ');
                             const arr = element.saleService.split(';');
                             element.saleService = '';
-                            console.log(arr);
                             arr.forEach(item => {
                                 element.saleService += item + '; ';
                             });
@@ -210,6 +203,19 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                                 element.saleService = element.saleService.substr(0, element.saleService.length - 2);
                             }
                         }
+                        if (!!element.officeId) {
+                            if (element.officeId.includes(';')) {
+                                const arrayOffice = element.officeId.split(';');
+                                element.officeNameEn = '';
+                                arrayOffice.forEach(itemOffice => {
+                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                                });
+                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                }
+                            }
+                        }
+
                     });
                 }
             );
