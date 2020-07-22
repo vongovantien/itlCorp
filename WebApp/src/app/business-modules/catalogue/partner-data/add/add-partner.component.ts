@@ -367,6 +367,7 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
     }
 
+
     onSubmit() {
         this.formPartnerComponent.isSubmitted = true;
         // this.partner.saleMans = this.saleMandetail;
@@ -374,6 +375,9 @@ export class AddPartnerDataComponent extends AppList {
         //     element.effectDate = element.effectDate !== null ? formatDate(element.effectDate.startDate !== undefined ? element.effectDate.startDate : element.effectDate, 'yyyy-MM-dd', 'en') : null;
         //     element.createDate = element.createDate !== null ? formatDate(element.createDate.startDate !== undefined ? element.createDate.startDate : element.createDate, 'yyyy-MM-dd', 'en') : null;
         // });
+        this.formPartnerComponent.applyDim.setErrors(null);
+        this.formPartnerComponent.roundUpMethod.setErrors(null);
+
         if (!this.formPartnerComponent.partnerForm.valid) {
             return;
         }
@@ -386,8 +390,7 @@ export class AddPartnerDataComponent extends AppList {
 
 
 
-        this.formPartnerComponent.applyDim.setErrors(null);
-        this.formPartnerComponent.roundUpMethod.setErrors(null);
+
         // if (!this.contracts.length) {
         //     this._toastService.warning("Partner don't have any contract in this period, Please check it again!");
         //     return;
@@ -447,8 +450,8 @@ export class AddPartnerDataComponent extends AppList {
             provinceShippingId: formBody.provinceShippingId,
             parentId: formBody.partnerAccountRef,
 
-            roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
-            applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            roundUpMethod: formBody.roundUpMethod != null && formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
+            applyDim: formBody.applyDim != null && formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
         };
