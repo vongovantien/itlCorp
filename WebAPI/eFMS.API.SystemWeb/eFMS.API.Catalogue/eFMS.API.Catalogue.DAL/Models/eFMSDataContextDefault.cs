@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatChargeDefaultAccount> CatChargeDefaultAccount { get; set; }
         public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
+        public virtual DbSet<CatChargeIncoterm> CatChargeIncoterm { get; set; }
         public virtual DbSet<CatChartOfAccounts> CatChartOfAccounts { get; set; }
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
@@ -231,6 +232,39 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatChargeIncoterm>(entity =>
+            {
+                entity.ToTable("catChargeIncoterm");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.Currency).HasMaxLength(10);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.FeeType).HasMaxLength(50);
+
+                entity.Property(e => e.IncotermId).HasColumnName("IncotermID");
+
+                entity.Property(e => e.QuantityType).HasMaxLength(10);
+
+                entity.Property(e => e.Unit).HasMaxLength(10);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
