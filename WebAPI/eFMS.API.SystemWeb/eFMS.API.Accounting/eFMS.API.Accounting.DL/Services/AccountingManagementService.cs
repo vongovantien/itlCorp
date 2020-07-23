@@ -1203,7 +1203,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item = mapper.Map<AccountingManagementExport>(charge);
                     item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
                     item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
-                    item.PartnerId = partnerAcct.AccountNo; //Partner ID trên VAT Invoice Or Voucher
+                    item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
                     item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
                     item.Description = acct.Description;
