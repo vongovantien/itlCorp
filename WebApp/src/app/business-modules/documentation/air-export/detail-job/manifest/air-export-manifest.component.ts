@@ -66,13 +66,13 @@ export class AirExportManifestComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbNo', sortable: true, width: 100 },
-            { title: 'No of Pieces', field: 'packageContainer', sortable: true },
-            { title: 'G.W', field: 'grossWeight', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'No of Pieces', field: 'packageQty', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Destination', field: 'podName', sortable: true },
             { title: 'Shipper', field: 'shipperName', sortable: true },
-            { title: 'Consignee', field: 'consignee', sortable: true },
+            { title: 'Consignee', field: 'consigneeName', sortable: true },
             { title: 'Description', field: 'desOfGoods', sortable: true },
             { title: 'Freight Charge', field: '', sortable: true }
         ];
