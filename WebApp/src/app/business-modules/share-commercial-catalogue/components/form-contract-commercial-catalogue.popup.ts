@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { finalize, catchError, mergeMap, distinctUntilChanged, map } from 'rxjs/operators';
+import { finalize, catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
@@ -21,6 +21,7 @@ import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/p
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
+
     formGroup: FormGroup;
 
     isUpdate: boolean = false;
@@ -324,6 +325,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
+        this.setError(this.officeId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
@@ -356,6 +358,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(this.selectedContract);
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -370,6 +373,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             if (res.status) {
                                 this._toastService.success(res.message);
                                 this.onRequest.emit(this.selectedContract);
+
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);

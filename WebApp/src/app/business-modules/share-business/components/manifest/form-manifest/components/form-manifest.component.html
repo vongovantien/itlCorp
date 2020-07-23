@@ -142,14 +142,15 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (freightCharge.dirty && !freightCharge.valid) || (isSubmitted && !freightCharge.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (freightCharge.dirty && !freightCharge.valid) || (isSubmitted && !freightCharge.valid) || freightChargeEmpty}">
                             <label class="form-control-label" for="">
                                 Freight Charge <span class="m--font-danger">(*)</span>
                             </label>
-                            <ng-select [items]="freightCharges" placeholder="select" formControlName="freightCharge">
+                            <ng-select [items]="freightCharges" (selected)="selectedFreightCharge()"
+                                placeholder="select" formControlName="freightCharge">
                             </ng-select>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') && freightCharge.dirty">
+                                *ngIf="isSubmitted && (freightCharge.errors | equalError: 'required') && freightCharge.dirty ||  freightChargeEmpty">
                                 Freight Charge is required!
                             </div>
                         </div>

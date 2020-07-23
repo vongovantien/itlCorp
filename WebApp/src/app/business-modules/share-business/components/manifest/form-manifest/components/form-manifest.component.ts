@@ -45,6 +45,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     defaultMarksOfNationality: string = '';
     defaultVoyNo: string = '';
     ports: Observable<PortIndex[]>;
+    freightChargeEmpty: boolean = false;
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
         { field: 'nameEn', label: 'Port Name' },
@@ -92,8 +93,9 @@ export class ShareBusinessFormManifestComponent extends AppForm {
                         this.pod.setValue(this.shipmentDetail.pod);
 
                         this.marksOfNationality.setValue(this.defaultMarksOfNationality);
-
-                        this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                        if (!!this.shipmentDetail.paymentTerm) {
+                            this.freightCharge.setValue([<CommonInterface.INg2Select>{ id: this.shipmentDetail.paymentTerm, text: this.shipmentDetail.paymentTerm }]);
+                        }
 
                         if (this.isAir) {
                             this.vesselNo.setValue(res.flightVesselName);
@@ -177,6 +179,10 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         this.agent = this.formGroup.controls['agent'];
         this.pol = this.formGroup.controls['pol'];
         this.pod = this.formGroup.controls['pod'];
+    }
+
+    selectedFreightCharge() {
+        this.freightChargeEmpty = false;
     }
 
 }
