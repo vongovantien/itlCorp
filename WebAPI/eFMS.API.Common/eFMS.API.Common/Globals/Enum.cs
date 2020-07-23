@@ -176,7 +176,8 @@
         accManagement,
         settingUnlockRequest,
         commercialCustomer,
-        commercialAgent
+        commercialAgent,
+        commercialIncoterm
     }
     public enum UnlockTypeEnum
     {
