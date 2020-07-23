@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, mergeMap, distinctUntilChanged, map } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
@@ -13,7 +13,7 @@ import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { cloneDeep } from 'lodash';
+import { SelectComponent } from 'ng2-select';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -21,6 +21,7 @@ import { cloneDeep } from 'lodash';
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
+
     formGroup: FormGroup;
 
     isUpdate: boolean = false;
@@ -326,6 +327,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
+        this.setError(this.officeId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
@@ -358,6 +360,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(this.selectedContract);
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -372,6 +375,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             if (res.status) {
                                 this._toastService.success(res.message);
                                 this.onRequest.emit(this.selectedContract);
+
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);

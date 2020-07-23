@@ -50,6 +50,7 @@ export class AirExportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
+
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -165,6 +166,12 @@ export class AirExportManifestComponent extends AppList {
     addOrUpdateManifest() {
         this.formManifest.isSubmitted = true;
         this.getTotalWeight();
+        if (this.formManifest.freightCharge.value.length > 0 && !this.formManifest.freightCharge.value[0].id) {
+            this.formManifest.freightChargeEmpty = true;
+            return;
+        } else {
+            this.formManifest.freightChargeEmpty = false;
+        }
         if (this.formManifest.formGroup.valid) {
 
             this._progressRef.start();
