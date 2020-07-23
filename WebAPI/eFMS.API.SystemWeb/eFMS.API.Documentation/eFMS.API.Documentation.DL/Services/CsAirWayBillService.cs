@@ -371,8 +371,8 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.OChrVal = string.Empty; //NOT USE
                 awb.TTChgAgntPP = DueAgentPpNumber ? DueAgentPp.ToString("0.00") :  data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
                 awb.TTChgAgntCC = DueAgentCcNumber ? DueAgentCc.ToString("0.00") :   data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
-                awb.TTCarrPP = string.Empty; //NOT USE
-                awb.TTCarrCC = string.Empty; //NOT USE
+                awb.TTCarrPP = data.DueCarrierPp; //Due to carrier (prepaid)
+                awb.TTCarrCC = data.DueCarrierCll; //Due to carrier (Collect)
                 awb.TtalPP = TtalPPNumber? TtalPP.ToString("0.00") : data.TotalPp?.ToUpper(); //Total (prepaid)
                 awb.TtalCC = TtalCCNumber? TtalCC.ToString("0.00") :  data.TotalCll?.ToUpper(); //Total (Collect)
                 awb.CurConvRate = string.Empty; //NOT USE
