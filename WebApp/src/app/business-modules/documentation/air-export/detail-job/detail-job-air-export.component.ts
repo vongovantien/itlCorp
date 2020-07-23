@@ -341,7 +341,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            MblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb
         };
 
         this._progressRef.start();

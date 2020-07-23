@@ -333,7 +333,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            MblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb
 
         };
 

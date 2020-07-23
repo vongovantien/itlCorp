@@ -313,7 +313,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
             pol: modelAdd.pol,
             pod: modelAdd.pod,
             bookingNo: modelAdd.bookingNo,
-            voyNo: modelAdd.voyNo
+            voyNo: modelAdd.voyNo,
+            mblNo: modelAdd.mawb
         };
 
         this._progressRef.start();
