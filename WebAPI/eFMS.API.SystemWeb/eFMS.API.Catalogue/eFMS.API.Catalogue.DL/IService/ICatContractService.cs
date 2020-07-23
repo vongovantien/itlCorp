@@ -32,6 +32,8 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState UpdateFileToContract(List<SysImage> files);
         Task<HandleState> DeleteFileContract(Guid id);
         HandleState ActiveInActiveContract(Guid id,string partnerId,SalesmanCreditModel credit);
+        List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list);
+        HandleState Import(List<CatContractImportModel> data);
 
 
     }

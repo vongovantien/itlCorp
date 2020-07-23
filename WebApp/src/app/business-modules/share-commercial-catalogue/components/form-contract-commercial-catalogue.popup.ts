@@ -406,7 +406,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listService = Service.split(";");
         const activeServiceList: any = [];
         listService.forEach(item => {
-            const element = this.serviceTypes.find(x => x.id === item);
+            const element = this.serviceTypes.find(x => x.id === item.trim());
             if (element !== undefined) {
                 const activeService = element;
                 activeServiceList.push(activeService);
@@ -419,7 +419,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listVas = Vas.split(";");
         const activeVasList: any = [];
         listVas.forEach(item => {
-            const element = this.vaslst.find(x => x.id === item);
+            const element = this.vaslst.find(x => x.id === item.trim());
             if (element !== undefined) {
                 const activeVas = element;
                 activeVasList.push(activeVas);
@@ -432,7 +432,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listOffice = Office.split(";");
         const activeOfficeList: any = [];
         listOffice.forEach(item => {
-            const element = this.offices.find(x => x.id === item);
+            const element = this.offices.find(x => x.id === item.toLowerCase());
             if (element !== undefined) {
                 const activeOffice = element;
                 activeOfficeList.push(activeOffice);

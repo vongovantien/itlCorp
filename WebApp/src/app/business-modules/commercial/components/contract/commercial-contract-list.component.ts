@@ -214,6 +214,11 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                                 if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
                                     element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
                                 }
+                            } else {
+                                element.officeId = element.officeId.toLowerCase();
+                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                element.officeNameEn = !!obj ? obj.text : null;
                             }
                         }
 

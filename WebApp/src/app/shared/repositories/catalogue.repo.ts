@@ -175,6 +175,19 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    importCustomerAgent(body: any, type: string) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/ImportCustomerAgent/${type}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    importContract(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getPartnerGroup() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
             map((res: any) => {
@@ -540,8 +553,31 @@ export class CatalogueRepo {
     upLoadPartnerFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFile`, files, "uploadedFile");
     }
+
+    upLoadCustomerAgentFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFileCustomerAgent`, files, "uploadedFile");
+    }
+
+    upLoadContractFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/uploadFile`, files, "uploadedFile");
+    }
+
     downloadPartnerExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadCommercialExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcelCommercial`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadContractExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/DownloadExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
