@@ -145,13 +145,10 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                     if (res.status) {
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-lcl-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
-                        this.formCreateComponent.formCreate.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }

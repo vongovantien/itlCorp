@@ -153,13 +153,10 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     if (res.status) {
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
-                        this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
-                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }
