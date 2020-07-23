@@ -2,6 +2,8 @@ export class AccountingConstants {
     public static PAYMENT_METHOD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
         { id: 'Cash', text: 'Cash' },
         { id: 'Bank Transfer', text: 'Bank Transfer' },
+        { id: 'Bank Transfer / Cash', text: 'Bank Transfer / Cash' },
+
     ];
 
     public static VOUCHER_TYPE: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[

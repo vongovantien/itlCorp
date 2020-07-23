@@ -157,12 +157,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                     if (res.status) {
                         this._toastService.success("Duplicate data successfully");
                         this.jobId = res.data.id;
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
-                        this.formCreateComponent.formGroup.controls['jobId'].setValue(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -341,7 +340,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            MblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb
         };
 
         this._progressRef.start();

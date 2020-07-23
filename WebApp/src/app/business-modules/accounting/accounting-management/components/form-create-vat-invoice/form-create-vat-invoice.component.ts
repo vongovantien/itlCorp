@@ -13,6 +13,7 @@ import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState }
 
 import { Observable, forkJoin } from 'rxjs';
 import { map, debounceTime, takeUntil } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'form-create-vat-invoice',
@@ -113,7 +114,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             date: [{ startDate: new Date(), endDate: new Date() }],
             invoiceNoTempt: [null, Validators.required],
             invoiceNoReal: [{ value: null, disabled: true }],
-            serie: [null, Validators.required],
+            serie: [this.generateSerieNo(), Validators.required],
             paymentMethod: [],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
@@ -171,5 +172,9 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                     this.invoiceNoReal.setValue(res[1].invoiceNoTemp);
                 }
             );
+    }
+
+    generateSerieNo() {
+        return `INV/${formatDate(new Date(), "yy", "en")}`;
     }
 }
