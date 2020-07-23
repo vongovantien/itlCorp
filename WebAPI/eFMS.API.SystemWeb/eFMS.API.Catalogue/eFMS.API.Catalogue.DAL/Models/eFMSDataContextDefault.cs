@@ -63,7 +63,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -256,6 +256,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.IncotermId).HasColumnName("IncotermID");
 
                 entity.Property(e => e.QuantityType).HasMaxLength(10);
+
+                entity.Property(e => e.Type).HasMaxLength(10);
 
                 entity.Property(e => e.Unit).HasMaxLength(10);
 

@@ -17,5 +17,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid? ObjectTo { get; set; }
         public string Currency { get; set; }
         public string FeeType { get; set; }
+        public string Type { get; set; }
     }
 }

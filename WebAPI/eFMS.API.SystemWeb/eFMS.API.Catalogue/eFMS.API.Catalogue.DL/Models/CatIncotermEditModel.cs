@@ -5,18 +5,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace eFMS.API.Catalogue.Models
 {
-    public class CatIncotermEditModel: CatIncotermModel
+    public class CatIncotermEditModel
     {
-        [Required]
-        public string Code { get; set; }
-        [Required]
-        public string NameEn { get; set; }
-        public string NameLocal { get; set; }
-        [Required]
-        public string Service { get; set; }
-        public string DescriptionEn { get; set; }
-        public string DescriptionLocal { get; set; }
-        public string Active { get; set; }
+        public CatIncoterm Incoterm { get; set; } 
         public List<CatChargeIncoterm> sellings { get; set; }
         public List<CatChargeIncoterm> buyings { get; set; }
     }
