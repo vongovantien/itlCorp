@@ -4,29 +4,29 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <ng-container *ngIf="isShowUpdate">
-                <div class="dropdown m-dropdown m-dropdown--inline">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                        <i class="la la-print"></i>Preview<span class="caret"></span>
-                    </button>
+            <!-- <ng-container *ngIf="isShowUpdate"> -->
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>Preview<span class="caret"></span>
+                </button>
 
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item pointer" (click)="preview('Single')">Preview MAWB Frame Single</a>
-                        <a class="dropdown-item pointer" (click)="preview('Full')">Preview MAWB Frame Full</a>
-                    </div>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="preview('Single')">Preview MAWB Frame Single</a>
+                    <a class="dropdown-item pointer" (click)="preview('Full')">Preview MAWB Frame Full</a>
                 </div>
+            </div>
 
-                <div class="dropdown m-dropdown m-dropdown--inline">
-                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                        <i class="la la-print"></i>Print<span class="caret"></span>
-                    </button>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item pointer" (click)="exportMawb()">Print MAWB</a>
-                        <a class="dropdown-item pointer" (click)="exportSCSC()">Print SCSC</a>
-                        <a class="dropdown-item pointer" (click)="exportTCS()">Print TCS</a>
-                    </div>
+            <div class="dropdown m-dropdown m-dropdown--inline">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <i class="la la-print"></i>Print<span class="caret"></span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item pointer" (click)="exportMawb()">Print MAWB</a>
+                    <a class="dropdown-item pointer" (click)="exportSCSC()">Print SCSC</a>
+                    <a class="dropdown-item pointer" (click)="exportTCS()">Print TCS</a>
                 </div>
-            </ng-container>
+            </div>
+            <!-- </ng-container> -->
 
             <span *ngIf="(isLocked | async) === true" class="m--margin-right-10 align-middle">
                 <i class="fa fa-lock text-danger fa-3x"></i>
