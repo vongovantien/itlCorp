@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.Documentation.DL.Models
+namespace eFMS.API.ReportData.Models
 {
-    public class JobProfitAnalysisExportResult
+    public class JobProfitAnalysisExport
     {
         public string JobNo { get; set; }
         public string Service { get; set; }
@@ -23,12 +24,9 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? CW { get; set; }
         public decimal? CBM { get; set; }
         public string ChargeCode { get; set; }
-        //public decimal? Revenue { get; set; }
-        //public decimal? Cost { get; set; }
         public decimal? JobProfit { get; set; }
         public decimal? TotalRevenue { get; set; }
         public decimal? TotalCost { get; set; }
         public decimal? TotalJobProfit { get; set; }
-
     }
 }

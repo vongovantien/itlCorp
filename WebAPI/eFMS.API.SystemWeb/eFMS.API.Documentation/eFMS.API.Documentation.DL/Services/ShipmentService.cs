@@ -2071,39 +2071,29 @@ namespace eFMS.API.Documentation.DL.Services
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
                     if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
-                        data.Revenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
                     }
                     if(charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
                         if(_charge.DebitCharge != null)
                         {
-                            data.Cost = 0;
-                            data.Revenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            data.TotalCost = 0;
+                            data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
                         }
                         else
                         {
-                            data.Cost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
-                            data.Revenue = 0;
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            data.TotalRevenue = 0;
                         }
                     }
-                    data.Cost = data.Cost ?? 0;
-                    data.Revenue = data.Revenue ?? 0;
-                    data.JobProfit = data.Revenue - data.Cost;
                     data.TotalCost = data.TotalCost ?? 0;
                     data.TotalRevenue = data.TotalRevenue ?? 0;
-                    data.TotalJobProfit = data.TotalJobProfit ?? 0;
+
+                    data.JobProfit = data.TotalRevenue - data.TotalCost;
+      
                     dataList.Add(data);
                 }
             }
-            if (dataList.Any())
-            {
-                dataList.ForEach(x=> { x.TotalCost = dataList.Select(t => t.Cost).Sum();
-                    x.TotalRevenue = dataList.Select(t => t.Revenue).Sum();
-                    x.TotalJobProfit = dataList.Select(t => t.JobProfit).Sum(); });
-            }
-
-            
-
             return dataList.AsQueryable();
 
         }
@@ -2226,6 +2216,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         Etd = master.Etd, 
                                         GW=  house.GrossWeight, 
                                         CW= house.ChargeWeight,
+                                        CBM = house.Cbm,
                                         Quantity = house.PackageQty,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
@@ -2251,6 +2242,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         Etd = master.Etd,
                                         GW = house.GrossWeight,
                                         CW = house.ChargeWeight,
+                                        CBM = house.Cbm,
                                         Quantity = house.PackageQty,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
                                         Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,

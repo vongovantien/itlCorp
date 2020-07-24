@@ -476,7 +476,8 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
 
     getTypeReport() {
         this.typeReportList = [
-            { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET }
+            { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
+            { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS }
         ];
         // Default value: Accountant P/L Sheet
         this.typeReportActive = [this.typeReportList[0]];
