@@ -1068,7 +1068,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
-
+            var dataPartner = catPartnerRepo.Get();
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
@@ -1077,6 +1077,8 @@ namespace eFMS.API.Documentation.DL.Services
                                     from house in housebill.DefaultIfEmpty()
                                     join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
                                     from unit in units.DefaultIfEmpty()
+                                    join partner in dataPartner on house.CustomerId equals partner.Id into Partner
+                                    from partner in Partner.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1103,7 +1105,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
-                                        CustomerId = catPartnerRepo.Get(x=>x.Id == house.CustomerId).Select(t=>t.AccountNo).FirstOrDefault(),
+                                        CustomerId = partner.AccountNo,
                                         OfficeId = master.OfficeId,
                                         Creator = master.UserCreated,
                                         POINV = master.Pono,
@@ -1124,6 +1126,8 @@ namespace eFMS.API.Documentation.DL.Services
                                     join house in houseBills on master.Id equals house.JobId
                                     join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
                                     from unit in units.DefaultIfEmpty()
+                                    join partner in dataPartner on house.CustomerId equals partner.Id into Partner
+                                    from partner in Partner.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1150,7 +1154,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
-                                        CustomerId = catPartnerRepo.Get(x => x.Id == house.CustomerId).Select(t => t.AccountNo).FirstOrDefault(),
+                                        CustomerId = partner.AccountNo,
                                         OfficeId = master.OfficeId,
                                         Creator = master.UserCreated,
                                         POINV = master.Pono,
@@ -1160,6 +1164,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         Created = master.DatetimeCreated,
                                         QTy = house.PackageQty.ToString() + " " + unit.Code
                                     };
+         
                 return queryShipment;
             }
         }
