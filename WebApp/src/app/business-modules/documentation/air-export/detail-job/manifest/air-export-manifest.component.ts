@@ -50,7 +50,6 @@ export class AirExportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
-
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -119,7 +118,6 @@ export class AirExportManifestComponent extends AppList {
     }
 
     onRefresh() {
-        console.log("clicked!");
         this.confirmCreatePopup.hide();
         this.refreshManifest();
     }
@@ -149,11 +147,10 @@ export class AirExportManifestComponent extends AppList {
     }
 
     getManifest(id: string) {
-        console.log("id: ", id);
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
-                console.log("response: ", res);
                 if (!!res) {
+                    this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
                 } else {
@@ -296,7 +293,6 @@ export class AirExportManifestComponent extends AppList {
                                 element.isRemoved = false;
                             });
                         }
-                        console.log(hasHbl);
                         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                     }
 

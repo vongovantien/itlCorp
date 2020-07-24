@@ -173,6 +173,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }),
                 map((data: AirwayBill | CsTransaction | any) => {
                     if (data.hasOwnProperty("mblno1")) {
+                        this.isShowUpdate = true;
                         console.log("update csAirwaybill");
                         this.airwaybillId = data.id;
                         this.isUpdate = true;
