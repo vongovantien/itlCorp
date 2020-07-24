@@ -2791,7 +2791,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("Sheet1");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BindingDataAccoutingManagementExcel(workSheet, acctMngts);
+                    BindingDataAccoutingManagementExcel(workSheet, acctMngts, typeOfAcctMngt);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -2847,7 +2847,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(40).Width = 25; //Cột AN
         }
 
-        private void BindingDataAccoutingManagementExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts)
+        private void BindingDataAccoutingManagementExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
             List<string> headers = new List<string>
@@ -2908,7 +2908,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 1].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 workSheet.Cells[rowStart, 2].Value = item.VoucherId; //Số chứng từ 
-                workSheet.Cells[rowStart, 3].Value = item.VoucherId?.Substring(0, 2); //2 ký tự đầu của số chứng từ
+                workSheet.Cells[rowStart, 3].Value = (typeOfAcctMngt == "Invoice") ? "HD" : item.VoucherId?.Substring(0, 2); //2 ký tự đầu của số chứng từ
                 workSheet.Cells[rowStart, 4].Value = item.ChargeName;
                 workSheet.Cells[rowStart, 5].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
                 workSheet.Cells[rowStart, 6].Value = item.AccountNo;
