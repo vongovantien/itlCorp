@@ -319,6 +319,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportJobProfitAnalysis")]
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ExportJobProfitAnalysis(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();

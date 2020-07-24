@@ -29,7 +29,7 @@ export class SheetDebitReportComponent extends AppList {
                 this.exportAccountingPLSheet(data);
                 break;
             case CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS:
-                this.exportAccountingPLSheet(data);
+                this.exportJobProfitAnalysis(data);
                 break;
         }
     }
