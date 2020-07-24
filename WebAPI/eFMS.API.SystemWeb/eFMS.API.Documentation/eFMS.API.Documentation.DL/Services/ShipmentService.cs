@@ -822,6 +822,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Consignee = catPartnerRepo.Get(x => x.Id == item.Consignee).FirstOrDefault()?.PartnerNameEn;
                 data.MblMawb = item.Mblno;
                 data.HblHawb = item.Hwbno;
+                data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
                 #region -- Phí Selling trước thuế --
                 decimal _totalSellAmountFreight = 0;
                 decimal _totalSellAmountTrucking = 0;
@@ -936,7 +937,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
                 data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
-                data.CustomerId = item.CustomerId;
                 data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
