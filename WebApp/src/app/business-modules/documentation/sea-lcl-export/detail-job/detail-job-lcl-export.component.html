@@ -59,7 +59,7 @@
 <div class="m-content">
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
-            <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
+            <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
 
                 <form-create-sea-export type="SLE">
                     <ng-container *ngIf="!!shipmentDetail">

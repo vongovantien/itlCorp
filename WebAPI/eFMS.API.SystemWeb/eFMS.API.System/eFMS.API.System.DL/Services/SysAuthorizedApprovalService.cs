@@ -165,11 +165,11 @@ namespace eFMS.API.System.DL.Services
                    || x.Commissioner.IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
                 if (criteria.EffectiveDate != null)
                 {
-                    query = query.Or(x => x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date);
+                    query = query.Or(x => x.EffectiveDate.HasValue ? x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date : true);
                 }
                 if (criteria.ExpirationDate != null)
                 {
-                    query = query.Or(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
+                    query = query.Or(x => x.ExpirationDate.HasValue ? x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date : true);
                 }
 
                 if (criteria.Active != null)
@@ -186,11 +186,11 @@ namespace eFMS.API.System.DL.Services
                      && x.Commissioner.IndexOf(criteria.Commissioner ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
                 if (criteria.EffectiveDate != null)
                 {
-                    query = query.And(x => x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date);
+                    query = query.And(x => x.EffectiveDate.HasValue ? x.EffectiveDate.Value.Date == criteria.EffectiveDate.Value.Date : true);
                 }
                 if (criteria.ExpirationDate != null)
                 {
-                    query = query.And(x => x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date);
+                    query = query.And(x => x.ExpirationDate.HasValue ? x.ExpirationDate.Value.Date == criteria.ExpirationDate.Value.Date : true);
                 }
 
                 if (criteria.Active != null)

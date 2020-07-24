@@ -8,7 +8,7 @@ export class CsOtherCharge extends BaseModel {
     hblId: string = SystemConstants.EMPTY_GUID;
     chargeName: string = null;
     amount: number = null;
-    dueTo: string = 'Agent';
+    dueTo: string = 'Carrier';
     quantity: number = null;
     rate: number = null;
 

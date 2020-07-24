@@ -927,6 +927,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
+                                    charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -1024,6 +1025,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     surchargeOfAcct.InvoiceNo = null;
                                     surchargeOfAcct.InvoiceDate = null;
+                                    surchargeOfAcct.SeriesNo = null;
                                 }
                                 surchargeOfAcct.DatetimeModified = DateTime.Now;
                                 surchargeOfAcct.UserModified = currentUser.UserID;
@@ -1046,6 +1048,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
+                                    charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -1340,7 +1343,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item = mapper.Map<AccountingManagementExport>(charge);
                     item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
                     item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
-                    item.PartnerId = partnerAcct.AccountNo; //Partner ID trên VAT Invoice Or Voucher
+                    item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
                     item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
                     item.Description = acct.Description;
@@ -1352,6 +1355,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.StatusInvoice = _statusInvoice; //Tình trạng hóa đơn (Dùng cho Invoice)
                     item.VatPartnerEmail = vatPartner?.Email; //Email Partner của charge
                     item.ReleaseDateEInvoice = null;
+                    item.Vat = item.Vat ?? 0;
 
                     data.Add(item);
                 }
