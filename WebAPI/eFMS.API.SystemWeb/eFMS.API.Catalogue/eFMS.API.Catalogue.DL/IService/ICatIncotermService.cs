@@ -13,11 +13,10 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         IQueryable<CatIncoterm> Query(CatIncotermCriteria criteria);
         IQueryable<CatIncoterm> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount);
-        //HandleState Add(CatChartOfAccounts model);
         HandleState Update(CatIncotermEditModel model);
         HandleState AddNew(CatIncotermEditModel model);
         HandleState Delete(Guid Id);
-        CatChartOfAccountsModel GetDetail(Guid id);
+        CatIncotermEditModel GetDetail(Guid id);
         bool CheckAllowDelete(Guid id);
         bool CheckAllowViewDetail(Guid id);
     }

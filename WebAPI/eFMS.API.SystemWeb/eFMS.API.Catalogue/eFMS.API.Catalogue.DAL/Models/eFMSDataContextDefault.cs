@@ -257,7 +257,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.QuantityType).HasMaxLength(10);
 
-                entity.Property(e => e.Type).HasMaxLength(10);
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.Unit).HasMaxLength(10);
 
@@ -699,6 +699,12 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DescriptionEn)
+                    .HasColumnName("DescriptionEN")
+                    .HasMaxLength(2000);
+
+                entity.Property(e => e.DescriptionLocal).HasMaxLength(2000);
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 

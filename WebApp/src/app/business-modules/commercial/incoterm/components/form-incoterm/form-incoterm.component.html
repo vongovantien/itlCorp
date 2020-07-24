@@ -1,0 +1,53 @@
+<div class="m-animate-fade-in mt-3">
+    <div class="m-form m-form--state">
+        <div class="form" [formGroup]="formGroup">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label required>Code</label>
+                        <input type="text" class="form-control" formControlName="code">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label required>Name EN</label>
+                        <input type="text" class="form-control" formControlName="nameEn">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Local Name</label>
+                        <input type="text" class="form-control" formControlName="nameLocal">
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label required>Service</label>
+                        <ng-select #s [items]="services" (opened)="closeOtherSelects(s)" formControlName="service">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Description EN</label>
+                        <textarea rows="6" class="form-control" formControlName="descriptionEn"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Description Local</label>
+                        <textarea rows="6" class="form-control" formControlName="descriptionLocal"></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label>Active</label>
+                        <div class="m-checkbox-inline">
+                            <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)"></app-switch>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

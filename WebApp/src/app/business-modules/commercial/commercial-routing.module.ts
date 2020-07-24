@@ -14,6 +14,10 @@ const routes: Routes = [
     {
         path: 'customer', loadChildren: () => import('./customer/commercial-customer.module').then(m => m.CommercialCustomerModule),
         data: { name: 'Customer', type: 'Customer' }
+    },
+    {
+        path: 'incoterm', loadChildren: () => import('./incoterm/commercial-incoterm.module').then(m => m.CommercialIncotermModule),
+        data: { name: 'Incoterm' }
     }
 ];
 

@@ -6,6 +6,8 @@ using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -22,17 +24,20 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CatChargeIncoterm> catChargeIncotermRepository;
+        private readonly IContextBase<SysUser> sysUserRepository;
 
         public CatIncotermService(IContextBase<CatIncoterm> repository,
             IMapper mapper,
             IStringLocalizer<CatalogueLanguageSub> localizer,
             IContextBase<CatChargeIncoterm> catChargeIncotermRepo,
-            ICurrentUser curUser
+            ICurrentUser curUser,
+            IContextBase<SysUser> sysUserRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = curUser;
             catChargeIncotermRepository = catChargeIncotermRepo;
+            sysUserRepository = sysUserRepo;
         }
 
         public HandleState AddNew(CatIncotermEditModel model)
@@ -54,13 +59,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         List<CatChargeIncoterm> listCharge = new List<CatChargeIncoterm>();
 
-                        if (model.buyings.Count() > 0 )
+                        if (model.Buyings.Count() > 0 )
                         {
-                            listCharge.AddRange(model.buyings);
+                            listCharge.AddRange(model.Buyings);
                         }
-                        if (model.sellings.Count() > 0)
+                        if (model.Sellings.Count() > 0)
                         {
-                           listCharge.AddRange(model.sellings);
+                           listCharge.AddRange(model.Sellings);
                         }
 
                         if(listCharge.Count() > 0)
@@ -121,13 +126,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
                     List<CatChargeIncoterm> listCharge = new List<CatChargeIncoterm>();
 
-                    if (model.buyings.Count() > 0)
+                    if (model.Buyings.Count() > 0)
                     {
-                        listCharge.AddRange(model.buyings);
+                        listCharge.AddRange(model.Buyings);
                     }
-                    if (model.sellings.Count() > 0)
+                    if (model.Sellings.Count() > 0)
                     {
-                        listCharge.AddRange(model.sellings);
+                        listCharge.AddRange(model.Sellings);
                     }
 
                     if (listCharge.Count() > 0)
@@ -176,6 +181,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public bool CheckAllowViewDetail(Guid id)
         {
+
             throw new NotImplementedException();
         }
 
@@ -184,10 +190,45 @@ namespace eFMS.API.Catalogue.DL.Services
             throw new NotImplementedException();
         }
 
-        public CatChartOfAccountsModel GetDetail(Guid id)
+        public CatIncotermEditModel GetDetail(Guid id)
         {
+            CatIncotermEditModel incotermDataViewModel = new CatIncotermEditModel();
 
-            throw new NotImplementedException();
+            CatIncoterm incoterm = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            CatIncotermModel incotermModel = mapper.Map<CatIncotermModel>(incoterm);
+
+            List<CatChargeIncoterm> listChargeDefault = catChargeIncotermRepository.Get(x => x.IncotermId == id).ToList();
+            if(listChargeDefault.Count > 0)
+            {
+                incotermDataViewModel.Buyings = listChargeDefault.Where(x => x.Type.ToLower() == "BUY".ToLower()).ToList();
+                incotermDataViewModel.Sellings = listChargeDefault.Where(x => x.Type.ToLower() == "SELL".ToLower()).ToList();
+            }
+
+            // Update permission
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = incoterm.UserCreated,
+                CompanyId = incoterm.CompanyId,
+                DepartmentId = incoterm.DepartmentId,
+                OfficeId = incoterm.OfficeId,
+                GroupId = incoterm.GroupId
+            };
+            incotermDataViewModel.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
+            };
+            SysUser userCreated = sysUserRepository.Get(u => u.Id == incotermModel.UserCreated).FirstOrDefault();
+            SysUser userModified = sysUserRepository.Get(u => u.Id == incotermModel.UserModified).FirstOrDefault();
+
+            incotermDataViewModel.Incoterm = new CatIncotermModel();
+            incotermDataViewModel.Incoterm = incotermModel;
+            incotermDataViewModel.Incoterm.UserCreatedName = userCreated != null ? userCreated.Username : "Admin";
+            incotermDataViewModel.Incoterm.UserModified = userModified != null ? userModified.Username : "Admin";
+
+            return incotermDataViewModel;
         }
 
         public IQueryable<CatIncoterm> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount)

@@ -135,9 +135,10 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpGet]
         [Route("getById/{id}")]
+        [Authorize]
         public IActionResult Get(Guid id)
         {
-            var result = catIncotermService.GetDetail(id);
+            CatIncotermEditModel result = catIncotermService.GetDetail(id);
             return Ok(result);
         }
 

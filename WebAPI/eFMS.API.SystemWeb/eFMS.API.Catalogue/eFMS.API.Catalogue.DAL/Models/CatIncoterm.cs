@@ -10,6 +10,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Service { get; set; }
         public string NameEn { get; set; }
         public string NameVn { get; set; }
+        public string DescriptionEn { get; set; }
+        public string DescriptionLocal { get; set; }
         public bool? Active { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

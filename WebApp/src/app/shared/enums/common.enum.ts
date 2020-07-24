@@ -146,6 +146,16 @@ export namespace CommonEnum {
         SETTEMENT = 3,
         CHANGESERVICEDATE = 4,
     }
+
+    export enum FEE_TYPE {
+        HANDLING = "Handling",
+        FREIGHT = "Freight",
+        OTHER = "Other",
+        LOCALCHARGE = "LocalCharge",
+        LOGISTICS = "Logistics",
+        FUEL = "Fuel",
+        TRUCKING = "Trucking",
+    }
 }
 
 
