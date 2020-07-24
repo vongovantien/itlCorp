@@ -18,13 +18,14 @@ export class SOA {
     userModified: string = '';
     userNameCreated: string = '';
     userNameModified: string = '';
-    
+
     amountBalanceUSD: number = 0;
     amountCreditLocal: number = 0;
     amountCreditUSD: number = 0;
     amountDebitLocal: number = 0;
     amountDebitUSD: number = 0;
     chargeShipments: any[] = [];
+    groupShipments: any[] = [];
     amountBalanceLocal: number = 0;
     servicesNameSoa: any[] = [];
     serviceTypeId: string = '';

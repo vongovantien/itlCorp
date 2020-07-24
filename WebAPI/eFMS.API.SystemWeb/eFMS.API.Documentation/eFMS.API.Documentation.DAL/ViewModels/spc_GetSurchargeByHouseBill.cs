@@ -62,5 +62,9 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string JobNo { get; set; }
         public string MBLNo { get; set; }
         public string HBLNo { get; set; }
+        public string VoucherId { get; set; }
+        public DateTime? VoucherIddate { get; set; }
+        public string VoucherIdre { get; set; }
+        public DateTime? VoucherIdredate { get; set; }
     }
 }
