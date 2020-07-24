@@ -25,6 +25,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     dataExportSOA: ISOAExport;
     dataReport: any = null;
     initGroup: any[] = [];
+    TYPE: string = 'LIST';
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -82,9 +83,13 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     sortChargeList(sortField?: string) {
-        this.soa.groupShipments.forEach(element => {
-            element.chargeShipments = this._sortService.sort(element.chargeShipments, sortField, this.order);
-        });
+        if (this.TYPE === 'GROUP') {
+            this.soa.groupShipments.forEach(element => {
+                element.chargeShipments = this._sortService.sort(element.chargeShipments, sortField, this.order);
+            });
+        } else {
+            this.soa.chargeShipments = this._sortService.sort(this.soa.chargeShipments, sortField, this.order);
+        }
     }
 
     exportExcelSOA() {
@@ -196,37 +201,46 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     // Charge keyword search
     onChangeKeyWord(keyword: string) {
-        this.soa.groupShipments = this.initGroup;
-        // TODO improve search.
-        if (!!keyword) {
-            if (keyword.indexOf('\\') !== -1) { return this.soa.groupShipments = []; }
-            keyword = keyword.toLowerCase();
-            // Search group
-            let dataGrp = this.soa.groupShipments.filter((item: any) => item.jobId.toLowerCase().toString().search(keyword) !== -1
-                || item.hbl.toLowerCase().toString().search(keyword) !== -1
-                || item.mbl.toLowerCase().toString().search(keyword) !== -1);
-            // Không tìm thấy group thì search tiếp list con của group
-            if (dataGrp.length === 0) {
-                const arrayCharge = [];
-                for (const group of this.soa.groupShipments) {
-                    const data = group.chargeShipments.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1
-                        || item.currency.toLowerCase().toString().search(keyword) !== -1
-                        || item.jobId.toLowerCase().toString().search(keyword) !== -1
-                        || item.hbl.toLowerCase().toString().search(keyword) !== -1
-                        || item.mbl.toLowerCase().toString().search(keyword) !== -1
-                        || item.chargeName.toLowerCase().toString().search(keyword) !== -1);
-                    if (data.length > 0) {
-                        arrayCharge.push({ jobId: group.jobId, hbl: group.hbl, mbl: group.mbl, totalDebit: group.totalDebit, totalCredit: group.totalCredit, chargeShipments: data });
-                    }
-                }
-                dataGrp = arrayCharge;
-            }
-            return this.soa.groupShipments = dataGrp;
-        } else {
+        if (this.TYPE === 'GROUP') {
             this.soa.groupShipments = this.initGroup;
+            // TODO improve search.
+            if (!!keyword) {
+                if (keyword.indexOf('\\') !== -1) { return this.soa.groupShipments = []; }
+                keyword = keyword.toLowerCase();
+                // Search group
+                let dataGrp = this.soa.groupShipments.filter((item: any) => item.jobId.toLowerCase().toString().search(keyword) !== -1
+                    || item.hbl.toLowerCase().toString().search(keyword) !== -1
+                    || item.mbl.toLowerCase().toString().search(keyword) !== -1);
+                // Không tìm thấy group thì search tiếp list con của group
+                if (dataGrp.length === 0) {
+                    const arrayCharge = [];
+                    for (const group of this.soa.groupShipments) {
+                        const data = group.chargeShipments.filter((item: any) => item.chargeCode.toLowerCase().toString().search(keyword) !== -1
+                            || item.currency.toLowerCase().toString().search(keyword) !== -1
+                            || item.jobId.toLowerCase().toString().search(keyword) !== -1
+                            || item.hbl.toLowerCase().toString().search(keyword) !== -1
+                            || item.mbl.toLowerCase().toString().search(keyword) !== -1
+                            || item.chargeName.toLowerCase().toString().search(keyword) !== -1);
+                        if (data.length > 0) {
+                            arrayCharge.push({ jobId: group.jobId, hbl: group.hbl, mbl: group.mbl, totalDebit: group.totalDebit, totalCredit: group.totalCredit, chargeShipments: data });
+                        }
+                    }
+                    dataGrp = arrayCharge;
+                }
+                return this.soa.groupShipments = dataGrp;
+            } else {
+                this.soa.groupShipments = this.initGroup;
+            }
         }
     }
 
+    switchToGroup() {
+        if (this.TYPE === 'GROUP') {
+            this.TYPE = 'LIST';
+        } else {
+            this.TYPE = 'GROUP';
+        }
+    }
 }
 
 interface IExcel {
