@@ -156,7 +156,7 @@ namespace eFMS.API.System.DL.Services
                 }
                 if (criteria.EndDate != null)
                 {
-                    query = query.Or(x => x.EndDate.Value.Date == criteria.EndDate.Value.Date);
+                    query = query.Or(x => x.EndDate.HasValue ? x.EndDate.Value.Date == criteria.EndDate.Value.Date : true);
                 }
                 if (criteria.Active != null)
                 {
@@ -175,7 +175,7 @@ namespace eFMS.API.System.DL.Services
                 }
                 if (criteria.EndDate != null)
                 {
-                    query = query.And(x => x.EndDate.Value.Date == criteria.EndDate.Value.Date);
+                    query = query.And(x => x.EndDate.HasValue ? x.EndDate.Value.Date == criteria.EndDate.Value.Date : true);
                 }
                 if (criteria.Active != null)
                 {
