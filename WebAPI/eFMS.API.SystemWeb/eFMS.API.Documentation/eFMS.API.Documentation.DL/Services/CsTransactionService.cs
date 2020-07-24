@@ -1750,19 +1750,17 @@ namespace eFMS.API.Documentation.DL.Services
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
 
             var transaction = GetDefaultJob(model);
-            List<CsMawbcontainer> containers = null;
-            List<CsDimensionDetail> dimensionDetails = null;
-            List<CsShipmentSurcharge> surcharges = null;
-            List<CsArrivalFrieghtCharge> freightCharges = null;
-            if (model.CsMawbcontainers != null)
+            List<CsMawbcontainer> containers = new List<CsMawbcontainer>();
+            List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>(); 
+            List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>(); 
+            List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
+            if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count() > 0)
             {
-                containers = new List<CsMawbcontainer>();
                 var masterContainers = GetMasterBillcontainer(transaction.Id, model.CsMawbcontainers);
                 containers.AddRange(masterContainers);
             }
-            if (model.DimensionDetails != null)
+            if (model.DimensionDetails != null && model.DimensionDetails.Count() > 0)
             {
-                dimensionDetails = new List<CsDimensionDetail>();
                 var masterDimensionDetails = GetMasterDimensiondetails(transaction.Id, model.DimensionDetails);
                 dimensionDetails.AddRange(masterDimensionDetails);
             }
@@ -1779,8 +1777,6 @@ namespace eFMS.API.Documentation.DL.Services
                     generatePrefixHouse = DocumentConstants.SEF_HBL
                         + GenerateID.GeneratePrefixHousbillNo();
                 }
-                freightCharges = new List<CsArrivalFrieghtCharge>();
-                surcharges = new List<CsShipmentSurcharge>();
                 string hawbCurrentMax = GetMaxHAWB();
 
                 foreach (var item in detailTrans)
@@ -1813,6 +1809,9 @@ namespace eFMS.API.Documentation.DL.Services
                     if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
                     {
                         item.Mawb = model.Mawb;
+                    }
+                    if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
+                    {
                         item.Hwbno = null;
                     }
 
@@ -1843,40 +1842,39 @@ namespace eFMS.API.Documentation.DL.Services
             }
             try
             {
-                var hsTrans = transactionRepository.Add(transaction, false);
+                var hsTrans = transactionRepository.Add(transaction);
                 if (hsTrans.Success)
                 {   
-                    if(detailTrans != null || detailTrans.Count() > 0)
+                    if(detailTrans != null && detailTrans.Count() > 0)
                     {
                         HandleState hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
-                        csTransactionDetailRepo.SubmitChanges();
+                        var hs = csTransactionDetailRepo.SubmitChanges();
                     }
 
-                    if (containers != null || containers.Count() > 0)
+                    if (containers != null && containers.Count() > 0)
                     {
                         HandleState hsContainers = csMawbcontainerRepo.Add(containers, false);
                         csMawbcontainerRepo.SubmitChanges();
                     }
 
-                    if (dimensionDetails != null || dimensionDetails.Count() > 0)
+                    if (dimensionDetails != null && dimensionDetails.Count() > 0)
                     {
                         HandleState hsDimentions = dimensionDetailRepository.Add(dimensionDetails, false);
                         dimensionDetailRepository.SubmitChanges();
                     }
 
-                    if (surcharges != null || surcharges.Count() > 0)
+                    if (surcharges != null && surcharges.Count() > 0)
                     {
                         HandleState hsSurcharges = csShipmentSurchargeRepo.Add(surcharges, false);
                         csShipmentSurchargeRepo.SubmitChanges();
                     }
 
-                    if (freightCharges != null || freightCharges.Count() > 0)
+                    if (freightCharges != null && freightCharges.Count() > 0)
                     {
                         HandleState hsFreighcharges = freighchargesRepository.Add(freightCharges, false);
                         freighchargesRepository.SubmitChanges();
                     }
 
-                    transactionRepository.SubmitChanges();
 
                     return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
