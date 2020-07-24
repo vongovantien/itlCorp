@@ -50,7 +50,6 @@ export class AirExportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
-
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -66,13 +65,13 @@ export class AirExportManifestComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
-            { title: 'HBL No', field: 'hwbNo', sortable: true, width: 100 },
-            { title: 'No of Pieces', field: 'packageContainer', sortable: true },
-            { title: 'G.W', field: 'grossWeight', sortable: true },
+            { title: 'HBL No', field: 'hwbno', sortable: true, width: 100 },
+            { title: 'No of Pieces', field: 'packageQty', sortable: true },
+            { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
             { title: 'Destination', field: 'podName', sortable: true },
             { title: 'Shipper', field: 'shipperName', sortable: true },
-            { title: 'Consignee', field: 'consignee', sortable: true },
+            { title: 'Consignee', field: 'consigneeName', sortable: true },
             { title: 'Description', field: 'desOfGoods', sortable: true },
             { title: 'Freight Charge', field: '', sortable: true }
         ];
@@ -119,7 +118,6 @@ export class AirExportManifestComponent extends AppList {
     }
 
     onRefresh() {
-        console.log("clicked!");
         this.confirmCreatePopup.hide();
         this.refreshManifest();
     }
@@ -149,11 +147,10 @@ export class AirExportManifestComponent extends AppList {
     }
 
     getManifest(id: string) {
-        console.log("id: ", id);
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
-                console.log("response: ", res);
                 if (!!res) {
+                    this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
                 } else {
@@ -296,7 +293,6 @@ export class AirExportManifestComponent extends AppList {
                                 element.isRemoved = false;
                             });
                         }
-                        console.log(hasHbl);
                         this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                     }
 

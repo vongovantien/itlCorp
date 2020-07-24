@@ -66,7 +66,7 @@
 <div class="m-content">
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
-            <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')">
+            <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
                 <form-create-air>
                     <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
                         <div class="col-md-4">
