@@ -614,6 +614,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this.isShowUpdate = true;
                         this._toastService.success(res.message, '');
                     } else {
                         this._toastService.error(res.message, '');
