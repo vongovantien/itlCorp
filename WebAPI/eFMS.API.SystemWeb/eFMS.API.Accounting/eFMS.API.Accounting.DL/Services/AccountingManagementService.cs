@@ -928,6 +928,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
                                     charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
+                                    charge.VoucherIddate = accounting.Date; //Cập nhật VoucherDate
+                                    charge.VoucherId = accounting.VoucherId; //Cập nhật VoucherId
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -1026,6 +1028,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     surchargeOfAcct.InvoiceNo = null;
                                     surchargeOfAcct.InvoiceDate = null;
                                     surchargeOfAcct.SeriesNo = null;
+                                    surchargeOfAcct.VoucherIddate = null;
+                                    surchargeOfAcct.VoucherId = null;
                                 }
                                 surchargeOfAcct.DatetimeModified = DateTime.Now;
                                 surchargeOfAcct.UserModified = currentUser.UserID;
@@ -1049,6 +1053,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     charge.InvoiceNo = accounting.InvoiceNoReal;
                                     charge.InvoiceDate = accounting.Date;
                                     charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
+                                    charge.VoucherIddate = accounting.Date; //Cập nhật VoucherDate
+                                    charge.VoucherId = accounting.VoucherId; //Cập nhật VoucherId
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;

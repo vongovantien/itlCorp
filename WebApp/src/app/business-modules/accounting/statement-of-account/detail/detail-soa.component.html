@@ -112,7 +112,6 @@
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Type:</span>
                         <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
-                        <!-- <span class="m--font-brand m--margin-left-5">{{soa.type}}</span> -->
                     </div>
                 </div>
             </div>
@@ -126,7 +125,7 @@
                     <div class="col-lg-6">
                         <div class="m-input-icon m-input-icon--right">
                             <input type="text" class="form-control m-input m-input--square" placeholder="Search"
-                                [(ngModel)]="keyword" name="keyword">
+                                [(ngModel)]="keyword" name="keyword" (ngModelChange)="onChangeKeyWord($event)">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-search"></i>
@@ -134,79 +133,160 @@
                             </span>
                         </div>
                     </div>
+                    <div class="col-lg-6">
+                        <div class="m--align-right foat-right">
+                            <a class="pointer icon-switch" (click)="switchToGroup()">
+                                <i class="la la-list" *ngIf="TYPE === 'GROUP' else list"></i>
+                                <ng-template #list> <i class="la la-sitemap"></i></ng-template>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="table-wrapper">
                 <table class="table table-striped table-brand dataTable">
-                    <thead>
-                        <tr>
-                            <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                [class]="sortClass(header.sortable ? header.field : '')"
-                                (click)="sortBy(header.sortable ? header.field : '')">
-                                <span>{{header.title}}</span>
-                                <span class="sort-indicator"></span>
-                            </th>
-                        </tr>
-                    </thead>
+                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
                     <tbody class="tbody-group">
-                        <tr *ngIf="!isLoading && !soa.chargeShipments.length">
-                            <td colspan="100">
-                                <div class="no-data">
-                                    <i class="flaticon-coins"></i>
-                                    <span class="no-data-text">No records found</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr
-                            *ngFor="let charge of soa.chargeShipments | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn">
-                            <td>
-                                <span>{{charge.chargeCode}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.chargeName}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.jobId}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.hbl}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.mbl}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.customNo}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.debit | number: '.0-3'}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.credit | number: '.0-3'}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.currency}}</span>
-                            </td>
-                            <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
-                                <span>{{charge.cdNote}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.invoiceNo}}</span>
-                            </td>
-                            <td>
-                                <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
-                            </td>
-                            <td>
-                                <span>{{charge.note}}</span>
-                            </td>
-                        </tr>
-                        <tr class="loading-wrapper" *ngIf="isLoading">
-                            <td colspan="100">
-                                <div class="on-loading">
-                                    <div class="m-loader m-loader--brand">
-                                    </div><span>Loading</span>
-                                </div>
-                            </td>
-                        </tr>
+                        <ng-container *ngIf="TYPE === 'GROUP'">
+                            <ng-container
+                                *ngFor="let groupShipment of soa.groupShipments ; let i = index; trackBy: trackByFn">
+                                <tr *ngIf="!isLoading && !soa.groupShipments.length">
+                                    <td colspan="100">
+                                        <div class="no-data">
+                                            <i class="flaticon-coins"></i>
+                                            <span class="no-data-text">No records found</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="collapse-toggle-row tgroup">
+                                    <td colspan="13">
+                                        <div class='row'>
+                                            <div class='col-4'>Shipment: <span
+                                                    class='text-info'>[{{groupShipment.jobId}}] -
+                                                    [{{groupShipment.hbl}}] -
+                                                    [{{groupShipment.mbl}}]</span>
+                                            </div>
+                                            <div class='col-4'>Total Debit: <span
+                                                    class='text-danger'>{{groupShipment.totalDebit}}</span>
+                                            </div>
+                                            <div class='col-4'>Total Credit: <span
+                                                    class='text-primary'>{{groupShipment.totalCredit}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="child"
+                                    *ngFor="let charge of groupShipment.chargeShipments; let j = index; trackBy: trackByFn">
+                                    <td>
+                                        <span>{{charge.chargeCode}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.chargeName}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.jobId}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.hbl}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.mbl}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.customNo}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.debit | number: '.0-3'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.credit | number: '.0-3'}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.currency}}</span>
+                                    </td>
+                                    <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                        <span>{{charge.cdNote}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.invoiceNo}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{charge.note}}</span>
+                                    </td>
+                                </tr>
+                                <tr class="loading-wrapper" *ngIf="isLoading">
+                                    <td colspan="100">
+                                        <div class="on-loading">
+                                            <div class="m-loader m-loader--brand">
+                                            </div><span>Loading</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="TYPE === 'LIST'">
+                            <tr *ngIf="!isLoading && !soa.chargeShipments.length">
+                                <td colspan="100">
+                                    <div class="no-data">
+                                        <i class="flaticon-coins"></i>
+                                        <span class="no-data-text">No records found</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr
+                                *ngFor="let charge of soa.chargeShipments  | filter: keyword: ['chargeCode', 'hbl', 'currency' , 'mbl' , 'jobId' , 'chargeName'] ; let i = index; trackBy: trackByFn">
+                                <td>
+                                    <span>{{charge.chargeCode}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.chargeName}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.jobId}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.hbl}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.mbl}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.customNo}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.debit | number: '.0-3'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.credit | number: '.0-3'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.currency}}</span>
+                                </td>
+                                <td [ngClass]="charge.cdNote ? '' : 'bg-red'">
+                                    <span>{{charge.cdNote}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.invoiceNo}}</span>
+                                </td>
+                                <td>
+                                    <span>{{!!charge.serviceDate ? (charge.serviceDate | date: 'dd/MM/yyyy') : ''}}</span>
+                                </td>
+                                <td>
+                                    <span>{{charge.note}}</span>
+                                </td>
+                            </tr>
+                            <tr class="loading-wrapper" *ngIf="isLoading">
+                                <td colspan="100">
+                                    <div class="on-loading">
+                                        <div class="m-loader m-loader--brand">
+                                        </div><span>Loading</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
                     </tbody>
                 </table>
             </div>
