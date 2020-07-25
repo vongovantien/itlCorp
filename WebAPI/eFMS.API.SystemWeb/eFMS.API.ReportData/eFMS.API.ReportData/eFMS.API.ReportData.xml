@@ -278,6 +278,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportJobProfitAnalysis(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Job Profit Analysis
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -407,6 +414,15 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateJobProfitAnalysisExportExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.JobProfitAnalysisExport},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
+            <summary>
+            
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateStandardGeneralReportExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.GeneralReportResult},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
             <summary>
             Generate Standard General Report Excel
@@ -415,6 +431,7 @@
             <param name="criteria"></param>
             <param name="stream"></param>
             <returns></returns>
+            
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>

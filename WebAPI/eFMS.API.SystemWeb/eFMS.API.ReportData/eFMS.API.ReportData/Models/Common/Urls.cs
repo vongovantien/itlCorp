@@ -58,6 +58,8 @@
             public const string GetDataShipmentOverviewUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverview";
             public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
             public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
+            public const string GetDataJobProfitAnalysisUrl = "/Documentation/api/v1/en-US/Shipment/GetDataJobProfitAnalysis";
+
         }
     }
 }

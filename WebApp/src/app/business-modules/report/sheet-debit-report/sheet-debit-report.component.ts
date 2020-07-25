@@ -28,6 +28,9 @@ export class SheetDebitReportComponent extends AppList {
             case CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET:
                 this.exportAccountingPLSheet(data);
                 break;
+            case CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS:
+                this.exportJobProfitAnalysis(data);
+                break;
         }
     }
 
@@ -42,6 +45,24 @@ export class SheetDebitReportComponent extends AppList {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'Accounting PL Sheet (' + data.currency + ').xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportJobProfitAnalysis(data) {
+        this._progressRef.start();
+        this._exportRepo.exportJobProfitAnalysis(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Job Profit Analysis.xlsx');
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

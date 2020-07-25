@@ -906,6 +906,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataJobProfitAnalysis(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Get data for export accounting P/L
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>
             
