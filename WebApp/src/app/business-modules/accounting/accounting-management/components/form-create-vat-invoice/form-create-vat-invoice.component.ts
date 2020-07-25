@@ -115,7 +115,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             invoiceNoTempt: [null, Validators.required],
             invoiceNoReal: [{ value: null, disabled: true }],
             serie: [this.generateSerieNo(), Validators.required],
-            paymentMethod: [],
+            paymentMethod: [[this.paymentMethods[2]]],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
