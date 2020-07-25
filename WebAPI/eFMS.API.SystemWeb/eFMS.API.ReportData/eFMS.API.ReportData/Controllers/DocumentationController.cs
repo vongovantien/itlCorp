@@ -311,5 +311,31 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Job Profit Analysis
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [Route("ExportJobProfitAnalysis")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportJobProfitAnalysis(GeneralReportCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataJobProfitAnalysisUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<JobProfitAnalysisExport>>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            var stream = new DocumentationHelper().GenerateJobProfitAnalysisExportExcel(dataObjects.Result, criteria, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Job Profit Analysis.xlsx");
+            return fileContent;
+        }
     }
 }

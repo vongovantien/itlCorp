@@ -511,7 +511,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     break;
             }
-            if(data== null)
+            if (data == null)
             {
                 rowsCount = 0;
                 return null;
@@ -865,6 +865,73 @@ namespace eFMS.API.Catalogue.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+
+        public HandleState ImportCustomerAgent(List<CatPartnerImportModel> data, string type)
+        {
+            try
+            {
+                var partners = new List<CatPartner>();
+                var salesmans = new List<CatContract>();
+                foreach (var item in data)
+                {
+                    DateTime? inactiveDate = DateTime.Now ;
+                    var partner = mapper.Map<CatPartner>(item);
+                    partner.UserCreated = currentUser.UserID;
+                    partner.DatetimeModified = DateTime.Now;
+                    partner.DatetimeCreated = DateTime.Now;
+                 
+                    partner.Id = Guid.NewGuid().ToString();
+                    partner.AccountNo = partner.TaxCode;
+                    if (!string.IsNullOrEmpty(partner.AccountNo) && !string.IsNullOrEmpty(item.InternalReferenceNo))
+                    {
+                        partner.AccountNo = partner.AccountNo + "." + item.InternalReferenceNo;
+                    }
+                    partner.Active = true;
+                    partner.InactiveOn = inactiveDate;
+                    partner.CompanyId = currentUser.CompanyID;
+                    partner.OfficeId = currentUser.OfficeID;
+                    partner.GroupId = currentUser.GroupId;
+                    partner.DepartmentId = currentUser.DepartmentId;
+                    partner.PartnerGroup = type == "Customer" ? "Customer" : "CUSTOMER;AGENT";
+                    partner.PartnerType = type == "Customer" ? "Customer" : "Agent";
+                    partner.ParentId = DataContext.Get(x=>x.AccountNo == item.AcReference).Select(x=>x.Id)?.FirstOrDefault();
+                    partner.SalePersonId = sysUserRepository.Get(x => x.Username == item.SaleManName).Select(x=>x.Id).FirstOrDefault();
+                    partners.Add(partner);
+                }
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(partners);
+                        if (hs.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        ClearCache();
+                        Get();
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
             var partners = Get().ToList();
@@ -963,6 +1030,178 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (string.IsNullOrEmpty(item.AddressVn))
                 {
                     item.AddressVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CountryBilling))
+                {
+                    if (!string.IsNullOrEmpty(item.CityBilling))
+                    {
+                        item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityBilling);
+                        item.IsValid = false;
+                    }
+                }
+                else
+                {
+                    string countryBilling = item.CountryBilling?.ToLower();
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countryBilling);
+                    if (country != null)
+                    {
+                        item.CountryId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityBilling))
+                        {
+                            string cityBilling = item.CityBilling.ToLower();
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityBilling && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_BILLING_NOT_FOUND], item.CityBilling);
+                                item.IsValid = false;
+                            }
+                            else
+                            {
+                                item.ProvinceId = province.Id;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        item.CountryBillingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_BILLING_NOT_FOUND], item.CountryBilling);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.CountryShipping))
+                {
+                    if (!string.IsNullOrEmpty(item.CityShipping))
+                    {
+                        item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_REQUIRED_COUNTRY], item.CityShipping);
+                        item.IsValid = false;
+                    }
+                }
+                else
+                {
+                    string countShipping = item.CountryShipping?.ToLower();
+                    var country = countries.FirstOrDefault(i => i.NameEn.ToLower() == countShipping);
+                    if (country != null)
+                    {
+                        item.CountryShippingId = country.Id;
+                        if (!string.IsNullOrEmpty(item.CityShipping))
+                        {
+                            string cityShipping = item.CityShipping.ToLower();
+                            var province = provinces.FirstOrDefault(i => i.NameEn.ToLower() == cityShipping && i.CountryId == country.Id);
+                            if (province == null)
+                            {
+                                item.CityShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND], item.CityShipping);
+                                item.IsValid = false;
+                            }
+                            else
+                            {
+                                item.ProvinceShippingId = province.Id;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        item.CountryShippingError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_COUNTRY_SHIPPING_NOT_FOUND], item.CountryShipping);
+                        item.IsValid = false;
+                    }
+                }
+            });
+            return list;
+        }
+
+        public List<CatPartnerImportModel> CheckValidCustomerAgentImport(List<CatPartnerImportModel> list)
+        {
+            var partners = Get().ToList();
+            var users = sysUserRepository.Get().ToList();
+            var countries = countryService.Get().ToList();
+            var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
+            var branchs = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Branch)).ToList();
+            var salemans = sysUserRepository.Get().ToList();
+            var offices = officeRepository.Get().ToList();
+            var regexItem = new Regex("^[a-zA-Z0-9-]+$");
+            var paymentTerms = new List<string> { "All", "Prepaid", "Collect" };
+
+            var allGroup = DataEnums.PARTNER_GROUP;
+            var partnerGroups = allGroup.Split(";");
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.TaxCode))
+                {
+                    item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EMPTY]);
+                    item.IsValid = false;
+                }
+                else
+                {
+                    string taxCode = item.TaxCode.Replace(" ", "");
+                    var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
+                    var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
+                    if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
+                        item.IsValid = false;
+                    }
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        if (partners.Any(x => x.TaxCode == taxCode))
+                        {
+                            item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
+                            item.IsValid = false;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.InternalReferenceNo))
+                {
+                    string internalReferenceNo = item.InternalReferenceNo.Replace(" ", "");
+                    var asciiBytesCount = Encoding.ASCII.GetByteCount(internalReferenceNo);
+                    var unicodBytesCount = Encoding.UTF8.GetByteCount(internalReferenceNo);
+                    if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(internalReferenceNo))
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_INTERNAL_REFERENCENO_INVALID], item.InternalReferenceNo);
+                        item.IsValid = false;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(item.AcReference))
+                {
+                    if (!partners.Any(x => x.AccountNo?.ToLower() == item.AcReference?.ToLower()))
+                    {
+                        item.AcReferenceError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_AC_REFERENCE_NOT_FOUND], item.AcReference);
+                        item.IsValid = false;
+                    }
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameEn))
+                {
+                    item.PartnerNameEnError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_NAME_EN_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameVn))
+                {
+                    item.PartnerNameVnError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_NAME_VN_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ShortName))
+                {
+                    item.ShortNameError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_SHORT_NAME_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressEn))
+                {
+                    item.AddressEnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND];
+                    item.IsValid = false;
+
+                }
+                if (string.IsNullOrEmpty(item.AddressVn))
+                {
+                    item.AddressVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.AddressShippingVn))
+                {
+                    item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CountryBilling))

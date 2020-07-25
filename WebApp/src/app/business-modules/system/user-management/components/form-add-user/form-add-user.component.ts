@@ -29,6 +29,10 @@ export class FormAddUserComponent extends AppList {
     ldap: AbstractControl;
     userLevels: UserLevel[] = [];
     headersuslv: CommonInterface.IHeaderTable[];
+    //
+    creditLimit: AbstractControl;
+    creditRate: AbstractControl;
+
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -86,7 +90,11 @@ export class FormAddUserComponent extends AppList {
                 ])],
             phone: [],
             description: [],
-            ldap: [true]
+            ldap: [true],
+            //
+            creditLimit: [],
+            creditRate: [],
+
 
 
         });
@@ -103,6 +111,10 @@ export class FormAddUserComponent extends AppList {
         this.description = this.formGroup.controls['description'];
         this.ldap = this.formGroup.controls['ldap'];
         this.workingg = this.formGroup.controls['workingg'];
+        //
+        this.creditLimit = this.formGroup.controls['creditLimit'];
+        this.creditRate = this.formGroup.controls['creditRate'];
+
     }
 
     ngOnInit() {

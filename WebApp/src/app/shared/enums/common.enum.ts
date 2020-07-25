@@ -123,6 +123,10 @@ export namespace CommonEnum {
         ACCNT_PL_SHEET = 'ACCNT_PL_SHEET'
     }
 
+    export enum JOB_PROFIT_ANALYSIS_TYPE {
+        JOB_PROFIT_ANALYSIS = 'JOB_PROFIT_ANALYSIS'
+    }
+
     export enum ROUND_DIM {
         HALF = '0.5',
         ONE = '1.0',

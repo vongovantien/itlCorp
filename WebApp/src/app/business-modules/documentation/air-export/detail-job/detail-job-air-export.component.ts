@@ -163,7 +163,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.jobId = res.data.id;
 
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
-                        this.ACTION = null;
+                        this.ACTION = 'SHIPMENT';
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -342,7 +342,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            MblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb
         };
 
         this._progressRef.start();

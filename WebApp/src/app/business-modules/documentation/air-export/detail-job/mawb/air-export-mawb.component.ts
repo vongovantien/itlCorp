@@ -173,6 +173,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                 }),
                 map((data: AirwayBill | CsTransaction | any) => {
                     if (data.hasOwnProperty("mblno1")) {
+                        this.isShowUpdate = true;
                         console.log("update csAirwaybill");
                         this.airwaybillId = data.id;
                         this.isUpdate = true;
@@ -198,7 +199,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
                             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : null,
                             flightNo: data.flightVesselName,
-                            freightPayment: !!data.paymentTerm ? [{ id: data.paymentTerm, text: data.paymentTerm }] : null,
+                            freightPayment: !!data.paymentTerm ? [{ id: data.paymentTerm, text: data.paymentTerm }] : [this.termTypes[1]],
                             route: data.route,
                             warehouseId: data.warehouseId,
                             issuedBy: data.issuedBy,
@@ -210,7 +211,8 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                             consigneeDescription: this.setDefaultAgentData(data),
                             shipperDescription: this.setDefaultShipperWithOffice(data),
                             firstCarrierBy: data.supplierName,
-                            wtorValpayment: this.setDefaultWTVal(data)
+                            wtorValpayment: this.setDefaultWTVal(data),
+                            otherPayment: this.setDefaultWTVal(data)
                         });
                     }
                     return data;
@@ -238,9 +240,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             if (shipment.paymentTerm === 'Prepaid') {
                 return [this.wts[0]];
             }
-            return [this.wts[1]];
         }
-        return null;
+        return [this.wts[1]];
+
     }
 
     setDefaultAgentData(shipment: CsTransaction) {
@@ -612,6 +614,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this.isShowUpdate = true;
                         this._toastService.success(res.message, '');
                     } else {
                         this._toastService.error(res.message, '');

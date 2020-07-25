@@ -10,6 +10,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from '@constants';
 import { SortService } from '@services';
+import { SelectComponent } from 'ng2-select';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -213,6 +214,11 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                                 if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
                                     element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
                                 }
+                            } else {
+                                element.officeId = element.officeId.toLowerCase();
+                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                element.officeNameEn = !!obj ? obj.text : null;
                             }
                         }
 
@@ -238,7 +244,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     this._toastService.error('Contract no has been existed!');
                 } else {
                     this.formContractPopup.isDuplicateContract = false;
-                    this.contracts.push(this.selectedContract);
+                    this.contracts = [...this.contracts, ...$event];
+                    console.log(this.contracts);
                 }
             }
         }

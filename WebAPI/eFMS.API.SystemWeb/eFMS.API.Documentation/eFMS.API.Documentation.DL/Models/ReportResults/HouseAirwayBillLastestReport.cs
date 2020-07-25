@@ -77,6 +77,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string PicMarks { get; set; }
         public string GoodsDelivery { get; set; }
         public string Airline { get; set; }
+        public decimal? SeaAir { get; set; }
     }
 
     public class HouseAirwayBillLastestReportParams

@@ -8,9 +8,12 @@
                 <i class="fa fa-lock text-danger fa-3x"></i>
             </span>
 
-            <button id="button-nested" dropdownToggle type="button" class="btn btn-success" (click)="previewManifest()">
-                <i class="la la-print"></i> Preview<span class="caret"></span>
-            </button>
+            <ng-container *ngIf="isShowUpdate">
+                <button id="button-nested" dropdownToggle type="button" class="btn btn-success"
+                    (click)="previewManifest()">
+                    <i class="la la-print"></i> Preview<span class="caret"></span>
+                </button>
+            </ng-container>
 
             <ng-container *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">

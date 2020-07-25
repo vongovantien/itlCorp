@@ -260,6 +260,13 @@ export class ExportRepo {
         );
     }
 
+    exportJobProfitAnalysis(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportJobProfitAnalysis`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportStandardGeneralReport(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportStandardGeneralReport`, searchObject).pipe(
             catchError((error) => throwError(error)),

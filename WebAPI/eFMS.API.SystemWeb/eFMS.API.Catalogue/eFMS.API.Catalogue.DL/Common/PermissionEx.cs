@@ -11,6 +11,8 @@ namespace eFMS.API.Catalogue.DL.Common
             int code = 0;
             switch (permissionRange)
             {
+                case PermissionRange.All:
+                    break;
                 case PermissionRange.None:
                     code = 403;
                     break;

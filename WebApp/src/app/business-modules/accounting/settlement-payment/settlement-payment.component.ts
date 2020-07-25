@@ -268,4 +268,21 @@ export class SettlementPaymentComponent extends AppList {
         this.selectRequesterPopup.hide();
     }
 
+    checkAllSettlement() {
+        if (this.isCheckAll) {
+            this.settlements.forEach(x => {
+                if (x.statusApproval === 'Done') {
+                    x.isSelected = true;
+                }
+            });
+        } else {
+            this.settlements.forEach(x => {
+                x.isSelected = false;
+            });
+        }
+    }
+
+    onChangeSelectedSettlement() {
+        this.isCheckAll = this.settlements.filter(x => x.statusApproval === 'Done').every(x => x.isSelected === true);
+    }
 }

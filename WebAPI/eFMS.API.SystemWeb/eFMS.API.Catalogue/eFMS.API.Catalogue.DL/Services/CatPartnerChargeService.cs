@@ -16,13 +16,17 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private ICurrentUser currentUser;
         private readonly IContextBase<CatPartner> catPartnerRepository;
+        private readonly IContextBase<CatCharge> catChargeRepository;
+
         public CatPartnerChargeService(IContextBase<CatPartnerCharge> repository,
             IMapper mapper,
             IContextBase<CatPartner> catPartnerRepo,
+            IContextBase<CatCharge> catChargeRepo,
             ICurrentUser currtUser) : base(repository, mapper)
         {
             currentUser = currtUser;
             catPartnerRepository = catPartnerRepo;
+            catChargeRepository = catChargeRepo;
         }
 
         public HandleState AddAndUpdate(string partnerId, List<CatPartnerChargeModel> charges)
@@ -51,24 +55,27 @@ namespace eFMS.API.Catalogue.DL.Services
 
             data = DataContext.Get(x => x.PartnerId == partnerId);
             if (data == null) return null;
-            IQueryable<CatPartnerChargeModel> catPartnerChargeModel = data.Select(x => mapper.Map<CatPartnerChargeModel>(x));
 
-            IQueryable<CatPartnerChargeModel> results = catPartnerChargeModel.Select(x => new CatPartnerChargeModel
-            {
-                partnerName = partner.PartnerNameEn,
-                partnerShortName = partner.ShortName,
-                PartnerId = x.PartnerId,
-                Id = x.Id,
-                UnitId = x.UnitId,
-                ChargeId = x.ChargeId,
-                Quantity = x.Quantity,
-                QuantityType = x.QuantityType,
-                UnitPrice = x.UnitPrice,
-                CurrencyId = x.CurrencyId,
-                Vatrate = x.Vatrate,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-            });
+            IQueryable<CatPartnerChargeModel> results = from d in data
+                                                        join charge in catChargeRepository.Get() on d.ChargeId equals charge.Id into chargeGr
+                                                        from itemCharge in chargeGr.DefaultIfEmpty()
+                                                        select new CatPartnerChargeModel
+                                                        {
+                                                            chargeNameEn = itemCharge.ChargeNameEn,
+                                                            partnerName = partner.PartnerNameEn,
+                                                            partnerShortName = partner.ShortName,
+                                                            PartnerId = d.PartnerId,
+                                                            Id = d.Id,
+                                                            UnitId = d.UnitId,
+                                                            ChargeId = d.ChargeId,
+                                                            Quantity = d.Quantity,
+                                                            QuantityType = d.QuantityType,
+                                                            UnitPrice = d.UnitPrice,
+                                                            CurrencyId = d.CurrencyId,
+                                                            Vatrate = d.Vatrate,
+                                                            UserModified = d.UserModified,
+                                                            DatetimeModified = d.DatetimeModified,
+                                                        };
             return results;
         }
     }

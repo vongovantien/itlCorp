@@ -186,5 +186,18 @@ namespace eFMS.API.Documentation.Controllers
             var list = shipmentService.GetShipmentAssignPIC();
             return Ok(list);
         }
+
+        /// <summary>
+        /// Get data for export accounting P/L
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataJobProfitAnalysis")]
+        //[Authorize]
+        public IActionResult GetDataJobProfitAnalysis(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataJobProfitAnalysis(criteria);
+            return Ok(data);
+        }
     }
 }
