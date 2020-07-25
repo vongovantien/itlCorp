@@ -25,6 +25,7 @@ export class SOA {
     amountDebitLocal: number = 0;
     amountDebitUSD: number = 0;
     chargeShipments: any[] = [];
+    groupShipments: any[] = [];
     amountBalanceLocal: number = 0;
     servicesNameSoa: any[] = [];
     serviceTypeId: string = '';
