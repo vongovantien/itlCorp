@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { JobConstants, AccountingConstants } from '@constants';
-import { ChartOfAccounts, Partner } from '@models';
+import { ChartOfAccounts, Partner, ChargeOfAccountingManagementModel } from '@models';
 import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 
@@ -45,6 +45,8 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     totalAmount: AbstractControl;
     currency: AbstractControl;
     status: AbstractControl;
+    attachDocInfo: AbstractControl;
+    description: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -62,6 +64,8 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     listCurrency: Observable<CommonInterface.INg2Select[]>;
     chartOfAccounts: Observable<ChartOfAccounts[]>;
 
+    listCharge: ChargeOfAccountingManagementModel[] = [];
+    attachInfo: string = '';
 
     constructor(
         private _fb: FormBuilder,
@@ -85,13 +89,16 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: IAccountingManagementPartnerState) => {
+                    console.log(res);
+                    this.attachInfo = res.inputRefNo;
                     if (!!res.partnerId) {
                         if (!this.formGroup.controls['partnerId'].value) {
                             this.formGroup.controls['partnerId'].setValue(res.partnerId);
                             this.formGroup.controls['personalName'].setValue(res.partnerName);
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
-                            this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
                     }
                 }
             );
@@ -132,6 +139,8 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
         this.status = this.formGroup.controls['status'];
+        this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
+        this.description = this.formGroup.controls['description'];
 
 
         if (!this.update) {
@@ -176,5 +185,12 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
     generateSerieNo() {
         return `INV/${formatDate(new Date(), "yy", "en")}`;
+    }
+
+    updateAttachInfo(pre: string, cur: string) {
+        if (!pre) {
+            return cur;
+        }
+        return `${pre}, ${cur}`;
     }
 }

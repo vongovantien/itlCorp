@@ -32,6 +32,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     totalAmount: AbstractControl;
     currency: AbstractControl;
     voucherType: AbstractControl;
+    description: AbstractControl;
+    attachDocInfo: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -78,15 +80,19 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
                                 this.formGroup.controls['personalName'].setValue(res.partnerName);
                             }
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
-                            this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
+                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                     } else {
                         if (!this.formGroup.controls['personalName'].value) {
                             if (!this.formGroup.controls['personalName'].value) {
                                 this.formGroup.controls['personalName'].setValue(res.settlementRequester);
                             }
-                            this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
+                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                     }
                 }
             );
@@ -122,6 +128,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.currency = this.formGroup.controls['currency'];
         this.accountNo = this.formGroup.controls['accountNo'];
         this.voucherType = this.formGroup.controls['voucherType'];
+        this.description = this.formGroup.controls['description'];
+        this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
     }
 
 
@@ -136,5 +144,12 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             default:
                 break;
         }
+    }
+
+    updateAttachInfo(pre: string, cur: string) {
+        if (!pre) {
+            return cur;
+        }
+        return `${pre}, ${cur}`;
     }
 }
