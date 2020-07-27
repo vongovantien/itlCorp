@@ -4,6 +4,7 @@ import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
+import { IncotermUpdateModel } from "../models/commercial/incoterm";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -1070,6 +1071,23 @@ export class CatalogueRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    createIncoterm(body: IncotermUpdateModel) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Add`, body);
+    }
+
+    updateIncoterm(body: IncotermUpdateModel) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Update`, body);
+    }
+
+    deleteIncoterm(body: IncotermUpdateModel) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Delete`);
+    }
+
+    getDetailIncoterm(id: string): any {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/GetById/${id}`);
+
     }
 
 

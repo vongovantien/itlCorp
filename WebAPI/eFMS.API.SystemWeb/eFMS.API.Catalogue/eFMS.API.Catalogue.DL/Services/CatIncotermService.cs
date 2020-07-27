@@ -47,7 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 model.Incoterm.Id = Guid.NewGuid();
                 model.Incoterm.UserCreated = model.Incoterm.UserModified = currentUser.UserID;
-                model.Incoterm.DatetimeCreated = DateTime.Now;
+                model.Incoterm.DatetimeCreated = model.Incoterm.DatetimeModified = DateTime.Now;
                 model.Incoterm.GroupId = currentUser.GroupId;
                 model.Incoterm.DepartmentId = currentUser.DepartmentId;
                 model.Incoterm.OfficeId = currentUser.OfficeID;

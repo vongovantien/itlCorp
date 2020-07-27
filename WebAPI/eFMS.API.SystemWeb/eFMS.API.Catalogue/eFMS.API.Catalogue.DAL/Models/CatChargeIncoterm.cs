@@ -13,8 +13,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public Guid? ChargeId { get; set; }
         public string QuantityType { get; set; }
-        public string Unit { get; set; }
-        public Guid? ObjectTo { get; set; }
+        public int? Unit { get; set; }
+        public int? ChargeTo { get; set; }
         public string Currency { get; set; }
         public string FeeType { get; set; }
         public string Type { get; set; }

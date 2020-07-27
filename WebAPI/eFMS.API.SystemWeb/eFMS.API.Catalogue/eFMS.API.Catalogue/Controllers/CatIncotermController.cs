@@ -93,7 +93,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpPut]
-        [Route("update")]
+        [Route("Update")]
         [Authorize]
         public IActionResult Update(CatIncotermEditModel model)
         {
@@ -134,7 +134,7 @@ namespace eFMS.API.Catalogue.Controllers
 
 
         [HttpGet]
-        [Route("getById/{id}")]
+        [Route("GetById/{id}")]
         [Authorize]
         public IActionResult Get(Guid id)
         {

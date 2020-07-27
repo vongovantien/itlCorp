@@ -3,13 +3,13 @@
         <div class="form" [formGroup]="formGroup">
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !code.valid}">
                         <label required>Code</label>
                         <input type="text" class="form-control" formControlName="code">
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !nameEn.valid}">
                         <label required>Name EN</label>
                         <input type="text" class="form-control" formControlName="nameEn">
                     </div>
@@ -21,9 +21,10 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !service.valid}">
                         <label required>Service</label>
-                        <ng-select #s [items]="services" (opened)="closeOtherSelects(s)" formControlName="service">
+                        <ng-select #s [items]="services" (opened)="closeOtherSelects(s)" formControlName="service"
+                            (selected)="onSelectService($event)">
                         </ng-select>
                     </div>
                 </div>
@@ -47,6 +48,7 @@
                         </div>
                     </div>
                 </div>
+                <ng-content> </ng-content>
             </div>
         </div>
     </div>

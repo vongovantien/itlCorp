@@ -245,7 +245,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
 
-                entity.Property(e => e.Currency).HasMaxLength(10);
+                entity.Property(e => e.Currency).HasMaxLength(50);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
@@ -255,11 +255,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.IncotermId).HasColumnName("IncotermID");
 
-                entity.Property(e => e.QuantityType).HasMaxLength(10);
+                entity.Property(e => e.QuantityType).HasMaxLength(50);
 
                 entity.Property(e => e.Type).HasMaxLength(50);
-
-                entity.Property(e => e.Unit).HasMaxLength(10);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -712,9 +710,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("NameEN")
                     .HasMaxLength(150);
 
-                entity.Property(e => e.NameVn)
-                    .HasColumnName("NameVN")
-                    .HasMaxLength(150);
+                entity.Property(e => e.NameLocal).HasMaxLength(150);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 

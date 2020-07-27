@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { ChargeConstants } from '@constants';
+import { DataService } from '@services';
+import { SelectItem } from 'ng2-select';
 
 @Component({
     selector: 'form-incoterm',
@@ -10,13 +12,10 @@ import { ChargeConstants } from '@constants';
 export class CommercialFormIncotermComponent extends AppForm implements OnInit {
 
     formGroup: FormGroup;
-    code: FormControl;
-    service: FormControl;
-    nameEn: FormControl;
-    nameLocal: FormControl;
-    active: FormControl;
-    descriptionEn: FormControl;
-    descriptionLocal: FormControl;
+    code: AbstractControl;
+    service: AbstractControl;
+    nameEn: AbstractControl;
+    active: AbstractControl;
 
     services: CommonInterface.INg2Select[] = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
@@ -29,9 +28,11 @@ export class CommercialFormIncotermComponent extends AppForm implements OnInit {
         { text: ChargeConstants.SCE_DES, id: ChargeConstants.SCE_CODE },
         { text: ChargeConstants.SCI_DES, id: ChargeConstants.SCI_CODE },
         { text: ChargeConstants.CL_DES, id: ChargeConstants.CL_CODE }
-    ]
+    ];
+
     constructor(
-        private _fb: FormBuilder
+        private _fb: FormBuilder,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -42,15 +43,27 @@ export class CommercialFormIncotermComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formGroup = this._fb.group({
-            code: [],
-            service: [],
-            nameEn: [],
+            code: [null, Validators.required],
+            service: [null, Validators.required],
+            nameEn: [null, Validators.required],
             nameLocal: [],
-            active: [],
+            active: [true],
             descriptionEn: [],
             descriptionLocal: [],
         });
 
-        this.active = new FormControl();
+        this.active = this.formGroup.controls['active'];
+        this.nameEn = this.formGroup.controls['nameEn'];
+        this.service = this.formGroup.controls['service'];
+        this.code = this.formGroup.controls['code'];
     }
+
+    onSelectService(service: SelectItem) {
+        console.log(service);
+        if (!!service) {
+            this._dataService.setData('incotermService', service.id);
+            this._dataService.setData('isResetCharge', true);
+        }
+    }
+
 }

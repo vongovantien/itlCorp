@@ -1,25 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, ViewChildren, QueryList } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { CatChargeIncoterm, Charge, Unit, Currency } from '@models';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo } from '@repositories';
-import { map, takeUntil, shareReplay } from 'rxjs/operators';
+import { map, takeUntil, shareReplay, filter, switchMapTo, tap, switchMap, distinctUntilChanged, share, finalize } from 'rxjs/operators';
 import { forkJoin, Observable } from 'rxjs';
+import { DataService } from '@services';
+import cloneDeep from 'lodash/cloneDeep';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'list-charge-incoterm',
     templateUrl: './list-charge-incoterm.component.html',
-    styleUrls: ['./list-charge-incoterm.component.scss']
+    styleUrls: ['./list-charge-incoterm.component.scss'],
 })
 export class CommercialListChargeIncotermComponent extends AppList implements OnInit {
 
-    sellings: CatChargeIncoterm[] = [];
-    buyings: CatChargeIncoterm[] = [];
+    @Input() type: string = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+    serviceTypeId: string = null;
+
+    incotermCharges: CatChargeIncoterm[] = [];
 
     listCharges: Charge[] = [];
     listUnits: Observable<Unit[]>;
     listCurrency: Observable<Currency[]>;
-
 
     configChargeDisplayFields: CommonInterface.IComboGridDisplayField[] = [
         { field: 'chargeNameEn', label: 'Charge Code' },
@@ -50,52 +54,83 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
         { displayName: 'Other', value: CommonEnum.FEE_TYPE.OTHER },
     ];
 
+    isSubmitted: boolean = false;
+    isLoadingCharge: boolean = false;
+
     constructor(
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _dataService: DataService
     ) {
         super();
     }
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Charge Name', field: 'chargeId', sortable: true, required: true },
+            { title: 'Charge Name', field: 'chargeId', sortable: true, required: true, width: 300 },
             { title: 'Hint Qty', field: 'chargeId', sortable: true, required: true },
             { title: 'Unit', field: 'chargeId', sortable: true, required: true },
             { title: 'Charge To', field: 'chargeId', sortable: true, required: true },
             { title: 'Currency', field: 'chargeId', sortable: true, required: true },
             { title: 'Fee Type', field: 'chargeId', sortable: true, required: true },
         ];
-        this.getListCharge();
+
         this.listUnits = this._catalogueRepo.getUnit({ active: true }).pipe(shareReplay());
         this.listCurrency = this._catalogueRepo.getListCurrency().pipe(shareReplay());
+
+        this.subscription = this._dataService.currentMessage
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map((s: { default: string, incotermService: string }) => !!s.incotermService ? s.incotermService : null),
+                tap((s) => {
+                    this.serviceTypeId = s; console.log(this.serviceTypeId);
+                }),
+                distinctUntilChanged(),
+                switchMap((service: string) => this._catalogueRepo.getListCharge(null, null, { active: true, serviceTypeId: service, type: this.utility.getChargeType(this.type) })),
+            ).subscribe(
+                (charges: Charge[] = []) => {
+                    this.listCharges = charges;
+                }
+            );
 
     }
 
     addCharge(type: string) {
         if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-            this.sellings.push(new CatChargeIncoterm({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE }));
+            this.incotermCharges.push(new CatChargeIncoterm({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE }));
             return;
         }
-        this.sellings.push(new CatChargeIncoterm({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE }));
+        this.incotermCharges.push(new CatChargeIncoterm({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE }));
     }
 
-    deleteCharge(index: number, type: string) {
+    copyCharge(index: number) {
+        this.isSubmitted = false;
+        const newCharge = cloneDeep(this.incotermCharges[index]);
+        newCharge.id = SystemConstants.EMPTY_GUID;
+
+        if (this.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+            newCharge.type = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+        } else {
+            newCharge.type = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
+        }
+        this.incotermCharges.push(new CatChargeIncoterm(newCharge));
     }
 
-    getListCharge(serviceTypeId: string = null) {
-        this._catalogueRepo.getListCharge(null, null, { active: true, serviceTypeId: serviceTypeId })
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            ).subscribe(
-                (res: any[]) => {
-                    this.listCharges = res;
-                    console.log(this.listCharges);
-                }
-            );
+    deleteCharge(index: number) {
+        this.incotermCharges.splice(index, 1);
     }
 
-    onSelectDataTableInfo(data: any, chargeItem: CatChargeIncoterm, key: string, type: string) {
-        console.log(data);
+    onSelectDataTableInfo(data: any, chargeItem: CatChargeIncoterm, key: string) {
+        [this.isSubmitted, chargeItem.isDuplicate] = [false, false];
+        switch (key) {
+            case 'charge':
+                chargeItem.chargeId = data.id;
+                break;
+            case 'unit':
+                chargeItem.unit = data.id;
+                break;
+            default:
+                break;
+        }
     }
 
     getUnitCurrency() {
@@ -110,7 +145,64 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
                 this.listCurrency = currencies || [];
             }
         );
+    }
 
+    resetCharge(charges: CatChargeIncoterm[]) {
+        charges.forEach(c => {
+            c.chargeId = null;
+        });
+    }
+
+    validateListCharge(): boolean {
+        if (!this.incotermCharges.length) {
+            return true;
+        }
+        let valid: boolean = true;
+        for (const c of this.incotermCharges) {
+            if (
+                !c.chargeId ||
+                !c.quantityType ||
+                !c.unit ||
+                !c.chargeTo ||
+                !c.currency ||
+                !c.feeType
+            ) {
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+    }
+
+
+    validateDuplicate(): boolean {
+        const chargeIds = this.incotermCharges.map(c => c.chargeId);
+        const isDuplicate = new Set(chargeIds).size !== this.incotermCharges.length;
+        let valid: boolean = false;
+
+        if (isDuplicate) {
+            const arrayDuplicates = [...new Set(this.utility.findDuplicates(chargeIds))];
+            this.incotermCharges.forEach((c: CatChargeIncoterm) => {
+                if (arrayDuplicates.includes(c.chargeId)) {
+                    c.isDuplicate = true;
+                } else {
+                    c.isDuplicate = false;
+                }
+            });
+            valid = false;
+        } else {
+            valid = true;
+        }
+
+        return valid;
+    }
+
+    ngOnDestroy() {
+        this.serviceTypeId = null;
+        this.ngUnsubscribe.next();
+        this.ngUnsubscribe.complete();
+        this.subscription.unsubscribe();
+        console.log(this.serviceTypeId);
     }
 
 }
