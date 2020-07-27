@@ -92,7 +92,7 @@
                                 <ng-select [multiple]='true' formControlName="office"
                                     (removed)="onRemoveDataFormInfo($event, 'office')" [items]="officeList"
                                     [active]="officeActive" (selected)="onSelectDataFormInfo($event, 'office')"
-                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company'">
+                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
                                 </ng-select>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
                                 <ng-select [multiple]='true' formControlName="department"
                                     (removed)="onRemoveDataFormInfo($event, 'department')" [items]="departmentList"
                                     [active]="departmentActive" (selected)="onSelectDataFormInfo($event, 'department')"
-                                    [disabled]="menuPermission.list !== 'Office' && menuPermission.list !== 'Company'">
+                                    [disabled]="menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
                                 </ng-select>
                             </div>
                         </div>
@@ -116,7 +116,7 @@
                                 <ng-select [multiple]='true' formControlName="group"
                                     (removed)="onRemoveDataFormInfo($event, 'group')" [items]="groupList"
                                     [active]="groupActive" (selected)="onSelectDataFormInfo($event, 'group')"
-                                    [disabled]="menuPermission.list === 'Owner' || menuPermission.list === 'Group'">
+                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
                                 </ng-select>
                             </div>
                         </div>
@@ -130,7 +130,7 @@
                                 <ng-select [multiple]='true' formControlName="staff"
                                     (removed)="onRemoveDataFormInfo($event, 'staff')" [items]="staffList"
                                     [active]="staffActive" (selected)="onSelectDataFormInfo($event, 'staff')"
-                                    [disabled]="menuPermission.list === 'Owner'">
+                                    [disabled]="menuPermission.list !== 'Group' && menuPermission.list !== 'Department' && menuPermission.list !== 'Office' && menuPermission.list !== 'Company' && menuPermission.list !== 'All'">
                                 </ng-select>
                             </div>
                         </div>

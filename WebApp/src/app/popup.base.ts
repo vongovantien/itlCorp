@@ -130,4 +130,16 @@ export abstract class PopupBase extends AppPage {
             });
         }
     }
+
+    removeKeyworkNg2Select() {
+        const ng2 = this.selectElements.toArray();
+        ng2.forEach(
+            c => {
+                const a: HTMLInputElement = c.element.nativeElement.querySelector('.ui-select-search');
+                if (!!a) {
+                    a.value = '';
+                }
+            }
+        );
+    }
 }

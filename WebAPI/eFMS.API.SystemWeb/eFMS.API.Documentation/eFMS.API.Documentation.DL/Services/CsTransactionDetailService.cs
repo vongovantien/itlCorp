@@ -1378,7 +1378,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }         
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
-                housebill.NoPieces = data.PackageQty + " " + _packageType; // Package Qty & Package Type of HBL
+                housebill.NoPieces = string.Format("{0:n}", data.PackageQty) + " " + _packageType; // Package Qty & Package Type of HBL
                 hbConstainers += " CONTAINER(S) S.T.C:";
                 housebill.Qty = hbConstainers?.ToUpper();
                 housebill.MaskNos = markNo?.ToUpper();
@@ -1568,7 +1568,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.HandlingInfo = data.HandingInformation?.ToUpper(); //Handing Information
                 housebill.Notify = data.Notify?.ToUpper(); //Notify
                 housebill.SCI = string.Empty; //NOT USE
-                housebill.NoPieces = data.PackageQty != null ? data.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
+                housebill.NoPieces = data.PackageQty != null ? string.Format("{0:n0}", data.PackageQty) : string.Empty; //Số kiện (Pieces)
                 housebill.GrossWeight = data.GrossWeight ?? 0; //GrossWeight
                 housebill.GrwDecimal = 3; //NOT USE
                 housebill.Wlbs = data.KgIb?.ToUpper() ?? string.Empty; //KgIb
@@ -1579,20 +1579,28 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : ( data.RateCharge?.ToString() ?? string.Empty); //RateCharge
                 housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
-                housebill.WghtPP = data.Wtpp?.ToUpper(); //WT (prepaid)
-                housebill.WghtCC = data.Wtcll?.ToUpper(); //WT (Collect)
+                decimal _wtpp = 0;
+                housebill.WghtPP = (decimal.TryParse(data.Wtpp, out _wtpp)) ? string.Format("{0:n}", _wtpp) : data.Wtpp?.ToUpper(); //WT (prepaid)
+                decimal _wtcll = 0;
+                housebill.WghtCC = (decimal.TryParse(data.Wtcll, out _wtcll)) ? string.Format("{0:n}", _wtcll) : data.Wtcll?.ToUpper(); //WT (Collect)
                 housebill.ValChPP = string.Empty; //NOT USE
                 housebill.ValChCC = string.Empty; //NOT USE
                 housebill.TxPP = string.Empty; //NOT USE
                 housebill.TxCC = string.Empty; //NOT USE
                 housebill.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
-                housebill.TTChgAgntPP = data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
-                housebill.TTChgAgntCC = data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
-                housebill.TTCarrPP = string.Empty; //NOT USE
-                housebill.TTCarrCC = string.Empty; //NOT USE
-                housebill.TtalPP = data.TotalPp?.ToUpper(); //Total (prepaid)
-                housebill.TtalCC = data.TotalCll?.ToUpper(); //Total (Collect)
+                decimal _dueAgentPp = 0;
+                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? string.Format("{0:n}", _dueAgentPp) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)                
+                decimal _dueAgentCll = 0;
+                housebill.TTChgAgntCC = (decimal.TryParse(data.DueAgentCll, out _dueAgentCll)) ? string.Format("{0:n}", _dueAgentCll) : data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
+                decimal _dueCarrierPp = 0;
+                housebill.TTCarrPP = (decimal.TryParse(data.DueCarrierPp, out _dueCarrierPp)) ? string.Format("{0:n}", _dueCarrierPp) : data.DueCarrierPp?.ToUpper(); //Due to carrier (prepaid)
+                decimal _dueCarrierCll = 0;
+                housebill.TTCarrCC = (decimal.TryParse(data.DueCarrierCll, out _dueCarrierCll)) ? string.Format("{0:n}", _dueCarrierCll) : data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
+                decimal _totalPp = 0;
+                housebill.TtalPP = (decimal.TryParse(data.TotalPp, out _totalPp)) ? string.Format("{0:n}", _totalPp) : data.TotalPp?.ToUpper(); //Total (prepaid)
+                decimal _totalCll = 0;
+                housebill.TtalCC = (decimal.TryParse(data.TotalCll, out _totalCll)) ? string.Format("{0:n}", _totalCll) : data.TotalCll?.ToUpper(); //Total (Collect)
                 housebill.CurConvRate = string.Empty; //NOT USE
                 housebill.CCChgDes = string.Empty; //NOT USE
                 housebill.SpecialNote = data.ShippingMark?.ToUpper(); //Shipping Mark
@@ -1621,6 +1629,7 @@ namespace eFMS.API.Documentation.DL.Services
                     _airlineName = airline?.ShortName;
                 }
                 housebill.Airline = _airlineName?.ToUpper();
+                housebill.SeaAir = data.SeaAir;
 
                 housebills.Add(housebill);
             }

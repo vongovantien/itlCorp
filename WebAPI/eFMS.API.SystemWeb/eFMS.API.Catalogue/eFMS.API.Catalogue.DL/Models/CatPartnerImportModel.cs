@@ -13,12 +13,13 @@ namespace eFMS.API.Catalogue.DL.Models
         public string CityShipping { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
-        public string ACReference { get; set; }
         public string Profile { get; set; }
         public string PartnerNameEnError { get; set; }
+        public string AcReferenceError { get; set; }
         public string PartnerNameVnError { get; set; }
         public string ShortNameError { get; set; }
         public string TaxCodeError { get; set; }
+        public string InternalReferenceNoError { get; set; }
         public string PartnerGroupError { get; set; }
         public string ContactPersonError { get; set; }
         public string TelError { get; set; }
@@ -36,6 +37,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ServiceId { get; set; }
         public string ServiceSalemanDefaultError { get; set; }
         public string OfficeSalemanDefault { get; set; }
+        public string AcReference { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public string OfficeSalemanDefaultError { get; set; }

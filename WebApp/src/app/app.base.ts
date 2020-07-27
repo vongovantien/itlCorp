@@ -35,7 +35,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     isLoading: boolean | any = false;
     isCheckAll: boolean = false;
     isLocked: boolean | any = false;
-    isShowUpdate: boolean = true;
+    isShowUpdate: boolean = false;
     permissionShipments: Observable<PermissionShipment>;
     permissionHblDetail: Observable<PermissionHouseBill>;
     menuSpecialPermission: Observable<SystemInterface.ISpecialAction[]>;

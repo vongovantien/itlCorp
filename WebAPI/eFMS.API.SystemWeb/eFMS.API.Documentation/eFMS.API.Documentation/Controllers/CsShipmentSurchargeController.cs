@@ -53,7 +53,6 @@ namespace eFMS.API.Documentation.Controllers
         [Route("GetByHB")]
         public IActionResult GetByHouseBill(Guid hbId, string type)
         {
-
             return Ok(csShipmentSurchargeService.GetByHB(hbId, type));
         }
 

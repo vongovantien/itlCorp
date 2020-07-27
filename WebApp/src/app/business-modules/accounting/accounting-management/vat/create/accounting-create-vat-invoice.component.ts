@@ -87,7 +87,9 @@ export class AccountingManagementCreateVATInvoiceComponent extends AppForm imple
                 (exchangeRate + exchangeRate * 0.01) as number,
                 (exchangeRate - exchangeRate * 0.01) as number
             ];
-            valid = this.listChargeComponent.charges.every(c => c.exchangeRate <= validRangeExchangeRate[0] && c.exchangeRate >= validRangeExchangeRate[1]);
+            valid = this.listChargeComponent.charges
+                .filter(x => x.currency !== 'VND')
+                .every(c => c.exchangeRate <= validRangeExchangeRate[0] && c.exchangeRate >= validRangeExchangeRate[1]);
         }
         return valid;
     }

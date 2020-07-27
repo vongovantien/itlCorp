@@ -127,7 +127,10 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 if (res.generalExchangeRate) {
                     if (!!this.charges.length) {
                         this.charges.forEach(c => {
-                            c.exchangeRate = res.generalExchangeRate;
+                            if (c.currency !== 'VND') { // ! CURENCY LOCAL
+                                c.exchangeRate = res.generalExchangeRate; // * for Display
+                                c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
+                            }
                         });
                         this._toastService.success("Exchange Rate synced successfully");
                     }

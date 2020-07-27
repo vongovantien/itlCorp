@@ -65,6 +65,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [HttpPost("Paging")]
+        [Authorize]
         public IActionResult Paging(SysAuthorizationCriteria criteria, int page, int size)
         {
             var data = sysAuthorizationService.Paging(criteria, page, size, out int rowCount);

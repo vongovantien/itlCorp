@@ -1447,6 +1447,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     data.Shipment = criteria.ChargeShipmentsCurrent.Where(x => x.HBL != null).GroupBy(x => x.HBL).Count();
                     data.TotalCharge = criteria.ChargeShipmentsCurrent.Count();
+                    data.GroupShipments = null;
                     data.ChargeShipments = criteria.ChargeShipmentsCurrent;
                     data.AmountDebitLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountDebitLocal);
                     data.AmountCreditLocal = criteria.ChargeShipmentsCurrent.Sum(x => x.AmountCreditLocal);
@@ -1776,7 +1777,17 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var charge = GetChargeShipmentDocAndOperation(query, null);
             var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
+            var _groupShipments = new List<GroupShipmentModel>();
+            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL }).Select(s => new GroupShipmentModel {
+                    JobId = s.Key.JobId,
+                    HBL = s.Key.HBL,
+                    MBL = s.Key.MBL,
+                    TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+                    TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+                    ChargeShipments = s.ToList()
+                }).ToList();            
             data = soaDetail;
+            data.GroupShipments = _groupShipments;
             data.ChargeShipments = chargeShipments;
             data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
             data.AmountCreditLocal = Math.Round(chargeShipments.Sum(x => x.AmountCreditLocal), 3);

@@ -137,6 +137,7 @@ export class SeaLclExportManifestComponent extends AppList {
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
                 if (!!res) {
+                    this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
                 }

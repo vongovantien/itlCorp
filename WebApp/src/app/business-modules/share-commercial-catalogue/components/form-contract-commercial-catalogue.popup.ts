@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { finalize, catchError, mergeMap, distinctUntilChanged, map } from 'rxjs/operators';
+import { finalize, catchError, distinctUntilChanged, map } from 'rxjs/operators';
 import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
@@ -21,6 +21,7 @@ import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/p
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
+
     formGroup: FormGroup;
 
     isUpdate: boolean = false;
@@ -324,6 +325,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     onSubmit(isRequestApproval: boolean = false) {
         this.setError(this.vas);
         this.setError(this.paymentMethod);
+        this.setError(this.officeId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
@@ -356,6 +358,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(this.selectedContract);
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -370,6 +373,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             if (res.status) {
                                 this._toastService.success(res.message);
                                 this.onRequest.emit(this.selectedContract);
+
+                                this.removeKeyworkNg2Select();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -401,7 +406,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listService = Service.split(";");
         const activeServiceList: any = [];
         listService.forEach(item => {
-            const element = this.serviceTypes.find(x => x.id === item);
+            const element = this.serviceTypes.find(x => x.id === item.trim());
             if (element !== undefined) {
                 const activeService = element;
                 activeServiceList.push(activeService);
@@ -414,7 +419,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listVas = Vas.split(";");
         const activeVasList: any = [];
         listVas.forEach(item => {
-            const element = this.vaslst.find(x => x.id === item);
+            const element = this.vaslst.find(x => x.id === item.trim());
             if (element !== undefined) {
                 const activeVas = element;
                 activeVasList.push(activeVas);
@@ -427,7 +432,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const listOffice = Office.split(";");
         const activeOfficeList: any = [];
         listOffice.forEach(item => {
-            const element = this.offices.find(x => x.id === item);
+            const element = this.offices.find(x => x.id === item.toLowerCase());
             if (element !== undefined) {
                 const activeOffice = element;
                 activeOfficeList.push(activeOffice);

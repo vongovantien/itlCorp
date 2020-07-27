@@ -62,11 +62,20 @@
         public struct CatPartner
         {
             public static string ExelImportFileName = "Partner";
+            public static string ExelImportCommercialCustomerFileName = "CommercialCustomer";
             public struct NameCaching
             {
                 public static string ListName = "Partners";
             }
         }
+
+        public struct CatContract
+        {
+            public static string ExelImportFileName = "CustomerContract";
+        }
+
+
+
         public struct CatSaleMan
         {
             public struct NameCaching
