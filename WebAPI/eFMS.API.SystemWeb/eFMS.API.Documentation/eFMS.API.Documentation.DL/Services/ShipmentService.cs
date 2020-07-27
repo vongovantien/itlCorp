@@ -34,6 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatChargeGroup> catChargeGroupRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+        readonly IContextBase<CustomsDeclaration> customsDeclarationRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
         public ShipmentService(IContextBase<CsTransaction> repository, IMapper mapper,
@@ -52,6 +53,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<CatUnit> catUnit,
+            IContextBase<CustomsDeclaration> customsDeclaration,
             ICurrencyExchangeService currencyExchange) : base(repository, mapper)
         {
             opsRepository = ops;
@@ -70,6 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserLevelRepo = sysUserLevel;
             currencyExchangeService = currencyExchange;
             catUnitRepo = catUnit;
+            customsDeclarationRepo = customsDeclaration;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -2158,5 +2161,326 @@ namespace eFMS.API.Documentation.DL.Services
             return dataList.AsQueryable();
         }
         #endregion -- Export Accounting PL Sheet --
+
+
+        #region -- Export Summary Of Costs Incurred
+        public List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
+        {
+            var dataDocumentation = SummaryOfCostsIncurred(criteria);
+            IQueryable<SummaryOfCostsIncurredExportResult> list;
+            list = dataDocumentation;
+            return list.ToList();
+        }
+        private string GetTopClearanceNoByJobNo(string JobNo)
+        {
+            var custom = customsDeclarationRepo.Get();
+            var clearanceNo = custom.Where(x => x.JobNo != null && x.JobNo == JobNo)
+                .OrderBy(x => x.JobNo)
+                .OrderByDescending(x => x.ClearanceDate)
+                .FirstOrDefault()?.ClearanceNo;
+            return clearanceNo;
+        }
+        private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurred(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataSummaryOfCostsIncurred(criteria);
+            if (dataShipment == null)  return null;
+            var port = catPlaceRepo.Get();
+            List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHBuy(query, null) : GetChargeOBHBuy(null, null);
+            foreach (var item in dataShipment)
+            {
+                var _charges = chargeData.Where(x => x.HBLID == item.HBLID);
+                foreach(var charge in _charges)
+                {
+                    SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
+                    var _partnerId = charge.PayerId;
+                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
+                    data.SupplierCode = _partner?.AccountNo;
+                    data.SuplierName = _partner?.PartnerNameVn;
+                    data.ChargeName = charge.ChargeName;
+                    data.POLName = port.Where(x => x.Id == charge.AOL).Select(t => t.Code).FirstOrDefault();
+                    data.PurchaseOrderNo = item.PurchaseOrderNo;
+                    data.CustomNo =  GetTopClearanceNoByJobNo(item.JobId);
+                    data.HBL = charge.HBL;
+                    data.GrossWeight = charge.GrossWeight;
+                    data.CBM = charge.CBM;
+                    data.PackageContainer = charge.PackageContainer;
+                    decimal? percent = 0;
+                    if (charge.VATRate > 0)
+                    {
+                        percent = (charge.VATRate * 10) / 100;
+                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                        if (charge.Currency != "VND")
+                        {
+                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                        }
+                    }
+                    else
+                    {
+                        charge.VATAmount = charge.VATRate;
+                    }
+                    charge.NetAmount = charge.UnitPrice * charge.Quantity;
+                    data.NetAmount = charge.NetAmount;
+                    data.VATAmount = charge.VATAmount;
+                    data.Type = charge.Type;
+                    data.TypeCharge = charge.TypeCharge;
+                    dataList.Add(data);
+                }
+            }
+            return dataList.AsQueryable();
+        }
+        private IQueryable<SummaryOfCostsIncurredExportResult> QueryDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> queryTrans;
+            Expression<Func<CsTransactionDetail, bool>> queryTranDetail = null;
+            if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
+            {
+                queryTrans = q =>
+                    q.TransactionType.Contains("E") ?
+                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                    :
+                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+            }
+            else
+            {
+                queryTrans = q =>
+                    q.DatetimeCreated.HasValue ? q.DatetimeCreated.Value.Date >= criteria.CreatedDateFrom.Value.Date && q.DatetimeCreated.Value.Date <= criteria.CreatedDateTo.Value.Date : false;
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Service))
+            {
+                queryTrans = queryTrans.And(q => criteria.Service.Contains(q.TransactionType));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.TransactionType == criteria.Service);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.JobId))
+            {
+                queryTrans = queryTrans.And(q => q.JobNo == criteria.JobId);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Mawb))
+            {
+                queryTrans = queryTrans.And(q => q.Mawb == criteria.Mawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                queryTranDetail = queryTranDetail == null ?
+                    (q => q.Hwbno == criteria.Hawb)
+                    :
+                    queryTranDetail.And(q => q.Hwbno == criteria.Hawb);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                queryTrans = queryTrans.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.OfficeId == Guid.Empty);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.DepartmentId))
+            {
+                queryTrans = queryTrans.And(q => criteria.DepartmentId.Contains(q.DepartmentId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.DepartmentId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.GroupId))
+            {
+                queryTrans = queryTrans.And(q => criteria.GroupId.Contains(q.GroupId.ToString()));
+            }
+            else
+            {
+                queryTrans = queryTrans.And(q => q.GroupId == null);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PersonInCharge))
+            {
+                queryTrans = queryTrans.And(q => criteria.PersonInCharge.Contains(q.PersonIncharge));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SalesMan))
+            {
+                queryTranDetail = (queryTranDetail == null) ?
+                    (q => criteria.SalesMan.Contains(q.SaleManId))
+                    :
+                    queryTranDetail.And(q => criteria.SalesMan.Contains(q.SaleManId));
+            }
+
+            if (!string.IsNullOrEmpty(criteria.Creator))
+            {
+                queryTrans = queryTrans.And(q => criteria.Creator.Contains(q.UserCreated));
+            }
+
+            if (criteria.Pol != null && criteria.Pol != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pol == criteria.Pol);
+            }
+
+            if (criteria.Pod != null && criteria.Pod != Guid.Empty)
+            {
+                queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
+            }
+
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            if (queryTranDetail == null)
+            {
+                var houseBills = detailRepository.Get();
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId into housebill
+                                    from house in housebill.DefaultIfEmpty()
+                                    select new SummaryOfCostsIncurredExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType, 
+                                        HBLID = house.Id,
+                                        PurchaseOrderNo = master.Pono
+                                    };
+                return queryShipment;
+            }
+            else
+            {
+                var houseBills = detailRepository.Get().Where(queryTranDetail);
+                var queryShipment = from master in masterBills
+                                    join house in houseBills on master.Id equals house.JobId
+                                    select new SummaryOfCostsIncurredExportResult
+                                    {
+                                        JobId = master.JobNo,
+                                        ServiceDate = master.ServiceDate,
+                                        Service = master.TransactionType,
+                                        HBLID = house.Id,
+                                        PurchaseOrderNo = master.Pono
+                                    };
+                return queryShipment;
+            }
+        }
+
+        private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHBuy(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
+        {
+            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
+            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE);
+            var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
+            var csTransDe = detailRepository.Get();
+            var charge = catChargeRepo.Get();
+            //OBH Payer (BUY - Credit)
+            var queryObhBuyOperation = from sur in surcharge
+                                       join ops in opst on sur.Hblid equals ops.Hblid
+                                       join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                       from chg in chg2.DefaultIfEmpty()
+                                       select new SummaryOfCostsIncurredExportResult
+                                       {
+                                           ID = sur.Id,
+                                           HBLID = sur.Hblid,
+                                           ChargeID = sur.ChargeId,
+                                           ChargeCode = chg.Code,
+                                           ChargeName = chg.ChargeNameEn,
+                                           JobId = ops.JobNo,
+                                           HBL = ops.Hwbno,
+                                           MBL = ops.Mblno,
+                                           Type = sur.Type + "-BUY",
+                                           Debit = null,
+                                           Credit = sur.Total,
+                                           IsOBH = true,
+                                           Currency = sur.CurrencyId,
+                                           InvoiceNo = sur.InvoiceNo,
+                                           Note = sur.Notes,
+                                           CustomerID = sur.PayerId,
+                                           ServiceDate = ops.ServiceDate,
+                                           CreatedDate = ops.DatetimeCreated,
+                                           TransactionType = null,
+                                           UserCreated = ops.UserCreated,
+                                           Quantity = sur.Quantity,
+                                           UnitId = sur.UnitId,
+                                           UnitPrice = sur.UnitPrice,
+                                           VATRate = sur.Vatrate,
+                                           CreditDebitNo = sur.CreditNo,
+                                           CommodityGroupID = ops.CommodityGroupId,
+                                           Service = "CL",
+                                           ExchangeDate = sur.ExchangeDate,
+                                           FinalExchangeRate = sur.FinalExchangeRate,
+                                           TypeCharge = chg.Type,
+                                           PayerId = sur.PayerId
+                                       };
+            if(query != null)
+            {
+                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+            }
+            if (isOBH != null)
+            {
+                queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
+            }
+            var queryObhBuyDocument = from sur in surcharge
+                                      join cstd in csTransDe on sur.Hblid equals cstd.Id
+                                      join cst in csTrans on cstd.JobId equals cst.Id
+                                      join chg in charge on sur.ChargeId equals chg.Id into chg2
+                                      from chg in chg2.DefaultIfEmpty()
+                                      select new SummaryOfCostsIncurredExportResult
+                                      {
+                                          ID = sur.Id,
+                                          HBLID = sur.Hblid,
+                                          ChargeID = sur.ChargeId,
+                                          ChargeCode = chg.Code,
+                                          ChargeName = chg.ChargeNameEn,
+                                          JobId = cst.JobNo,
+                                          HBL = cstd.Hwbno,
+                                          MBL = cst.Mawb,
+                                          Type = sur.Type + "-BUY",
+                                          Debit = null,
+                                          Credit = sur.Total,
+                                          IsOBH = true,
+                                          Currency = sur.CurrencyId,
+                                          InvoiceNo = sur.InvoiceNo,
+                                          Note = sur.Notes,
+                                          CustomerID = sur.PayerId,
+                                          ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                          CreatedDate = cst.DatetimeCreated,
+                                          TransactionType = cst.TransactionType,
+                                          UserCreated = cst.UserCreated,
+                                          Quantity = sur.Quantity,
+                                          UnitId = sur.UnitId,
+                                          UnitPrice = sur.UnitPrice,
+                                          VATRate = sur.Vatrate,
+                                          CreditDebitNo = sur.CreditNo,
+                                          CommodityGroupID = null,
+                                          Service = cst.TransactionType,
+                                          CBM = cstd.Cbm,
+                                          Commodity = cst.Commodity,
+                                          FlightNo = cstd.FlightNo,
+                                          ShippmentDate = cst.TransactionType == "AE" ? cstd.Etd : cst.TransactionType == "AI" ? cstd.Eta : null,
+                                          AOL = cst.Pol,
+                                          AOD = cst.Pod,
+                                          PackageQty = cstd.PackageQty,
+                                          GrossWeight = cstd.GrossWeight,
+                                          ChargeWeight = cstd.ChargeWeight,
+                                          FinalExchangeRate = sur.FinalExchangeRate,
+                                          ExchangeDate = sur.ExchangeDate,
+                                          PackageContainer = cstd.PackageContainer,
+                                          TypeCharge = chg.Type,
+                                          PayerId = sur.PayerId
+                                      };
+            if(query != null)
+            {
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+            }
+            if (isOBH != null)
+            {
+                queryObhBuyDocument = queryObhBuyDocument.Where(x => x.IsOBH == isOBH);
+            }
+            var queryObhBuy = queryObhBuyOperation.Union(queryObhBuyDocument);
+            return queryObhBuyDocument;
+        }
+
+        #endregion
+
     }
 }
