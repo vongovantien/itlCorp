@@ -311,5 +311,32 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Shipment Overview
+        /// </summary>
+        /// <param name="criteria">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportSummaryOfCostsIncurred")]
+        [HttpPost]
+        public async Task<IActionResult> ExportSummaryOfCostsIncurred(GeneralReportCriteria criteria)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<SummaryOfCostsIncurredModel>>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateSummaryOfCostsIncurredExcel(dataObjects.Result, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview.xlsx");
+
+            return fileContent;
+        }
     }
 }

@@ -1934,5 +1934,187 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
+        #region Summary Cost
+        public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Summary Of Costs");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BinddingDatalSummaryOfCostsIncurred(workSheet, lst);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+        public void BinddingDatalSummaryOfCostsIncurred(ExcelWorksheet workSheet, List<SummaryOfCostsIncurredModel> lst)
+        {
+            List<string> headerTable = new List<string>()
+            {
+               "STT/No", 
+               "Mã Nhà Cung Cấp/Supplier Code",
+               "Tên Nhà Cung Cấp/Supplier Name",
+               "Tên hàng hóa/Commodity",
+               "Cảng/Port",
+               "Số hợp đồng/PO No./Contract No",
+               "Số Tờ Khai/Customs Declaration No",
+               "Số Vận Đơn/Bill of Lading No./AWB No.",
+               "Trọng Lượng/VOLUMNE",
+               "Phí dịch vụ làm hàng/Customs clearance fee",
+               "Phí thu hộ/Authorized fees",
+               "Tổng cộng/Total"
+            };
+
+            List<string> subheaderTable = new List<string>()
+            {
+               "KGS",
+               "CBM",
+               "Container",
+               "Chi phí/Fee",
+               "VAT",
+               "Tổng cộng/Total"
+            };
+
+            // Tạo header
+            for (int i = 0; i < headerTable.Count; i++)
+            {
+                //if (i == 7)
+                //{
+                //    workSheet.Cells[1, i + 3].Value = headerTable[i];
+                //}
+                if (i < 8)
+                {
+                    workSheet.Cells[1, i + 1].Value = headerTable[i];
+                }
+                //if (i > 13)
+                //{
+                //    workSheet.Cells[1, i + 3].Value = headerTable[i];
+                //    workSheet.Cells[1, i + 3].Style.Font.Bold = true;
+                //}
+                //if (i > 13)
+                //{
+                //    workSheet.Cells[1, i + 3].Value = headerTable[i];
+                //    workSheet.Cells[1, i + 3].Style.Font.Bold = true;
+                //}
+
+
+                workSheet.Cells[1, i + 5].Style.Font.Bold = true;
+                workSheet.Cells[1, i + 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[1, i + 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[1, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[1, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[1, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            }
+            workSheet.Cells["I1"].Value = headerTable[8];
+            workSheet.Cells["L1"].Value = headerTable[9];
+            workSheet.Cells["O1"].Value = headerTable[10];
+
+
+            workSheet.Cells["I2"].Value = subheaderTable[0];
+            workSheet.Cells["J2"].Value = subheaderTable[1];
+            workSheet.Cells["K2"].Value = subheaderTable[2];
+
+            workSheet.Cells["L2"].Value = subheaderTable[3];
+            workSheet.Cells["M2"].Value = subheaderTable[4];
+            workSheet.Cells["N2"].Value = subheaderTable[5];
+
+            workSheet.Cells["O2"].Value = subheaderTable[3];
+            workSheet.Cells["P2"].Value = subheaderTable[4];
+            workSheet.Cells["Q2"].Value = subheaderTable[5];
+            workSheet.Cells["R1"].Value = subheaderTable[5];
+            workSheet.Cells["R1:R2"].Merge = true;
+
+            workSheet.Cells["I2:Q2"].Style.Font.Bold = true;
+
+            workSheet.Cells["I2:Q2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["I2:Q2"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["R1"].Style.Font.Bold = true;
+
+            workSheet.Cells["R1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["R1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["A1:A2"].Merge = true;
+            workSheet.Cells["B1:B2"].Merge = true;
+            workSheet.Cells["C1:C2"].Merge = true;
+            workSheet.Cells["D1:D2"].Merge = true;
+            workSheet.Cells["E1:E2"].Merge = true;
+            workSheet.Cells["F1:F2"].Merge = true;
+            workSheet.Cells["G1:G2"].Merge = true;
+            workSheet.Cells["H1:H2"].Merge = true;
+            workSheet.Cells["I1:K1"].Merge = true;
+            workSheet.Cells["L1:N1"].Merge = true;
+            workSheet.Cells["O1:Q1"].Merge = true;
+
+            int addressStartContent = 3;
+            for (int i = 0; i < lst.Count; i++)
+            {
+                var item = lst[i];
+                workSheet.Cells[i + addressStartContent, 1].Value = i + 1;
+                workSheet.Cells[i + addressStartContent, 2].Value = item.SupplierCode;
+                workSheet.Cells[i + addressStartContent, 3].Value = item.SuplierName;
+                workSheet.Cells[i + addressStartContent, 4].Value = item.ChargeName;
+                workSheet.Cells[i + addressStartContent, 5].Value = item.POLName;
+                workSheet.Cells[i + addressStartContent, 6].Value = item.PurchaseOrderNo;
+                workSheet.Cells[i + addressStartContent, 7].Value = item.CustomNo;
+                workSheet.Cells[i + addressStartContent, 8].Value = item.HBL;
+
+                workSheet.Cells[i + addressStartContent, 9].Value = item.GrossWeight;
+                workSheet.Cells[i + addressStartContent, 9].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 10].Value = item.CBM;
+                workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 11].Value = item.PackageContainer;
+                if (!item.Type.Contains("OBH"))
+                {
+                    workSheet.Cells[i + addressStartContent, 12].Value =  item.NetAmount != null ? item.NetAmount: 0M;
+                    workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 13].Value = item.VATAmount != null ? item.VATAmount : 0M;
+                    workSheet.Cells[i + addressStartContent, 14].Value = item.VATAmount.GetValueOrDefault(0M) + item.NetAmount.GetValueOrDefault(0M);
+                    workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 15].Value = 0M;
+                    workSheet.Cells[i + addressStartContent, 16].Value = 0M;
+                    workSheet.Cells[i + addressStartContent, 17].Value = 0M;
+                }
+                else
+                {
+                    workSheet.Cells[i + addressStartContent, 12].Value = 0M;
+                    workSheet.Cells[i + addressStartContent, 13].Value = 0M;
+                    workSheet.Cells[i + addressStartContent, 14].Value = 0M;
+
+
+                    workSheet.Cells[i + addressStartContent, 15].Value = item.NetAmount != null ? item.NetAmount : 0M;
+                    workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 16].Value = item.VATAmount != null ? item.VATAmount : 0M;
+                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 17].Value = item.VATAmount.GetValueOrDefault(0M) + item.NetAmount.GetValueOrDefault(0M);
+                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormatVND;
+                }
+
+                decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 14].Value);
+                decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
+
+                workSheet.Cells[i + addressStartContent, 18].Value = TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
+                workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormatVND;
+
+
+            }
+
+
+
+
+
+        }
+
+
+        #endregion
     }
 }
