@@ -276,7 +276,21 @@ namespace eFMS.API.Catalogue.DL.Services
                                         && (x.Active == criteria.Active));
                 }
             }
-            return Get(query);
+
+            IQueryable<CatIncotermModel> dataQuery = Get(query);
+
+            if(dataQuery != null && dataQuery.Count() > 0)
+            {
+                foreach (var item in dataQuery)
+                {
+                    SysUser userCreated = sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault();
+                    SysUser userModified = sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault();
+                    item.UserCreatedName = userCreated.Username;
+                    item.UserModifiedName = userModified.Username;
+                }
+            }
+
+            return dataQuery;
         }
 
 
