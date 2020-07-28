@@ -148,6 +148,10 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                     } else {
                         this.accountingManagement = new AccAccountingManagementModel(res);
                         this.updateFormVoucher((res as AccAccountingManagementModel));
+
+                        // * Update list charge & total amount without dispatch action UpdateChargeList.
+                        this.listChargeComponent.charges = res.charges;
+                        this.listChargeComponent.updateTotalAmount();
                     }
                 },
             );

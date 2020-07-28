@@ -158,6 +158,10 @@ export class AccountingManagementDetailVatInvoiceComponent extends AccountingMan
                     } else {
                         this.accountingManagement = new AccAccountingManagementModel(res);
                         this.updateFormInvoice((res as AccAccountingManagementModel));
+
+                        // * Update list charge & total amount without dispatch action UpdateChargeList.
+                        this.listChargeComponent.charges = res.charges;
+                        this.listChargeComponent.updateTotalAmount();
                     }
                 },
                 (error: HttpErrorResponse) => {
