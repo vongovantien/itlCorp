@@ -50,7 +50,7 @@ export class FormValidators extends Validators {
     }
 
     public static validateMAWB(controls: AbstractControl | FormControl | FormGroup): ValidationErrors {
-        if (controls.valid) {
+        if (controls.valid && controls.value) {
             const mawbNo: string = controls.value;
             const mawbNumber: number = +(mawbNo.replace(/\s+/g, '').substring(4, mawbNo.length - 2));
             const checkDigit: number = +mawbNo.slice(-1);
