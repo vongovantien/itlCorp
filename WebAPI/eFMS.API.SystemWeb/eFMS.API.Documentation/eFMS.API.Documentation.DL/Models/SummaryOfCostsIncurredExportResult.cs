@@ -66,5 +66,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string TypeCharge { get; set; }
         public decimal? VATAmount { get; set; }
         public decimal? NetAmount { get; set; }
+        public string SoaNo { get; set; }
     }
 }

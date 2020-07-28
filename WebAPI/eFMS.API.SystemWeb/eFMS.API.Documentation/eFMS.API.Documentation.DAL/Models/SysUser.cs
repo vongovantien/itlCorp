@@ -23,5 +23,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? InactiveOn { get; set; }
         public string WorkingStatus { get; set; }
         public string Description { get; set; }
+        public decimal? CreditLimit { get; set; }
+        public decimal? CreditRate { get; set; }
     }
 }

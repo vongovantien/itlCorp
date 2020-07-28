@@ -334,7 +334,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Cossts incurred.xlsx");
 
             return fileContent;
         }
