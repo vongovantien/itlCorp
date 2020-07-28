@@ -35,6 +35,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     currency: AbstractControl;
     voucherType: AbstractControl;
     totalExchangeRate: AbstractControl;
+    description: AbstractControl;
+    attachDocInfo: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -83,15 +85,19 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
                                 this.formGroup.controls['personalName'].setValue(res.partnerName);
                             }
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
-                            this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
+                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                     } else {
                         if (!this.formGroup.controls['personalName'].value) {
                             if (!this.formGroup.controls['personalName'].value) {
                                 this.formGroup.controls['personalName'].setValue(res.settlementRequester);
                             }
-                            this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
+                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                     }
                 }
             );
@@ -113,7 +119,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             invoiceNoReal: [],
 
             voucherType: [],
-            paymentMethod: [],
+            paymentMethod: [[this.paymentMethods[2]]],
             accountNo: [],
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
@@ -129,6 +135,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.accountNo = this.formGroup.controls['accountNo'];
         this.voucherType = this.formGroup.controls['voucherType'];
         this.totalExchangeRate = this.formGroup.controls['totalExchangeRate'];
+        this.description = this.formGroup.controls['description'];
+        this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
     }
 
 
@@ -149,5 +157,12 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         if (!!this.totalExchangeRate.value) {
             this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
         }
+    }
+
+    updateAttachInfo(pre: string, cur: string) {
+        if (!pre) {
+            return cur;
+        }
+        return `${pre}, ${cur}`;
     }
 }

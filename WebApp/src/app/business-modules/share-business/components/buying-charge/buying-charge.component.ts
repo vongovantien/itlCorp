@@ -632,6 +632,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 || charge.unitPrice === null
                 || charge.quantity < 0
                 || charge.unitPrice < 0
+                || charge.currencyId === null
                 || charge.vatrate > 100
             ) {
                 valid = false;

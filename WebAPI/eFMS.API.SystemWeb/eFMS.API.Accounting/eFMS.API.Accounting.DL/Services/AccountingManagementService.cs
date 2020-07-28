@@ -1326,13 +1326,16 @@ namespace eFMS.API.Accounting.DL.Services
                     string _paymentMethod = string.Empty;
                     if (!string.IsNullOrEmpty(acct.PaymentMethod))
                     {
-                        if (acct.PaymentMethod.Contains("Cash"))
+                        if (acct.PaymentMethod.Equals("Cash"))
                         {
                             _paymentMethod = "TM";
                         }
-                        else if (acct.PaymentMethod.Contains("Bank"))
+                        else if (acct.PaymentMethod.Equals("Bank Transfer"))
                         {
                             _paymentMethod = "CK";
+                        } else if (acct.PaymentMethod.Equals("Bank Transfer / Cash"))
+                        {
+                            _paymentMethod = "CK/TM";
                         }
                     }
                     string _statusInvoice = string.Empty;

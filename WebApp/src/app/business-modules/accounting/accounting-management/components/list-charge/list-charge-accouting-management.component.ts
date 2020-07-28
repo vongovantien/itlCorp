@@ -108,6 +108,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (charges: ChargeOfAccountingManagementModel[]) => {
+                    console.log(charges);
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
                         this.charges = [...this.charges, ...charges];
 

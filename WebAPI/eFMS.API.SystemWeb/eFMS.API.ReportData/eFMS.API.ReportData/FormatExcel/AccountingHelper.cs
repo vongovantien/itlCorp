@@ -24,6 +24,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
 
+        const string decimalFormat = "#,##0.00";
         /// <summary>
         /// Generate advance payment excel
         /// </summary>
@@ -2922,7 +2923,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 13].Value = item.Vat;
                 for(int i = 10; i < 14; i++)
                 {
-                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
                 }
 
                 workSheet.Cells[rowStart, 14].Value = item.AccountNo;
@@ -2932,7 +2933,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 17].Value = item.VatAmountVnd;
                 for (int i = 16; i < 18; i++)
                 {
-                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
                 }
 
                 workSheet.Cells[rowStart, 18].Value = item.InvoiceNo; //Invoice No của charge
