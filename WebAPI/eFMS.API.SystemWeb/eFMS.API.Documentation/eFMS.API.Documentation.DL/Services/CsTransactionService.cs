@@ -1981,6 +1981,13 @@ namespace eFMS.API.Documentation.DL.Services
                     item.DebitNo = null;
                     item.Soaclosed = null;
                     item.SettlementCode = null;
+
+                    item.AcctManagementId = null;
+                    item.InvoiceNo = null;
+                    item.InvoiceDate = null;
+                    item.VoucherId = null;
+                    item.VoucherIddate = null;
+
                     surCharges.Add(item);
                 }
             }
