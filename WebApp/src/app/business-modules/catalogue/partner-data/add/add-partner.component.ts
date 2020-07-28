@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
@@ -29,12 +28,11 @@ import _merge from 'lodash/merge';
 })
 export class AddPartnerDataComponent extends AppList {
     @ViewChild(FormAddPartnerComponent, { static: false }) formPartnerComponent: FormAddPartnerComponent;
-    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) confirmTaxcode: InfoPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
+    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
+
 
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
@@ -192,31 +190,6 @@ export class AddPartnerDataComponent extends AppList {
         }
 
 
-    }
-    closeppAndDeleteSaleman(index: any) {
-        this.index = index;
-        this.deleteSaleman(this.index);
-    }
-
-    showPopupSaleman() {
-        this.poupSaleman.isSave = false;
-        this.poupSaleman.isDetail = false;
-        this.poupSaleman.resetForm();
-        this.poupSaleman.show();
-    }
-
-    onDeleteSaleman() {
-        if (this.saleMandetail.length > 0) {
-            this.saleMandetail.splice(this.index, 1);
-            this.confirmDeleteJobPopup.hide();
-            this.toastr.success('Delete Success !');
-        }
-
-    }
-    deleteSaleman(index: any) {
-        this.index = index;
-        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
-        this.confirmDeleteJobPopup.show();
     }
 
     getDataCombobox() {
@@ -427,7 +400,6 @@ export class AddPartnerDataComponent extends AppList {
     }
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        console.log("formBody: ", formBody);
 
         this.trimInputForm(formBody);
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
@@ -455,14 +427,13 @@ export class AddPartnerDataComponent extends AppList {
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
         };
-        console.log("formBody: ", formBody);
-        console.log("clone: ", cloneObject);
+
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
         //merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
 
 
-        console.log("merge2: ", mergeObjPartner);
+
 
         //
         this.onCreatePartner(mergeObjPartner);
@@ -534,22 +505,33 @@ export class AddPartnerDataComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
+                    console.log("ir res: ", res.internalReferenceNo);
+                    console.log("ir body: ", body.internalReferenceNo);
                     if (!!res) {
                         console.log(res);
                         this.formPartnerComponent.isExistedTaxcode = true;
-                        console.log(this.formPartnerComponent.internalReferenceNo);
+
                         if (body.internalReferenceNo !== null) {
                             this.deleteMessage = `This Parnter is existed, please you check again!`;
                         } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                         }
                         this.confirmTaxcode.show();
+
                     } else {
                         this.onSave(body);
                     }
                 },
             );
     }
+
+    onFocusInternalReference() {
+        this.confirmTaxcode.hide();
+
+        //
+        this.formPartnerComponent.handleFocusInternalReference();
+    }
+
     onSave(body: any) {
         this._catalogueRepo.createPartner(body)
             .pipe(catchError(this.catchError))
