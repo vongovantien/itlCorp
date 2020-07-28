@@ -1772,7 +1772,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                     && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
                 string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
 
-                if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                if (csTransactionDetailRepo.Any(x => (x.Hwbno ?? "").IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     generatePrefixHouse = DocumentConstants.SEF_HBL
                         + GenerateID.GeneratePrefixHousbillNo();
