@@ -239,8 +239,9 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
             if (shipment.paymentTerm === 'Prepaid') {
                 return [this.wts[0]];
             }
+            return [this.wts[1]];
         }
-        return [this.wts[1]];
+        return [this.wts[0]];
 
     }
 
