@@ -8,6 +8,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     {
         public string Code { get; set; }
         public string Service { get; set; }
-        public string Active { get; set; }
+        public bool? Active { get; set; }
     }
 }

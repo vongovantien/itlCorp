@@ -11,8 +11,8 @@ namespace eFMS.API.Catalogue.DL.IService
 {
     public interface ICatIncotermService : IRepositoryBase<CatIncoterm, CatIncotermModel>
     {
-        IQueryable<CatIncoterm> Query(CatIncotermCriteria criteria);
-        IQueryable<CatIncoterm> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount);
+        IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria);
+        IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount);
         HandleState Update(CatIncotermEditModel model);
         HandleState AddNew(CatIncotermEditModel model);
         HandleState Delete(Guid Id);

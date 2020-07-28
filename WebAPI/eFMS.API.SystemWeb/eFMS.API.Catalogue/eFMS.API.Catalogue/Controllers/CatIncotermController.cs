@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
 using eFMS.API.Common;
@@ -45,10 +46,12 @@ namespace eFMS.API.Catalogue.Controllers
 
         }
 
-        [HttpGet]
-        public IActionResult Get()
+        [HttpPost]
+        [Route("Query")]
+        public IActionResult QueryIncoterm(CatIncotermCriteria criteria)
         {
-            return Ok(catIncotermService.Get());
+            var result = catIncotermService.Query(criteria);
+            return Ok(result);
         }
 
         [HttpPost]

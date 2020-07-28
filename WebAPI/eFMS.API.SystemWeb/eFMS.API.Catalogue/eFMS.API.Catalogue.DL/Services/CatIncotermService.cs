@@ -16,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -231,16 +232,53 @@ namespace eFMS.API.Catalogue.DL.Services
             return incotermDataViewModel;
         }
 
-        public IQueryable<CatIncoterm> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount)
         {
             throw new NotImplementedException();
         }
 
-        public IQueryable<CatIncoterm> Query(CatIncotermCriteria criteria)
+        public IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria)
         {
-            throw new NotImplementedException();
+
+            return GetQueryBy(criteria);
         }
 
-        
+        private IQueryable<CatIncotermModel> GetQueryBy(CatIncotermCriteria criteria)
+        {
+            Expression<Func<CatIncotermModel, bool>> query;
+            if (criteria.Service == null)
+            {
+                if(criteria.Active == null)
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Active == true || x.Active == false));
+                }
+                else
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Active == criteria.Active));
+                }
+            }
+            else
+            {
+                if (criteria.Active == null)
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Active == true || x.Active == false));
+                }
+                else
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (x.Active == criteria.Active));
+                }
+            }
+            return Get(query);
+        }
+
+
     }
 }
