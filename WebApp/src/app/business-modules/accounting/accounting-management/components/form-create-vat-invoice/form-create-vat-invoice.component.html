@@ -38,14 +38,14 @@
                         <div class="col-lg-12">
                             <div class="form-group">
                                 <label>General Exchange Rate
-                                    <span>
-                                        <button
-                                            class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
-                                            title="Sync to charges" (click)="syncExchangeRateCharge()">
-                                            <i class="la la-refresh"></i>
-                                        </button>
-                                    </span>
                                 </label>
+                                <span>
+                                    <button
+                                        class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
+                                        title="Sync to charges" (click)="syncExchangeRateCharge()">
+                                        <i class="la la-refresh"></i>
+                                    </button>
+                                </span>
                                 <input type="number" class="form-control" formControlName="totalExchangeRate"
                                     autoFormatCurrency numeric [decimals]="digitDecimal">
                             </div>
