@@ -12,7 +12,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         public CatChargeIncotermService(IContextBase<CatChargeIncoterm> repository, IMapper mapper) : base(repository, mapper)
         {
-
+            SetChildren<CatCharge>("ChargeId", "Id");
         }
     }
 }

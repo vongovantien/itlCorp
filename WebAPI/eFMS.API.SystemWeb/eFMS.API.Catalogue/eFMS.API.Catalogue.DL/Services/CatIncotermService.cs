@@ -8,6 +8,7 @@ using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Provider.Services.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -20,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService
+    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService, IPermissionBaseService<CatIncoterm, CatIncotermModel>
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -39,6 +40,8 @@ namespace eFMS.API.Catalogue.DL.Services
             currentUser = curUser;
             catChargeIncotermRepository = catChargeIncotermRepo;
             sysUserRepository = sysUserRepo;
+
+            SetChildren<CatChargeIncoterm>("Id", "IncotermId");
         }
 
         public HandleState AddNew(CatIncotermEditModel model)
@@ -175,6 +178,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
         }
+
         public bool CheckAllowDelete(Guid id)
         {
             throw new NotImplementedException();
@@ -239,7 +243,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria)
         {
-
             return GetQueryBy(criteria);
         }
 
@@ -278,21 +281,66 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             IQueryable<CatIncotermModel> dataQuery = Get(query);
+            dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
 
-            if(dataQuery != null && dataQuery.Count() > 0)
+            List<CatIncotermModel> listIncoterm = new List<CatIncotermModel>();
+
+            if (dataQuery != null && dataQuery.Count() > 0)
             {
                 foreach (var item in dataQuery)
                 {
-                    SysUser userCreated = sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault();
-                    SysUser userModified = sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault();
-                    item.UserCreatedName = userCreated.Username;
-                    item.UserModifiedName = userModified.Username;
+                    item.UserCreatedName = sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
+                    item.UserModifiedName = sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
+                    listIncoterm.Add(item);
                 }
-            }
 
-            return dataQuery;
+                IEnumerable< CatIncotermModel> d = listIncoterm.Select(x => new CatIncotermModel {
+                    UserCreatedName = x.UserCreatedName,
+                    UserModified = x.UserModified,
+                    UserModifiedName = x.UserModifiedName,
+                    UserCreated = x.UserCreated,
+                    DatetimeCreated = x.DatetimeCreated,
+                    DatetimeModified = x.DatetimeModified,
+                    Id = x.Id,
+                    Code = x.Code,
+                    NameEn = x.NameEn,
+                    Active = x.Active,
+                    DescriptionEn = x.DescriptionEn,
+                    DescriptionLocal = x.DescriptionLocal,
+                    Service = x.Service,
+                    NameLocal =x.NameLocal
+                });
+                return d.AsQueryable();
+            }
+            return Enumerable.Empty<CatIncotermModel>().AsQueryable();
         }
 
-
+        public IQueryable<CatIncotermModel> QueryByPermission(IQueryable<CatIncotermModel> data, PermissionRange range, ICurrentUser currentUser)
+        {
+            switch (range)
+            {
+                case PermissionRange.None:
+                    data = null;
+                    break;
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    data = data.Where(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    data = data.Where(x => x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    data = data.Where(x => x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    data = data.Where(x => x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    data = data.Where(x => x.CompanyId == currentUser.CompanyID);
+                    break;
+            }
+            return data;
+        }
     }
 }
