@@ -19,7 +19,7 @@ import { JobConstants, SystemConstants } from '@constants';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { Observable, of, merge } from 'rxjs';
-import { map, tap, takeUntil, catchError, finalize, switchMap, concatMap } from 'rxjs/operators';
+import { map, tap, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 
 @Component({
@@ -395,7 +395,10 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
         const formControlValueChanges = Object.keys(this.formMAWB.value).map((key) =>
             this.formMAWB.get(key).valueChanges.pipe(map((value) => ({ key, value })))
         );
-        merge(...formControlValueChanges)
+        merge(...formControlValueChanges).pipe(
+            distinctUntilChanged(),
+            takeUntil(this.ngUnsubscribe)
+        )
             .subscribe(({ key, value }) => {
                 if (key === 'rateCharge') {
                     if (this.total.value !== this.AA) {
@@ -459,6 +462,11 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     } else {
                         this.dueAgentPp.setValue(null);
                         this.dueAgentCll.setValue(null);
+                    }
+                }
+                if (key === 'etd') {
+                    if (!!value.startDate) {
+                        this.flightDate.setValue(value);
                     }
                 }
             });
