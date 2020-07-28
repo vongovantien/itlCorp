@@ -1772,7 +1772,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                                     && x.DatetimeCreated.Value.Day == DateTime.Now.Day);
                 string generatePrefixHouse = GenerateID.GeneratePrefixHousbillNo();
 
-                if (csTransactionDetailRepo.Any(x => x.Hwbno.IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
+                if (csTransactionDetailRepo.Any(x => (x.Hwbno ?? "").IndexOf(generatePrefixHouse, StringComparison.OrdinalIgnoreCase) >= 0))
                 {
                     generatePrefixHouse = DocumentConstants.SEF_HBL
                         + GenerateID.GeneratePrefixHousbillNo();
@@ -1981,6 +1981,13 @@ namespace eFMS.API.Documentation.DL.Services
                     item.DebitNo = null;
                     item.Soaclosed = null;
                     item.SettlementCode = null;
+
+                    item.AcctManagementId = null;
+                    item.InvoiceNo = null;
+                    item.InvoiceDate = null;
+                    item.VoucherId = null;
+                    item.VoucherIddate = null;
+
                     surCharges.Add(item);
                 }
             }

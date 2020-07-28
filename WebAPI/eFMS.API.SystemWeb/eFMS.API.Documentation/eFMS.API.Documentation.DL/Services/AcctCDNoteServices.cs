@@ -547,11 +547,11 @@ namespace eFMS.API.Documentation.DL.Services
                     sealsContsNo += (!string.IsNullOrEmpty(cont.ContainerNo) || !string.IsNullOrEmpty(cont.SealNo)) ? (cont.ContainerNo + "/" + cont.SealNo + ", ") : "";
                 }
 
-                // Đối với các Service là OPS hoặc các service khác Sea FCL thì lấy package qty & package type theo Housebill
-                if (!transaction.TransactionType.Contains("SF") || opsTransaction != null)
+                // Đối với các Service là OPS hoặc các service khác Sea FCL, Air thì lấy package qty & package type theo Housebill
+                if ((!transaction.TransactionType.Contains("SF") && !transaction.TransactionType.Contains("A")) || opsTransaction != null)
                 {
                     hbPackages += item.PackageQty + " " + unitRepository.Get(x => x.Id == item.PackageType).FirstOrDefault()?.UnitNameEn + "; ";
-                }
+                }               
 
                 if (conts.Count() > 0)
                 {
@@ -566,6 +566,13 @@ namespace eFMS.API.Documentation.DL.Services
                     hbCw += item.ChargeWeight;
                 }
             }
+
+            //Đối với hàng Air (Import & Export) thì sẽ sum PackageQty của các Housebill
+            if (transaction.TransactionType.Equals("AI") || transaction.TransactionType.Equals("AE"))
+            {
+                hbPackages = HBList.Select(s => s.PackageQty).Sum()?.ToString();
+            }
+
             hbConstainers += ".";
             hbConstainers = hbConstainers != "." ? hbConstainers.Replace(", .", "") : string.Empty;
             hbPackages += ".";
