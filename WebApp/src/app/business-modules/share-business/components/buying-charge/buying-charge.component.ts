@@ -621,7 +621,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             charge.duplicateCharge = false;
             charge.duplicateInvoice = false;
             if (this.checkSpecialCaseCharge(charge)) {
-                break;
+                valid = true;
             }
             if (
                 !charge.paymentObjectId
