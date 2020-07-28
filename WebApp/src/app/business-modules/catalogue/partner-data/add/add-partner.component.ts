@@ -32,6 +32,7 @@ export class AddPartnerDataComponent extends AppList {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
     @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
 
 
     contracts: Contract[] = [];
@@ -505,17 +506,20 @@ export class AddPartnerDataComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
+                    console.log("res check: ", res);
 
                     if (!!res) {
 
                         this.formPartnerComponent.isExistedTaxcode = true;
 
-                        if (body.internalReferenceNo !== null) {
-                            this.deleteMessage = `This Parnter is existed, please you check again!`;
+                        if (!!res.internalReferenceNo) {
+                            this.deleteMessage = `This Partner is existed, please you check again!`;
+                            this.confirmDuplicatePartner.show();
                         } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
+                            this.confirmTaxcode.show();
                         }
-                        this.confirmTaxcode.show();
+
 
                     } else {
                         this.onSave(body);

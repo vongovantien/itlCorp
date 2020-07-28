@@ -36,7 +36,8 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild("popupDeleteContract", { static: false }) confirmDeleteContract: ConfirmPopupComponent;
 
     @ViewChild("popupDeletePartner", { static: false }) confirmDeletePartnerPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent, { static: false }) confirmTaxcode: InfoPopupComponent;
+    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
+    @ViewChild('duplicatePartnerPopup', { static: false }) confirmDuplicatePartner: InfoPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
@@ -526,42 +527,33 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingPhone, formBody.billingPhone);
     }
 
+    onFocusInternalReference() {
+        this.confirmTaxcode.hide();
+        //
+        this.formPartnerComponent.handleFocusInternalReference();
+    }
+
     updatePartner(body: any) {
         this._catalogueRepo.checkTaxCode(body)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
+                    console.log("res check: ", res);
+
                     if (!!res) {
-                        console.log("ir res: ", res.internalReferenceNo);
-                        console.log("ir body: ", body.internalReferenceNo);
 
-                        // có internalRef
+                        this.formPartnerComponent.isExistedTaxcode = true;
+
                         if (!!res.internalReferenceNo) {
-                            // 
-                            if (body.internalReferenceNo === null) {
-                                this.onSave(body);
-                                return;
-                            }
-                            else if (res.internalReferenceNo !== body.internalReferenceNo) {
-                                this.formPartnerComponent.isExistedTaxcode = true;
-                                this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
-                                this.confirmTaxcode.show();
-                            }
-                            else if (res.internalReferenceNo === body.internalReferenceNo) {
-                                this.formPartnerComponent.isExistedTaxcode = true;
-                                this.deleteMessage = `This Parnter is existed, please you check again!`;
-                                this.confirmTaxcode.show();
-                            }
-
-                        }
-                        else {
-                            this.formPartnerComponent.isExistedTaxcode = true;
+                            this.deleteMessage = `This Partner is existed, please you check again!`;
+                            this.confirmDuplicatePartner.show();
+                        } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                             this.confirmTaxcode.show();
                         }
 
+
                     } else {
-                        //res = null
                         this.onSave(body);
                     }
                 },
