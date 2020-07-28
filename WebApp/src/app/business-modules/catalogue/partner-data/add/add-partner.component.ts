@@ -154,11 +154,11 @@ export class AddPartnerDataComponent extends AppList {
                     (res: any) => {
                         if (!!res) {
                             if (this.isDup) {
-                                console.log("dup");
+
                                 this.toastr.error('Duplicate service, office with sale man!');
                             } else {
                                 this.saleMandetail.push(this.salemanToAdd);
-                                console.log(this.saleMandetail);
+
                                 this.poupSaleman.hide();
 
                                 /// get detail employee --- to be continue
@@ -300,7 +300,7 @@ export class AddPartnerDataComponent extends AppList {
     getPartnerGroups(): any {
         this._catalogueRepo.getPartnerGroup().subscribe((response: any) => {
             if (response != null) {
-                console.log(response);
+
                 this.formPartnerComponent.partnerGroups = response.map(x => ({ "text": x.id, "id": x.id }));
                 this.getPartnerGroupActive(this.partnerType);
             }
@@ -505,10 +505,9 @@ export class AddPartnerDataComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    console.log("ir res: ", res.internalReferenceNo);
-                    console.log("ir body: ", body.internalReferenceNo);
+
                     if (!!res) {
-                        console.log(res);
+
                         this.formPartnerComponent.isExistedTaxcode = true;
 
                         if (body.internalReferenceNo !== null) {
@@ -589,7 +588,7 @@ export class AddPartnerDataComponent extends AppList {
         if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(null);
         } else {
-            console.log(this.selectedContract);
+
             const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 this.contracts[this.indexlstContract] = this.selectedContract;
