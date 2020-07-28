@@ -170,28 +170,28 @@ namespace eFMS.API.Accounting.DL.Services
                        select new { advancePayment, advancePaymentApr };
             var result = data.Where(x =>
                 (
-                    permissionRangeRequester == PermissionRange.All ? ((!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester == currentUser.UserID) ? x.advancePayment.Requester == currentUser.UserID : true) : true
+                    permissionRangeRequester == PermissionRange.All ? (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false) : true
                     &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? (!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester == currentUser.UserID) ? x.advancePayment.Requester == currentUser.UserID : true : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == criteria.Requester : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.advancePayment.GroupId == currentUser.GroupId
                                                                         && x.advancePayment.DepartmentId == currentUser.DepartmentId
                                                                         && x.advancePayment.OfficeId == currentUser.OfficeID
                                                                         && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                        && (!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester == currentUser.UserID) ? x.advancePayment.Requester == currentUser.UserID : true) : true
+                                                                        && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Department ? (x.advancePayment.DepartmentId == currentUser.DepartmentId
                                                                               && x.advancePayment.OfficeId == currentUser.OfficeID
                                                                               && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                              && (!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester == currentUser.UserID) ? x.advancePayment.Requester == currentUser.UserID : true) : true
+                                                                              && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Office ? (x.advancePayment.OfficeId == currentUser.OfficeID
                                                                           && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                          && (!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester == currentUser.UserID) ? x.advancePayment.Requester == currentUser.UserID : true) : true
+                                                                          && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
-                    permissionRangeRequester == PermissionRange.Company ? x.advancePayment.CompanyId == currentUser.CompanyID && x.advancePayment.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Company ? x.advancePayment.CompanyId == currentUser.CompanyID && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false) : true
                 )
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
@@ -204,7 +204,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                && ((!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester != currentUser.UserID) ? x.advancePayment.Requester == criteria.Requester : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //LEADER AND DEPUTY OF LEADER
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
@@ -217,7 +217,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                && ((!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester != currentUser.UserID) ? x.advancePayment.Requester == criteria.Requester : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //MANANER AND DEPUTY OF MANAGER
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
@@ -230,7 +230,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                && ((!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester != currentUser.UserID) ? x.advancePayment.Requester == criteria.Requester : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
@@ -244,7 +244,7 @@ namespace eFMS.API.Accounting.DL.Services
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Accountant) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
-                && ((!string.IsNullOrEmpty(criteria.Requester) && criteria.Requester != currentUser.UserID) ? x.advancePayment.Requester == criteria.Requester : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.advancePayment);
             return result;
