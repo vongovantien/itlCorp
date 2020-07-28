@@ -91,11 +91,14 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
+        this.dataSearch = {
+            requester: this.userLogged.id
+        };
         this.getListAdvancePayment(this.dataSearch);
     }
 
     onSearchAdvPayment(data: any) {
-        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
+        this.dataSearch = data; //Object.assign({}, data, { requester: this.userLogged.id });
         this.getListAdvancePayment(this.dataSearch);
     }
 

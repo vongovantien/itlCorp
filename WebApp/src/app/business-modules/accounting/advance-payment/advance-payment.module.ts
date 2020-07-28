@@ -19,6 +19,7 @@ import { NgxCurrencyModule } from "ngx-currency";
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-advance-payment.component';
+import { SelectModule } from 'ng2-select';
 const routing: Routes = [
     {
         path: "",
@@ -83,7 +84,8 @@ const customCurrencyMaskConfig = {
         ReactiveFormsModule,
         NgProgressModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        ShareApprovePaymentModule
+        ShareApprovePaymentModule,
+        SelectModule,
     ],
     declarations: [
         AdvancePaymentComponent,
