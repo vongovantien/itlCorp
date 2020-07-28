@@ -1579,27 +1579,31 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
                 decimal _wtpp = 0;
-                housebill.WghtPP = (decimal.TryParse(data.Wtpp, out _wtpp)) ? string.Format("{0:n}", _wtpp) : data.Wtpp?.ToUpper(); //WT (prepaid)
+                housebill.WghtPP = (decimal.TryParse(data.Wtpp, out _wtpp)) ? (_wtpp != 0 ? string.Format("{0:n}", _wtpp) : string.Empty) : data.Wtpp?.ToUpper(); //WT (prepaid)
                 decimal _wtcll = 0;
-                housebill.WghtCC = (decimal.TryParse(data.Wtcll, out _wtcll)) ? string.Format("{0:n}", _wtcll) : data.Wtcll?.ToUpper(); //WT (Collect)
-                housebill.ValChPP = string.Empty; //NOT USE
-                housebill.ValChCC = string.Empty; //NOT USE
-                housebill.TxPP = string.Empty; //NOT USE
-                housebill.TxCC = string.Empty; //NOT USE
+                housebill.WghtCC = (decimal.TryParse(data.Wtcll, out _wtcll)) ? (_wtcll != 0 ? string.Format("{0:n}", _wtcll) : string.Empty) : data.Wtcll?.ToUpper(); //WT (Collect)
+                decimal _valChPP = 0;
+                housebill.ValChPP = (decimal.TryParse(data.Valpp, out _valChPP)) ? (_valChPP != 0 ? string.Format("{0:n}", _valChPP) : string.Empty) : data.Valpp?.ToUpper(); //Val (Prepaid)
+                decimal _valChCC = 0;
+                housebill.ValChCC = (decimal.TryParse(data.Valcll, out _valChCC)) ? (_valChCC != 0 ? string.Format("{0:n}", _valChCC) : string.Empty) : data.Valcll?.ToUpper(); //Val (Collect)
+                decimal _txPP = 0;
+                housebill.TxPP = (decimal.TryParse(data.Taxpp, out _txPP)) ? (_txPP != 0 ? string.Format("{0:n}", _txPP) : string.Empty) : data.Taxpp?.ToUpper(); //Tax (Prepaid)
+                decimal _txCC = 0;
+                housebill.TxCC = (decimal.TryParse(data.Taxcll, out _txCC)) ? (_txCC != 0 ? string.Format("{0:n}", _txCC) : string.Empty) : data.Taxcll?.ToUpper(); //Tax (Collect)
                 housebill.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
                 decimal _dueAgentPp = 0;
-                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? string.Format("{0:n}", _dueAgentPp) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)                
+                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? (_dueAgentPp != 0 ? string.Format("{0:n}", _dueAgentPp) : string.Empty) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)                
                 decimal _dueAgentCll = 0;
-                housebill.TTChgAgntCC = (decimal.TryParse(data.DueAgentCll, out _dueAgentCll)) ? string.Format("{0:n}", _dueAgentCll) : data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
+                housebill.TTChgAgntCC = (decimal.TryParse(data.DueAgentCll, out _dueAgentCll)) ? (_dueAgentCll != 0 ? string.Format("{0:n}", _dueAgentCll) : string.Empty) : data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
                 decimal _dueCarrierPp = 0;
-                housebill.TTCarrPP = (decimal.TryParse(data.DueCarrierPp, out _dueCarrierPp)) ? string.Format("{0:n}", _dueCarrierPp) : data.DueCarrierPp?.ToUpper(); //Due to carrier (prepaid)
+                housebill.TTCarrPP = (decimal.TryParse(data.DueCarrierPp, out _dueCarrierPp)) ? (_dueCarrierPp != 0 ? string.Format("{0:n}", _dueCarrierPp) : string.Empty) : data.DueCarrierPp?.ToUpper(); //Due to carrier (prepaid)
                 decimal _dueCarrierCll = 0;
-                housebill.TTCarrCC = (decimal.TryParse(data.DueCarrierCll, out _dueCarrierCll)) ? string.Format("{0:n}", _dueCarrierCll) : data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
+                housebill.TTCarrCC = (decimal.TryParse(data.DueCarrierCll, out _dueCarrierCll)) ? (_dueCarrierCll != 0 ? string.Format("{0:n}", _dueCarrierCll) : string.Empty): data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
                 decimal _totalPp = 0;
-                housebill.TtalPP = (decimal.TryParse(data.TotalPp, out _totalPp)) ? string.Format("{0:n}", _totalPp) : data.TotalPp?.ToUpper(); //Total (prepaid)
+                housebill.TtalPP = (decimal.TryParse(data.TotalPp, out _totalPp)) ? (_totalPp != 0 ? string.Format("{0:n}", _totalPp) : string.Empty) : data.TotalPp?.ToUpper(); //Total (prepaid)
                 decimal _totalCll = 0;
-                housebill.TtalCC = (decimal.TryParse(data.TotalCll, out _totalCll)) ? string.Format("{0:n}", _totalCll) : data.TotalCll?.ToUpper(); //Total (Collect)
+                housebill.TtalCC = (decimal.TryParse(data.TotalCll, out _totalCll)) ? (_totalCll != 0 ? string.Format("{0:n}", _totalCll) : string.Empty) : data.TotalCll?.ToUpper(); //Total (Collect)
                 housebill.CurConvRate = string.Empty; //NOT USE
                 housebill.CCChgDes = string.Empty; //NOT USE
                 housebill.SpecialNote = data.ShippingMark?.ToUpper(); //Shipping Mark
@@ -1641,8 +1645,11 @@ namespace eFMS.API.Documentation.DL.Services
                 case DocumentConstants.HOUSEAIRWAYBILLLASTEST_ITL_FRAME:
                     _reportName = "HouseAirwayBillLastestITLFrame.rpt";
                     break;
+                case DocumentConstants.HOUSEAIRWAYBILLLASTEST_HAWB:
+                    _reportName = "HouseAirwayBillHAWB.rpt";
+                    break;
                 case DocumentConstants.HOUSEAIRWAYBILLLASTEST_HAWB_FRAME:
-                    _reportName = "HouseAirwayBillHAWBFrame.rpt";
+                    _reportName = "HouseAirwayBillHAWBFrame.rpt";                
                     break;
             }
             result = new Crystal

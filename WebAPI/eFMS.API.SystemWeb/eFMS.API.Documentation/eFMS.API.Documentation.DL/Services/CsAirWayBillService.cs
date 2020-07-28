@@ -310,9 +310,7 @@ namespace eFMS.API.Documentation.DL.Services
                     // It's a number!
                     Wtpp = Convert.ToDecimal(data.Wtpp);
                     WghtPPNumber = true;
-                }
-                awb.WghtPP = WghtPPNumber ? Wtpp.ToString("0.00") : data.Wtpp?.ToUpper();//WT (prepaid)
-
+                }               
 
                 decimal Wtcc = 0M;
                 bool WghtCCNumber = false;
@@ -359,22 +357,76 @@ namespace eFMS.API.Documentation.DL.Services
                     TtalCCNumber = true;
                 }
 
-                awb.WghtPP = WghtPPNumber ? Wtpp.ToString("0.00") : data.Wtpp?.ToUpper();//WT (prepaid)
-                awb.WghtCC = WghtCCNumber ? Wtcc.ToString("0.00") : data.Wtcll?.ToUpper();//WT (Collect)
+                decimal ValChPP = 0M;
+                bool ValChPPNumber = false;
+                if (double.TryParse(data.Valpp, out num))
+                {
+                    // It's a number!
+                    ValChPP = Convert.ToDecimal(data.Valpp);
+                    ValChPPNumber = true;
+                }
+
+                decimal ValChCC = 0M;
+                bool ValChCCNumber = false;
+                if (double.TryParse(data.Valcll, out num))
+                {
+                    // It's a number!
+                    ValChCC = Convert.ToDecimal(data.Valcll);
+                    ValChCCNumber = true;
+                }
+
+                decimal TxPP = 0M;
+                bool TxPPNumber = false;
+                if (double.TryParse(data.Taxpp, out num))
+                {
+                    // It's a number!
+                    TxPP = Convert.ToDecimal(data.Taxpp);
+                    TxPPNumber = true;
+                }
+
+                decimal TxCC = 0M;
+                bool TxCCNumber = false;
+                if (double.TryParse(data.Taxcll, out num))
+                {
+                    // It's a number!
+                    TxCC = Convert.ToDecimal(data.Taxcll);
+                    TxCCNumber = true;
+                }
+
+                decimal TTCarrPP = 0M;
+                bool TTCarrPPNumber = false;
+                if (double.TryParse(data.DueCarrierPp, out num))
+                {
+                    // It's a number!
+                    TTCarrPP = Convert.ToDecimal(data.DueCarrierPp);
+                    TTCarrPPNumber = true;
+                }
+
+                decimal TTCarrCC = 0M;
+                bool TTCarrCCNumber = false;
+                if (double.TryParse(data.DueCarrierCll, out num))
+                {
+                    // It's a number!
+                    TTCarrCC = Convert.ToDecimal(data.DueCarrierCll);
+                    TTCarrCCNumber = true;
+                }
+
+                awb.WghtPP = WghtPPNumber ? (Wtpp != 0 ? Wtpp.ToString("0.00") : string.Empty) : data.Wtpp?.ToUpper();//WT (prepaid)
+                awb.WghtCC = WghtCCNumber ? (Wtcc != 0 ? Wtcc.ToString("0.00") : string.Empty) : data.Wtcll?.ToUpper();//WT (Collect)
                 //awb.WghtCC = data.Wtcll?.ToUpper(); 
 
-                awb.ValChPP = string.Empty; //NOT USE
-                awb.ValChCC = string.Empty; //NOT USE
-                awb.TxPP = string.Empty; //NOT USE
-                awb.TxCC = string.Empty; //NOT USE
+                awb.ValChPP = ValChPPNumber ? (ValChPP != 0 ? ValChPP.ToString("0.00") : string.Empty) : data.Valpp?.ToUpper(); //Val (Prepaid)
+                awb.ValChCC = ValChCCNumber ? (ValChCC != 0 ? ValChCC.ToString("0.00") : string.Empty) : data.Valcll?.ToUpper(); //Val (Collect)
+                awb.TxPP = TxPPNumber ? (TxPP != 0 ? TxPP.ToString("0.00") : string.Empty) : data.Taxpp?.ToUpper(); //Tax (Prepaid)
+                awb.TxCC = TxCCNumber ? (TxCC != 0 ? TxCC.ToString("0.00") : string.Empty) : data.Taxcll?.ToUpper(); //Tax (Collect)
                 awb.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 awb.OChrVal = string.Empty; //NOT USE
-                awb.TTChgAgntPP = DueAgentPpNumber ? DueAgentPp.ToString("0.00") :  data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
-                awb.TTChgAgntCC = DueAgentCcNumber ? DueAgentCc.ToString("0.00") :   data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
-                awb.TTCarrPP = data.DueCarrierPp; //Due to carrier (prepaid)
-                awb.TTCarrCC = data.DueCarrierCll; //Due to carrier (Collect)
-                awb.TtalPP = TtalPPNumber? TtalPP.ToString("0.00") : data.TotalPp?.ToUpper(); //Total (prepaid)
-                awb.TtalCC = TtalCCNumber? TtalCC.ToString("0.00") :  data.TotalCll?.ToUpper(); //Total (Collect)
+                awb.TTChgAgntPP = DueAgentPpNumber ? (DueAgentPp != 0 ? DueAgentPp.ToString("0.00") : string.Empty) :  data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
+                awb.TTChgAgntCC = DueAgentCcNumber ? (DueAgentCc != 0 ? DueAgentCc.ToString("0.00") : string.Empty) :   data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
+                awb.TTCarrPP = TTCarrPPNumber ? (TTCarrPP != 0 ? TTCarrPP.ToString("0.00") : string.Empty) : data.DueCarrierPp?.ToUpper(); //Due to carrier (prepaid)
+                awb.TTCarrCC = TTCarrCCNumber ? (TTCarrCC != 0 ? TTCarrCC.ToString("0.00") : string.Empty) : data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
+                awb.TtalPP = TtalPPNumber? (TtalPP != 0 ? TtalPP.ToString("0.00") : string.Empty) : data.TotalPp?.ToUpper(); //Total (prepaid)
+                awb.TtalCC = TtalCCNumber? (TtalCC != 0 ? TtalCC.ToString("0.00") : string.Empty) :  data.TotalCll?.ToUpper(); //Total (Collect)
                 awb.CurConvRate = string.Empty; //NOT USE
                 awb.CCChgDes = string.Empty; //NOT USE
                 awb.SpecialNote = data.ShippingMark?.ToUpper(); //Shipping Mark
