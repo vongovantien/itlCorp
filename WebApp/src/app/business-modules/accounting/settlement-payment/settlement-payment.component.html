@@ -28,6 +28,11 @@
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-50 first">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" [checked]="isCheckAll"
+                                                (change)="isCheckAll=!isCheckAll; checkAllSettlement()">
+                                            <span></span>
+                                        </label>
                                     </th>
                                 </thead>
                                 <tbody class="tbody-group">
@@ -40,7 +45,8 @@
                                                 <div class="m-checkbox-list d-flex align-items-center">
                                                     <label class="m-checkbox"
                                                         *ngIf="settlePayment.statusApproval === 'Done'">
-                                                        <input type="checkbox" [(ngModel)]="settlePayment.isSelected">
+                                                        <input type="checkbox" [(ngModel)]="settlePayment.isSelected"
+                                                            (change)="onChangeSelectedSettlement(settlePayment);">
                                                         <span></span>
                                                     </label>
                                                     <button
@@ -51,19 +57,15 @@
                                                         (click)="showSurcharge(settlePayment.settlementNo, i)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <!-- <ng-container
+                                                    <ng-container
                                                         *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
-                                                        <a title="Delete" class="pointer"
-                                                            (click)="showDeletePopup(settlePayment)">
+                                                        <button
+                                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Delete"
+                                                            (click)="prepareDeleteAdvance(settlePayment)">
                                                             <i class="la la-trash text-danger"></i>
-                                                        </a>
-                                                    </ng-container> -->
-                                                    <button
-                                                        [disabled]="settlePayment.statusApproval !== 'New' && settlePayment.statusApproval !== 'Denied'"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Delete" (click)="prepareDeleteAdvance(settlePayment)">
-                                                        <i class="la la-trash text-danger"></i>
-                                                    </button>
+                                                        </button>
+                                                    </ng-container>
                                                     <span>
                                                         <a title="Preview" class="pointer"
                                                             (click)="printSettlement(settlePayment.settlementNo)">

@@ -71,3 +71,4 @@ ShipPicture	BLOB
 PicMarks	String	255	
 GoodsDelivery	String	255	
 Airline	String	255	
+SeaAir	Number		

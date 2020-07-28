@@ -19,6 +19,8 @@ import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogue
 import { FormValidators } from 'src/app/shared/validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 import { formatCurrency } from '@angular/common';
+import { JobConstants } from '@constants';
+import { SelectItem } from 'ng2-select';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -75,22 +77,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     airwayBill: AirwayBill;
 
 
-    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'shortName', label: 'Name ABBR' },
-        { field: 'partnerNameEn', label: 'Name EN' },
-        { field: 'taxCode', label: 'Tax Code' },
-    ];
-
-    displayFieldsCountry: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Country Code' },
-        { field: 'nameEn', label: 'Name EN' },
-    ];
-
-    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'code', label: 'Port Code' },
-        { field: 'nameEn', label: 'Port Name' },
-        { field: 'countryNameEN', label: 'Country' },
-    ];
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PORT;
 
     billTypes: CommonInterface.INg2Select[] = [
         { id: 'Copy', text: 'Copy' },
@@ -102,26 +91,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         { id: 'Collect', text: 'Collect' },
         { id: 'Sea - Air Difference', text: 'Sea - Air Difference' }
     ];
-    shipmentTypes: CommonInterface.INg2Select[] = [
-        { id: 'Freehand', text: 'Freehand' },
-        { id: 'Nominated', text: 'Nominated' }
-    ];
-    wts: CommonInterface.INg2Select[] = [
-        { id: 'PP', text: 'PP' },
-        { id: 'CLL', text: 'CLL' }
-    ];
-    numberOBLs: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'Zero (0)' },
-        { id: 1, text: 'One (1)' },
-        { id: 2, text: 'Two (2)' },
-        { id: 3, text: 'Three (3)' }
-    ];
 
-    rClasses: CommonInterface.INg2Select[] = [
-        { id: 'M', text: 'M' },
-        { id: 'N', text: 'N' },
-        { id: 'Q', text: 'Q' }
-    ];
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
+    wts: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.WT;
+    numberOBLs: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.BLNUMBERS;
+    rClasses: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.RCLASS;
 
     selectedIndexDIM: number = -1;
 
@@ -245,6 +219,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     warehouseId: shipment.warehouseId,
                                     firstCarrierBy: shipment.flightVesselName,
                                     freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
+
                                 });
                             }
                         }
@@ -399,6 +374,19 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.updateHeightWeight(changes);
             });
 
+        this.freightPayment.valueChanges.subscribe(
+            (c: SelectItem[]) => {
+                if (!!c) {
+                    if (c[0].id === "Prepaid") {
+                        this.wtorValpayment.setValue([this.wts[0]]);
+                    } else if (c[0].id === "Collect") {
+                        this.wtorValpayment.setValue([this.wts[1]]);
+                    } else {
+                        this.wtorValpayment.setValue([this.wts[0]]);
+                    }
+                }
+            }
+        )
         this.onWTVALChange();
         this.otherPaymentChange();
         this.onRateChargeChange();

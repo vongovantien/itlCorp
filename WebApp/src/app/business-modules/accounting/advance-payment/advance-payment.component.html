@@ -89,14 +89,15 @@
                                                         title="Collapse" type="button">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-
-                                                    <button
-                                                        [disabled]="advancePayment.statusApproval !== 'New' && advancePayment.statusApproval !== 'Denied'"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                        title="Delete advance payment"
-                                                        (click)="prepareDeleteAdvance(advancePayment)">
-                                                        <i class="la la-trash text-danger"></i>
-                                                    </button>
+                                                    <ng-container
+                                                        *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
+                                                        <button
+                                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Delete advance payment"
+                                                            (click)="prepareDeleteAdvance(advancePayment)">
+                                                            <i class="la la-trash text-danger"></i>
+                                                        </button>
+                                                    </ng-container>
                                                 </div>
                                             </td>
                                             <td class="text-underline text-primary pointer">

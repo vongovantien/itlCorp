@@ -341,6 +341,24 @@ namespace eFMS.API.Documentation.DL.Services
                     DueAgentCcNumber = true;
                 }
 
+                decimal DueCarrierPp = 0M;
+                bool DueCarrierPpNumber = false;
+                if (double.TryParse(data.DueCarrierPp, out num))
+                {
+                    // It's a number!
+                    DueCarrierPp = Convert.ToDecimal(data.DueCarrierPp);
+                    DueCarrierPpNumber = true;
+                }
+
+                decimal DueCarrierCc = 0M;
+                bool DueCarrierCcNumber = false;
+                if (double.TryParse(data.DueAgentCll, out num))
+                {
+                    // It's a number!
+                    DueCarrierCc = Convert.ToDecimal(data.DueCarrierCll);
+                    DueCarrierCcNumber = true;
+                }
+
                 decimal TtalPP = 0M;
                 bool TtalPPNumber = false;
                 if (double.TryParse(data.TotalPp, out num))
@@ -371,8 +389,8 @@ namespace eFMS.API.Documentation.DL.Services
                 awb.OChrVal = string.Empty; //NOT USE
                 awb.TTChgAgntPP = DueAgentPpNumber ? DueAgentPp.ToString("0.00") :  data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
                 awb.TTChgAgntCC = DueAgentCcNumber ? DueAgentCc.ToString("0.00") :   data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
-                awb.TTCarrPP = string.Empty; //NOT USE
-                awb.TTCarrCC = string.Empty; //NOT USE
+                awb.TTCarrPP = DueCarrierPpNumber ? DueCarrierPp.ToString("0.00") : data.DueCarrierPp?.ToUpper();//Due to carrier (prepaid)
+                awb.TTCarrCC = DueCarrierCcNumber  ? DueCarrierCc.ToString("0.00") : data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
                 awb.TtalPP = TtalPPNumber? TtalPP.ToString("0.00") : data.TotalPp?.ToUpper(); //Total (prepaid)
                 awb.TtalCC = TtalCCNumber? TtalCC.ToString("0.00") :  data.TotalCll?.ToUpper(); //Total (Collect)
                 awb.CurConvRate = string.Empty; //NOT USE

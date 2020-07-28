@@ -10,6 +10,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from '@constants';
 import { SortService } from '@services';
+import { SelectComponent } from 'ng2-select';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -232,7 +233,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     this._toastService.error('Contract no has been existed!');
                 } else {
                     this.formContractPopup.isDuplicateContract = false;
-                    this.contracts.push(this.selectedContract);
+                    this.contracts = [...this.contracts, ...$event];
+                    console.log(this.contracts);
                 }
             }
         }
