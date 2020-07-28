@@ -469,8 +469,18 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                         this.flightDate.setValue(value);
                     }
                 }
+                if (key === 'freightPayment') {
+                    if (!!value) {
+                        if (value[0].id === "Prepaid") {
+                            this.wtorValpayment.setValue([this.wts[0]]);
+                        } else if (value[0].id === "Collect") {
+                            this.wtorValpayment.setValue([this.wts[1]]);
+                        } else {
+                            this.wtorValpayment.setValue([this.wts[0]]);
+                        }
+                    }
+                }
             });
-
     }
 
     getDataForm() {
