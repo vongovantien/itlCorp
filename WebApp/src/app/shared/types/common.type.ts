@@ -3,7 +3,7 @@ namespace CommonType {
 
     export type ACTION_FORM = 'CREATE' | 'UPDATE' | 'COPY';
 
-    export type DIRECTION = 'left' | 'right';
+    export type DIRECTION = 'left' | 'right' | 'center';
 
     export type SERVICE_TYPE = 'air' | 'sea' | 'logistic';
 

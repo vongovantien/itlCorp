@@ -280,6 +280,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             || (!!this.billSIComponent.loadingDate.value && !this.billSIComponent.loadingDate.value.startDate)
             || (!!this.billSIComponent.issueDate.value && !this.billSIComponent.issueDate.value.startDate)
             || (this.billSIComponent.pod.value === this.billSIComponent.pol.value)
+            || (this.billSIComponent.voyNo.value.trim() === '')
         ) {
             valid = false;
         }

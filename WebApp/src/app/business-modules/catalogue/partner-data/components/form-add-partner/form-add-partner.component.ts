@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, Input, ElementRef } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
@@ -24,6 +24,9 @@ export class FormAddPartnerComponent extends AppForm {
 
     @Output() requireSaleman = new EventEmitter<boolean>();
     @Input() isUpdate: boolean = false;
+    //
+    @ViewChild('focusInput', { static: false }) internalReferenceRef: ElementRef;
+
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
 
@@ -436,6 +439,7 @@ export class FormAddPartnerComponent extends AppForm {
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
+            //
             partnerAccountRef: partner.parentId,
             taxCode: partner.taxCode,
             partnerGroup: partnerGroupActives,
@@ -503,5 +507,9 @@ export class FormAddPartnerComponent extends AppForm {
         this.zipCode.setValue(this.zipCodeShipping.value);
         this.addressEn.setValue(this.addressShippingEn.value);
         this.addressVn.setValue(this.addressShippingVn.value);
+    }
+
+    handleFocusInternalReference() {
+        this.setFocusInput(this.internalReferenceRef);
     }
 }
