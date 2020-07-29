@@ -19,6 +19,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
+        public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
         public virtual DbSet<CatContract> CatContract { get; set; }
         public virtual DbSet<CatCountry> CatCountry { get; set; }
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
@@ -318,6 +319,43 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<CatCommodityGroup>(entity =>
+            {
+                entity.ToTable("catCommodityGroup");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.GroupNameEn)
+                    .HasColumnName("GroupName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.GroupNameVn)
+                    .HasColumnName("GroupName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Note).HasMaxLength(4000);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<CatContract>(entity =>
             {
                 entity.ToTable("catContract");
@@ -342,6 +380,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(16, 8)");
 
+                entity.Property(e => e.CreditRate).HasColumnType("decimal(16, 8)");
+
                 entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(16, 8)");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -358,7 +398,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
-                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+                entity.Property(e => e.OfficeId)
+                    .HasColumnName("OfficeID")
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(16, 8)");
 
@@ -3185,6 +3227,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
