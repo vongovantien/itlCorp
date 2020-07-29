@@ -2943,7 +2943,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[rowStart, 20].Value = item.Serie; //Số serie của charge
                 workSheet.Cells[rowStart, 21].Value = string.Empty; //Mặt hàng VAT (Để trống)
-                workSheet.Cells[rowStart, 22].Value = item.VatPartnerNameEn; //Partner Name En của charge
+                workSheet.Cells[rowStart, 22].Value = item.VatPartnerNameVn; //Partner Name Local của charge
                 workSheet.Cells[rowStart, 23].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
                 workSheet.Cells[rowStart, 24].Value = item.JobNo;
                 workSheet.Cells[rowStart, 25].Value = item.Description;
