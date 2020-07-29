@@ -13,7 +13,7 @@ export class ConfirmPopupComponent extends PopupBase {
     @Input() body: string = 'You are not allow to delete';
     @Input() labelConfirm: string = 'Yes';
     @Input() labelCancel: string = 'Cancel';
-    @Input() iconConfirm = "la la-save"; internalReferenceConfirmPopup
+    @Input() iconConfirm = "la la-save";
     @Input() iconCancel: string = 'la la-ban';
 
     @Output() onSubmit: EventEmitter<any> = new EventEmitter<any>();
