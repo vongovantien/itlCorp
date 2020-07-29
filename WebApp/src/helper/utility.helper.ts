@@ -174,6 +174,14 @@ export class UtilityHelper {
             [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
         ]).get(type)[0];
     }
+
+    getChargeType(type: string) {
+        return new Map([
+            ['BUY', [CommonEnum.CHARGE_TYPE.DEBIT]],
+            ['SELL', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['OBH', [CommonEnum.CHARGE_TYPE.OBH]],
+        ]).get(type)[0];
+    }
     findDuplicates = (arr: any) => arr.filter((item: any, index: number) => arr.indexOf(item) != index);
 
 }
