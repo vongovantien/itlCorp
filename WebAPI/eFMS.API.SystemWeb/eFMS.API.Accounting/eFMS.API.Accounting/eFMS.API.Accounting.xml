@@ -375,6 +375,12 @@
             <param name="service"></param>
             <param name="user"></param>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetAll">
+            <summary>
+            Get all settlement payment
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria,System.Int32,System.Int32)">
             <summary>
             get and paging the list of Settlement Payment by conditions
@@ -382,13 +388,6 @@
             <param name="criteria">search conditions</param>
             <param name="pageNumber">page to retrieve data</param>
             <param name="pageSize">number items per page</param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
-            <summary>
-            get list settlement payment by conditions
-            </summary>
-            <param name="criteria">search conditions</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">

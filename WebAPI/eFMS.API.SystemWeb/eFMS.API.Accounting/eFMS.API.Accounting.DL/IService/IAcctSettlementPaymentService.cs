@@ -49,6 +49,8 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctApproveSettlementModel GetInfoApproveSettlementBySettlementNo(string settlementNo);
 
+        List<DeniedInfoResult> GetHistoryDeniedSettlement(string settlementNo);
+
         Crystal Preview(string settlementNo);
 
         List<ShipmentChargeSettlement> CopyChargeFromSettlementOldToSettlementNew(ShipmentsCopyCriteria criteria);
@@ -75,7 +77,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CheckExistSettingFlow(string type, Guid? officeId);
 
-        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
-
+        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);     
     }
 }

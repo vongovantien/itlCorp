@@ -33,18 +33,25 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-
+                <div class="row">
+                    <div class="col-12 m--align-right m--margin-bottom-10">
+                        <a *ngIf="!!approveInfo" class="text-underline pointer" (click)="showInfoDenied()">Denied
+                            Comments:
+                            {{approveInfo.numOfDeny}}</a>
+                    </div>
+                </div>
                 <ng-container *ngIf="!!approveInfo">
                     <process-approve [approveInfo]="approveInfo"></process-approve>
                 </ng-container>
 
                 <div class="row height-row-12">
                     <div class="col-lg-12">
-                        <div class="text-center m--margin-top-20" *ngIf="!!approveInfo">
+                        <div class="text-center m--margin-top-20" *ngIf="!!settlementPayment">
                             <div class="c-button-actions">
                                 <button
                                     class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                    title="Approve" (click)="showModalApprove()" *ngIf="!approveInfo.isApproved">
+                                    title="Approve" (click)="showModalApprove()"
+                                    *ngIf="settlementPayment.settlement.statusApproval !== 'New' && settlementPayment.settlement.statusApproval !== 'Denied' && settlementPayment.settlement.statusApproval !== 'Done' && settlementPayment.settlement.isManager && !settlementPayment.settlement.isApproved">
                                     <span>
                                         <i class="la la-save"></i>
                                         <span>
@@ -54,8 +61,7 @@
                                 </button>
                                 <button
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                                    title="Deny"
-                                    *ngIf="!approveInfo.isApproved || (approveInfo.isManager && (approveInfo.statusApproval === 'RequestApproval' || approveInfo.statusApproval === 'DepartmentManagerApproved'))"
+                                    title="Deny" *ngIf="settlementPayment.settlement.isShowBtnDeny"
                                     (click)="showDenyPopup()">
                                     <span>
                                         <i class="la la-times"></i>
@@ -65,7 +71,7 @@
                                     </span>
                                 </button>
                                 <button
-                                    *ngIf="!approveInfo.isManager && approveInfo.statusApproval === 'RequestApproval'"
+                                    *ngIf="settlementPayment.settlement.statusApproval === 'Request Approval' && settlementPayment.settlement.isRequester"
                                     class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Recall" (click)="recall()">
                                     <span>
@@ -147,3 +153,4 @@
 
 <confirm-popup #confirmApprovePopup (onSubmit)="onConfirmApprove()"
     [body]="'Do you want to approve this settlement payment?'" [labelConfirm]="'Yes'"></confirm-popup>
+<history-denied-popup></history-denied-popup>

@@ -28,6 +28,7 @@ import { SettlementTableListChargePopupComponent } from './components/popup/tabl
 import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
+import { SelectModule } from 'ng2-select';
 
 const routing: Routes = [
     {
@@ -96,8 +97,8 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
         BsDropdownModule.forRoot(),
-        ShareAccountingModule
-
+        ShareAccountingModule,
+        SelectModule,
 
     ],
     exports: [],
