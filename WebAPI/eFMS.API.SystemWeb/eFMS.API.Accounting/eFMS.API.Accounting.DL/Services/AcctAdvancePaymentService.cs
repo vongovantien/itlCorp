@@ -159,7 +159,7 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
-        private IQueryable<AcctAdvancePayment> GetDataAdvancePayment()
+        private IQueryable<AcctAdvancePayment> GetDataAdvancePayment(AcctAdvancePaymentCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
             var advancePayments = DataContext.Get();
@@ -170,28 +170,28 @@ namespace eFMS.API.Accounting.DL.Services
                        select new { advancePayment, advancePaymentApr };
             var result = data.Where(x =>
                 (
-                    permissionRangeRequester == PermissionRange.All ? x.advancePayment.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.All ? (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false) : true
                     &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == currentUser.UserID && x.advancePayment.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.advancePayment.UserCreated == criteria.Requester : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.advancePayment.GroupId == currentUser.GroupId
                                                                         && x.advancePayment.DepartmentId == currentUser.DepartmentId
                                                                         && x.advancePayment.OfficeId == currentUser.OfficeID
                                                                         && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                        && x.advancePayment.Requester == currentUser.UserID) : true
+                                                                        && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Department ? (x.advancePayment.DepartmentId == currentUser.DepartmentId
                                                                               && x.advancePayment.OfficeId == currentUser.OfficeID
                                                                               && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                              && x.advancePayment.Requester == currentUser.UserID) : true
+                                                                              && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Office ? (x.advancePayment.OfficeId == currentUser.OfficeID
                                                                           && x.advancePayment.CompanyId == currentUser.CompanyID
-                                                                          && x.advancePayment.Requester == currentUser.UserID) : true
+                                                                          && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false)) : true
                     &&
-                    permissionRangeRequester == PermissionRange.Company ? x.advancePayment.CompanyId == currentUser.CompanyID && x.advancePayment.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Company ? x.advancePayment.CompanyId == currentUser.CompanyID && (criteria.Requester == currentUser.UserID ? x.advancePayment.UserCreated == criteria.Requester : false) : true
                 )
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
@@ -204,6 +204,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.CompanyId == currentUser.CompanyID
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //LEADER AND DEPUTY OF LEADER
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
@@ -216,6 +217,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 && (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //MANANER AND DEPUTY OF MANAGER
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
@@ -228,6 +230,7 @@ namespace eFMS.API.Accounting.DL.Services
                 && x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
@@ -241,6 +244,7 @@ namespace eFMS.API.Accounting.DL.Services
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Leader) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Manager) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
                 //&& (!string.IsNullOrEmpty(x.advancePaymentApr.Accountant) ? x.advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
+                && (x.advancePayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.advancePayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.advancePayment);
             return result;
@@ -277,7 +281,7 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
         {
             var queryAdvancePayment = ExpressionQuery(criteria);
-            var dataAdvancePayments = GetDataAdvancePayment();
+            var dataAdvancePayments = GetDataAdvancePayment(criteria);
             if (dataAdvancePayments == null) return null;
             var advancePayments = dataAdvancePayments.Where(queryAdvancePayment);
             advancePayments = QueryWithAdvanceRequest(advancePayments, criteria);
@@ -2658,7 +2662,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ) //Dept Manager
             {
                 isApproved = true;
-                if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                 {
                     return true;
                 }
@@ -2675,11 +2679,11 @@ namespace eFMS.API.Accounting.DL.Services
                     ) //Accountant Manager
             {
                 isApproved = true;
-                if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                 {
                     return true;
                 }
-                if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                 {
                     return true;
                 }
@@ -2697,15 +2701,15 @@ namespace eFMS.API.Accounting.DL.Services
                 isApproved = true;
                 if (buHeadLevel.Role != AccountingConstants.ROLE_SPECIAL)
                 {
-                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                    if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                     {
                         return true;
                     }
-                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                    if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                     {
                         return true;
                     }
-                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                    if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                     {
                         return true;
                     }
@@ -2839,13 +2843,19 @@ namespace eFMS.API.Accounting.DL.Services
 
                     ) //Dept Manager
             {
-                if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED || advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED || (leaderLevel.Role == AccountingConstants.ROLE_NONE && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE))
+                isShowBtnDeny = false;
+                if (   !string.IsNullOrEmpty(approve.Manager)
+                    && advancePayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
                 {
                     isShowBtnDeny = true;
                 }
-                else
+
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                 {
-                    isShowBtnDeny = false;
+                    return false;
                 }
             }
             else if (
@@ -2854,13 +2864,23 @@ namespace eFMS.API.Accounting.DL.Services
                         accountantLevel.UserDeputies.Contains(currentUser.UserID))
                     ) //Accountant Manager
             {
-                if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED || advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED || (managerLevel.Role == AccountingConstants.ROLE_NONE && leaderLevel.Role == AccountingConstants.ROLE_NONE && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE))
+                isShowBtnDeny = false;
+                if (!string.IsNullOrEmpty(approve.Accountant)
+                    && advancePayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
                 {
                     isShowBtnDeny = true;
                 }
-                else
+
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                 {
-                    isShowBtnDeny = false;
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                {
+                    return false;
                 }
             }
             else if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && isBod

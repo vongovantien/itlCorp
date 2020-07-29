@@ -16,8 +16,10 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Requester</label>
-                                <input type="text" formControlName="requester" class="form-control"
-                                    placeholder="Requester">
+                                <ng-select formControlName="requester" [allowClear]="true"
+                                    (removed)="onRemoveDataFormInfo($event, 'requester')" [items]="requesters"
+                                    [active]="requesterActive">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-12">
