@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { CatalogueRepo } from '@repositories';
+import { Observable } from 'rxjs';
+import { Partner } from '@models';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'app-design-table',
@@ -7,11 +11,22 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TableComponent implements OnInit {
 
-    constructor() { }
+    countries: Observable<Partner[]>;
+    displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
+    selectedCountry: any = null;
+    constructor
+        (
+            private _catalogueRepo: CatalogueRepo
+        ) { }
 
     ngOnInit() {
+        this.countries = this._catalogueRepo.getAllProvinces();
     }
 
+    onSelectDataFormInfo(data: any) {
+        console.log(data);
+        this.selectedCountry = data.id;
+    }
 
     /**
     * ng2-select
