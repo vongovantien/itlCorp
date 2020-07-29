@@ -18,6 +18,7 @@ export class ConfirmPopupComponent extends PopupBase {
 
     @Output() onSubmit: EventEmitter<any> = new EventEmitter<any>();
     @Output() onCancel: EventEmitter<any> = new EventEmitter<any>();
+    @Input() align: CommonType.DIRECTION = 'center';
 
     constructor() {
         super();

@@ -3,7 +3,7 @@ import { AbstractControl, FormControl, FormGroup, ValidatorFn, ValidationErrors 
 import { ButtonModalSetting } from './shared/models/layout/button-modal-setting.model';
 import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
-import { ViewChildren, QueryList, HostListener } from '@angular/core';
+import { ViewChildren, QueryList, HostListener, ElementRef } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
 
 export abstract class AppForm extends AppPage {
@@ -107,6 +107,13 @@ export abstract class AppForm extends AppPage {
         if (!!this.requestReset) {
             this.requestReset($event);
         }
+    }
+
+    setFocusInput(element: ElementRef) {
+        if (!!element) {
+            element.nativeElement.focus();
+        }
+
     }
 
     closeOtherSelects(element: { optionsOpened: any; }) {

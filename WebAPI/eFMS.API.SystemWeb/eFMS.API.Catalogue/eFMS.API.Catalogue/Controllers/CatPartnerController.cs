@@ -177,7 +177,7 @@ namespace eFMS.API.Catalogue.Controllers
                                                     && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0)
-                            )?.FirstOrDefault();
+                            )?.Where(y => (string.IsNullOrEmpty(y.InternalReferenceNo) ? "" : y.InternalReferenceNo) == refNo).FirstOrDefault();
                 return Ok(result);
             }
             else
@@ -186,7 +186,7 @@ namespace eFMS.API.Catalogue.Controllers
                                                       && (
                                                       ((string.IsNullOrEmpty(x.InternalReferenceNo) ? "" : x.InternalReferenceNo.Trim()) == refNo)
                                                       || refNo.Length == 0))
-                            ?.FirstOrDefault();
+                            ?.Where(y => (string.IsNullOrEmpty(y.InternalReferenceNo) ? "" : y.InternalReferenceNo) == refNo).FirstOrDefault();
                 return Ok(result);
             }
         }
