@@ -2631,6 +2631,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            TypeCharge = chg.Type,
                                            PayerId = sur.PayerId,
                                            Unit = uni.UnitNameEn,
+                                           InvoiceDate = sur.InvoiceDate
                                        };
             if (query != null)
             {
@@ -2691,7 +2692,9 @@ namespace eFMS.API.Documentation.DL.Services
                                           PackageContainer = cstd.PackageContainer,
                                           TypeCharge = chg.Type,
                                           PayerId = sur.PayerId,
-                                          Unit = uni.UnitNameEn
+                                          Unit = uni.UnitNameEn,
+                                          InvoiceDate = sur.InvoiceDate
+
 
                                       };
             if (query != null)

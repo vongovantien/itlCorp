@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal Quantity { get; set; }
         public short UnitId { get; set; }
         public string Unit { get; set; }
+        public DateTime? InvoiceDate { get; set; }
         public decimal? UnitPrice { get; set; }
         public decimal? VATRate { get; set; }
         public string CreditDebitNo { get; set; }

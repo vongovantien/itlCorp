@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
@@ -336,6 +337,32 @@ namespace eFMS.API.ReportData.Controllers
             }
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Cossts incurred.xlsx");
 
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export Shipment Overview
+        /// </summary>
+        /// <param name="criteria">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportSummaryOfRevenueIncurred")]
+        [HttpPost]
+        public async Task<IActionResult> ExportSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
+        {
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result, null);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Revenue incurred.xlsx");
             return fileContent;
         }
     }

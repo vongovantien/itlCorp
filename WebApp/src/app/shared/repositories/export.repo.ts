@@ -281,6 +281,12 @@ export class ExportRepo {
         );
     }
 
+    exportSummaryOfRevenueIncurred(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/exportSummaryOfRevenueIncurred`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     exportAccountingManagement(body: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingManagement`, body).pipe(
             catchError((error) => throwError(error)),
