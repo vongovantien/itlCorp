@@ -1215,6 +1215,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
                     item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
+                    item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
                     item.PaymentTerm = 0; //Default is 0                    
