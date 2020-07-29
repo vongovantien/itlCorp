@@ -54,6 +54,7 @@ namespace eFMS.API.Documentation.DL.Common
 
         public const string HOUSEAIRWAYBILLLASTEST_ITL = "LASTEST_ITL";
         public const string HOUSEAIRWAYBILLLASTEST_ITL_FRAME = "LASTEST_ITL_FRAME";
+        public const string HOUSEAIRWAYBILLLASTEST_HAWB = "LASTEST_HAWB";
         public const string HOUSEAIRWAYBILLLASTEST_HAWB_FRAME = "HAWB_FRAME";
 
         public const string CODE_ITL = "ITL7939";

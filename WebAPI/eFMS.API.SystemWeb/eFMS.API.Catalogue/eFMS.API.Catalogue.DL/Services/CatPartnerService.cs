@@ -122,7 +122,11 @@ namespace eFMS.API.Catalogue.DL.Services
         private CatPartner GetModelToAdd(CatPartnerModel entity)
         {
             var partner = mapper.Map<CatPartner>(entity);
-            if (string.IsNullOrEmpty(partner.InternalReferenceNo))
+            if (!string.IsNullOrEmpty(entity.ParentId))
+            {
+                partner.ParentId = entity.ParentId;
+            }
+            else if (string.IsNullOrEmpty(partner.InternalReferenceNo) && string.IsNullOrEmpty(entity.ParentId))
             {
                 partner.ParentId = partner.Id;
             }
@@ -259,16 +263,16 @@ namespace eFMS.API.Catalogue.DL.Services
             var entity = mapper.Map<CatPartner>(model);
             var partner = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
 
-            if (!string.IsNullOrEmpty(partner.InternalReferenceNo))
+            if (!string.IsNullOrEmpty(entity.InternalReferenceNo) && string.IsNullOrEmpty(entity.ParentId))
             {
-                var refPartner = DataContext.Get(x => x.TaxCode == partner.TaxCode && string.IsNullOrEmpty(x.InternalReferenceNo)).FirstOrDefault();
+                var refPartner = DataContext.Get(x => x.TaxCode == entity.TaxCode && string.IsNullOrEmpty(x.InternalReferenceNo)).FirstOrDefault();
                 if (refPartner == null)
                 {
-                    partner.ParentId = partner.Id;
+                    entity.ParentId = entity.Id;
                 }
                 else
                 {
-                    partner.ParentId = refPartner.Id;
+                    entity.ParentId = refPartner.Id;
                 }
             }
 
@@ -1161,7 +1165,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
-                                && (x.Active == criteria.Active || criteria.Active == null)
+                                //&& (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel

@@ -432,6 +432,7 @@ export class AddPartnerDataComponent extends AppList {
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
         //merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
+        console.log(mergeObjPartner);
 
 
 

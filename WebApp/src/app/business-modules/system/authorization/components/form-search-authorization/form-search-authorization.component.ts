@@ -81,8 +81,8 @@ export class AuthorizationFormSearchComponent extends AppForm {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (data: any) => {
-                    this.personInChargeList = data.map(x => ({ "text": x.username, "id": x.username }));
-                    this.authorizedPersonList = data.map(x => ({ "text": x.username, "id": x.username }));
+                    this.personInChargeList = data.map(x => ({ "text": x.username, "id": x.id }));
+                    this.authorizedPersonList = data.map(x => ({ "text": x.username, "id": x.id }));
                 },
             );
     }
@@ -92,7 +92,7 @@ export class AuthorizationFormSearchComponent extends AppForm {
             { "text": 'Active', "id": 'active' },
             { "text": 'Inactive', "id": 'inactive' }
         ];
-        //Default value: Active
+        // Default value: Active
         this.statusActive = [this.statusList[0]];
     }
 

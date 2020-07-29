@@ -439,6 +439,7 @@ export class FormAddPartnerComponent extends AppForm {
             partnerNameEn: partner.partnerNameEn,
             partnerNameVn: partner.partnerNameVn,
             shortName: partner.shortName,
+            //
             partnerAccountRef: partner.parentId,
             taxCode: partner.taxCode,
             partnerGroup: partnerGroupActives,
