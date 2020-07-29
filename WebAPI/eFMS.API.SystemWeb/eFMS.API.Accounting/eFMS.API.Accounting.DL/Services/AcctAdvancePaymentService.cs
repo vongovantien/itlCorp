@@ -1981,11 +1981,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (!sendMailSuggest)
                     {
-                        return new HandleState("Send mail suggest Approval failed");
+                        return new HandleState("Send mail suggest approval failed");
                     }
                     if (!sendMailApproved)
                     {
-                        return new HandleState("Send mail Approved Approval failed");
+                        return new HandleState("Send mail approved approval failed");
                     }
 
                     advancePayment.UserModified = approve.UserModified = userCurrent;
@@ -2020,7 +2020,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     var advancePayment = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-                    if (advancePayment == null) return new HandleState("Not found Advance Payment");
+                    if (advancePayment == null) return new HandleState("Not found advance payment");
 
                     var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
@@ -2432,6 +2432,8 @@ namespace eFMS.API.Accounting.DL.Services
             var advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == false).FirstOrDefault();
             var advanceApproveModel = new AcctApproveAdvanceModel();
 
+            advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
+            advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
             if (advanceApprove != null)
             {
                 advanceApproveModel = mapper.Map<AcctApproveAdvanceModel>(advanceApprove);
@@ -2440,17 +2442,10 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceApproveModel.ManagerName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Manager)?.EmployeeNameVn;
                 advanceApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Accountant)?.EmployeeNameVn;
                 advanceApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Buhead)?.EmployeeNameVn;
-                advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
                 advanceApproveModel.IsShowLeader = !string.IsNullOrEmpty(advanceApprove.Leader);
                 advanceApproveModel.IsShowManager = !string.IsNullOrEmpty(advanceApprove.Manager);
                 advanceApproveModel.IsShowAccountant = !string.IsNullOrEmpty(advanceApprove.Accountant);
                 advanceApproveModel.IsShowBuHead = !string.IsNullOrEmpty(advanceApprove.Buhead);
-            }
-            else
-            {
-                advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
             }
             return advanceApproveModel;
         }

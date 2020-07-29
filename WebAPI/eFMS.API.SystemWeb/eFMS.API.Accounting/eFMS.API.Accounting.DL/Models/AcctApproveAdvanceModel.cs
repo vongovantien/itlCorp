@@ -9,7 +9,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string ManagerName { get; set; }
         public string AccountantName { get; set; }
         public string BUHeadName { get; set; }
-        public bool IsApproved { get; set; }
         public string StatusApproval { get; set; }
         public int NumOfDeny { get; set; }
         public bool IsShowLeader { get; set; }

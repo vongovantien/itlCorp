@@ -16,9 +16,7 @@ namespace eFMS.API.Accounting.DL.IService
     public interface IAcctSettlementPaymentService : IRepositoryBase<AcctSettlementPayment, AcctSettlementPaymentModel>
     {
         List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount);
-
-        IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria);
-
+        
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 
         HandleState DeleteSettlementPayment(string settlementNo);
@@ -74,6 +72,10 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState RecallRequest(Guid settlementId);
 
         bool CheckIsLockedShipment(string jobNo);
+
+        HandleState CheckExistSettingFlow(string type, Guid? officeId);
+
+        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
 
     }
 }

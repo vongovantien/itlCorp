@@ -49,6 +49,17 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Get all settlement payment
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
+        {
+            var data = acctSettlementPaymentService.Get();
+            return Ok(data);
+        }
+
+        /// <summary>
         /// get and paging the list of Settlement Payment by conditions
         /// </summary>
         /// <param name="criteria">search conditions</param>
@@ -64,21 +75,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-
-        /// <summary>
-        /// get list settlement payment by conditions
-        /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("QueryData")]
-        [Authorize]
-        public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
-        {
-            var data = acctSettlementPaymentService.QueryData(criteria);
-            return Ok(data);
-        }
-
+        
         /// <summary>
         /// Get list shipment of settlement payment list by settlementNo
         /// </summary>

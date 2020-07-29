@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -45,6 +46,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
+        private string typeApproval = "Settlement";
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -93,10 +95,10 @@ namespace eFMS.API.Accounting.DL.Services
             userBaseService = userBase;
         }
 
-        #region --- LIST SETTLEMENT PAYMENT ---
+        #region --- LIST & PAGING SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = QueryDataPermission(criteria);
+            var data = GetDatas(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -118,70 +120,144 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
-        private IQueryable<AcctSettlementPayment> GetSettlementsPermission()
+        private PermissionRange GetPermissionRangeOfRequester()
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
             PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (_permissionRange == PermissionRange.None) return null;
-
-            IQueryable<AcctSettlementPayment> settlements = null;
-            switch (_permissionRange)
-            {
-                case PermissionRange.None:
-                    break;
-                case PermissionRange.All:
-                    settlements = DataContext.Get();
-                    break;
-                case PermissionRange.Owner:
-                    settlements = DataContext.Get(x => x.UserCreated == _user.UserID);
-                    break;
-                case PermissionRange.Group:
-                    settlements = DataContext.Get(x => x.GroupId == _user.GroupId
-                                                    && x.DepartmentId == _user.DepartmentId
-                                                    && x.OfficeId == _user.OfficeID
-                                                    && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Department:
-                    settlements = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
-                                                    && x.OfficeId == _user.OfficeID
-                                                    && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Office:
-                    settlements = DataContext.Get(x => x.OfficeId == _user.OfficeID
-                                                    && x.CompanyId == _user.CompanyID);
-                    break;
-                case PermissionRange.Company:
-                    settlements = DataContext.Get(x => x.CompanyId == _user.CompanyID);
-                    break;
-            }
-            return settlements;
+            return _permissionRange;
         }
 
-        private IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria, IQueryable<AcctSettlementPayment> settlements)
+        private Expression<Func<AcctSettlementPayment, bool>> ExpressionQuery(AcctSettlementPaymentCriteria criteria)
         {
-            if (settlements == null) return null;
+            Expression<Func<AcctSettlementPayment, bool>> query = q => true;
+            if (criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue)
+            {
+                //Convert RequestDate về date nếu RequestDate có value
+                query = query.And(x =>
+                                   x.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
+                                && x.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo));
+            }
 
-            var approveSettle = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
-            var user = sysUserRepo.Get();
+            if (!string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All"))
+            {
+                query = query.And(x => x.StatusApproval == criteria.StatusApproval);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All"))
+            {
+                query = query.And(x => x.PaymentMethod == criteria.PaymentMethod);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All"))
+            {
+                query = query.And(x => x.SettlementCurrency == criteria.CurrencyID);
+            }
+            return query;
+        }
+
+        private IQueryable<AcctSettlementPayment> GetDataSettlementPayment(AcctSettlementPaymentCriteria criteria)
+        {
+            var permissionRangeRequester = GetPermissionRangeOfRequester();
+            var settlementPayments = DataContext.Get();
+            var settlementPaymentAprs = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
+            var data = from settlementPayment in settlementPayments
+                       join settlementPaymentApr in settlementPaymentAprs on settlementPayment.SettlementNo equals settlementPaymentApr.SettlementNo into settlementPaymentApr2
+                       from settlementPaymentApr in settlementPaymentApr2.DefaultIfEmpty()
+                       select new { settlementPayment, settlementPaymentApr };
+            var result = data.Where(x =>
+                (
+                    permissionRangeRequester == PermissionRange.All ? (criteria.Requester == currentUser.UserID ? x.settlementPayment.UserCreated == criteria.Requester : false) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.None ? false : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Owner ? x.settlementPayment.UserCreated == criteria.Requester : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Group ? (x.settlementPayment.GroupId == currentUser.GroupId
+                                                                        && x.settlementPayment.DepartmentId == currentUser.DepartmentId
+                                                                        && x.settlementPayment.OfficeId == currentUser.OfficeID
+                                                                        && x.settlementPayment.CompanyId == currentUser.CompanyID
+                                                                        && (criteria.Requester == currentUser.UserID ? x.settlementPayment.UserCreated == criteria.Requester : false)) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Department ? (x.settlementPayment.DepartmentId == currentUser.DepartmentId
+                                                                              && x.settlementPayment.OfficeId == currentUser.OfficeID
+                                                                              && x.settlementPayment.CompanyId == currentUser.CompanyID
+                                                                              && (criteria.Requester == currentUser.UserID ? x.settlementPayment.UserCreated == criteria.Requester : false)) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Office ? (x.settlementPayment.OfficeId == currentUser.OfficeID
+                                                                          && x.settlementPayment.CompanyId == currentUser.CompanyID
+                                                                          && (criteria.Requester == currentUser.UserID ? x.settlementPayment.UserCreated == criteria.Requester : false)) : true
+                    &&
+                    permissionRangeRequester == PermissionRange.Company ? x.settlementPayment.CompanyId == currentUser.CompanyID && (criteria.Requester == currentUser.UserID ? x.settlementPayment.UserCreated == criteria.Requester : false) : true
+                )
+                ||
+                (x.settlementPaymentApr != null && (x.settlementPaymentApr.Leader == currentUser.UserID
+                  || x.settlementPaymentApr.LeaderApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy(typeApproval, x.settlementPaymentApr.Leader, x.settlementPayment.GroupId, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                )
+                && x.settlementPayment.GroupId == currentUser.GroupId
+                && x.settlementPayment.DepartmentId == currentUser.DepartmentId
+                && x.settlementPayment.OfficeId == currentUser.OfficeID
+                && x.settlementPayment.CompanyId == currentUser.CompanyID
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //LEADER AND DEPUTY OF LEADER
+                ||
+                (x.settlementPaymentApr != null && (x.settlementPaymentApr.Manager == currentUser.UserID
+                  || x.settlementPaymentApr.ManagerApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy(typeApproval, x.settlementPaymentApr.Manager, null, x.settlementPayment.DepartmentId, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  )
+                && x.settlementPayment.DepartmentId == currentUser.DepartmentId
+                && x.settlementPayment.OfficeId == currentUser.OfficeID
+                && x.settlementPayment.CompanyId == currentUser.CompanyID
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                && (!string.IsNullOrEmpty(x.settlementPaymentApr.Leader) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //MANANER AND DEPUTY OF MANAGER
+                ||
+                (x.settlementPaymentApr != null && (x.settlementPaymentApr.Accountant == currentUser.UserID
+                  || x.settlementPaymentApr.AccountantApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy(typeApproval, x.settlementPaymentApr.Accountant, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  )
+                && x.settlementPayment.OfficeId == currentUser.OfficeID
+                && x.settlementPayment.CompanyId == currentUser.CompanyID
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Leader) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Manager) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
+                ||
+                (x.settlementPaymentApr != null && (x.settlementPaymentApr.Buhead == currentUser.UserID
+                  || x.settlementPaymentApr.BuheadApr == currentUser.UserID
+                  || userBaseService.CheckIsUserDeputy(typeApproval, x.settlementPaymentApr.Buhead ?? null, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  )
+                && x.settlementPayment.OfficeId == currentUser.OfficeID
+                && x.settlementPayment.CompanyId == currentUser.CompanyID
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                && x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Leader) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Manager) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                //&& (!string.IsNullOrEmpty(x.settlementPaymentApr.Accountant) ? x.settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED : true)
+                && (x.settlementPayment.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.settlementPayment.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
+                ) //BOD AND DEPUTY OF BOD                
+            ).Select(s => s.settlementPayment);
+            return result;
+        }
+
+        private IQueryable<AcctSettlementPayment> QueryWithShipment(IQueryable<AcctSettlementPayment> settlementPayments, AcctSettlementPaymentCriteria criteria)
+        {
             var surcharge = csShipmentSurchargeRepo.Get();
             var opst = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
             var custom = customsDeclarationRepo.Get();
             var advRequest = acctAdvanceRequestRepo.Get();
-
-            var isManagerDeputy = false;
-            var isAccountantDeputy = false;
-            if (!string.IsNullOrEmpty(criteria.Requester))
-            {
-                isManagerDeputy = userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, criteria.Requester);
-                isAccountantDeputy = userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, criteria.Requester);
-            }
-
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from set in settlements
+                refNo = (from set in settlementPayments
                          join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
                          from sur in sc.DefaultIfEmpty()
                          join ops in opst on sur.Hblid equals ops.Hblid into op
@@ -218,104 +294,52 @@ namespace eFMS.API.Accounting.DL.Services
                          select set.SettlementNo).ToList();
             }
 
-            var data = from set in settlements
-                       join u in user on set.Requester equals u.Id into u2
-                       from u in u2.DefaultIfEmpty()
-                       join apr in approveSettle on set.SettlementNo equals apr.SettlementNo into apr1
-                       from apr in apr1.DefaultIfEmpty()
-                       where
-                       (
-                            criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ? refNo.Contains(set.SettlementNo) : true
-                       )
-                       &&
-                       (
-                            !string.IsNullOrEmpty(criteria.Requester) ?
-                            (
-                                    (set.Requester == criteria.Requester && currentUser.GroupId != 11)
-                                || (currentUser.GroupId == 11
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false 
-                                    && apr.Manager == criteria.Requester 
-                                    && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
-                                || (currentUser.GroupId == 11
-                                    && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == true
-                                    && apr.Accountant == criteria.Requester 
-                                    && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
-                                || (apr.ManagerApr == criteria.Requester 
-                                    && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
-                                || (apr.AccountantApr == criteria.Requester 
-                                    && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
-                                || (isManagerDeputy && set.DepartmentId == currentUser.DepartmentId && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED)
-                                || (isAccountantDeputy && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && set.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
-                            )
-                            :
-                                true
-                       )
-                       &&
-                       (
-                            criteria.RequestDateFrom.HasValue && criteria.RequestDateTo.HasValue ?
-                                //Convert RequestDate về date nếu RequestDate có value
-                                set.RequestDate.Value.Date >= (criteria.RequestDateFrom.HasValue ? criteria.RequestDateFrom.Value.Date : criteria.RequestDateFrom)
-                                && set.RequestDate.Value.Date <= (criteria.RequestDateTo.HasValue ? criteria.RequestDateTo.Value.Date : criteria.RequestDateTo)
-                            :
-                                true
-                       )
-                       &&
-                       (
-                            !string.IsNullOrEmpty(criteria.StatusApproval) && !criteria.StatusApproval.Equals("All") ?
-                                set.StatusApproval == criteria.StatusApproval
-                            :
-                                true
-                       )
-                       &&
-                       (
-                           !string.IsNullOrEmpty(criteria.PaymentMethod) && !criteria.PaymentMethod.Equals("All") ?
-                                set.PaymentMethod == criteria.PaymentMethod
-                           :
-                                true
-                       )
-                       &&
-                       (
-                           !string.IsNullOrEmpty(criteria.CurrencyID) && !criteria.CurrencyID.Equals("All") ?
-                                set.SettlementCurrency == criteria.CurrencyID
-                           :
-                                true
-                       )
+            if (refNo.Count() > 0)
+            {
+                settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
+            }
+            return settlementPayments;
+        }
+
+        private IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria)
+        {
+            var querySettlementPayment = ExpressionQuery(criteria);
+            var dataSettlementPayments = GetDataSettlementPayment(criteria);
+            if (dataSettlementPayments == null) return null;
+            var settlementPayments = dataSettlementPayments.Where(querySettlementPayment);
+            settlementPayments = QueryWithShipment(settlementPayments, criteria);
+            if (settlementPayments == null) return null;
+
+            var approveSettlePayment = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
+            var users = sysUserRepo.Get();
+                        
+            var data = from settlePayment in settlementPayments
+                       join user in users on settlePayment.Requester equals user.Id into user2
+                       from user in user2.DefaultIfEmpty()
+                       join aproveSettlement in approveSettlePayment on settlePayment.SettlementNo equals aproveSettlement.SettlementNo into aproveSettlement2
+                       from aproveSettlement in aproveSettlement2.DefaultIfEmpty()                       
                        select new AcctSettlementPaymentResult
                        {
-                           Id = set.Id,
-                           Amount = set.Amount ?? 0,
-                           SettlementNo = set.SettlementNo,
-                           SettlementCurrency = set.SettlementCurrency,
-                           Requester = set.Requester,
-                           RequesterName = u.Username,
-                           RequestDate = set.RequestDate,
-                           StatusApproval = set.StatusApproval,
-                           PaymentMethod = set.PaymentMethod,
-                           Note = set.Note,
-                           DatetimeModified = set.DatetimeModified,
-                           StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == set.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
-                           PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == set.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                           Id = settlePayment.Id,
+                           Amount = settlePayment.Amount ?? 0,
+                           SettlementNo = settlePayment.SettlementNo,
+                           SettlementCurrency = settlePayment.SettlementCurrency,
+                           Requester = settlePayment.Requester,
+                           RequesterName = user.Username,
+                           RequestDate = settlePayment.RequestDate,
+                           StatusApproval = settlePayment.StatusApproval,
+                           PaymentMethod = settlePayment.PaymentMethod,
+                           Note = settlePayment.Note,
+                           DatetimeModified = settlePayment.DatetimeModified,
+                           StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == settlePayment.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
+                           PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == settlePayment.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                        };
 
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
-
-        private IQueryable<AcctSettlementPaymentResult> QueryDataPermission(AcctSettlementPaymentCriteria criteria)
-        {
-            var settlements = GetSettlementsPermission();
-            var data = GetDatas(criteria, settlements);
-            return data;
-        }
-
-        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
-        {
-            var settlements = GetSettlementsPermission();
-            var data = GetDatas(criteria, settlements);
-            return data;
-        }
-
+        
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)
         {
             var settlement = DataContext.Get();
@@ -379,7 +403,7 @@ namespace eFMS.API.Accounting.DL.Services
             );
             return dataGrp.ToList();
         }
-        #endregion --- LIST SETTLEMENT PAYMENT ---
+        #endregion --- LIST & PAGING SETTLEMENT PAYMENT ---
 
         public HandleState DeleteSettlementPayment(string settlementNo)
         {
@@ -459,10 +483,22 @@ namespace eFMS.API.Accounting.DL.Services
         public AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement)
         {
             var settlement = DataContext.Get(x => x.Id == idSettlement).FirstOrDefault();
+            if (settlement == null) return null;
             var settlementMap = mapper.Map<AcctSettlementPaymentModel>(settlement);
             settlementMap.NumberOfRequests = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Count();
             settlementMap.UserNameCreated = sysUserRepo.Get(x => x.Id == settlement.UserCreated).FirstOrDefault()?.Username;
             settlementMap.UserNameModified = sysUserRepo.Get(x => x.Id == settlement.UserModified).FirstOrDefault()?.Username;
+
+            var settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeny == false).FirstOrDefault();
+            settlementMap.IsRequester = (currentUser.UserID == settlement.Requester
+                && currentUser.GroupId == settlement.GroupId
+                && currentUser.DepartmentId == settlement.DepartmentId
+                && currentUser.OfficeID == settlement.OfficeId
+                && currentUser.CompanyID == settlement.CompanyId) ? true : false;
+            settlementMap.IsManager = CheckUserIsManager(currentUser, settlement, settlementApprove);
+            settlementMap.IsApproved = CheckUserIsApproved(currentUser, settlement, settlementApprove);
+            settlementMap.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, settlement, settlementApprove);
+
             return settlementMap;
         }
 
@@ -1766,95 +1802,273 @@ namespace eFMS.API.Accounting.DL.Services
             return new HandleState();
         }
 
-        public HandleState InsertOrUpdateApprovalSettlement(AcctApproveSettlementModel settlement)
+        public HandleState InsertOrUpdateApprovalSettlement(AcctApproveSettlementModel approve)
         {
             try
             {
                 var userCurrent = currentUser.UserID;
 
-                var acctApprove = mapper.Map<AcctApproveSettlement>(settlement);
+                var settlementApprove = mapper.Map<AcctApproveSettlement>(approve);
+                var settlementPayment = DataContext.Get(x => x.SettlementNo == approve.SettlementNo).FirstOrDefault();
 
-                if (!string.IsNullOrEmpty(settlement.SettlementNo))
+                if (!string.IsNullOrEmpty(approve.SettlementNo))
                 {
-                    var settle = DataContext.Get(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault();
-                    if (settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
-                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
-                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
-                        && settle.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
+                    if (settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                        && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                        && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
+                        && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL)
                     {
                         return new HandleState("Awaiting approval");
                     }
+                }
+
+                // Check existing Settling Flow
+                var settingFlow = userBaseService.GetSettingFlowApproval(typeApproval, settlementPayment.OfficeId);
+                if (settingFlow == null)
+                {
+                    return new HandleState("No setting flow yet");
                 }
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        //Lấy ra brandId của user 
-                        var brandOfUser = currentUser.OfficeID;
-                        if (brandOfUser == Guid.Empty || brandOfUser == null) return new HandleState("Not found office of user");
+                        string _leader = null;
+                        string _manager = null;
+                        string _accountant = null;
+                        string _bhHead = null;
 
-                        //Lấy ra các user Leader, Manager Dept của user requester, user Accountant, BUHead(nếu có) của user requester
-                        acctApprove.Leader = userBaseService.GetLeaderIdOfUser(userCurrent);
-                        acctApprove.Manager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault();
-                        if (string.IsNullOrEmpty(acctApprove.Manager)) return new HandleState("Not found department manager of user");
-                        acctApprove.Accountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault();
-                        if (string.IsNullOrEmpty(acctApprove.Accountant)) return new HandleState("Not found accountant manager");
-                        acctApprove.Buhead = userBaseService.GetBUHeadId(brandOfUser.ToString());
-
-                        var emailLeaderOrManager = string.Empty;
-                        var userLeaderOrManager = string.Empty;
-                        List<string> usersDeputy = new List<string>();
-
-                        //Send mail đề nghị approve đến Leader(Nếu có) nếu không có thì send tới Manager Dept
-                        //Lấy ra Leader của User & Manager Dept của User Requester
-                        if (string.IsNullOrEmpty(acctApprove.Leader))
+                        var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(typeApproval, settlementPayment.OfficeId);
+                        if (isAllLevelAutoOrNone)
                         {
-                            userLeaderOrManager = acctApprove.Manager;
-                            //Lấy ra employeeId của managerIdOfUser
-                            var employeeIdOfUserManager = userBaseService.GetEmployeeIdOfUser(userLeaderOrManager);
-                            //Lấy ra email của Manager
-                            emailLeaderOrManager = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUserManager)?.Email;
+                            //Cập nhật Status Approval là Done cho Settlement Payment
+                            settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            var hsUpdateAdvancePayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id, false);
+                        }
 
-                            var deptCodeRequester = userBaseService.GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
-                            usersDeputy = userBaseService.GetListUserDeputyByDept(deptCodeRequester);
+                        var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                        var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                        var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                        var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+                        var userLeaderOrManager = string.Empty;
+                        var mailLeaderOrManager = string.Empty;
+                        List<string> mailUsersDeputy = new List<string>();
+
+                        if (leaderLevel.Role == AccountingConstants.ROLE_AUTO || leaderLevel.Role == AccountingConstants.ROLE_APPROVAL)
+                        {
+                            _leader = leaderLevel.UserId;
+                            if (string.IsNullOrEmpty(_leader)) return new HandleState("Not found leader");
+                            if (leaderLevel.Role == AccountingConstants.ROLE_AUTO)
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
+                                settlementApprove.LeaderApr = userCurrent;
+                                settlementApprove.LeaderAprDate = DateTime.Now;
+                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_LEADER;
+                            }
+                            if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL)
+                            {
+                                userLeaderOrManager = leaderLevel.UserId;
+                                mailLeaderOrManager = leaderLevel.EmailUser;
+                                mailUsersDeputy = leaderLevel.EmailDeputies;
+                            }
                         }
                         else
                         {
-                            userLeaderOrManager = acctApprove.Leader;
-                            //Lấy ra employeeId của managerIdOfUser
-                            var employeeIdOfUserLeader = userBaseService.GetEmployeeIdOfUser(userLeaderOrManager);
-                            //Lấy ra email của Leader (hiện tại chưa có nên gán rỗng)
-                            emailLeaderOrManager = userBaseService.GetEmployeeByEmployeeId(employeeIdOfUserLeader)?.Email;
+                            if (
+                                (buHeadLevel.Role == AccountingConstants.ROLE_NONE || buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
+                               )
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
-                        if (string.IsNullOrEmpty(emailLeaderOrManager)) return new HandleState("Not found email Leader or Manager");
-
-                        var sendMailResult = SendMailSuggestApproval(acctApprove.SettlementNo, userLeaderOrManager, emailLeaderOrManager, usersDeputy);
-
-                        if (sendMailResult)
+                        if (managerLevel.Role == AccountingConstants.ROLE_AUTO || managerLevel.Role == AccountingConstants.ROLE_APPROVAL)
                         {
-                            var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == acctApprove.SettlementNo && x.IsDeny == false).FirstOrDefault();
-                            if (checkExistsApproveBySettlementNo == null) //Insert AcctApproveSettlement
+                            _manager = managerLevel.UserId;
+                            if (string.IsNullOrEmpty(_manager)) return new HandleState("Not found manager");
+                            if (managerLevel.Role == AccountingConstants.ROLE_AUTO && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
                             {
-                                acctApprove.Id = Guid.NewGuid();
-                                acctApprove.RequesterAprDate = DateTime.Now;
-                                acctApprove.UserCreated = acctApprove.UserModified = userCurrent;
-                                acctApprove.DateCreated = acctApprove.DateModified = DateTime.Now;
-                                acctApprove.IsDeny = false;
-                                var hsAddApproveSettlement = acctApproveSettlementRepo.Add(acctApprove);
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                                settlementApprove.ManagerApr = userCurrent;
+                                settlementApprove.ManagerAprDate = DateTime.Now;
+                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_MANAGER;
                             }
-                            else //Update AcctApproveSettlement by SettlementNo
+                            if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
                             {
-                                checkExistsApproveBySettlementNo.RequesterAprDate = DateTime.Now;
-                                checkExistsApproveBySettlementNo.UserModified = userCurrent;
-                                checkExistsApproveBySettlementNo.DateModified = DateTime.Now;
-                                var hsUpdateApproveSettlement = acctApproveSettlementRepo.Update(checkExistsApproveBySettlementNo, x => x.Id == checkExistsApproveBySettlementNo.Id);
+                                userLeaderOrManager = managerLevel.UserId;
+                                mailLeaderOrManager = managerLevel.EmailUser;
+                                mailUsersDeputy = managerLevel.EmailDeputies;
                             }
-                            trans.Commit();
+                        }
+                        else
+                        {
+                            if (
+                                (buHeadLevel.Role == AccountingConstants.ROLE_NONE || buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
+                               )
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
-                        return !sendMailResult ? new HandleState("Send mail suggest approval failed") : new HandleState();
+                        if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_APPROVAL)
+                        {
+                            _accountant = accountantLevel.UserId;
+                            if (string.IsNullOrEmpty(_accountant)) return new HandleState("Not found accountant");
+                            if (accountantLevel.Role == AccountingConstants.ROLE_AUTO
+                                && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                settlementApprove.AccountantApr = userCurrent;
+                                settlementApprove.AccountantAprDate = DateTime.Now;
+                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+                                if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
+                                {
+                                    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                    settlementApprove.BuheadApr = settlementApprove.AccountantApr = userCurrent;
+                                    settlementApprove.BuheadAprDate = settlementApprove.AccountantAprDate = DateTime.Now;
+                                    settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                }
+                            }
+                            if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL
+                                && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
+                            {
+                                userLeaderOrManager = accountantLevel.UserId;
+                                mailLeaderOrManager = accountantLevel.EmailUser;
+                                mailUsersDeputy = accountantLevel.EmailDeputies;
+                            }
+                        }
+                        else
+                        {
+                            if (
+                                (buHeadLevel.Role == AccountingConstants.ROLE_NONE || buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
+                               )
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            }
+                        }
+
+                        if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
+                        {
+                            _bhHead = buHeadLevel.UserId;
+                            if (string.IsNullOrEmpty(_bhHead)) return new HandleState("Not found BOD");
+                            if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO
+                                && accountantLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                settlementApprove.BuheadApr = userCurrent;
+                                settlementApprove.BuheadAprDate = DateTime.Now;
+                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                            }
+                            if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
+                                && accountantLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
+                                && leaderLevel.Role != AccountingConstants.ROLE_APPROVAL)
+                            {
+                                userLeaderOrManager = buHeadLevel.UserId;
+                                mailLeaderOrManager = buHeadLevel.EmailUser;
+                                mailUsersDeputy = buHeadLevel.EmailDeputies;
+                            }
+                            if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                settlementApprove.BuheadApr = userCurrent;
+                                settlementApprove.BuheadAprDate = DateTime.Now;
+                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
+                                {
+                                    settlementApprove.LeaderApr = userCurrent;
+                                    settlementApprove.LeaderAprDate = DateTime.Now;
+                                }
+                                if (managerLevel.Role != AccountingConstants.ROLE_NONE)
+                                {
+                                    settlementApprove.ManagerApr = userCurrent;
+                                    settlementApprove.ManagerAprDate = DateTime.Now;
+                                }
+                                if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
+                                {
+                                    settlementApprove.AccountantApr = userCurrent;
+                                    settlementApprove.AccountantAprDate = DateTime.Now;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (
+                                (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
+                                &&
+                                (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
+                               )
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            }
+                        }
+
+                        var sendMailApproved = true;
+                        var sendMailSuggest = true;
+                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            //Send Mail Approved
+                            sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
+                        }
+                        else
+                        {
+                            //Send Mail Suggest
+                            sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
+                        }
+
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail approved approval failed");
+                        }
+
+                        var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementApprove.SettlementNo && x.IsDeny == false).FirstOrDefault();
+                        if (checkExistsApproveBySettlementNo == null) //Insert ApproveSettlement
+                        {
+                            settlementApprove.Id = Guid.NewGuid();
+                            settlementApprove.Leader = _leader;
+                            settlementApprove.Manager = _manager;
+                            settlementApprove.Accountant = _accountant;
+                            settlementApprove.Buhead = _bhHead;
+                            settlementApprove.UserCreated = settlementApprove.UserModified = userCurrent;
+                            settlementApprove.DateCreated = settlementApprove.DateModified = DateTime.Now;
+                            settlementApprove.IsDeny = false;
+                            var hsAddApprove = acctApproveSettlementRepo.Add(settlementApprove, false);
+                        }
+                        else //Update ApproveSettlement by Settlement No
+                        {
+                            checkExistsApproveBySettlementNo.UserModified = userCurrent;
+                            checkExistsApproveBySettlementNo.DateModified = DateTime.Now;
+                            var hsUpdateApprove = acctApproveSettlementRepo.Update(checkExistsApproveBySettlementNo, x => x.Id == checkExistsApproveBySettlementNo.Id, false);
+                        }
+
+                        acctApproveSettlementRepo.SubmitChanges();
+                        DataContext.SubmitChanges();
+                        trans.Commit();
+
+                        return new HandleState();
                     }
                     catch (Exception ex)
                     {
@@ -1885,131 +2099,299 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 try
                 {
-                    var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
+                    var settlementPayment = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
 
-                    if (settlement == null) return new HandleState("Not found settlement payment");
+                    if (settlementPayment == null) return new HandleState("Not found settlement payment");
 
-                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeny == false).FirstOrDefault();
-
+                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
                     {
-                        if (acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Any() == false)
+                        return new HandleState("Not found settlement payment approval");
+                    }
+
+                    var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(typeApproval, settlementPayment.OfficeId);
+                    if (isAllLevelAutoOrNone)
+                    {
+                        //Cập nhật Status Approval là Done cho Settlement Payment
+                        settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                    }
+
+                    var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+                    var userApproveNext = string.Empty;
+                    var mailUserApproveNext = string.Empty;
+                    List<string> mailUsersDeputy = new List<string>();
+
+                    var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
+                    var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL
+                         &&
+                         (
+                           (isLeader && currentUser.GroupId != AccountingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
+                           ||
+                           leaderLevel.UserDeputies.Contains(userCurrent)
+                          )
+                        )
+                    {
+                        if (string.IsNullOrEmpty(approve.LeaderApr))
                         {
-                            return new HandleState("Not found Settlement Approval by SettlementNo is " + settlement.SettlementNo);
+                            if (!string.IsNullOrEmpty(approve.Requester))
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
+                                approve.LeaderApr = userCurrent;
+                                approve.LeaderAprDate = DateTime.Now;
+                                approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
+                                userApproveNext = managerLevel.UserId;
+                                mailUserApproveNext = managerLevel.EmailUser;
+                                mailUsersDeputy = managerLevel.EmailDeputies;
+                                if (managerLevel.Role == AccountingConstants.ROLE_AUTO || managerLevel.Role == AccountingConstants.ROLE_NONE)
+                                {
+                                    if (managerLevel.Role == AccountingConstants.ROLE_AUTO)
+                                    {
+                                        settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                                        approve.ManagerApr = managerLevel.UserId;
+                                        approve.ManagerAprDate = DateTime.Now;
+                                        approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
+                                        userApproveNext = accountantLevel.UserId;
+                                        mailUserApproveNext = accountantLevel.EmailUser;
+                                        mailUsersDeputy = accountantLevel.EmailDeputies;
+                                    }
+                                    if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_NONE)
+                                    {
+                                        if (accountantLevel.Role == AccountingConstants.ROLE_AUTO)
+                                        {
+                                            settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                            approve.AccountantApr = accountantLevel.UserId;
+                                            approve.AccountantAprDate = DateTime.Now;
+                                            approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+                                            userApproveNext = buHeadLevel.UserId;
+                                            mailUserApproveNext = buHeadLevel.EmailUser;
+                                            mailUsersDeputy = buHeadLevel.EmailDeputies;
+                                        }
+                                        if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                        {
+                                            settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                            approve.BuheadApr = buHeadLevel.UserId;
+                                            approve.BuheadAprDate = DateTime.Now;
+                                            approve.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                        }
+                                        if (buHeadLevel.Role == AccountingConstants.ROLE_NONE)
+                                        {
+                                            settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                            approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
                         }
                         else
                         {
-                            return new HandleState("Not allow approve");
+                            return new HandleState("Leader approved");
                         }
                     }
 
-                    //Lấy ra brandId của user requester
-                    var brandOfUserRequest = settlement.OfficeId;
-                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-                    //Lấy ra brandId của userId
-                    var brandOfUserId = currentUser.OfficeID;
-                    if (brandOfUserId == Guid.Empty) return new HandleState("Not found office of user");
-
-                    //Lấy ra dept code của userApprove dựa vào userApprove
-                    var deptCodeOfUser = userBaseService.GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
-                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                    var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, currentUser, deptCodeOfUser);
-                    if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-                    if (approve != null && settlement != null)
+                    var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !isDeptAccountant
+                        &&
+                        (
+                           (isManager && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
+                           ||
+                           managerLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
                     {
-                        if (userCurrent == userBaseService.GetLeaderIdOfUser(settlement.Requester))
+                        if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                         {
-                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Leader approved");
-                            }
-                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Approve của Leader
-
-                            //Lấy email của Department Manager
-                            userAprNext = userBaseService.GetDeptManager(settlement.CompanyId, settlement.OfficeId, settlement.DepartmentId).FirstOrDefault();
-                            var userAprNextId = userBaseService.GetEmployeeIdOfUser(userAprNext);
-                            emailUserAprNext = userBaseService.GetEmployeeByEmployeeId(userAprNextId)?.Email;
-
-                            var deptCodeRequester = userBaseService.GetInfoDeptOfUser(settlement.DepartmentId)?.Code;
-                            usersDeputy = userBaseService.GetListUserDeputyByDept(deptCodeRequester);
+                            return new HandleState("Leader has not approved it yet");
                         }
-                        else if ( (currentUser.GroupId == AccountingConstants.SpecialGroup 
-                            && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false 
-                            && userCurrent == userBaseService.GetDeptManager(settlement.CompanyId, settlement.OfficeId, settlement.DepartmentId).FirstOrDefault()
-                                )
-                                || userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID))
+                        if (string.IsNullOrEmpty(approve.ManagerApr))
                         {
-                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            if ((!string.IsNullOrEmpty(approve.Leader) && !string.IsNullOrEmpty(approve.LeaderApr)) || string.IsNullOrEmpty(approve.Leader) || leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
-                                return new HandleState("Manager department approved");
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
+                                approve.ManagerApr = userCurrent;
+                                approve.ManagerAprDate = DateTime.Now;
+                                approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
+                                userApproveNext = accountantLevel.UserId;
+                                mailUserApproveNext = accountantLevel.EmailUser;
+                                mailUsersDeputy = accountantLevel.EmailDeputies;
+                                if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_NONE)
+                                {
+                                    if (accountantLevel.Role == AccountingConstants.ROLE_AUTO)
+                                    {
+                                        settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                        approve.AccountantApr = accountantLevel.UserId;
+                                        approve.AccountantAprDate = DateTime.Now;
+                                        approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+                                        userApproveNext = buHeadLevel.UserId;
+                                        mailUserApproveNext = buHeadLevel.EmailUser;
+                                        mailUsersDeputy = buHeadLevel.EmailDeputies;
+                                    }
+                                    if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                    {
+                                        settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                        approve.BuheadApr = buHeadLevel.UserId;
+                                        approve.BuheadAprDate = DateTime.Now;
+                                        approve.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                    }
+                                    if (buHeadLevel.Role == AccountingConstants.ROLE_NONE)
+                                    {
+                                        settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                        approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
+                                    }
+                                }
                             }
-                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Approve của Manager
-                            approve.ManagerApr = userCurrent;
-
-                            //Lấy email của Accountant Manager
-                            userAprNext = userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault();
-                            var userAprNextId = userBaseService.GetEmployeeIdOfUser(userAprNext);
-                            emailUserAprNext = userBaseService.GetEmployeeByEmployeeId(userAprNextId)?.Email;
-
-                            //var deptCodeAccountant = GetInfoDeptOfUser(AccountingConstants.AccountantDeptId)?.Code;
-                            //usersDeputy = GetListUserDeputyByDept(deptCodeAccountant);
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
                         }
-                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
-                                && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
-                                && userCurrent == userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault()
-                                    )
-                                    || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
+                        else
                         {
-                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Chief accountant approved");
-                            }
-                            settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                            approve.AccountantAprDate = approve.BuheadAprDate = DateTime.Now;//Cập nhật ngày Approve của Accountant & BUHead
-                            approve.AccountantApr = userCurrent;
-                            approve.BuheadApr = approve.Buhead;
-
-                            //Cập nhật Status Payment cho Advance Request dựa vào HBL
-                            acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlement.SettlementNo);
-
-                            //Send mail approval success when Accountant approved, mail send to requester
-                            SendMailApproved(settlement.SettlementNo, DateTime.Now);
+                            return new HandleState("Manager approved");
                         }
-
-                        settlement.UserModified = approve.UserModified = userCurrent;
-                        settlement.DatetimeModified = approve.DateModified = DateTime.Now;
-
-                        var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
-                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
-                        trans.Commit();
                     }
 
-                    //Nếu currentUser là Accoutant of Requester thì return
-                    if ((userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) 
-                        && userCurrent == userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault())
-                        || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
+                    var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && isDeptAccountant
+                        &&
+                        (
+                           (isAccountant && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
+                           ||
+                           accountantLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
                     {
-                        return new HandleState();
+                        if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                        {
+                            return new HandleState("Leader has not approved it yet");
+                        }
+                        if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                        {
+                            return new HandleState("The manager has not approved it yet");
+                        }
+                        if (string.IsNullOrEmpty(approve.AccountantApr))
+                        {
+                            if ((!string.IsNullOrEmpty(approve.Manager) && !string.IsNullOrEmpty(approve.ManagerApr)) || string.IsNullOrEmpty(approve.Manager) || managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
+                                approve.AccountantApr = userCurrent;
+                                approve.AccountantAprDate = DateTime.Now;
+                                approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+                                userApproveNext = buHeadLevel.UserId;
+                                mailUserApproveNext = buHeadLevel.EmailUser;
+                                mailUsersDeputy = buHeadLevel.EmailDeputies;
+                                if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                {
+                                    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                    approve.BuheadApr = buHeadLevel.UserId;
+                                    approve.BuheadAprDate = DateTime.Now;
+                                    approve.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                }
+                                if (buHeadLevel.Role == AccountingConstants.ROLE_NONE)
+                                {
+                                    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                    approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+                                }
+                            }
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState("Accountant approved");
+                        }
+                    }
+
+                    var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
+                        &&
+                        (
+                          (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
+                          ||
+                          buHeadLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (buHeadLevel.Role != AccountingConstants.ROLE_SPECIAL)
+                        {
+                            if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                            {
+                                return new HandleState("Leader has not approved it yet");
+                            }
+                            if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                            {
+                                return new HandleState("The manager has not approved it yet");
+                            }
+                            if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                            {
+                                return new HandleState("The accountant has not approved it yet");
+                            }
+                        }
+                        if (string.IsNullOrEmpty(approve.BuheadApr))
+                        {
+                            if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
+                            {
+                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                approve.BuheadApr = userCurrent;
+                                approve.BuheadAprDate = DateTime.Now;
+                                approve.LevelApprove = AccountingConstants.LEVEL_BOD;
+                            }
+                            else
+                            {
+                                return new HandleState("Not allow approve");
+                            }
+                        }
+                        else
+                        {
+                            return new HandleState("BOD approved");
+                        }
+                    }
+
+                    var sendMailApproved = true;
+                    var sendMailSuggest = true;
+
+                    if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                    {
+                        //Send Mail Approved
+                        sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
                     }
                     else
                     {
-                        if (string.IsNullOrEmpty(emailUserAprNext)) return new HandleState("Not found email of user " + userAprNext);
-
-                        //Send mail đề nghị approve
-                        var sendMailResult = SendMailSuggestApproval(settlement.SettlementNo, userAprNext, emailUserAprNext, usersDeputy);
-
-                        return sendMailResult ? new HandleState() : new HandleState("Send mail suggest approval failed");
+                        //Send Mail Suggest
+                        sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
                     }
+
+                    if (!sendMailSuggest)
+                    {
+                        return new HandleState("Send mail suggest approval failed");
+                    }
+                    if (!sendMailApproved)
+                    {
+                        return new HandleState("Send mail approved approval failed");
+                    }
+
+                    settlementPayment.UserModified = approve.UserModified = userCurrent;
+                    settlementPayment.DatetimeModified = approve.DateModified = DateTime.Now;
+
+                    var hsUpdateSettlementPayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id, false);
+                    var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
+
+                    acctApproveSettlementRepo.SubmitChanges();
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    return new HandleState();
                 }
                 catch (Exception ex)
                 {
@@ -2025,113 +2407,160 @@ namespace eFMS.API.Accounting.DL.Services
 
         public HandleState DeniedApprove(Guid settlementId, string comment)
         {
-            var userCurrent = currentUser.UserID;
-
+            var userCurrent = currentUser.UserID;            
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var settlement = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
+                    var settlementPayment = DataContext.Get(x => x.Id == settlementId).FirstOrDefault();
+                    if (settlementPayment == null) return new HandleState("Not found settlement payment");
 
-                    if (settlement == null) return new HandleState("Not found settlement payment");
-
-                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo && x.IsDeny == false).FirstOrDefault();
+                    var approve = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
                     {
-                        if (acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Any() == false)
-                        {
-                            return new HandleState("Not found approve settlement by SettlementNo " + settlement.SettlementNo);
-                        }
-                        else
-                        {
-                            return new HandleState("Not allow deny");
-                        }
+                        return new HandleState("Not found settlement payment approval");
                     }
 
-                    //Lấy ra brandId của user requester
-                    var brandOfUserRequest = settlement.OfficeId;
-                    if (brandOfUserRequest == Guid.Empty || brandOfUserRequest == null) return new HandleState("Not found office of user requester");
-
-                    //Lấy ra brandId của userId
-                    var brandOfUserId = currentUser.OfficeID;
-                    if (brandOfUserId == Guid.Empty || brandOfUserId == null) return new HandleState("Not found office of user");
-
-                    //Lấy ra dept code của userApprove dựa vào userApprove
-                    var deptCodeOfUser = userBaseService.GetInfoDeptOfUser(currentUser.DepartmentId)?.Code;
-                    if (string.IsNullOrEmpty(deptCodeOfUser)) return new HandleState("Not found department of user");
-
-                    //Kiểm tra group trước đó đã được approve chưa và group của userApprove đã được approve chưa
-                    //var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, userCurrent, deptCodeOfUser);
-                    //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-                    if (approve != null && settlement != null)
+                    if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED)
                     {
-                        if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED)
-                        {
-                            return new HandleState("Settlement payment denied");
-                        }
-
-                        if (userCurrent == userBaseService.GetLeaderIdOfUser(settlement.Requester))
-                        {
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, currentUser, deptCodeOfUser);
-                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-                            approve.LeaderAprDate = DateTime.Now;//Cập nhật ngày Denie của Leader
-                        }
-                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
-                            && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId) == false
-                            && userCurrent == userBaseService.GetDeptManager(settlement.CompanyId, settlement.OfficeId, settlement.DepartmentId).FirstOrDefault()
-                                )
-                            || userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID))
-                        {
-                            //Cho phép User Manager thực hiện deny khi user Manager đã Approved, 
-                            //nếu Chief Accountant đã Approved thì User Manager ko được phép deny
-                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
-                                || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Not allow deny. Settlement payment has been approved");
-                            }
-
-                            approve.ManagerAprDate = DateTime.Now;//Cập nhật ngày Denie của Manager
-                            approve.ManagerApr = userCurrent; //Cập nhật user manager denie                   
-                        }
-                        else if ((currentUser.GroupId == AccountingConstants.SpecialGroup
-                            && userBaseService.CheckIsAccountantDept(currentUser.DepartmentId)
-                            && userCurrent == userBaseService.GetAccoutantManager(settlement.CompanyId, settlement.OfficeId).FirstOrDefault()
-                                )
-                                || userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID))
-                        {
-                            //var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, currentUser, deptCodeOfUser);
-                            //if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-                            if (settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                return new HandleState("Not allow deny. Settlement payment has been approved");
-                            }
-                            approve.AccountantAprDate = DateTime.Now;//Cập nhật ngày Denie của Accountant
-                            approve.AccountantApr = userCurrent; //Cập nhật user accountant denie
-                        }
-                        else
-                        {
-                            var checkApr = CheckApprovedOfDeptPrevAndDeptCurrent(settlement.SettlementNo, currentUser, deptCodeOfUser);
-                            if (checkApr.Success == false) return new HandleState(checkApr.Exception.Message);
-                        }
-
-                        approve.UserModified = userCurrent;
-                        approve.DateModified = DateTime.Now;
-                        approve.Comment = comment;
-                        approve.IsDeny = true;
-                        var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id);
-
-                        //Cập nhật lại advance status của Settlement Payment
-                        settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
-                        settlement.UserModified = userCurrent;
-                        settlement.DatetimeModified = DateTime.Now;
-                        var hsUpdateSettle = DataContext.Update(settlement, x => x.Id == settlement.Id);
-
-                        trans.Commit();
+                        return new HandleState("Settlement payment has been denied");
                     }
 
-                    //Send mail denied approval
-                    var sendMailResult = SendMailDeniedApproval(settlement.SettlementNo, comment, DateTime.Now);
-                    return sendMailResult ? new HandleState() : new HandleState("Send mail deny approval failed");
+                    var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+                    var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+                    var isApprover = false;
+                    var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+
+                    var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL
+                        &&
+                        (
+                            (isLeader && currentUser.GroupId != AccountingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
+                            ||
+                            leaderLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED
+                            || settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                            || settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            return new HandleState("Not allow deny. Settlement payment has been approved");
+                        }
+
+                        if (string.IsNullOrEmpty(approve.Requester))
+                        {
+                            return new HandleState("The requester has not send the request yet");
+                        }
+                        approve.LeaderApr = userCurrent;
+                        approve.LeaderAprDate = DateTime.Now;
+                        approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
+
+                        isApprover = true;
+                    }
+
+                    var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !isDeptAccountant
+                        &&
+                        (
+                            (isManager && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
+                            ||
+                            managerLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                            || settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            return new HandleState("Not allow deny. Settlement payment has been approved");
+                        }
+
+                        if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.LeaderApr))
+                        {
+                            return new HandleState("Leader not approve");
+                        }
+                        approve.ManagerApr = userCurrent;
+                        approve.ManagerAprDate = DateTime.Now;
+                        approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
+
+                        isApprover = true;
+                    }
+
+                    var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && isDeptAccountant
+                        &&
+                        (
+                            (isAccountant && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
+                            ||
+                            accountantLevel.UserDeputies.Contains(userCurrent)
+                         )
+                        )
+                    {
+                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            return new HandleState("Not allow deny. Settlement payment has been approved");
+                        }
+
+                        if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.ManagerApr))
+                        {
+                            return new HandleState("The manager has not approved it yet");
+                        }
+                        approve.AccountantApr = userCurrent;
+                        approve.AccountantAprDate = DateTime.Now;
+                        approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+
+                        isApprover = true;
+                    }
+
+                    var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+                    var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                    if (buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL && isBod
+                        &&
+                        (
+                          (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
+                          ||
+                          buHeadLevel.UserDeputies.Contains(userCurrent)
+                        )
+                       )
+                    {
+                        if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
+                        {
+                            return new HandleState("The accountant has not approved it yet");
+                        }
+                        approve.BuheadApr = userCurrent;
+                        approve.BuheadAprDate = DateTime.Now;
+                        approve.LevelApprove = AccountingConstants.LEVEL_BOD;
+
+                        isApprover = true;
+                    }
+
+                    if (!isApprover)
+                    {
+                        return new HandleState("Not allow deny. You are not in the approval process.");
+                    }
+
+                    var sendMailDeny = SendMailDeniedApproval(settlementPayment.SettlementNo, comment, DateTime.Now);
+                    if (!sendMailDeny)
+                    {
+                        return new HandleState("Send mail denied failed");
+                    }
+
+                    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DENIED;
+                    approve.IsDeny = true;
+                    approve.Comment = comment;
+                    settlementPayment.UserModified = approve.UserModified = userCurrent;
+                    settlementPayment.DatetimeModified = approve.DateModified = DateTime.Now;
+
+                    var hsUpdateSettlementPayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id, false);
+                    var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
+
+                    acctApproveSettlementRepo.SubmitChanges();
+                    DataContext.SubmitChanges();
+                    trans.Commit();
+                    return new HandleState();
                 }
                 catch (Exception ex)
                 {
@@ -2151,28 +2580,21 @@ namespace eFMS.API.Accounting.DL.Services
             var approveSettlement = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == false).FirstOrDefault();
             var aprSettlementMap = new AcctApproveSettlementModel();
 
+            aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault()?.StatusApproval;
+            aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+
             if (approveSettlement != null)
             {
                 aprSettlementMap = mapper.Map<AcctApproveSettlementModel>(approveSettlement);
-
-                //Kiểm tra User đăng nhập vào có thuộc các user Approve Settlement không, nếu không thuộc bất kỳ 1 user nào thì gán cờ IsApproved bằng true
-                //Kiểm tra xem dept đã approve chưa, nếu dept của user đó đã approve thì gán cờ IsApproved bằng true           
-                aprSettlementMap.IsApproved = CheckUserInApproveSettlementAndDeptApproved(currentUser, aprSettlementMap);
-                aprSettlementMap.RequesterName = string.IsNullOrEmpty(aprSettlementMap.Requester) ? null : userBaseService.GetEmployeeByUserId(aprSettlementMap.Requester)?.EmployeeNameVn;
-                aprSettlementMap.LeaderName = string.IsNullOrEmpty(aprSettlementMap.Leader) ? null : userBaseService.GetEmployeeByUserId(aprSettlementMap.Leader)?.EmployeeNameVn;
-                aprSettlementMap.ManagerName = string.IsNullOrEmpty(aprSettlementMap.Manager) ? null : userBaseService.GetEmployeeByUserId(aprSettlementMap.Manager)?.EmployeeNameVn;
-                aprSettlementMap.AccountantName = string.IsNullOrEmpty(aprSettlementMap.Accountant) ? null : userBaseService.GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
-                aprSettlementMap.BUHeadName = string.IsNullOrEmpty(aprSettlementMap.Buhead) ? null : userBaseService.GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
-                aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == aprSettlementMap.SettlementNo).FirstOrDefault()?.StatusApproval;
-
-                var isManagerDeputy = userBaseService.CheckDeputyManagerByUser(currentUser.DepartmentId, currentUser.UserID);
-                var isAccountantDeputy = userBaseService.CheckDeputyAccountantByUser(currentUser.DepartmentId, currentUser.UserID);
-                aprSettlementMap.IsManager = (currentUser.GroupId == AccountingConstants.SpecialGroup && (userCurrent == approveSettlement.Manager || userCurrent == approveSettlement.ManagerApr)) || isManagerDeputy || isAccountantDeputy ? true : false;
-            }
-            else
-            {
-                //Mặc định nếu chưa send request thì gán IsApproved bằng true (nhằm để disable button Approve & Deny)
-                aprSettlementMap.IsApproved = true;
+                aprSettlementMap.RequesterName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Requester)?.EmployeeNameVn;
+                aprSettlementMap.LeaderName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Leader)?.EmployeeNameVn;
+                aprSettlementMap.ManagerName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Manager)?.EmployeeNameVn;
+                aprSettlementMap.AccountantName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
+                aprSettlementMap.BUHeadName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
+                aprSettlementMap.IsShowLeader = !string.IsNullOrEmpty(approveSettlement.Leader);
+                aprSettlementMap.IsShowManager = !string.IsNullOrEmpty(approveSettlement.Manager);
+                aprSettlementMap.IsShowAccountant = !string.IsNullOrEmpty(approveSettlement.Accountant);
+                aprSettlementMap.IsShowBuHead = !string.IsNullOrEmpty(approveSettlement.Buhead);
             }
             return aprSettlementMap;
         }
@@ -2217,6 +2639,434 @@ namespace eFMS.API.Accounting.DL.Services
             return data.FirstOrDefault();
         }
         #endregion --- APPROVAL SETTLEMENT PAYMENT ---
+
+        #region -- Info Level Approve --        
+        public bool CheckAllLevelIsAutoOrNone(string type, Guid? officeId)
+        {
+            var roleLeader = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_LEADER, type, officeId);
+            var roleManager = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_MANAGER, type, officeId);
+            var roleAccountant = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_ACCOUNTANT, type, officeId);
+            var roleBuHead = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_BOD, type, officeId);
+            if (
+                (roleLeader == AccountingConstants.ROLE_AUTO && roleManager == AccountingConstants.ROLE_AUTO && roleAccountant == AccountingConstants.ROLE_AUTO && roleBuHead == AccountingConstants.ROLE_AUTO)
+                ||
+                (roleLeader == AccountingConstants.ROLE_NONE && roleManager == AccountingConstants.ROLE_NONE && roleAccountant == AccountingConstants.ROLE_NONE && roleBuHead == AccountingConstants.ROLE_NONE)
+               )
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public InfoLevelApproveResult LeaderLevel(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var result = new InfoLevelApproveResult();
+            var roleLeader = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_LEADER, type, officeId);
+            var userLeader = userBaseService.GetLeaderGroup(companyId, officeId, departmentId, groupId).FirstOrDefault();
+            var employeeIdOfLeader = userBaseService.GetEmployeeIdOfUser(userLeader);
+
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userLeader, groupId, departmentId, officeId, companyId);
+
+            result.LevelApprove = AccountingConstants.LEVEL_LEADER;
+            result.Role = roleLeader;
+            result.UserId = userLeader;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfLeader)?.Email;
+            result.EmailDeputies = emailDeputies;
+
+            return result;
+        }
+
+        public InfoLevelApproveResult ManagerLevel(string type, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var result = new InfoLevelApproveResult();
+            var roleManager = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_MANAGER, type, officeId);
+            var userManager = userBaseService.GetDeptManager(companyId, officeId, departmentId).FirstOrDefault();
+            var employeeIdOfManager = userBaseService.GetEmployeeIdOfUser(userManager);
+
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userManager, null, departmentId, officeId, companyId);
+
+            result.LevelApprove = AccountingConstants.LEVEL_MANAGER;
+            result.Role = roleManager;
+            result.UserId = userManager;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfManager)?.Email;
+            result.EmailDeputies = emailDeputies;
+
+            return result;
+        }
+
+        public InfoLevelApproveResult AccountantLevel(string type, Guid? officeId, Guid? companyId)
+        {
+            var result = new InfoLevelApproveResult();
+            var roleAccountant = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_ACCOUNTANT, type, officeId);
+            var userAccountant = userBaseService.GetAccoutantManager(companyId, officeId).FirstOrDefault();
+            var employeeIdOfAccountant = userBaseService.GetEmployeeIdOfUser(userAccountant);
+
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+
+            result.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
+            result.Role = roleAccountant;
+            result.UserId = userAccountant;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
+            result.EmailDeputies = emailDeputies;
+
+            return result;
+        }
+
+        public InfoLevelApproveResult BuHeadLevel(string type, Guid? officeId, Guid? companyId)
+        {
+            var result = new InfoLevelApproveResult();
+            var roleBuHead = userBaseService.GetRoleByLevel(AccountingConstants.LEVEL_BOD, type, officeId);
+            var userBuHead = userBaseService.GetBUHead(companyId, officeId).FirstOrDefault();
+            var employeeIdOfBuHead = userBaseService.GetEmployeeIdOfUser(userBuHead);
+
+            var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userBuHead, null, null, officeId, companyId);
+
+            result.LevelApprove = AccountingConstants.LEVEL_BOD;
+            result.Role = roleBuHead;
+            result.UserId = userBuHead;
+            result.UserDeputies = userDeputies;
+            result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfBuHead)?.Email;
+            result.EmailDeputies = emailDeputies;
+
+            return result;
+        }
+        #endregion -- Info Level Approve --
+
+        #region -- Check Exist, Check Is Manager, Is Approved --
+        public HandleState CheckExistSettingFlow(string type, Guid? officeId)
+        {
+            // Check existing Settling Flow
+            var settingFlow = userBaseService.GetSettingFlowApproval(type, officeId);
+            if (settingFlow == null)
+            {
+                return new HandleState("No setting flow yet");
+            }
+            return new HandleState();
+        }
+
+        public HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        {
+            var infoLevelApprove = LeaderLevel(type, groupId, departmentId, officeId, companyId);
+
+            if (infoLevelApprove.Role == AccountingConstants.ROLE_AUTO || infoLevelApprove.Role == AccountingConstants.ROLE_APPROVAL)
+            {
+                if (infoLevelApprove.LevelApprove == AccountingConstants.LEVEL_LEADER)
+                {
+                    if (string.IsNullOrEmpty(infoLevelApprove.UserId)) return new HandleState("Not found leader");
+                }
+            }
+
+            var managerLevel = ManagerLevel(type, departmentId, officeId, companyId);
+            if (managerLevel.Role == AccountingConstants.ROLE_AUTO || managerLevel.Role == AccountingConstants.ROLE_APPROVAL)
+            {
+                if (string.IsNullOrEmpty(managerLevel.UserId)) return new HandleState("Not found manager");
+            }
+
+            var accountantLevel = AccountantLevel(type, officeId, companyId);
+            if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_APPROVAL)
+            {
+                if (string.IsNullOrEmpty(accountantLevel.UserId)) return new HandleState("Not found accountant");
+            }
+
+            var buHeadLevel = BuHeadLevel(type, officeId, companyId);
+            if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL)
+            {
+                if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
+            }
+            return new HandleState();
+        }
+
+        public bool CheckUserIsApproved(ICurrentUser userCurrent, AcctSettlementPayment settlementPayment, AcctApproveSettlement approve)
+        {
+            var isApproved = false;
+            if (approve == null) return true;
+            var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+            var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+
+            if (!isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup && userCurrent.UserID == approve.Requester) //Requester
+            {
+                isApproved = true;
+                if (approve.RequesterAprDate == null)
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                      ||
+                        leaderLevel.UserDeputies.Contains(userCurrent.UserID)
+                    ) //Leader
+            {
+                isApproved = true;
+                if (string.IsNullOrEmpty(approve.LeaderApr) && leaderLevel.Role != AccountingConstants.ROLE_NONE)
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (isManager && !isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                      ||
+                        managerLevel.UserDeputies.Contains(currentUser.UserID)
+                    ) //Dept Manager
+            {
+                isApproved = true;
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                {
+                    return true;
+                }
+                if (string.IsNullOrEmpty(approve.ManagerApr) && managerLevel.Role != AccountingConstants.ROLE_NONE)
+                {
+                    isApproved = false;
+                }
+
+            }
+            else if (
+                        (isAccountant && isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                      ||
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID)
+                    ) //Accountant Manager
+            {
+                isApproved = true;
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                {
+                    return true;
+                }
+                if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                {
+                    return true;
+                }
+                if (string.IsNullOrEmpty(approve.AccountantApr) && accountantLevel.Role != AccountingConstants.ROLE_NONE)
+                {
+                    isApproved = false;
+                }
+            }
+            else if (
+                        (userCurrent.GroupId == AccountingConstants.SpecialGroup && isBuHead && isBod && (userCurrent.UserID == approve.Buhead || userCurrent.UserID == approve.BuheadApr))
+                      ||
+                        buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                    ) //BUHead
+            {
+                isApproved = true;
+                if (buHeadLevel.Role != AccountingConstants.ROLE_SPECIAL)
+                {
+                    if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                    {
+                        return true;
+                    }
+                    if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                    {
+                        return true;
+                    }
+                    if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                    {
+                        return true;
+                    }
+                }
+                if (
+                    (string.IsNullOrEmpty(approve.BuheadApr) && buHeadLevel.Role != AccountingConstants.ROLE_NONE)
+                    ||
+                    (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && !string.IsNullOrEmpty(approve.Requester))
+                   )
+                {
+                    isApproved = false;
+                }
+            }
+            else
+            {
+                //Đây là trường hợp các User không thuộc Approve
+                isApproved = true;
+            }
+            return isApproved;
+        }
+
+        public bool CheckUserIsManager(ICurrentUser userCurrent, AcctSettlementPayment settlementPayment, AcctApproveSettlement approve)
+        {
+            var isManagerOrLeader = false;
+
+            var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            if (approve == null)
+            {
+                if ((isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup) || leaderLevel.UserDeputies.Contains(userCurrent.UserID)) //Leader
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isManager && userCurrent.GroupId == AccountingConstants.SpecialGroup) || managerLevel.UserDeputies.Contains(currentUser.UserID)) //Dept Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup) || accountantLevel.UserDeputies.Contains(currentUser.UserID)) //Accountant Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if ((isBuHead && userCurrent.GroupId == AccountingConstants.SpecialGroup) || buHeadLevel.UserDeputies.Contains(userCurrent.UserID)) //BUHead
+                {
+                    isManagerOrLeader = true;
+                }
+            }
+            else
+            {
+                if (
+                     (isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                     ||
+                     leaderLevel.UserDeputies.Contains(userCurrent.UserID)
+                   ) //Leader
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (isManager && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                          ||
+                            managerLevel.UserDeputies.Contains(currentUser.UserID)
+                        ) //Dept Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (userCurrent.GroupId == AccountingConstants.SpecialGroup && isAccountant && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                          ||
+                            accountantLevel.UserDeputies.Contains(currentUser.UserID)
+                        ) //Accountant Manager
+                {
+                    isManagerOrLeader = true;
+                }
+                else if (
+                            (userCurrent.GroupId == AccountingConstants.SpecialGroup && isBuHead && (userCurrent.UserID == approve.Buhead || userCurrent.UserID == approve.BuheadApr))
+                          ||
+                            buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                        ) //BUHead
+                {
+                    isManagerOrLeader = true;
+                }
+            }
+            return isManagerOrLeader;
+        }
+
+        public bool CheckIsShowBtnDeny(ICurrentUser userCurrent, AcctSettlementPayment settlementPayment, AcctApproveSettlement approve)
+        {
+            if (approve == null) return false;
+
+            var leaderLevel = LeaderLevel(typeApproval, settlementPayment.GroupId, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var managerLevel = ManagerLevel(typeApproval, settlementPayment.DepartmentId, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var accountantLevel = AccountantLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+            var buHeadLevel = BuHeadLevel(typeApproval, settlementPayment.OfficeId, settlementPayment.CompanyId);
+
+            var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
+            var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
+            var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+            var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
+
+            var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
+            var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+
+            var isShowBtnDeny = false;
+
+            if (
+                 ((isLeader && userCurrent.GroupId != AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Leader || userCurrent.UserID == approve.LeaderApr))
+                 ||
+                 leaderLevel.UserDeputies.Contains(userCurrent.UserID))
+               ) //Leader
+            {
+                if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL || settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED)
+                {
+                    isShowBtnDeny = true;
+                }
+                else
+                {
+                    isShowBtnDeny = false;
+                }
+            }
+            else if (
+                        ((isManager && !isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Manager || userCurrent.UserID == approve.ManagerApr))
+                      ||
+                        managerLevel.UserDeputies.Contains(currentUser.UserID))
+
+                    ) //Dept Manager
+            {
+                isShowBtnDeny = false;
+                if (!string.IsNullOrEmpty(approve.Manager)
+                    && settlementPayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
+                {
+                    isShowBtnDeny = true;
+                }
+
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                {
+                    return false;
+                }
+            }
+            else if (
+                       ((isAccountant && isDeptAccountant && userCurrent.GroupId == AccountingConstants.SpecialGroup && (userCurrent.UserID == approve.Accountant || userCurrent.UserID == approve.AccountantApr))
+                      ||
+                        accountantLevel.UserDeputies.Contains(currentUser.UserID))
+                    ) //Accountant Manager
+            {
+                isShowBtnDeny = false;
+                if (!string.IsNullOrEmpty(approve.Accountant)
+                    && settlementPayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
+                {
+                    isShowBtnDeny = true;
+                }
+
+                if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                {
+                    return false;
+                }
+            }
+            else if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && isBod
+                &&
+                (
+                  (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent.UserID == buHeadLevel.UserId)
+                  ||
+                  buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
+                )
+                && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
+               )
+            {
+                isShowBtnDeny = true;
+            }
+            else
+            {
+                isShowBtnDeny = false;
+            }
+            return isShowBtnDeny;
+        }
+        #endregion -- Check Exist, Check Is Manager, Is Approved --
 
         #region --- COPY CHARGE ---        
         /// <summary>
