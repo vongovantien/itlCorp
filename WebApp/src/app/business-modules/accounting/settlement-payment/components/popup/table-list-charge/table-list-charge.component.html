@@ -75,14 +75,16 @@
                                         <td>
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || charge.isDuplicate) }">
-                                                <app-combo-grid-virtual-scroll #comboGridCharge
-                                                    [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                                    (itemSelected)="onSelectDataTableInfo($event, charge, 'charge')"
-                                                    [selectedDisplayFields]="['chargeNameEn']"
-                                                    [dataSources]="listCharges"
-                                                    [displayFields]="configChargeDisplayFields" [height]="150"
-                                                    placeholder="Please Select" (remove)="charge.chargeId = null">
-                                                </app-combo-grid-virtual-scroll>
+                                                <div class="list-master-charge">
+                                                    <app-combo-grid-virtual-scroll #comboGridCharge
+                                                        [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                        (itemSelected)="onSelectDataTableInfo($event, charge, 'charge')"
+                                                        [selectedDisplayFields]="['chargeNameEn']"
+                                                        [dataSources]="listCharges"
+                                                        [displayFields]="configChargeDisplayFields" [height]="150"
+                                                        placeholder="Please Select" (remove)="charge.chargeId = null">
+                                                    </app-combo-grid-virtual-scroll>
+                                                </div>
                                             </div>
                                         </td>
                                         <td>

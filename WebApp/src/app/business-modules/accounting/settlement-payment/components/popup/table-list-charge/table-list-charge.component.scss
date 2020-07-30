@@ -43,6 +43,11 @@
             }
         }
         .table-editable {
+            .list-master-charge {
+                .e--combogrid-content {
+                    width: 520px;
+                }
+            }
             .table-date {
                 .table-condensed {
                     tr {

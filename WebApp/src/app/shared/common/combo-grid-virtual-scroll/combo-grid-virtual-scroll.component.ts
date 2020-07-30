@@ -88,15 +88,16 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     onKeydownSearchInput(e: any) {
         if (e.keyCode === DOWN_ARROW) {
             this.keyManager.onKeydown(e);
+            this.keyManager.setFirstItemActive();
 
-            if (!this.CurrentActiveItemIdObj) {
-                this.keyManager.setFirstItemActive();
-            } else {
-                const itemIndex = this.ConstDataSources.findIndex(o => o[this.CurrentActiveItemIdObj.field] === this.CurrentActiveItemIdObj.value);
-                if (itemIndex !== -1) {
-                    this.keyManager.setActiveItem(itemIndex);
-                }
-            }
+            // if (!this.CurrentActiveItemIdObj) {
+            //     this.keyManager.setFirstItemActive();
+            // } else {
+            //     const itemIndex = this.ConstDataSources.findIndex(o => o[this.CurrentActiveItemIdObj.field] === this.CurrentActiveItemIdObj.value);
+            //     if (itemIndex !== -1) {
+            //         this.keyManager.setActiveItem(itemIndex);
+            //     }
+            // }
         }
     }
 

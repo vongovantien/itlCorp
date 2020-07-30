@@ -124,4 +124,16 @@
     .invisibleHeader {
         display: none !important;
     }
+
+    .list-master-unit {
+        .e--combogrid-content {
+            min-width: 265px;
+        }
+    }
+
+    .list-master-charge {
+        .e--combogrid-content {
+            min-width: 520px;
+        }
+    }
 }
