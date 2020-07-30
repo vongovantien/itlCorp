@@ -84,6 +84,7 @@ export class CsShipmentSurcharge {
     debitCharge: string = null;
     paySoano: string = null;
     unitCode: string = null;
+    chargeGroup: string = null;
 
     // * Custom
     duplicateCharge: boolean = false;
