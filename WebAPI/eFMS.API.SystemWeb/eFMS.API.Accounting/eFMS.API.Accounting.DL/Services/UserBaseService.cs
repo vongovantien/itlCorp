@@ -20,6 +20,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysSettingFlow> settingFlowRepo;
         readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
+        readonly IContextBase<SysUser> sysUserRepo;
 
         public UserBaseService(
             IContextBase<SysUser> repository, 
@@ -30,7 +31,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmployee> sysEmployee,
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysSettingFlow> settingFlow,
-            IContextBase<SysAuthorizedApproval> authourizedApproval) : base(repository, mapper)
+            IContextBase<SysAuthorizedApproval> authourizedApproval,
+            IContextBase<SysUser> sysUser) : base(repository, mapper)
         {
             sysUserLevelRepo = sysUserLevel;
             sysGroupRepo = sysGroup;
@@ -39,6 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepo = sysOffice;
             settingFlowRepo = settingFlow;
             authourizedApprovalRepo = authourizedApproval;
+            sysUserRepo = sysUser;
         }
 
         private int? GetGroupIdOfUser(string userId)
@@ -73,46 +76,56 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- LEADER, MANAGER, ACCOUNTANT, BOD --
         public List<string> GetLeaderGroup(Guid? companyId, Guid? officeId, int? departmentId, int? groupId)
         {
+            var userIds = sysUserRepo.Get().Select(s => s.Id).ToList();
             var leaders = sysUserLevelRepo.Get(x => x.Position == AccountingConstants.PositionManager
                                                     && x.GroupId == groupId
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
                                                     && x.OfficeId == officeId
-                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+                                                    && x.CompanyId == companyId)
+                                                    .Where(w => userIds.Contains(w.UserId))
+                                                    .Select(s => s.UserId).ToList();
             return leaders;
         }
 
         public List<string> GetDeptManager(Guid? companyId, Guid? officeId, int? departmentId)
         {
+            var userIds = sysUserRepo.Get().Select(s => s.Id).ToList();
             var managers = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
                                                     && x.Position == AccountingConstants.PositionManager
                                                     && x.DepartmentId == departmentId
                                                     && x.DepartmentId != null
                                                     && x.OfficeId == officeId
-                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+                                                    && x.CompanyId == companyId)
+                                                    .Where(w => userIds.Contains(w.UserId))
+                                                    .Select(s => s.UserId).ToList();
             return managers;
         }
 
         public List<string> GetAccoutantManager(Guid? companyId, Guid? officeId)
         {
+            var userIds = sysUserRepo.Get().Select(s => s.Id).ToList();
             var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == AccountingConstants.DeptTypeAccountant).Select(s => s.Id).ToList();
             var accountants = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
                                                     && x.Position == AccountingConstants.PositionManager
                                                     && x.OfficeId == officeId
                                                     && x.DepartmentId != null
                                                     && x.CompanyId == companyId)
-                                                    .Where(x => deptAccountants.Contains(x.DepartmentId.Value))
+                                                    .Where(x => deptAccountants.Contains(x.DepartmentId.Value) && userIds.Contains(x.UserId))
                                                     .Select(s => s.UserId).ToList();
             return accountants;
         }
 
         public List<string> GetBUHead(Guid? companyId, Guid? officeId)
         {
+            var userIds = sysUserRepo.Get().Select(s => s.Id).ToList();
             var buHeads = sysUserLevelRepo.Get(x => x.GroupId == AccountingConstants.SpecialGroup
                                                     && x.Position == AccountingConstants.PositionManager
                                                     && x.DepartmentId == null
                                                     && x.OfficeId == officeId
-                                                    && x.CompanyId == companyId).Select(s => s.UserId).ToList();
+                                                    && x.CompanyId == companyId)
+                                                    .Where(w => userIds.Contains(w.UserId))
+                                                    .Select(s => s.UserId).ToList();
             return buHeads;
         }
         #endregion -- LEADER, MANAGER, ACCOUNTANT, BOD --

@@ -2339,6 +2339,24 @@ namespace eFMS.API.Accounting.DL.Services
                                 return new HandleState("The accountant has not approved it yet");
                             }
                         }
+                        else //buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL
+                        {
+                            if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                            {
+                                approve.LeaderApr = userCurrent;
+                                approve.LeaderAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                            {
+                                approve.ManagerApr = userCurrent;
+                                approve.ManagerAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                            {
+                                approve.AccountantApr = userCurrent;
+                                approve.AccountantAprDate = DateTime.Now;
+                            }
+                        }
                         if (string.IsNullOrEmpty(approve.BuheadApr))
                         {
                             if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
@@ -2517,7 +2535,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if (buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL && isBod
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
@@ -2526,7 +2544,7 @@ namespace eFMS.API.Accounting.DL.Services
                         )
                        )
                     {
-                        if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
+                        if (buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL && accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
                         {
                             return new HandleState("The accountant has not approved it yet");
                         }
@@ -2776,12 +2794,12 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var infoLevelApprove = LeaderLevel(type, groupId, departmentId, officeId, companyId);
-
             if (infoLevelApprove.Role == AccountingConstants.ROLE_AUTO || infoLevelApprove.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (infoLevelApprove.LevelApprove == AccountingConstants.LEVEL_LEADER)
                 {
                     if (string.IsNullOrEmpty(infoLevelApprove.UserId)) return new HandleState("Not found leader");
+                    if (string.IsNullOrEmpty(infoLevelApprove.EmailUser)) return new HandleState("Not found email of leader");
                 }
             }
 
@@ -2789,18 +2807,21 @@ namespace eFMS.API.Accounting.DL.Services
             if (managerLevel.Role == AccountingConstants.ROLE_AUTO || managerLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(managerLevel.UserId)) return new HandleState("Not found manager");
+                if (string.IsNullOrEmpty(managerLevel.EmailUser)) return new HandleState("Not found email of manager");
             }
 
             var accountantLevel = AccountantLevel(type, officeId, companyId);
             if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(accountantLevel.UserId)) return new HandleState("Not found accountant");
+                if (string.IsNullOrEmpty(accountantLevel.EmailUser)) return new HandleState("Not found email of accountant");
             }
 
             var buHeadLevel = BuHeadLevel(type, officeId, companyId);
             if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
+                if (string.IsNullOrEmpty(buHeadLevel.EmailUser)) return new HandleState("Not found email of BOD");
             }
             return new HandleState();
         }
@@ -3032,7 +3053,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 isShowBtnDeny = false;
                 if (!string.IsNullOrEmpty(approve.Manager)
-                    && settlementPayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
@@ -3053,7 +3074,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 isShowBtnDeny = false;
                 if (!string.IsNullOrEmpty(approve.Accountant)
-                    && settlementPayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
                 {
@@ -3070,17 +3091,40 @@ namespace eFMS.API.Accounting.DL.Services
                     return false;
                 }
             }
-            else if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && isBod
+            else if (isBod
                 &&
                 (
                   (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent.UserID == buHeadLevel.UserId)
                   ||
                   buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
                 )
-                && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
                )
             {
-                isShowBtnDeny = true;
+                isShowBtnDeny = false;
+                if (settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW 
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED 
+                    && settlementPayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
+                {
+                    isShowBtnDeny = true;
+                }
+
+                if (buHeadLevel.Role != AccountingConstants.ROLE_SPECIAL)
+                {
+                    if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                    {
+                        return false;
+                    }
+                }
             }
             else
             {

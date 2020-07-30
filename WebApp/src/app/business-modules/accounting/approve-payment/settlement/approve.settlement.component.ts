@@ -252,7 +252,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Recall Is Successfull');
-                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        // this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        this.getDetailSettlement(this.settlementPayment.settlement.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
