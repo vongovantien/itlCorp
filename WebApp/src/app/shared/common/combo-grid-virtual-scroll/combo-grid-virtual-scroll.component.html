@@ -46,7 +46,6 @@
             </div>
             <div *ngIf="!loading && !!DataSources.length">
                 <cdk-virtual-scroll-viewport [ngStyle]="{'height.px': height}" [itemSize]="size">
-
                     <!-- <table class="table table-hover">
                         <tbody>
                             <ng-container>
@@ -70,7 +69,7 @@
                                     *cdkVirtualFor="let item of DataSources | filter :keyword: searchKeys; let i= index;trackBy: trackByFn"
                                     data-id="{{(i+1)}}"
                                     (click)="emitSelected(item,i); showAngledownIcon = false; dropdown.hide()"
-                                    [class.data-selected]="!!currentItemSelected && item.id === currentItemSelected.id">
+                                    [class.data-selected]="indexSelected !== -1 && i === indexSelected">
                                 </tr>
                             </ng-container>
                         </tbody>

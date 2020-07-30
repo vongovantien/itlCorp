@@ -69,7 +69,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     onKeydown(event: any) {
         if (event.keyCode === ENTER) {
             const item = this.keyManager.activeItem.data;
-            console.log(item);
 
             this.itemSelected.emit(item);
             this.setCurrentActiveItem(item);
@@ -82,13 +81,14 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             // * Reset keyword search.
             this.keyword = '';
         } else {
-            console.log(this.keyManager);
             this.keyManager.onKeydown(event);
         }
     }
 
     onKeydownSearchInput(e: any) {
         if (e.keyCode === DOWN_ARROW) {
+            this.keyManager.onKeydown(e);
+
             if (!this.CurrentActiveItemIdObj) {
                 this.keyManager.setFirstItemActive();
             } else {
@@ -97,7 +97,6 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.keyManager.setActiveItem(itemIndex);
                 }
             }
-            this.keyManager.onKeydown(e);
         }
     }
 
