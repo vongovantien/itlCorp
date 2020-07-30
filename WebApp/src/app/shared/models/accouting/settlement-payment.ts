@@ -21,6 +21,10 @@ export class SettlementPayment {
     isSelected: boolean = false;
     settleRequests: SettleRequestsPayment[] = [];
 
+    isRequester: boolean = false;
+    isManager: boolean = false;
+    isApproved: boolean = false;
+    isShowBtnDeny: boolean = false;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

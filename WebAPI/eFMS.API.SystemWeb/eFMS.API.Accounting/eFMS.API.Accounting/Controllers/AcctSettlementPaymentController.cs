@@ -33,6 +33,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctSettlementPaymentService acctSettlementPaymentService;
         private readonly ICurrentUser currentUser;
         private readonly IMapper mapper;
+        private string typeApproval = "Settlement";
 
         /// <summary>
         /// Contructor
@@ -46,6 +47,17 @@ namespace eFMS.API.Accounting.Controllers
             acctSettlementPaymentService = service;
             currentUser = user;
             mapper = _mapper;
+        }
+
+        /// <summary>
+        /// Get all settlement payment
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
+        {
+            var data = acctSettlementPaymentService.Get();
+            return Ok(data);
         }
 
         /// <summary>
@@ -64,21 +76,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-
-        /// <summary>
-        /// get list settlement payment by conditions
-        /// </summary>
-        /// <param name="criteria">search conditions</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("QueryData")]
-        [Authorize]
-        public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
-        {
-            var data = acctSettlementPaymentService.QueryData(criteria);
-            return Ok(data);
-        }
-
+        
         /// <summary>
         /// Get list shipment of settlement payment list by settlementNo
         /// </summary>
@@ -432,7 +430,6 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            HandleState hs;
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
@@ -481,23 +478,32 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
-
-            //Check exist thông tin Manager, Accountant của User requester
-            AcctApproveSettlementModel settlementAppr = new AcctApproveSettlementModel
-            {
-                Requester = model.Settlement.Requester
-            };
-            var isExistsManager = acctSettlementPaymentService.CheckExistsInfoManagerOfRequester(settlementAppr);
-            if (!isExistsManager.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = isExistsManager.Exception.Message };
-                return BadRequest(_result);
-            }
-
+            
+            HandleState hs;
+            var message = string.Empty;
             if (string.IsNullOrEmpty(model.Settlement.SettlementNo))//Insert Settlement Payment
             {
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = acctSettlementPaymentService.CheckExistSettingFlow(typeApproval, currentUser.OfficeID);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = acctSettlementPaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.AddSettlementPayment(model);
+                message = HandleError.GetMessage(hs, Crud.Insert);
                 if (hs.Code == 403)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -511,28 +517,58 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
 
+                var settlementPaymentCurrent = acctSettlementPaymentService.Get(x => x.Id == model.Settlement.Id).FirstOrDefault();
+                #region -- Check Exist Settlement Payment --
+                if (settlementPaymentCurrent == null)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = "Not found settlement payment" };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Settlement Payment --
+
+                #region -- Check Exist Setting Flow --
+                var isExistSettingFlow = acctSettlementPaymentService.CheckExistSettingFlow(typeApproval, settlementPaymentCurrent.OfficeId);
+                if (!isExistSettingFlow.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist Setting Flow --
+
+                #region -- Check Exist User Approval --
+                var isExistUserApproval = acctSettlementPaymentService.CheckExistUserApproval(typeApproval, settlementPaymentCurrent.GroupId, settlementPaymentCurrent.DepartmentId, settlementPaymentCurrent.OfficeId, settlementPaymentCurrent.CompanyId);
+                if (!isExistUserApproval.Success)
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
+                    return BadRequest(_result);
+                }
+                #endregion -- Check Exist User Approval --
+
+                #region -- Check Settlement Payment Approving --
                 if (!model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(AccountingConstants.STATUS_APPROVAL_DENIED))
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
                     return BadRequest(_result);
                 }
+                #endregion -- Check Settlement Payment Approving --
 
                 model.Settlement.StatusApproval = AccountingConstants.STATUS_APPROVAL_REQUESTAPPROVAL;
                 hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
+                message = HandleError.GetMessage(hs, Crud.Update);
                 if (hs.Code == 403)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
                 }
             }
-
-            var message = HandleError.GetMessage(hs, Crud.Insert);
+            
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (hs.Success)
             {
                 AcctApproveSettlementModel approve = new AcctApproveSettlementModel
                 {
                     SettlementNo = model.Settlement.SettlementNo,
-                    Requester = model.Settlement.Requester
+                    Requester = model.Settlement.Requester,
+                    RequesterAprDate = DateTime.Now
                 };
                 var resultInsertUpdateApprove = acctSettlementPaymentService.InsertOrUpdateApprovalSettlement(approve);
                 if (!resultInsertUpdateApprove.Success)
@@ -745,6 +781,14 @@ namespace eFMS.API.Accounting.Controllers
                 }
             }
             return false;
-        }        
+        }
+
+        [HttpGet]
+        [Route("GetHistoryDeniedSettlementPayment")]
+        public IActionResult GetHistoryDeniedSettlement(string settlementNo)
+        {
+            var data = acctSettlementPaymentService.GetHistoryDeniedSettlement(settlementNo);
+            return Ok(data);
+        }
     }
 }

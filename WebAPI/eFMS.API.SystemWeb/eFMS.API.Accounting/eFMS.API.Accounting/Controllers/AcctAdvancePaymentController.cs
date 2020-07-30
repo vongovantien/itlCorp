@@ -37,7 +37,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        private string typeApproval = "Advance";
 
         /// <summary>
         /// Contructor
@@ -438,7 +438,7 @@ namespace eFMS.API.Accounting.Controllers
             if (string.IsNullOrEmpty(model.AdvanceNo))//Insert Advance Payment
             {
                 #region -- Check Exist Setting Flow --
-                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow("Advance", currentUser.OfficeID);
+                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow(typeApproval, currentUser.OfficeID);
                 if (!isExistSettingFlow.Success)
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
@@ -447,7 +447,7 @@ namespace eFMS.API.Accounting.Controllers
                 #endregion -- Check Exist Setting Flow --
 
                 #region -- Check Exist User Approval --
-                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval("Advance", currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
+                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval(typeApproval, currentUser.GroupId, currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
                 if (!isExistUserApproval.Success)
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };
@@ -481,7 +481,7 @@ namespace eFMS.API.Accounting.Controllers
                 #endregion -- Check Exist Advance Payment --
 
                 #region -- Check Exist Setting Flow --
-                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow("Advance", advancePaymentCurrent.OfficeId);
+                var isExistSettingFlow = acctAdvancePaymentService.CheckExistSettingFlow(typeApproval, advancePaymentCurrent.OfficeId);
                 if (!isExistSettingFlow.Success)
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = isExistSettingFlow.Exception.Message };
@@ -490,7 +490,7 @@ namespace eFMS.API.Accounting.Controllers
                 #endregion -- Check Exist Setting Flow --
 
                 #region -- Check Exist User Approval --
-                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval("Advance", advancePaymentCurrent.GroupId, advancePaymentCurrent.DepartmentId, advancePaymentCurrent.OfficeId, advancePaymentCurrent.CompanyId);
+                var isExistUserApproval = acctAdvancePaymentService.CheckExistUserApproval(typeApproval, advancePaymentCurrent.GroupId, advancePaymentCurrent.DepartmentId, advancePaymentCurrent.OfficeId, advancePaymentCurrent.CompanyId);
                 if (!isExistUserApproval.Success)
                 {
                     ResultHandle _result = new ResultHandle { Status = false, Message = isExistUserApproval.Exception.Message };

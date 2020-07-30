@@ -8,7 +8,7 @@
                         <i class="la la-check-circle-o" *ngIf="approveInfo.requesterName"></i>
                     </div>
                     <div class="font-weight-bold">{{approveInfo.requesterName}}</div>
-                    <div class="font-weight-bold">
+                    <div class="font-weight-bold">Date:
                         {{!!approveInfo.requesterAprDate ? (approveInfo.requesterAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     <div class="font-weight-bold">
                         {{approveInfo.managerName}}
                     </div>
-                    <div class="font-weight-bold">
+                    <div class="font-weight-bold">Date:
                         {{!!approveInfo.managerAprDate ? (approveInfo.managerAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                     <div class="font-weight-bold">
                         {{approveInfo.accountantName}}
                     </div>
-                    <div class="font-weight-bold">
+                    <div class="font-weight-bold">Date:
                         {{!!approveInfo.accountantAprDate ? (approveInfo.accountantAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                     <div class="font-weight-bold">
                         {{approveInfo.buHeadName}}
                     </div>
-                    <div class="font-weight-bold">
+                    <div class="font-weight-bold">Date:
                         {{!!approveInfo.buheadAprDate ? (approveInfo.buheadAprDate | date: 'dd/MM/yyyy HH:mm') : '/.../'}}
                     </div>
                 </div>

@@ -18,9 +18,7 @@ using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Localization;
-using System.Globalization;
 using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -792,7 +790,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo);
                         if (approveAdvance != null)
                         {
-                            foreach(var approve in approveAdvance)
+                            foreach (var approve in approveAdvance)
                             {
                                 var approveAdvanceDelete = acctApproveAdvanceRepo.Delete(x => x.Id == approve.Id, false);
                             }
@@ -1981,11 +1979,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (!sendMailSuggest)
                     {
-                        return new HandleState("Send mail suggest Approval failed");
+                        return new HandleState("Send mail suggest approval failed");
                     }
                     if (!sendMailApproved)
                     {
-                        return new HandleState("Send mail Approved Approval failed");
+                        return new HandleState("Send mail approved approval failed");
                     }
 
                     advancePayment.UserModified = approve.UserModified = userCurrent;
@@ -2020,7 +2018,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     var advancePayment = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-                    if (advancePayment == null) return new HandleState("Not found Advance Payment");
+                    if (advancePayment == null) return new HandleState("Not found advance payment");
 
                     var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
@@ -2424,7 +2422,7 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
             return sendMailResult;
         }
-        
+
         public AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo)
         {
             var userCurrent = currentUser.UserID;
@@ -2844,7 +2842,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ) //Dept Manager
             {
                 isShowBtnDeny = false;
-                if (   !string.IsNullOrEmpty(approve.Manager)
+                if (!string.IsNullOrEmpty(approve.Manager)
                     && advancePayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED

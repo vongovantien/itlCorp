@@ -16,6 +16,7 @@ import { SettlementFormCreateComponent } from '../../settlement-payment/componen
 
 import { finalize, catchError } from 'rxjs/operators';
 import { switchMap, tap } from 'rxjs/operators';
+import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 
 
 @Component({
@@ -33,7 +34,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     @ViewChild('confirmApprovePopup', { static: false }) confirmApprovePopup: ConfirmPopupComponent;
 
     @ViewChild(InjectViewContainerRefDirective, { static: false }) public reportContainerRef: InjectViewContainerRefDirective;
-
+    @ViewChild(HistoryDeniedPopupComponent, { static: false }) historyDeniedPopup: HistoryDeniedPopupComponent;
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -97,7 +98,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
                         amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
-                        currency: this.settlementPayment.settlement.settlementCurrency
+                        currency: this.settlementPayment.settlement.settlementCurrency,
+                        statusApproval: this.settlementPayment.settlement.statusApproval
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
@@ -158,7 +160,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message, ' Approve Is Successfull');
-                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        // this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        this.getDetailSettlement(this.settlementPayment.settlement.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -178,7 +181,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message, ' Deny Is Successfull');
-                        this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        // this.getInfoApproveSettlement(this.settlementPayment.settlement.settlementNo);
+                        this.getDetailSettlement(this.settlementPayment.settlement.id);
                     } else {
                         this._toastService.error(res.message, '');
                     }
@@ -254,6 +258,11 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     }
                 },
             );
+    }
+
+    showInfoDenied() {
+        this.historyDeniedPopup.getDeniedComment('Settlement', this.settlementPayment.settlement.settlementNo);
+        this.historyDeniedPopup.show();
     }
 }
 
