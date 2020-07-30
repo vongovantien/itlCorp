@@ -1,6 +1,25 @@
 <div class="m-content">
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
+        <div class="m-portlet__head">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title">
+                    <h3 class="m-portlet__head-text">
+                        Combogrid navigation
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body">
+            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                [currentActiveItemId]="{ field: 'id', value: selectedCountry}" [selectedDisplayFields]="['name_EN']"
+                [dataSources]="countries | async" [displayFields]="displayFieldCity" placeholder="Select city"
+                [size]="15">
+            </app-combo-grid-virtual-scroll>
+        </div>
+    </div>
+
+
+    <!-- <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title">
@@ -11,7 +30,6 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <!--begin: table -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand">
                     <thead>
@@ -52,12 +70,8 @@
                     </tbody>
                 </table>
             </div>
-            <!--end: table -->
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -78,7 +92,7 @@
                     class to the tr element with selected state.
                 </div>
             </div>
-            <!--begin: table -->
+           
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand">
                     <thead>
@@ -111,11 +125,13 @@
                         <tr class="invalid-row">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -146,11 +162,13 @@
                         <tr class="selected-row">
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -181,11 +199,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -216,12 +236,8 @@
                     </tbody>
                 </table>
             </div>
-            <!--end: table -->
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -242,7 +258,6 @@
                     to the th element to sorting table
                 </div>
             </div>
-            <!--begin: Datatable -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
@@ -275,11 +290,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -310,11 +327,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -345,11 +364,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -380,8 +401,6 @@
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable -->
-            <!--begin::pagination-->
             <div class="pagination-nav">
                 <div class="row">
                     <div class="col-sm-6">
@@ -410,12 +429,8 @@
                     </div>
                 </div>
             </div>
-            <!--end::pagination-->
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -427,7 +442,6 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <!--begin: Datatable -->
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
@@ -670,7 +684,8 @@
                             <tr class="loading-wrapper">
                                 <td colspan="6">
                                     <div class="on-loading">
-                                        <div class="m-loader m-loader--brand" style="width: 30px; display: inline-block;"></div>
+                                        <div class="m-loader m-loader--brand"
+                                            style="width: 30px; display: inline-block;"></div>
                                         <span>Loading</span>
                                     </div>
                                 </td>
@@ -679,12 +694,8 @@
                     </table>
                 </perfect-scrollbar>
             </div>
-            <!--end: Datatable -->
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -696,7 +707,6 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <!--begin: Datatable -->
             <div class="table-wrapper" id="" style="min-height: 300px">
                 <table class="table table-striped table-brand table-editable">
                     <thead class="">
@@ -778,21 +788,25 @@
                         <tr class="m-form m-form--state invalid-row row-editing">
                             <td class="table-actions-col fixed-side">
                                 <div class="table-actions content-editable" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
                                 <div class="table-actions control-editable" style="width: 70px">
-                                    <button type="button" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Save">
                                         <i class="la la-save"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Cancel">
                                         <i class="la la-ban"></i>
                                     </button>
@@ -803,9 +817,9 @@
                                     Cont Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                                 <div class="has-danger row-control-feedback">
@@ -819,21 +833,18 @@
                                     Cont Q'ty
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
-                                <!-- <div class="control-editable has-danger">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
-                                    <div class="form-control-feedback">
-                                        Sorry, that's not correct. Try another?
-                                    </div>
-                                </div> -->
+                  
                             </td>
                             <td class="">
                                 <span class="content-editable">
                                     Cont No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -841,7 +852,8 @@
                                     Seal No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -849,7 +861,8 @@
                                     Mark No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -858,13 +871,16 @@
                                 </span>
                                 <div class="control-editable">
                                     <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            value="Vũng Tàu, Bà Rịa, Việt">
                                         <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
-                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
                                                             <i class="icon-search"></i>
                                                         </div>
                                                     </div>
@@ -916,9 +932,9 @@
                                     Package Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -927,7 +943,8 @@
                                     Package Q'ty
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="" style="width: 130px">
@@ -935,7 +952,8 @@
                                     Description of Good dài thiệt là dài đó nha Tem Tem
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -943,7 +961,8 @@
                                     N.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -951,7 +970,8 @@
                                     G.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -959,7 +979,8 @@
                                     C.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -967,7 +988,8 @@
                                     Unit
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -975,28 +997,33 @@
                                     CBM
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                         </tr>
                         <tr class="m-form m-form--state invalid-row row-editing">
                             <td class="table-actions-col fixed-side">
                                 <div class="table-actions content-editable" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove">
                                         <i class="la la-trash"></i>
                                     </button>
                                 </div>
                                 <div class="table-actions control-editable" style="width: 70px">
-                                    <button type="button" class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-primary btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Save">
                                         <i class="la la-save"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Cancel">
                                         <i class="la la-ban"></i>
                                     </button>
@@ -1007,9 +1034,9 @@
                                     Cont Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -1018,7 +1045,8 @@
                                     Cont Q'ty
                                 </span>
                                 <div class="control-editable has-danger">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                     <div class="form-control-feedback">
                                         Sorry, that's not correct. Try another?
                                     </div>
@@ -1029,7 +1057,8 @@
                                     Cont No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1037,7 +1066,8 @@
                                     Seal No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1045,7 +1075,8 @@
                                     Mark No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1054,13 +1085,16 @@
                                 </span>
                                 <div class="control-editable">
                                     <div class="dropdown e--combogrid">
-                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text" readonly data-toggle="dropdown" placeholder="Please selected" value="Vũng Tàu, Bà Rịa, Việt">
+                                        <input class="form-control m-input m-input--square dropdown-toggle" type="text"
+                                            readonly data-toggle="dropdown" placeholder="Please selected"
+                                            value="Vũng Tàu, Bà Rịa, Việt">
                                         <div class="dropdown-menu  dropdown-menu-right e--combogrid-content">
                                             <div class="tabel-wrapper table-fixed">
                                                 <div class="table-head-fixed">
                                                     <div class="table-filter-block">
                                                         <div class="search-field">
-                                                            <input class="form-control m-input m-input--square" type="text" placeholder="Search...">
+                                                            <input class="form-control m-input m-input--square"
+                                                                type="text" placeholder="Search...">
                                                             <i class="icon-search"></i>
                                                         </div>
                                                     </div>
@@ -1112,9 +1146,9 @@
                                     Package Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -1123,7 +1157,8 @@
                                     Package Q'ty
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="" style="width: 130px">
@@ -1131,7 +1166,8 @@
                                     Description of Good dài thiệt là dài đó nha Tem Tem
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1139,7 +1175,8 @@
                                     N.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1147,7 +1184,8 @@
                                     G.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1155,7 +1193,8 @@
                                     C.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1163,7 +1202,8 @@
                                     Unit
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1171,18 +1211,21 @@
                                     CBM
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                         </tr>
                         <tr class="">
                             <td class="table-actions-col fixed-side">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1193,9 +1236,9 @@
                                     Cont Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -1204,7 +1247,8 @@
                                     Cont Q'ty
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1212,7 +1256,8 @@
                                     Cont No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1220,7 +1265,8 @@
                                     Seal No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1228,7 +1274,8 @@
                                     Mark No.
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1236,9 +1283,9 @@
                                     Commodity
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -1247,9 +1294,9 @@
                                     Package Type
                                 </span>
                                 <div class="control-editable">
-                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled" (data)="refreshValue($event)"
-                                        (selected)="selected($event)" (removed)="removed($event)" (typed)="typed($event)"
-                                        placeholder="Select filter">
+                                    <ng-select [allowClear]="true" [items]="items" [disabled]="disabled"
+                                        (data)="refreshValue($event)" (selected)="selected($event)"
+                                        (removed)="removed($event)" (typed)="typed($event)" placeholder="Select filter">
                                     </ng-select>
                                 </div>
                             </td>
@@ -1258,7 +1305,8 @@
                                     Package Q'ty
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="" style="width: 130px">
@@ -1266,7 +1314,8 @@
                                     Description of Good dài thiệt là dài đó nha Tem Tem
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1274,7 +1323,8 @@
                                     N.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1282,7 +1332,8 @@
                                     G.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1290,7 +1341,8 @@
                                     C.W
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1298,7 +1350,8 @@
                                     Unit
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                             <td class="">
@@ -1306,19 +1359,16 @@
                                     CBM
                                 </span>
                                 <div class="control-editable">
-                                    <input type="text" class="form-control m-input m-input--square" placeholder="Please enter">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter">
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable -->
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -1334,11 +1384,11 @@
                 <div class="alert m-alert m-alert--default" role="alert">
                     Add
                     <code>table-scrollable</code>
-                    class to the div element has class 
+                    class to the div element has class
                     <code>table-wrapper</code>
                 </div>
             </div>
-            <!--begin: Datatable -->
+           
             <div class="table-wrapper table-scrollable" id="">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
@@ -1371,11 +1421,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1406,11 +1458,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1441,11 +1495,13 @@
                         <tr>
                             <td class="table-actions-col">
                                 <div class="table-actions" style="width: 70px">
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1476,12 +1532,9 @@
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable -->
+           
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -1493,7 +1546,7 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <!--begin: Datatable -->
+           
             <div class="table-wrapper" id="table-001">
                 <table class="table table-striped table-brand dataTable">
                     <thead>
@@ -1523,19 +1576,22 @@
                         </tr>
                     </thead>
                     <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
+                        
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
                                 <div class="table-actions">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-001"
-                                        title="Collapse">
+                                    <button type="button"
+                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                        data-toggle="collapse" data-target="#id-001" title="Collapse">
                                         <i class="la la-angle-up"></i>
                                     </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1563,8 +1619,7 @@
                                 <span>Active</span>
                             </td>
                         </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
+                        
                         <tr class="collapse-panel-row">
                             <td colspan="8">
                                 <div class="detail-panel-block collapse" id="id-001" data-parent="#table-001">
@@ -1625,22 +1680,25 @@
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
+                        
                     </tbody>
                     <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
+                        
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
                                 <div class="table-actions">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-002"
-                                        title="Collapse">
+                                    <button type="button"
+                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                        data-toggle="collapse" data-target="#id-002" title="Collapse">
                                         <i class="la la-angle-up"></i>
                                     </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1668,8 +1726,8 @@
                                 <span>Active</span>
                             </td>
                         </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
+                        
+                        <
                         <tr class="collapse-panel-row">
                             <td colspan="8">
                                 <div class="detail-panel-block collapse" id="id-002" data-parent="#table-001">
@@ -1730,22 +1788,25 @@
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
+                        
                     </tbody>
                     <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
+                        
                         <tr class="collapse-toggle-row">
                             <td class="table-actions-col">
                                 <div class="table-actions">
-                                    <button type="button" class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed" data-toggle="collapse" data-target="#id-003"
-                                        title="Collapse">
+                                    <button type="button"
+                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                        data-toggle="collapse" data-target="#id-003" title="Collapse">
                                         <i class="la la-angle-up"></i>
                                     </button>
-                                    <button type="button" class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Edit">
                                         <i class="la la-edit"></i>
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
                                         title="Remove" data-toggle="modal" data-target="#confirm-delete-modal">
                                         <i class="la la-trash"></i>
                                     </button>
@@ -1773,8 +1834,8 @@
                                 <span>Active</span>
                             </td>
                         </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
+                        
+                        <
                         <tr class="collapse-panel-row">
                             <td colspan="8">
                                 <div class="detail-panel-block collapse" id="id-003" data-parent="#table-001">
@@ -1835,16 +1896,13 @@
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
+                        
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable -->
+           
         </div>
     </div>
-    <!--end::  m-portlet-->
-
-    <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__head">
             <div class="m-portlet__head-caption">
@@ -1856,7 +1914,7 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <!--begin: Datatable-->
+            
             <div class="table-wrapper table-scrollable" id="">
                 <table class="table table-striped table-brand table-collapse-group dataTable">
                     <thead>
@@ -1888,31 +1946,38 @@
                         </tr>
                     </thead>
                     <tbody class="tbody-group">
-                        <!-- begin collapse-toggle-row -->
+                        
                         <tr class="collapse-toggle-row tgroup">
                             <td colspan="8">
-                                <label class="btn-toggle-collapse m--font-danger" title="view more"  data-toggle="collapse" data-target="#id-cd-001">
+                                <label class="btn-toggle-collapse m--font-danger" title="view more"
+                                    data-toggle="collapse" data-target="#id-cd-001">
                                     <i class="la la-minus-square"></i>
-                                </label> 
-                                <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Tâm Tâm</span>
+                                </label>
+                                <span class="tgroup-title m--margin-right-10">No-1</span>&nbsp;<span
+                                    class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Tâm
+                                    Tâm</span>
                             </td>
                         </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
+                        
+                        <
                         <tr class="collapse-panel-row">
                             <td colspan="8">
                                 <div class="collapse show" id="id-cd-001">
                                     <table class="table">
                                         <tbody>
                                             <tr class="">
-                                                <td class="table-actions-col" >
+                                                <td class="table-actions-col">
                                                     <div class="table-actions">
-                                                        <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                                        <button type="button"
+                                                            class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit" data-toggle="modal"
+                                                            data-target="#detail-credit-debit-note-modal">
                                                             <i class="la la-list"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal"
+                                                            data-target="#confirm-delete-CDnote-modal">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </div>
@@ -1921,7 +1986,8 @@
                                                     <span>text</span>
                                                 </td>
                                                 <td>
-                                                    <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
+                                                    <a class="" href="javascript:void(0)" data-toggle="modal"
+                                                        data-target="#detail-credit-debit-note-modal">Note no</a>
                                                 </td>
                                                 <td>
                                                     <span>text</span>
@@ -1940,14 +2006,18 @@
                                                 </td>
                                             </tr>
                                             <tr class="">
-                                                <td class="table-actions-col"  width="70">
+                                                <td class="table-actions-col" width="70">
                                                     <div class="table-actions">
-                                                        <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                                        <button type="button"
+                                                            class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit" data-toggle="modal"
+                                                            data-target="#detail-credit-debit-note-modal">
                                                             <i class="la la-list"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal"
+                                                            data-target="#confirm-delete-CDnote-modal">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </div>
@@ -1956,7 +2026,8 @@
                                                     <span>text</span>
                                                 </td>
                                                 <td>
-                                                    <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
+                                                    <a class="" href="javascript:void(0)" data-toggle="modal"
+                                                        data-target="#detail-credit-debit-note-modal">Note no</a>
                                                 </td>
                                                 <td>
                                                     <span>text</span>
@@ -1979,33 +2050,40 @@
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
+                        
 
-                        <!-- begin collapse-toggle-row -->
+                        
                         <tr class="collapse-toggle-row tgroup">
                             <td colspan="8">
-                                <label class="btn-toggle-collapse m--font-danger" title="view more" data-toggle="collapse" data-target="#id-cd-002">
+                                <label class="btn-toggle-collapse m--font-danger" title="view more"
+                                    data-toggle="collapse" data-target="#id-cd-002">
                                     <i class="la la-minus-square"></i>
-                                </label> 
-                                <span class="tgroup-title m--margin-right-10">No-2</span>&nbsp;<span class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Thor Thế</span>
+                                </label>
+                                <span class="tgroup-title m--margin-right-10">No-2</span>&nbsp;<span
+                                    class="tgroup-title">Partner name:</span>&nbsp;<span class="tgroup-title">Thor
+                                    Thế</span>
                             </td>
                         </tr>
-                        <!-- end of collapse-toggle-row -->
-                        <!-- begin collapse-panel-row -->
+                        
+                        <
                         <tr class="collapse-panel-row">
                             <td colspan="8">
                                 <div class="collapse show" id="id-cd-002">
                                     <table class="table">
                                         <tbody>
                                             <tr class="">
-                                                <td class="table-actions-col"  width="70">
+                                                <td class="table-actions-col" width="70">
                                                     <div class="table-actions">
-                                                        <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                                        <button type="button"
+                                                            class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit" data-toggle="modal"
+                                                            data-target="#detail-credit-debit-note-modal">
                                                             <i class="la la-list"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal"
+                                                            data-target="#confirm-delete-CDnote-modal">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </div>
@@ -2014,7 +2092,8 @@
                                                     <span>text</span>
                                                 </td>
                                                 <td>
-                                                    <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
+                                                    <a class="" href="javascript:void(0)" data-toggle="modal"
+                                                        data-target="#detail-credit-debit-note-modal">Note no</a>
                                                 </td>
                                                 <td>
                                                     <span>text</span>
@@ -2033,14 +2112,18 @@
                                                 </td>
                                             </tr>
                                             <tr class="">
-                                                <td class="table-actions-col"  width="70">
+                                                <td class="table-actions-col" width="70">
                                                     <div class="table-actions">
-                                                        <button type="button" class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Edit" data-toggle="modal" data-target="#detail-credit-debit-note-modal">
+                                                        <button type="button"
+                                                            class="btn btn-brand btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Edit" data-toggle="modal"
+                                                            data-target="#detail-credit-debit-note-modal">
                                                             <i class="la la-list"></i>
                                                         </button>
-                                                        <button type="button" class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" data-toggle="modal" data-target="#confirm-delete-CDnote-modal">
+                                                        <button type="button"
+                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                            title="Remove" data-toggle="modal"
+                                                            data-target="#confirm-delete-CDnote-modal">
                                                             <i class="la la-trash"></i>
                                                         </button>
                                                     </div>
@@ -2049,7 +2132,8 @@
                                                     <span>text</span>
                                                 </td>
                                                 <td>
-                                                    <a class="" href="javascript:void(0)" data-toggle="modal" data-target="#detail-credit-debit-note-modal">Note no</a>
+                                                    <a class="" href="javascript:void(0)" data-toggle="modal"
+                                                        data-target="#detail-credit-debit-note-modal">Note no</a>
                                                 </td>
                                                 <td>
                                                     <span>text</span>
@@ -2072,12 +2156,9 @@
                                 </div>
                             </td>
                         </tr>
-                        <!--end of collapse-panel-row -->
                     </tbody>
                 </table>
             </div>
-            <!--end: Datatable-->  
         </div>
-    </div>
-    <!--end::  m-portlet-->
+    </div> -->
 </div>

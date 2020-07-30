@@ -36,6 +36,7 @@
         transform: translate(-50%, -50%);
     }
     .dropdown-menu {
+        top: 0 !important;
         min-width: 100%;
         padding: 0;
         background-color: #fff;
@@ -78,7 +79,14 @@
                 &.data-selected {
                     td {
                         background-color: #3965b6;
-                        color: #fff;
+                        color: #ffffff;
+                    }
+                }
+                &.data-selected-row {
+                    background: lightblue;
+                    color: #000000;
+                    td {
+                        color: #000000;
                     }
                 }
             }
