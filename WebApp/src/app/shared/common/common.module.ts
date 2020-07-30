@@ -11,6 +11,7 @@ import { AppPaginationComponent } from './pagination/pagination.component';
 import { TableCellComponent } from './table-cell/table-cell.component';
 import { PipeModule } from '../pipes/pipe.module';
 import { RouterModule } from '@angular/router';
+import { AppCombogridItemComponent } from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.component';
 const COMPONENTS = [
     SubHeaderComponent,
     InputTableLayoutComponent,
@@ -35,7 +36,8 @@ const COMPONENTS = [
     AppPermissionButtonComponent,
     ExportCrystalComponent,
     Permission403PopupComponent,
-    AppComboGridIconComponent
+    AppComboGridIconComponent,
+    AppCombogridItemComponent
 ];
 
 @NgModule({
