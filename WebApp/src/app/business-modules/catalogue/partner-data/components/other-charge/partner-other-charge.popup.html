@@ -37,14 +37,17 @@
                                         <td>
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId)}">
-                                                <app-combo-grid-virtual-scroll
-                                                    [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                                    (itemSelected)="onSelectDataFormInfo($event, charge)"
-                                                    [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                    [dataSources]="listCharges"
-                                                    [displayFields]="configComboGridCharge.displayFields"
-                                                    placeholder="Select charge" (remove)="charge.chargeId = null">
-                                                </app-combo-grid-virtual-scroll>
+                                                <div class="list-master-charge">
+                                                    <app-combo-grid-virtual-scroll
+                                                        [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                        (itemSelected)="onSelectDataFormInfo($event, charge)"
+                                                        [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                                        [dataSources]="listCharges"
+                                                        [displayFields]="configComboGridCharge.displayFields"
+                                                        placeholder="Select charge" (remove)="charge.chargeId = null">
+                                                    </app-combo-grid-virtual-scroll>
+                                                </div>
+
                                             </div>
                                         </td>
                                         <td>

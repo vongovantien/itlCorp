@@ -20,6 +20,8 @@ import { ShareContainerImportComponent } from '../container-import/container-imp
 @Component({
     selector: 'hbl-fcl-container-popup',
     templateUrl: './hbl-fcl-container.popup.html',
+    styleUrls: ['./../container-list/container-list-popup.scss']
+
 })
 export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
 

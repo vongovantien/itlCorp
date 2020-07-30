@@ -192,13 +192,16 @@
                                             [(ngModel)]="charge.unitCode">
                                     </ng-container>
                                     <ng-template #unit>
-                                        <app-combo-grid-virtual-scroll
-                                            [currentActiveItemId]="{field: 'id', value: charge.unitId}"
-                                            (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
-                                            [selectedDisplayFields]="['code']" [dataSources]="listUnits"
-                                            [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
-                                            (remove)="charge.unitId = null" placeholder="Select Unit" size="15">
-                                        </app-combo-grid-virtual-scroll>
+                                        <div class="list-master-unit">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: charge.unitId}"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
+                                                [selectedDisplayFields]="['code']" [dataSources]="listUnits"
+                                                [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
+                                                (remove)="charge.unitId = null" placeholder="Select Unit" size="15">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
+
                                     </ng-template>
                                 </div>
                             </td>
