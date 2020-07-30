@@ -130,20 +130,18 @@
                                             </td>
                                             <td>
                                                 <div class="form-group">
-                                                    <!-- <select [(ngModel)]="charge.unitId" class="form-control">
-                                                        <option [ngValue]="null">-</option>
-                                                        <option *ngFor="let unit of (listUnits | async)"
-                                                            [ngValue]="unit.id">
-                                                            {{unit.code}}</option>
-                                                    </select> -->
-                                                    <app-combo-grid-virtual-scroll
-                                                        [currentActiveItemId]="{field: 'id', value: charge.unitId}"
-                                                        (itemSelected)="charge.unitId = $event.id"
-                                                        [selectedDisplayFields]="['code']"
-                                                        [dataSources]="listUnits | async"
-                                                        [displayFields]="[{'field':'code','label':'Code'},{'field':'unitNameEn','label':'Name En'}]"
-                                                        size="15" (remove)="charge.unitId = null" placeholder="Unit">
-                                                    </app-combo-grid-virtual-scroll>
+                                                    <div class="list-master-unit">
+                                                        <app-combo-grid-virtual-scroll
+                                                            [currentActiveItemId]="{field: 'id', value: charge.unitId}"
+                                                            (itemSelected)="charge.unitId = $event.id"
+                                                            [selectedDisplayFields]="['code']"
+                                                            [dataSources]="listUnits | async"
+                                                            [displayFields]="[{'field':'code','label':'Code'},{'field':'unitNameEn','label':'Name En'}]"
+                                                            size="15" (remove)="charge.unitId = null"
+                                                            placeholder="Unit">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+
                                                 </div>
 
                                             </td>

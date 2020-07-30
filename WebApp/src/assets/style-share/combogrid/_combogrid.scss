@@ -37,6 +37,7 @@
     }
     .dropdown-menu {
         top: 0 !important;
+        left: 0 !important;
         min-width: 100%;
         padding: 0;
         background-color: #fff;
@@ -67,7 +68,6 @@
         thead,
         tbody {
             tr {
-                th,
                 td {
                     width: 100px;
                     padding: 4px;
@@ -76,6 +76,13 @@
                     word-break: break-word;
                 }
 
+                th {
+                    width: 100px;
+                    padding: 4px;
+                    border-bottom-width: 1px;
+                    font-size: 12px;
+                    word-break: break-word;
+                }
                 &.data-selected {
                     td {
                         background-color: #3965b6;
