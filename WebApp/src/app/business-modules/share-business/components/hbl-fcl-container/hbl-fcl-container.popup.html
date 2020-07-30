@@ -84,20 +84,16 @@
                                     <td>
                                         <div class="form-group "
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!container.containerTypeId || isDuplicateContPakage )}">
-                                            <!-- <select class="form-control" [(ngModel)]="container.containerTypeId"
-                                                (ngModelChange)="onChangeDataFormTable()" name=containerTypeId>
-                                                <option [ngValue]="null">Please select</option>
-                                                <option *ngFor="let unit of containerUnits" [ngValue]="unit.id">
-                                                    {{unit.unitNameEn}}
-                                                </option>
-                                            </select> -->
-                                            <app-combo-grid-virtual-scroll
-                                                [currentActiveItemId]="{field: 'id', value: container.containerTypeId}"
-                                                (itemSelected)="onChangeDataFormTable();container.containerTypeId = $event.id"
-                                                [selectedDisplayFields]="['unitNameEn']" [dataSources]="containerUnits"
-                                                [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'descriptionEn','label':'Descriptiton'}]"
-                                                placeholder="Please select">
-                                            </app-combo-grid-virtual-scroll>
+                                            <div class="list-unit-container">
+                                                <app-combo-grid-virtual-scroll
+                                                    [currentActiveItemId]="{field: 'id', value: container.containerTypeId}"
+                                                    (itemSelected)="onChangeDataFormTable();container.containerTypeId = $event.id"
+                                                    [selectedDisplayFields]="['unitNameEn']"
+                                                    [dataSources]="containerUnits"
+                                                    [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'descriptionEn','label':'Descriptiton'}]"
+                                                    placeholder="Please select">
+                                                </app-combo-grid-virtual-scroll>
+                                            </div>
                                         </div>
                                     </td>
                                     <td>
@@ -181,14 +177,16 @@
                                     </td>
                                     <td>
                                         <div class="form-group">
-                                            <app-combo-grid-virtual-scroll
-                                                [currentActiveItemId]="{field: 'id', value: container.commodityId}"
-                                                (itemSelected)="container.commodityId = $event.id"
-                                                [selectedDisplayFields]="['commodityNameEn']"
-                                                [dataSources]="commodities"
-                                                [displayFields]="[{'field':'commodityNameEn','label':'Name En'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]"
-                                                [height]="150" placeholder="Select commodity">
-                                            </app-combo-grid-virtual-scroll>
+                                            <div class="list-unit-container">
+                                                <app-combo-grid-virtual-scroll
+                                                    [currentActiveItemId]="{field: 'id', value: container.commodityId}"
+                                                    (itemSelected)="container.commodityId = $event.id"
+                                                    [selectedDisplayFields]="['commodityNameEn']"
+                                                    [dataSources]="commodities"
+                                                    [displayFields]="[{'field':'commodityNameEn','label':'Name En'},{'field':'commodityNameVn','label':'Name VN'},{'field':'commodityGroupNameEn','label':'Group'}]"
+                                                    [height]="150" placeholder="Select commodity">
+                                                </app-combo-grid-virtual-scroll>
+                                            </div>
                                         </div>
                                     </td>
 
