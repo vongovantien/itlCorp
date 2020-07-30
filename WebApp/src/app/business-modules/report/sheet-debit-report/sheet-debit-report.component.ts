@@ -31,6 +31,12 @@ export class SheetDebitReportComponent extends AppList {
             case CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS:
                 this.exportJobProfitAnalysis(data);
                 break;
+            case CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST:
+                this.exportSummaryOfCostsIncurred(data);
+                break;
+            case CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE:
+                this.exportSummaryOfRevenueIncurred(data);
+                break;
         }
     }
 
@@ -63,6 +69,42 @@ export class SheetDebitReportComponent extends AppList {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'Job Profit Analysis.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportSummaryOfCostsIncurred(data) {
+        this._progressRef.start();
+        this._exportRepo.exportSummaryOfCostsIncurred(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Summary of costs incurred.xlsx');
+                    } else {
+                        this._toastService.warning('There is no mawb data to print', '');
+                    }
+                },
+            );
+    }
+
+    exportSummaryOfRevenueIncurred(data) {
+        this._progressRef.start();
+        this._exportRepo.exportSummaryOfRevenueIncurred(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'Summary of revenue incurred.xlsx');
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }

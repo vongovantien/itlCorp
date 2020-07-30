@@ -176,6 +176,30 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Get data for export accounting P/L
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataSummaryOfCostsIncurred")]
+        //[Authorize]
+        public IActionResult GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataSummaryOfCostsIncurred(criteria);
+            return Ok(data);
+        }
+
+        /// Get data for export accounting P/L
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataSummaryOfRevenueIncurred")]
+        //[Authorize]
+        public IActionResult GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataSummaryOfRevenueIncurred(criteria);
+            return Ok(data);
+        }
+        /// <summary>
         /// get list of shipment assign or PIC is current user
         /// </summary>
         /// <returns></returns>

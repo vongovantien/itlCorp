@@ -23,7 +23,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? VatAmountVnd { get; set; }
         public string VatPartnerId { get; set; }
         public string VatPartnerCode { get; set; }
-        public string VatPartnerName { get; set; }
+        public string VatPartnerName { get; set; } //Short Name Partner
         public string VatPartnerAddress { get; set; }
         public string ObhPartnerCode { get; set; }
         public string ObhPartner { get; set; }
@@ -43,6 +43,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string PartnerId { get; set; } //Partner trên VAT Invoice Or Voucher
         public string AccountNo { get; set; } //Account No trên VAT Invoice Or Voucher
         public string VatPartnerNameEn { get; set; } //Partner Name En của Charge
+        public string VatPartnerNameVn { get; set; } //Partner Name Local của Charge
         public string Description { get; set; } //Description trên VAT Invoice Or Voucher
         public bool IsTick { get; set; } //Đánh dấu
         public decimal PaymentTerm { get; set; } //Thời hạn thanh toán
