@@ -112,6 +112,11 @@
                                 <span>Tax Code *</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'acReference'), 'sorting_desc': (!isDesc && sortKey == 'acReference') }"
+                                (click)="sort('acReference')">
+                                <span>A/C Reference</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerGroup'), 'sorting_desc': (!isDesc && sortKey == 'partnerGroup') }"
                                 (click)="sort('partnerGroup')">
                                 <span>Category *</span>
@@ -125,6 +130,11 @@
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'tel'), 'sorting_desc': (!isDesc && sortKey == 'tel') }"
                                 (click)="sort('tel')">
                                 <span>Phone</span>
+                            </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'fax'), 'sorting_desc': (!isDesc && sortKey == 'fax') }"
+                                (click)="sort('fax')">
+                                <span>Fax</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'addressEn'), 'sorting_desc': (!isDesc && sortKey == 'addressEn') }"
@@ -217,24 +227,14 @@
                                 <span>Note</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serviceSalemanDefault'), 'sorting_desc': (!isDesc && sortKey == 'serviceSalemanDefault') }"
-                                (click)="sort('serviceSalemanDefault')">
-                                <span>Service - Salesman Default</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'billingPhone'), 'sorting_desc': (!isDesc && sortKey == 'billingPhone') }"
+                                (click)="sort('billingPhone')">
+                                <span>Billing Phone</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'officeSalemanDefault'), 'sorting_desc': (!isDesc && sortKey == 'officeSalemanDefault') }"
-                                (click)="sort('officeSalemanDefault')">
-                                <span>Office - Salesman Default</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentTerm'), 'sorting_desc': (!isDesc && sortKey == 'paymentTerm') }"
-                                (click)="sort('paymentTerm')">
-                                <span>Payment Term - Salesman Default</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
-                                <span>Effect Date -Salesman Default</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'billingEmail'), 'sorting_desc': (!isDesc && sortKey == 'billingEmail') }"
+                                (click)="sort('billingEmail')">
+                                <span>Billing Email</span>
                             </th>
                         </tr>
                     </thead>
@@ -265,6 +265,11 @@
                                         *ngIf="item.taxCodeError !== null">{{ item.taxCodeError }}</span>
                                 </td>
                                 <td>
+                                    <span *ngIf="item.acReferenceError === null">{{ item.acReference }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.acReferenceError !== null">{{ item.acReferenceError }}</span>
+                                </td>
+                                <td>
                                     <span *ngIf="item.partnerGroupError === null">{{ item.partnerGroup }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.partnerGroupError !== null">{{ item.partnerGroupError }}</span>
@@ -278,6 +283,9 @@
                                     <span *ngIf="item.telError === null">{{ item.tel }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.telError !== null">{{ item.telError }}</span>
+                                </td>
+                                <td>
+                                    {{ item.fax }}
                                 </td>
                                 <td>
                                     <span *ngIf="item.addressEnError === null">{{ item.addressEn }}</span>
@@ -356,22 +364,10 @@
                                     <span>{{ item.note }}</span>
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.serviceSalemanDefaultError === null">{{ item.serviceSalemanDefault }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.serviceSalemanDefaultError !== null">{{ item.serviceSalemanDefaultError }}</span>
+                                    {{ item.billingPhone }}
                                 </td>
                                 <td>
-                                    <span
-                                        *ngIf="item.officeSalemanDefaultError === null">{{ item.officeSalemanDefault }}</span>
-                                    <span class="m--font-danger"
-                                        *ngIf="item.officeSalemanDefaultError !== null">{{ item.officeSalemanDefaultError }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.paymentTerm }}</span>
-                                </td>
-                                <td>
-                                    <span>{{ item.effectDate }}</span>
+                                    {{ item.billingEmail}}
                                 </td>
                             </tr>
                         </ng-container>

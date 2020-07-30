@@ -803,30 +803,32 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = Guid.NewGuid().ToString();
                     partner.AccountNo = partner.TaxCode;
+                    partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
                     partner.Active = active;
                     partner.InactiveOn = inactiveDate;
                     partner.CompanyId = currentUser.CompanyID;
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
-                    var salesman = new CatContract
-                    {
-                        Id = Guid.NewGuid(),
-                        //OfficeId = item.OfficeId,
-                        CompanyId = item.CompanyId,
-                        SaleManId = item.SalePersonId,
-                        PaymentMethod = item.PaymentTerm,
-                        EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
-                        Active = true,
-                        PartnerId = partner.Id,
-                        DatetimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        UserCreated = currentUser.UserID,
-                        UserModified = currentUser.UserID,
-                        SaleService = item.ServiceId
-                    };
+                    
+                    //var salesman = new CatContract
+                    //{
+                    //    Id = Guid.NewGuid(),
+                    //    //OfficeId = item.OfficeId,
+                    //    CompanyId = item.CompanyId,
+                    //    SaleManId = item.SalePersonId,
+                    //    PaymentMethod = item.PaymentTerm,
+                    //    EffectiveDate = item.EffectDate != null ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null,
+                    //    Active = true,
+                    //    PartnerId = partner.Id,
+                    //    DatetimeCreated = DateTime.Now,
+                    //    DatetimeModified = DateTime.Now,
+                    //    UserCreated = currentUser.UserID,
+                    //    UserModified = currentUser.UserID,
+                    //    SaleService = item.ServiceId
+                    //};
                     partners.Add(partner);
-                    salesmans.Add(salesman);
+                    //salesmans.Add(salesman);
                 }
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -835,15 +837,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         var hs = DataContext.Add(partners);
                         if (hs.Success)
                         {
-                            hs = contractRepository.Add(salesmans);
-                            if (hs.Success)
-                            {
-                                trans.Commit();
-                            }
-                            else
-                            {
-                                trans.Rollback();
-                            }
+                            //hs = contractRepository.Add(salesmans);
+                            //if (hs.Success)
+                            //{
+                            //    trans.Commit();
+                            //}
+                            //else
+                            //{
+                            //    trans.Rollback();
+                            //}
+                            trans.Commit();
                         }
                         else
                         {
@@ -975,7 +978,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode == taxCode))
+                        if (partners.Any(x => x.TaxCode?.Replace(" ","") == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
@@ -1008,7 +1011,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.PartnerGroup = String.Join(";", groups);
                         }
                     }
-                    item = GetSaleManInfo(item, salemans, offices, services);
+                    //item = GetSaleManInfo(item, salemans, offices, services);
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameEn))
                 {
@@ -1031,11 +1034,22 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
 
                 }
+
                 if (string.IsNullOrEmpty(item.AddressVn))
                 {
                     item.AddressVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND];
                     item.IsValid = false;
                 }
+
+                if (!string.IsNullOrEmpty(item.AcReference))
+                {
+                    if (!partners.Any(x => x.AccountNo?.ToLower() == item.AcReference?.ToLower()))
+                    {
+                        item.AcReferenceError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_AC_REFERENCE_NOT_FOUND], item.AcReference);
+                        item.IsValid = false;
+                    }
+                }
+
                 if (string.IsNullOrEmpty(item.CountryBilling))
                 {
                     if (!string.IsNullOrEmpty(item.CityBilling))
