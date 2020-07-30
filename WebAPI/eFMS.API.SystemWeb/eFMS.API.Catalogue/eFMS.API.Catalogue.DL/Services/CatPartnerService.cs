@@ -810,6 +810,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
+                    partner.PartnerType = "Supplier";
                     
                     //var salesman = new CatContract
                     //{
