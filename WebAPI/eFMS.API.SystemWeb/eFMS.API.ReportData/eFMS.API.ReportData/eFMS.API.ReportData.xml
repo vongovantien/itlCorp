@@ -283,14 +283,9 @@
             Export Job Profit Analysis
             </summary>
             <param name="criteria"></param>
-        </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfCostsIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
-            <summary>
-            Export Shipment Overview
-            </summary>
-            <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfCostsIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)" -->
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfRevenueIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Export Shipment Overview
