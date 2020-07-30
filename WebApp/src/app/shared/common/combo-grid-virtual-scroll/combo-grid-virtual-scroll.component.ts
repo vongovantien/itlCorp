@@ -2,8 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { AppPage } from 'src/app/app.base';
 
 import cloneDeep from 'lodash/cloneDeep';
-import { ListKeyManager } from '@angular/cdk/a11y';
-import { UP_ARROW, DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
+import { ListKeyManager, FocusKeyManager } from '@angular/cdk/a11y';
+import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
+import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
     templateUrl: './combo-grid-virtual-scroll.component.html',
@@ -26,10 +27,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
 
-    @ViewChild('inputSearch', { static: true }) inputSearch: ElementRef;
+    @ViewChild('inputSearch', { static: false }) inputSearch: ElementRef;
     @ViewChild('clkSearch', { static: true }) inputPlaceholder: ElementRef;
-
-    @ViewChildren('listItem') listItems: QueryList<any>;
 
     currentItemSelected: any = null;
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
@@ -48,7 +47,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     isFocusSearch: boolean = false;
 
-
+    @ViewChildren(AppCombogridItemComponent) items: QueryList<AppCombogridItemComponent>;
+    private keyManager: FocusKeyManager<AppCombogridItemComponent>;
 
     @HostListener('keydown.Enter', ['$event'])
     onKeydownEnterHandler(event: KeyboardEvent) {
@@ -60,6 +60,45 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     constructor(
     ) {
         super();
+    }
+
+    ngAfterViewInit() {
+        this.keyManager = new FocusKeyManager(this.items).withWrap();
+    }
+
+    onKeydown(event: any) {
+        if (event.keyCode === ENTER) {
+            const item = this.keyManager.activeItem.data;
+            console.log(item);
+
+            this.itemSelected.emit(item);
+            this.setCurrentActiveItem(item);
+
+            this.currentItemSelected = item;
+            if (this.CurrentActiveItemIdObj !== null && this.CurrentActiveItemIdObj.value !== null) {
+                this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
+            }
+
+            // * Reset keyword search.
+            this.keyword = '';
+        } else {
+            console.log(this.keyManager);
+            this.keyManager.onKeydown(event);
+        }
+    }
+
+    onKeydownSearchInput(e: any) {
+        if (e.keyCode === DOWN_ARROW) {
+            if (!this.CurrentActiveItemIdObj) {
+                this.keyManager.setFirstItemActive();
+            } else {
+                const itemIndex = this.ConstDataSources.findIndex(o => o[this.CurrentActiveItemIdObj.field] === this.CurrentActiveItemIdObj.value);
+                if (itemIndex !== -1) {
+                    this.keyManager.setActiveItem(itemIndex);
+                }
+            }
+            this.keyManager.onKeydown(e);
+        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -95,53 +134,8 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         }
     }
 
-    // tslint:disable: deprecation
-    handleKeyUp(event: KeyboardEvent) {
-        let currenIndex: number;
-        currenIndex = this.indexSelected;
-        event.stopImmediatePropagation();
-        if (this.keyboardEventsManager) {
-            if (event.keyCode === DOWN_ARROW) {
-                this.keyboardEventsManager.onKeydown(event);
-
-                currenIndex++;
-                return false;
-            } else if (event.keyCode === UP_ARROW) {
-                this.keyboardEventsManager.onKeydown(event);
-
-                if (currenIndex === 0) {
-                    return;
-                }
-                currenIndex--;
-
-                return false;
-            }
-            // else if (event.keyCode === ENTER) {
-            //     // TODO handle event enter when selecting titem.
-            //     // Set index for item is selecting
-            //     this.keyboardEventsManager.setActiveItem(this.indexSelected);
-
-            //     // get item selected.
-            //     const arrayItems = this.listItems.toArray();
-            //     const dataSourceIndex: number = +(<ElementRef>arrayItems[this.keyboardEventsManager.activeItemIndex]).nativeElement.getAttribute('id');
-            //     const itemObject = this.ConstDataSources[dataSourceIndex - 1];
-
-            //     if (!!this.CurrentActiveItemIdObj) {
-            //         // this.setCurrentActiveItemId(Object.assign({}, this.CurrentActiveItemIdObj, { value: itemObject[this.CurrentActiveItemIdObj.field] }));
-            //     }
-
-            //     return false;
-            // }
-        }
-    }
-
     setDataSource(data: any[]) {
-
-
         if (!!data && data.length > 0) {
-            // * ? initializing the eventkey manager here
-            this.keyboardEventsManager = new ListKeyManager(this.listItems);
-
             this.DataSources = data;
             this.ConstDataSources = cloneDeep(data);
             if (this.CurrentActiveItemIdObj !== null) {
@@ -156,9 +150,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                     this.displaySelectedStr = activeItemData.hardValue;
                 }
             }
-        }
-        //thien
-        else {
+        } else {
             this.DataSources = data;
             this.ConstDataSources = cloneDeep(data);
         }
@@ -222,6 +214,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
             this.CurrentActiveItemIdObj.value = item[this.CurrentActiveItemIdObj.field];
         }
 
+        this.keyManager.setActiveItem(index);
         // * Reset keyword search.
         this.keyword = '';
     }
