@@ -278,6 +278,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(250)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
                 entity.Property(e => e.JobId)
                     .HasColumnName("JobID")
                     .HasMaxLength(50)

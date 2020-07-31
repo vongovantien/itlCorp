@@ -318,6 +318,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             hbl: this.selectedShipmentData.hbl,
             mbl: this.selectedShipmentData.mbl,
             jobId: this.selectedShipmentData.jobId,
+            hblid: this.selectedShipmentData.hblid,
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,
