@@ -58,11 +58,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     users: User[] = [];
     companies: Company[] = [];
-    offices: Office[] = [];
+    // offices: Office[] = [];
+    offices: CommonInterface.INg2Select[] = [];
     contracts: Contract[] = [];
     activeServices: any = [];
     activeVas: any = [];
-
+    activeOffice: any = [];
 
     selectedContract: Contract = new Contract();
 
@@ -245,11 +246,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: Office[]) => {
-                    this.offices = res;
+                    if (!!res) {
+                        this.offices = this.utility.prepareNg2SelectData(res || [], 'id', 'shortName');
+                    }
                 },
             );
     }
-
     onSelectedDataFormInfo($event, type: string) {
         if (type === 'salesman') {
             this.salesmanId.setValue($event.id);
@@ -395,7 +397,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     );
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
-                this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
+                // this.selectedContract.officeNameEn = !!this.selectedContract.officeId ? this.offices.find(x => x.id === this.selectedContract.officeId).branchNameEn : null;
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
                 this.selectedContract.fileList = this.fileList;
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
@@ -438,6 +440,19 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             }
         });
         return activeVasList;
+    }
+
+    getCurrentActiveOffice(Office: any) {
+        const listOffice = Office.split(";");
+        const activeOfficeList: any = [];
+        listOffice.forEach(item => {
+            const element = this.offices.find(x => x.id === item.toLowerCase());
+            if (element !== undefined) {
+                const activeOffice = element;
+                activeOfficeList.push(activeOffice);
+            }
+        });
+        return activeOfficeList;
     }
 
     pachValueToFormContract() {
@@ -493,6 +508,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.saleService = services;
         const vass = this.vas.value ? (this.vas.value.length > 0 ? this.vas.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.vas = vass;
+        const offices = this.officeId.value ? (this.officeId.value.length > 0 ? this.officeId.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
+        this.selectedContract.officeId = offices;
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value[0].id : null;
         this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
