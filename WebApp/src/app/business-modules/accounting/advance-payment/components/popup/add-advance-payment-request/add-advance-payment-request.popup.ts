@@ -125,7 +125,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             currency: data.requestCurrency
         });
 
-        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl };
+        this.selectedShipmentData = <OperationInteface.IShipment>{ hbl: data.hbl, jobId: data.jobId, mbl: data.mbl, hblid: data.hblid };
         this.selectedShipment = { field: 'jobId', value: data.jobId };
 
         this.advanceNo = data.advanceNo;
@@ -149,6 +149,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             hbl: this.selectedShipmentData.hbl,
             mbl: this.selectedShipmentData.mbl,
             jobId: this.selectedShipmentData.jobId,
+            hblid: this.selectedShipmentData.hblid,
             advanceType: form.value.type.value,
             requestCurrency: form.value.currency,
             description: form.value.description,

@@ -90,6 +90,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PartnerId)
                     .IsRequired()
                     .HasColumnName("PartnerID")
@@ -115,6 +117,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.TotalExchangeRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Type).HasMaxLength(50);
+
+                entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
