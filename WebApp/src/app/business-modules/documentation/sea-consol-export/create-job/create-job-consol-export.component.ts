@@ -104,10 +104,10 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
             cbm: this.shipmentGoodSummaryComponent.totalCBM,
         };
 
-        const fclExportAddModel: CsTransaction = new CsTransaction(formData);
-        fclExportAddModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaFCLExport;
+        const seaConsolExportModel: CsTransaction = new CsTransaction(formData);
+        seaConsolExportModel.transactionTypeEnum = CommonEnum.TransactionTypeEnum.SeaConsolExport;
 
-        return fclExportAddModel;
+        return seaConsolExportModel;
     }
 
     checkValidateForm() {

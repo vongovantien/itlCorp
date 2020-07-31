@@ -1,15 +1,23 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { TabsModule } from 'ngx-bootstrap';
+
+import { ChargeConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
 import { SeaConsolExportComponent } from './sea-consol-export.component';
-import { CommonModule } from '@angular/common';
 import { CommonComponentModule } from 'src/app/shared/common/common.module';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
-import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { SeaConsolExportCreateJobComponent } from './create-job/create-job-consol-export.component';
-import { TabsModule } from 'ngx-bootstrap';
+import { SeaConsolExportDetailJobComponent } from './detail-job/detail-job-consol-export.component';
+import { SeaConsolExportLazyLoadModule } from './sea-consol-export-lazy-load.module';
+import { SeaConsolExportManifestComponent } from './detail-job/manifest/sea-consol-manifest.component';
+import { SeaConsolExportShippingInstructionComponent } from './detail-job/si/sea-consol-si.component';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { FormsModule } from '@angular/forms';
 
 const routing: Routes = [
     {
@@ -21,30 +29,40 @@ const routing: Routes = [
                 path: 'new', component: SeaConsolExportCreateJobComponent,
                 data: { name: "Create New Job" }
             },
-            // {
-            //     path: ':jobId',
-            //     data: { transactionType: CommonEnum.TransactionTypeEnum.AirExport, name: "Job Detail" },
-            //     children: [
-            //         {
-            //             path: '', component: AirExportDetailJobComponent, data: { name: "" }
-            //         },
-            //         {
-            //             path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
-            //             data: {
-            //                 name: "House Bill",
-            //             },
-            //         },
-            //         {
-            //             path: 'manifest', component: AirExportManifestComponent,
-            //             data: { name: "Manifest", },
-            //         },
-            //         {
-            //             path: 'mawb', component: AirExportMAWBFormComponent,
-            //             data: { name: "MAWB Detail", },
-            //         },
+            {
+                path: ':jobId',
+                data: { transactionType: CommonEnum.TransactionTypeEnum.SeaConsolExport, name: "Job Detail" },
+                children: [
+                    {
+                        path: '', component: SeaConsolExportDetailJobComponent, data: { name: "" }
+                    },
+                    // {
+                    //     path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
+                    //     data: {
+                    //         name: "House Bill",
+                    //     },
+                    // },
+                    {
+                        path: 'manifest', component: SeaConsolExportManifestComponent,
+                        data: { name: "Manifest", },
+                    },
+                    {
+                        path: 'si',
+                        data: { name: "Shipping Instructions", },
+                        children: [
+                            {
+                                path: '', component: SeaConsolExportShippingInstructionComponent, data: { name: "" }
+                            },
+                            {
+                                path: 'send-si', component: ShareBusinessReAlertComponent, data: {
+                                    name: "Send S.I", serviceId: ChargeConstants.SCE_CODE
+                                }
+                            },
+                        ]
+                    },
 
-            //     ]
-            // },
+                ]
+            },
 
         ]
     },
@@ -59,13 +77,19 @@ const routing: Routes = [
         PipeModule,
         ShareBussinessModule,
         CommonModule,
-        TabsModule.forRoot()
+        FormsModule,
+        DirectiveModule,
+        TabsModule.forRoot(),
+        SeaConsolExportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note)
         // SharedModule,
     ],
     exports: [],
     declarations: [
         SeaConsolExportComponent,
-        SeaConsolExportCreateJobComponent
+        SeaConsolExportCreateJobComponent,
+        SeaConsolExportDetailJobComponent,
+        SeaConsolExportManifestComponent,
+        SeaConsolExportShippingInstructionComponent
     ],
     providers: [],
 })
