@@ -2229,7 +2229,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             approve.UserModified = userCurrent;
                             approve.DateModified = DateTime.Now;
-                            approve.Comment = "RECALL";
+                            approve.Comment = "RECALL BY " + userCurrent;
                             approve.IsDeny = true;
                             var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
                         }
@@ -2473,7 +2473,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo)
         {
-            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)
