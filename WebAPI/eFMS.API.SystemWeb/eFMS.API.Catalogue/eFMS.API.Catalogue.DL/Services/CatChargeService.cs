@@ -570,7 +570,8 @@ namespace eFMS.API.Catalogue.DL.Services
                             OfficeId =x.x.OfficeId,
                             GroupId = x.x.GroupId,
                             CompanyId = x.x.CompanyId,
-                            DepartmentId = x.x.DepartmentId
+                            DepartmentId = x.x.DepartmentId,
+                            ChargeGroup = x.x.ChargeGroup
                         });
             return list?.OrderByDescending(x=>x.DatetimeModified);
 

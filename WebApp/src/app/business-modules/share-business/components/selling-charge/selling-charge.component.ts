@@ -98,6 +98,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
