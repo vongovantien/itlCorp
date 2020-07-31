@@ -46,13 +46,16 @@
                         <td>
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unit === null}">
-                                <app-combo-grid-virtual-scroll [currentActiveItemId]="{field: 'id', value: charge.unit}"
-                                    (itemSelected)="onSelectDataTableInfo($event, charge, 'unit')"
-                                    (itemSelected)="charge.unit = $event.id" [selectedDisplayFields]="['code']"
-                                    [dataSources]="listUnits | async"
-                                    [displayFields]="[{'field':'code','label':'Code'},{'field':'unitNameEn','label':'Name En'}]"
-                                    size="15" (remove)="charge.unit = null" placeholder="Unit">
-                                </app-combo-grid-virtual-scroll>
+                                <div class="list-master-unit">
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field: 'id', value: charge.unit}"
+                                        (itemSelected)="onSelectDataTableInfo($event, charge, 'unit')"
+                                        (itemSelected)="charge.unit = $event.id" [selectedDisplayFields]="['code']"
+                                        [dataSources]="listUnits | async"
+                                        [displayFields]="[{'field':'code','label':'Code'},{'field':'unitNameEn','label':'Name En'}]"
+                                        size="15" (remove)="charge.unit = null" placeholder="Unit">
+                                    </app-combo-grid-virtual-scroll>
+                                </div>
                             </div>
                         </td>
                         <td>
@@ -106,4 +109,3 @@
         </table>
     </div>
 </div>
-{{serviceTypeId | json}}
