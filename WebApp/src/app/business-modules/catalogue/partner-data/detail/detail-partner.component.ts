@@ -490,6 +490,8 @@ export class PartnerDetailComponent extends AppList {
             roundUpMethod: formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
             applyDim: formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
             partnerGroup: this.partner.partnerGroup,
+            partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
+            partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
             id: this.partner.id,
         };
         console.log("formBody: ", formBody);

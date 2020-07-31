@@ -69,5 +69,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string BillingPhone { get; set; }
         public string BillingEmail { get; set; }
         public string PartnerType { get; set; }
+        public string PartnerMode { get; set; }
+        public string PartnerLocation { get; set; }
     }
 }

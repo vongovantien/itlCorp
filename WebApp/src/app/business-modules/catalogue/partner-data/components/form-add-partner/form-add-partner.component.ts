@@ -92,6 +92,9 @@ export class FormAddPartnerComponent extends AppForm {
     billingEmail: AbstractControl;
     billingPhone: AbstractControl;
     groups: string = '';
+    partnerMode: AbstractControl;
+    partnerLocation: AbstractControl;
+
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -103,6 +106,17 @@ export class FormAddPartnerComponent extends AppForm {
         { id: 'Single', text: 'Single Dim' },
         { id: 'Total', text: 'Total Dim' }
     ];
+
+    partnerModes: CommonInterface.INg2Select[] = [
+        { id: 'Internal', text: 'Internal' },
+        { id: 'External', text: 'External' }
+    ];
+
+    partnerLocations: CommonInterface.INg2Select[] = [
+        { id: 'Domestic', text: 'Domestic' },
+        { id: 'Oversea', text: 'Oversea' }
+    ];
+
 
 
     constructor(
@@ -320,7 +334,9 @@ export class FormAddPartnerComponent extends AppForm {
             note: [null],
             coLoaderCode: [null],
             applyDim: [null],
-            roundUpMethod: [null]
+            roundUpMethod: [null],
+            partnerMode: [null],
+            partnerLocation: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -358,6 +374,15 @@ export class FormAddPartnerComponent extends AppForm {
         this.roundUpMethod = this.partnerForm.controls['roundUpMethod'];
         this.billingEmail = this.partnerForm.controls['billingEmail'];
         this.billingPhone = this.partnerForm.controls['billingPhone'];
+        this.partnerMode = this.partnerForm.controls['partnerMode'];
+        this.partnerLocation = this.partnerForm.controls['partnerLocation'];
+
+        if (!this.isUpdate) {
+            this.partnerMode.setValue([<CommonInterface.INg2Select>{ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' }]);
+            this.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partnerLocations.find(x => x.text === 'Domestic').id, text: 'Domestic' }]);
+
+        }
+
         this.activePartner = this.active.value;
     }
 
@@ -473,7 +498,10 @@ export class FormAddPartnerComponent extends AppForm {
             note: partner.note,
             coLoaderCode: partner.coLoaderCode,
             roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
-            applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }]
+            applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }],
+            partnerMode: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerMode }],
+            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerLocation }]
+
         });
     }
 
