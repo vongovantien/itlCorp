@@ -493,7 +493,7 @@ namespace eFMS.API.Documentation.DL.Services
                     airWayBills[7].FooterName = lstFooter[7];
                 }
             }
-            string _reportName = "MAWBITLFrame.rpt";
+            string _reportName = reportType == "SingleNoFrame" ? "MAWBITLNoFrame.rpt" : "MAWBITLFrame.rpt";
             result = new Crystal
             {
                 ReportName = _reportName,
