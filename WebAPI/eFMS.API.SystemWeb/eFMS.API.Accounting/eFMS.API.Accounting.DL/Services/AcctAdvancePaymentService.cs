@@ -2457,7 +2457,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Accountant)?.EmployeeNameVn;
                 advanceApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Buhead)?.EmployeeNameVn;
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
                 advanceApproveModel.IsShowLeader = !string.IsNullOrEmpty(advanceApprove.Leader);
                 advanceApproveModel.IsShowManager = !string.IsNullOrEmpty(advanceApprove.Manager);
                 advanceApproveModel.IsShowAccountant = !string.IsNullOrEmpty(advanceApprove.Accountant);
@@ -2466,7 +2466,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
             }
             return advanceApproveModel;
         }
