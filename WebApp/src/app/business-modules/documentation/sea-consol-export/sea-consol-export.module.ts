@@ -8,6 +8,8 @@ import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { SeaConsolExportCreateJobComponent } from './create-job/create-job-consol-export.component';
+import { TabsModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
     {
@@ -15,10 +17,10 @@ const routing: Routes = [
             {
                 path: '', component: SeaConsolExportComponent
             },
-            // {
-            //     path: 'new', component: AirExportCreateJobComponent,
-            //     data: { name: "Create New Job" }
-            // },
+            {
+                path: 'new', component: SeaConsolExportCreateJobComponent,
+                data: { name: "Create New Job" }
+            },
             // {
             //     path: ':jobId',
             //     data: { transactionType: CommonEnum.TransactionTypeEnum.AirExport, name: "Job Detail" },
@@ -57,11 +59,13 @@ const routing: Routes = [
         PipeModule,
         ShareBussinessModule,
         CommonModule,
+        TabsModule.forRoot()
         // SharedModule,
     ],
     exports: [],
     declarations: [
-        SeaConsolExportComponent
+        SeaConsolExportComponent,
+        SeaConsolExportCreateJobComponent
     ],
     providers: [],
 })

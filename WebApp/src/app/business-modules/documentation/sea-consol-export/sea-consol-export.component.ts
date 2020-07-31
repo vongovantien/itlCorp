@@ -1,16 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
-import { CsTransactionDetail } from '@models';
-import { CommonEnum } from '@enums';
 import { Router } from '@angular/router';
+import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
+
+import { Store } from '@ngrx/store';
+import { CsTransactionDetail, CsTransaction } from '@models';
+import { CommonEnum } from '@enums';
 import { SortService } from '@services';
 import { DocumentationRepo } from '@repositories';
-import { NgProgress } from '@ngx-progressbar/core';
-import { Store } from '@ngrx/store';
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { IShareBussinessState, getTransationLoading, getTransactionListShipment, TransactionLoadListAction } from '@share-bussiness';
+
+import { AppList } from 'src/app/app.list';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-sea-consol-export',
@@ -22,15 +25,14 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
-    headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
-    shipments: any[] = [];
+    shipments: CsTransaction[] = [];
     houseBills: CsTransactionDetail[] = [];
     tmpHouseBills: CsTransactionDetail[] = [];
     tmpIndex: number = -1;
 
-    itemToDelete: any = null;
+    itemToDelete: { id: string } = null;
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaConsolExport;
 
     _fromDate: Date = this.createMoment().startOf('month').toDate();
@@ -53,14 +55,13 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
         this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortShipment;
 
-        this.isLoading = <any>this._store.select(getTransationLoading);
+        this.isLoading = this._store.select(getTransationLoading);
 
         this.dataSearch = {
             transactionType: this.transactionService,
             fromDate: this._fromDate,
             toDate: this._toDate,
         };
-
     }
 
     ngOnInit() {
@@ -202,7 +203,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/sea-fcl-export/new']);
+        this._router.navigate(['home/documentation/sea-consol-export/new']);
     }
 
     loadListHouseBillExpanding() {
@@ -216,13 +217,10 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-
-
-                    this._router.navigate(["/home/documentation/sea-fcl-export", id]);
+                    this._router.navigate(["/home/documentation/sea-consol-export", id]);
                 } else {
                     this.permissionPopup.show();
                 }
             });
     }
-
 }
