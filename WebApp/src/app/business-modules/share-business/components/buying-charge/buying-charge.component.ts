@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction } from '@models';
+import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
@@ -14,7 +14,7 @@ import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAct
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { Observable } from 'rxjs';
-import { catchError, takeUntil, finalize, share, skip, map } from 'rxjs/operators';
+import { catchError, takeUntil, finalize, share, skip, map, shareReplay } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import * as fromRoot from 'src/app/store';
@@ -54,6 +54,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     listUnits: Unit[] = [];
     listCurrency: Observable<Currency[]>;
     listPartner: Partner[] = new Array<Partner>();
+    listChargeGroup: Observable<ChargeGroup[]>;
 
     configComboGridCharge: Partial<CommonInterface.IComboGirdConfig> = {};
 
@@ -158,6 +159,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.getHBLContainer();
         this.getShipmentDetail();
         this.getDetailHBL();
+        this.getChargeGroup();
 
     }
 
@@ -175,6 +177,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
             { title: 'KB', field: 'kickBack', sortable: true },
@@ -199,6 +202,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this._dataService.setData(SystemConstants.CSTORAGE.UNIT, this.listUnits);
                 }
             );
+    }
+
+    getChargeGroup() {
+        this.listChargeGroup = this._catalogueRepo.getChargeGroup().pipe(shareReplay());
     }
 
     getCurrency() {
@@ -288,6 +295,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeItem.chargeId = data.id;
                 chargeItem.chargeCode = data.code;
                 chargeItem.chargeNameEn = data.chargeNameEn;
+                chargeItem.chargeGroup = data.chargeGroup;
+
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
                     chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;

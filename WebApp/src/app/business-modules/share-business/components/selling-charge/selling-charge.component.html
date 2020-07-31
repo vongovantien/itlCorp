@@ -263,6 +263,16 @@
                                         [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
+                            <td>
+                                <div class="form-group ">
+                                    <select class="form-control" [(ngModel)]="charge.chargeGroup"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
+                                        <option *ngFor="let group of (listChargeGroup | async)" [ngValue]="group.id">
+                                            {{group.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </td>
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control"
