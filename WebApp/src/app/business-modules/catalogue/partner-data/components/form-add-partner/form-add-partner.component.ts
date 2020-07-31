@@ -149,15 +149,12 @@ export class FormAddPartnerComponent extends AppForm {
         switch (type) {
             case 'countryShippingId':
                 this.getShippingProvinces(event.id, !!this.provinceShippingId.value && this.provinceShippingId.value.length > 0 ? this.provinceShippingId.value[0].id : null);
-
-
                 break;
             case 'countryId':
                 this.getBillingProvinces(event.id, !!this.provinceId.value && this.provinceId.value.length > 0 ? this.provinceId.value[0].id : null);
                 break;
             case 'category':
                 if (event.id === 'ALL') {
-
                     const temp = [{ text: event.text, id: event.id }];
                     this.partnerGroup.setValue([...temp]);
                 } else {
