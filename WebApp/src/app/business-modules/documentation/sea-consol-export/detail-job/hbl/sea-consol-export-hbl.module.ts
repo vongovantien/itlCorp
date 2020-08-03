@@ -3,11 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { PaginationModule, TabsModule, ModalModule } from 'ngx-bootstrap';
-import { SelectModule } from 'ng2-select';
+import { TabsModule, ModalModule } from 'ngx-bootstrap';
 import { ChargeConstants } from '@constants';
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 import { SeaConsolExportHBLComponent } from './sea-consol-export-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';
@@ -32,11 +30,8 @@ const routing: Routes = [
 ];
 
 const LIB = [
-    // PaginationModule.forRoot(),
     ModalModule.forRoot(),
     TabsModule.forRoot(),
-    SelectModule,
-    NgxDaterangepickerMd.forRoot()
 
 ];
 @NgModule({

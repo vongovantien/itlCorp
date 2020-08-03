@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
-import { SeaConsolImportComponent } from './sea-consol-import/sea-consol-import.component';
 
 const routes: Routes = [
     {
@@ -18,11 +17,9 @@ const routes: Routes = [
         },
     },
     {
-        path: 'sea-consol-import',
-        component: SeaConsolImportComponent,
+        path: 'sea-consol-import', loadChildren: () => import('./sea-consol-import/sea-consol-import.module').then(m => m.SeaConsolImportModule),
         data: {
             name: "Sea Consol Import",
-            level: 2
         }
     },
     {
