@@ -56,16 +56,27 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Office</label>
-                                <app-combo-grid-virtual-scroll
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !officeId.valid || !officeId.value)}">
+                                <label required>Office</label>
+                                <!-- <app-combo-grid-virtual-scroll
                                     [currentActiveItemId]="{ field: 'id', value: officeId.value}"
                                     (itemSelected)="onSelectedDataFormInfo($event,'office')"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="offices"
                                     (remove)="resetFormControl('office')"
                                     [displayFields]="[{field: 'shortName', label: 'Abbr Name'}, { field: 'branchNameEn', label: 'Name EN' }]"
                                     [height]="200" placeholder="Select Office">
-                                </app-combo-grid-virtual-scroll>
+                                </app-combo-grid-virtual-scroll> -->
+                                <div class="pos-rel">
+                                    <ng-select #of [items]="offices" [allowClear]="true" [active]="activeOffice"
+                                        (opened)="closeOtherSelects(of)" formControlName="officeId" [multiple]="true"
+                                        (selected)="selectedOffice($event)" placeholder="Please select">
+                                    </ng-select>
+                                    <combo-grid-icon
+                                        *ngIf="!officeId.value || (!!officeId.value && !officeId.value.length)">
+                                    </combo-grid-icon>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -135,8 +146,7 @@
                                         formControlName="saleService" [multiple]="true" placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon
-                                        *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)"
-                                        (onDropdown)="openNg2Select(saleService)">
+                                        *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)">
                                     </combo-grid-icon>
                                 </div>
 
@@ -153,7 +163,16 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <div class="col-lg-8">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label>Currency</label>
+                                <ng-select #c [items]="listCurrency | async" [allowClear]="true"
+                                    (opened)="closeOtherSelects(c)" formControlName="currencyId"
+                                    placeholder="Select Currency">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
@@ -162,8 +181,7 @@
                                         [active]="activeVas" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">
                                     </ng-select>
-                                    <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)"
-                                        (onDropdown)="openNg2Select(vas)">
+                                    <combo-grid-icon *ngIf="!vas.value || (!!vas.value && !vas.value.length)">
                                     </combo-grid-icon>
 
 
