@@ -70,6 +70,10 @@ export class Partner {
     contracts: Contract[] = [];
 
     partnerType: string = '';
+    partnerMode: string = '';
+    partnerLocation: string = '';
+
+
 
     permission: PermissionPartner = new PermissionPartner();
 
