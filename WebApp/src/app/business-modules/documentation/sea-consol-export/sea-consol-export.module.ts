@@ -36,12 +36,12 @@ const routing: Routes = [
                     {
                         path: '', component: SeaConsolExportDetailJobComponent, data: { name: "" }
                     },
-                    // {
-                    //     path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
-                    //     data: {
-                    //         name: "House Bill",
-                    //     },
-                    // },
+                    {
+                        path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-consol-export-hbl.module').then(m => m.SeaConsolExportHBLModule),
+                        data: {
+                            name: "House Bill",
+                        },
+                    },
                     {
                         path: 'manifest', component: SeaConsolExportManifestComponent,
                         data: { name: "Manifest", },
@@ -81,7 +81,6 @@ const routing: Routes = [
         DirectiveModule,
         TabsModule.forRoot(),
         SeaConsolExportLazyLoadModule // ?  Lazy loading module with  tab component (CD Note)
-        // SharedModule,
     ],
     exports: [],
     declarations: [
