@@ -61,7 +61,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     gotoCreateContract() {
         this.formContractPopup.formGroup.patchValue({
-            officeId: null,
+            officeId: [this.formContractPopup.offices[0]],
             contractNo: null,
             effectiveDate: null,
             expiredDate: null,
@@ -97,6 +97,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
         this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
+        this.formContractPopup.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
+
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
 
@@ -237,6 +239,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 this.contracts[this.indexlstContract] = this.selectedContract;
+                this.contracts = [...this.contracts];
                 this.formContractPopup.hide();
             } else {
                 if (objCheckContract && objCheckContract != null) {
@@ -245,7 +248,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 } else {
                     this.formContractPopup.isDuplicateContract = false;
                     this.contracts = [...this.contracts, ...$event];
-                    console.log(this.contracts);
                 }
             }
         }

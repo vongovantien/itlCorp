@@ -41,6 +41,7 @@ export class Contract {
     index: number = null;
     fileList: any = null;
     file: File = null;
+    currencyId: string = null;
     isRequestApproval: boolean = false;
 
     constructor(data?: any) {

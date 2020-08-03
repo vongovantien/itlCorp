@@ -2607,7 +2607,7 @@ namespace eFMS.API.Accounting.DL.Services
                 aprSettlementMap.AccountantName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
                 aprSettlementMap.BUHeadName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
                 aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault()?.StatusApproval;
-                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
                 aprSettlementMap.IsShowLeader = !string.IsNullOrEmpty(approveSettlement.Leader);
                 aprSettlementMap.IsShowManager = !string.IsNullOrEmpty(approveSettlement.Manager);
                 aprSettlementMap.IsShowAccountant = !string.IsNullOrEmpty(approveSettlement.Accountant);
@@ -2616,7 +2616,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault()?.StatusApproval;
-                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
             }
             return aprSettlementMap;
         }
@@ -2663,7 +2663,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<DeniedInfoResult> GetHistoryDeniedSettlement(string settlementNo)
         {
-            var approves = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && x.Comment != "RECALL").OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)

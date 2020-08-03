@@ -471,7 +471,21 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label"> Partner Mode </label>
+                                        <ng-select [allowClear]="true" [items]="partnerModes" name="partnerMode"
+                                            formControlName="partnerMode" placeholder="Select partner mode">
+                                        </ng-select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-control-label"> Partner Location </label>
+                                        <ng-select [allowClear]="true" [items]="partnerLocations" name="partnerLocation"
+                                            formControlName="partnerLocation" placeholder="Select partner location">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8">
                                     <!--Note-->
                                     <div class="form-group">
                                         <label class="form-control-label" for="">

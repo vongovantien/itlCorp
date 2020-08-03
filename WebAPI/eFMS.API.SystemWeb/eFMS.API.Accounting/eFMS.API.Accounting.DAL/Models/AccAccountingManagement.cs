@@ -38,5 +38,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? PaymentDatetimeUpdated { get; set; }
         public string ServiceType { get; set; }
         public decimal? TotalExchangeRate { get; set; }
+        public decimal? PaidAmount { get; set; }
+        public decimal? UnpaidAmount { get; set; }
     }
 }

@@ -2229,7 +2229,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             approve.UserModified = userCurrent;
                             approve.DateModified = DateTime.Now;
-                            approve.Comment = "RECALL";
+                            approve.Comment = "RECALL BY " + userCurrent;
                             approve.IsDeny = true;
                             var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
                         }
@@ -2457,7 +2457,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Accountant)?.EmployeeNameVn;
                 advanceApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Buhead)?.EmployeeNameVn;
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
                 advanceApproveModel.IsShowLeader = !string.IsNullOrEmpty(advanceApprove.Leader);
                 advanceApproveModel.IsShowManager = !string.IsNullOrEmpty(advanceApprove.Manager);
                 advanceApproveModel.IsShowAccountant = !string.IsNullOrEmpty(advanceApprove.Accountant);
@@ -2466,14 +2466,14 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
             }
             return advanceApproveModel;
         }
 
         public List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo)
         {
-            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)
