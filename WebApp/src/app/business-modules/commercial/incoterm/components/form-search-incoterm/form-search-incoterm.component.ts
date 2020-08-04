@@ -12,6 +12,7 @@ import { Incoterm } from '@models';
 export class CommercialFormSearchIncotermComponent extends AppForm implements OnInit {
 
     @Output() onSearch: EventEmitter<Partial<ISearchIncoterm>> = new EventEmitter<Partial<ISearchIncoterm>>();
+    @Output() onReset: EventEmitter<Partial<ISearchIncoterm>> = new EventEmitter<Partial<ISearchIncoterm>>();
 
     formSearch: FormGroup;
     //
@@ -45,6 +46,7 @@ export class CommercialFormSearchIncotermComponent extends AppForm implements On
     ) {
         super();
         this.requestSearch = this.onSearchIncoterm;
+        this.requestReset = this.onResetIncoterm;
     }
 
     ngOnInit() {
@@ -66,7 +68,11 @@ export class CommercialFormSearchIncotermComponent extends AppForm implements On
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         const body = this.formatSearchParams(dataForm);
         this.onSearch.emit(body);
-
+    }
+    //
+    onResetIncoterm() {
+        const body = {};
+        this.onReset.emit(body);
     }
     //
     formatSearchParams(body: any): ISearchIncoterm {

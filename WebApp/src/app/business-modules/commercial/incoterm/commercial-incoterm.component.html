@@ -14,7 +14,10 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m-form">
-                <form-search-incoterm (onSearch)="onSearchIncoterm($event)"></form-search-incoterm>
+                <form-search-incoterm #formSearch (onSearch)="onSearchIncoterm($event)"
+                    (onReset)="onResetIncoterm($event)">
+
+                </form-search-incoterm>
             </div>
         </div>
     </div>

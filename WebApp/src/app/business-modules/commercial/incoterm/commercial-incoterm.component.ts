@@ -1,13 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Incoterm, IncotermModel } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
+import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
 @Component({
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
 })
 export class CommercialIncotermComponent extends AppList implements OnInit {
+
+    @ViewChild("formSearch", { static: false }) formSearch: CommercialFormSearchIncotermComponent;
 
     incoterms: IncotermModel[];
 
@@ -59,7 +62,13 @@ export class CommercialIncotermComponent extends AppList implements OnInit {
     onSearchIncoterm(event) {
         this.criteria = event;
         console.log(this.criteria);
+        this.page = 1;
+        this.getIncotermListPaging();
+    }
 
+    onResetIncoterm(event) {
+        this.criteria = event;
+        this.formSearch.initForm();
         this.getIncotermListPaging();
     }
 }
