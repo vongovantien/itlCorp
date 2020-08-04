@@ -536,7 +536,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
 
                     //Đối với service là Sea FCL (Import & Export)
-                    if (transaction.TransactionType.Contains("SF"))
+                    if (transaction != null && transaction.TransactionType.Contains("SF"))
                     {
                         var packageUnit = unitRepository.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
                         if (packageUnit != null)
@@ -548,7 +548,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 // Đối với các Service là OPS hoặc các service khác Sea FCL, Air thì lấy package qty & package type theo Housebill
-                if ((!transaction.TransactionType.Contains("SF") && !transaction.TransactionType.Contains("A")) || opsTransaction != null)
+                if ((transaction != null && !transaction.TransactionType.Contains("SF") && !transaction.TransactionType.Contains("A")) || opsTransaction != null)
                 {
                     hbPackages += item.PackageQty + " " + unitRepository.Get(x => x.Id == item.PackageType).FirstOrDefault()?.UnitNameEn + "; ";
                 }               
@@ -568,7 +568,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Đối với hàng Air (Import & Export) thì sẽ sum PackageQty của các Housebill
-            if (transaction.TransactionType.Equals("AI") || transaction.TransactionType.Equals("AE"))
+            if (transaction != null && (transaction.TransactionType.Equals("AI") || transaction.TransactionType.Equals("AE")))
             {
                 hbPackages = HBList.Select(s => s.PackageQty).Sum()?.ToString();
             }
@@ -985,17 +985,17 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.TotalDebit = string.Empty;
             if (_totalDebit != 0)
             {
-                parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n}", _totalDebit);
+                parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n3}", _totalDebit);
             }
 
             parameter.TotalCredit = string.Empty;
             if (_totalCredit != 0)
             {
-                parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
+                parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n3}", _totalCredit);
             }
 
             var _blAmount = Math.Abs(_totalDebit - _totalCredit);
-            parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _blAmount) : String.Format("{0:n}", _blAmount);
+            parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _blAmount) : String.Format("{0:n3}", _blAmount);
 
             //Chuyển tiền Amount thành chữ
             decimal _balanceAmount = Math.Round(_blAmount, 3);
@@ -1159,17 +1159,17 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.TotalDebit = string.Empty;
             if (_totalDebit != 0)
             {
-                parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n}", _totalDebit);
+                parameter.TotalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalDebit) : String.Format("{0:n3}", _totalDebit);
             }
 
             parameter.TotalCredit = string.Empty;
             if (_totalCredit != 0)
             {
-                parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n}", _totalCredit);
+                parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n3}", _totalCredit);
             }
             
             decimal _balanceAmount = Math.Abs(_totalDebit - _totalCredit);
-            parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n}", _balanceAmount);
+            parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n3}", _balanceAmount);
 
             //Chuyển tiền Amount thành chữ
             _balanceAmount = Math.Round(_balanceAmount, 3);
@@ -1213,7 +1213,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             parameter.Currency = criteria.Currency;
             parameter.HBLList = _hbllist?.ToUpper();
-            parameter.DecimalNo = 2;
+            parameter.DecimalNo = 3;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
             parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;            
