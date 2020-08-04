@@ -2443,7 +2443,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         var itemCharge = item.SummaryOfCostsIncurredExportResults[j];
 
                         workSheet.Cells[i + addressStartContent, 2].Value = item.SupplierCode;
-                        workSheet.Cells[i + addressStartContent, 3].Value = item.SuplierName;
+                        workSheet.Cells[i + addressStartContent, 3].Value = itemCharge.SuplierName;
                         workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.ChargeName;
                         workSheet.Cells[i + addressStartContent, 5].Value = itemCharge.JobId;
                         workSheet.Cells[i + addressStartContent, 6].Value = item.POLName;
@@ -2473,7 +2473,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         }
                         else
                         {
-                            workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount;
+                            workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount != null ?  itemCharge.VATAmount : null;
                             workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
                         }
                         workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
@@ -2569,7 +2569,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[addressStartContent, 15].Value = totalNetAmountNormalCharge;
                 workSheet.Cells[addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
 
-                workSheet.Cells[addressStartContent, 16].Value = totalVATNormalCharge;
+                workSheet.Cells[addressStartContent, 16].Value = totalVATNormalCharge != null ? totalVATNormalCharge : null  ;
+                if(totalVATNormalCharge == 0)
+                {
+                    workSheet.Cells[addressStartContent, 16].Value = null;
+                }
                 workSheet.Cells[addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
 
                 workSheet.Cells[addressStartContent, 17].Value = totalNormalCharge;
