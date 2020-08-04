@@ -999,6 +999,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 chargeId: c.id,
                 id: SystemConstants.EMPTY_GUID,
                 exchangeDate: { startDate: new Date, endDate: new Date() },
+                hblno: this.hbl.hwbno || null,
+                mblno: this.shipment.mawb || this.shipment.mblno || null,
+                jobNo: this.shipment.jobNo || null,
             })));
         return newCsShipmentSurcharge || [];
     }
@@ -1032,6 +1035,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.id = SystemConstants.EMPTY_GUID;
                                 c.type = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                c.hblno = this.hbl.hwbno || null;
+                                c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                                c.jobNo = this.shipment.jobNo || null;
 
                                 this.onChangeDataUpdateTotal(c);
                                 // * Update Quantity with hint
