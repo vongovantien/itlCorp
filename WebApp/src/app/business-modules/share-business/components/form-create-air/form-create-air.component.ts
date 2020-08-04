@@ -152,8 +152,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             }
         );
 
-        this.getUserLogged();
         this.initForm();
+        this.getUserLogged();
         // this.getCarriers();
         this.getAgents();
         this.getUnits();
@@ -268,7 +268,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     initForm() {
         this.formGroup = this._fb.group({
             jobNo: [{ value: null, disabled: true }],
-            personIncharge: [{ value: this.userLogged.id, disabled: true }],
+            personIncharge: [],
             notes: [],
             mawb: ['', Validators.compose([
                 Validators.required,
@@ -336,7 +336,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.pod = this.formGroup.controls["pod"];
         this.agentId = this.formGroup.controls["agentId"];
         this.warehouseId = this.formGroup.controls["warehouseId"];
-
+        this.personalIncharge = this.formGroup.controls["personIncharge"];
 
         // * Handle etdchange.
         if (this.type !== 'import') {
@@ -374,6 +374,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+
+        this.personalIncharge.setValue(this.userLogged.id);
+        this.personalIncharge.disable();
     }
 
     getAgents() {
