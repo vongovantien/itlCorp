@@ -1161,7 +1161,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            return null;
+            //Sử dụng lại của service Sea FCL Export
+            var result = QuerySEF(criteria, listSearch);
+            return result;
         }
 
         /// <summary>
@@ -1172,7 +1174,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            return null;
+            //Sử dụng lại của service Sea FCL Import
+            var result = QuerySIF(criteria, listSearch);
+            return result;
         }
 
         /// <summary>
