@@ -2571,10 +2571,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false)
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
