@@ -238,63 +238,33 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount)
         {
-            throw new NotImplementedException();
+            var data = GetQueryBy(criteria);
+            var result = FormatIncoterm(data);
+            rowsCount = result.Count();
+            return result.Skip((page - 1)*size).Take(size);
         }
+        
 
         public IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria)
         {
             return GetQueryBy(criteria);
         }
-
-        private IQueryable<CatIncotermModel> GetQueryBy(CatIncotermCriteria criteria)
+        private IQueryable<CatIncotermModel> FormatIncoterm(IQueryable<CatIncotermModel> dataQuery)
         {
-            Expression<Func<CatIncotermModel, bool>> query;
-            if (criteria.Service == null)
-            {
-                if(criteria.Active == null)
-                {
-                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Active == true || x.Active == false));
-                }
-                else
-                {
-                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Active == criteria.Active));
-                }
-            }
-            else
-            {
-                if (criteria.Active == null)
-                {
-                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Active == true || x.Active == false));
-                }
-                else
-                {
-                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Service ?? "").IndexOf(criteria.Service ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                        && (x.Active == criteria.Active));
-                }
-            }
-
-            IQueryable<CatIncotermModel> dataQuery = Get(query);
-            dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
-
             List<CatIncotermModel> listIncoterm = new List<CatIncotermModel>();
 
             if (dataQuery != null && dataQuery.Count() > 0)
             {
                 foreach (var item in dataQuery)
                 {
-                    item.UserCreatedName = sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
-                    item.UserModifiedName = sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
+                    
+                    item.UserCreatedName = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
+                    item.UserModifiedName = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
                     listIncoterm.Add(item);
                 }
 
-                IEnumerable< CatIncotermModel> d = listIncoterm.Select(x => new CatIncotermModel {
+                IEnumerable<CatIncotermModel> d = listIncoterm.Select(x => new CatIncotermModel
+                {
                     UserCreatedName = x.UserCreatedName,
                     UserModified = x.UserModified,
                     UserModifiedName = x.UserModifiedName,
@@ -308,11 +278,54 @@ namespace eFMS.API.Catalogue.DL.Services
                     DescriptionEn = x.DescriptionEn,
                     DescriptionLocal = x.DescriptionLocal,
                     Service = x.Service,
-                    NameLocal =x.NameLocal
+                    NameLocal = x.NameLocal
                 });
                 return d.AsQueryable();
             }
             return Enumerable.Empty<CatIncotermModel>().AsQueryable();
+        }
+        private IQueryable<CatIncotermModel> GetQueryBy(CatIncotermCriteria criteria)
+        {
+            Expression<Func<CatIncotermModel, bool>> query;
+            if (criteria.Service == null)
+            {
+                if(criteria.Active == null)
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+                                        : "" == "")
+                                        && (x.Active == true || x.Active == false));
+                }
+                else
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+                                        : "" == "")
+                                        && (x.Active == criteria.Active));
+                }
+            }
+            else
+            {
+                if (criteria.Active == null)
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+                                        : "" == "")
+                                        && (x.Active == true || x.Active == false));
+                }
+                else
+                {
+                    query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+                                        && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
+                                        : "" == "")
+                                        && (x.Active == criteria.Active));
+                }
+            }
+
+            IQueryable<CatIncotermModel> dataQuery = Get(query);
+            dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
+
+            return dataQuery;
         }
 
         public IQueryable<CatIncotermModel> QueryByPermission(IQueryable<CatIncotermModel> data, PermissionRange range, ICurrentUser currentUser)

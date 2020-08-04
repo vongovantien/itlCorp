@@ -1,21 +1,15 @@
 import { CatChargeIncoterm } from "./charge-incoterm";
-import { Permission } from "../system/permission";
+import { BaseModel } from "../base.model";
 
-export class Incoterm {
-    id: string;
-    code: string;
-    nameEn: string;
-    nameLocal: string;
-    active: boolean;
-    descriptionEn: string;
-    descriptionLocal: string;
-    service: string;
-    datetimeCreated: string;
-    datetimeModified: string;
-    userCreated: string;
-    userModified: string;
-    userCreatedName: string;
-    UserModifiedName: string;
+
+export class Incoterm extends BaseModel {
+    code: string = null;
+    nameEn: string = null;
+    nameLocal: string = null;
+    active: boolean = null;
+    descriptionEn: string = null;
+    descriptionLocal: string = null;
+    service: string = null;
 }
 
 export class IncotermUpdateModel {
@@ -32,4 +26,24 @@ export class IncotermUpdateModel {
         }
     }
 }
+
+export class IncotermModel extends Incoterm {
+
+    userCreatedName: string = null;
+    UserModifiedName: string = null;
+
+    constructor(data?: any) {
+        super();
+        const self = this;
+        for (const key in data) {
+
+            if (self.hasOwnProperty(key)) {
+                self[key] = data[key];
+
+            }
+        }
+    }
+}
+
+
 

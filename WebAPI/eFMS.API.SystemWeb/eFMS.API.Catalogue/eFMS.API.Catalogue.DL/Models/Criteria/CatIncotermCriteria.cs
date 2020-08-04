@@ -7,7 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     public class CatIncotermCriteria
     {
         public string Code { get; set; }
-        public string Service { get; set; }
+        public List<string> Service { get; set; }
         public bool? Active { get; set; }
     }
 }

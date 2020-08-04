@@ -1125,6 +1125,13 @@ export class CatalogueRepo {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/GetById/${id}`);
 
     }
+    //
+    getIncotermListPaging(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Paging/`, body, {
+            page: '' + page,
+            size: '' + size
+        })
+    }
 
 
 }

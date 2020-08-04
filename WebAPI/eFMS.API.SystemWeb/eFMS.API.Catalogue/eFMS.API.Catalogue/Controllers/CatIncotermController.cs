@@ -45,6 +45,15 @@ namespace eFMS.API.Catalogue.Controllers
             mapper = iMapper;
 
         }
+        [HttpPost]
+        [Route("Paging")]
+        
+        public IActionResult Paging(CatIncotermCriteria criteria, int page, int size)
+        {
+            var data = catIncotermService.Paging(criteria, page, size, out int rowsCount);
+            var result = new { data, totalItems = rowsCount, page, size };
+            return Ok(result);
+        }
 
         [HttpPost]
         [Route("Query")]
