@@ -128,7 +128,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.note = this.partner.note;
         modelAdd.public = this.partner.public;
         modelAdd.workPlaceId = this.partner.workPlaceId;
-
+        modelAdd.partnerMode = this.partner.partnerMode;
+        modelAdd.partnerLocation = this.partner.partnerLocation;
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);

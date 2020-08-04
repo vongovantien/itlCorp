@@ -62,7 +62,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     gotoCreateContract() {
         this.formContractPopup.formGroup.patchValue({
-            officeId: null,
+            officeId: [this.formContractPopup.offices[0]],
             contractNo: null,
             effectiveDate: null,
             expiredDate: null,
@@ -98,6 +98,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
         this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
+        this.formContractPopup.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
+
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
 
@@ -198,12 +200,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     console.log(this.contracts);
                     this.contracts.forEach(element => {
                         if (element.saleService.includes(';')) {
-
-                            // element.saleService = element.saleService.replace(';', '; ');
-                            // const data = element.saleService.replace(';', ' ');
                             const arr = element.saleService.split(';');
                             element.saleService = '';
-                            console.log(arr);
                             arr.forEach(item => {
                                 element.saleService += item + '; ';
                             });
@@ -211,6 +209,24 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                                 element.saleService = element.saleService.substr(0, element.saleService.length - 2);
                             }
                         }
+                        if (!!element.officeId) {
+                            if (element.officeId.includes(';')) {
+                                const arrayOffice = element.officeId.split(';');
+                                element.officeNameEn = '';
+                                arrayOffice.forEach(itemOffice => {
+                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                                });
+                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                }
+                            } else {
+                                element.officeId = element.officeId.toLowerCase();
+                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                element.officeNameEn = !!obj ? obj.text : null;
+                            }
+                        }
+
                     });
                 }
             );
@@ -226,6 +242,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 this.contracts[this.indexlstContract] = this.selectedContract;
+                this.contracts = [...this.contracts];
                 this.formContractPopup.hide();
             } else {
                 if (objCheckContract && objCheckContract != null) {
@@ -234,7 +251,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 } else {
                     this.formContractPopup.isDuplicateContract = false;
                     this.contracts = [...this.contracts, ...$event];
-                    console.log(this.contracts);
                 }
             }
         }

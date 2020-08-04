@@ -351,6 +351,10 @@ export class AddPartnerDataComponent extends AppList {
         // });
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUpMethod.setErrors(null);
+        this.formPartnerComponent.partnerMode.setErrors(null);
+        this.formPartnerComponent.partnerLocation.setErrors(null);
+
+
 
         if (!this.formPartnerComponent.partnerForm.valid) {
             return;
@@ -425,6 +429,9 @@ export class AddPartnerDataComponent extends AppList {
 
             roundUpMethod: formBody.roundUpMethod != null && formBody.roundUpMethod.length > 0 ? formBody.roundUpMethod[0].id : null,
             applyDim: formBody.applyDim != null && formBody.applyDim.length > 0 ? formBody.applyDim[0].id : null,
+            partnerMode: formBody.partnerMode != null && formBody.partnerMode.length > 0 ? formBody.partnerMode[0].id : null,
+            partnerLocation: formBody.partnerLocation != null && formBody.partnerLocation.length > 0 ? formBody.partnerLocation[0].id : null,
+
             partnerGroup: this.partner.partnerGroup,
             id: this.partner.id,
         };
