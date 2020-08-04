@@ -38,8 +38,6 @@ export class AdvancePaymentComponent extends AppList {
     groupRequest: AdvancePaymentRequest[] = [];
     userLogged: User;
 
-    dataSearch: any = {};
-
     advancePaymentIds: string[] = [];
 
     menuSpecialPermission: Observable<any[]>;
@@ -91,21 +89,19 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        this.dataSearch = {
-            requester: this.userLogged.id
-        };
-        this.getListAdvancePayment(this.dataSearch);
+        this.getListAdvancePayment();
     }
 
     onSearchAdvPayment(data: any) {
-        this.dataSearch = data; //Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListAdvancePayment(this.dataSearch);
+        this.page = 1;
+        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
+        this.getListAdvancePayment();
     }
 
-    getListAdvancePayment(dataSearch?: any) {
+    getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
+        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -151,7 +147,7 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Delete Success');
-                        this.getListAdvancePayment(this.dataSearch);
+                        this.getListAdvancePayment();
                     }
                 },
             );
@@ -336,7 +332,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.checkAll = false;
-                        this.getListAdvancePayment(this.dataSearch);
+                        this.getListAdvancePayment();
                     } else {
                         this._toastService.error(res.message, '');
                     }

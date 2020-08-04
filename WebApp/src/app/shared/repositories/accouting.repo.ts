@@ -599,6 +599,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getHistoryDeniedSettlementPayment(settlementNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetHistoryDeniedSettlementPayment`, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

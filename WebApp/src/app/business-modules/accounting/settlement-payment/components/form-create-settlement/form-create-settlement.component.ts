@@ -30,6 +30,7 @@ export class SettlementFormCreateComponent extends AppForm {
     amount: AbstractControl;
     currency: AbstractControl;
     note: AbstractControl;
+    statusApproval: AbstractControl;
 
     currencyList: Currency[];
     methods: CommonInterface.ICommonTitleValue[];
@@ -62,6 +63,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'amount': [{ value: null, disabled: true }],
             'currency': [],
             'note': [],
+            'statusApproval': ['New'],
         });
 
 
@@ -72,6 +74,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.amount = this.form.controls['amount'];
         this.currency = this.form.controls['currency'];
         this.note = this.form.controls['note'];
+        this.statusApproval = this.form.controls['statusApproval'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)

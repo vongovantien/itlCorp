@@ -28,3 +28,8 @@ export class Charge {
     }
 }
 
+export class ChargeGroup {
+    id: string = null;
+    name: string = null;
+}
+

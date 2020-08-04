@@ -138,7 +138,8 @@ export class SettlementPaymentDetailComponent extends AppPage {
                         paymentMethod: this.formCreateSurcharge.methods.filter(method => method.value === this.settlementPayment.settlement.paymentMethod)[0],
                         note: this.settlementPayment.settlement.note,
                         amount: this.settlementPayment.chargeGrpSettlement.reduce((acc, curr) => acc + curr.totalAmount, 0),
-                        currency: this.settlementPayment.settlement.settlementCurrency
+                        currency: this.settlementPayment.settlement.settlementCurrency,
+                        statusApproval: this.settlementPayment.settlement.statusApproval
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;

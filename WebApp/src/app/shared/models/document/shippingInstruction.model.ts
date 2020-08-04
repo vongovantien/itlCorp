@@ -1,4 +1,3 @@
-import { Container } from "./container.model";
 import { CsTransactionDetail } from "./csTransactionDetail";
 
 export class CsShippingInstruction {

@@ -7,7 +7,6 @@ export * from './operation/custom-declaration';
 export * from './operation/shipment';
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
-export * from './catalogue/catCharge.model';
 export * from './catalogue/catUnit.model';
 export * from './catalogue/port-index.model';
 export * from './catalogue/customer.model';
@@ -21,6 +20,7 @@ export * from './catalogue/catChartOfAccounts.model';
 export * from './catalogue/saleman.model';
 export * from './catalogue/province.model';
 export * from './catalogue/catContract.model';
+export { ChargeGroup, Charge } from './catalogue/catCharge.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';

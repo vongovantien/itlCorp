@@ -50,6 +50,7 @@ export class AdvancePaymentRequest {
     jobId: string = '';
     hbl: string = '';
     mbl: string = '';
+    hblid: string = '00000000-0000-0000-0000-000000000000';
     amount: number = 0;
     requestCurrency: string = '';
     advanceType: string = '';

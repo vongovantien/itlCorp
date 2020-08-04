@@ -1171,8 +1171,9 @@ namespace eFMS.API.Accounting.DL.Services
             string month = (monthCurrent < 10 ? "0" : string.Empty) + monthCurrent.ToString();
             string no = "001";
 
-            var voucherNewests = Get(x => x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month).OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
-            var voucherNewest = voucherNewests.FirstOrDefault();
+            IQueryable<string> voucherNewests = Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId.Substring(0, 4) == year  && x.VoucherId.Substring(11, 2) == month)
+            .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
+            string voucherNewest = voucherNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(voucherNewest))
             {
                 var _noNewest = voucherNewest.Substring(7, 3);
@@ -1182,7 +1183,7 @@ namespace eFMS.API.Accounting.DL.Services
                     no = no.PadLeft(3, '0');
                 }
             }
-            var voucher = year + "FDT" + no + "/" + month;
+            string voucher = year + "FDT" + no + "/" + month;
             return voucher;
         }
 
@@ -1355,6 +1356,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
                     item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
+                    item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
                     item.PaymentTerm = 0; //Default is 0                    

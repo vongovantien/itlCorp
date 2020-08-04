@@ -120,7 +120,10 @@ export namespace CommonEnum {
     }
 
     export enum SHEET_DEBIT_REPORT_TYPE {
-        ACCNT_PL_SHEET = 'ACCNT_PL_SHEET'
+        ACCNT_PL_SHEET = 'ACCNT_PL_SHEET',
+        SUMMARY_OF_COST = 'SUMMARY_OF_COST',
+        SUMMARY_OF_REVENUE = 'SUMMARY_OF_REVENUE'
+
     }
 
     export enum JOB_PROFIT_ANALYSIS_TYPE {

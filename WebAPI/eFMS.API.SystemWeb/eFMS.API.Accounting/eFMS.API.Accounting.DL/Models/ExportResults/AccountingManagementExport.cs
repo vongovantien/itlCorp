@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string PartnerId { get; set; } //Partner trên VAT Invoice Or Voucher
         public string AccountNo { get; set; } //Account No trên VAT Invoice Or Voucher
         public string VatPartnerNameEn { get; set; } //Partner Name En của Charge
+        public string VatPartnerNameVn { get; set; } //Partner Name Local của Charge
         public string Description { get; set; } //Description trên VAT Invoice Or Voucher
         public bool IsTick { get; set; } //Đánh dấu
         public decimal PaymentTerm { get; set; } //Thời hạn thanh toán

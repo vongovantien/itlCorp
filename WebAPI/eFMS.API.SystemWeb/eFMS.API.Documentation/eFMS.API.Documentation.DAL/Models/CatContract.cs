@@ -7,7 +7,7 @@ namespace eFMS.API.Documentation.Service.Models
     {
         public Guid Id { get; set; }
         public string SaleManId { get; set; }
-        public Guid? OfficeId { get; set; }
+        public string OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public string SaleService { get; set; }
         public string PartnerId { get; set; }
@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? PaidAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? CustomerAdvanceAmount { get; set; }
-        public int? CreditRate { get; set; }
+        public decimal? CreditRate { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

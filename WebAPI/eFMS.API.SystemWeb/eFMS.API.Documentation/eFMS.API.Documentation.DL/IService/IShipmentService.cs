@@ -23,7 +23,8 @@ namespace eFMS.API.Documentation.DL.IService
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
         List<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
         List<JobProfitAnalysisExportResult> GetDataJobProfitAnalysis(GeneralReportCriteria criteria);
-
+        List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria);
+        SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria);
         IQueryable<Shipments> GetShipmentAssignPIC();
     }
 }

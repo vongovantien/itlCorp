@@ -138,14 +138,16 @@
                                 <ng-template #chargeID>
                                     <div class="form-group"
                                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
-                                        <app-combo-grid-virtual-scroll
-                                            [currentActiveItemId]="{field:'id', value:charge.chargeId}"
-                                            (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
-                                            [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                            [dataSources]="listCharges"
-                                            [displayFields]="configComboGridCharge.displayFields" [height]="150"
-                                            placeholder="Select charge" (remove)="charge.chargeId = null">
-                                        </app-combo-grid-virtual-scroll>
+                                        <div class="list-master-charge">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
+                                                [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
+                                                [dataSources]="listCharges"
+                                                [displayFields]="configComboGridCharge.displayFields" [height]="150"
+                                                placeholder="Select charge" (remove)="charge.chargeId = null">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
                                     </div>
                                 </ng-template>
                             </td>
@@ -189,13 +191,15 @@
                                             [(ngModel)]="charge.unitCode">
                                     </ng-container>
                                     <ng-template #unit>
-                                        <app-combo-grid-virtual-scroll
-                                            [currentActiveItemId]="{field: 'id', value: charge.unitId}"
-                                            (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
-                                            [selectedDisplayFields]="['code']" [dataSources]="listUnits"
-                                            [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
-                                            (remove)="charge.unitId = null" placeholder="Select Unit" size="15">
-                                        </app-combo-grid-virtual-scroll>
+                                        <div class="list-master-unit">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: charge.unitId}"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'unit', charge)"
+                                                [selectedDisplayFields]="['code']" [dataSources]="listUnits"
+                                                [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
+                                                (remove)="charge.unitId = null" placeholder="Select Unit" size="15">
+                                            </app-combo-grid-virtual-scroll>
+                                        </div>
                                     </ng-template>
                                 </div>
                             </td>
@@ -257,6 +261,16 @@
                                     <input type="text" class="form-control" [(ngModel)]="charge.notes"
                                         placeholder="Note"
                                         [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group ">
+                                    <select class="form-control" [(ngModel)]="charge.chargeGroup"
+                                        [disabled]="!!charge.debitNo || !charge.isFromShipment ? 'disabled': null">
+                                        <option *ngFor="let group of (listChargeGroup | async)" [ngValue]="group.id">
+                                            {{group.name}}
+                                        </option>
+                                    </select>
                                 </div>
                             </td>
                             <td class="disabled">

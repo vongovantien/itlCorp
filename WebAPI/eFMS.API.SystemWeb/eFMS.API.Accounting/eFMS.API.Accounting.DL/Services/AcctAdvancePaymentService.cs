@@ -18,9 +18,7 @@ using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Common.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Localization;
-using System.Globalization;
 using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -792,7 +790,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var approveAdvance = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo);
                         if (approveAdvance != null)
                         {
-                            foreach(var approve in approveAdvance)
+                            foreach (var approve in approveAdvance)
                             {
                                 var approveAdvanceDelete = acctApproveAdvanceRepo.Delete(x => x.Id == approve.Id, false);
                             }
@@ -1945,6 +1943,24 @@ namespace eFMS.API.Accounting.DL.Services
                                 return new HandleState("The accountant has not approved it yet");
                             }
                         }
+                        else //buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL
+                        {
+                            if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                            {
+                                approve.LeaderApr = userCurrent;
+                                approve.LeaderAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                            {
+                                approve.ManagerApr = userCurrent;
+                                approve.ManagerAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                            {
+                                approve.AccountantApr = userCurrent;
+                                approve.AccountantAprDate = DateTime.Now;
+                            }
+                        }
                         if (string.IsNullOrEmpty(approve.BuheadApr))
                         {
                             if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
@@ -1981,11 +1997,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (!sendMailSuggest)
                     {
-                        return new HandleState("Send mail suggest Approval failed");
+                        return new HandleState("Send mail suggest approval failed");
                     }
                     if (!sendMailApproved)
                     {
-                        return new HandleState("Send mail Approved Approval failed");
+                        return new HandleState("Send mail approved approval failed");
                     }
 
                     advancePayment.UserModified = approve.UserModified = userCurrent;
@@ -2020,7 +2036,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     var advancePayment = DataContext.Get(x => x.Id == advanceId).FirstOrDefault();
-                    if (advancePayment == null) return new HandleState("Not found Advance Payment");
+                    if (advancePayment == null) return new HandleState("Not found advance payment");
 
                     var approve = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                     if (approve == null)
@@ -2124,7 +2140,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if (buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL && isBod
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
@@ -2133,7 +2149,7 @@ namespace eFMS.API.Accounting.DL.Services
                         )
                        )
                     {
-                        if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
+                        if (buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL && accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
                         {
                             return new HandleState("The accountant has not approved it yet");
                         }
@@ -2213,7 +2229,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             approve.UserModified = userCurrent;
                             approve.DateModified = DateTime.Now;
-                            approve.Comment = "RECALL";
+                            approve.Comment = "RECALL BY " + userCurrent;
                             approve.IsDeny = true;
                             var hsUpdateApproveAdvance = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id);
                         }
@@ -2424,7 +2440,7 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
             return sendMailResult;
         }
-        
+
         public AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo)
         {
             var userCurrent = currentUser.UserID;
@@ -2441,7 +2457,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Accountant)?.EmployeeNameVn;
                 advanceApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Buhead)?.EmployeeNameVn;
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
                 advanceApproveModel.IsShowLeader = !string.IsNullOrEmpty(advanceApprove.Leader);
                 advanceApproveModel.IsShowManager = !string.IsNullOrEmpty(advanceApprove.Manager);
                 advanceApproveModel.IsShowAccountant = !string.IsNullOrEmpty(advanceApprove.Accountant);
@@ -2450,14 +2466,14 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
             }
             return advanceApproveModel;
         }
 
         public List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo)
         {
-            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && x.Comment != "RECALL").OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)
@@ -2589,12 +2605,12 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
             var infoLevelApprove = LeaderLevel(type, groupId, departmentId, officeId, companyId);
-
             if (infoLevelApprove.Role == AccountingConstants.ROLE_AUTO || infoLevelApprove.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (infoLevelApprove.LevelApprove == AccountingConstants.LEVEL_LEADER)
                 {
                     if (string.IsNullOrEmpty(infoLevelApprove.UserId)) return new HandleState("Not found leader");
+                    if (string.IsNullOrEmpty(infoLevelApprove.EmailUser)) return new HandleState("Not found email of leader");
                 }
             }
 
@@ -2602,18 +2618,21 @@ namespace eFMS.API.Accounting.DL.Services
             if (managerLevel.Role == AccountingConstants.ROLE_AUTO || managerLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(managerLevel.UserId)) return new HandleState("Not found manager");
+                if (string.IsNullOrEmpty(managerLevel.EmailUser)) return new HandleState("Not found email of manager");
             }
 
             var accountantLevel = AccountantLevel(type, officeId, companyId);
             if (accountantLevel.Role == AccountingConstants.ROLE_AUTO || accountantLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(accountantLevel.UserId)) return new HandleState("Not found accountant");
+                if (string.IsNullOrEmpty(accountantLevel.EmailUser)) return new HandleState("Not found email of accountant");
             }
 
             var buHeadLevel = BuHeadLevel(type, officeId, companyId);
             if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL)
             {
                 if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
+                if (string.IsNullOrEmpty(buHeadLevel.EmailUser)) return new HandleState("Not found email of BOD");
             }
             return new HandleState();
         }
@@ -2844,8 +2863,8 @@ namespace eFMS.API.Accounting.DL.Services
                     ) //Dept Manager
             {
                 isShowBtnDeny = false;
-                if (   !string.IsNullOrEmpty(approve.Manager)
-                    && advancePayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                if (!string.IsNullOrEmpty(approve.Manager)
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
@@ -2866,7 +2885,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 isShowBtnDeny = false;
                 if (!string.IsNullOrEmpty(approve.Accountant)
-                    && advancePayment.StatusApproval != AccountingConstants.ACCOUNTING_INVOICE_STATUS_NEW
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
                     && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
                 {
@@ -2883,17 +2902,40 @@ namespace eFMS.API.Accounting.DL.Services
                     return false;
                 }
             }
-            else if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && isBod
+            else if (isBod
                 &&
                 (
                   (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent.UserID == buHeadLevel.UserId)
                   ||
                   buHeadLevel.UserDeputies.Contains(userCurrent.UserID)
                 )
-                && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE
                )
             {
-                isShowBtnDeny = true;
+                isShowBtnDeny = false;
+                if (advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_NEW
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DENIED
+                    && advancePayment.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE)
+                {
+                    isShowBtnDeny = true;
+                }
+
+                if (buHeadLevel.Role != AccountingConstants.ROLE_SPECIAL)
+                {
+                    if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                    {
+                        return false;
+                    }
+
+                    if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                    {
+                        return false;
+                    }
+                }
             }
             else
             {

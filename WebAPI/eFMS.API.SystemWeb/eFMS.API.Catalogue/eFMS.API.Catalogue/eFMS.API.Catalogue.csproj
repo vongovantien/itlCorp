@@ -69,7 +69,7 @@
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Provider">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>

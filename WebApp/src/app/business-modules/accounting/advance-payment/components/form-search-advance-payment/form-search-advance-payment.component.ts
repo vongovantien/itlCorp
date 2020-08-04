@@ -72,7 +72,6 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
         this.currencyId = this.formSearch.controls['currencyId'];
 
-
     }
 
     initDataInform() {
@@ -168,6 +167,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
                     if (!!users) {
                         this.requesters = users.map((item: any) => ({ text: item.username, id: item.id }));
                         this.requesterActive = [this.requesters.filter(stf => stf.id === this.userLogged.id)[0]];
+                        this.requester.setValue(this.requesterActive);
                     }
                 },
             );

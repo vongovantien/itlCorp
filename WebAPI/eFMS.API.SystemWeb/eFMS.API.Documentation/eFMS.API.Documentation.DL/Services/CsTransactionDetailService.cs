@@ -594,24 +594,24 @@ namespace eFMS.API.Documentation.DL.Services
                 if (criteria.TypeFCL == "Export")
                 {
                     query = query.Where(x => (x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                 && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+                 && (x.detail.Hwbno != null && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.Etd >= criteria.FromDate || criteria.FromDate == null)
                  && (x.tran.Etd <= criteria.ToDate || criteria.ToDate == null)
                  && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
-                 );
+                 ));
                 }
-                else if(criteria.TypeFCL == "Import")
+                else if (criteria.TypeFCL == "Import")
                 {
-                        query = query.Where(x => (x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                  && (x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                  && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                  && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
-                  && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
-                  && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
-                  && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
-                  );
+                    query = query.Where(x => (x.tran.Mawb ?? "").IndexOf(criteria.Mawb ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+              && ((x.detail.Hwbno != null && x.detail.Hwbno.IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+              && (x.cus.ShortName.IndexOf(criteria.CustomerName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+              && (x.tran.Eta >= criteria.FromDate || criteria.FromDate == null)
+              && (x.tran.Eta <= criteria.ToDate || criteria.ToDate == null)
+              && (x.sale.Username.IndexOf(criteria.SaleManName ?? "", StringComparison.OrdinalIgnoreCase) >= 0)
+              && (x.tran.TransactionType == transactionType || string.IsNullOrEmpty(transactionType))
+              ));
                 }
                 else
                 {
