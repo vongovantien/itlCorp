@@ -362,6 +362,7 @@ namespace eFMS.API.Accounting.Controllers
                         RealInvoiceNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         InvoiceDate = !string.IsNullOrEmpty(date) ? dateToPase : (DateTime?)null,
                         SerieNo = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        PaymentStatus = worksheet.Cells[row,5].Value.ToString().Trim()
                     };
                     list.Add(acc);
                 }

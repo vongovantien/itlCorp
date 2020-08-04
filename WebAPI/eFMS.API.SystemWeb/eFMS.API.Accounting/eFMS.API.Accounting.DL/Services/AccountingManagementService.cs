@@ -1426,6 +1426,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
                                 item.IsValid = false;
                             }
+                            if(!string.IsNullOrEmpty(item.PaymentStatus) && item.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                            {
+                                item.PaymentStatus = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_STATUS_INVALID, item.PaymentStatus];
+                                item.IsValid = true;
+                            }
                             else
                             {
                                 // Trùng Invoice, Serie #

@@ -134,5 +134,7 @@
   "MSG_PAIDDATE_ACCOUNTING_PAYMENT_INVALID": "Paid Date invalid",
   "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY": "Payment Type not allow empty",
   "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type invalid",
-  "MSG_VOUCHER_ID_HAD_PAYMENT": "VoucherId {0} has been paid"
+  "MSG_VOUCHER_ID_HAD_PAYMENT": "VoucherId {0} has been paid",
+  "MSG_PAYMENT_STATUS_INVALID": "Payment Status {0} invalid"
+
 }
