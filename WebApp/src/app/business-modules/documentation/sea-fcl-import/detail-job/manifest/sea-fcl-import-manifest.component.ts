@@ -261,25 +261,27 @@ export class SeaFclImportManifestComponent extends AppList {
                 })
             ).subscribe(
                 (res: any) => {
-                    this.AddHblToManifestPopup.houseBills = this.housebills;
-
-                    res.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
-                        element.isChecked = false;
-                        if (element["manifestRefNo"] == null) {
-                            element.isRemoved = true;
-                        } else {
-                            element.isRemoved = false;
-                        }
-                    });
-                    this.housebills = res;
-                    const hasHbl = this.housebills.some(element => element.isRemoved === false);
-                    if (!hasHbl) {
-                        this.housebills.forEach(element => {
-                            element.isRemoved = false;
+                    if (!!res) {
+                        this.AddHblToManifestPopup.houseBills = this.housebills;
+                        res.forEach((element: { isChecked: boolean; isRemoved: boolean }) => {
+                            element.isChecked = false;
+                            if (element["manifestRefNo"] == null) {
+                                element.isRemoved = true;
+                            } else {
+                                element.isRemoved = false;
+                            }
                         });
+                        this.housebills = res;
+                        const hasHbl = this.housebills.some(element => element.isRemoved === false);
+                        if (!hasHbl) {
+                            this.housebills.forEach(element => {
+                                element.isRemoved = false;
+                            });
+                        }
+                        console.log(hasHbl);
+                        this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
                     }
-                    console.log(hasHbl);
-                    this.AddHblToManifestPopup.houseBills = this.housebills.filter(x => x.isRemoved === true);
+
                 },
             );
     }

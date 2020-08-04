@@ -15,6 +15,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { getTransactionPermission, getTransactionLocked } from '../../../../share-business/store';
 import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
 import _groupBy from 'lodash/groupBy';
+import { JobConstants } from '@constants';
 @Component({
     selector: 'app-sea-lcl-export-shipping-instruction',
     templateUrl: './sea-lcl-export-shipping-instruction.component.html'
@@ -24,7 +25,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     jobId: string;
-    termTypes: CommonInterface.INg2Select[];
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
     houseBills: any[] = [];
     dataReport: any = null;
 
@@ -37,7 +38,7 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
     }
 
     ngOnInit() {
-        this.getTerms();
+        // this.getTerms();
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param && param.jobId) {
                 this.jobId = param.jobId;
