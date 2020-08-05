@@ -158,6 +158,8 @@ export class UtilityHelper {
             [ChargeConstants.SLE_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLExport]],
             [ChargeConstants.SLI_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLImport]],
             [ChargeConstants.CL_CODE, [CommonEnum.TransactionTypeEnum.CustomLogistic]],
+            [ChargeConstants.SCE_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolExport]],
+            [ChargeConstants.SCI_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolImport]],
             [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
         ]).get(type)[0];
     }
@@ -172,6 +174,8 @@ export class UtilityHelper {
             [ChargeConstants.SLI_CODE, [ChargeConstants.SLI_DES]],
             [ChargeConstants.CL_CODE, [ChargeConstants.CL_DES]],
             [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
+            [ChargeConstants.SCE_CODE, [ChargeConstants.SCE_DES]],
+            [ChargeConstants.SCI_CODE, [ChargeConstants.SCI_DES]],
         ]).get(type)[0];
     }
 

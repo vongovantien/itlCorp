@@ -19,6 +19,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string ContractNo { get; set; }
         public string ContractType { get; set; }
         public string Vas { get; set; }
+        public string CurrencyId { get; set; }
         public decimal? TrialCreditLimited { get; set; }
         public int? TrialCreditDays { get; set; }
         public DateTime? TrialEffectDate { get; set; }

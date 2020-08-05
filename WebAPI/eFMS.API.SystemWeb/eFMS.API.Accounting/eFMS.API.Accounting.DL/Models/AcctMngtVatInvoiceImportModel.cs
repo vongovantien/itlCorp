@@ -11,5 +11,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string RealInvoiceNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string SerieNo { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

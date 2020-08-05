@@ -1931,13 +1931,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlementApprove.AccountantApr = userCurrent;
                                 settlementApprove.AccountantAprDate = DateTime.Now;
                                 settlementApprove.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
-                                if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
-                                {
-                                    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                    settlementApprove.BuheadApr = settlementApprove.AccountantApr = userCurrent;
-                                    settlementApprove.BuheadAprDate = settlementApprove.AccountantAprDate = DateTime.Now;
-                                    settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                                }
+                                //if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
+                                //{
+                                //    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                //    settlementApprove.BuheadApr = settlementApprove.AccountantApr = userCurrent;
+                                //    settlementApprove.BuheadAprDate = settlementApprove.AccountantAprDate = DateTime.Now;
+                                //    settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                //}
                             }
                             if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL
                                 && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
@@ -1985,28 +1985,28 @@ namespace eFMS.API.Accounting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
-                            if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
-                            {
-                                settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                settlementApprove.BuheadApr = userCurrent;
-                                settlementApprove.BuheadAprDate = DateTime.Now;
-                                settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                                if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    settlementApprove.LeaderApr = userCurrent;
-                                    settlementApprove.LeaderAprDate = DateTime.Now;
-                                }
-                                if (managerLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    settlementApprove.ManagerApr = userCurrent;
-                                    settlementApprove.ManagerAprDate = DateTime.Now;
-                                }
-                                if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    settlementApprove.AccountantApr = userCurrent;
-                                    settlementApprove.AccountantAprDate = DateTime.Now;
-                                }
-                            }
+                            //if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
+                            //{
+                            //    settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            //    settlementApprove.BuheadApr = userCurrent;
+                            //    settlementApprove.BuheadAprDate = DateTime.Now;
+                            //    settlementApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                            //    if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        settlementApprove.LeaderApr = userCurrent;
+                            //        settlementApprove.LeaderAprDate = DateTime.Now;
+                            //    }
+                            //    if (managerLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        settlementApprove.ManagerApr = userCurrent;
+                            //        settlementApprove.ManagerAprDate = DateTime.Now;
+                            //    }
+                            //    if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        settlementApprove.AccountantApr = userCurrent;
+                            //        settlementApprove.AccountantAprDate = DateTime.Now;
+                            //    }
+                            //}
                         }
                         else
                         {
@@ -2607,7 +2607,7 @@ namespace eFMS.API.Accounting.DL.Services
                 aprSettlementMap.AccountantName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Accountant)?.EmployeeNameVn;
                 aprSettlementMap.BUHeadName = userBaseService.GetEmployeeByUserId(aprSettlementMap.Buhead)?.EmployeeNameVn;
                 aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault()?.StatusApproval;
-                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
+                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
                 aprSettlementMap.IsShowLeader = !string.IsNullOrEmpty(approveSettlement.Leader);
                 aprSettlementMap.IsShowManager = !string.IsNullOrEmpty(approveSettlement.Manager);
                 aprSettlementMap.IsShowAccountant = !string.IsNullOrEmpty(approveSettlement.Accountant);
@@ -2616,7 +2616,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 aprSettlementMap.StatusApproval = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault()?.StatusApproval;
-                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
+                aprSettlementMap.NumOfDeny = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
             }
             return aprSettlementMap;
         }
@@ -2663,7 +2663,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<DeniedInfoResult> GetHistoryDeniedSettlement(string settlementNo)
         {
-            var approves = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)
