@@ -158,7 +158,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-
         [HttpGet]
         [Route("GetById/{id}")]
         [Authorize]

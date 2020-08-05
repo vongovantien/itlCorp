@@ -200,7 +200,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             // Update permission
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
-            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
 
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
