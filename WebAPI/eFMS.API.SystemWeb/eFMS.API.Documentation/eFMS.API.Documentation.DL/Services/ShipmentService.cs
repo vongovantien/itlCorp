@@ -1818,6 +1818,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     data.ChargeCode = _charge?.Code;
                     data.ChargeName = _charge?.ChargeNameEn;
+                    data.Pol = item.Pol;
 
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
 
@@ -2397,11 +2398,72 @@ namespace eFMS.API.Documentation.DL.Services
 
 
         #region -- Export Summary Of Costs Incurred
+        private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurredOperation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            if (dataShipment == null) return null;
+            var port = catPlaceRepo.Get();
+            List<SummaryOfCostsIncurredExportResult> dataList = new List<SummaryOfCostsIncurredExportResult>();
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayee(query, null) : GetChargeOBHSellPayee(null, null);
+            foreach (var item in dataShipment)
+            {
+                var _charges = chargeData;
+             
+                _charges = chargeData.Where(x => x.JobId == item.JobNo);
+                
+                foreach (var charge in _charges)
+                {
+                    SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
+                    var _partnerId = charge.CustomerID;
+                    var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
+                    data.SupplierCode = _partner?.AccountNo;
+                    data.SuplierName = _partner?.PartnerNameVn;
+                    data.ChargeName = charge.ChargeName;
+                    data.POLName = port.Where(x => x.Id == charge.AOL).Select(t => t.NameEn).FirstOrDefault();
+                    data.PurchaseOrderNo = item.PurchaseOrderNo;
+                    data.CustomNo = GetTopClearanceNoByJobNo(item.JobNo);
+                    data.HBL = charge.HBL;
+                    data.GrossWeight = charge.GrossWeight;
+                    data.CBM = charge.CBM;
+                    data.PackageContainer = charge.PackageContainer;
+                    decimal? percent = 0;
+                    if (charge.VATRate > 0)
+                    {
+                        percent = (charge.VATRate * 10) / 100;
+                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                        if (charge.Currency != "VND")
+                        {
+                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                        }
+                    }
+                    else
+                    {
+                        charge.VATAmount = charge.VATRate;
+                    }
+                    charge.NetAmount = charge.UnitPrice * charge.Quantity;
+                    data.NetAmount = charge.NetAmount;
+                    data.VATAmount = charge.VATAmount;
+                    data.Type = charge.Type;
+                    data.TypeCharge = charge.TypeCharge;
+                    dataList.Add(data);
+                }
+            }
+            return dataList.AsQueryable();
+        }
         public List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             var dataDocumentation = SummaryOfCostsIncurred(criteria);
             IQueryable<SummaryOfCostsIncurredExportResult> list;
-            list = dataDocumentation;
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = SummaryOfCostsIncurredOperation(criteria);
+                list = dataDocumentation.Union(dataOperation);
+            }
+            else
+            {
+                list = dataDocumentation;
+            }
             return list.ToList();
         }
         private string GetTopClearanceNoByJobNo(string JobNo)
@@ -2712,7 +2774,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => x.IsOBH == isOBH);
             }
             var queryObhBuy = queryObhBuyOperation.Union(queryObhBuyDocument);
-            return queryObhBuyDocument;
+            return queryObhBuy;
         }
 
 
@@ -2720,12 +2782,105 @@ namespace eFMS.API.Documentation.DL.Services
         #endregion
 
         #region Export Summary Of Revenue Incurred
+        private SummaryOfRevenueModel SummaryOfRevenueIncurredOperation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            if (dataShipment == null) return null;
+            var port = catPlaceRepo.Get();
+            SummaryOfRevenueModel ObjectSummaryRevenue = new SummaryOfRevenueModel();
+            List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
+            Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
+            var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayerJob(query, null) : GetChargeOBHSellPayerJob(null, null);
+            var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID}).AsQueryable();
+            if (results == null)
+                return null;
+            foreach (var item in dataShipment)
+            {
+                var data = results;
+                data = results.Where(x => x.Key.JobId == item.JobNo);
+                //var data = results.Where(x => x.Key.HBLID == item.Hblid);
+                foreach (var group in data)
+                {
+                    SummaryOfRevenueExportResult SummaryRevenue = new SummaryOfRevenueExportResult();
+                    SummaryRevenue.SummaryOfCostsIncurredExportResults = new List<SummaryOfCostsIncurredExportResult>();
+                    var commodity = DataContext.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
+                    var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
+                    string commodityName = string.Empty;
+                    var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
+                    var _partner = catPartnerRepo.Get(x => _partnerId != null && x.Id == _partnerId ).FirstOrDefault();
+                    SummaryRevenue.SupplierCode = _partner?.AccountNo;
+                    SummaryRevenue.SuplierName = _partner?.PartnerNameVn;
+                    if (commodity != null)
+                    {
+                        string[] commodityArr = commodity.Split(',');
+                        foreach (var it in commodityArr)
+                        {
+                            commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                        }
+                        commodityName = commodityName.Substring(1);
+                    }
+                    if (commodityGroup != null)
+                    {
+                        commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
+                    }
+                    SummaryRevenue.ChargeName = commodityName;
+                    SummaryRevenue.POLName = port.Where(x => x.Id == item.Pol).Select(t => t.NameEn).FirstOrDefault();
+                    SummaryRevenue.CustomNo = GetTopClearanceNoByJobNo(group.Key.JobId);
+                    SummaryRevenue.HBL = group.Select(t => t.HBL).FirstOrDefault();
+                    SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
+                    SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
+                    SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
+                    foreach (var ele in group)
+                    {
+                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
+                    }
+                    SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
+                    dataList.Add(SummaryRevenue);
+                }
+            }
+            ObjectSummaryRevenue.summaryOfRevenueExportResults = dataList;
+            foreach (var item in ObjectSummaryRevenue.summaryOfRevenueExportResults)
+            {
+                foreach (var it in item.SummaryOfCostsIncurredExportResults)
+                {
+                    decimal? percent = 0;
+                    if (it.VATRate > 0)
+                    {
+                        percent = (it.VATRate * 10) / 100;
+                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
+                        if (it.Currency != "VND")
+                        {
+                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
 
+                        }
+                    }
+                    else
+                    {
+                        it.VATAmount = it.VATRate;
+                    }
+                    it.NetAmount = it.UnitPrice * it.Quantity;
+
+                }
+            }
+            return ObjectSummaryRevenue;
+        }
         public SummaryOfRevenueModel GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
         {
             var dataDocumentation = SummaryOfRevenueIncurred(criteria);
             SummaryOfRevenueModel obj = new SummaryOfRevenueModel();
-            obj = dataDocumentation;
+  
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = SummaryOfRevenueIncurredOperation(criteria);
+                var lstDoc = dataDocumentation.summaryOfRevenueExportResults.AsQueryable();
+                var lstOperation = dataOperation.summaryOfRevenueExportResults.AsQueryable();
+                var lst = lstDoc.Union(lstOperation);
+                obj.summaryOfRevenueExportResults = lst.ToList();
+            }
+            else
+            {
+                obj = dataDocumentation;
+            }
             return obj;
         }
         private SummaryOfRevenueModel SummaryOfRevenueIncurred(GeneralReportCriteria criteria)
@@ -2773,7 +2928,11 @@ namespace eFMS.API.Documentation.DL.Services
                     SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
                     SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
                     SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
-
+                    foreach(var ele in group)
+                    {
+                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t=>t.PartnerNameVn).FirstOrDefault();
+                    }
+                    
                     SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
                     dataList.Add(SummaryRevenue);
                 }
@@ -2805,7 +2964,7 @@ namespace eFMS.API.Documentation.DL.Services
             return ObjectSummaryRevenue;
         }
 
-        private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayer(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
+        private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayerJob(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
         {
             //Chỉ lấy những phí từ shipment (IsFromShipment = true)
             var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
@@ -2814,8 +2973,6 @@ namespace eFMS.API.Documentation.DL.Services
             var csTransDe = detailRepository.Get();
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
-
-            //OBH Payer (BUY - Credit)
             var queryObhBuyOperation = from sur in surcharge
                                        join ops in opst on sur.Hblid equals ops.Hblid
                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
@@ -2840,7 +2997,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            Currency = sur.CurrencyId,
                                            InvoiceNo = sur.InvoiceNo,
                                            Note = sur.Notes,
-                                           CustomerID = sur.PayerId,
+                                           CustomerID = sur.PaymentObjectId,
                                            ServiceDate = ops.ServiceDate,
                                            CreatedDate = ops.DatetimeCreated,
                                            TransactionType = null,
@@ -2859,14 +3016,71 @@ namespace eFMS.API.Documentation.DL.Services
                                            Unit = uni.UnitNameEn,
                                            InvoiceDate = sur.InvoiceDate
                                        };
-            if (query != null)
-            {
-                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            }
-            if (isOBH != null)
-            {
-                queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
-            }
+            return queryObhBuyOperation;
+        }
+
+        private IQueryable<SummaryOfCostsIncurredExportResult> GetChargeOBHSellPayer(Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query, bool? isOBH)
+        {
+            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
+            var surcharge = surCharge.Get(x => x.IsFromShipment == true && x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE);
+            var opst = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
+            var csTrans = DataContext.Get(x => x.CurrentStatus != TermData.Canceled);
+            var csTransDe = detailRepository.Get();
+            var charge = catChargeRepo.Get();
+            var unit = catUnitRepo.Get();
+
+            ////OBH Payer (BUY - Credit)
+            //var queryObhBuyOperation = from sur in surcharge
+            //                           join ops in opst on sur.Hblid equals ops.Hblid
+            //                           join chg in charge on sur.ChargeId equals chg.Id into chg2
+            //                           from chg in chg2.DefaultIfEmpty()
+            //                           join uni in unit on sur.UnitId equals uni.Id into uni2
+            //                           from uni in uni2.DefaultIfEmpty()
+            //                           select new SummaryOfCostsIncurredExportResult
+            //                           {
+            //                               ID = sur.Id,
+            //                               HBLID = sur.Hblid,
+            //                               ChargeID = sur.ChargeId,
+            //                               ChargeCode = chg.Code,
+            //                               ChargeName = chg.ChargeNameEn,
+            //                               JobId = ops.JobNo,
+            //                               HBL = ops.Hwbno,
+            //                               MBL = ops.Mblno,
+            //                               Type = sur.Type + "-BUY",
+            //                               SoaNo = sur.PaySoano,
+            //                               Debit = null,
+            //                               Credit = sur.Total,
+            //                               IsOBH = true,
+            //                               Currency = sur.CurrencyId,
+            //                               InvoiceNo = sur.InvoiceNo,
+            //                               Note = sur.Notes,
+            //                               CustomerID = sur.PayerId,
+            //                               ServiceDate = ops.ServiceDate,
+            //                               CreatedDate = ops.DatetimeCreated,
+            //                               TransactionType = null,
+            //                               UserCreated = ops.UserCreated,
+            //                               Quantity = sur.Quantity,
+            //                               UnitId = sur.UnitId,
+            //                               UnitPrice = sur.UnitPrice,
+            //                               VATRate = sur.Vatrate,
+            //                               CreditDebitNo = sur.CreditNo,
+            //                               CommodityGroupID = ops.CommodityGroupId,
+            //                               Service = "CL",
+            //                               ExchangeDate = sur.ExchangeDate,
+            //                               FinalExchangeRate = sur.FinalExchangeRate,
+            //                               TypeCharge = chg.Type,
+            //                               PayerId = sur.PayerId,
+            //                               Unit = uni.UnitNameEn,
+            //                               InvoiceDate = sur.InvoiceDate
+            //                           };
+            //if (query != null)
+            //{
+            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+            //}
+            //if (isOBH != null)
+            //{
+            //    queryObhBuyOperation = queryObhBuyOperation.Where(x => x.IsOBH == isOBH);
+            //}
             var queryObhBuyDocument = from sur in surcharge
                                       join cstd in csTransDe on sur.Hblid equals cstd.Id
                                       join cst in csTrans on cstd.JobId equals cst.Id
@@ -2920,8 +3134,6 @@ namespace eFMS.API.Documentation.DL.Services
                                           PayerId = sur.PayerId,
                                           Unit = uni.UnitNameEn,
                                           InvoiceDate = sur.InvoiceDate
-
-
                                       };
             if (query != null)
             {
@@ -2931,7 +3143,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryObhBuyDocument = queryObhBuyDocument.Where(x => x.IsOBH == isOBH);
             }
-            var queryObhBuy = queryObhBuyOperation.Union(queryObhBuyDocument);
+            //var queryObhBuy = queryObhBuyOperation.Union(queryObhBuyDocument);
             return queryObhBuyDocument;
         }
 
