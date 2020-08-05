@@ -78,7 +78,7 @@ namespace eFMS.API.Setting.DL.Services
                 unlockApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Accountant)?.EmployeeNameVn;
                 unlockApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(unlockApproveModel.Buhead)?.EmployeeNameVn;
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
-                unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
                 unlockApproveModel.IsShowLeader = !string.IsNullOrEmpty(unlockApprove.Leader);
                 unlockApproveModel.IsShowManager = !string.IsNullOrEmpty(unlockApprove.Manager);
                 unlockApproveModel.IsShowAccountant = !string.IsNullOrEmpty(unlockApprove.Accountant);
@@ -87,14 +87,14 @@ namespace eFMS.API.Setting.DL.Services
             else
             {
                 unlockApproveModel.StatusApproval = unlockRequestRepo.Get(x => x.Id == id).FirstOrDefault()?.StatusApproval;
-                unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").Select(s => s.Id).Count();
+                unlockApproveModel.NumOfDeny = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
             }
             return unlockApproveModel;
         }
 
         public List<DeniedUnlockRequestResult> GetHistoryDenied(Guid id)
         {
-            var approves = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && x.Comment != "RECALL").ToList();
+            var approves = DataContext.Get(x => x.UnlockRequestId == id && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).ToList();
             var data = new List<DeniedUnlockRequestResult>();
             int i = 1;
             foreach (var approve in approves)
@@ -222,13 +222,13 @@ namespace eFMS.API.Setting.DL.Services
                                 unlockApprove.AccountantApr = userCurrent;
                                 unlockApprove.AccountantAprDate = DateTime.Now;
                                 unlockApprove.LevelApprove = SettingConstants.LEVEL_ACCOUNTANT;
-                                if (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
-                                {
-                                    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-                                    unlockApprove.BuheadApr = unlockApprove.AccountantApr = userCurrent;
-                                    unlockApprove.BuheadAprDate = unlockApprove.AccountantAprDate = DateTime.Now;
-                                    unlockApprove.LevelApprove = SettingConstants.LEVEL_BOD;
-                                }
+                                //if (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
+                                //{
+                                //    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                                //    unlockApprove.BuheadApr = unlockApprove.AccountantApr = userCurrent;
+                                //    unlockApprove.BuheadAprDate = unlockApprove.AccountantAprDate = DateTime.Now;
+                                //    unlockApprove.LevelApprove = SettingConstants.LEVEL_BOD;
+                                //}
                             }
                             if (accountantLevel.Role == SettingConstants.ROLE_APPROVAL
                                 && managerLevel.Role != SettingConstants.ROLE_APPROVAL
@@ -267,28 +267,28 @@ namespace eFMS.API.Setting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
-                            if (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL && (leaderLevel.Role == SettingConstants.ROLE_NONE || leaderLevel.Role == SettingConstants.ROLE_AUTO) && (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO) && (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO))
-                            {
-                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-                                unlockApprove.BuheadApr = userCurrent;
-                                unlockApprove.BuheadAprDate = DateTime.Now;
-                                unlockApprove.LevelApprove = SettingConstants.LEVEL_BOD;
-                                if (leaderLevel.Role != SettingConstants.ROLE_NONE)
-                                {
-                                    unlockApprove.LeaderApr = userCurrent;
-                                    unlockApprove.LeaderAprDate = DateTime.Now;
-                                }
-                                if (managerLevel.Role != SettingConstants.ROLE_NONE)
-                                {
-                                    unlockApprove.ManagerApr = userCurrent;
-                                    unlockApprove.ManagerAprDate = DateTime.Now;
-                                }
-                                if (accountantLevel.Role != SettingConstants.ROLE_NONE)
-                                {
-                                    unlockApprove.AccountantApr = userCurrent;
-                                    unlockApprove.AccountantAprDate = DateTime.Now;
-                                }
-                            }
+                            //if (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL && (leaderLevel.Role == SettingConstants.ROLE_NONE || leaderLevel.Role == SettingConstants.ROLE_AUTO) && (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO) && (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO))
+                            //{
+                            //    unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            //    unlockApprove.BuheadApr = userCurrent;
+                            //    unlockApprove.BuheadAprDate = DateTime.Now;
+                            //    unlockApprove.LevelApprove = SettingConstants.LEVEL_BOD;
+                            //    if (leaderLevel.Role != SettingConstants.ROLE_NONE)
+                            //    {
+                            //        unlockApprove.LeaderApr = userCurrent;
+                            //        unlockApprove.LeaderAprDate = DateTime.Now;
+                            //    }
+                            //    if (managerLevel.Role != SettingConstants.ROLE_NONE)
+                            //    {
+                            //        unlockApprove.ManagerApr = userCurrent;
+                            //        unlockApprove.ManagerAprDate = DateTime.Now;
+                            //    }
+                            //    if (accountantLevel.Role != SettingConstants.ROLE_NONE)
+                            //    {
+                            //        unlockApprove.AccountantApr = userCurrent;
+                            //        unlockApprove.AccountantAprDate = DateTime.Now;
+                            //    }
+                            //}
                         }
                         else
                         {

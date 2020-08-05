@@ -382,6 +382,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CreditRate).HasColumnType("decimal(16, 8)");
 
+                entity.Property(e => e.CurrencyId)
+                    .HasColumnName("CurrencyID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(16, 8)");
 
                 entity.Property(e => e.DatetimeCreated)
@@ -713,6 +718,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PartnerGroup)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerLocation)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerMode)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PartnerNameEn)
@@ -1746,6 +1759,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.TransactionType).HasMaxLength(10);
 
                 entity.Property(e => e.Type)
                     .IsRequired()

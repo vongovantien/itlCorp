@@ -728,6 +728,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("DetailSettlementPaymentExport")]
+        [Authorize]
         public IActionResult DetailSettlementPaymentExport(Guid settlementId)
         {
             var result = acctSettlementPaymentService.SettlementExport(settlementId);

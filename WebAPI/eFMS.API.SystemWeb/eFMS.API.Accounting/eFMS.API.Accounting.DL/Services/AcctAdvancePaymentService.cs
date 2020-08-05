@@ -1541,13 +1541,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 advanceApprove.AccountantApr = userCurrent;
                                 advanceApprove.AccountantAprDate = DateTime.Now;
                                 advanceApprove.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
-                                if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
-                                {
-                                    advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                    advanceApprove.BuheadApr = advanceApprove.AccountantApr = userCurrent;
-                                    advanceApprove.BuheadAprDate = advanceApprove.AccountantAprDate = DateTime.Now;
-                                    advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                                }
+                                //if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO)
+                                //{
+                                //    advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                                //    advanceApprove.BuheadApr = advanceApprove.AccountantApr = userCurrent;
+                                //    advanceApprove.BuheadAprDate = advanceApprove.AccountantAprDate = DateTime.Now;
+                                //    advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                                //}
                             }
                             if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL
                                 && managerLevel.Role != AccountingConstants.ROLE_APPROVAL
@@ -1595,28 +1595,28 @@ namespace eFMS.API.Accounting.DL.Services
                                 mailLeaderOrManager = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
                             }
-                            if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
-                            {
-                                advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                advanceApprove.BuheadApr = userCurrent;
-                                advanceApprove.BuheadAprDate = DateTime.Now;
-                                advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
-                                if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    advanceApprove.LeaderApr = userCurrent;
-                                    advanceApprove.LeaderAprDate = DateTime.Now;
-                                }
-                                if (managerLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    advanceApprove.ManagerApr = userCurrent;
-                                    advanceApprove.ManagerAprDate = DateTime.Now;
-                                }
-                                if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
-                                {
-                                    advanceApprove.AccountantApr = userCurrent;
-                                    advanceApprove.AccountantAprDate = DateTime.Now;
-                                }
-                            }
+                            //if (buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL && (leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO) && (managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO) && (accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO))
+                            //{
+                            //    advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
+                            //    advanceApprove.BuheadApr = userCurrent;
+                            //    advanceApprove.BuheadAprDate = DateTime.Now;
+                            //    advanceApprove.LevelApprove = AccountingConstants.LEVEL_BOD;
+                            //    if (leaderLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        advanceApprove.LeaderApr = userCurrent;
+                            //        advanceApprove.LeaderAprDate = DateTime.Now;
+                            //    }
+                            //    if (managerLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        advanceApprove.ManagerApr = userCurrent;
+                            //        advanceApprove.ManagerAprDate = DateTime.Now;
+                            //    }
+                            //    if (accountantLevel.Role != AccountingConstants.ROLE_NONE)
+                            //    {
+                            //        advanceApprove.AccountantApr = userCurrent;
+                            //        advanceApprove.AccountantAprDate = DateTime.Now;
+                            //    }
+                            //}
                         }
                         else
                         {
@@ -2457,7 +2457,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advanceApproveModel.AccountantName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Accountant)?.EmployeeNameVn;
                 advanceApproveModel.BUHeadName = userBaseService.GetEmployeeByUserId(advanceApproveModel.Buhead)?.EmployeeNameVn;
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
                 advanceApproveModel.IsShowLeader = !string.IsNullOrEmpty(advanceApprove.Leader);
                 advanceApproveModel.IsShowManager = !string.IsNullOrEmpty(advanceApprove.Manager);
                 advanceApproveModel.IsShowAccountant = !string.IsNullOrEmpty(advanceApprove.Accountant);
@@ -2466,14 +2466,14 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 advanceApproveModel.StatusApproval = DataContext.Get(x => x.AdvanceNo == advanceNo).FirstOrDefault()?.StatusApproval;
-                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).Select(s => s.Id).Count();
+                advanceApproveModel.NumOfDeny = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).Select(s => s.Id).Count();
             }
             return advanceApproveModel;
         }
 
         public List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo)
         {
-            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !x.Comment.Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
+            var approves = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceNo && x.IsDeny == true && !(x.Comment ?? string.Empty).Contains("RECALL")).OrderByDescending(x => x.DateCreated).ToList();
             var data = new List<DeniedInfoResult>();
             int i = 1;
             foreach (var approve in approves)

@@ -12,6 +12,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PartnerName { get; set; }
         public string Mbl { get; set; }
         public string Hbl { get; set; }
+        public Guid? Pol { get; set; }
         public string CustomNo { get; set; }
         public string PaymentMethodTerm { get; set; }
         public string ChargeCode { get; set; }
