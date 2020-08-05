@@ -42,6 +42,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<AcctSoa> soaRepo;
+        private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -63,6 +64,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSettlementPayment> settlementPayment,
             IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<SysEmployee> employee,
+            IContextBase<AccAccountingPayment> accountingPaymentRepo,
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -84,6 +86,7 @@ namespace eFMS.API.Accounting.DL.Services
             employeeRepo = employee;
             stringLocalizer = localizer;
             soaRepo = soa;
+            accountingPaymentRepository = accountingPaymentRepo;
         }
 
         #region --- DELETE ---
@@ -1426,6 +1429,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.SerieNo = stringLocalizer[AccountingLanguageSub.MSG_SERIE_NO_NOT_EMPTY];
                                 item.IsValid = false;
                             }
+                            if(!string.IsNullOrEmpty(item.PaymentStatus) && item.PaymentStatus.ToLower() != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID.ToLower())
+                            {
+                                item.PaymentStatus = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_STATUS_INVALID, item.PaymentStatus];
+                                item.IsValid = true;
+                            }
                             else
                             {
                                 // Trùng Invoice, Serie #
@@ -1453,6 +1461,10 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         AccAccountingManagement vatInvoice = DataContext.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId == item.VoucherId)?.FirstOrDefault();
 
+                        if(vatInvoice.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                        {
+                            continue;
+                        }
                         vatInvoice.InvoiceNoTempt = vatInvoice.InvoiceNoReal = item.RealInvoiceNo;
                         vatInvoice.Serie = item.SerieNo;
                         vatInvoice.Date = item.InvoiceDate;
@@ -1467,6 +1479,39 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         vatInvoice.PaymentDueDate = dueDate;
                         vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
+
+                        // Handle PaymentStatus
+                        if (!string.IsNullOrEmpty(item.PaymentStatus) && item.PaymentStatus.ToLower() == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID.ToLower())
+                        {   
+                            // Tạo 1 paymentNo cho AR
+                            AccAccountingPayment payment = new AccAccountingPayment
+                            {
+                                Id = Guid.NewGuid(),
+                                RefId = vatInvoice.Id.ToString(),
+                                PaymentNo = item.RealInvoiceNo + "_" + string.Format("{0:00}", 1),
+                                PaymentAmount = vatInvoice.TotalAmount,
+                                Balance = 0,
+                                CurrencyId = vatInvoice.Currency,
+                                PaymentType = AccountingConstants.ACCOUNTING_PAYMENT_TYPE_NORMAL,
+                                PaidDate = item.InvoiceDate,
+                                Type = "INVOICE",
+                                UserCreated = currentUser.UserID,
+                                UserModified = currentUser.UserID,
+                                DatetimeCreated = DateTime.Now,
+                                DatetimeModified = DateTime.Now,
+                                GroupId = currentUser.GroupId,
+                                DepartmentId = currentUser.DepartmentId,
+                                OfficeId = currentUser.OfficeID,
+                                CompanyId = currentUser.CompanyID
+                            };
+
+                            // Cập nhật lại Status, số tiền thanh toán cho invoice này
+                            vatInvoice.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                            vatInvoice.PaidAmount = vatInvoice.TotalAmount;
+                            vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
+
+                            accountingPaymentRepository.Add(payment, false);
+                        }
 
                         IQueryable<CsShipmentSurcharge> surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == vatInvoice.Id);
 
@@ -1490,6 +1535,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     surchargeRepo.SubmitChanges();
                     DataContext.SubmitChanges();
+                    accountingPaymentRepository.SubmitChanges();
+
                     trans.Commit();
 
                     return new ResultHandle { Status = true, Message = "Import Vat Invoice successfully" };
