@@ -102,6 +102,9 @@
         public static readonly string ACCOUNTING_PAYMENT_STATUS_UNPAID = "Unpaid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID = "Paid";
         public static readonly string ACCOUNTING_PAYMENT_STATUS_PAID_A_PART = "Paid A Part";
+        public static readonly string ACCOUNTING_PAYMENT_TYPE_NORMAL = "Normal";
+        public static readonly string ACCOUNTING_PAYMENT_TYPE_NET_OFF = "Net Off";
+
 
 
         #endregion
