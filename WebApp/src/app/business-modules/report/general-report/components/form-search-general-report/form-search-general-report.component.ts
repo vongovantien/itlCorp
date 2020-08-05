@@ -79,6 +79,8 @@ export class GeneralReportFormSearchComponent extends AppForm {
     departmentsInit: any[] = [];
     groupsInit: any[] = [];
     staffsInit: any[] = [];
+
+    groupSpecial: any[] = [];
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -114,7 +116,6 @@ export class GeneralReportFormSearchComponent extends AppForm {
                             this.getAllGroup();
                         }
                         this.getDataUserLever();
-
                         this.getAllStaff();
                     }
                 }
@@ -390,21 +391,18 @@ export class GeneralReportFormSearchComponent extends AppForm {
                             const office = res.map((item: any) => ({ companyId: item.companyId, officeId: item.officeId, officeAbbrName: item.officeAbbrName }));
                             this.officesInit = office;
                             this.getOffice(office);
-                            console.log(office)
                         }
 
                         if (this.menuPermission.list !== 'All' && this.menuPermission.list !== 'Company' && this.menuPermission.list !== 'Office') {
                             const department = res.map((item: any) => ({ officeId: item.officeId, departmentId: item.departmentId, departmentAbbrName: item.departmentAbbrName }));
                             this.departmentsInit = department;
                             this.getDepartment(department);
-                            console.log(department)
                         }
 
                         if (this.menuPermission.list !== 'All' && this.menuPermission.list !== 'Company' && this.menuPermission.list !== 'Office' && this.menuPermission.list !== 'Department') {
                             const group = res.map((item: any) => ({ departmentId: item.departmentId, groupId: item.groupId, groupAbbrName: item.groupAbbrName }));
                             this.groupsInit = group;
                             this.getGroup(group);
-                            console.log(group)
                         }
                     }
                 },
@@ -513,15 +511,26 @@ export class GeneralReportFormSearchComponent extends AppForm {
     }
 
     getStaff(data: any) {
-        let groupSelected = [];
         if (this.groupActive.length > 0) {
+            let groupSelected = [];
             if (this.groupActive.map(i => i.id).includes('All')) {
                 groupSelected = this.groupList.map(i => i.id);
             } else {
                 groupSelected = this.groupActive.map(i => i.id);
             }
-            console.log(groupSelected);
-            data = data.filter(f => f.userId !== null && f.groupId !== null && f.departmentId !== null && groupSelected.includes(f.groupId.toString()));
+
+            let deparmentSelected = [];
+            if (this.departmentActive.length > 0) {
+                if (this.departmentActive.map(i => i.id).includes('All')) {
+                    deparmentSelected = this.departmentList.map(i => i.id);
+                } else {
+                    deparmentSelected = this.departmentActive.map(i => i.id);
+                }
+            }
+
+            data = data.filter(f => f.userId !== null && f.groupId !== null && f.departmentId !== null
+                && deparmentSelected.includes(f.departmentId.toString())
+                && groupSelected.includes(f.groupId.toString()));
         } else {
             data = [];
         }
@@ -659,7 +668,6 @@ export class GeneralReportFormSearchComponent extends AppForm {
                         office = office.map((item: any) => ({ companyId: item.buid, officeId: item.id, officeAbbrName: item.shortName }));
                         this.officesInit = office;
                         this.getOffice(office);
-                        console.log(office)
                     }
                 },
             );
@@ -674,9 +682,11 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 (department: any) => {
                     if (!!department) {
                         department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
+                        department.forEach(element => {
+                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
+                        });
                         this.departmentsInit = department;
                         this.getDepartment(department);
-                        console.log(department);
                     }
                 },
             );
@@ -689,12 +699,13 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (group: any) => {
-                    console.log(group)
                     if (!!group) {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
-                        this.groupsInit = group;
-                        this.getGroup(group);
-                        console.log(group)
+                        group.forEach(element => {
+                            this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                        });
+                        this.groupsInit = this.groupSpecial;
+                        this.getGroup(this.groupSpecial);
                     }
                 },
             );
