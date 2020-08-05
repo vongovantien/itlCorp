@@ -2052,17 +2052,19 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[8, 1, row1 + 1, 21].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[8, 1, row1, 21].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[8, 1, row1, 21].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[row + 3, 1].Value = headers[3]; //Total
+            addressStartContent = addressStartContent + airfreightObj.HawbAirFrieghts.Count;
+
+            workSheet.Cells[addressStartContent, 1].Value = headers[3]; //Total
 
 
             string idT = workSheet
-            .Cells[row + 3, 1]
+            .Cells[addressStartContent, 1]
             .First(c => c.Value.ToString() == "TOTAL")
             .Start
             .Address;
 
             string idT1 = workSheet
-            .Cells[row + 3, 8]
+            .Cells[addressStartContent, 8]
             .Start
             .Address;
             string totalStr = idT + ":" + idT1;
@@ -2073,7 +2075,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[idT].Style.Font.Bold = true;
 
             string idPCS = workSheet
-           .Cells[row + 3, 9]
+           .Cells[addressStartContent, 9]
            .Start
            .Address;
             workSheet.Cells[idPCS].Value = airfreightObj.HawbAirFrieghts.Select(t => t.Pcs).Sum();
@@ -2081,7 +2083,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idGW = workSheet
-            .Cells[row + 3, 10]
+            .Cells[addressStartContent, 10]
             .Start
             .Address;
             workSheet.Cells[idGW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.GW).Sum();
@@ -2089,7 +2091,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idCW = workSheet
-            .Cells[row + 3, 11]
+            .Cells[addressStartContent, 11]
             .Start
             .Address;
             workSheet.Cells[idCW].Value = airfreightObj.HawbAirFrieghts.Select(t => t.CW).Sum();
@@ -2097,7 +2099,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idAF = workSheet
-              .Cells[row + 3, 13]
+              .Cells[addressStartContent, 13]
               .Start
               .Address;
             workSheet.Cells[idAF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.AirFreight).Sum();
@@ -2105,21 +2107,21 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
             string idHF = workSheet
-             .Cells[row + 3, 18]
+             .Cells[addressStartContent, 18]
              .Start
              .Address;
             workSheet.Cells[idHF].Value = airfreightObj.HawbAirFrieghts.Select(t => t.HandlingFee).Sum();
             workSheet.Cells[idHF].Style.Numberformat.Format = numberFormat;
 
             string idNA = workSheet
-             .Cells[row + 3, 19]
+             .Cells[addressStartContent, 19]
              .Start
              .Address;
             workSheet.Cells[idNA].Value = airfreightObj.HawbAirFrieghts.Select(t => t.NetAmount).Sum();
             workSheet.Cells[idNA].Style.Numberformat.Format = numberFormat;
 
             string idTT = workSheet
-             .Cells[row + 3, 21]
+             .Cells[addressStartContent, 21]
              .Start
              .Address;
             workSheet.Cells[idTT].Value = airfreightObj.HawbAirFrieghts.Select(t => t.TotalAmount).Sum();
@@ -2142,12 +2144,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[idPCS].Style.Border.Left.Style = ExcelBorderStyle.Thin;
 
             string idToBoder = workSheet
-             .Cells[row + 3, 10]
+             .Cells[addressStartContent, 10]
              .Start
              .Address;
 
             string idToborder1 = workSheet
-            .Cells[row + 3, 21]
+            .Cells[addressStartContent, 21]
             .Start
             .Address;
             string addressBorderRight = idToBoder + ":" + idToborder1;
@@ -2161,14 +2163,14 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A7"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells[row + 4, 4].Value = "Issued by";
-            workSheet.Cells[row + 4, 4].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+            workSheet.Cells[row1 + 2, 4].Value = "Issued by";
+            workSheet.Cells[row1 + 2, 4].Style.Font.SetFromFont(new Font("Times New Roman", 13));
 
-            workSheet.Cells[row + 4, 7].Value = "Approved by";
-            workSheet.Cells[row + 4, 7].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+            workSheet.Cells[row1 + 2, 7].Value = "Approved by";
+            workSheet.Cells[row1 + 2, 7].Style.Font.SetFromFont(new Font("Times New Roman", 13));
 
-            workSheet.Cells[row + 4, 13].Value = "Account";
-            workSheet.Cells[row + 4, 13].Style.Font.SetFromFont(new Font("Times New Roman", 13));
+            workSheet.Cells[row1 + 2, 13].Value = "Account";
+            workSheet.Cells[row1 + 2, 13].Style.Font.SetFromFont(new Font("Times New Roman", 13));
 
 
             //Bôi đen header
@@ -2193,8 +2195,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(21).Width = 20;   //Cột T
             workSheet.Column(22).Width = 25;   //Cột U
 
-            workSheet.Cells[row + 6, 3].Value = "Kindly arrange the payment to: ";
-            string textBottom = workSheet.Cells[row + 6, 3].Value.ToString();
+            workSheet.Cells[row1 + 3, 3].Value = "Kindly arrange the payment to: ";
+            string textBottom = workSheet.Cells[row1 + 3, 3].Value.ToString();
 
             if (!string.IsNullOrEmpty(airfreightObj.OfficeEn))
             {
@@ -2222,26 +2224,26 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             textBottom = textBottom + "\n" + "Thanks for your kind co-operation.";
 
-            string idTexRoot = workSheet
-           .Cells[row + 6, 3]
-           .First(c => c.Value.ToString() == "Kindly arrange the payment to: ")
-           .Start
-           .Address;
-
-            string idTexBottom = workSheet
-            .Cells[row + 12, 9]
+             string idTexRoot = workSheet
+            .Cells[row1 + 3, 3]
+            .First(c => c.Value.ToString() == "Kindly arrange the payment to: ")
             .Start
             .Address;
 
-            workSheet.Cells[row + 6, 3].Value = textBottom;
+             string idTexBottom = workSheet
+             .Cells[row1+ 9, 9]
+             .Start
+             .Address;
 
-            string addressTextBottom = idTexRoot + ":" + idTexBottom;
-            workSheet.Cells[idTexRoot].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[idTexRoot].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[addressTextBottom].Merge = true;
-            workSheet.Cells[addressTextBottom].Style.WrapText = true;
-            workSheet.Column(4).Width = 20; //Cột D
-            //workSheet.Cells.AutoFitColumns();
+             workSheet.Cells[row1 + 3, 3].Value = textBottom;
+
+             string addressTextBottom = idTexRoot + ":" + idTexBottom;
+             workSheet.Cells[idTexRoot].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+             workSheet.Cells[idTexRoot].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+             workSheet.Cells[addressTextBottom].Merge = true;
+             workSheet.Cells[addressTextBottom].Style.WrapText = true;
+             workSheet.Column(4).Width = 20; //Cột D
+            workSheet.Cells.AutoFitColumns();
 
         }
         #endregion
