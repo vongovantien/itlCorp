@@ -103,9 +103,18 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 if (res !== null && res !== undefined && Object.keys(res).length !== 0) {
                     this.menuPermission = res;
                     if (this.menuPermission.list !== 'None') {
-                        this.getAllOffice();
-                        this.getAllDepartment();
-                        this.getAllGroup();
+                        if (this.menuPermission.list === 'All' || this.menuPermission.list === 'Company') {
+                            this.getAllOffice();
+                            this.getAllDepartment();
+                            this.getAllGroup();
+                        } else if (this.menuPermission.list === 'All' || this.menuPermission.list === 'Company' || this.menuPermission.list === 'Office') {
+                            this.getAllDepartment();
+                            this.getAllGroup();
+                        } else if (this.menuPermission.list === 'All' || this.menuPermission.list === 'Company' || this.menuPermission.list === 'Office' || this.menuPermission.list === 'Department') {
+                            this.getAllGroup();
+                        }
+                        this.getDataUserLever();
+
                         this.getAllStaff();
                     }
                 }
@@ -369,17 +378,50 @@ export class GeneralReportFormSearchComponent extends AppForm {
         this.refNoTypeActive = [this.refNoTypeList[0]];
     }
 
+    getDataUserLever() {
+        this._systemRepo.getListUserLevelByUserId(this.userLogged.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        if (this.menuPermission.list !== 'All' && this.menuPermission.list !== 'Company') {
+                            const office = res.map((item: any) => ({ companyId: item.companyId, officeId: item.officeId, officeAbbrName: item.officeAbbrName }));
+                            this.officesInit = office;
+                            this.getOffice(office);
+                            console.log(office)
+                        }
+
+                        if (this.menuPermission.list !== 'All' && this.menuPermission.list !== 'Company' && this.menuPermission.list !== 'Office') {
+                            const department = res.map((item: any) => ({ officeId: item.officeId, departmentId: item.departmentId, departmentAbbrName: item.departmentAbbrName }));
+                            this.departmentsInit = department;
+                            this.getDepartment(department);
+                            console.log(department)
+                        }
+
+                        if (this.menuPermission.list !== 'All' && this.menuPermission.list !== 'Company' && this.menuPermission.list !== 'Office' && this.menuPermission.list !== 'Department') {
+                            const group = res.map((item: any) => ({ departmentId: item.departmentId, groupId: item.groupId, groupAbbrName: item.groupAbbrName }));
+                            this.groupsInit = group;
+                            this.getGroup(group);
+                            console.log(group)
+                        }
+                    }
+                },
+            );
+    }
+
     getOffice(data: any) {
         if (this.menuPermission.list === 'All') {
             data = data;
         } else if (this.menuPermission.list === 'Company') {
-            data = data.filter(f => f.id !== null && f.buid === this.userLogged.companyId);
+            data = data.filter(f => f.officeId !== null && f.companyId === this.userLogged.companyId);
         } else {
-            data = data.filter(f => f.id !== null && f.id === this.userLogged.officeId);
+            data = data.filter(f => f.officeId !== null && f.officeId === this.userLogged.officeId);
         }
 
         this.officeList = data
-            .map((item: any) => ({ text: item.shortName, id: item.id }))
+            .map((item: any) => ({ text: item.officeAbbrName, id: item.officeId }))
             .filter((o, i, arr) => arr.findIndex(t => t.id === o.id) === i); // Distinct office
 
         if (this.officeList.length > 0) {
@@ -407,13 +449,13 @@ export class GeneralReportFormSearchComponent extends AppForm {
             } else {
                 officeSelected = this.officeActive.map(i => i.id);
             }
-            data = data.filter(f => f.id !== null && officeSelected.includes(f.branchId));
+            data = data.filter(f => f.departmentId !== null && officeSelected.includes(f.officeId));
         } else {
             data = [];
         }
 
         this.departmentList = data
-            .map((item: any) => ({ text: item.deptNameAbbr, id: item.id.toString() }))
+            .map((item: any) => ({ text: item.departmentAbbrName, id: item.departmentId.toString() }))
             .filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct department
 
         if (this.departmentList.length > 0 && this.officeActive.length > 0) {
@@ -442,13 +484,13 @@ export class GeneralReportFormSearchComponent extends AppForm {
             } else {
                 deparmentSelected = this.departmentActive.map(i => i.id);
             }
-            data = data.filter(f => f.id !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
+            data = data.filter(f => f.groupId !== null && f.departmentId !== null && deparmentSelected.includes(f.departmentId.toString()));
         } else {
             data = [];
         }
 
         this.groupList = data
-            .map((item: any) => ({ text: item.shortName, id: item.id.toString() }))
+            .map((item: any) => ({ text: item.groupAbbrName, id: item.groupId.toString() }))
             .filter((g, i, arr) => arr.findIndex(t => t.id === g.id) === i); // Distinct group
 
         if (this.groupList.length > 0 && this.departmentActive.length > 0) {
@@ -478,7 +520,8 @@ export class GeneralReportFormSearchComponent extends AppForm {
             } else {
                 groupSelected = this.groupActive.map(i => i.id);
             }
-            data = data.filter(f => f.userId !== null && f.groupId !== null && groupSelected.includes(f.groupId.toString()));
+            console.log(groupSelected);
+            data = data.filter(f => f.userId !== null && f.groupId !== null && f.departmentId !== null && groupSelected.includes(f.groupId.toString()));
         } else {
             data = [];
         }
@@ -612,8 +655,12 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (office: any) => {
-                    this.officesInit = office;
-                    this.getOffice(office);
+                    if (!!office) {
+                        office = office.map((item: any) => ({ companyId: item.buid, officeId: item.id, officeAbbrName: item.shortName }));
+                        this.officesInit = office;
+                        this.getOffice(office);
+                        console.log(office)
+                    }
                 },
             );
     }
@@ -625,8 +672,12 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (department: any) => {
-                    this.departmentsInit = department;
-                    this.getDepartment(department);
+                    if (!!department) {
+                        department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
+                        this.departmentsInit = department;
+                        this.getDepartment(department);
+                        console.log(department);
+                    }
                 },
             );
     }
@@ -638,8 +689,13 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (group: any) => {
-                    this.groupsInit = group;
-                    this.getGroup(group);
+                    console.log(group)
+                    if (!!group) {
+                        group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
+                        this.groupsInit = group;
+                        this.getGroup(group);
+                        console.log(group)
+                    }
                 },
             );
     }
@@ -651,8 +707,10 @@ export class GeneralReportFormSearchComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (staff: any) => {
-                    this.staffsInit = staff;
-                    this.getStaff(staff);
+                    if (!!staff) {
+                        this.staffsInit = staff;
+                        this.getStaff(staff);
+                    }
                 },
             );
     }
