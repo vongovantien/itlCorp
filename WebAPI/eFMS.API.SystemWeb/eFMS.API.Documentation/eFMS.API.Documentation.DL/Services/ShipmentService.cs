@@ -2687,7 +2687,14 @@ namespace eFMS.API.Documentation.DL.Services
                         string[] commodityArr = commodity.Split(',');
                         foreach (var it in commodityArr)
                         {
-                            commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                            if (catCommodityRepo.Any(x => x.CommodityNameEn == it.Replace("\n", "")))
+                            {
+                                commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                            }
+                            else
+                            {
+                                commodityName = commodityName + "," + catCommodityRepo.Get(x => x.Code == it.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
+                            }
                         }
                         commodityName = commodityName.Substring(1);
                     }
