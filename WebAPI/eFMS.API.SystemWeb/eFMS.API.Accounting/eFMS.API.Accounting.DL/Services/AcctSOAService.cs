@@ -179,7 +179,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                     var hsUpdateSurChargeDebit = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
-                            }                           
+                            }
                         }
                         csShipmentSurchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
@@ -247,7 +247,7 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.OfficeId = soaCurrent.OfficeId;
                         soa.CompanyId = soaCurrent.CompanyId;
 
-                       
+
                         //Check exists OBH Debit Charge
                         var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
                                                                        && model.Surcharges.Any(c => c.surchargeId == x.Id && c.type == AccountingConstants.TYPE_CHARGE_OBH_SELL)
@@ -293,7 +293,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     if (string.IsNullOrEmpty(item.CreditNo) && string.IsNullOrEmpty(item.DebitNo))
                                     {
                                         //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                                        item.ExchangeDate = model.DatetimeCreated; 
+                                        item.ExchangeDate = model.DatetimeCreated;
                                     }
                                     var hsUpdateSurchargeCredit = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
@@ -315,7 +315,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                     var hsUpdateSurchargeDebit = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
-                            }                            
+                            }
                         }
                         csShipmentSurchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
@@ -460,7 +460,7 @@ namespace eFMS.API.Accounting.DL.Services
             //                :
             //                    GetRateLatestCurrencyExchange(currencyExchange, chg.Currency, model.Currency)) * (chg.Credit != null ? chg.Credit.Value : 0),
             //});
-            
+
             //Count number shipment (HBL)
             var totalShipment = charge.Select(s => s.HBL).Distinct().Count();
 
@@ -794,7 +794,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             FinalExchangeRate = sur.FinalExchangeRate
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
-            if(isOBH != null)
+            if (isOBH != null)
             {
                 queryObhSellOperation = queryObhSellOperation.Where(x => x.IsOBH == isOBH);
             }
@@ -1071,7 +1071,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<ChargeSOAResult, bool>> query = chg =>
                     string.IsNullOrEmpty(chg.SOANo)
                 && chg.CustomerID == criteria.CustomerID;
-            
+
             if (string.IsNullOrEmpty(criteria.DateType) || criteria.DateType == "CreatedDate")
             {
                 query = query.And(chg =>
@@ -1242,7 +1242,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         #region -- Get List More Charges & Add More Charge Shipment By Criteria --
         private IQueryable<ChargeShipmentModel> GetMoreChargesShipmentByCriteria(MoreChargeShipmentCriteria criteria)
-        {            
+        {
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.CustomerID == criteria.CustomerID;
 
             if (criteria.InSoa == true)
@@ -1778,14 +1778,15 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = GetChargeShipmentDocAndOperation(query, null);
             var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
             var _groupShipments = new List<GroupShipmentModel>();
-            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL }).Select(s => new GroupShipmentModel {
-                    JobId = s.Key.JobId,
-                    HBL = s.Key.HBL,
-                    MBL = s.Key.MBL,
-                    TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
-                    TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
-                    ChargeShipments = s.ToList()
-                }).ToList();            
+            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL }).Select(s => new GroupShipmentModel
+            {
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL,
+                TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+                TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+                ChargeShipments = s.ToList()
+            }).ToList();
             data = soaDetail;
             data.GroupShipments = _groupShipments;
             data.ChargeShipments = chargeShipments;
@@ -1881,7 +1882,7 @@ namespace eFMS.API.Accounting.DL.Services
 
 
 
-        public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo,string officeId)
+        public ExportSOAAirfreightModel GetSoaAirFreightBySoaNo(string soaNo, string officeId)
         {
             var soa = DataContext.Get(x => x.Soano == soaNo);
             var partner = catPartnerRepo.Get();
@@ -1919,8 +1920,8 @@ namespace eFMS.API.Accounting.DL.Services
                     air.JobNo = chargeData.JobId;
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
-                    air.AOL = chargeData.MBL.Substring(1, 3) + port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 8);
+                    air.AOL = chargeData.MBL.Substring(0, 3) + port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
+                    air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 9);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
@@ -1963,8 +1964,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         air.NetAmount += air.HandlingFee;
                     }
-
-                    if (chargeData.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())
+                    var dataCharge = charge.Where(x => x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower());
+                    if (dataCharge.Any())
                     {
                         if (chargeData.FinalExchangeRate != null)
                         {
@@ -1979,7 +1980,9 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        air.ExchangeRate = chargeData.FinalExchangeRate;
+                        var dataCurrencyExchange = catCurrencyExchangeRepo.Get(x => x.CurrencyFromId == AccountingConstants.CURRENCY_USD && x.CurrencyToId == AccountingConstants.CURRENCY_LOCAL).OrderByDescending(x => x.DatetimeModified).AsQueryable();
+                        var dataObjectCurrencyExchange = dataCurrencyExchange.Where(x => x.DatetimeModified.Value.Date == chargeData.DatetimeModified.Value.Date).FirstOrDefault();
+                        air.ExchangeRate = dataObjectCurrencyExchange.Rate;
                     }
 
                     air.TotalAmount = air.NetAmount * air.ExchangeRate;
@@ -2002,7 +2005,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
             var soa = DataContext.Get(x => x.Soano == soaNo);
             var charge = GetChargeShipmentDocAndOperation(query, null);
-            if(soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
+            if (soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
             soa?.FirstOrDefault().Type.ToLower() != AccountingConstants.TYPE_SOA_DEBIT.ToLower())
             {
                 charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
@@ -2021,7 +2024,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  ToDate = s.SoatoDate
                              };
 
-            var results = charge.GroupBy(x => new { x.JobId, x.HBLID}).AsQueryable();
+            var results = charge.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
 
             foreach (var group in results)
             {
@@ -2030,16 +2033,16 @@ namespace eFMS.API.Accounting.DL.Services
                 var commodity = csTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.Commodity).FirstOrDefault();
                 var commodityGroup = opsTransactionRepo.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
                 string commodityName = string.Empty;
-                if(commodity != null)
+                if (commodity != null)
                 {
                     string[] commodityArr = commodity.Split(',');
-                    foreach(var item in commodityArr)
+                    foreach (var item in commodityArr)
                     {
-                        commodityName = commodityName + "," + catCommodityRepo.Get(x=>x.CommodityNameEn == item.Replace("\n","")).Select(t=>t.CommodityNameEn).FirstOrDefault() ;
+                        commodityName = commodityName + "," + catCommodityRepo.Get(x => x.CommodityNameEn == item.Replace("\n", "")).Select(t => t.CommodityNameEn).FirstOrDefault();
                     }
-                    commodityName =  commodityName.Substring(1);
+                    commodityName = commodityName.Substring(1);
                 }
-                if(commodityGroup != null)
+                if (commodityGroup != null)
                 {
                     commodityName = catCommodityGroupRepo.Get(x => x.Id == commodityGroup).Select(t => t.GroupNameVn).FirstOrDefault();
                 }
@@ -2056,8 +2059,8 @@ namespace eFMS.API.Accounting.DL.Services
             opssoa.BillingAddressVN = resultData?.Select(t => t.BillingAddressVN).FirstOrDefault();
             opssoa.PartnerNameVN = resultData?.Select(t => t.PartnerNameVN).FirstOrDefault();
             opssoa.FromDate = resultData?.Select(t => t.FromDate).FirstOrDefault();
- 
-            foreach(var item in opssoa.exportSOAOPs)
+
+            foreach (var item in opssoa.exportSOAOPs)
             {
                 foreach (var it in item.Charges)
                 {
@@ -2066,7 +2069,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         percent = (it.VATRate * 10) / 100;
                         it.VATAmount = percent * (it.UnitPrice * it.Quantity);
-                        if(it.Currency != "VND")
+                        if (it.Currency != "VND")
                         {
                             it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
 
@@ -2076,9 +2079,9 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         it.VATAmount = it.VATRate;
                     }
-                    
+
                     it.NetAmount = it.UnitPrice * it.Quantity;
-                    
+
                 }
 
             }
@@ -2121,7 +2124,7 @@ namespace eFMS.API.Accounting.DL.Services
                              {
                                  ServiceDate = chg.ServiceDate,
                                  SOANo = s.Soano,
-                                 Service =  GetServiceNameOfSoa(chg.Service).ToString(),
+                                 Service = GetServiceNameOfSoa(chg.Service).ToString(),
                                  PartnerCode = pat.TaxCode,
                                  Debit = cd.DebitAccountNo,
                                  Credit = cd.CreditAccountNo,
@@ -2194,7 +2197,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _mawb = ops.Mblno;
                     _hwbNo = ops.Hwbno;
                     _customNo = GetTopClearanceNoByJobNo(ops.JobNo);
-                } 
+                }
                 else
                 {
                     var houseBillDoc = csTransactionDetailRepo.Get(x => x.Id == charge.Hblid).FirstOrDefault();
