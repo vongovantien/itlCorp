@@ -5,8 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { ReportPreviewComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
-import { DataService } from '@services';
-import { SystemConstants, JobConstants } from '@constants';
+import { SystemConstants } from '@constants';
 import { CsTransaction } from '@models';
 
 import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
@@ -22,7 +21,7 @@ import {
 import { AppList } from 'src/app/app.list';
 
 import _groupBy from 'lodash/groupBy';
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, take, startWith } from 'rxjs/operators';
 
 
 @Component({
@@ -33,59 +32,47 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
+
     jobId: string;
-    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
     houseBills: any[] = [];
-    dataReport: any = null;
 
     constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
-        private _dataService: DataService) {
+    ) {
         super();
     }
 
     ngOnInit() {
-        this.getTerms();
+        this.permissionShipments = this._store.select(getTransactionPermission);
+        this.isLocked = this._store.select(getTransactionLocked);
+    }
+
+    ngAfterViewInit() {
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param && param.jobId) {
                 this.jobId = param.jobId;
                 this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+
                 this.getHouseBills();
+                this.getBillingInstruction(this.jobId);
             }
         });
-
-        this.permissionShipments = this._store.select(getTransactionPermission);
-        this.isLocked = this._store.select(getTransactionLocked);
     }
-    getHouseBills() {
 
-        this.isLoading = true;
+    getHouseBills() {
         this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
+            startWith([]),
             catchError(this.catchError),
-            finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBills = res;
                 this.billDetail.housebills = res;
-
-                this.getBillingInstruction(this.jobId);
             },
         );
     }
-    async getTerms() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
 
-        } else {
-            const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-        }
-    }
     getBillingInstruction(jobId: string) {
         this._documentRepo.getShippingInstruction(jobId)
             .pipe(
@@ -98,6 +85,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                 },
             );
     }
+
     setDataBillInstructionComponent(data: any) {
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
@@ -109,18 +97,18 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                             this.billSIComponent.shippingInstruction.refNo = res.jobNo;
                         } else {
                             this.initNewShippingInstruction(res);
-                            if (this.billSIComponent.type === "consol") {
+                            if (this.billSIComponent.type === "fcl") {
                                 this.getContainers();
                             }
                         }
 
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
-                        this.billSIComponent.termTypes = this.termTypes;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
                     }
                 }
             );
     }
+
     calculateGoodInfo() {
         if (this.houseBills != null) {
             // let desOfGoods = '';
@@ -165,6 +153,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             })
         }
     }
+
     setFormRefresh(res: any) {
         this.billSIComponent.formSI.patchValue({
             grossWeight: res.grossWeight,
@@ -174,6 +163,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             contSealNo: res.containerSealNo,
         });
     }
+
     getContainers() {
         this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }).pipe(
             catchError(this.catchError),
@@ -186,6 +176,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         );
 
     }
+
     getContSealNo(containers: any) {
         let contSealNos = '';
         const contseal = containers.split("; ");
@@ -201,6 +192,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         }
         return contSealNos;
     }
+
     getPackages(lstPackages: any[]): string {
         const t = _groupBy(lstPackages, "package");
         let packages = '';
@@ -216,6 +208,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         }
         return packages;
     }
+
     initNewShippingInstruction(res: CsTransaction) {
         const user: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.billSIComponent.shippingInstruction = new CsShippingInstruction();
@@ -234,6 +227,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         this.billSIComponent.shippingInstruction.remark = res.mbltype;
         this.getExportDefault(res);
     }
+
     getExportDefault(res: CsTransaction) {
         this.billSIComponent.shippingInstruction.cargoNoticeRecevier = "SAME AS CONSIGNEE";
         if (res.creatorOffice) {
@@ -258,6 +252,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
             }
         }
     }
+
     save() {
         this.billSIComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {
@@ -268,6 +263,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         data.jobId = this.jobId;
         this.saveData(data);
     }
+
     saveData(data: CsShippingInstruction) {
         this._documentRepo.updateShippingInstruction(data).pipe(
             catchError(this.catchError)
@@ -283,6 +279,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                 }
             );
     }
+
     checkValidateForm() {
         let valid: boolean = true;
         if (!this.billSIComponent.formSI.valid
@@ -295,9 +292,11 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
         }
         return valid;
     }
+
     refresh() {
         this.setDataBillInstructionComponent(null);
     }
+
     previewSummaryReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
@@ -322,6 +321,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                 },
             );
     }
+
     previewSIReport() {
         if (this.billSIComponent.shippingInstruction.jobId === '00000000-0000-0000-0000-000000000000') {
             this._toastService.warning('This shipment have not saved. please save.');
