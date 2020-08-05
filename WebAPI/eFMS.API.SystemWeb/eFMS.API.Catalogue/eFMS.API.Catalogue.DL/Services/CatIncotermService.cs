@@ -21,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService, IPermissionBaseService<CatIncoterm, CatIncotermModel>
+    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -179,17 +179,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public bool CheckAllowDelete(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CheckAllowViewDetail(Guid id)
-        {
-
-            throw new NotImplementedException();
-        }
-
         public HandleState Delete(Guid Id)
         {
             throw new NotImplementedException();
@@ -341,6 +330,29 @@ namespace eFMS.API.Catalogue.DL.Services
                     break;
             }
             return data;
+        }
+
+        public bool CheckAllowPermissionAction(Guid id, PermissionRange range)
+        {
+            CatIncoterm incoterm = DataContext.Get(o => o.Id == id).FirstOrDefault();
+            if (incoterm == null)
+            {
+                return false;
+            }
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = incoterm.UserCreated,
+                CompanyId = incoterm.CompanyId,
+                DepartmentId = incoterm.DepartmentId,
+                OfficeId = incoterm.OfficeId,
+                GroupId = incoterm.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
         }
     }
 }
