@@ -133,70 +133,206 @@ namespace eFMS.API.Accounting.DL.Services
                 var currencyExchange = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == acct.DatetimeCreated.Value.Date).ToList();
                 var _exchangeRate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, acct.Currency, model.ContractCurrency);
                 // Chia đều cho số lượng service có trong VAT Invoice
-                var unpaidAmount = acct.UnpaidAmount;
+                var _unpaidAmount = acct.UnpaidAmount;
                 if (acct.UnpaidAmount == 0 || acct.UnpaidAmount == null)
                 {
                     var paymentsInvoice = accountingPaymentRepo.Get(x => x.RefId == acct.Id.ToString());
-                    unpaidAmount = paymentsInvoice.Sum(s => s.Balance);
+                    _unpaidAmount = paymentsInvoice.Sum(s => s.Balance);// Unpaid sẽ sum theo Balance
                 }
-                var _unpaidAmount = (unpaidAmount * _exchangeRate) / qtyService;
+                _unpaidAmount = (_unpaidAmount * _exchangeRate) / qtyService;
                 billingUnpaid += _unpaidAmount;
             }
 
             return billingUnpaid;
         }
 
-        private decimal CalculatorPaidAmount(AccAccountReceivableModel model)
+        private decimal? CalculatorPaidAmount(AccAccountReceivableModel model)
         {
-            var paidAmount = 0;
+            decimal? paidAmount = 0;
+            //Lấy ra VAT Invoice có payment status là Paid A Part & có status là Updated Invoice
+            var acctMngts = accountingManagementRepo.Get(x => x.Type == "Invoice" && x.PaymentStatus == "Paid A Part" && x.Status == "Updated Invoice");
+            //Lấy ra các phí thu (SELLING)
+            var surcharges = surchargeRepo.Get(x => x.PaymentObjectId == model.PartnerId && x.Type == "SELL" && x.AcctManagementId != null);
+            var operations = opsRepo.Get(x => x.OfficeId == model.Office); // && x.BillingOpsId == model.SaleMan
+            var acctMngtOperation = from surcharge in surcharges
+                                    join acctMngt in acctMngts on surcharge.AcctManagementId equals acctMngt.Id
+                                    join operation in operations on surcharge.Hblid equals operation.Hblid
+                                    select acctMngt;
+            var transDetails = transactionDetailRepo.Get(x => x.OfficeId == model.Office); // && x.SaleManId == model.SaleMan
+            var transactions = transactionRepo.Get(x => x.TransactionType == model.Service);
+            var acctMngtDocumentation = from surcharge in surcharges
+                                        join acctMngt in acctMngts on surcharge.AcctManagementId equals acctMngt.Id
+                                        join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                                        join trans in transactions on transDetail.JobId equals trans.Id
+                                        select acctMngt;
+            var acctMngtMerge = acctMngtOperation.Union(acctMngtDocumentation);
+            foreach (var acct in acctMngtMerge)
+            {
+                var qtyService = !string.IsNullOrEmpty(acct.ServiceType) ? acct.ServiceType.Split(';').Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
+                var currencyExchange = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == acct.DatetimeCreated.Value.Date).ToList();
+                var _exchangeRate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, acct.Currency, model.ContractCurrency);
+                // Chia đều cho số lượng service có trong VAT Invoice
+                var _paidAmount = acct.PaidAmount;
+                if (acct.PaidAmount == 0 || acct.PaidAmount == null)
+                {
+                    var paymentsInvoice = accountingPaymentRepo.Get(x => x.RefId == acct.Id.ToString());
+                    _paidAmount = paymentsInvoice.Sum(s => s.PaymentAmount); //Paid sẽ sum theo PaymentAmount
+                }
+                _paidAmount = (_paidAmount * _exchangeRate) / qtyService;
+                paidAmount += _paidAmount;
+            }
             return paidAmount;
         }
 
-        private decimal CalculatorObhAmount(AccAccountReceivableModel model)
+        private decimal? CalculatorObhAmount(AccAccountReceivableModel model)
         {
-            var obhAmount = 0;
+            decimal? obhAmount = 0;
+            //Lấy ra các phí OBH theo đối tượng OBH Partner (PaymentObjectId)
+            var surcharges = surchargeRepo.Get(x => x.PaymentObjectId == model.PartnerId && x.Type == "OBH");
+            var soas = soaRepo.Get(x => x.PaymentStatus != "Paid");
+            var operations = opsRepo.Get(x => x.OfficeId == model.Office); // && x.BillingOpsId == model.SaleMan
+            var chargeOperation = from surcharge in surcharges
+                                  join soa in soas on surcharge.Soano equals soa.Soano into soa2
+                                  from soa in soa2.DefaultIfEmpty()
+                                  join operation in operations on surcharge.Hblid equals operation.Hblid
+                                  select surcharge;
+            var transDetails = transactionDetailRepo.Get(x => x.OfficeId == model.Office); // && x.SaleManId == model.SaleMan
+            var transactions = transactionRepo.Get(x => x.TransactionType == model.Service);
+            var chargeDocumentation = from surcharge in surcharges
+                                      join soa in soas on surcharge.Soano equals soa.Soano into soa2
+                                      from soa in soa2.DefaultIfEmpty()
+                                      join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                                      join trans in transactions on transDetail.JobId equals trans.Id
+                                      select surcharge;
+            var chargeMerge = chargeOperation.Union(chargeDocumentation);
+            foreach (var charge in chargeMerge)
+            {
+                var _exchangeRateToCurrencyContract = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, model.ContractCurrency);
+                obhAmount += _exchangeRateToCurrencyContract * charge.Total;
+            }
             return obhAmount;
         }
 
-        private decimal CalculatorObhUnpaid(AccAccountReceivableModel model)
+        private decimal? CalculatorObhUnpaid(AccAccountReceivableModel model)
         {
-            var obhUnpaid = 0;
+            decimal? obhUnpaid = 0;
+            var surchargesPO = surchargeRepo.Get(x => x.PaymentObjectId == model.PartnerId && x.Type == "OBH");
+            var surchargesPR = surchargeRepo.Get(x => x.PayerId == model.PartnerId && x.Type == "OBH");
+            var soas = soaRepo.Get(x => x.PaymentStatus != "Paid");
+            
+            if (model.Service == "CL")
+            {
+                #region --- Operation ---
+                var operations = opsRepo.Get(x => x.OfficeId == model.Office); // && x.BillingOpsId == model.SaleMan
+                var chargeOperationPO = from surcharge in surchargesPO
+                                        join soa in soas on surcharge.Soano equals soa.Soano
+                                        join operation in operations on surcharge.Hblid equals operation.Hblid
+                                        select new { soaId = soa.Id, soaNo = soa.Soano, soaCreatedDate = soa.DatetimeCreated, soaCurrency = soa.Currency, serviceType = surcharge.TransactionType };
+                var chargeOperationPR = from surcharge in surchargesPR
+                                        join soa in soas on surcharge.PaySoano equals soa.Soano
+                                        join operation in operations on surcharge.Hblid equals operation.Hblid
+                                        select new { soaId = soa.Id, soaNo = soa.Soano, soaCreatedDate = soa.DatetimeCreated, soaCurrency = soa.Currency, serviceType = surcharge.TransactionType };
+                var chargeOperation = chargeOperationPO.Union(chargeOperationPR);
+
+                var dataGroupSoa = chargeOperation.ToList().GroupBy(g => new { soaId = g.soaId, soaNo = g.soaNo, soaCreatedDate = g.soaCreatedDate, soaCurrency = g.soaCurrency }).Select(s => new
+                {
+                    soaId = s.Key.soaId,
+                    soaNo = s.Key.soaNo,
+                    soaCreatedDate = s.Key.soaCreatedDate,
+                    soaCurrency = s.Key.soaCurrency,
+                    services = s.Select(se => se.serviceType).ToList()
+                });
+
+                foreach (var soa in dataGroupSoa)
+                {
+                    var qtyService = soa.services.Count() > 0 ? soa.services.Count() : 1;
+                    var currencyExchange = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == soa.soaCreatedDate.Value.Date).ToList();
+                    var _exchangeRate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, soa.soaCurrency, model.ContractCurrency);
+                    // Chia đều cho số lượng service có trong SOA
+                    decimal? _obhUnpaid = 0;
+                    var paymentsObh = accountingPaymentRepo.Get(x => x.RefId == soa.soaId.ToString());
+                    _obhUnpaid = paymentsObh.Sum(s => s.Balance);// Unpaid sẽ sum theo Balance
+                    _obhUnpaid = (_obhUnpaid * _exchangeRate) / qtyService;
+                    obhUnpaid += _obhUnpaid;
+                }
+                #endregion --- Operation ---
+            }
+            else
+            {
+                #region --- Documentation ---
+                var transDetails = transactionDetailRepo.Get(x => x.OfficeId == model.Office); // && x.SaleManId == model.SaleMan
+                var transactions = transactionRepo.Get(x => x.TransactionType == model.Service);
+                var chargeDocumentationPO = from surcharge in surchargesPO
+                                            join soa in soas on surcharge.Soano equals soa.Soano
+                                            join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                                            join trans in transactions on transDetail.JobId equals trans.Id
+                                            select new { soaId = soa.Id, soaNo = soa.Soano, soaCreatedDate = soa.DatetimeCreated, soaCurrency = soa.Currency, serviceType = surcharge.TransactionType };
+                var chargeDocumentationPR = from surcharge in surchargesPR
+                                            join soa in soas on surcharge.PaySoano equals soa.Soano
+                                            join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                                            join trans in transactions on transDetail.JobId equals trans.Id
+                                            select new { soaId = soa.Id, soaNo = soa.Soano, soaCreatedDate = soa.DatetimeCreated, soaCurrency = soa.Currency, serviceType = surcharge.TransactionType };
+                var chargeDocumentation = chargeDocumentationPO.Union(chargeDocumentationPR);
+
+                var dataGroupSoa = chargeDocumentation.ToList().GroupBy(g => new { soaId = g.soaId, soaNo = g.soaNo, soaCreatedDate = g.soaCreatedDate, soaCurrency = g.soaCurrency }).Select(s => new
+                {
+                    soaId = s.Key.soaId,
+                    soaNo = s.Key.soaNo,
+                    soaCreatedDate = s.Key.soaCreatedDate,
+                    soaCurrency = s.Key.soaCurrency,
+                    services = s.Select(se => se.serviceType).ToList()
+                });
+
+                foreach (var soa in dataGroupSoa)
+                {
+                    var qtyService = soa.services.Count() > 0 ? soa.services.Count() : 1;
+                    var currencyExchange = currencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == soa.soaCreatedDate.Value.Date).ToList();
+                    var _exchangeRate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, soa.soaCurrency, model.ContractCurrency);
+                    // Chia đều cho số lượng service có trong SOA
+                    decimal? _obhUnpaid = 0;
+                    var paymentsObh = accountingPaymentRepo.Get(x => x.RefId == soa.soaId.ToString());
+                    _obhUnpaid = paymentsObh.Sum(s => s.Balance);// Unpaid sẽ sum theo Balance
+                    _obhUnpaid = (_obhUnpaid * _exchangeRate) / qtyService;
+                    obhUnpaid += _obhUnpaid;
+                }
+                #endregion --- Documentation ---
+            }                        
             return obhUnpaid;
         }
 
-        private decimal CalculatorAdvanceAmount(AccAccountReceivableModel model)
+        private decimal? CalculatorAdvanceAmount(AccAccountReceivableModel model)
         {
-            var advanceAmount = 0;
+            decimal? advanceAmount = 0;
             return advanceAmount;
         }
 
-        private decimal CalculatorCreditAmount(AccAccountReceivableModel model)
+        private decimal? CalculatorCreditAmount(AccAccountReceivableModel model)
         {
-            var creditAmount = 0;
+            decimal? creditAmount = 0;
             return creditAmount;
         }
 
-        private decimal CalculatorSellingNoVat(AccAccountReceivableModel model)
+        private decimal? CalculatorSellingNoVat(AccAccountReceivableModel model)
         {
-            var sellingNoVat = 0;
+            decimal? sellingNoVat = 0;
             return sellingNoVat;
         }
 
-        private decimal CalculatorOver1To15Day(AccAccountReceivableModel model)
+        private decimal? CalculatorOver1To15Day(AccAccountReceivableModel model)
         {
-            var over1To15Day = 0;
+            decimal? over1To15Day = 0;
             return over1To15Day;
         }
 
-        private decimal CalculatorOver16To30Day(AccAccountReceivableModel model)
+        private decimal? CalculatorOver16To30Day(AccAccountReceivableModel model)
         {
-            var over16To30Day = 0;
+            decimal? over16To30Day = 0;
             return over16To30Day;
         }
 
-        private decimal CalculatorOver30Day(AccAccountReceivableModel model)
+        private decimal? CalculatorOver30Day(AccAccountReceivableModel model)
         {
-            var over30Day = 0;
+            decimal? over30Day = 0;
             return over30Day;
         }
 
@@ -210,6 +346,8 @@ namespace eFMS.API.Accounting.DL.Services
                 model.Id = Guid.NewGuid();
                 var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
                 if (partner == null) return new HandleState("Not found partner");
+
+                model.AcRef = partner.ParentId;
 
                 var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                 && x.PartnerId == model.PartnerId

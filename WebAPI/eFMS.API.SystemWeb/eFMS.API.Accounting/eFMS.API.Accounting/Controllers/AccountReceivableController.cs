@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common.Globals;
 using Microsoft.AspNetCore.Http;
@@ -40,5 +41,12 @@ namespace eFMS.API.Accounting.Controllers
         {
             return Ok(accountReceivableService.Get());
         }
+
+        [HttpPost("CalculatorReceivable")]
+        public IActionResult CalculatorReceivable(AccAccountReceivableModel model)
+        {
+            return Ok();
+        }
+        
     }
 }
