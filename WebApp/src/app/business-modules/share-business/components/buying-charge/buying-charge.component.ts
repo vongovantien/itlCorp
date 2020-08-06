@@ -1077,18 +1077,27 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     }
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         charges.forEach(c => {
+                            c.hblno = this.hbl.hwbno || null;
+                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                         });
                     }
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
                         charges.forEach(c => {
+                            c.hblno = this.hbl.hwbno || null;
+                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                         });
                     }
                     if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
                         charges.forEach(c => {
+                            c.hblno = this.hbl.hwbno || null;
+                            c.mblno = this.shipment.mawb || this.shipment.mblno || null;
+                            c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
                             this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
                         });
