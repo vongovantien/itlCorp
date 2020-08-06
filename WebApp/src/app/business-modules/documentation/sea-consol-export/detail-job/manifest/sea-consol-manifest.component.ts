@@ -10,14 +10,11 @@ import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
 import { getParamsRouterState } from '@store';
 import { SortService } from '@services';
-import { Crystal } from '@models';
 import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
 
 import { AppList } from 'src/app/app.list';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
@@ -39,21 +36,12 @@ export class SeaConsolExportManifestComponent extends AppList {
     housebillsRoot: any[] = [];
     housebillsChange: any[] = [];
     manifest: any = {};
-    saveButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.save
-    };
-
-    cancelButtonSetting: ButtonModalSetting = {
-        typeButton: ButtonType.cancel
-    };
 
     jobId: string = '';
-    headers: CommonInterface.IHeaderTable[];
     checkAll = false;
     totalGW = 0;
     totalCBM = 0;
     fistOpen: boolean = true;
-    dataReport: Crystal;
 
     constructor(
         protected _store: Store<any>,

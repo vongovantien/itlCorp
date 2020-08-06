@@ -163,6 +163,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                 }
             );
     }
+
     saveJob(body: any) {
         this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
