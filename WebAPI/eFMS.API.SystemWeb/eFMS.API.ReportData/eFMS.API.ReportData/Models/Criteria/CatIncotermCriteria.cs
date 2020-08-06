@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace eFMS.API.Catalogue.DL.Models.Criteria
+namespace eFMS.API.ReportData.Models.Criteria
 {
     public class CatIncotermCriteria
     {

@@ -18,6 +18,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState AddNew(CatIncotermEditModel model);
         HandleState Delete(Guid Id);
         CatIncotermEditModel GetDetail(Guid id);
+        IQueryable<CatIncotermModel> QueryExport(CatIncotermCriteria criteria);
        
     }
 }

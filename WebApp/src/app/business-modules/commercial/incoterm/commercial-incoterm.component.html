@@ -4,9 +4,18 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button title="add new" [routerLink]="['/home/commercial/incoterm/new']">
-            </app-permission-button>
+            <ng-container>
+                <app-permission-button title="add new" [routerLink]="['/home/commercial/incoterm/new']">
+                </app-permission-button>
+            </ng-container>
+            <ng-container>
+                <app-permission-button type="export" (onClick)="exportExcel()">
+                </app-permission-button>
+            </ng-container>
+
         </div>
+
+
     </div>
 </div>
 
@@ -14,13 +23,88 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m-form">
-                <code>form search component</code>
+                <form-search-incoterm #formSearch (onSearch)="onSearchIncoterm($event)"
+                    (onReset)="onResetIncoterm($event)">
+
+                </form-search-incoterm>
             </div>
         </div>
     </div>
     <div class="m-portlet">
         <div class="m-portlet__body">
-            table here !
+            <div class="table-wrapper">
+                <table class="table table-striped table-brand dataTable">
+                    <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                        <th class="m--w-50 first table-actions-col">
+
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container>
+                            <tr *ngFor="let incoterm of incoterms;let i = index;">
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <app-permission-button type="detail">
+                                        </app-permission-button>
+                                        <app-permission-button type="delete">
+                                        </app-permission-button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#">{{incoterm.code}}</a>
+                                </td>
+                                <td>
+                                    <span>{{incoterm.nameEn}}</span>
+                                </td>
+                                <td>
+                                    <span>{{incoterm.service}}</span>
+                                </td>
+                                <td>
+                                    <span [ngClass]="incoterm.active ? 'text-success' : 'text-danger'">
+                                        {{ incoterm.active ? 'Active' : 'Inactive'}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>{{ incoterm.datetimeCreated | date: 'dd/MM/yyyy'}}</span>
+                                </td>
+                                <td>
+                                    <span>{{ incoterm.userCreatedName}}</span>
+                                </td>
+
+
+                            </tr>
+                        </ng-container>
+                        <!--
+                        <tr app-table-row-loading *ngIf="isLoading"></tr>-->
+                    </tbody>
+                </table>
+            </div>
+
+            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                (onChange)="updatePagingData($event)"></app-pagination>
+            <!-- <div class="pagination-nav ">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="tatable__pager-size">
+                            <div class="select-box">
+                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
+                                    <ng-container *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
+                                        <option [ngValue]="item">{{item}} line / screen</option>
+                                    </ng-container>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                        <div class="float-right">
+                            <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
+                                (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]="10">
+                            </pagination>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
         </div>
     </div>
 </div>

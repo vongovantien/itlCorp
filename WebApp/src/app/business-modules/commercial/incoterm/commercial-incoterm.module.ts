@@ -11,7 +11,9 @@ import { CommercialCreateIncotermComponent } from './create/create-incoterm-comm
 import { CommercialDetailIncotermComponent } from './detail/detail-incoterm-commercial.component';
 import { CommercialFormIncotermComponent } from './components/form-incoterm/form-incoterm.component';
 import { CommercialListChargeIncotermComponent } from './components/list-charge/list-charge-incoterm.component';
-import { TabsModule } from 'ngx-bootstrap';
+import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
+import { TabsModule, PaginationModule } from 'ngx-bootstrap';
+
 
 const routing: Routes = [
     {
@@ -35,7 +37,8 @@ const routing: Routes = [
         CommercialCreateIncotermComponent,
         CommercialDetailIncotermComponent,
         CommercialFormIncotermComponent,
-        CommercialListChargeIncotermComponent
+        CommercialListChargeIncotermComponent,
+        CommercialFormSearchIncotermComponent
     ],
     imports: [
         SharedModule,
@@ -44,7 +47,8 @@ const routing: Routes = [
         SelectModule,
         ReactiveFormsModule,
         TabsModule.forRoot(),
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        PaginationModule.forRoot(),
     ],
     exports: [],
     providers: [],
