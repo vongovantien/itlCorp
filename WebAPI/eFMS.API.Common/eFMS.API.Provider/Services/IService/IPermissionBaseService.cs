@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
+using System;
 using System.Linq;
 
 namespace eFMS.API.Provider.Services.IService
@@ -9,5 +10,6 @@ namespace eFMS.API.Provider.Services.IService
         where TModel : class, new()
     {
         IQueryable<TModel> QueryByPermission(IQueryable<TModel> data, PermissionRange range, ICurrentUser currentUser);
+        bool CheckAllowPermissionAction(Guid id, PermissionRange range);
     }
 }

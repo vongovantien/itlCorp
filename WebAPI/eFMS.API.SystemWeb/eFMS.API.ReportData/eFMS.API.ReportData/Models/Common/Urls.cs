@@ -14,7 +14,7 @@
             public const string CatchargeUrl = "/api/v1/en-US/CatCharge/QueryExport";
             public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
             public const string CatChartOfAccountsUrl = "/api/v1/en-US/CatChartOfAccounts/QueryExport";
-            public const string CatIncotermListUrl = "/api/v1/en-US/CatIncoterm/Paging";
+            public const string CatIncotermListUrl = "/api/v1/en-US/CatIncoterm/QueryExport";
 
         }
         public class CustomClearance

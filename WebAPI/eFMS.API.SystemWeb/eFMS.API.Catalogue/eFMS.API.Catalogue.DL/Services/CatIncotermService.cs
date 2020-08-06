@@ -21,7 +21,7 @@ using System.Linq.Expressions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService, IPermissionBaseService<CatIncoterm, CatIncotermModel>
+    public class CatIncotermService : RepositoryBase<CatIncoterm, CatIncotermModel>, ICatIncotermService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -179,17 +179,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public bool CheckAllowDelete(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CheckAllowViewDetail(Guid id)
-        {
-
-            throw new NotImplementedException();
-        }
-
         public HandleState Delete(Guid Id)
         {
             throw new NotImplementedException();
@@ -211,7 +200,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             // Update permission
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
-            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
+            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
 
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
@@ -297,21 +286,21 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         private IQueryable<CatIncotermModel> GetQueryBy(CatIncotermCriteria criteria)
         {
-            Expression<Func<CatIncotermModel, bool>> query;
+            Expression<Func<CatIncotermModel, bool>> query = q => true;
             if (criteria.Service == null)
             {
                 if(criteria.Active == null)
                 {
                     query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
-                                        : "" == "")
+                                        : true)
                                         && (x.Active == true || x.Active == false));
                 }
                 else
                 {
                     query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
-                                        : "" == "")
+                                        : true)
                                         && (x.Active == criteria.Active));
                 }
             }
@@ -321,14 +310,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
-                                        : "" == "")
+                                        : true)
                                         && (x.Active == true || x.Active == false));
                 }
                 else
                 {
                     query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) >= 0
                                         && (criteria.Service != null && !string.IsNullOrEmpty(x.Service) ? criteria.Service.Any(val => x.Service.Contains(val.Trim(), StringComparison.OrdinalIgnoreCase))
-                                        : "" == "")
+                                        : true)
                                         && (x.Active == criteria.Active));
                 }
             }
@@ -365,6 +354,42 @@ namespace eFMS.API.Catalogue.DL.Services
                     break;
             }
             return data;
+        }
+
+        public bool CheckAllowPermissionAction(Guid id, PermissionRange range)
+        {
+            CatIncoterm incoterm = DataContext.Get(o => o.Id == id).FirstOrDefault();
+            if (incoterm == null)
+            {
+                return false;
+            }
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = incoterm.UserCreated,
+                CompanyId = incoterm.CompanyId,
+                DepartmentId = incoterm.DepartmentId,
+                OfficeId = incoterm.OfficeId,
+                GroupId = incoterm.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        public IQueryable<CatIncotermModel> QueryExport(CatIncotermCriteria criteria)
+        {
+            var data = GetQueryBy(criteria);
+            //
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+
+            data = QueryByPermission(data, permissionRangeList, _user);
+            //format
+            var result = FormatIncoterm(data);
+            return result;
         }
     }
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { CommercialCreateIncotermComponent } from '../create/create-incoterm-commercial.component';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -37,6 +36,7 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
                 takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
                     if (p.incotermId && UUID(p.incotermId)) {
+                        console.log(p.incotermId);
                         return p.incotermId;
                     }
                     return null;
@@ -74,8 +74,8 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
         this.listChargeSelling.isLoading = false;
         this.listChargeBuying.isLoading = false;
 
-        this.listChargeSelling.incotermCharges = data.sellings;
-        this.listChargeBuying.incotermCharges = data.buyings;
+        this.listChargeSelling.incotermCharges = data.sellings || [];
+        this.listChargeBuying.incotermCharges = data.buyings || [];
     }
 
     saveIncoterm(model: IncotermUpdateModel) {

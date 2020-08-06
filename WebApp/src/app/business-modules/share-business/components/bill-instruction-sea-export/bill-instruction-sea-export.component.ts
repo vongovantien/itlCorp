@@ -21,7 +21,7 @@ export class ShareBussinessBillInstructionSeaExportComponent extends AppForm imp
     consignees: any[] = [];
     shippers: any[] = [];
     ports: any[] = [];
-    termTypes: CommonInterface.INg2Select[];
+    termTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.FREIGHTTERMS;
     shippingInstruction: CsShippingInstruction;
 
     siRefNo: AbstractControl;

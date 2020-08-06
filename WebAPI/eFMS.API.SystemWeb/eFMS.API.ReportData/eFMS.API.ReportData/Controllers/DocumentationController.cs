@@ -352,7 +352,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SummaryOfCostsIncurredModel>>();
-            if (dataObjects.Result == null)
+            if (dataObjects.Result == null || !dataObjects.Result.Any())
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
@@ -378,7 +378,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
-            if (dataObjects.Result == null)
+            if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
