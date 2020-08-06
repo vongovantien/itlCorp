@@ -6,6 +6,7 @@ import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
+import { Permission403PopupComponent } from '@common';
 @Component({
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
@@ -13,6 +14,7 @@ import { SystemConstants } from '@constants';
 export class CommercialIncotermComponent extends AppList implements OnInit, IPermissionBase {
 
     @ViewChild("formSearch", { static: false }) formSearch: CommercialFormSearchIncotermComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
 
     incoterms: IncotermModel[];
 
@@ -51,10 +53,11 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
     }
 
     getIncotermListPaging() {
+        this.isLoading = true;
         this._catalogueRepo.getIncotermListPaging(this.page, this.pageSize, Object.assign({}, this.criteria))
             .pipe(
                 catchError(this.catchError),
-                // finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+                finalize(() => { this.isLoading = false; }),
                 map((res: any) => {
                     return {
                         data: res.data,
@@ -96,6 +99,39 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
             .subscribe(
                 (res: Blob) => {
                     this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'incoterm-list.xlsx');
+                }
+            );
+    }
+
+    handleClickDetailItem(incotermId: string) {
+        this._catalogueRepo.checkAllowGetDetailIncoterm(incotermId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+
+                    } else {
+                        this.permissionPopup.show();
+                    }
+                }
+            );
+
+    }
+
+    handleClickDeleteItem(incotermId: string) {
+        this._catalogueRepo.checkAllowDeleteIncoterm(incotermId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res) {
+
+                    } else {
+                        this.permissionPopup.show();
+                    }
                 }
             );
     }

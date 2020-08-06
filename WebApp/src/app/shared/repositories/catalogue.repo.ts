@@ -1127,7 +1127,7 @@ export class CatalogueRepo {
     }
     //
     getIncotermListPaging(page: number, size: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Paging/`, body, {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Paging`, body, {
             page: '' + page,
             size: '' + size
         })
@@ -1140,6 +1140,17 @@ export class CatalogueRepo {
         );
 
     }
+    //
+    checkAllowGetDetailIncoterm(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
+    checkAllowDeleteIncoterm(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }
