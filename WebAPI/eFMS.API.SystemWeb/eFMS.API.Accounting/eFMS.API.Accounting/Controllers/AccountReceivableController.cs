@@ -5,7 +5,11 @@ using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
+using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -42,10 +46,30 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(accountReceivableService.Get());
         }
 
+        /// <summary>
+        /// Calculator Receivable
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost("CalculatorReceivable")]
+        [Authorize]
         public IActionResult CalculatorReceivable(AccAccountReceivableModel model)
         {
-            return Ok();
+            var receivable = accountReceivableService.Get(x => x.PartnerId == model.PartnerId && x.Office == model.Office && x.Service == model.Service).FirstOrDefault();
+            HandleState hs;
+            var message = string.Empty;
+            if (receivable == null)
+            {
+                hs = accountReceivableService.AddReceivable(model);
+                message = HandleError.GetMessage(hs, Crud.Insert);
+            }
+            else
+            {
+                hs = accountReceivableService.UpdateReceivable(receivable);
+                message = HandleError.GetMessage(hs, Crud.Update);
+            }
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            return Ok(result);
         }
         
     }
