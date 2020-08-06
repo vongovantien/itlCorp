@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
+import { AppList, IPermissionBase } from 'src/app/app.list';
 import { Incoterm, IncotermModel } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { SystemConstants } from '@constants';
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
 })
-export class CommercialIncotermComponent extends AppList implements OnInit {
+export class CommercialIncotermComponent extends AppList implements OnInit, IPermissionBase {
 
     @ViewChild("formSearch", { static: false }) formSearch: CommercialFormSearchIncotermComponent;
 
@@ -26,6 +26,16 @@ export class CommercialIncotermComponent extends AppList implements OnInit {
         this.requestList = this.getIncotermListPaging;
         this.requestSort = this.sortIncotermList;
     }
+
+    checkAllowDetail(T: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    checkAllowDelete(T: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+
 
     ngOnInit(): void {
         this.headers = [
