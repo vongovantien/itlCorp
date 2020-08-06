@@ -385,8 +385,8 @@ namespace eFMS.API.Documentation.DL.Services
                 PortLading = model.PolName?.ToUpper() ?? string.Empty,
                 PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
-                Shipper = !string.IsNullOrEmpty( airwayBill.ShipperDescription) ? airwayBill.ShipperDescription :  DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
-                Consignee = !string.IsNullOrEmpty(airwayBill.ConsigneeDescription) ? airwayBill.ConsigneeDescription : agentName,
+                Shipper =  !string.IsNullOrEmpty(airwayBill?.ShipperDescription) && airwayBill?.ShipperDescription != "" ? airwayBill.ShipperDescription :  DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
+                Consignee = !string.IsNullOrEmpty(airwayBill?.ConsigneeDescription) && airwayBill?.ConsigneeDescription != "" ? airwayBill.ConsigneeDescription : agentName,
                 Contact = currentUser.UserName
             };
             result = new Crystal
