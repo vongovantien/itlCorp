@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICurrentUser currentUser;
         readonly ICsTransactionDetailService transactionDetailService;
         readonly IContextBase<CatPartner> partnerRepository;
+        readonly IContextBase<CsAirWayBill> airwayBillRepository;
         public CsManifestService(IContextBase<CsManifest> repository, 
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -37,7 +38,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
-            IContextBase<CatPartner> partnerRepo) : base(repository, mapper)
+            IContextBase<CatPartner> partnerRepo,
+            IContextBase<CsAirWayBill> airwaybillRepo) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -48,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
             currentUser = currUser;
             transactionDetailService = transDetailService;
             partnerRepository = partnerRepo;
+            airwayBillRepository = airwaybillRepo;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -326,6 +329,7 @@ namespace eFMS.API.Documentation.DL.Services
             string agentName = string.Empty;
             var transaction = csTransactionService.GetDetails(model.JobId);//csTransactionService.GetById(model.JobId);
             var agent = transaction.AgentId != null ? partnerRepository.Get(x => x.Id == transaction.AgentId)?.FirstOrDefault() : null;
+            var airwayBill = airwayBillRepository.Get(x => x.JobId == model.JobId).FirstOrDefault();
             if(agent != null) {
                 agentName = agent.PartnerNameEn;
                 if (!string.IsNullOrEmpty(agent.AddressEn))
@@ -381,8 +385,8 @@ namespace eFMS.API.Documentation.DL.Services
                 PortLading = model.PolName?.ToUpper() ?? string.Empty,
                 PortUnlading = model.PodName?.ToUpper() ?? string.Empty,
                 FlightDate = transaction.FlightDate == null?string.Empty: transaction.FlightDate.Value.ToString("MMM dd, yyyy"),
-                Shipper = DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
-                Consignee = agentName,
+                Shipper = !string.IsNullOrEmpty( airwayBill.ShipperDescription) ? airwayBill.ShipperDescription :  DocumentConstants.COMPANY_NAME + "\n" + DocumentConstants.COMPANY_ADDRESS1,
+                Consignee = !string.IsNullOrEmpty(airwayBill.ConsigneeDescription) ? airwayBill.ConsigneeDescription : agentName,
                 Contact = currentUser.UserName
             };
             result = new Crystal
