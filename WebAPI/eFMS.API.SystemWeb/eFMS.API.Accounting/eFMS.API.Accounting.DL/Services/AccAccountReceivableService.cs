@@ -517,8 +517,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                 && x.PartnerId == model.PartnerId
                                                                 && x.OfficeId == model.Office.ToString()
-                                                                && x.SaleService.Contains(model.Service)
-                                                                && x.SaleManId == model.SaleMan).FirstOrDefault();
+                                                                && x.SaleService.Contains(model.Service)).FirstOrDefault();
 
                 if (contractPartner == null)
                 {
@@ -614,8 +613,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                 && x.PartnerId == model.PartnerId
                                                                 && x.OfficeId == model.Office.ToString()
-                                                                && x.SaleService.Contains(model.Service)
-                                                                && x.SaleManId == model.SaleMan).FirstOrDefault();
+                                                                && x.SaleService.Contains(model.Service)).FirstOrDefault();
 
                 if (contractPartner == null)
                 {
