@@ -56,5 +56,6 @@ namespace eFMS.API.Documentation.Service.Models
         public Guid? AcctManagementId { get; set; }
         public Guid? ChargeGroup { get; set; }
         public string TransactionType { get; set; }
+        public Guid? OfficeId { get; set; }
     }
 }

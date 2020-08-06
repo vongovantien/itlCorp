@@ -1710,6 +1710,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
                 entity.Property(e => e.PaySoano)
                     .HasColumnName("PaySOANo")
                     .HasMaxLength(50)
