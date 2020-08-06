@@ -239,8 +239,19 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = GetQueryBy(criteria);
+            //
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+
+            data = QueryByPermission(data, permissionRangeList, _user);
+            //format
             var result = FormatIncoterm(data);
             rowsCount = result.Count();
+            if(page == 0)
+            {
+                page = 1;
+                size = rowsCount;
+            }
             return result.Skip((page - 1)*size).Take(size);
         }
         

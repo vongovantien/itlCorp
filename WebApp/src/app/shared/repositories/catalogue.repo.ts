@@ -1132,6 +1132,14 @@ export class CatalogueRepo {
             size: '' + size
         })
     }
+    //
+    downloadIncotermListExcel(body: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+
+    }
 
 
 }

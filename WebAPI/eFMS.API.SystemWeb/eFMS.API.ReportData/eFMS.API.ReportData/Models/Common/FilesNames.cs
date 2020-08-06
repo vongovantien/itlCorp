@@ -20,6 +20,7 @@
         public const string DepartmentName = "Department List.xlsx";
         public const string GroupName = "Group List.xlsx";
         public const string UserName = "User List.xlsx";
+        public const string IncotermList = "Incoterm List.xlsx";
 
     }
 }

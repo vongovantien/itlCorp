@@ -4,6 +4,8 @@ import { Incoterm, IncotermModel } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
+import { SortService } from '@services';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
@@ -18,9 +20,11 @@ export class CommercialIncotermComponent extends AppList implements OnInit {
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
+        private _sortService: SortService,
     ) {
         super();
         this.requestList = this.getIncotermListPaging;
+        this.requestSort = this.sortIncotermList;
     }
 
     ngOnInit(): void {
@@ -70,6 +74,20 @@ export class CommercialIncotermComponent extends AppList implements OnInit {
         this.criteria = event;
         this.formSearch.initForm();
         this.getIncotermListPaging();
+    }
+
+    sortIncotermList(sortField: string, order: boolean) {
+        this.incoterms = this._sortService.sort(this.incoterms, sortField, order);
+    }
+
+    exportExcel() {
+        console.log("criteria in export: ", this.criteria);
+        this._catalogueRepo.downloadIncotermListExcel(this.criteria)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'incoterm-list.xlsx');
+                }
+            );
     }
 }
 

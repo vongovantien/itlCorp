@@ -47,10 +47,15 @@ namespace eFMS.API.Catalogue.Controllers
         }
         [HttpPost]
         [Route("Paging")]
-        
+        [Authorize]
         public IActionResult Paging(CatIncotermCriteria criteria, int page, int size)
         {
             var data = catIncotermService.Paging(criteria, page, size, out int rowsCount);
+            //export excel
+            if(page == 0)
+            {
+                return Ok(data);
+            }
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
