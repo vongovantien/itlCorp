@@ -742,7 +742,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return hs;
         }
-        
+
         public HandleState CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
@@ -756,7 +756,10 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
-                var surchargeIds = model.ObjectReceivable.Where(x => string.IsNullOrEmpty(x.PartnerId) && (x.Office == null || x.Office == Guid.Empty) && string.IsNullOrEmpty(x.Service)).Select(s => s.SurchargeId).ToList();
+                var surchargeIds = model.ObjectReceivable.Where(x => (x.SurchargeId != null && x.SurchargeId != Guid.Empty)
+                                                                  && string.IsNullOrEmpty(x.PartnerId)
+                                                                  && (x.Office == null || x.Office == Guid.Empty)
+                                                                  && string.IsNullOrEmpty(x.Service)).Select(s => s.SurchargeId).ToList();
                 if (surchargeIds.Count() > 0)
                 {
                     var objectReceivables = GetObjectReceivableBySurchargeId(surchargeIds);
@@ -780,13 +783,13 @@ namespace eFMS.API.Accounting.DL.Services
             #region --- OPERATION ---
             var operations = opsRepo.Get();
             var objOpsPO = from surcharge in surcharges
-                               join operation in operations on surcharge.Hblid equals operation.Hblid
-                               where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                               select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = operation.OfficeId, Service = "CL" };
+                           join operation in operations on surcharge.Hblid equals operation.Hblid
+                           where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+                           select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = operation.OfficeId, Service = "CL" };
             var objOpsPR = from surcharge in surcharges
-                               join operation in operations on surcharge.Hblid equals operation.Hblid
-                               where !string.IsNullOrEmpty(surcharge.PayerId)
-                               select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = operation.OfficeId, Service = "CL" };
+                           join operation in operations on surcharge.Hblid equals operation.Hblid
+                           where !string.IsNullOrEmpty(surcharge.PayerId)
+                           select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = operation.OfficeId, Service = "CL" };
             var objOps = objOpsPO.Union(objOpsPR);
             #endregion --- OPERATION ---
 
@@ -794,16 +797,16 @@ namespace eFMS.API.Accounting.DL.Services
             var transDetails = transactionDetailRepo.Get();
             var transactions = transactionRepo.Get();
             var objDocPO = from surcharge in surcharges
-                               join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
-                               join trans in transactions on transDetail.JobId equals trans.Id
-                               where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                               select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = transDetail.OfficeId, Service = trans.TransactionType };
+                           join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                           join trans in transactions on transDetail.JobId equals trans.Id
+                           where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+                           select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = transDetail.OfficeId, Service = trans.TransactionType };
 
             var objDocPR = from surcharge in surcharges
-                               join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
-                               join trans in transactions on transDetail.JobId equals trans.Id
-                               where !string.IsNullOrEmpty(surcharge.PayerId)
-                               select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = transDetail.OfficeId, Service = trans.TransactionType };
+                           join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
+                           join trans in transactions on transDetail.JobId equals trans.Id
+                           where !string.IsNullOrEmpty(surcharge.PayerId)
+                           select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = transDetail.OfficeId, Service = trans.TransactionType };
             var objDoc = objDocPO.Union(objDocPR);
             #endregion --- DOCUMENTATION ---
 

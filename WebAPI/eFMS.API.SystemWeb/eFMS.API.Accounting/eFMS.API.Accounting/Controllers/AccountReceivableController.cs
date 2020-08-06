@@ -40,6 +40,10 @@ namespace eFMS.API.Accounting.Controllers
             accountReceivableService = accountReceivable;
         }
 
+        /// <summary>
+        /// Get All Account Receivable
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
