@@ -54,6 +54,29 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpDelete]
+        [Route("delete/{id}")]
+        [Authorize]
+        public IActionResult Delete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            if (!catIncotermService.CheckAllowPermissionAction(id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            HandleState hs = catIncotermService.Delete(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         [HttpPost]
         [Route("Add")]
         [Authorize]
@@ -135,7 +158,6 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-
         [HttpGet]
         [Route("GetById/{id}")]
         [Authorize]
@@ -145,6 +167,36 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            var charge = catIncotermService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            return Ok(catIncotermService.CheckAllowPermissionAction(id, permissionRange));
+        }
+
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            var charge = catIncotermService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            return Ok(catIncotermService.CheckAllowPermissionAction(id, permissionRange));
+        }
         private bool CheckExisIncoterm(Guid Id, string code)
         {
             bool isDuplicate = false;

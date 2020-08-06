@@ -6,10 +6,11 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Linq;
 using eFMS.API.Catalogue.Models;
+using eFMS.API.Provider.Services.IService;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatIncotermService : IRepositoryBase<CatIncoterm, CatIncotermModel>
+    public interface ICatIncotermService : IRepositoryBase<CatIncoterm, CatIncotermModel>, IPermissionBaseService<CatIncoterm, CatIncotermModel>
     {
         IQueryable<CatIncotermModel> Query(CatIncotermCriteria criteria);
         IQueryable<CatIncotermModel> Paging(CatIncotermCriteria criteria, int page, int size, out int rowsCount);
@@ -17,7 +18,6 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState AddNew(CatIncotermEditModel model);
         HandleState Delete(Guid Id);
         CatIncotermEditModel GetDetail(Guid id);
-        bool CheckAllowDelete(Guid id);
-        bool CheckAllowViewDetail(Guid id);
+       
     }
 }
