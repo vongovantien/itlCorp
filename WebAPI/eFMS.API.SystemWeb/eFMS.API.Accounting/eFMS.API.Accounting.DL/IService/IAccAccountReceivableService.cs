@@ -12,5 +12,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         HandleState AddReceivable(AccAccountReceivableModel model);
         HandleState UpdateReceivable(AccAccountReceivableModel model);
+        HandleState InsertOrUpdateReceivable(ObjectReceivableModel model);
+        HandleState CalculatorReceivable(CalculatorReceivableModel model);
     }
 }

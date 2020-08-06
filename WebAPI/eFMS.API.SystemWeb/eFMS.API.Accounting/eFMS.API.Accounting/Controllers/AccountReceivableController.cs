@@ -53,24 +53,23 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost("CalculatorReceivable")]
         [Authorize]
-        public IActionResult CalculatorReceivable(AccAccountReceivableModel model)
+        public IActionResult CalculatorReceivable(CalculatorReceivableModel model)
         {
-            var receivable = accountReceivableService.Get(x => x.PartnerId == model.PartnerId && x.Office == model.Office && x.Service == model.Service).FirstOrDefault();
-            HandleState hs;
-            var message = string.Empty;
-            if (receivable == null)
-            {
-                hs = accountReceivableService.AddReceivable(model);
-                message = HandleError.GetMessage(hs, Crud.Insert);
-            }
-            else
-            {
-                hs = accountReceivableService.UpdateReceivable(receivable);
-                message = HandleError.GetMessage(hs, Crud.Update);
-            }
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            return Ok(result);
+            var calculatorReceivable = accountReceivableService.CalculatorReceivable(model);
+            return Ok(calculatorReceivable);
         }
-        
+
+        /// <summary>
+        /// Insert Or Update Receivable
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("InsertOrUpdateReceivable")]
+        [Authorize]
+        public IActionResult InsertOrUpdateReceivable(ObjectReceivableModel model)
+        {
+            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(model);
+            return Ok(insertOrUpdateReceivable);
+        }
     }
 }
