@@ -42,6 +42,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<AcctSoa> soaRepo;
+        private readonly IContextBase<CatContract> catContractRepository;
+
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -63,6 +65,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSettlementPayment> settlementPayment,
             IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<SysEmployee> employee,
+            IContextBase<CatContract> catContractRepo,
+
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -84,6 +88,7 @@ namespace eFMS.API.Accounting.DL.Services
             employeeRepo = employee;
             stringLocalizer = localizer;
             soaRepo = soa;
+            catContractRepository = catContractRepo;
         }
 
         #region --- DELETE ---
@@ -1563,6 +1568,45 @@ namespace eFMS.API.Accounting.DL.Services
             isExited = DataContext.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.VoucherId != voucherId && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
 
             return isExited;
+        }
+
+        public CatContractInvoiceModel GetContractForInvoice(AccMngtContractInvoiceCriteria model)
+        {
+            string acRef = null;
+            CatContractInvoiceModel result = new CatContractInvoiceModel { };
+
+            CatPartner partner = partnerRepo.Get(p => p.AccountNo == model.PartnerId)?.FirstOrDefault();
+            if(partner == null)
+            {
+                return result;
+            }
+
+            if(!string.IsNullOrEmpty(partner.ParentId))
+            {
+                acRef = partner.ParentId;
+            }
+            else
+            {
+                acRef = partner.Id; // Đối tượng công nợ là chính nó
+            }
+            CatPartner partnerRef = partnerRepo.Get(p => p.Id == acRef)?.FirstOrDefault();
+
+
+            Expression<Func<CatContract, bool>> queryContractByCriteria = null;
+            queryContractByCriteria = x => (
+            (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
+            && (x.SaleService.Contains(model.Service) && x.PartnerId == partnerRef.Id));
+
+            IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);
+
+            if(agreements != null && agreements.Count() > 0)
+            {
+                result.ContractNo = agreements.FirstOrDefault().ContractNo;
+                result.ContractType = agreements.FirstOrDefault().ContractType;
+                result.PaymentTerm = agreements.FirstOrDefault().PaymentTerm;
+            }
+
+            return result;
         }
     }
 }
