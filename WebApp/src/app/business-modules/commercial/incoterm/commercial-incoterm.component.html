@@ -44,11 +44,9 @@
                             <tr *ngFor="let incoterm of incoterms;let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <app-permission-button type="detail"
-                                            (click)="handleClickDetailItem(incoterm.id)">
+                                        <app-permission-button type="detail" (click)="checkAllowDetail(incoterm.id)">
                                         </app-permission-button>
-                                        <app-permission-button type="delete"
-                                            (click)="handleClickDeleteItem(incoterm.id)">
+                                        <app-permission-button type="delete" (click)="checkAllowDelete(incoterm.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>
@@ -90,4 +88,5 @@
         </div>
     </div>
 </div>
+<confirm-popup body="You want to delete this incoterm ?" (onSubmit)="onDelete()"></confirm-popup>
 <permission-403-popup></permission-403-popup>
