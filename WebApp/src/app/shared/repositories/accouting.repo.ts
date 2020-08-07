@@ -605,6 +605,20 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    // Tính công nợ theo {surchargeId, partnerId, office, service}
+    calculatorReceivable(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    // Tính công nợ theo {partnerId, office, service}
+    insertOrUpdateReceivable(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/InsertOrUpdateReceivable`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 
