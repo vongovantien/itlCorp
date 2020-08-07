@@ -170,6 +170,20 @@
             <param name="localizer"></param>
             <param name="accountReceivable"></param>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivable(eFMS.API.Accounting.DL.Models.CalculatorReceivableModel)">
+            <summary>
+            Calculator Receivable
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(eFMS.API.Accounting.DL.Models.ObjectReceivableModel)">
+            <summary>
+            Insert Or Update Receivable
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

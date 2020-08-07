@@ -1776,6 +1776,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.TransactionType).HasMaxLength(10);
+
                 entity.Property(e => e.Type)
                     .IsRequired()
                     .HasMaxLength(50)
