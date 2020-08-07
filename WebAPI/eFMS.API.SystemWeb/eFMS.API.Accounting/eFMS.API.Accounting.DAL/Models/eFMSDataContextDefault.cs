@@ -750,6 +750,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.ProductDept)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")
                     .HasMaxLength(250)
