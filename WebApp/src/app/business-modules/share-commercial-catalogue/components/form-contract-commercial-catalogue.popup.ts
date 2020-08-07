@@ -78,6 +78,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     files: any = {};
 
+    serviceNames: string = '';
+
     menuSpecialPermission: Observable<any[]>;
 
     listCurrency: Observable<CommonInterface.INg2Select[]>;
@@ -90,14 +92,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
-        { id: "Air Import", text: "Air Import" },
-        { id: "Air Export", text: "Air Export" },
-        { id: "Sea FCL Export", text: "Sea FCL Export" },
-        { id: "Sea LCL Export", text: "Sea LCL Export" },
-        { id: "Sea FCL Import", text: "Sea FCL Import" },
-        { id: "Sea LCL Import", text: "Sea LCL Import" },
-        { id: "Custom Logistic", text: "Custom Logistic" },
-        { id: "Trucking", text: "Trucking" }
+        { id: "AI", text: "Air Import" },
+        { id: "AE", text: "Air Export" },
+        { id: "SFE", text: "Sea FCL Export" },
+        { id: "SLE", text: "Sea LCL Export" },
+        { id: "SFI", text: "Sea FCL Import" },
+        { id: "SLI", text: "Sea LCL Import" },
+        { id: "CL", text: "Custom Logistic" },
+        { id: "IT", text: "Trucking" }
     ];
 
 
@@ -410,7 +412,26 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
                     this.selectedContract.officeNameEn = !!obj ? obj.text : null;
                 }
+
+                if (this.selectedContract.saleService.includes(';')) {
+                    const arrayOffice = this.selectedContract.saleService.split(';');
+                    this.selectedContract.saleServiceName = '';
+                    arrayOffice.forEach(itemOffice => {
+                        this.selectedContract.saleServiceName += this.serviceTypes.find(x => x.id === itemOffice).text + "; ";
+                    });
+                    if (this.selectedContract.saleServiceName.charAt(this.selectedContract.saleServiceName.length - 2) === ';') {
+                        this.selectedContract.saleServiceName = this.selectedContract.saleServiceName.substr(0, this.selectedContract.saleServiceName.length - 2);
+                    }
+                }
+                else {
+                    this.selectedContract.saleServiceName = this.selectedContract.saleService.toLowerCase();
+                    const obj = this.serviceTypes.find(x => x.id === this.selectedContract.saleService);
+
+                    this.selectedContract.saleServiceName = !!obj ? obj.text : null;
+                }
+
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
+
                 this.selectedContract.fileList = this.fileList;
                 const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
                 if (!objCheckContract) {
@@ -426,7 +447,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         }
     }
-
 
     getCurrentActiveService(Service: any) {
         const listService = Service.split(";");
@@ -529,6 +549,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
         if (this.officeId.value[0].id === 'All') {
             this.selectedContract.officeId = this.mapOfficeId();
+        }
+        if (this.saleService.value[0].id === 'All') {
+            this.selectedContract.saleService = this.mapServiceId();
+        }
+        if (this.vas.value != null && this.vas.value[0].id === 'All') {
+            this.selectedContract.vas = this.mapVas();
         }
         if (this.contractType.value[0].id === 'Trial' && !this.isUpdate) {
             if (!!this.effectiveDate.value.startDate) {
@@ -665,6 +691,20 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const off = this.offices.filter(office => office.id !== 'All');
         officeId = off.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         return officeId;
+    }
+
+    mapServiceId() {
+        let serviceId = '';
+        const serv = this.serviceTypes.filter(service => service.id !== 'All');
+        serviceId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+        return serviceId;
+    }
+
+    mapVas() {
+        let vasId = '';
+        const serv = this.vaslst.filter(vas => vas.id !== 'All');
+        vasId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+        return vasId;
     }
 
     close() {
