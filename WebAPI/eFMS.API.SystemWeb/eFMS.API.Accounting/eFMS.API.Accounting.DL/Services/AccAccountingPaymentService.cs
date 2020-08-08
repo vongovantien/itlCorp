@@ -551,11 +551,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
-            var partners = partnerRepository.Get();
-            var invoices = accountingManaRepository.Get();
+            IQueryable<CatPartner> partners = partnerRepository.Get();
+            IQueryable<AccAccountingManagement> invoices = accountingManaRepository.Get();
+
             list.ForEach(item =>
             {
-                var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
+                CatPartner partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
                 if(partner == null)
                 {
                     item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
@@ -563,11 +564,17 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
+                    item.PartnerName = partner.ShortName;
                     var accountManagement = invoices.FirstOrDefault(x => x.Serie == item.SerieNo && x.InvoiceNoReal == item.InvoiceNo && x.PartnerId == partner.Id);
                     if (accountManagement == null)
                     {
                         item.PartnerAccountError = "Not found " + item.SerieNo + " and " + item.InvoiceNo + " of " + item.PartnerAccount;
                         item.IsValid = false;
+                    }
+                    else if (accountManagement.Currency != item.CurrencyId)
+                    {
+                        item.IsValid = false;
+                        item.CurrencyIdError = "Currency not match with invoice";
                     }
                     else
                     {
@@ -580,7 +587,8 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             item.PartnerId = partner.Id;
                             item.RefId = accountManagement.Id.ToString();
-                            var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
+
+                            AccAccountingPayment lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
                             if (lastItem != null)
                             {
                                 if (item.PaidDate < lastItem.PaidDate)

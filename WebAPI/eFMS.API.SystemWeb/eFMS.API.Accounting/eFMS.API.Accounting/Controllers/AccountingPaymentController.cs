@@ -127,15 +127,21 @@ namespace eFMS.API.Accounting.Controllers
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
             {
+                int totalValidRows = 0;
+
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest();
+
                 List<AccountingPaymentImportModel> list = new List<AccountingPaymentImportModel>();
                 list = ReadInvoicePaymentData(worksheet, rowCount);
-                
-                var data = accountingPaymentService.CheckValidImportInvoicePayment(list);
-                int totalValidRows = 0;
+                if(list.Any(x => x.IsValid == false))
+                {
+                    totalValidRows = list.Count(x => x.IsValid == true);
+                    return Ok(new { data = list, totalValidRows });
+                }
+                List<AccountingPaymentImportModel> data = accountingPaymentService.CheckValidImportInvoicePayment(list);
                 if (data != null)
                 {
                     totalValidRows = data.Count(x => x.IsValid == true);
@@ -196,7 +202,7 @@ namespace eFMS.API.Accounting.Controllers
                     var checkPaymentAmount = decimal.TryParse(worksheet.Cells[row, 5].Value.ToString(), out decimal paymentAmount);
                     if (checkPaymentAmount == false)
                     {
-                        payment.PaymentAmountError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_EMPTY].Value;
+                        payment.PaymentAmountError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_AMOUNT_ACCOUNTING_PAYMENT_MUST_BE_NUMBER].Value;
                         payment.IsValid = false;
                     }
                     else
@@ -204,14 +210,53 @@ namespace eFMS.API.Accounting.Controllers
                         payment.PaymentAmount = paymentAmount;
                     }
                 }
-                if (worksheet.Cells[row, 6].Value == null)
+                if (worksheet.Cells[row, 6].Value == null){
+                    payment.CurrencyIdError = stringLocalizer[AccountingLanguageSub.MSG_CURRENCY_ACCOUNTING_PAYMENT_EMPTY].Value;
+                    payment.IsValid = false;
+                }
+                else
+                {
+                    payment.CurrencyId = worksheet.Cells[row, 6].Value.ToString();
+                }
+                if (worksheet.Cells[row, 7].Value != null)
+                {
+                    var checkExchangeRate = decimal.TryParse(worksheet.Cells[row, 7].Value.ToString(), out decimal exchangeRate);
+                    if (!checkExchangeRate)
+                    {
+                        payment.ExchangeRateError = stringLocalizer[AccountingLanguageSub.MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID, worksheet.Cells[row,7].Value.ToString()].Value;
+                        payment.IsValid = false;
+                    }
+                    else
+                    {
+                        payment.ExchangeRate = exchangeRate;
+                    }
+                }
+                if(worksheet.Cells[row,8].Value == null)
+                {
+                    payment.IsValid = false;
+                    payment.PaymentMethodError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_EMPTY].Value;
+                }
+                else
+                {
+                    string paymentMethod = worksheet.Cells[row, 8].Value.ToString();
+                    if (paymentMethod.ToLower() == "cash" || paymentMethod.ToLower() == "bank transfer")
+                    {
+                        payment.PaymentMethod = worksheet.Cells[row, 8].Value.ToString();
+                    }
+                    else
+                    {
+                        payment.PaymentMethodError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_INVALID, worksheet.Cells[row, 8].Value.ToString()].Value;
+                        payment.IsValid = false;
+                    }
+                }
+                if (worksheet.Cells[row, 9].Value == null)
                 {
                     payment.PaidDateError = stringLocalizer[AccountingLanguageSub.MSG_PAIDDATE_ACCOUNTING_PAYMENT_EMPTY].Value;
                     payment.IsValid = false;
                 }
                 else
                 {
-                    if (DateTime.TryParse(worksheet.Cells[row, 6].Value.ToString(), out DateTime dDate))
+                    if (DateTime.TryParse(worksheet.Cells[row, 9].Value.ToString(), out DateTime dDate))
                     {
                         payment.PaidDate = dDate;
                     }
@@ -221,17 +266,17 @@ namespace eFMS.API.Accounting.Controllers
                         payment.IsValid = false;
                     }
                 }
-                if (worksheet.Cells[row, 7].Value == null)
+                if (worksheet.Cells[row, 10].Value == null)
                 {
                     payment.PaymentTypeError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY].Value;
                     payment.IsValid = false;
                 }
                 else
                 {
-                    string paymentType = worksheet.Cells[row, 7].Value.ToString();
+                    string paymentType = worksheet.Cells[row, 10].Value.ToString();
                     if (paymentType == "Net Off" || paymentType == "Normal")
                     {
-                        payment.PaymentType = worksheet.Cells[row, 7].Value.ToString();
+                        payment.PaymentType = worksheet.Cells[row, 10].Value.ToString();
                     }
                     else
                     {
@@ -239,6 +284,9 @@ namespace eFMS.API.Accounting.Controllers
                         payment.IsValid = false;
                     }
                 }
+
+                payment.Note = worksheet.Cells[row, 11].Value.ToString();
+
                 list.Add(payment);
             }
             return list;

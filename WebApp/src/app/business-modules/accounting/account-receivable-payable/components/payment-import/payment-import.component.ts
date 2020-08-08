@@ -1,30 +1,32 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PagingService, SortService } from '@services';
-import { SystemConstants } from '@constants';
-import { finalize, catchError } from 'rxjs/operators';
 import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
+import { AppList } from 'src/app/app.list';
+
+import cloneDeep from 'lodash/cloneDeep';
+import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'payment-import',
     templateUrl: './payment-import.component.html'
 })
-export class PaymentImportComponent extends AppPage implements OnInit {
+export class PaymentImportComponent extends AppList implements OnInit {
+
     @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
-    pager: PagerSetting = PAGINGSETTING;
-    isShowInvalid: boolean = true;
-    inValidItems: any[] = [];
-    data: any[];
-    pagedItems: any[] = [];
-    sortKey: string = '';
-    isDesc = true;
+
+    inValidItems: IInvoicePaymentImport[] = [];
+    data: IInvoicePaymentImport[];
+    pagedItems: IInvoicePaymentImport[] = [];
+
     totalRows: number = 0;
     totalValidRows: number = 0;
+
+    startIndex: number = 0;
+
+    isShowInvalid: boolean = true;
 
     constructor(private pagingService: PagingService,
         private sortService: SortService,
@@ -33,61 +35,65 @@ export class PaymentImportComponent extends AppPage implements OnInit {
         private _toastService: ToastrService) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortList;
+        this.requestList = this.onPaging;
+
     }
 
     ngOnInit() {
+        this.headers = [
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Serie No', field: 'serieNo', sortable: true },
+            { title: 'Partner ID', field: 'partnerAccount', sortable: true },
+            { title: 'Partner Name', field: 'partnerName', sortable: true },
+            { title: 'Payment Amount', field: 'paymentAmount', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Paid Date', field: 'paidDate', sortable: true },
+            { title: 'Payment Type', field: 'paymentType', sortable: true },
+            { title: 'Note', field: 'note', sortable: true },
+        ];
     }
 
-    selectPageSize() {
-        this.pager.currentPage = 1;
-        if (!!this.data) {
-            if (this.isShowInvalid) {
-                this.pager.totalItems = this.data.length;
-                this.pagingData(this.data);
+    pagingData(totalItem: number, currentPage: number) {
+        const dataPaging: {
+            startIndex: number,
+            endIndex: number,
+            pageSize: number,
+            totalItems: number
+        } = this.pagingService.getPager(totalItem, currentPage, this.pageSize);
 
-            } else {
-                this.inValidItems = this.data.filter(x => !x.isValid);
-                this.pagingData(this.inValidItems);
-                this.pager.totalItems = this.inValidItems.length;
-            }
-        }
+        this.pagedItems = this.data.slice(dataPaging.startIndex, dataPaging.endIndex + 1);
+        this.totalItems = dataPaging.totalItems;
+        this.startIndex = dataPaging.startIndex;
     }
 
-    pageChanged(event: any): void {
-        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
-            this.pager.currentPage = event.page;
-            this.pager.pageSize = event.itemsPerPage;
+    onPaging(property: string) {
+        this.pagingData(this.data.length, this.page);
+    }
 
-            this.pagingData(this.data);
-        }
+    sortList() {
+        this.pagedItems = this.sortService.sort(this.pagedItems, this.sort, this.order);
     }
-    pagingData(data: any[]) {
-        this.pager = this.pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
-        this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
-        this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-        this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-        console.log(this.pagedItems);
-    }
-    sort(property: string) {
-        this.isDesc = !this.isDesc;
-        this.sortKey = property;
-        this.pagedItems = this.sortService.sort(this.pagedItems, property, this.isDesc);
-    }
+
     hideInvalid() {
-        if (this.data == null) { return; }
+        if (!this.data.length) { return; }
         this.isShowInvalid = !this.isShowInvalid;
-        this.sortKey = '';
+
         if (this.isShowInvalid) {
-            this.pager.totalItems = this.data.length;
-            this.pagingData(this.data);
+            this.pagedItems = cloneDeep(this.data);
+            this.totalItems = this.pagedItems.length;
+
         } else {
-            this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pagingData(this.inValidItems);
-            this.pager.totalItems = this.inValidItems.length;
+            const invalidData = this.data.filter(x => !x.isValid);
+            this.pagedItems.length = 0;
+            this.pagedItems = invalidData;
+            this.totalItems = invalidData.length;
         }
     }
+
     chooseFile(file: Event) {
-        this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
         this._progressRef.start();
         this.accoutingRepo.upLoadInvoicePaymentFile(file.target['files'])
@@ -98,12 +104,15 @@ export class PaymentImportComponent extends AppPage implements OnInit {
             )
             .subscribe((response: any) => {
                 this.data = response.data;
-                console.log(this.data);
-                this.pager.currentPage = 1;
-                this.pager.totalItems = this.data.length;
+                this.pagedItems = cloneDeep(this.data);
+
+                this.page = 1;
+                this.totalItems = this.data.length;
+
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
-                this.pagingData(this.data);
+
+                this.pagingData(this.data.length, this.page);
             }, () => {
             });
     }
@@ -116,20 +125,19 @@ export class PaymentImportComponent extends AppPage implements OnInit {
                 },
             );
     }
-    import(element) {
+
+    import() {
+        this.invaliDataAlert.show();
 
         if (this.data == null) {
-            this.invaliDataAlert.show();
             this._progressRef.complete();
             return;
         }
         if (this.data.length === 0) {
-            this.invaliDataAlert.show();
             this._progressRef.complete();
             return;
         }
         if (this.totalRows - this.totalValidRows > 0) {
-            this.invaliDataAlert.show();
             this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);
@@ -144,8 +152,6 @@ export class PaymentImportComponent extends AppPage implements OnInit {
                     (res) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            this.pager.totalItems = 0;
-                            this.reset(element);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -153,10 +159,32 @@ export class PaymentImportComponent extends AppPage implements OnInit {
                 );
         }
     }
-    reset(element) {
-        this.data = null;
-        this.pagedItems = null;
-        element.value = "";
-        this.pager.totalItems = 0;
-    }
+}
+
+interface IInvoicePaymentImport {
+    paymentAmount: number;
+    exchangeRate: number;
+    isValid: boolean;
+
+    currencyId: string;
+    currencyIdError: string;
+    exchangeRateError: string;
+    invoiceNo: string;
+    invoiceNoError: string;
+    note: string;
+    paidDate: string;
+    paidDateError: string;
+    partnerAccount: string;
+    partnerAccountError: string;
+    partnerId: string;
+    partnerName: string;
+    paymentAmountError: string;
+    paymentMethod: string;
+    paymentMethodError: string;
+    paymentType: string;
+    paymentTypeError: string;
+    refId: string;
+    serieNo: string;
+    serieNoError: string;
+    soaNo: string;
 }
