@@ -95,8 +95,8 @@ export class FormAddChargeComponent extends AppForm {
             debitCharge: [],
             chargeGroup: [],
             active: [true],
-            generateSelling: [true]
-
+            generateSelling: [true],
+            productDept: []
         });
 
         this.code = this.formGroup.controls["code"];
@@ -208,7 +208,8 @@ export class FormAddChargeComponent extends AppForm {
             service: [<CommonInterface.INg2Select>{ id: res.charge.serviceTypeId, text: '' }],
             debitCharge: res.charge.debitCharge,
             chargeGroup: !!res.charge.chargeGroup ? [<CommonInterface.INg2Select>{ id: res.charge.chargeGroup, text: '' }] : null,
-            active: res.charge.active
+            active: res.charge.active,
+            productDept: res.charge.productDept
         });
         setTimeout(() => {
             const itemUnit = this.ngDataUnit.find(x => x.id === res.charge.unitId);

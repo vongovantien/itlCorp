@@ -21,6 +21,8 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string StatusInvoice { get; set; } //Tình trạng hóa đơn
         public string VatPartnerEmail { get; set; } //Email Partner của charge
         public DateTime? ReleaseDateEInvoice { get; set; } //Ngày phát hành E-Invoice
+        public string TkNoVat { get; set; } //Tài khoản Nợ VAT
+        public string TkCoVat { get; set; } //Tài khoản Có VAT
 
     }
 }

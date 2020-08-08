@@ -40,5 +40,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? TotalExchangeRate { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
+        public decimal? PaymentTerm { get; set; }
     }
 }
