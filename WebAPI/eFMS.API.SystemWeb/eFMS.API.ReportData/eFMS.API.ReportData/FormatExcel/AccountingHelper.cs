@@ -2928,8 +2928,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
                 }
 
-                workSheet.Cells[rowStart, 14].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 15].Value = item.VatAccount; //Account Debit No
+                workSheet.Cells[rowStart, 14].Value = item.TkNoVat;
+                workSheet.Cells[rowStart, 15].Value = item.TkCoVat;
 
                 workSheet.Cells[rowStart, 16].Value = item.OrgVatAmount;
                 workSheet.Cells[rowStart, 17].Value = item.VatAmountVnd;

@@ -17,12 +17,13 @@ namespace eFMS.API.ReportData.Models
         public string ChargeCode { get; set; }
         public string ChargeName { get; set; }
         public string TaxInvNoRevenue { get; set; }
+        public string VoucherIdRevenue { get; set; }
         public decimal? UsdRevenue { get; set; }
         public decimal? VndRevenue { get; set; }
         public decimal? TaxOut { get; set; }
         public decimal? TotalRevenue { get; set; }
         public string TaxInvNoCost { get; set; }
-        public string VoucherId { get; set; }
+        public string VoucherIdCost { get; set; }
         public decimal? UsdCost { get; set; }
         public decimal? VndCost { get; set; }
         public decimal? TaxIn { get; set; }

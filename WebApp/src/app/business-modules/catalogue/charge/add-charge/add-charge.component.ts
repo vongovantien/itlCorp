@@ -52,6 +52,7 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.debitCharge = this.formAddCharge.debitCharge.value;
         this.ChargeToAdd.charge.chargeGroup = this.formAddCharge.chargeGroup.value != null && this.formAddCharge.chargeGroup.value.length > 0 ? this.formAddCharge.chargeGroup.value[0].id : null;
         this.ChargeToAdd.charge.active = this.formAddCharge.active.value;
+        this.ChargeToAdd.charge.productDept = this.formAddCharge.formGroup.controls['productDept'].value;
         let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value[0].id;
         if (this.formAddCharge.service.value !== null) {

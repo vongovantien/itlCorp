@@ -1824,13 +1824,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                     decimal? _amount = charge.Quantity * charge.UnitPrice;
                     var _taxInvNoRevenue = string.Empty;
+                    var _voucherRevenue = string.Empty;
                     decimal? _usdRevenue = 0;
                     decimal? _vndRevenue = 0;
                     decimal? _taxOut = 0;
                     decimal? _totalRevenue = 0;
                     if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
-                        _taxInvNoRevenue = charge.InvoiceNo ?? charge.DebitNo;
+                        _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
                         _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
 
                         if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
@@ -1851,23 +1852,25 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _taxOut = Math.Abs(charge.Vatrate ?? 0);
                         }
-
+                        _voucherRevenue = charge.VoucherId;
                         _totalRevenue = (_amount * _exchangeRate) + _taxOut;
                     }
                     data.TaxInvNoRevenue = _taxInvNoRevenue;
+                    data.VoucherIdRevenue = _voucherRevenue;
                     data.UsdRevenue = _usdRevenue;
                     data.VndRevenue = _vndRevenue;
                     data.TaxOut = _taxOut;
                     data.TotalRevenue = _totalRevenue;
 
                     var _taxInvNoCost = string.Empty;
+                    var _voucherCost = string.Empty;
                     decimal? _usdCost = 0;
                     decimal? _vndCost = 0;
                     decimal? _taxIn = 0;
                     decimal? _totalCost = 0;
                     if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
-                        _taxInvNoCost = charge.InvoiceNo ?? charge.DebitNo;
+                        _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
                         _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
 
                         if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
@@ -1888,11 +1891,11 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _taxIn = Math.Abs(charge.Vatrate ?? 0);
                         }
-
+                        _voucherCost = charge.VoucherId;
                         _totalCost = (_amount * _exchangeRate) + _taxIn;
                     }
                     data.TaxInvNoCost = _taxInvNoCost;
-                    data.VoucherId = charge.VoucherId;
+                    data.VoucherIdCost = _voucherCost;
                     data.UsdCost = _usdCost;
                     data.VndCost = _vndCost;
                     data.TaxIn = _taxIn;
@@ -1905,7 +1908,7 @@ namespace eFMS.API.Documentation.DL.Services
                     data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
                     data.PaidDate = null;
                     data.AcVoucherNo = string.Empty;
-                    data.PmVoucherNo = string.Empty;
+                    data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
                     data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                     data.UserExport = currentUser.UserName;
 
@@ -2304,13 +2307,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                     decimal? _amount = charge.Quantity * charge.UnitPrice;
                     var _taxInvNoRevenue = string.Empty;
+                    var _voucherRevenue = string.Empty;
                     decimal? _usdRevenue = 0;
                     decimal? _vndRevenue = 0;
                     decimal? _taxOut = 0;
                     decimal? _totalRevenue = 0;
                     if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
-                        _taxInvNoRevenue = charge.InvoiceNo ?? charge.DebitNo;
+                        _taxInvNoRevenue = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.DebitNo;
                         _usdRevenue = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Selling có currency là USD
 
                         if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
@@ -2331,23 +2335,25 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _taxOut = Math.Abs(charge.Vatrate ?? 0);
                         }
-
+                        _voucherRevenue = charge.VoucherId;
                         _totalRevenue = (_amount * _exchangeRate) + _taxOut;
                     }
                     data.TaxInvNoRevenue = _taxInvNoRevenue;
+                    data.VoucherIdRevenue = _voucherRevenue;
                     data.UsdRevenue = _usdRevenue;
                     data.VndRevenue = _vndRevenue;
                     data.TaxOut = _taxOut;
                     data.TotalRevenue = _totalRevenue;
 
                     var _taxInvNoCost = string.Empty;
+                    var _voucherCost = string.Empty;
                     decimal? _usdCost = 0;
                     decimal? _vndCost = 0;
                     decimal? _taxIn = 0;
                     decimal? _totalCost = 0;
                     if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
-                        _taxInvNoCost = charge.InvoiceNo ?? charge.DebitNo;
+                        _taxInvNoCost = !string.IsNullOrEmpty(charge.InvoiceNo) ? charge.InvoiceNo : charge.CreditNo;
                         _usdCost = (charge.CurrencyId == DocumentConstants.CURRENCY_USD) ? _amount : 0; //Amount trước thuế của phí Buying có currency là USD
 
                         if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
@@ -2368,11 +2374,11 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _taxIn = Math.Abs(charge.Vatrate ?? 0);
                         }
-
+                        _voucherCost = charge.VoucherId;
                         _totalCost = (_amount * _exchangeRate) + _taxIn;
                     }
                     data.TaxInvNoCost = _taxInvNoCost;
-                    data.VoucherId = charge.VoucherId;
+                    data.VoucherIdCost = _voucherCost;
                     data.UsdCost = _usdCost;
                     data.VndCost = _vndCost;
                     data.TaxIn = _taxIn;
@@ -2385,7 +2391,7 @@ namespace eFMS.API.Documentation.DL.Services
                     data.AmountObh = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.Total * _exchangeRate : 0; //Amount sau thuế của phí OBH
                     data.PaidDate = null;
                     data.AcVoucherNo = string.Empty;
-                    data.PmVoucherNo = string.Empty;
+                    data.PmVoucherNo = charge.Type == DocumentConstants.CHARGE_OBH_TYPE ? charge.VoucherId : string.Empty; //Voucher của phí OBH theo Payee
                     data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
                     data.UserExport = currentUser.UserName;
 
