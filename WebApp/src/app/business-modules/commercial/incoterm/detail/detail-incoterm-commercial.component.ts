@@ -2,13 +2,14 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommercialCreateIncotermComponent } from '../create/create-incoterm-commercial.component';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { Router, ActivatedRoute, ParamMap, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
 
 import UUID from 'validator/lib/isUUID';
 import { IncotermUpdateModel, Incoterm } from '@models';
 import _merge from 'lodash/merge';
 import { DataService } from '@services';
+import { of } from 'rxjs';
 @Component({
     selector: 'detail-incoterm-commercial',
     templateUrl: './detail-incoterm-commercial.component.html',
@@ -45,13 +46,7 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
                 switchMap((id) => this._catalogueRepo.getDetailIncoterm(id)),
             ).subscribe(
                 (data: IncotermUpdateModel) => {
-                    console.log(data);
-                    if (!!data) {
-                        this.incotermDetail = data;
-                        this.updateForm(this.incotermDetail.incoterm);
-                        this.setListChargeIncoterm(this.incotermDetail);
-
-                    }
+                    this.reloadIncotermDetail(data);
                 }
             );
     }
@@ -81,34 +76,28 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
     saveIncoterm(model: IncotermUpdateModel) {
         model.incoterm.id = this.incotermDetail.incoterm.id;
         model.incoterm.userCreated = this.incotermDetail.incoterm.userCreated;
-
+        model.incoterm.datetimeCreated = this.incotermDetail.incoterm.datetimeCreated;
         this._catalogueRepo.updateIncoterm(model).pipe(
             catchError(this.catchError),
-        ).subscribe(
-            (res: CommonInterface.IResult) => {
+            switchMap((res: CommonInterface.IResult) => {
                 if (res.status) {
-                    this.reloadIncotermDetail(this.incotermDetail.incoterm.id);
                     this._toastService.success(res.message);
+                    return this._catalogueRepo.getDetailIncoterm(this.incotermId);
                 }
+                return of(null);
+            })
+        ).subscribe(
+            (res: IncotermUpdateModel) => {
+                this.reloadIncotermDetail(res);
             }
         );
     }
 
-    reloadIncotermDetail(incotermId: string): void {
-        this._catalogueRepo.getDetailIncoterm(incotermId)
-            .subscribe(
-                (data: IncotermUpdateModel) => {
-                    console.log(data);
-                    if (!!data) {
-                        this.incotermDetail = data;
-                        this.updateForm(this.incotermDetail.incoterm);
-                        this.setListChargeIncoterm(this.incotermDetail);
-
-                    }
-                }
-            );
+    reloadIncotermDetail(data: IncotermUpdateModel): void {
+        if (!!data) {
+            this.incotermDetail = data;
+            this.updateForm(this.incotermDetail.incoterm);
+            this.setListChargeIncoterm(this.incotermDetail);
+        }
     }
-
-
-
 }

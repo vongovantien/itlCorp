@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList, IPermissionBase } from 'src/app/app.list';
-import { Incoterm, IncotermModel } from '@models';
+import { IncotermModel } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
@@ -22,7 +22,6 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
 
     incoterms: IncotermModel[];
     selectedIncotermId: string;
-    criteria: any = {};
 
     constructor(
         private _ngProgressService: NgProgress,
@@ -52,7 +51,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
 
     getIncotermListPaging() {
         this.isLoading = true;
-        this._catalogueRepo.getIncotermListPaging(this.page, this.pageSize, Object.assign({}, this.criteria))
+        this._catalogueRepo.getIncotermListPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),
@@ -64,25 +63,21 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
-                    console.log(res);
-
                     this.totalItems = res.totalItems || 0;
                     this.incoterms = (res.data || []).map(i => new IncotermModel(i)) || [];
-                    console.log(this.incoterms);
 
                 },
             );
     }
 
     onSearchIncoterm(event) {
-        this.criteria = event;
-        console.log(this.criteria);
+        this.dataSearch = event;
         this.page = 1;
         this.getIncotermListPaging();
     }
 
     onResetIncoterm(event) {
-        this.criteria = event;
+        this.dataSearch = event;
         this.formSearch.initForm();
         this.getIncotermListPaging();
     }
@@ -92,8 +87,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
     }
 
     exportExcel() {
-        console.log("criteria in export: ", this.criteria);
-        this._catalogueRepo.downloadIncotermListExcel(this.criteria)
+        this._catalogueRepo.downloadIncotermListExcel(this.dataSearch)
             .subscribe(
                 (res: Blob) => {
                     this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'incoterm-list.xlsx');
