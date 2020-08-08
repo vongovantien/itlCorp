@@ -39,5 +39,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string SettlementCode { get; set; }
         public Guid? AcctManagementId { get; set; }
         public string RequesterId { get; set; }
+        public string ChargeType { get; set; }
     }
 }
