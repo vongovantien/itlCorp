@@ -1395,7 +1395,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
-                    item.PaymentTerm = 0; //Default is 0                    
+                    item.PaymentTerm = acct.PaymentTerm ?? 0; //Default is 0                    
                     item.DepartmentCode = _deptCode;
                     item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);
                     item.PaymentMethod = _paymentMethod;
