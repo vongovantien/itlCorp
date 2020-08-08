@@ -353,7 +353,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : string.Empty,
                                          SettlementCode = null,
                                          AcctManagementId = sur.AcctManagementId,
-                                         RequesterId = null
+                                         RequesterId = null,
+                                         ChargeType = sur.Type
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -403,7 +404,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : string.Empty,
                                              SettlementCode = null,
                                              AcctManagementId = sur.AcctManagementId,
-                                             RequesterId = null
+                                             RequesterId = null,
+                                             ChargeType = sur.Type
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -555,7 +557,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                             SettlementCode = sett.SettlementNo,
                                             AcctManagementId = sur.AcctManagementId,
-                                            RequesterId = sett.Requester
+                                            RequesterId = sett.Requester,
+                                            ChargeType = sur.Type
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(query);
             var queryBuySellDocumentation = from sur in surcharges
@@ -607,7 +610,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 SoaNo = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.Soano : sur.PaySoano,
                                                 SettlementCode = sett.SettlementNo,
                                                 AcctManagementId = sur.AcctManagementId,
-                                                RequesterId = sett.Requester
+                                                RequesterId = sett.Requester,
+                                                ChargeType = sur.Type
                                             };
             queryBuySellDocumentation = queryBuySellDocumentation.Where(query);
             var mergeBuySell = queryBuySellOperation.Union(queryBuySellDocumentation);
@@ -686,7 +690,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            SoaNo = sur.PaySoano,
                                            SettlementCode = sett.SettlementNo,
                                            AcctManagementId = sur.AcctManagementId,
-                                           RequesterId = sett.Requester
+                                           RequesterId = sett.Requester,
+                                           ChargeType = sur.Type
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(query);
             var queryObhBuyDocumentation = from sur in surcharges
@@ -740,7 +745,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                SoaNo = sur.PaySoano,
                                                SettlementCode = sett.SettlementNo,
                                                AcctManagementId = sur.AcctManagementId,
-                                               RequesterId = sett.Requester
+                                               RequesterId = sett.Requester,
+                                               ChargeType = sur.Type
                                            };
             queryObhBuyDocumentation = queryObhBuyDocumentation.Where(query);
             var mergeObhBuy = queryObhBuyOperation.Union(queryObhBuyDocumentation);
@@ -1309,19 +1315,30 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var charge in charges)
                 {
                     string _deptCode = string.Empty;
-                    if (!string.IsNullOrEmpty(charge.JobNo))
+                    var _productDept = chargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault()?.ProductDept;
+                    if (!string.IsNullOrEmpty(_productDept))
                     {
-                        if (charge.JobNo.Contains("LOG"))
+                        _deptCode = _productDept;
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(charge.JobNo))
                         {
-                            _deptCode = "OPS";
-                        }
-                        else if (charge.JobNo.Contains("A"))
-                        {
-                            _deptCode = "AIR";
-                        }
-                        else if (charge.JobNo.Contains("S"))
-                        {
-                            _deptCode = "SEA";
+                            if (charge.JobNo.Contains("LOG"))
+                            {
+                                //_deptCode = "OPS";
+                                _deptCode = "ITLOPS";
+                            }
+                            else if (charge.JobNo.Contains("A"))
+                            {
+                                //_deptCode = "AIR";
+                                _deptCode = "ITLAIR";
+                            }
+                            else if (charge.JobNo.Contains("S"))
+                            {
+                                //_deptCode = "SEA";
+                                _deptCode = "ITLCS";
+                            }
                         }
                     }
                     string _paymentMethod = string.Empty;
@@ -1354,12 +1371,31 @@ namespace eFMS.API.Accounting.DL.Services
                     item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
                     item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
                     item.PartnerId = partnerAcct?.AccountNo; //Partner ID trên VAT Invoice Or Voucher
-                    item.AccountNo = acct.AccountNo; //Account No trên VAT Invoice Or Voucher
+
+                    item.AccountNo = string.Empty;//acct.AccountNo; //Account No trên VAT Invoice Or Voucher
+                    item.ContraAccount = string.Empty;
+                    item.TkNoVat = string.Empty;
+                    item.TkCoVat = string.Empty;
+                    if (charge.ChargeType == AccountingConstants.TYPE_CHARGE_SELL) //Debit charge
+                    {
+                        item.AccountNo = acct.AccountNo;
+                        item.ContraAccount = charge.ContraAccount;
+                        item.TkNoVat = acct.AccountNo;
+                        item.TkCoVat = charge.VatAccount;
+                    }
+                    else //Credit hoặc OBH charge
+                    {
+                        item.AccountNo = charge.ContraAccount;
+                        item.ContraAccount = acct.AccountNo;
+                        item.TkNoVat = charge.VatAccount;
+                        item.TkCoVat = acct.AccountNo;
+                    }                  
+                    
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
                     item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
-                    item.PaymentTerm = 0; //Default is 0                    
+                    item.PaymentTerm = acct.PaymentTerm ?? 0; //Default is 0                    
                     item.DepartmentCode = _deptCode;
                     item.CustomNo = GetCustomNoOldOfShipment(charge.JobNo);
                     item.PaymentMethod = _paymentMethod;
