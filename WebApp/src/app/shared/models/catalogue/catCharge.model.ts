@@ -17,7 +17,7 @@ export class Charge {
     inactiveOn: string = '';
     debitCharge: string = null;
     chargeGroup: string = null;
-
+    productDept: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
