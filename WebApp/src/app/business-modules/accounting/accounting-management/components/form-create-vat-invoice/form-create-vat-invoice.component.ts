@@ -13,7 +13,7 @@ import { DataService } from '@services';
 import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
-import { map, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { map, debounceTime, takeUntil, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
 
 @Component({
@@ -48,6 +48,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
     status: AbstractControl;
     attachDocInfo: AbstractControl;
     description: AbstractControl;
+    paymentTerm: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -126,6 +127,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
             status: ['New'],
+            paymentTerm: [],
         });
 
         this.partnerId = this.formGroup.controls['partnerId'];
@@ -141,12 +143,14 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         this.totalExchangeRate = this.formGroup.controls['totalExchangeRate'];
         this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
         this.description = this.formGroup.controls['description'];
+        this.paymentTerm = this.formGroup.controls['paymentTerm'];
 
 
         if (!this.update) {
             this.invoiceNoTempt.valueChanges
                 .pipe(
                     debounceTime(400),
+                    startWith(this.invoiceNoTempt.value),
                     distinctUntilChanged()
                 )
                 .subscribe(
