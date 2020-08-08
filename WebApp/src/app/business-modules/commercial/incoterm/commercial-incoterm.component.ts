@@ -6,7 +6,10 @@ import { catchError, finalize, map, tap, switchMap } from 'rxjs/operators';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
 import { SortService } from '@services';
 import { SystemConstants } from '@constants';
-import { Permission403PopupComponent } from '@common';
+import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'app-commercial-incoterm',
     templateUrl: './commercial-incoterm.component.html',
@@ -15,29 +18,24 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
 
     @ViewChild("formSearch", { static: false }) formSearch: CommercialFormSearchIncotermComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     incoterms: IncotermModel[];
-
+    selectedIncotermId: string;
     criteria: any = {};
 
     constructor(
+        private _ngProgressService: NgProgress,
+        private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
+        private _toastService: ToastrService,
     ) {
         super();
         this.requestList = this.getIncotermListPaging;
         this.requestSort = this.sortIncotermList;
+        this._progressRef = this._ngProgressService.ref();
     }
-
-    checkAllowDetail(T: any): void {
-        throw new Error("Method not implemented.");
-    }
-
-    checkAllowDelete(T: any): void {
-        throw new Error("Method not implemented.");
-    }
-
-
 
     ngOnInit(): void {
         this.headers = [
@@ -103,7 +101,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
             );
     }
 
-    handleClickDetailItem(incotermId: string) {
+    checkAllowDetail(incotermId: string): void {
         this._catalogueRepo.checkAllowGetDetailIncoterm(incotermId)
             .pipe(
                 catchError(this.catchError),
@@ -111,26 +109,45 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
             .subscribe(
                 (res: boolean) => {
                     if (res) {
-
+                        this._router.navigate([`/home/commercial/incoterm/${incotermId}`]);
                     } else {
                         this.permissionPopup.show();
                     }
                 }
             );
-
     }
 
-    handleClickDeleteItem(incotermId: string) {
-        this._catalogueRepo.checkAllowDeleteIncoterm(incotermId)
+    checkAllowDelete(incotermId: string): void {
+        this.selectedIncotermId = incotermId;
+        this._catalogueRepo.checkAllowDeleteIncoterm(this.selectedIncotermId)
             .pipe(
                 catchError(this.catchError),
             )
             .subscribe(
                 (res: boolean) => {
                     if (res) {
-
+                        this.confirmDeletePopup.show();
                     } else {
                         this.permissionPopup.show();
+                    }
+                }
+            );
+    }
+
+    onDelete() {
+        this._progressRef.start();
+        this._catalogueRepo.deleteIncoterm(this.selectedIncotermId)
+            .pipe(catchError(this.catchError),
+                finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.confirmDeletePopup.hide();
+                        this._toastService.success(res.message);
+                        this.onResetIncoterm({});
+
+                    } else {
+                        this._toastService.error(res.message);
                     }
                 }
             );

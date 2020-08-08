@@ -181,7 +181,20 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Delete(Guid Id)
         {
-            throw new NotImplementedException();
+            var hs = new HandleState();
+            var chargeIncotermIdList = catChargeIncotermRepository.Where(c => c.IncotermId == Id).Select(s => s.Id).ToList();
+            if (chargeIncotermIdList.Count <= 0)
+            {
+                hs = DataContext.Delete(x => x.Id == Id);
+            }
+            else
+            {
+                catChargeIncotermRepository.Delete(ci => chargeIncotermIdList.Any(id => id == ci.Id));
+                hs = DataContext.Delete(x => x.Id == Id);
+            }
+            //var hs = DataContext.Delete(x => x.Id == Id);
+            DataContext.SubmitChanges();
+            return hs;
         }
 
         public CatIncotermEditModel GetDetail(Guid id)

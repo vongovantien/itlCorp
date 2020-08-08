@@ -87,9 +87,28 @@ export class CommercialDetailIncotermComponent extends CommercialCreateIncotermC
         ).subscribe(
             (res: CommonInterface.IResult) => {
                 if (res.status) {
+                    this.reloadIncotermDetail(this.incotermDetail.incoterm.id);
                     this._toastService.success(res.message);
                 }
             }
         );
     }
+
+    reloadIncotermDetail(incotermId: string): void {
+        this._catalogueRepo.getDetailIncoterm(incotermId)
+            .subscribe(
+                (data: IncotermUpdateModel) => {
+                    console.log(data);
+                    if (!!data) {
+                        this.incotermDetail = data;
+                        this.updateForm(this.incotermDetail.incoterm);
+                        this.setListChargeIncoterm(this.incotermDetail);
+
+                    }
+                }
+            );
+    }
+
+
+
 }

@@ -1117,8 +1117,8 @@ export class CatalogueRepo {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Update`, body);
     }
 
-    deleteIncoterm(body: IncotermUpdateModel) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Delete`);
+    deleteIncoterm(incotermId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/delete/${incotermId}`);
     }
 
     getDetailIncoterm(id: string): any {
