@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -401,6 +402,7 @@ namespace eFMS.API.Catalogue.Controllers
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
             {
+                DateTime temp;
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 int colCount = worksheet.Dimension.Columns;
@@ -408,6 +410,33 @@ namespace eFMS.API.Catalogue.Controllers
                 List<CatContractImportModel> list = new List<CatContractImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
+                    string dateEffect = worksheet.Cells[row, 7].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+                    if (DateTime.TryParse(dateEffect, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(dateEffect, culture);
+                    }
+
+                    string dateExpired = worksheet.Cells[row, 8].Value?.ToString().Trim();
+                    DateTime? dateToPaseExpired = null;
+                    if (DateTime.TryParse(dateExpired, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPaseExpired = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPaseExpired = DateTime.Parse(dateExpired, culture);
+                    }
+
+
                     var contract = new CatContractImportModel
                     {
                         IsValid = true,
@@ -417,8 +446,8 @@ namespace eFMS.API.Catalogue.Controllers
                         SaleService = worksheet.Cells[row, 4].Value?.ToString().Trim(), 
                         Company = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                         Office  = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                        EffectDate = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                        ExpireDate = worksheet.Cells[row, 8].Value?.ToString().Trim(),
+                        EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
+                        ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
                         PaymentMethod = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Vas = worksheet.Cells[row, 10].Value?.ToString().Trim(), 
                         Salesman = worksheet.Cells[row, 11].Value?.ToString().Trim(),

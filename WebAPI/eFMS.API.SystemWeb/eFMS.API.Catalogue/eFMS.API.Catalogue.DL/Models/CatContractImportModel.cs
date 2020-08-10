@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Catalogue.Service.Models;
+using System;
 
 namespace eFMS.API.Catalogue.DL.Models
 {
@@ -21,12 +22,12 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ActiveError { get; set; }
         public string Company { get; set; }
         public string Office { get; set; }
-        public string EffectDate { get; set; }
+        public DateTime? EffectDate { get; set; }
         public string EffectDateError { get; set; }
         public string ExpiredtDateError { get; set; }
         public string CreditLimitError { get; set; }
 
-        public string ExpireDate { get; set; }
+        public DateTime? ExpireDate { get; set; }
         public string Salesman { get; set; }
         public string CreditLimited { get; set; }
         public string CreditLimitedRated { get; set; }
