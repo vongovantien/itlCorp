@@ -410,21 +410,25 @@ namespace eFMS.API.Accounting.Controllers
             //read data
             List<AccountingPaymentOBHImportTemplateModel> dataList = null;
             int totalRows = 0;
+            int totalValidRows = 0;
             using (ExcelPackage package = new ExcelPackage(file.OpenReadStream()))
             {
                 ExcelWorksheet workSheet = package.Workbook.Worksheets[1];
                 totalRows = workSheet.Dimension.Rows;
                 dataList = ReadOBHPaymentFile(workSheet, totalRows);
             }
-            var data = accountingPaymentService.CheckValidImportOBHPayment(dataList);
-            int totalValidRows = 0;
+
+            if (dataList.Any(x => x.IsValid == false))
+            {
+                totalValidRows = dataList.Count(x => x.IsValid == true);
+                return Ok(new { data = dataList, totalValidRows });
+            }
+            List<AccountingPaymentOBHImportTemplateModel> data = accountingPaymentService.CheckValidImportOBHPayment(dataList);
             if (data != null)
             {
                 totalValidRows = data.Count(x => x.IsValid == true);
             }
-            var results = new { data, totalValidRows };
-            int validCount = dataList.Count(cdn => cdn.IsValid);
-            return Ok(new { totalValidRows = validCount, data = dataList});
+            return Ok(new { totalValidRows, data});
         }
 
         private List<AccountingPaymentOBHImportTemplateModel> ReadOBHPaymentFile(ExcelWorksheet workSheet, int totalRows)
@@ -432,16 +436,20 @@ namespace eFMS.API.Accounting.Controllers
             var dataList = new List<AccountingPaymentOBHImportTemplateModel>();
             for (int i = 2; i <= totalRows; i++)
             {
-                var data = new AccountingPaymentOBHImportTemplateModel();
-                // gán true trước sau đó lỗi gán lại false
-                data.IsValid = true;
+                AccountingPaymentOBHImportTemplateModel data = new AccountingPaymentOBHImportTemplateModel
+                {
+                    // gán true trước sau đó lỗi gán lại false
+                    IsValid = true
+                };
                 //
                 if (
                     (workSheet.Cells[i, 1].Value == null || workSheet.Cells[i, 1].Value.ToString().Trim() == "") ||
                     (workSheet.Cells[i, 2].Value == null || workSheet.Cells[i, 2].Value.ToString().Trim() == "") ||
-                    (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" || !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
-                    (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "" || !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDateCheck)) ||
-                    (workSheet.Cells[i, 6].Value == null || workSheet.Cells[i, 6].Value.ToString().Trim() == ""))
+                    (workSheet.Cells[i, 4].Value == null || workSheet.Cells[i, 4].Value.ToString().Trim() == "" ||
+                    (workSheet.Cells[i, 5].Value == null || workSheet.Cells[i, 5].Value.ToString().Trim() == "") ||
+                    !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultIntCheck)) ||
+                    (workSheet.Cells[i, 8].Value == null || workSheet.Cells[i, 8].Value.ToString().Trim() == "") || 
+                    !DateTime.TryParse(workSheet.Cells[i, 8].Value.ToString().Trim(), out DateTime resultDateCheck))
                 {
                     data.IsValid = false;
                 }
@@ -462,14 +470,42 @@ namespace eFMS.API.Accounting.Controllers
                     !Int32.TryParse(workSheet.Cells[i, 4].Value.ToString().Trim(), out int resultInt) ? // Type field invalid
                     (int?)null : int.Parse(workSheet.Cells[i, 4].Value.ToString().Trim());
 
-                data.PaidDate = workSheet.Cells[i, 5].Value == null ||
-                    workSheet.Cells[i, 5].Value.ToString().Trim() == "" ||
-                    !DateTime.TryParse(workSheet.Cells[i, 5].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
-                    (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 5].Value.ToString().Trim());
+                data.CurrencyId = workSheet.Cells[i, 5].Value == null ||
+                    workSheet.Cells[i, 5].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 5].Value.ToString().Trim();
 
-                data.PaymentType = workSheet.Cells[i, 6].Value == null ||
-                    workSheet.Cells[i, 6].Value.ToString().Trim() == "" ?
-                    null : workSheet.Cells[i, 6].Value.ToString().Trim();
+                if (workSheet.Cells[i, 6].Value != null)
+                {
+                    bool checkExchangeRate = decimal.TryParse(workSheet.Cells[i, 6].Value.ToString(), out decimal exchangeRate);
+                    if (!checkExchangeRate)
+                    {
+                        data.IsValid = false;
+                    }
+                    else
+                    {
+                        data.ExchangeRate = exchangeRate;
+                    }
+                }
+
+                data.PaymentMethod = workSheet.Cells[i, 7].Value.ToString();
+
+                if(!string.IsNullOrEmpty(data.PaymentMethod) && (data.PaymentMethod.ToLower() != "cash" && data.PaymentMethod.ToLower() != "bank transfer" ))
+                {
+                    data.IsValid = false;
+                    data.PaymentMethodError = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_INVALID, data.PaymentMethod].Value;
+                }
+                data.PaidDate = workSheet.Cells[i, 8].Value == null ||
+                    workSheet.Cells[i, 8].Value.ToString().Trim() == "" ||
+                    !DateTime.TryParse(workSheet.Cells[i, 8].Value.ToString().Trim(), out DateTime resultDate) ? // Type field invalid
+                    (DateTime?)null : DateTime.Parse(workSheet.Cells[i, 8].Value.ToString().Trim());
+
+                data.PaymentType = workSheet.Cells[i, 9].Value == null ||
+                    workSheet.Cells[i, 9].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 9].Value.ToString().Trim();
+
+                data.Note = workSheet.Cells[i, 10].Value == null ||
+                    workSheet.Cells[i, 10].Value.ToString().Trim() == "" ?
+                    null : workSheet.Cells[i, 10].Value.ToString().Trim();
 
                 dataList.Add(data);
             }

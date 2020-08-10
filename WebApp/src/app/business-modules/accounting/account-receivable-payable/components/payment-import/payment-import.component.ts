@@ -17,7 +17,6 @@ export class PaymentImportComponent extends AppList implements OnInit {
 
     @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
 
-    inValidItems: IInvoicePaymentImport[] = [];
     data: IInvoicePaymentImport[];
     pagedItems: IInvoicePaymentImport[] = [];
 
@@ -127,17 +126,18 @@ export class PaymentImportComponent extends AppList implements OnInit {
     }
 
     import() {
-        this.invaliDataAlert.show();
-
         if (this.data == null) {
+            this.invaliDataAlert.show();
             this._progressRef.complete();
             return;
         }
         if (this.data.length === 0) {
+            this.invaliDataAlert.show();
             this._progressRef.complete();
             return;
         }
         if (this.totalRows - this.totalValidRows > 0) {
+            this.invaliDataAlert.show();
             this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);

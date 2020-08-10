@@ -73,6 +73,8 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paidDate', sortable: true },
             { title: 'Payment Type', field: 'paymentType', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
             { title: 'Update Person', field: 'userModifiedName', sortable: true },
             { title: 'Update Date', field: 'datetimeModified', sortable: true }
         ];
@@ -121,7 +123,6 @@ export class AccountReceivablePayableListInvoicePaymentComponent extends AppList
             ).subscribe(
                 (res: []) => {
                     this.payments = res || [];
-                    //console.log(this.payments);
                 },
             );
     }
