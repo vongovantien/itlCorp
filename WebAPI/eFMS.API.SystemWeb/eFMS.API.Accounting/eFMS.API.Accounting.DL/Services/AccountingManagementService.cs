@@ -195,9 +195,9 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => x.PartnerId == criteria.PartnerId);
             }
 
-            if (criteria.IssuedDate != null)
+            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
-                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromIssuedDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
 
             if (!string.IsNullOrEmpty(criteria.CreatorId))

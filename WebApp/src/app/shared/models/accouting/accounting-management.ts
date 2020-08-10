@@ -162,7 +162,8 @@ export class AccAccountingManagementResult extends AccAccountingManagement {
 export class AccAccountingManagementCriteria {
     referenceNos: string[];
     partnerId: string;
-    issuedDate: string;
+    fromIssuedDate: string;
+    toIssuedDate: string;
     creatorId: string;
     invoiceStatus: string;
     voucherType: string;
