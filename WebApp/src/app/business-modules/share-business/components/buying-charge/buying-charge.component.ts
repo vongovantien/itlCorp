@@ -4,7 +4,7 @@ import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { Charge, Unit, CsShipmentSurcharge, Currency, Partner, HouseBill, CsTransaction, CatPartnerCharge, Container, OpsTransaction, ChargeGroup } from '@models';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from 'src/app/shared/services';
@@ -77,7 +77,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedIndexFee: number;
     isSelectedChargeDynamicCombogrid: boolean = false;
     isSelectedPartnerDynamicCombogrid: boolean = false;
-
+    userLogged: any;
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -87,7 +87,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService,
-
+        protected _accountingRepo: AccountingRepo,
 
     ) {
         super();
@@ -121,7 +121,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     ngOnInit(): void {
         this.configHeader();
-
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.headerPartner = [
             { title: 'Name', field: 'partnerNameEn' },
             { title: 'Partner Code', field: 'taxCode' },
@@ -392,7 +392,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 // this.charges = [...this.charges.slice(0, this.selectedIndexCharge), ...this.charges.slice(this.selectedIndexCharge + 1)];
                                 // this._store.dispatch(new fromStore.DeleteBuyingSurchargeAction(this.selectedIndexCharge));
 
+                                // Tính công nợ
+                                // this.charges.filter(f => f.id === this.selectedSurcharge.id)
+                                this.calculatorReceivable([this.selectedSurcharge]);
+
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
+
                             }
                             // this.getSurcharges(type);
                             this.getProfit();
@@ -484,6 +489,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // Tính công nợ
+                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(type);
@@ -1199,6 +1207,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             //         componentRefCharge.clear();
             //     }
         }
+    }
+
+    calculatorReceivable(charges: CsShipmentSurcharge[]) {
+        const objReceivable = charges.map((item: any) => ({ surchargeId: item.id, partnerId: item.paymentObjectId, office: (!!item.officeId ? item.officeId : this.userLogged.officeId), service: (!!item.transactionType ? item.transactionType : this.serviceTypeId) }));
+        charges.forEach((element: any) => {
+            if (element.type === 'OBH') {
+                objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
+            }
+        });
+
+        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 }
 

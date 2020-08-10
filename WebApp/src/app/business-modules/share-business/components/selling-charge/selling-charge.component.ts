@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -39,10 +39,10 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService
-
+        protected _dataService: DataService,
+        protected _accountingRepo: AccountingRepo,
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService, _accountingRepo);
         this._progressRef = this._ngProgressService.ref();
 
     }
@@ -144,6 +144,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // Tính công nợ
+                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
 

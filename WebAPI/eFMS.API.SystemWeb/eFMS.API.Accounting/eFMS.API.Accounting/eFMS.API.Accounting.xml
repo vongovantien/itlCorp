@@ -170,6 +170,12 @@
             <param name="localizer"></param>
             <param name="accountReceivable"></param>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetAll">
+            <summary>
+            Get All Account Receivable
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivable(eFMS.API.Accounting.DL.Models.CalculatorReceivableModel)">
             <summary>
             Calculator Receivable
