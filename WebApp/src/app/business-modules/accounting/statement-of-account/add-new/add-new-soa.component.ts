@@ -130,6 +130,10 @@ export class StatementOfAccountAddnewComponent extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toastService.success(res.message, '', { positionClass: 'toast-bottom-right' });
+
+                            // Tính công nợ
+                            this.calculatorReceivable(this.listCharges);
+
                             //  * go to detail page
                             this._router.navigate(['home/accounting/statement-of-account/detail'], { queryParams: { no: res.data.soano, currency: 'VND' } });
 
@@ -178,6 +182,11 @@ export class StatementOfAccountAddnewComponent extends AppList {
 
         this.totalCharge = data.totalCharge;
         this.totalShipment = data.shipment;
+    }
+
+    calculatorReceivable(surcharges: any[]) {
+        const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
+        this._accountRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 }
 

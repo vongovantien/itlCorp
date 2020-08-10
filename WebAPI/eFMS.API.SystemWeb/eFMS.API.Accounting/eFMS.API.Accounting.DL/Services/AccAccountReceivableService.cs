@@ -746,7 +746,7 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
-            if (model.ObjectReceivable.Count() > 0)
+            if (model != null && model.ObjectReceivable.Count() > 0)
             {
                 // PartnerId, Office, Service # Empty And Null
                 var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)

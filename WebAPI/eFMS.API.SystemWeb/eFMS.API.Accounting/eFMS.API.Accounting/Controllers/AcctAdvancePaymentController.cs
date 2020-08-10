@@ -38,6 +38,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private string typeApproval = "Advance";
+        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         /// <summary>
         /// Contructor
@@ -46,13 +47,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
+        /// <param name="accAccountReceivable"></param>
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accAccountReceivable)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
-
+            accAccountReceivableService = accAccountReceivable;
         }
 
         /// <summary>
@@ -171,6 +173,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            if (hs.Success)
+            {
+                // Tính công nợ
+                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -223,10 +231,19 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            // Get list request of advance no
+            var advanceRequests = acctAdvancePaymentService.GetAdvanceRequestByAdvanceNo(advanceNo);
+
             HandleState hs = acctAdvancePaymentService.DeleteAdvancePayment(advanceNo);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
+                CalculatorReceivableAdvancePayment(advanceRequests);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -352,6 +369,12 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Tính công nợ
+                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -530,6 +553,10 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
+                
+                // Tính công nợ
+                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                
                 return Ok(result);
             }
             else
@@ -810,6 +837,25 @@ namespace eFMS.API.Accounting.Controllers
         {
             var data = acctAdvancePaymentService.GetHistoryDeniedAdvance(advanceNo);
             return Ok(data);
+        }
+
+        private void CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
+        {
+            var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
+            foreach (var hblId in hblIds)
+            {
+                var surchargeIds = acctAdvancePaymentService.GetSurchargeIdByHblId(hblId);
+                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
+                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
+                foreach (var surchargeId in surchargeIds)
+                {
+                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
+                    objectReceivable.SurchargeId = surchargeId;
+                    receivableModels.Add(objectReceivable);
+                }
+                calculatorReceivable.ObjectReceivable = receivableModels;
+                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
+            }
         }
     }
 }

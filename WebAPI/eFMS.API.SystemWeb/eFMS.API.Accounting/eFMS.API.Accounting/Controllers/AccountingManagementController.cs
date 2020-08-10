@@ -29,27 +29,29 @@ namespace eFMS.API.Accounting.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class AccountingManagementController: ControllerBase
+    public class AccountingManagementController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingService;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        private readonly IAccAccountReceivableService accAccountReceivableService;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="hostingEnvironment"></param>
         /// <param name="accService"></param>
+        /// <param name="accAccountReceivable"></param>
         public AccountingManagementController(
             IStringLocalizer<LanguageSub> localizer,
              IHostingEnvironment hostingEnvironment,
-            IAccountingManagementService accService)
+            IAccountingManagementService accService,
+            IAccAccountReceivableService accAccountReceivable)
         {
             stringLocalizer = localizer;
             accountingService = accService;
             _hostingEnvironment = hostingEnvironment;
-
+            accAccountReceivableService = accAccountReceivable;
         }
 
         [Authorize]
@@ -68,10 +70,18 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(id);
+
             HandleState hs = accountingService.Delete(id);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào list surcharge id của accounting management
+                CalculatorReceivableAcctMngt(surchargeIds);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -159,7 +169,14 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = accountingService.AddAcctMgnt(model);
-            
+
+            if (hs.Success)
+            {
+                var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
+                // Tính công nợ
+                CalculatorReceivableAcctMngt(surchargeIds);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -204,7 +221,14 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             var hs = accountingService.UpdateAcctMngt(model);
-            
+
+            if (hs.Success)
+            {
+                var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
+                // Tính công nợ
+                CalculatorReceivableAcctMngt(surchargeIds);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -354,7 +378,7 @@ namespace eFMS.API.Accounting.Controllers
                             dateToPase = DateTime.Parse(date, culture);
                         }
                     }
-                   
+
                     var acc = new AcctMngtVatInvoiceImportModel
                     {
                         IsValid = true,
@@ -382,6 +406,15 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var result = accountingService.ImportVatInvoice(model);
+            if (result.Status)
+            {
+                var acctMngtIds = accountingService.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && model.Select(s => s.VoucherId).Contains(x.VoucherId)).Select(s => s.Id);
+                foreach(var acctMngtId in acctMngtIds)
+                {
+                    var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(acctMngtId);
+                    CalculatorReceivableAcctMngt(surchargeIds);
+                }
+            }
             return Ok(result);
         }
 
@@ -393,6 +426,23 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
             CatContractInvoiceModel result = accountingService.GetContractForInvoice(model);
             return Ok(result);
+        }
+
+        private void CalculatorReceivableAcctMngt(List<Guid> surchargeIds)
+        {
+            if (surchargeIds != null && surchargeIds.Count > 0)
+            {
+                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
+                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
+                foreach (var surchargeId in surchargeIds)
+                {
+                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
+                    objectReceivable.SurchargeId = surchargeId;
+                    receivableModels.Add(objectReceivable);
+                }
+                calculatorReceivable.ObjectReceivable = receivableModels;
+                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
+            }
         }
     }
 }
