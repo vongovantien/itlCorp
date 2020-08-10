@@ -36,24 +36,34 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>Payment Term</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
+                                <label required>Payment Term</label>
                                 <input type="text" class="form-control" formControlName="paymentTerm" integer>
                             </div>
                         </div>
-                        <div class="col-lg-12">
+                        <div class="col-lg-8">
                             <div class="form-group">
                                 <label>General Exchange Rate
                                 </label>
-                                <span>
-                                    <button
-                                        class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
-                                        title="Sync to charges" (click)="syncExchangeRateCharge()">
-                                        <i class="la la-refresh"></i>
-                                    </button>
-                                </span>
                                 <input type="number" class="form-control" formControlName="totalExchangeRate"
                                     autoFormatCurrency numeric [decimals]="digitDecimal">
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-flex align-items-end justify-content-end">
+                            <div class="form-group">
+                                <label> &nbsp;
+                                </label>
+                                <span>
+                                    <button class="btn btn-success m-btn--pill m-btn--icon m-btn--uppercase"
+                                        type="button" (click)="syncExchangeRateCharge()">
+                                        <span>
+                                            <i class="la la-refresh"></i>
+                                            <span>Update ExRate</span>
+                                        </span>
+                                    </button>
+                                </span>
+
                             </div>
                         </div>
                     </div>

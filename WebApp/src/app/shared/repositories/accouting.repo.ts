@@ -593,6 +593,10 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    getAgreementForInvoice(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/GetContractForInvoice`, body);
+    }
 }
 
 

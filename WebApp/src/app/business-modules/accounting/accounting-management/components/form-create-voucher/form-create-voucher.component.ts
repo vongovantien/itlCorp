@@ -37,6 +37,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
     totalExchangeRate: AbstractControl;
     description: AbstractControl;
     attachDocInfo: AbstractControl;
+    paymentTerm: AbstractControl;
 
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name ABBR' },
@@ -85,19 +86,21 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
                                 this.formGroup.controls['personalName'].setValue(res.partnerName);
                             }
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
-                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
-                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
-                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
+
                     } else {
                         if (!this.formGroup.controls['personalName'].value) {
                             if (!this.formGroup.controls['personalName'].value) {
                                 this.formGroup.controls['personalName'].setValue(res.settlementRequester);
                             }
-                            // this.formGroup.controls['attachDocInfo'].setValue(res.inputRefNo);
                         }
-                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
-                        this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
+                    }
+
+                    this.attachDocInfo.setValue(null);
+                    this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
+                    this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
+                    if (!this.paymentTerm.value) {
+                        this.paymentTerm.setValue(res.paymentTerm);
                     }
                 }
             );
@@ -124,6 +127,11 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
             status: [],
+            paymentTerm: [null, Validators.compose([
+                Validators.required,
+                Validators.max(31),
+                Validators.min(1)
+            ])],
         });
 
         this.partnerId = this.formGroup.controls['partnerId'];
@@ -137,6 +145,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.totalExchangeRate = this.formGroup.controls['totalExchangeRate'];
         this.description = this.formGroup.controls['description'];
         this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
+        this.paymentTerm = this.formGroup.controls['paymentTerm'];
     }
 
 

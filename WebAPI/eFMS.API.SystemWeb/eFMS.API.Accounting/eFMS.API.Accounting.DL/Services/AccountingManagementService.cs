@@ -458,7 +458,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //SELLING (DEBIT)
             var charges = GetChargeSellForInvoice(query);
-
+            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
             // Group by theo Partner
             var chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
                 new PartnerOfAcctManagementResult
@@ -468,7 +468,8 @@ namespace eFMS.API.Accounting.DL.Services
                     PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
                     SettlementRequester = null,
                     InputRefNo = string.Empty,
-                    Charges = s.ToList()
+                    Charges = s.ToList(),
+                    Service = GetTransactionType(jobNoGrouped)
                 }
                 ).ToList();
 
@@ -813,6 +814,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var charges = GetChargeForVoucher(query);
+            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
 
             var chargeGroupByPartner = new List<PartnerOfAcctManagementResult>();
 
@@ -828,7 +830,8 @@ namespace eFMS.API.Accounting.DL.Services
                         SettlementRequesterId = s.Key.SettlementRequesterId,
                         SettlementRequester = null, //Tính toán bên dưới
                         InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList()
+                        Charges = s.ToList(),
+                        Service = GetTransactionType(jobNoGrouped)
                     }
                     ).ToList();
             }
@@ -844,7 +847,8 @@ namespace eFMS.API.Accounting.DL.Services
                         SettlementRequesterId = null,
                         SettlementRequester = null,
                         InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList()
+                        Charges = s.ToList(),
+                        Service = GetTransactionType(jobNoGrouped)
                     }
                     ).ToList();
             }
@@ -1007,7 +1011,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DateTime? dueDate = null;
                 if (accounting.Date.HasValue)
                 {
-                    dueDate = accounting.Date.Value.AddDays(30);
+                    dueDate = accounting.Date.Value.AddDays(30 + (double)(accounting.PaymentTerm ?? 0));
                 }
                 accounting.PaymentDueDate = dueDate;
 
@@ -1504,7 +1508,7 @@ namespace eFMS.API.Accounting.DL.Services
                         DateTime? dueDate = null;
                         if (vatInvoice.Date.HasValue)
                         {
-                            dueDate = vatInvoice.Date.Value.AddDays(30);
+                            dueDate = vatInvoice.Date.Value.AddDays(30 + (double)(vatInvoice.PaymentTerm ?? 0));
                         }
                         vatInvoice.PaymentDueDate = dueDate;
                         vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
@@ -1631,7 +1635,8 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<CatContract, bool>> queryContractByCriteria = null;
             queryContractByCriteria = x => (
             (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
-            && (x.SaleService.Contains(model.Service) && x.PartnerId == partnerRef.Id));
+            && (x.SaleService.Contains(model.Service ?? "", StringComparison.OrdinalIgnoreCase) 
+            && x.PartnerId == partnerRef.Id));
 
             IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);
 

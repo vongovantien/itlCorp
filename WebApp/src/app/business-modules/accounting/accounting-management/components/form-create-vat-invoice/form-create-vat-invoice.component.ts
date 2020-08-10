@@ -96,8 +96,12 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                             this.formGroup.controls['personalName'].setValue(res.partnerName);
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
                         }
-                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, res.inputRefNo));
+                        this.attachDocInfo.setValue(null);
+                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
                         this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
+                        if (!this.paymentTerm.value) {
+                            this.paymentTerm.setValue(res.paymentTerm);
+                        }
                     }
                 }
             );
@@ -127,7 +131,11 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             totalAmount: [{ value: null, disabled: true }],
             currency: [[{ id: 'VND', text: 'VND' }]],
             status: ['New'],
-            paymentTerm: [],
+            paymentTerm: [null, Validators.compose([
+                Validators.required,
+                Validators.max(31),
+                Validators.min(1)
+            ])],
         });
 
         this.partnerId = this.formGroup.controls['partnerId'];

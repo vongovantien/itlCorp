@@ -6,7 +6,8 @@ import { ModalModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from './components/select-requester/select-requester.popup';
 import { StoreModule } from '@ngrx/store';
-import { reducers } from './accounting-management/store';
+import { reducers, effects } from './accounting-management/store';
+import { EffectsModule } from '@ngrx/effects';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { reducers } from './accounting-management/store';
         FormsModule,
         ModalModule.forRoot(),
         StoreModule.forFeature('accounting-management', reducers),
+        EffectsModule.forFeature(effects),
 
 
     ],
