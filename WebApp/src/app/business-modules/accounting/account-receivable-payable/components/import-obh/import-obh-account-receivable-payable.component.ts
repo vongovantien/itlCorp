@@ -2,13 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AccountingRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
-import { finalize, catchError } from 'rxjs/operators';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
-import { PAGINGSETTING } from 'src/constants/paging.const';
-import { PagingService } from '@services';
-import { SystemConstants } from '@constants';
+import { PagingService, SortService } from '@services';
 import { InfoPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
+
+import cloneDeep from 'lodash/cloneDeep';
+import { finalize, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'app-import-obh-account-receivable-payable',
@@ -17,24 +16,27 @@ import { ToastrService } from 'ngx-toastr';
 
 export class AccountReceivablePayableImportOBHPaymentComponent extends AppList implements OnInit {
     @ViewChild(InfoPopupComponent, { static: false }) invaliDataAlert: InfoPopupComponent;
-    headers: any = [];
+
     data: IImportOBH[];
+    pagedItems: IImportOBH[] = [];
+
     totalRows: number = 0;
     totalValidRows: number = 0;
-    inValidItems: any[] = [];
+    startIndex: number = 0;
+
     isShowInvalid: boolean = true;
-    //
-    pager: PagerSetting = PAGINGSETTING;
-    pagedItems: any[] = [];
 
     constructor(
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
         private _pagingService: PagingService,
+        private _sortService: SortService,
         private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
+        this.requestSort = this.sortList;
+        this.requestList = this.onPaging;
     }
 
     ngOnInit(): void {
@@ -45,30 +47,14 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
             { title: 'Partner Id', field: 'partnerId', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Payment Amount', field: 'paymentAmount', sortable: true },
+            { title: 'CurrencyId', field: 'currencyId', sortable: true },
+            { title: 'ExchangeRate', field: 'ExchangeRate', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Paid Date', field: 'paidDate', sortable: true },
             { title: 'Payment Type', field: 'paymentType', sortable: true }
         ];
     }
 
-    hideInvalid() {
-        if (this.data == null) { return; }
-        this.isShowInvalid = !this.isShowInvalid;
-        if (this.isShowInvalid) {
-            this.pager.totalItems = this.data.length;
-            this.pagingData(this.data);
-        } else {
-            this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pagingData(this.inValidItems);
-            this.pager.totalItems = this.inValidItems.length;
-        }
-    }
-
-    pagingData(data: any[]) {
-        this.pager = this._pagingService.getPager(this.pager.totalItems, this.pager.currentPage, this.pager.pageSize);
-        this.pager.numberPageDisplay = SystemConstants.OPTIONS_NUMBERPAGES_DISPLAY;
-        this.pager.numberToShow = SystemConstants.ITEMS_PER_PAGE;
-        this.pagedItems = data.slice(this.pager.startIndex, this.pager.endIndex + 1);
-    }
 
     changeFile(file: Event) {
         if (file.target['files'] == null) { return; }
@@ -81,39 +67,56 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
             )
             .subscribe((response: CommonInterface.IResponseImport) => {
                 this.data = response.data;
+                this.pagedItems = cloneDeep(this.data);
 
-                this.pager.currentPage = 1;
-                this.pager.totalItems = this.data.length;
+                this.page = 1;
+                this.totalItems = this.data.length;
 
                 this.totalValidRows = response.totalValidRows;
                 this.totalRows = this.data.length;
 
-                this.pagingData(this.data);
+                this.pagingData(this.data.length, this.page);
             }, () => { });
 
     }
 
-    pageChanged(event: any): void {
-        if (this.pager.currentPage !== event.page || this.pager.pageSize !== event.itemsPerPage) {
-            this.pager.currentPage = event.page;
-            this.pager.pageSize = event.itemsPerPage;
+    pagingData(totalItem: number, currentPage: number) {
+        const dataPaging: {
+            startIndex: number,
+            endIndex: number,
+            pageSize: number,
+            totalItems: number
+        } = this._pagingService.getPager(totalItem, currentPage, this.pageSize);
 
-            this.pagingData(this.data);
-        }
+        this.pagedItems = this.data.slice(dataPaging.startIndex, dataPaging.endIndex + 1);
+        this.totalItems = dataPaging.totalItems;
+        this.startIndex = dataPaging.startIndex;
     }
 
-    selectPageSize() {
-        this.pager.currentPage = 1;
+    hideInvalid() {
+        if (!this.data.length) { return; }
+        this.isShowInvalid = !this.isShowInvalid;
+
         if (this.isShowInvalid) {
-            this.pager.totalItems = this.data.length;
-            this.pagingData(this.data);
+            this.pagedItems = cloneDeep(this.data);
+            this.totalItems = this.pagedItems.length;
 
         } else {
-            this.inValidItems = this.data.filter(x => !x.isValid);
-            this.pagingData(this.inValidItems);
-            this.pager.totalItems = this.inValidItems.length;
+            const invalidData = this.data.filter(x => !x.isValid);
+            this.pagedItems.length = 0;
+            this.pagedItems = invalidData;
+            this.totalItems = invalidData.length;
         }
     }
+
+    onPaging() {
+        this.pagingData(this.data.length, this.page);
+    }
+
+    sortList() {
+        this.pagedItems = this._sortService.sort(this.pagedItems, this.sort, this.order);
+    }
+
     downloadSample() {
         this._accountingRepo.downloadOBHPaymentFile()
             .pipe(catchError(this.catchError))
@@ -123,7 +126,8 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
                 },
             );
     }
-    import(element) {
+
+    import() {
         if (this.data == null) { return; }
         if (this.data.length === 0) {
             this.invaliDataAlert.show();
@@ -146,8 +150,6 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
                     (res) => {
                         if (res.status) {
                             this._toastService.success(res.message);
-                            this.pager.totalItems = 0;
-                            this.reset(element);
                         } else {
                             this._toastService.error(res.message);
                         }
@@ -155,12 +157,7 @@ export class AccountReceivablePayableImportOBHPaymentComponent extends AppList i
                 );
         }
     }
-    reset(element) {
-        this.data = null;
-        this.pagedItems = null;
-        element.value = "";
-        this.pager.totalItems = 0;
-    }
+
 }
 interface IImportOBH {
     soaNo: string;
@@ -170,4 +167,11 @@ interface IImportOBH {
     paidDate: string;
     paymentType: string;
     isValid: boolean;
+    currencyId: string;
+    paymentMethod: string;
+    exchangeRate: number;
+    soaNoError: string;
+    partnerAccountError: string;
+    currencyIdError: string;
+    paymentMethodError: string;
 }

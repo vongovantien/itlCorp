@@ -131,5 +131,9 @@
   "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_EMPTY": "Payment Type không được để trống",
   "MSG_PAYMENT_TYPE_ACCOUNTING_PAYMENT_INVALID": "Payment Type không hợp lệ",
   "MSG_VOUCHER_ID_HAD_PAYMENT": "VoucherId {0} đã được thanh toán",
-  "MSG_PAYMENT_STATUS_INVALID": "Payment Status {0} không hợp lệ"
+  "MSG_PAYMENT_STATUS_INVALID": "Payment Status {0} không hợp lệ",
+  "MSG_CURRENCY_ACCOUNTING_PAYMENT_EMPTY": "Currency không được để trống",
+  "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_EMPTY": "Phương thức thanh toán không được để trống",
+  "MSG_PAYMENT_METHOD_ACCOUNTING_PAYMENT_INVALID": "Phương thức thanh toán {0} không hợp lệ",
+  "MSG_EXCHANGE_RATE_ACCOUNTING_PAYMENT_INVALID": "Tỷ giá {0} không hợp lệ"
 }

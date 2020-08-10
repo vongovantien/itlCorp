@@ -17,5 +17,12 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string PartnerAccountError { get; set; }
         public string RefId { get; set; }
         public string PaidDateError { get; set; }
+        public string CurrencyId { get; set; }
+        public decimal ExchangeRate { get; set; }
+        public string PaymentMethod { get; set; }
+        public string Note { get; set; }
+        public string CurrencyIdError { get; set; }
+        public string PaymentMethodError { get; set; }
+
     }
 }

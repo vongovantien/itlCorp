@@ -5,8 +5,6 @@
         </div>
     </div>
 </div>
-
-
 <div class="m-content">
     <div class="m-portlet">
         <div class="m-portlet__body">
@@ -52,7 +50,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="import(inputFile)">
+                        (click)="import()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -78,59 +76,17 @@
         <div class="m-portlet__body">
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand dataTable">
-                    <thead>
-                        <tr>
-                            <th>
-                                <span>No.</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'invoiceNo'), 'sorting_desc': (!isDesc && sortKey == 'invoiceNo') }"
-                                (click)="sort('invoiceNo')">
-                                <span>Invoice No</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'serieNo'), 'sorting_desc': (!isDesc && sortKey == 'serieNo') }"
-                                (click)="sort('serieNo')">
-                                <span>Serie No</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'voucherDate'), 'sorting_desc': (!isDesc && sortKey == 'voucherDate') }"
-                                (click)="sort('voucherDate')">
-                                <span>Partner ID</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerName'), 'sorting_desc': (!isDesc && sortKey == 'partnerName') }"
-                                (click)="sort('partnerName')">
-                                <span>Partner Name</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentAmount'), 'sorting_desc': (!isDesc && sortKey == 'paymentAmount') }"
-                                (click)="sort('paymentAmount')">
-                                <span>Payment Amount</span>
-                            </th>
-
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paidDate'), 'sorting_desc': (!isDesc && sortKey == 'paidDate') }"
-                                (click)="sort('paidDate')">
-                                <span>Paid Date</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'paymentType'), 'sorting_desc': (!isDesc && sortKey == 'paymentType') }"
-                                (click)="sort('paymentType')">
-                                <span>Payment Type</span>
-                            </th>
-                            <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'note'), 'sorting_desc': (!isDesc && sortKey == 'note') }"
-                                (click)="sort('note')">
-                                <span>Note</span>
-                            </th>
-                        </tr>
+                    <thead app-table-header [headers]="headers"
+                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                        <th class="first table-actions-col">
+                            No.
+                        </th>
                     </thead>
                     <tbody *ngIf="data">
                         <ng-container *ngFor="let item of pagedItems; let i = index">
                             <tr [ngClass]="{ 'invalid-row': !item.isValid }">
                                 <td class="">
-                                    <span>{{ (i + this.pager.startIndex + 1) }}</span>
+                                    <span>{{ (i + startIndex + 1) }}</span>
                                 </td>
                                 <td class="">
                                     <span *ngIf="item.invoiceNoError === null">{{ item.invoiceNo }}</span>
@@ -156,6 +112,31 @@
                                     <span class="m--font-danger" *ngIf="item.paymentAmountError !== null">{{
                                         item.paymentAmountError }}</span>
                                 </td>
+                                <td>
+                                    <span *ngIf="!item.currencyIdError; else curE">{{ item.currencyId}}</span>
+                                    <ng-template #curE>
+                                        <span class="m--font-danger">
+                                            {{item.currencyIdError}}
+                                        </span>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <span
+                                        *ngIf="!item.exchangeRateError; else exE">{{item.exchangeRate | number: '.0-3'}}</span>
+                                    <ng-template #exE>
+                                        <span class="m--font-danger">
+                                            {{item.exchangeRateError}}
+                                        </span>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <span *ngIf="!item.paymentMethodError; else pmE">{{item.paymentMethod}}</span>
+                                    <ng-template #pmE>
+                                        <span class="m--font-danger">
+                                            {{item.paymentMethodError}}
+                                        </span>
+                                    </ng-template>
+                                </td>
                                 <td class="">
                                     <span
                                         *ngIf="item.paidDateError === null">{{ item.paidDate | date: 'dd/MM/yyyy'  }}</span>
@@ -168,35 +149,16 @@
                                         item.paymentTypeError }}</span>
                                 </td>
                                 <td class="">
-                                    <span *ngIf="item.note === null">{{ item.note }}</span>
+                                    <span *ngIf="item.note !== null">{{ item.note }}</span>
                                 </td>
                             </tr>
                         </ng-container>
                     </tbody>
                 </table>
             </div>
-            <div class="pagination-nav">
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="select-box" style="max-width: 190px">
-                            <select class="form-control" id="" aria-label="" [(ngModel)]="pager.pageSize"
-                                (change)="selectPageSize()" name="pagesize">
-                                <ng-container *ngFor="let item of pager.numberToShow; index as i; first as isFirst">
-                                    <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page</option>
-                                </ng-container>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-sm-6" *ngIf="pager.totalItems > pager.pageSize">
-                        <div class="float-right">
-                            <pagination [boundaryLinks]="true" [totalItems]="pager.totalItems"
-                                [maxSize]="pager.numberPageDisplay" [itemsPerPage]="pager.pageSize"
-                                (pageChanged)="pageChanged($event)" [(ngModel)]="pager.currentPage">
-                            </pagination>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                (onChange)="updatePagingData($event)"></app-pagination>
         </div>
     </div>
 

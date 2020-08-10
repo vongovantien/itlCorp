@@ -106,6 +106,8 @@
                                                             <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
                                                             </td>
                                                             <td>{{ payment.paymentType }}</td>
+                                                            <td>{{ payment.paymentMethod  }}</td>
+                                                            <td>{{ payment.exchangeRate | number: '.0-3' }}</td>
                                                             <td>{{ payment.userModifiedName }}</td>
                                                             <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}
                                                             </td>
