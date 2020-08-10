@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string SettlementRequesterId { get; set; }
         public string SettlementRequester { get; set; }
         public string InputRefNo { get; set; }
+        public string Service { get; set; }
         public List<ChargeOfAccountingManagementModel> Charges;
     }
 }
