@@ -385,5 +385,14 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        [Route("GetContractForInvoice")]
+        [Authorize]
+        public IActionResult GetContractForInvoice(AccMngtContractInvoiceCriteria model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            CatContractInvoiceModel result = accountingService.GetContractForInvoice(model);
+            return Ok(result);
+        }
     }
 }

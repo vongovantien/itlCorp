@@ -67,7 +67,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         this.formSearch = this._fb.group({
             referenceNo: [],
             partner: [],
-            issueDate: [],
+            issueDate: [{ startDate: new Date(), endDate: new Date() }],
             creator: [],
             invoiceStatus: [],
             voucherType: []
@@ -107,7 +107,8 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
             // tslint:disable-next-line: no-any
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: this.partner.value,
-            issuedDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            fromIssuedDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            toIssuedDate: this.issueDate.value ? (this.issueDate.value.endDate !== null ? formatDate(this.issueDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
             creatorId: this.creator.value,
             invoiceStatus: this.invoiceStatus.value ? (this.invoiceStatus.value.length > 0 ? this.invoiceStatus.value[0].id : null) : null,
             voucherType: this.voucherType.value ? (this.voucherType.value.length > 0 ? this.voucherType.value[0].id : null) : null,
@@ -122,7 +123,11 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
 
     reset() {
         this.formSearch.reset();
-        // tslint:disable-next-line: no-any
-        this.onSearch.emit(<any>{ typeOfAcctManagement: this.accountType });
+        this.issueDate.setValue({ startDate: new Date(), endDate: new Date() });
+        this.onSearch.emit(<any>{
+            typeOfAcctManagement: this.accountType,
+            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        });
     }
 }

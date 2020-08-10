@@ -22,5 +22,7 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public decimal? ExchangeRate { get; set; }
+        public string PaymentMethod { get; set; }
     }
 }

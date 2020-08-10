@@ -1,0 +1,50 @@
+import { Injectable } from '@angular/core';
+import { Observable, of, EMPTY } from 'rxjs';
+import { Action } from '@ngrx/store';
+import { Actions, Effect, ofType, createEffect } from '@ngrx/effects';
+import { AccountingRepo } from '@repositories';
+import { catchError, mergeMap, map } from 'rxjs/operators';
+import { AccountingManagementActionTypes, GetAgreementForInvoice, IAccMngtContractInvoiceCriteria, IAgreementInvoice } from '../actions';
+import { PartnerOfAcctManagementResult } from '@models';
+import { SystemConstants } from '@constants';
+
+@Injectable()
+export class AccountingManagementEffects {
+
+    @Effect() effectOldSyntax$: Observable<Action> = this.actions$.pipe(ofType('ACTIONTYPE')); // ! cú pháp cũ
+
+    effectNewSystax$: Observable<Action> = createEffect(() => this.actions$.pipe(ofType('ACTIONTYPE'))); // ? Cú pháp mới
+
+    constructor(
+        private actions$: Actions,
+        private _accountingRepo: AccountingRepo,
+    ) { }
+
+    getAgreementBy$: Observable<Action> = createEffect(() => this.actions$
+        .pipe(
+            ofType(AccountingManagementActionTypes.SELECT_PARTNER, AccountingManagementActionTypes.SELECT_REQUESTER),
+            map((payload: PartnerOfAcctManagementResult) =>
+                ({
+                    partnerId: payload.partnerId,
+                    service: payload.service,
+                    office: this.getOfficeByCurrentUser()
+                })
+            ),
+            mergeMap(
+                (data: IAccMngtContractInvoiceCriteria) => this._accountingRepo.getAgreementForInvoice(data)
+                    .pipe(
+                        map((data: IAgreementInvoice) => GetAgreementForInvoice(data)),
+                        catchError(() => EMPTY)
+                    )
+            )
+        ));
+
+    getOfficeByCurrentUser() {
+        const loginData: SystemInterface.IClaimUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        return loginData.officeId;
+    }
+
+}
+
+
+
