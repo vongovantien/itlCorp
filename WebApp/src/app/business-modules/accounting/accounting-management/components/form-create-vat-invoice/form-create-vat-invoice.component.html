@@ -35,6 +35,13 @@
                                     formControlName="description"></textarea>
                             </div>
                         </div>
+                        <div class="col-lg-12">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
+                                <label required>Payment Term</label>
+                                <input type="text" class="form-control" formControlName="paymentTerm" integer>
+                            </div>
+                        </div>
                         <div class="col-lg-8">
                             <div class="form-group">
                                 <label>General Exchange Rate

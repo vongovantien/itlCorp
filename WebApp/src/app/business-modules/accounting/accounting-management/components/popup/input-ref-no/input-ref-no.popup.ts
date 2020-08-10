@@ -104,6 +104,8 @@ export class AccountingManagementInputRefNoPopupComponent extends PopupBase impl
                         if (!!res && !!res.length) {
                             if (res.length === 1) {
                                 this._store.dispatch(SelectPartner(res[0]));
+
+                                // Search agreement.
                                 this.hide();
                                 return;
                             } else {

@@ -43,6 +43,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<AcctSoa> soaRepo;
         private readonly IContextBase<AccAccountingPayment> accountingPaymentRepository;
+        private readonly IContextBase<CatContract> catContractRepository;
+
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -65,6 +67,8 @@ namespace eFMS.API.Accounting.DL.Services
             IStringLocalizer<AccountingLanguageSub> localizer,
             IContextBase<SysEmployee> employee,
             IContextBase<AccAccountingPayment> accountingPaymentRepo,
+            IContextBase<CatContract> catContractRepo,
+
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -87,6 +91,7 @@ namespace eFMS.API.Accounting.DL.Services
             stringLocalizer = localizer;
             soaRepo = soa;
             accountingPaymentRepository = accountingPaymentRepo;
+            catContractRepository = catContractRepo;
         }
 
         #region --- DELETE ---
@@ -456,7 +461,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //SELLING (DEBIT)
             var charges = GetChargeSellForInvoice(query);
-
+            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
             // Group by theo Partner
             var chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
                 new PartnerOfAcctManagementResult
@@ -466,7 +471,8 @@ namespace eFMS.API.Accounting.DL.Services
                     PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
                     SettlementRequester = null,
                     InputRefNo = string.Empty,
-                    Charges = s.ToList()
+                    Charges = s.ToList(),
+                    Service = GetTransactionType(jobNoGrouped)
                 }
                 ).ToList();
 
@@ -811,6 +817,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var charges = GetChargeForVoucher(query);
+            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
 
             var chargeGroupByPartner = new List<PartnerOfAcctManagementResult>();
 
@@ -826,7 +833,8 @@ namespace eFMS.API.Accounting.DL.Services
                         SettlementRequesterId = s.Key.SettlementRequesterId,
                         SettlementRequester = null, //Tính toán bên dưới
                         InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList()
+                        Charges = s.ToList(),
+                        Service = GetTransactionType(jobNoGrouped)
                     }
                     ).ToList();
             }
@@ -842,7 +850,8 @@ namespace eFMS.API.Accounting.DL.Services
                         SettlementRequesterId = null,
                         SettlementRequester = null,
                         InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList()
+                        Charges = s.ToList(),
+                        Service = GetTransactionType(jobNoGrouped)
                     }
                     ).ToList();
             }
@@ -1005,7 +1014,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DateTime? dueDate = null;
                 if (accounting.Date.HasValue)
                 {
-                    dueDate = accounting.Date.Value.AddDays(30);
+                    dueDate = accounting.Date.Value.AddDays(30 + (double)(accounting.PaymentTerm ?? 0));
                 }
                 accounting.PaymentDueDate = dueDate;
 
@@ -1511,7 +1520,7 @@ namespace eFMS.API.Accounting.DL.Services
                         DateTime? dueDate = null;
                         if (vatInvoice.Date.HasValue)
                         {
-                            dueDate = vatInvoice.Date.Value.AddDays(30);
+                            dueDate = vatInvoice.Date.Value.AddDays(30 + (double)(vatInvoice.PaymentTerm ?? 0));
                         }
                         vatInvoice.PaymentDueDate = dueDate;
                         vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
@@ -1646,6 +1655,46 @@ namespace eFMS.API.Accounting.DL.Services
             isExited = DataContext.Get(x => x.InvoiceNoTempt == invoiceNoTemp && x.Serie == serie && x.VoucherId != voucherId && x.Type == AccountingConstants.ADVANCE_TYPE_INVOICE).Any();
 
             return isExited;
+        }
+
+        public CatContractInvoiceModel GetContractForInvoice(AccMngtContractInvoiceCriteria model)
+        {
+            string acRef = null;
+            CatContractInvoiceModel result = new CatContractInvoiceModel { };
+
+            CatPartner partner = partnerRepo.Get(p => p.AccountNo == model.PartnerId)?.FirstOrDefault();
+            if(partner == null)
+            {
+                return result;
+            }
+
+            if(!string.IsNullOrEmpty(partner.ParentId))
+            {
+                acRef = partner.ParentId;
+            }
+            else
+            {
+                acRef = partner.Id; // Đối tượng công nợ là chính nó
+            }
+            CatPartner partnerRef = partnerRepo.Get(p => p.Id == acRef)?.FirstOrDefault();
+
+
+            Expression<Func<CatContract, bool>> queryContractByCriteria = null;
+            queryContractByCriteria = x => (
+            (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
+            && (x.SaleService.Contains(model.Service ?? "", StringComparison.OrdinalIgnoreCase) 
+            && x.PartnerId == partnerRef.Id));
+
+            IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);
+
+            if(agreements != null && agreements.Count() > 0)
+            {
+                result.ContractNo = agreements.FirstOrDefault().ContractNo;
+                result.ContractType = agreements.FirstOrDefault().ContractType;
+                result.PaymentTerm = agreements.FirstOrDefault().PaymentTerm;
+            }
+
+            return result;
         }
     }
 }
