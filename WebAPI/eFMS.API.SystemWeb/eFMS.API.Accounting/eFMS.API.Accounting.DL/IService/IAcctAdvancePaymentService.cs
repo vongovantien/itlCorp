@@ -7,6 +7,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -80,6 +81,9 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState CheckExistSettingFlow(string type, Guid? officeId);
 
         HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
-        
+
+        List<Guid> GetSurchargeIdByHblId(Guid? hblId);
+
+        List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo);
     }
 }

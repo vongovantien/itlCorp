@@ -3365,5 +3365,23 @@ namespace eFMS.API.Accounting.DL.Services
             });
             return list;
         }
+
+        public List<Guid> GetSurchargeIdByHblId(Guid? hblId)
+        {
+            var surchargeIds = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId).Select(s => s.Id).ToList();
+            return surchargeIds;
+        }
+
+        public List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo)
+        {
+            var _advanceRequests = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo);
+            List<AcctAdvanceRequestModel> advanceRequests = new List<AcctAdvanceRequestModel>();
+            foreach (var _advanceRequest in _advanceRequests)
+            {
+                var advRequest = mapper.Map<AcctAdvanceRequestModel>(_advanceRequest);
+                advanceRequests.Add(advRequest);
+            }
+            return advanceRequests;
+        }
     }
 }

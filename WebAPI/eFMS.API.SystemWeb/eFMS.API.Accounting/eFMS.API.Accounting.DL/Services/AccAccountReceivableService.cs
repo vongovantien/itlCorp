@@ -533,7 +533,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
                 if (partner == null) return new HandleState("Not found partner");
 
-                model.AcRef = partner.ParentId;
+                model.AcRef = partner.ParentId ?? partner.Id;
 
                 var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                 && x.PartnerId == model.PartnerId
@@ -629,7 +629,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
                 if (partner == null) return new HandleState("Not found partner");
 
-                model.AcRef = partner.ParentId;
+                model.AcRef = partner.ParentId ?? partner.Id;
 
                 var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                 && x.PartnerId == model.PartnerId
@@ -746,9 +746,15 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
-            if (model.ObjectReceivable.Count() > 0)
+            if (model != null && model.ObjectReceivable.Count() > 0)
             {
-                foreach (var obj in model.ObjectReceivable)
+                // PartnerId, Office, Service # Empty And Null
+                var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)
+                                                                  && (x.Office != null && x.Office != Guid.Empty)
+                                                                  && !string.IsNullOrEmpty(x.Service))
+                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service })
+                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service } ).ToList();
+                foreach (var obj in objReceivalble)
                 {
                     if (!string.IsNullOrEmpty(obj.PartnerId) && obj.Office != null && obj.Office != Guid.Empty && !string.IsNullOrEmpty(obj.Service))
                     {
@@ -756,10 +762,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
+                // PartnerId, Office, Service is Empty Or Null
                 var surchargeIds = model.ObjectReceivable.Where(x => (x.SurchargeId != null && x.SurchargeId != Guid.Empty)
                                                                   && string.IsNullOrEmpty(x.PartnerId)
                                                                   && (x.Office == null || x.Office == Guid.Empty)
-                                                                  && string.IsNullOrEmpty(x.Service)).Select(s => s.SurchargeId).ToList();
+                                                                  && string.IsNullOrEmpty(x.Service)).Select(s => s.SurchargeId).Distinct().ToList();
                 if (surchargeIds.Count() > 0)
                 {
                     var objectReceivables = GetObjectReceivableBySurchargeId(surchargeIds);

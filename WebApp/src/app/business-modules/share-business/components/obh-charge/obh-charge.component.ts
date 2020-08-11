@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
@@ -33,8 +33,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService
-
+        protected _dataService: DataService,
+        protected _accountingRepo: AccountingRepo,
     ) {
         super(
             _catalogueRepo,
@@ -44,7 +44,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _sortService,
             _ngProgressService,
             _spinner,
-            _dataService);
+            _dataService,
+            _accountingRepo);
         this._progressRef = this._ngProgressService.ref();
     }
 
@@ -225,6 +226,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // Tính công nợ
+                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
