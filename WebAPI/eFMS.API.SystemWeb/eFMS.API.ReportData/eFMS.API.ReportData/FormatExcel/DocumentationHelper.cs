@@ -18,7 +18,7 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormat = "#,##0.00";
         const string numberFormatKgs = "#,##0 \"KGS\"";
         const string numberFormatVND = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
-
+        const string numberFormats = "#,##0";
 
         public Stream CreateEManifestExcelFile(CsTransactionDetailModel transactionDetail, Stream stream = null)
         {
@@ -1414,33 +1414,33 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i + addressStartContent, 23].Value = item.CW;
                 workSheet.Cells[i + addressStartContent, 24].Value = item.CBM;
                 workSheet.Cells[i + addressStartContent, 25].Value = item.TotalSellFreight;
-                workSheet.Cells[i + addressStartContent, 25].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 25].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 26].Value = item.TotalSellTrucking;
-                workSheet.Cells[i + addressStartContent, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 27].Value = item.TotalSellHandling;
-                workSheet.Cells[i + addressStartContent, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 28].Value = item.TotalSellOthers;
-                workSheet.Cells[i + addressStartContent, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 29].Value = item.TotalSell;
-                workSheet.Cells[i + addressStartContent, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 30].Value = item.TotalBuyFreight;
-                workSheet.Cells[i + addressStartContent, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 31].Value = item.TotalBuyTrucking;
-                workSheet.Cells[i + addressStartContent, 31].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 31].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 32].Value = item.TotalBuyHandling;
-                workSheet.Cells[i + addressStartContent, 32].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 32].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 33].Value = item.TotalBuyKB;
-                workSheet.Cells[i + addressStartContent, 33].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 33].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 34].Value = item.TotalBuyOthers;
-                workSheet.Cells[i + addressStartContent, 34].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 34].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 35].Value = item.TotalBuy;
-                workSheet.Cells[i + addressStartContent, 35].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 35].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 36].Value = item.Profit;
-                workSheet.Cells[i + addressStartContent, 36].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 36].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 37].Value = item.AmountOBH;
-                workSheet.Cells[i + addressStartContent, 37].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 37].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 38].Value = item.AmountOBH;
-                workSheet.Cells[i + addressStartContent, 38].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+                workSheet.Cells[i + addressStartContent, 38].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 workSheet.Cells[i + addressStartContent, 39].Value = item.Destination;
                 workSheet.Cells[i + addressStartContent, 40].Value = item.CustomerId;
                 workSheet.Cells[i + addressStartContent, 41].Value = item.CustomerName;
@@ -1491,59 +1491,59 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[addressTotalCBM].Value = overview.Select(t => t.CBM).Sum();
             string addressTotalSellFreight= workSheet.Cells[address, 25].Start.Address;
             workSheet.Cells[addressTotalSellFreight].Value = overview.Select(t => t.TotalSellFreight).Sum();
-            workSheet.Cells[addressTotalSellFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalSellFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalSellTrucking = workSheet.Cells[address, 26].Start.Address;
             workSheet.Cells[addressTotalSellTrucking].Value = overview.Select(t => t.TotalSellTrucking).Sum();
-            workSheet.Cells[addressTotalSellTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalSellTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalSellHandling = workSheet.Cells[address, 27].Start.Address;
             workSheet.Cells[addressTotalSellHandling].Value = overview.Select(t => t.TotalSellHandling).Sum();
-            workSheet.Cells[addressTotalSellHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalSellHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalSellOther = workSheet.Cells[address, 28].Start.Address;
             workSheet.Cells[addressTotalSellOther].Value = overview.Select(t => t.TotalSellOthers).Sum();
-            workSheet.Cells[addressTotalSellOther].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalSellOther].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalSell = workSheet.Cells[address, 29].Start.Address;
             workSheet.Cells[addressTotalSell].Value = overview.Select(t => t.TotalSell).Sum();
-            workSheet.Cells[addressTotalSell].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalSell].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuyFreight = workSheet.Cells[address, 30].Start.Address;
             workSheet.Cells[addressTotalBuyFreight].Value = overview.Select(t => t.TotalBuyFreight).Sum();
-            workSheet.Cells[addressTotalBuyFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuyFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuyTrucking= workSheet.Cells[address, 31].Start.Address;
             workSheet.Cells[addressTotalBuyTrucking].Value = overview.Select(t => t.TotalBuyTrucking).Sum();
-            workSheet.Cells[addressTotalBuyTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuyTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuyHandling = workSheet.Cells[address, 32].Start.Address;
             workSheet.Cells[addressTotalBuyHandling].Value = overview.Select(t => t.TotalBuyHandling).Sum();
-            workSheet.Cells[addressTotalBuyHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuyHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuyKB = workSheet.Cells[address, 33].Start.Address;
             workSheet.Cells[addressTotalBuyKB].Value = overview.Select(t => t.TotalBuyKB).Sum();
-            workSheet.Cells[addressTotalBuyKB].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuyKB].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuyOthers = workSheet.Cells[address, 34].Start.Address;
             workSheet.Cells[addressTotalBuyOthers].Value = overview.Select(t => t.TotalBuyOthers).Sum();
-            workSheet.Cells[addressTotalBuyOthers].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuyOthers].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalBuy = workSheet.Cells[address, 35].Start.Address;
             workSheet.Cells[addressTotalBuy].Value = overview.Select(t => t.TotalBuy).Sum();
-            workSheet.Cells[addressTotalBuy].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressTotalBuy].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressProfit = workSheet.Cells[address, 36].Start.Address;
             workSheet.Cells[addressProfit].Value = overview.Select(t => t.Profit).Sum();
-            workSheet.Cells[addressProfit].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressProfit].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressAmountOBH = workSheet.Cells[address, 37].Start.Address;
             workSheet.Cells[addressAmountOBH].Value = overview.Select(t => t.AmountOBH).Sum();
-            workSheet.Cells[addressAmountOBH].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressAmountOBH].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressAmountOBHR = workSheet.Cells[address, 38].Start.Address;
             workSheet.Cells[addressAmountOBHR].Value = overview.Select(t => t.AmountOBH).Sum();
-            workSheet.Cells[addressAmountOBHR].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormatVND : numberFormat;
+            workSheet.Cells[addressAmountOBHR].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressToBold = addressTotalCont20 + ":" + addressAmountOBHR;
             workSheet.Cells[addressToBold].Style.Font.Bold = true;
@@ -2014,9 +2014,22 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[startRow, 12].Value = item.Cost;
                 workSheet.Cells[startRow, 13].Value = item.Profit;
                 workSheet.Cells[startRow, 14].Value = item.Obh;
-                for (int i = 10; i < 15; i++)
+
+                workSheet.Cells[startRow, 10].Style.Numberformat.Format = numberFormatVND;
+
+                if (criteria.Currency != "VND")
                 {
-                    workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormat;
+                    for (int i = 11; i < 15; i++)
+                    {
+                        workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormatVND;
+                    }
+                }
+                else
+                {
+                    for (int i = 11; i < 15; i++)
+                    {
+                        workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormats;
+                    }
                 }
 
                 workSheet.Cells[startRow, 15].Value = item.PersonInCharge;

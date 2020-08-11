@@ -648,11 +648,14 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal _totalSellAmountHandling = 0;
                 decimal _totalSellAmountOther = 0;
                 var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+                
                 foreach (var charge in _chargeSell)
                 {
 
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //SELL
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -698,6 +701,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
