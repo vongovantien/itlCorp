@@ -47,7 +47,9 @@ export class PermissionSample {
     companyName: string = '';
     nameUserCreated: string = '';
     nameUserModified: string = '';
-
+    //
+    companyAbbrName: string = '';
+    officeAbbrName: string = '';
 
 
     // custom

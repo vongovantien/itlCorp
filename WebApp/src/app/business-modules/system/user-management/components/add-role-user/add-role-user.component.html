@@ -65,7 +65,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (item.buid === null  || item.isDup) }"
                                     *ngIf="item.id">
-                                    <input type="text" class="form-control" [value]="item.companyName"
+                                    <input type="text" class="form-control" [value]="item.companyAbbrName"
                                         [readonly]="true">
                                 </div>
                             </td>
@@ -84,7 +84,8 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && ( item.officeId === null || item.isDup)  }"
                                     *ngIf="item.id">
-                                    <input type="text" class="form-control" [value]="item.officeName" [readonly]="true">
+                                    <input type="text" class="form-control" [value]="item.officeAbbrName"
+                                        [readonly]="true">
                                 </div>
                             </td>
                         </tr>
