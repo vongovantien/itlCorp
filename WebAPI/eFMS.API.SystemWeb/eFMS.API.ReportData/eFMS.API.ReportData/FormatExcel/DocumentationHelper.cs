@@ -1797,25 +1797,25 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].UsdRevenue != null && listData[i].UsdRevenue != 0)
                 {
                     workSheet.Cells[rowStart, 14].Value = listData[i].UsdRevenue;
-                    workSheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 14].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].VndRevenue != null && listData[i].VndRevenue != 0)
                 {
                     workSheet.Cells[rowStart, 15].Value = listData[i].VndRevenue;
-                    workSheet.Cells[rowStart, 15].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].TaxOut != null && listData[i].TaxOut != 0)
                 {
                     workSheet.Cells[rowStart, 16].Value = listData[i].TaxOut;
-                    workSheet.Cells[rowStart, 16].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].TotalRevenue != null && listData[i].TotalRevenue != 0)
                 {
                     workSheet.Cells[rowStart, 17].Value = listData[i].TotalRevenue;
-                    workSheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 17].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 workSheet.Cells[rowStart, 18].Value = listData[i].TaxInvNoCost;
@@ -1824,43 +1824,43 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].UsdCost != null && listData[i].UsdCost != 0)
                 {
                     workSheet.Cells[rowStart, 20].Value = listData[i].UsdCost;
-                    workSheet.Cells[rowStart, 20].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 20].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].VndCost != null && listData[i].VndCost != 0)
                 {
                     workSheet.Cells[rowStart, 21].Value = listData[i].VndCost;
-                    workSheet.Cells[rowStart, 21].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 21].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].TaxIn != null && listData[i].TaxIn != 0)
                 {
                     workSheet.Cells[rowStart, 22].Value = listData[i].TaxIn;
-                    workSheet.Cells[rowStart, 22].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 22].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].TotalCost != null && listData[i].TotalCost != 0)
                 {
                     workSheet.Cells[rowStart, 23].Value = listData[i].TotalCost;
-                    workSheet.Cells[rowStart, 23].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 23].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].TotalKickBack != null && listData[i].TotalKickBack != 0)
                 {
                     workSheet.Cells[rowStart, 24].Value = listData[i].TotalKickBack;
-                    workSheet.Cells[rowStart, 24].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 24].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].ExchangeRate != 0)
                 {
                     workSheet.Cells[rowStart, 25].Value = listData[i].ExchangeRate;
-                    workSheet.Cells[rowStart, 25].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 25].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 if (listData[i].Balance != null && listData[i].Balance != 0)
                 {
                     workSheet.Cells[rowStart, 26].Value = listData[i].Balance;
-                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 workSheet.Cells[rowStart, 27].Value = listData[i].InvNoObh;
@@ -1868,7 +1868,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (listData[i].AmountObh != null && listData[i].AmountObh != 0)
                 {
                     workSheet.Cells[rowStart, 28].Value = listData[i].AmountObh;
-                    workSheet.Cells[rowStart, 28].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 workSheet.Cells[rowStart, 29].Value = listData[i].PaidDate;
@@ -1891,7 +1891,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 17].Value = listData.Select(s => s.TotalRevenue).Sum(); // Sum Total Revenue            
             for (int i = 14; i < 18; i++)
             {
-                workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[rowStart, i].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
             }
 
             workSheet.Cells[rowStart, 20].Value = listData.Select(s => s.UsdCost).Sum(); // Total USD Cost
@@ -1900,13 +1900,13 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 23].Value = listData.Select(s => s.TotalCost).Sum(); // Sum Total Cost
             for (int i = 20; i < 24; i++)
             {
-                workSheet.Cells[rowStart, i].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[rowStart, i].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
             }
 
             workSheet.Cells[rowStart, 26].Value = listData.Select(s => s.Balance).Sum(); // Sum Total Balance
-            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 26].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
-            workSheet.Cells[rowStart, 28].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             workSheet.Cells[6, 1, 6, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[7, 1, rowStart, 32].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -2043,7 +2043,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
         #region Summary Cost
-        public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, Stream stream = null)
+        public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, GeneralReportCriteria criteria, Stream stream = null)
         {
             try
             {
@@ -2051,7 +2051,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("Summary Of Costs");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BinddingDatalSummaryOfCostsIncurred(workSheet, lst);
+                    BinddingDatalSummaryOfCostsIncurred(workSheet, criteria, lst);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -2062,7 +2062,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             return null;
         }
-        public void BinddingDatalSummaryOfCostsIncurred(ExcelWorksheet workSheet, List<SummaryOfCostsIncurredModel> lst)
+        public void BinddingDatalSummaryOfCostsIncurred(ExcelWorksheet workSheet, GeneralReportCriteria criteria, List<SummaryOfCostsIncurredModel> lst)
         {
             List<string> headerTable = new List<string>()
             {
@@ -2183,11 +2183,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (!item.Type.Contains("OBH"))
                 {
                     workSheet.Cells[i + addressStartContent, 12].Value = item.NetAmount != null ? item.NetAmount : 0M;
-                    workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     workSheet.Cells[i + addressStartContent, 13].Value = item.VATAmount != null ? item.VATAmount : 0M;
                     workSheet.Cells[i + addressStartContent, 14].Value = item.VATAmount.GetValueOrDefault(0M) + item.NetAmount.GetValueOrDefault(0M);
-                    workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormatVND;
-                    workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     workSheet.Cells[i + addressStartContent, 15].Value = 0M;
                     workSheet.Cells[i + addressStartContent, 16].Value = 0M;
                     workSheet.Cells[i + addressStartContent, 17].Value = 0M;
@@ -2200,18 +2200,18 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
                     workSheet.Cells[i + addressStartContent, 15].Value = item.NetAmount != null ? item.NetAmount : 0M;
-                    workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     workSheet.Cells[i + addressStartContent, 16].Value = item.VATAmount != null ? item.VATAmount : 0M;
-                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     workSheet.Cells[i + addressStartContent, 17].Value = item.VATAmount.GetValueOrDefault(0M) + item.NetAmount.GetValueOrDefault(0M);
-                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
                 decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 14].Value);
                 decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
 
                 workSheet.Cells[i + addressStartContent, 18].Value = TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
-                workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
             }
 
 
@@ -2264,31 +2264,34 @@ namespace eFMS.API.ReportData.FormatExcel
             totalAll = totalOBHCharge + totalNormalCharge;
 
             workSheet.Cells[addressTotalNext].Value = totalNetAmountNormalCharge;
-            workSheet.Cells[addressTotalNext].Style.Numberformat.Format = numberFormatVND;
-
+            workSheet.Cells[addressTotalNext].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
             string addressTotalVat = workSheet.Cells[addressStartContent, 13].Start.Address;
             workSheet.Cells[addressTotalVat].Value = totalVATNormalCharge;
-            workSheet.Cells[addressTotalVat].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressTotalVat].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalNormalCharge = workSheet.Cells[addressStartContent, 14].Start.Address;
             workSheet.Cells[addressTotalNormalCharge].Value = totalNormalCharge;
-            workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressNetAmountCharge = workSheet.Cells[addressStartContent, 15].Start.Address;
             workSheet.Cells[addressNetAmountCharge].Value = totalNetAmountOBHCharge;
-            workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressVATChargeNext = workSheet.Cells[addressStartContent, 16].Start.Address;
             workSheet.Cells[addressVATChargeNext].Value = totalVATOBHCharge;
-            workSheet.Cells[addressVATChargeNext].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressVATChargeNext].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalChargeNext = workSheet.Cells[addressStartContent, 17].Start.Address;
             workSheet.Cells[addressTotalChargeNext].Value = totalOBHCharge;
-            workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
             string addressTotalAll = workSheet.Cells[addressStartContent, 18].Start.Address;
             workSheet.Cells[addressTotalAll].Value = totalAll;
-            workSheet.Cells[addressTotalAll].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[addressTotalAll].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+            string addressToBold = addressTotalNext + ":" + addressTotalAll;
+
+            workSheet.Cells[addressToBold].Style.Font.Bold = true;
 
             workSheet.Column(1).Width = 8; //Cột A
             workSheet.Column(2).Width = 40; //Cột B
@@ -2311,7 +2314,7 @@ namespace eFMS.API.ReportData.FormatExcel
         #endregion
         #region Export Summary Of Revenue
 
-        public Stream GenerateSummaryOfRevenueExcel(SummaryOfRevenueModel obj, Stream stream = null)
+        public Stream GenerateSummaryOfRevenueExcel(SummaryOfRevenueModel obj, GeneralReportCriteria criteria, Stream stream = null)
         {
             try
             {
@@ -2319,7 +2322,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("Summary Of Revenue");
                     var workSheet = excelPackage.Workbook.Worksheets[1];
-                    BinddingDataSummaryOfRevenue(workSheet, obj);
+                    BinddingDataSummaryOfRevenue(workSheet, criteria , obj);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -2331,7 +2334,7 @@ namespace eFMS.API.ReportData.FormatExcel
             return null;
         }
 
-        public void BinddingDataSummaryOfRevenue(ExcelWorksheet workSheet, SummaryOfRevenueModel obj)
+        public void BinddingDataSummaryOfRevenue(ExcelWorksheet workSheet, GeneralReportCriteria criteria, SummaryOfRevenueModel obj)
         {
             List<string> headerTable = new List<string>()
             {
@@ -2493,37 +2496,37 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 15].Value = item.SummaryOfCostsIncurredExportResults.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 15].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 15].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 16].Value = item.SummaryOfCostsIncurredExportResults.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount);
                     workSheet.Cells[i + addressStartContent, 16].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 16].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 17].Value = item.SummaryOfCostsIncurredExportResults.Where(t => !t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.SummaryOfCostsIncurredExportResults.Where(t => !t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 17].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 17].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
 
                     workSheet.Cells[i + addressStartContent, 18].Value = item.SummaryOfCostsIncurredExportResults.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 18].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 18].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 19].Value = item.SummaryOfCostsIncurredExportResults.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount);
                     workSheet.Cells[i + addressStartContent, 19].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 19].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 20].Value = item.SummaryOfCostsIncurredExportResults.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.SummaryOfCostsIncurredExportResults.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
                     workSheet.Cells[i + addressStartContent, 20].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 20].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 21].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 21].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                     workSheet.Cells[i + addressStartContent, 22].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 22].Style.Fill.BackgroundColor.SetColor(colFromHex);
@@ -2541,7 +2544,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     decimal? TotalNormalCharge1 = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
                     decimal? TotalOBHCharge1 = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 20].Value);
                     workSheet.Cells[i + addressStartContent, 21].Value = TotalNormalCharge1.GetValueOrDefault(0M) + TotalOBHCharge1.GetValueOrDefault(0M);
-                    workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = numberFormatVND;
+                    workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     totalALLValue += TotalNormalCharge1.GetValueOrDefault(0M) + TotalOBHCharge1.GetValueOrDefault(0M);
 
                     for (int j = 0; j < item.SummaryOfCostsIncurredExportResults.Count; j++)
@@ -2570,7 +2573,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.PackageContainer;
 
                         workSheet.Cells[i + addressStartContent, 15].Value = itemCharge.NetAmount;
-                        workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
+                        workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
                         if (itemCharge.VATAmount < 0)
@@ -2581,20 +2584,20 @@ namespace eFMS.API.ReportData.FormatExcel
                         else
                         {
                             workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.VATAmount != null ?  itemCharge.VATAmount : null;
-                            workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
+                            workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                         }
                         workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormatVND;
+                        workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
                             workSheet.Cells[i + addressStartContent, 18].Value = itemCharge.NetAmount;
-                            workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat;
+                            workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                             workSheet.Cells[i + addressStartContent, 20].Value = itemCharge.VATAmount.GetValueOrDefault(0M) + itemCharge.NetAmount.GetValueOrDefault(0M);
-                            workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = numberFormatVND;
+                            workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                             workSheet.Cells[i + addressStartContent, 19].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = numberFormatVND;
+                            workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                             workSheet.Cells[i + addressStartContent, 15].Value = null;
                             workSheet.Cells[i + addressStartContent, 16].Value = null;
                             workSheet.Cells[i + addressStartContent, 17].Value = null;
@@ -2608,7 +2611,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
                         decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 20].Value);
                         workSheet.Cells[i + addressStartContent, 21].Value = TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = numberFormatVND;
+                        workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                         totalALLValue += TotalNormalCharge.GetValueOrDefault(0M) + TotalOBHCharge.GetValueOrDefault(0M);
 
                         //decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);
@@ -2672,35 +2675,40 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
 
                 workSheet.Cells[addressStartContent, 7].Value = totalQuantity;
-
+                workSheet.Cells[addressStartContent, 7].Style.Font.Bold = true;
                 workSheet.Cells[addressStartContent, 15].Value = totalNetAmountNormalCharge;
-                workSheet.Cells[addressStartContent, 15].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[addressStartContent, 15].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 15].Style.Font.Bold = true;
 
                 workSheet.Cells[addressStartContent, 16].Value = totalVATNormalCharge != null ? totalVATNormalCharge : null  ;
                 if(totalVATNormalCharge == 0)
                 {
                     workSheet.Cells[addressStartContent, 16].Value = null;
                 }
-                workSheet.Cells[addressStartContent, 16].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[addressStartContent, 16].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 16].Style.Font.Bold = true;
 
                 workSheet.Cells[addressStartContent, 17].Value = totalNormalCharge;
-                workSheet.Cells[addressStartContent, 17].Style.Numberformat.Format = numberFormatVND;
-
+                workSheet.Cells[addressStartContent, 17].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 17].Style.Font.Bold = true;
 
                 workSheet.Cells[addressStartContent, 18].Value = totalNetAmountOBHCharge;
-                workSheet.Cells[addressStartContent, 18].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[addressStartContent, 18].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 18].Style.Font.Bold = true;
 
                 workSheet.Cells[addressStartContent, 19].Value = totalVATOBHCharge;
-                workSheet.Cells[addressStartContent, 19].Style.Numberformat.Format = numberFormatVND;
-
+                workSheet.Cells[addressStartContent, 19].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 19].Style.Font.Bold = true;
 
                 workSheet.Cells[addressStartContent, 20].Value = totalOBHCharge;
-                workSheet.Cells[addressStartContent, 20].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[addressStartContent, 20].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 20].Style.Font.Bold = true;
 
                 totalAll = totalOBHCharge + totalNormalCharge;
 
                 workSheet.Cells[addressStartContent, 21].Value = totalAll;
-                workSheet.Cells[addressStartContent, 21].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[addressStartContent, 21].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[addressStartContent, 21].Style.Font.Bold = true;
 
 
             }
