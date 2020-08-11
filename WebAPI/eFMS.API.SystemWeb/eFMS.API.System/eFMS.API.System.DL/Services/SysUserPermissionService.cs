@@ -77,8 +77,10 @@ namespace eFMS.API.System.DL.Services
                               OfficeId = d.OfficeId,
                               PermissionSampleId = d.PermissionSampleId,
                               Buid = c.Id,
-                              CompanyName = c.BunameVn, 
-                              OfficeName = o.BranchNameVn
+                              CompanyName = c.BunameVn,
+                              CompanyAbbrName = c.BunameAbbr,
+                              OfficeName = o.BranchNameVn,
+                              OfficeAbbrName = o.ShortName,
                           };
 
             return results;
