@@ -599,7 +599,6 @@ namespace eFMS.API.Catalogue.DL.Services
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-
             if (partners == null) return null;
 
             var query = (from partner in partners
@@ -642,7 +641,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
-                           && (x.partner.PartnerType ?? "").IndexOf(criteria.PartnerType ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                           && (x.partner.PartnerType == criteria.PartnerType));
 
             }
             if (query == null) return null;
@@ -811,7 +810,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
                     partner.PartnerType = "Supplier";
-                    
+
                     //var salesman = new CatContract
                     //{
                     //    Id = Guid.NewGuid(),
@@ -882,12 +881,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 var salesmans = new List<CatContract>();
                 foreach (var item in data)
                 {
-                    DateTime? inactiveDate = DateTime.Now ;
+                    DateTime? inactiveDate = DateTime.Now;
                     var partner = mapper.Map<CatPartner>(item);
                     partner.UserCreated = currentUser.UserID;
                     partner.DatetimeModified = DateTime.Now;
                     partner.DatetimeCreated = DateTime.Now;
-                 
+
                     partner.Id = Guid.NewGuid().ToString();
                     partner.AccountNo = partner.TaxCode;
                     if (!string.IsNullOrEmpty(partner.AccountNo) && !string.IsNullOrEmpty(item.InternalReferenceNo))
@@ -900,10 +899,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.OfficeId = currentUser.OfficeID;
                     partner.GroupId = currentUser.GroupId;
                     partner.DepartmentId = currentUser.DepartmentId;
-                    partner.PartnerGroup = type == "Customer" ? "Customer" : "CUSTOMER;AGENT";
+                    partner.PartnerGroup = type == "Customer" ? "CUSTOMER" : "CUSTOMER;AGENT";
                     partner.PartnerType = type == "Customer" ? "Customer" : "Agent";
-                    partner.ParentId = DataContext.Get(x=>x.AccountNo == item.AcReference).Select(x=>x.Id)?.FirstOrDefault();
-                    partner.SalePersonId = sysUserRepository.Get(x => x.Username == item.SaleManName).Select(x=>x.Id).FirstOrDefault();
+                    partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
+                    partner.SalePersonId = sysUserRepository.Get(x => x.Username == item.SaleManName).Select(x => x.Id).FirstOrDefault();
                     partners.Add(partner);
                 }
                 using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -979,11 +978,17 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode?.Replace(" ","") == taxCode))
+                        if (partners.Any(x => x.TaxCode?.Replace(" ", "") == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
                         }
+                    }
+
+                    if (taxCode.Length < 8 || taxCode.Length > 14)
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH], item.TaxCode);
+                        item.IsValid = false;
                     }
                 }
                 if (string.IsNullOrEmpty(item.PartnerGroup))
@@ -1171,6 +1176,13 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.IsValid = false;
                         }
                     }
+
+
+                    if (taxCode.Length < 8 || taxCode.Length > 14)
+                    {
+                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_LENGTH]);
+                        item.IsValid = false;
+                    }
                 }
                 if (!string.IsNullOrEmpty(item.InternalReferenceNo))
                 {
@@ -1180,6 +1192,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(internalReferenceNo))
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_INTERNAL_REFERENCENO_INVALID], item.InternalReferenceNo);
+                        item.IsValid = false;
+                    }
+                    if (internalReferenceNo.Length < 3 || internalReferenceNo.Length > 10)
+                    {
+                        item.InternalReferenceNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_INTERNAL_REFERENCENO_LENGTH]);
                         item.IsValid = false;
                     }
                 }

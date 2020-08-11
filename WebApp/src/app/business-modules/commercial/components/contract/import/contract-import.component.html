@@ -207,12 +207,14 @@
                                 </td>
                                 <td>
 
-                                    <span *ngIf="item.effectDateError === null"> {{item.effectDate}}</span>
+                                    <span *ngIf="item.effectDateError === null">
+                                        {{item.effectDate | date: 'dd/MM/yyyy'  }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.effectDateError !== null">{{ item.effectDateError }}</span>
                                 </td>
                                 <td>
-                                    <span *ngIf="item.expiredtDateError === null"> {{item.expireDate}}</span>
+                                    <span *ngIf="item.expiredtDateError === null">
+                                        {{item.expireDate | date: 'dd/MM/yyyy'  }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.expiredtDateError !== null">{{ item.expiredtDateError }}</span>
                                 </td>

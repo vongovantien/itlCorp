@@ -16,6 +16,8 @@
         public static readonly string MSG_PARTNER_TAXCODE_EXISTED = "MSG_PARTNER_TAXCODE_EXISTED";
         public static readonly string MSG_PARTNER_TAXCODE_DUPLICATED = "MSG_PARTNER_TAXCODE_DUPLICATED";
         public static readonly string MSG_PARTNER_TAXCODE_INVALID = "MSG_PARTNER_TAXCODE_INVALID";
+        public static readonly string MSG_PARTNER_TAXCODE_LENGTH = "MSG_PARTNER_TAXCODE_LENGTH";
+        public static readonly string MSG_PARTNER_INTERNAL_REFERENCENO_LENGTH = "MSG_PARTNER_INTERNAL_REFERENCENO_LENGTH";
         public static readonly string MSG_PARTNER_GROUP_EMPTY = "MSG_PARTNER_GROUP_EMPTY";
         public static readonly string MSG_PARTNER_GROUP_NOT_FOUND = "MSG_PARTNER_GROUP_NOT_FOUND";
         public static readonly string MSG_PARTNER_SALEMAN_EMPTY = "MSG_PARTNER_SALEMAN_EMPTY";
@@ -63,6 +65,8 @@
         public static readonly string MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND = "MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND";
         public static readonly string MSG_CONTRACT_SALESMAN_NOT_FOUND = "MSG_CONTRACT_SALESMAN_NOT_FOUND";
         public static readonly string MSG_CONTRACT_ACTIVE_NOT_FOUND = "MSG_CONTRACT_ACTIVE_NOT_FOUND";
+        public static readonly string MSG_CONTRACT_EXPERIED_DATE_NOT_VALID = "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID";
+
 
         public static readonly string MSG_CONTRACT_EFFECTIVE_DATE_EMPTY = "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY";
         public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -120,11 +121,11 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
-            var hs = DataContext.Add(contract,false);
+            var hs = DataContext.Add(contract, false);
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
-                if(entity.isRequestApproval == true)
+                if (entity.isRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
@@ -147,7 +148,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
-            var hs = DataContext.Update(entity, x => x.Id == model.Id,false);
+            var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
@@ -258,14 +259,14 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id, string partnerId,SalesmanCreditModel credit)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit)
         {
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
-                if(credit.CreditLimit != null)
+                if (credit.CreditLimit != null)
                 {
                     objUpdate.CreditLimit = credit.CreditLimit;
                 }
@@ -285,7 +286,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = objUpdate.SaleService;
                     model.ContractType = objUpdate.ContractType;
-                    SendMailActiveSuccess(model,"active");
+                    SendMailActiveSuccess(model, "active");
                 }
             }
             return isUpdateDone;
@@ -303,30 +304,128 @@ namespace eFMS.API.Catalogue.DL.Services
                     contract.UserCreated = contract.UserModified = currentUser.UserID;
                     contract.DatetimeModified = DateTime.Now;
                     contract.DatetimeCreated = DateTime.Now;
-                    contract.ExpiredDate = !string.IsNullOrEmpty(item.ExpireDate) ? Convert.ToDateTime(item.ExpireDate) : (DateTime?)null;
-                    contract.EffectiveDate = !string.IsNullOrEmpty(item.EffectDate) ? Convert.ToDateTime(item.EffectDate) : (DateTime?)null;
-                    contract.TrialCreditDays = !string.IsNullOrEmpty( item.PaymentTermTrialDay) ? Convert.ToInt16(item.PaymentTermTrialDay) : (int?)null;
+                    contract.EffectiveDate = item.EffectDate;
+                    contract.ExpiredDate = item.ExpireDate;
+                    contract.TrialCreditDays = !string.IsNullOrEmpty(item.PaymentTermTrialDay) ? Convert.ToInt16(item.PaymentTermTrialDay) : (int?)null;
                     contract.PaymentTerm = contract.TrialCreditDays;
                     contract.CompanyId = sysCompanyRepository.Get(x => x.Code == item.Company).Select(t => t.Id)?.FirstOrDefault();
+                    var sale = item.SaleService.Split(";").ToArray();
+                    contract.SaleService = string.Empty;
+                    foreach (var it in sale)
+                    {
+                        if (it.Trim() == "Air Import")
+                        {
+                            contract.SaleService += "AI;";
+                        }
+                        if (it.Trim() == "Air Export")
+                        {
+                            contract.SaleService += "AE;";
+                        }
+                        if (it.Trim() == "Sea FCL Export")
+                        {
+                            contract.SaleService += "SFE;";
+                        }
+                        if (it.Trim() == "Sea LCL Export")
+                        {
+                            contract.SaleService += "SLE;";
+                        }
+                        if (it.Trim() == "Sea FCL Import")
+                        {
+                            contract.SaleService += "SFI;";
+                        }
+                        if (it.Trim() == "Sea LCL Import")
+                        {
+                            contract.SaleService += "SLI;";
+                        }
+                        if (it.Trim() == "Custom Logistic")
+                        {
+                            contract.SaleService += "CL;";
+                        }
+                        if (it.Trim() == "Trucking")
+                        {
+                            contract.SaleService += "IT;";
+                        }
+                        if(it.Trim() == "All")
+                        {
+                            contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                        }
+                    }
+                    var vas = item.Vas.Split(";").ToArray();
+                    contract.Vas = string.Empty;
+                    foreach (var it in vas)
+                    {
+                        if (it.Trim() == "Air Import")
+                        {
+                            contract.Vas += "AI;";
+                        }
+                        if (it.Trim() == "Air Export")
+                        {
+                            contract.Vas += "AE;";
+                        }
+                        if (it.Trim() == "Sea FCL Export")
+                        {
+                            contract.Vas += "SFE;";
+                        }
+                        if (it.Trim() == "Sea LCL Export")
+                        {
+                            contract.Vas += "SLE;";
+                        }
+                        if (it.Trim() == "Sea FCL Import")
+                        {
+                            contract.Vas += "SFI;";
+                        }
+                        if (it.Trim() == "Sea LCL Import")
+                        {
+                            contract.Vas += "SLI;";
+                        }
+                        if (it.Trim() == "Custom Logistic")
+                        {
+                            contract.Vas += "CL;";
+                        }
+                        if (it.Trim() == "Trucking")
+                        {
+                            contract.Vas += "IT;";
+                        }
+                        if (it.Trim() == "All")
+                        {
+                            contract.Vas = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(contract.Vas))
+                    {
+                        if (contract.Vas.Length > 0)
+                        {
+                            contract.Vas = contract.Vas.Remove(contract.Vas.Length - 1);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(contract.SaleService))
+                    {
+                        if (contract.SaleService.Length > 0)
+                        {
+                            contract.SaleService = contract.SaleService.Remove(contract.SaleService.Length - 1);
+                        }
+                    }
+                  
                     var arrOffice = item.Office.Split(";").ToArray();
                     string officeStr = string.Empty;
-                    if(arrOffice.Length > 1)
+                    if (arrOffice.Length > 1)
                     {
                         var dataOffice = sysOfficeRepository.Get().ToList();
-                        foreach (var office in dataOffice.GroupBy(x=>x.Code))
+                        foreach (var office in dataOffice.GroupBy(x => x.Code))
                         {
                             foreach (var o in arrOffice)
                             {
                                 if (o == office.Key)
                                 {
-                                    officeStr += office.Select(t=>t.Id)?.FirstOrDefault() + ";";
+                                    officeStr += office.Select(t => t.Id)?.FirstOrDefault() + ";";
                                 }
                             }
                         }
                     }
-                    contract.OfficeId = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Get(x=>x.Code == arrOffice[0].ToString()).Select(t=>t.Id.ToString())?.FirstOrDefault() ;
+                    contract.OfficeId = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Get(x => x.Code == arrOffice[0].ToString()).Select(t => t.Id.ToString())?.FirstOrDefault();
                     contract.SaleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id)?.FirstOrDefault();
-                    contract.CreditLimit = !string.IsNullOrEmpty(item.CreditLimited)? Convert.ToDecimal(item.CreditLimited): (Decimal?)null;
+                    contract.CreditLimit = !string.IsNullOrEmpty(item.CreditLimited) ? Convert.ToDecimal(item.CreditLimited) : (Decimal?)null;
                     if (contract.ContractType == "Trial")
                     {
                         contract.TrialCreditLimited = contract.CreditLimit;
@@ -335,8 +434,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         contract.TrialCreditDays = contract.PaymentTerm;
                     }
                     contract.CreditLimitRate = !string.IsNullOrEmpty(item.CreditLimitedRated) ? Convert.ToInt32(item.CreditLimitedRated) : (int?)null;
-                    contract.Active = item.Status =="Active" ? true : false;
-                    contract.PartnerId = catPartnerRepository.Get(x=>x.AccountNo == item.CustomerId).Select(t=>t.Id)?.FirstOrDefault();
+                    contract.Active = item.Status == "Active" ? true : false;
+                    contract.PartnerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
                     contract.Id = Guid.NewGuid();
                     contracts.Add(contract);
                 }
@@ -385,7 +484,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 }
 
-                else if (!catPartnerRepository.Any(x=>x.AccountNo == item.CustomerId))
+                else if (!catPartnerRepository.Any(x => x.AccountNo == item.CustomerId))
                 {
                     item.CustomerIdError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PARTNER_ID_NOT_FOUND], item.CustomerId);
                     item.IsValid = false;
@@ -411,13 +510,13 @@ namespace eFMS.API.Catalogue.DL.Services
 
                         item.IsValid = false;
                     }
-                    if (string.IsNullOrEmpty(item.ExpireDate) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
                         item.IsValid = false;
 
                     }
-                    if (string.IsNullOrEmpty(item.EffectDate) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
                         item.IsValid = false;
@@ -436,9 +535,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (!string.IsNullOrEmpty(item.ContractNo))
                 {
                     var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
-                    if(DataContext.Any(x=>x.PartnerId == customerId && x.ContractNo == item.ContractNo))
+                    if (DataContext.Any(x => x.PartnerId == customerId && x.ContractNo == item.ContractNo))
                     {
-                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED],item.ContractNo);
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], item.ContractNo);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.ContractNo == item.ContractNo) > 1)
@@ -448,7 +547,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
 
-                if(string.IsNullOrEmpty(item.SaleService))
+                if (string.IsNullOrEmpty(item.SaleService))
                 {
                     item.SaleServiceError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_SALE_SERVICE_EMPTY]);
                     item.IsValid = false;
@@ -459,7 +558,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_EMPTY]);
                     item.IsValid = false;
                 }
-                else if(!sysCompanyRepository.Any(x=>x.Code == item.Company))
+                else if (!sysCompanyRepository.Any(x => x.Code == item.Company))
                 {
                     item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
                     item.IsValid = false;
@@ -474,7 +573,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 else if (!sysOfficeRepository.Any(x => officeArr.Contains(x.Code)))
                 {
-                    item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_NOT_FOUND],item.Office);
+                    item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_NOT_FOUND], item.Office);
                     item.IsValid = false;
                 }
 
@@ -483,25 +582,35 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.PaymentMethodError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_METHOD_EMPTY]);
                     item.IsValid = false;
                 }
-                else if(item.PaymentMethod !="All" && item.PaymentMethod !="Collect" && item.PaymentMethod != "Prepaid"){
-                    item.PaymentMethodError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND],item.PaymentMethod);
+                else if (item.PaymentMethod != "All" && item.PaymentMethod != "Collect" && item.PaymentMethod != "Prepaid")
+                {
+                    item.PaymentMethodError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND], item.PaymentMethod);
                     item.IsValid = false;
                 }
 
                 if (!string.IsNullOrEmpty(item.Salesman))
                 {
-                    if(!sysUserRepository.Any(x=>x.Username == item.Salesman))
+                    if (!sysUserRepository.Any(x => x.Username == item.Salesman))
                     {
-                        item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_SALESMAN_NOT_FOUND],item.Salesman);
+                        item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_SALESMAN_NOT_FOUND], item.Salesman);
                         item.IsValid = false;
                     }
                 }
 
                 if (!string.IsNullOrEmpty(item.Status))
                 {
-                    if(item.Status.ToLower() != "active" && item.Status.ToLower() != "inactive")
+                    if (item.Status.ToLower() != "active" && item.Status.ToLower() != "inactive")
                     {
                         item.ActiveError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_ACTIVE_NOT_FOUND], item.Status);
+                        item.IsValid = false;
+                    }
+                }
+
+                if(item.EffectDate.HasValue && item.ExpireDate.HasValue)
+                {
+                    if(item.ExpireDate.Value < item.EffectDate.Value)
+                    {
+                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_NOT_VALID]);
                         item.IsValid = false;
                     }
                 }
@@ -509,7 +618,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return list;
         }
 
-        private void SendMailActiveSuccess(CatPartnerModel partner,string type)
+        private void SendMailActiveSuccess(CatPartnerModel partner, string type)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
@@ -541,7 +650,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string subject = string.Empty;
             string body = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-            if(type == "active")
+            if (type == "active")
             {
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
@@ -558,13 +667,14 @@ namespace eFMS.API.Catalogue.DL.Services
                     + linkEn + "</br>" + linkVn + "</br> </br>" +
                     "<i> Thanks and Regards </i>" + "</br> </br>" +
                     "eFMS System </div>");
-            } else
+            }
+            else
             {
                 linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
                 subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, "  + " </br> </br>" +
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
 
                   "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
                   "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
@@ -574,16 +684,16 @@ namespace eFMS.API.Catalogue.DL.Services
                   "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
 
                   "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
-                  "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>"+
-                  "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" + 
+                  "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
+                  "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
                   "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
 
                   + linkEn + "</br>" + linkVn + "</br> </br>" +
                   "<i> Thanks and Regards </i>" + "</br> </br>" +
                   "eFMS System </div>");
             }
-    
-            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com","luis.quang@itlvn.com" }, null, null);
+
+            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "luis.quang@itlvn.com" }, null, null);
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)
