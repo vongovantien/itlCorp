@@ -76,7 +76,20 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-        
+
+        /// <summary>
+        /// Query data
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("QueryData")]
+        [Authorize]
+        public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
+        {
+            var data = acctSettlementPaymentService.GetDatas(criteria);
+            return Ok(data);
+        }
+
         /// <summary>
         /// Get list shipment of settlement payment list by settlementNo
         /// </summary>

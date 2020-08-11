@@ -276,7 +276,7 @@ namespace eFMS.API.Accounting.DL.Services
             return advancePayments;
         }
 
-        private IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
+        public IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
         {
             var queryAdvancePayment = ExpressionQuery(criteria);
             var dataAdvancePayments = GetDataAdvancePayment(criteria);
@@ -360,7 +360,7 @@ namespace eFMS.API.Accounting.DL.Services
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
         }
-
+        
         public string GetAdvanceStatusPayment(string advanceNo)
         {
             var requestTmp = acctAdvanceRequestRepo.Get();
