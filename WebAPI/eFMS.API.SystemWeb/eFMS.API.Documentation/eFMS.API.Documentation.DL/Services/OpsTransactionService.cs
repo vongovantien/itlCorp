@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IUserPermissionService permissionService;
         readonly IContextBase<CatCurrencyExchange> currencyExchangeRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private readonly IContextBase<SysOffice> sysOfficeRepo;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
@@ -63,7 +64,8 @@ namespace eFMS.API.Documentation.DL.Services
             IUserPermissionService perService,
             IContextBase<CatCurrencyExchange> currencyExchangeRepo,
             IContextBase<CatCommodity> commodityRepo,
-            ICurrencyExchangeService currencyExchange) : base(repository, mapper)
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<SysOffice> sysOffice) : base(repository, mapper)
         {
             //catStageApi = stageApi;
             //catplaceApi = placeApi;
@@ -86,6 +88,7 @@ namespace eFMS.API.Documentation.DL.Services
             currencyExchangeRepository = currencyExchangeRepo;
             currencyExchangeService = currencyExchange;
             commodityRepository = commodityRepo;
+            sysOfficeRepo = sysOffice;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -115,11 +118,73 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
-            int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-            model.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+            SysOffice office = null;
+            string prefixJob = string.Empty;
+            var currentUserOffice = currentUser?.OfficeID ?? null;
+            if (currentUserOffice != null)
+            {
+                office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
+                prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
+            }
+            prefixJob += DocumentConstants.OPS_SHIPMENT;
+            int countNumberJob = GetNumberOpsToGenerateJobNo(office);
+            model.JobNo = GenerateID.GenerateOPSJobID(prefixJob, countNumberJob);
             var entity = mapper.Map<OpsTransaction>(model);
             return DataContext.Add(entity);
         }
+
+        private int GetNumberOpsToGenerateJobNo(SysOffice office)
+        {
+            int countNumberJob = 0;
+            if (office != null)
+            {
+                if (office.Code == "ITLHAN")
+                {
+                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                         && x.JobNo.StartsWith("HAN"));
+                }
+                else if (office.Code == "ITLDAD")
+                {
+                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                         && x.JobNo.StartsWith("DAD"));
+                }
+                else
+                {
+                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                         && !x.JobNo.StartsWith("DAD")
+                                                         && !x.JobNo.StartsWith("HAN"));
+                }
+            }
+            else
+            {
+                countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                     && !x.JobNo.StartsWith("DAD")
+                                                     && !x.JobNo.StartsWith("HAN"));
+            }
+            return countNumberJob;
+        }
+
+        private string SetPrefixJobIdByOfficeCode(string officeCode)
+        {
+            string prefixCode = string.Empty;
+            if (!string.IsNullOrEmpty(officeCode))
+            {
+                if (officeCode == "ITLHAN")
+                {
+                    prefixCode = "HAN-";
+                }
+                else if (officeCode == "ITLDAD")
+                {
+                    prefixCode = "DAD-";
+                }
+            }
+            return prefixCode;
+        }
+
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetBy(id);
