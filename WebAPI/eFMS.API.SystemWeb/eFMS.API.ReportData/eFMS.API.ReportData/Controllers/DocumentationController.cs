@@ -330,7 +330,7 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateSummaryOfCostsIncurredExcel(dataObjects.Result, null);
+            var stream = new DocumentationHelper().GenerateSummaryOfCostsIncurredExcel(dataObjects.Result, criteria, null);
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
@@ -357,7 +357,7 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result, null);
+            var stream = new DocumentationHelper().GenerateSummaryOfRevenueExcel(dataObjects.Result,criteria, null);
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
