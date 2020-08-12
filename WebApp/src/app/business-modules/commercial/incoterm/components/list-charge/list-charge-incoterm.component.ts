@@ -1,13 +1,16 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { CatChargeIncoterm, Charge, Unit, Currency } from '@models';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo } from '@repositories';
-import { map, takeUntil, shareReplay, filter, switchMapTo, tap, switchMap, distinctUntilChanged, share, finalize } from 'rxjs/operators';
-import { forkJoin, Observable } from 'rxjs';
 import { DataService } from '@services';
-import cloneDeep from 'lodash/cloneDeep';
 import { SystemConstants } from '@constants';
+
+import { map, takeUntil, shareReplay, tap, switchMap, distinctUntilChanged } from 'rxjs/operators';
+
+import cloneDeep from 'lodash/cloneDeep';
+import { forkJoin, Observable } from 'rxjs';
+
 
 @Component({
     selector: 'list-charge-incoterm',
@@ -94,8 +97,8 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
 
     }
 
-    addCharge(type: string) {
-        if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+    addCharge() {
+        if (this.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
             this.incotermCharges.push(new CatChargeIncoterm({ type: CommonEnum.SurchargeTypeEnum.SELLING_RATE }));
             return;
         }
@@ -121,6 +124,7 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
 
     onSelectDataTableInfo(data: any, chargeItem: CatChargeIncoterm, key: string) {
         [this.isSubmitted, chargeItem.isDuplicate] = [false, false];
+        this.resetCharge(this.incotermCharges);
         switch (key) {
             case 'charge':
                 chargeItem.chargeId = data.id;
@@ -149,7 +153,7 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
 
     resetCharge(charges: CatChargeIncoterm[]) {
         charges.forEach(c => {
-            c.chargeId = null;
+            c.isDuplicate = false;
         });
     }
 
@@ -202,7 +206,7 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
         this.ngUnsubscribe.next();
         this.ngUnsubscribe.complete();
         this.subscription.unsubscribe();
-        console.log(this.serviceTypeId);
+        this._dataService.setData('incotermService', null);
     }
 
 }
