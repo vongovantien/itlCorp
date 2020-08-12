@@ -1615,7 +1615,7 @@ namespace eFMS.API.Accounting.DL.Services
             string acRef = null;
             CatContractInvoiceModel result = new CatContractInvoiceModel { };
 
-            CatPartner partner = partnerRepo.Get(p => p.AccountNo == model.PartnerId)?.FirstOrDefault();
+            CatPartner partner = partnerRepo.Get(p => p.Id == model.PartnerId)?.FirstOrDefault();
             if(partner == null)
             {
                 return result;
