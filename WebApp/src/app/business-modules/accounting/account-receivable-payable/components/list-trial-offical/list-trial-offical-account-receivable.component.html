@@ -1,0 +1,85 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="m-form">
+
+            <div class="row">
+                <div class="col-lg-12 m--margin-top-20">
+                    <div class="table-wrapper table-scrollable" id="payment-table">
+                        <table class="table table-hover table-brand dataTable table-hover">
+                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                <th class="m--w-50 first table-actions-col">
+                                    Action
+                                </th>
+                            </thead>
+                            <tbody>
+                                <ng-container>
+                                    <ng-container *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                        <tr class="">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions" style="width: 70px">
+                                                    <app-permission-button type="detail">
+                                                    </app-permission-button>
+                                                </div>
+                                            </td>
+                                            <td><a href="#">{{ item.partnerId }}</a> </td>
+                                            <td>{{ item.partnerName }} </td>
+                                            <td>{{ item.creditLimited  | number: '.0-3' }}</td>
+                                            <td>{{ item.debitAmount | number: '.0-3' }}</td>
+                                            <td>
+                                                <span [ngClass]="item.debitRate < 120 ? 'text-success' : 'text-danger'">
+                                                    {{ item.debitRate}}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.billing | number: '.0-3' }}
+                                            </td>
+                                            <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
+                                            <td>{{ item.paid | number: '.0-3'}}</td>
+                                            <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.between1_15days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.between16_30days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.over30days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.contractNo}}</td>
+                                            <td>{{ item.contractType}}</td>
+                                            <td>{{ item.expiredDate }}</td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.expiredDays }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="item.status ? 'text-success' : 'text-danger'">
+                                                    {{ item.status ? 'Active' : 'Inactive'}}
+                                                </span>
+                                            </td>
+
+
+                                        </tr>
+
+                                    </ng-container>
+                                </ng-container>
+                                <tr app-table-none-record *ngIf="!seedData.length">
+                                </tr>
+                                <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

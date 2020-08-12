@@ -6,7 +6,7 @@ import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/fo
     selector: 'update-extend-day-popup',
     templateUrl: './update-extend-day.popup.html',
 })
-export class AccountReceivablePayableUpdateExtendDayPopupComponent extends PopupBase implements OnInit {
+export class AccountPaymentUpdateExtendDayPopupComponent extends PopupBase implements OnInit {
     @Output() onUpdateExtendDate: EventEmitter<any> = new EventEmitter<any>();
     formUpdateExtenDate: FormGroup;
     //
