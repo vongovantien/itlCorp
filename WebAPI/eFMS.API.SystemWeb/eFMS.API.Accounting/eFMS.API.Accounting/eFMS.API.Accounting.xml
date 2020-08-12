@@ -218,6 +218,13 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria)">
+            <summary>
+            Query data
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.GetGrpRequestsByAdvanceNo(System.String)">
             <summary>
             Get Group Requests by AdvanceNo
@@ -425,6 +432,13 @@
             <param name="criteria">search conditions</param>
             <param name="pageNumber">page to retrieve data</param>
             <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
+            <summary>
+            Query data
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetShipmentOfSettlements(System.String)">

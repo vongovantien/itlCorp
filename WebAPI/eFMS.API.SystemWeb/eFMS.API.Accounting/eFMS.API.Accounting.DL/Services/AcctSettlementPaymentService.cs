@@ -301,7 +301,7 @@ namespace eFMS.API.Accounting.DL.Services
             return settlementPayments;
         }
 
-        private IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria)
+        public IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria)
         {
             var querySettlementPayment = ExpressionQuery(criteria);
             var dataSettlementPayments = GetDataSettlementPayment(criteria);

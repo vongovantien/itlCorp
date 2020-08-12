@@ -75,6 +75,19 @@ namespace eFMS.API.Accounting.Controllers
         }
         
         /// <summary>
+        /// Query data
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("QueryData")]
+        [Authorize]
+        public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
+        {
+            var data = acctAdvancePaymentService.GetDatas(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Get Group Requests by AdvanceNo
         /// </summary>
         /// <param name="advanceNo">advanceNo that want to retrieve Advance Request</param>

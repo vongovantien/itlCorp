@@ -14,7 +14,9 @@ namespace eFMS.API.Accounting.DL.IService
     public interface IAcctAdvancePaymentService : IRepositoryBase<AcctAdvancePayment, AcctAdvancePaymentModel>
     {
         List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
-        
+
+        IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria);
+
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId);
