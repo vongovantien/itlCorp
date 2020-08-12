@@ -2558,7 +2558,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 5].Value = itemCharge.JobId;
                         workSheet.Cells[i + addressStartContent, 6].Value = item.POLName;
                         workSheet.Cells[i + addressStartContent, 7].Value = itemCharge.Quantity;
-                        workSheet.Cells[i + addressStartContent, 7].Style.Numberformat.Format = numberFormat;
+                        workSheet.Cells[i + addressStartContent, 7].Style.Numberformat.Format = numberFormatVND;
                         workSheet.Cells[i + addressStartContent, 8].Value = itemCharge.Unit;
                         workSheet.Cells[i + addressStartContent, 9].Value = itemCharge.PurchaseOrderNo;
                         workSheet.Cells[i + addressStartContent, 10].Value = itemCharge.CustomNo;
