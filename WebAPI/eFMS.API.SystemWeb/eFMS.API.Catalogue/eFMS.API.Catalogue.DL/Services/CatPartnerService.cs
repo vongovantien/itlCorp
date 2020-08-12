@@ -802,7 +802,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = Guid.NewGuid().ToString();
                     partner.AccountNo = partner.TaxCode;
-                    partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
+                    if(!string.IsNullOrEmpty(item.AcReference))
+                    {
+                        partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
+                    }
                     partner.Active = active;
                     partner.InactiveOn = inactiveDate;
                     partner.CompanyId = currentUser.CompanyID;
@@ -901,7 +904,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DepartmentId = currentUser.DepartmentId;
                     partner.PartnerGroup = type == "Customer" ? "CUSTOMER" : "CUSTOMER;AGENT";
                     partner.PartnerType = type == "Customer" ? "Customer" : "Agent";
-                    partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
+                    if(!string.IsNullOrEmpty(item.AcReference))
+                    {
+                        partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
+                    }
                     partner.SalePersonId = sysUserRepository.Get(x => x.Username == item.SaleManName).Select(x => x.Id).FirstOrDefault();
                     partners.Add(partner);
                 }
