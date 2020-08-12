@@ -13,7 +13,7 @@ export class Incoterm extends BaseModel {
 }
 
 export class IncotermUpdateModel {
-    incoterm: Incoterm = null;
+    incoterm: IncotermModel = null;
     sellings: CatChargeIncoterm[] = [];
     buyings: CatChargeIncoterm[] = [];
 
