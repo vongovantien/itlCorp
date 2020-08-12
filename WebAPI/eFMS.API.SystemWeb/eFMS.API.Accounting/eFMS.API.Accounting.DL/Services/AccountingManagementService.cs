@@ -1477,7 +1477,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if(!string.IsNullOrEmpty(item.PaymentStatus) && item.PaymentStatus.ToLower() != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID.ToLower())
                             {
                                 item.PaymentStatus = stringLocalizer[AccountingLanguageSub.MSG_PAYMENT_STATUS_INVALID, item.PaymentStatus];
-                                item.IsValid = true;
+                                item.IsValid = false;
                             }
                             else
                             {

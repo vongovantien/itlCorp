@@ -1,15 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
 import { AppForm } from 'src/app/app.form';
-import { CommercialFormIncotermComponent } from '../components/form-incoterm/form-incoterm.component';
-import _merge from 'lodash/merge';
-import { IncotermUpdateModel, Incoterm } from '@models';
-import { CommercialListChargeIncotermComponent } from '../components/list-charge/list-charge-incoterm.component';
+import { IncotermUpdateModel, IncotermModel } from '@models';
 import { InfoPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import { CatalogueRepo } from '@repositories';
-import { catchError, exhaust } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+
+import { CommercialFormIncotermComponent } from '../components/form-incoterm/form-incoterm.component';
+import { CommercialListChargeIncotermComponent } from '../components/list-charge/list-charge-incoterm.component';
+
+import { catchError } from 'rxjs/operators';
+
+import _merge from 'lodash/merge';
 
 @Component({
     selector: 'create-incoterm-commercial',
@@ -63,18 +67,18 @@ export class CommercialCreateIncotermComponent extends AppForm implements OnInit
             if (!this.listChargeBuying.validateListCharge()) {
                 this.infoPopup.show();
 
-                this.activeTab = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+                this.activeTab = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                 return;
             }
 
             if (!this.listChargeBuying.validateDuplicate()) {
                 this.infoPopup.show();
-                this.activeTab = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+                this.activeTab = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
                 return;
             }
         }
 
-        const formData: Incoterm = this.getFormData();
+        const formData: IncotermModel = this.getFormData();
 
         const incotermUpdateModel: IncotermUpdateModel = new IncotermUpdateModel();
         incotermUpdateModel.incoterm = formData;

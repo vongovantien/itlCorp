@@ -99,6 +99,9 @@
                                     <td>
                                         {{ item.serieNo }}
                                     </td>
+                                    <td>
+                                        {{ item.paymentStatus }}
+                                    </td>
                                 </tr>
                             </ng-container>
                             <tr app-table-none-record *ngIf="!isLoading && !tempData.length"
