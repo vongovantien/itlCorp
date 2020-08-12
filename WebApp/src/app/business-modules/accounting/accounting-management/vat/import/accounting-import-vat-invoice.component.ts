@@ -42,6 +42,8 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
             { title: 'Real Invoice', field: 'realInvoiceNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Serie', field: 'serieNo', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+
         ];
     }
 
@@ -150,4 +152,5 @@ interface IImportVatInvoice {
     invoiceDate: string;
     serieNo: string;
     isValid: string;
+    paymentStatus: string;
 }
