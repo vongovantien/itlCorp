@@ -5,6 +5,7 @@ import { CommonEnum } from '@enums';
 import { CatalogueRepo } from '@repositories';
 import { DataService } from '@services';
 import { SystemConstants } from '@constants';
+import { SortService } from '@services';
 
 import { map, takeUntil, shareReplay, tap, switchMap, distinctUntilChanged } from 'rxjs/operators';
 
@@ -62,19 +63,21 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _sortService: SortService,
     ) {
         super();
+        this.requestSort = this.sortChargeList;
     }
 
     ngOnInit(): void {
         this.headers = [
             { title: 'Charge Name', field: 'chargeId', sortable: true, required: true, width: 300 },
-            { title: 'Hint Qty', field: 'chargeId', sortable: true, required: true },
-            { title: 'Unit', field: 'chargeId', sortable: true, required: true },
-            { title: 'Charge To', field: 'chargeId', sortable: true, required: true },
-            { title: 'Currency', field: 'chargeId', sortable: true, required: true },
-            { title: 'Fee Type', field: 'chargeId', sortable: true, required: true },
+            { title: 'Hint Qty', field: 'quantityType', sortable: true, required: true },
+            { title: 'Unit', field: 'unit', sortable: true, required: true },
+            { title: 'Charge To', field: 'chargeTo', sortable: true, required: true },
+            { title: 'Currency', field: 'currency', sortable: true, required: true },
+            { title: 'Fee Type', field: 'feeType', sortable: true, required: true },
         ];
 
         this.listUnits = this._catalogueRepo.getUnit({ active: true }).pipe(shareReplay());
@@ -207,6 +210,10 @@ export class CommercialListChargeIncotermComponent extends AppList implements On
         this.ngUnsubscribe.complete();
         this.subscription.unsubscribe();
         this._dataService.setData('incotermService', null);
+    }
+
+    sortChargeList(sortField: string, order: boolean) {
+        this.incotermCharges = this._sortService.sort(this.incotermCharges, sortField, order);
     }
 
 }
