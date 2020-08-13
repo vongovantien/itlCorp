@@ -1128,6 +1128,72 @@ namespace eFMS.API.Documentation.DL.Services
             return crystal;
         }
 
+        public Crystal PreviewCombinationSaleReport(SaleReportCriteria criteria)
+        {
+
+            Crystal crystal = null;
+            // IQueryable<SummarySaleReportResult> data = GetSummarySaleReport(criteria);
+            IQueryable<CombinationSaleReportResult> data = null; 
+
+            DateTime _fromDate, _toDate = DateTime.Now;
+
+            if (criteria.CreatedDateFrom != null && criteria.CreatedDateTo != null)
+            {
+                _fromDate = criteria.CreatedDateFrom.Value;
+                _toDate = criteria.CreatedDateTo.Value;
+            }
+            else
+            {
+                _fromDate = criteria.ServiceDateFrom.Value;
+                _toDate = criteria.ServiceDateTo.Value;
+
+                var dataSource = data.ToList();
+
+                // get current user's office 
+                var _officeCurrentUser = officeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+                string _officeNameEn = _officeCurrentUser?.BranchNameEn ?? string.Empty;
+                string _addressOffice = _officeCurrentUser?.AddressEn ?? string.Empty;
+
+                // get current user's accountant 
+                string _userIdAccountant = GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault();
+                var _employeeIdAcountant = userRepository.Get(x => x.Id == _userIdAccountant).FirstOrDefault()?.EmployeeId;
+                string _accountantName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+
+                // get current user's company manager 
+                string _userIdComManager = GetCompanyManager(currentUser.CompanyID).FirstOrDefault();
+                var _employeeIdComManager = userRepository.Get(x => x.Id == _userIdComManager).FirstOrDefault()?.EmployeeId;
+                string _comManagerName = employeeRepository.Get(x => x.Id == _employeeIdAcountant).FirstOrDefault()?.EmployeeNameEn ?? string.Empty;
+
+                var parameter = new SummarySaleReportParams
+                {
+                    FromDate = _fromDate, //
+                    ToDate = _toDate, //
+                    Contact = currentUser.UserName, // Current User Name
+                    CompanyName = "ITL", //_officeNameEn, // Office Name En của Current User
+                    CompanyDescription = "Conpany Description", //string.Empty,
+                    CompanyAddress1 = "Company Address", // _addressOffice, // Address En của Current User
+                    CompanyAddress2 = string.Empty,
+                    Website = "Wesite", //string.Empty,
+                    CurrDecimalNo = 2, //
+                    ReportBy = string.Empty,
+                    SalesManager = string.Empty,
+                    Director = "Director",//_comManagerName, // Company Manager
+                    ChiefAccountant = "Accountant Name", //_accountantName // Accountant Manager của Current User
+                };
+                crystal = new Crystal
+                {
+                    ReportName = "TotalSalesReport.rpt",
+                    AllowPrint = true,
+                    AllowExport = true
+                };
+                crystal.AddDataSource(dataSource);
+                crystal.FormatType = ExportFormatType.PortableDocFormat;
+                crystal.SetParameter(parameter);
+            }
+            return crystal;
+
+        }
+
         #endregion -- SALE REPORT SUMMARY --        
 
         public string GetShipmentTypeForPreviewPL(string transactionType)
