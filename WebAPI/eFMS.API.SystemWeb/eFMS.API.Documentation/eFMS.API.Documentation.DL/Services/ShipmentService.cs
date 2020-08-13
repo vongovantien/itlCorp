@@ -1794,7 +1794,16 @@ namespace eFMS.API.Documentation.DL.Services
         public List<JobProfitAnalysisExportResult> GetDataJobProfitAnalysis(GeneralReportCriteria criteria)
         {
             var dataDocumentation = JobProfitAnalysisDocumetation(criteria);
-            IQueryable<JobProfitAnalysisExportResult> list = dataDocumentation;
+            IQueryable<JobProfitAnalysisExportResult> list;
+            if (criteria.Service.Contains("CL"))
+            {
+                var dataOperation = JobProfitAnalysisOperation(criteria);
+                list = dataDocumentation.Union(dataOperation);
+            }
+            else
+            {
+                list = dataDocumentation;
+            }
             return list.ToList();
         }
 
@@ -2125,6 +2134,104 @@ namespace eFMS.API.Documentation.DL.Services
             return dataList.AsQueryable();
 
         }
+
+        private IQueryable<JobProfitAnalysisExportResult> JobProfitAnalysisOperation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = QueryDataOperationAcctPLSheet(criteria);
+            List<JobProfitAnalysisExportResult> dataList = new List<JobProfitAnalysisExportResult>();
+            foreach (var item in dataShipment)
+            {
+                var _charges = surCharge.Get(x => x.Hblid == item.Hblid && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                if (!string.IsNullOrEmpty(criteria.CustomerId))
+                {
+                    _charges = _charges.Where(x => (criteria.CustomerId == x.PaymentObjectId || criteria.CustomerId == x.PayerId) && (x.Type == DocumentConstants.CHARGE_BUY_TYPE || x.Type == DocumentConstants.CHARGE_SELL_TYPE));
+                }
+                foreach (var charge in _charges)
+                {
+                    JobProfitAnalysisExportResult data = new JobProfitAnalysisExportResult();
+                    data.JobNo = item.JobNo;
+                    data.Service = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
+                    data.Mbl = item.Mblno;
+                    data.Hbl = item.Hwbno;
+                    data.Eta = item.ServiceDate;
+                    data.Etd = item.ServiceDate;
+                    data.Quantity = item.SumContainers;
+                    var DetailContainer = item.ContainerDescription.Split(";").ToArray();
+                    int? Cont20 = 0;
+                    int? Cont40 = 0;
+                    int? Cont40HC = 0;
+                    int? Cont45 = 0;
+                    int? Cont = 0;
+                    foreach(var it in DetailContainer)
+                    {
+                        if (Regex.Matches(it.Trim(), "20").Count > 0)
+                        {
+                            Cont20 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                        }
+
+                        if (Regex.Matches(it.Trim(), "40").Count > 0)
+                        {
+                            Cont40 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                        }
+   
+                        if (Regex.Matches(it.Trim(), "40´HC").Count > 0 )
+                        {
+                            Cont40HC = Convert.ToInt16(it.Trim().Substring(0, 1));
+                        }
+       
+                        if (Regex.Matches(it.Trim(), "45").Count > 0)
+                        {
+                            Cont45 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                        }
+         
+                        if (Regex.Matches(it.Trim(), "Cont").Count > 0)
+                        {
+                            Cont = Convert.ToInt16(it.Trim().Substring(0, 1));
+                        }
+          
+                    }
+                    data.Cont20 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont20 : 0;
+                    data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40 : 0;
+                    data.Cont40HC = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40HC : 0;
+                    data.Cont45 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont45 : 0;
+                    data.Cont = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont : 0;
+                    data.CW = item.SumChargeWeight;
+                    data.GW = item.SumGrossWeight;
+                    data.CBM = item.SumCbm;
+                    var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
+                    data.ChargeCode = _charge?.Code;
+                    var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
+                    if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                    {
+                        data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                    }
+                    if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                    {
+                        if (_charge.DebitCharge != null)
+                        {
+                            data.TotalCost = 0;
+                            data.TotalRevenue = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                        }
+                        else
+                        {
+                            data.TotalCost = charge.Quantity * charge.UnitPrice * _rate ?? 0;
+                            data.TotalRevenue = 0;
+                        }
+                    }
+                    data.TotalCost = data.TotalCost ?? 0;
+                    data.TotalRevenue = data.TotalRevenue ?? 0;
+
+                    data.JobProfit = data.TotalRevenue - data.TotalCost;
+
+                    dataList.Add(data);
+                }
+            }
+            return dataList.AsQueryable();
+
+        }
+
+
+
 
         private IQueryable<JobProfitAnalysisExportResult> QueryDataDocumentationJobProfitAnalysis(GeneralReportCriteria criteria)
         {
