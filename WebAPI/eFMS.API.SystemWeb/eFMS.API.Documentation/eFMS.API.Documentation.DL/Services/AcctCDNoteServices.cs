@@ -97,37 +97,45 @@ namespace eFMS.API.Documentation.DL.Services
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
         {
             string code = string.Empty;
+            SysOffice office = null;
+            var currentUserOffice = currentUser?.OfficeID ?? null;
+            if (currentUserOffice != null)
+            {
+                office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
+                code = SetPrefixJobIdByOfficeCode(office?.Code);
+            }
+
             switch (typeEnum)
             {
                 case TransactionTypeEnum.CustomLogistic:
-                    code = DocumentConstants.LG_SHIPMENT;
+                    code += DocumentConstants.LG_SHIPMENT;
                     break;
                 case TransactionTypeEnum.InlandTrucking:
-                    code = DocumentConstants.IT_SHIPMENT;
+                    code += DocumentConstants.IT_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
-                    code = DocumentConstants.AE_SHIPMENT;
+                    code += DocumentConstants.AE_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirImport:
-                    code = DocumentConstants.AI_SHIPMENT;
+                    code += DocumentConstants.AI_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    code = DocumentConstants.SEC_SHIPMENT;
+                    code += DocumentConstants.SEC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    code = DocumentConstants.SIC_SHIPMENT;
+                    code += DocumentConstants.SIC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
-                    code = DocumentConstants.SEF_SHIPMENT;
+                    code += DocumentConstants.SEF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLImport:
-                    code = DocumentConstants.SIF_SHIPMENT;
+                    code += DocumentConstants.SIF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
-                    code = DocumentConstants.SEL_SHIPMENT;
+                    code += DocumentConstants.SEL_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLImport:
-                    code = DocumentConstants.SIL_SHIPMENT;
+                    code += DocumentConstants.SIL_SHIPMENT;
                     break;
                 default:
                     break;
@@ -145,8 +153,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             int count = 0;
-            var cdCode = DataContext.Get(x => x.Code.StartsWith(code) && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
-                .OrderByDescending(x => x.DatetimeCreated).FirstOrDefault()?.Code;
+            //var cdCode = DataContext.Get(x => x.Code.StartsWith(code) && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
+            //    .OrderByDescending(x => x.DatetimeCreated).FirstOrDefault()?.Code;
+            var cdCode = GetCdNoteToGenerateCode(office, code)?.Code;
             if (cdCode != null)
             {
                 cdCode = cdCode.Substring(code.Length + 4, 5);
@@ -154,6 +163,70 @@ namespace eFMS.API.Documentation.DL.Services
             }
             code = GenerateID.GenerateCDNoteNo(code, count);
             return code;
+        }
+
+        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code)
+        {
+            AcctCdnote currentCdNote = null;
+            if (office != null)
+            {
+                if (office.Code == "ITLHAN")
+                {
+                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
+                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                    && x.Code.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.DatetimeCreated)
+                                                    .FirstOrDefault();
+                }
+                else if (office.Code == "ITLDAD")
+                {
+                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
+                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                      && x.Code.StartsWith("DAD"))
+                                                    .OrderByDescending(x => x.DatetimeCreated)
+                                                    .FirstOrDefault();
+                }
+                else
+                {
+                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && !x.Code.StartsWith("DAD")
+                                                        && !x.Code.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.DatetimeCreated)
+                                                    .FirstOrDefault();
+                }
+            }
+            else
+            {
+                currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
+                                                  && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                  && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                  && !x.Code.StartsWith("DAD")
+                                                  && !x.Code.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.DatetimeCreated)
+                                                    .FirstOrDefault();
+            }
+            return currentCdNote;
+        }
+
+        private string SetPrefixJobIdByOfficeCode(string officeCode)
+        {
+            string prefixCode = string.Empty;
+            if (!string.IsNullOrEmpty(officeCode))
+            {
+                if (officeCode == "ITLHAN")
+                {
+                    prefixCode = "HAN-";
+                }
+                else if (officeCode == "ITLDAD")
+                {
+                    prefixCode = "DAD-";
+                }
+            }
+            return prefixCode;
         }
 
         public HandleState AddNewCDNote(AcctCdnoteModel model)
@@ -321,7 +394,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var csShipment = cstransRepository.Get(x => x.Id == id)?.FirstOrDefault();
                     var houseBillPermission = transactionDetailService.GetHouseBill(csShipment.TransactionType);
                     List<CsTransactionDetail> housebills = houseBillPermission.Where(x => x.JobId == id && x.ParentId == null).ToList();
-                    
+
                     List<CsShipmentSurchargeDetailsModel> _listCharges = new List<CsShipmentSurchargeDetailsModel>();
                     foreach (var housebill in housebills)
                     {
@@ -352,7 +425,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //PermissionRange rangeSearch = PermissionEx.GetPermissionRange(currentUser.UserMenuPermission.List);
                     //var shipments = opsTransactionService.QueryByPermission(rangeSearch);
                     //var hblid = shipments.Where(x => x.Id == id).FirstOrDefault()?.Hblid;
-                    
+
                     listCharges = Query(hblid.Value);
 
                     foreach (var c in listCharges)
@@ -399,7 +472,8 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.soaNo = String.Join(", ", chargesOfCDNote.Select(x => !string.IsNullOrEmpty(x.Soano) ? x.Soano : x.PaySoano).Distinct());
                         cdNote.total_charge = chargesOfCDNote.Count();
                         cdNote.UserCreated = sysUserRepo.Get(x => x.Id == cdNote.UserCreated).FirstOrDefault()?.Username;
-                        var _cdCurrency = chargesOfCDNote.Select(s => new {
+                        var _cdCurrency = chargesOfCDNote.Select(s => new
+                        {
                             Currency = s.CurrencyId,
                             Debit = (s.Type == DocumentConstants.CHARGE_SELL_TYPE || (s.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == s.PaymentObjectId)) ? s.Total : 0,
                             Credit = (s.Type == DocumentConstants.CHARGE_BUY_TYPE || (s.Type == DocumentConstants.CHARGE_OBH_TYPE && cdNote.PartnerId == s.PayerId)) ? s.Total : 0
@@ -475,7 +549,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = mapper.Map<CsShipmentSurchargeDetailsModel>(item);
                 var hb = trandetailRepositoty.Get(x => x.Id == item.Hblid).FirstOrDefault();
                 var catCharge = catchargeRepository.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
-                
+
                 //Quy đổi theo Final Exchange Rate. Nếu Final Exchange Rate is null thì
                 //Check ExchangeDate # null: nếu bằng null thì gán ngày hiện tại.
                 //var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -523,7 +597,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal? hbGw = 0;
             decimal? hbCw = 0; //House Bill Charge Weight
             var hbShippers = string.Empty;
-            var hbConsignees = string.Empty;            
+            var hbConsignees = string.Empty;
             foreach (var item in HBList)
             {
                 var conts = csMawbcontainerRepository.Get(x => x.Hblid == item.Id).ToList();
@@ -551,7 +625,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if ((transaction != null && !transaction.TransactionType.Contains("SF") && !transaction.TransactionType.Contains("A")) || opsTransaction != null)
                 {
                     hbPackages += item.PackageQty + " " + unitRepository.Get(x => x.Id == item.PackageType).FirstOrDefault()?.UnitNameEn + "; ";
-                }               
+                }
 
                 if (conts.Count() > 0)
                 {
@@ -641,7 +715,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
                     if (isOtherSOA == true)
                     {
-                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);                        
+                        hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);
                     }
                     else
                     {
@@ -649,7 +723,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (hs.Success)
                         {
                             foreach (var item in charges)
-                            {                            
+                            {
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
@@ -916,7 +990,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
                     //Exchange Rate theo Currency truyền vào
                     decimal _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, criteria.Currency);
-                    
+
                     var charge = new SeaDebitAgentsNewReport();
                     //Thông tin Partner
                     var partner = partnerRepositoty.Get(x => x.Id == data.PartnerId).FirstOrDefault();
@@ -1167,7 +1241,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 parameter.TotalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _totalCredit) : String.Format("{0:n3}", _totalCredit);
             }
-            
+
             decimal _balanceAmount = Math.Abs(_totalDebit - _totalCredit);
             parameter.BalanceAmount = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? String.Format("{0:n0}", _balanceAmount) : String.Format("{0:n3}", _balanceAmount);
 
@@ -1216,7 +1290,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.DecimalNo = 3;
             //Exchange Rate USD to VND
             var _exchangeRateUSDToVND = catCurrencyExchangeRepository.Get(x => (x.DatetimeCreated.Value.Date == DateTime.Now.Date && x.CurrencyFromId == DocumentConstants.CURRENCY_USD && x.CurrencyToId == DocumentConstants.CURRENCY_LOCAL)).OrderByDescending(x => x.DatetimeModified).FirstOrDefault();
-            parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;            
+            parameter.RateUSDToVND = _exchangeRateUSDToVND != null ? _exchangeRateUSDToVND.Rate : 0;
 
             result = new Crystal
             {
@@ -1232,7 +1306,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private SysOffice GetInfoOfficeOfUser(Guid officeId)
         {
-            SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();           
+            SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             return result;
         }
         #endregion -- PREVIEW CD NOTE --        
@@ -1250,7 +1324,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
             }
-            if(perQuery != null)
+            if (perQuery != null)
             {
                 query = query.And(perQuery);
             }
@@ -1298,7 +1372,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CDNoteModel> results = null;
             var data = Query(criteria);
-            if(data == null) { rowsCount = 0; return results; }
+            if (data == null) { rowsCount = 0; return results; }
             var cdNotes = Query(criteria)?.OrderByDescending(x => x.DatetimeModified).Select(x => new CDNoteModel
             {
                 ReferenceNo = x.Code,
@@ -1315,7 +1389,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return results;
             }
             var cdNotesGroupByCurrency = surchargeRepository.Get(x => cdNotes.Any(cd => cd.ReferenceNo == x.DebitNo || cd.ReferenceNo == x.CreditNo))
-                .Select(x => new 
+                .Select(x => new
                 {
                     ReferenceNo = string.IsNullOrEmpty(x.DebitNo) ? x.CreditNo : x.DebitNo,
                     HBLNo = x.Hblno,
@@ -1324,15 +1398,17 @@ namespace eFMS.API.Documentation.DL.Services
                     x.VoucherId,
                     x.InvoiceNo,
                     x.Type
-                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel { Currency = x.Key.Currency,
+                }).GroupBy(x => new { x.ReferenceNo, x.Currency }).Select(x => new CDNoteModel
+                {
+                    Currency = x.Key.Currency,
                     ReferenceNo = x.Key.ReferenceNo,
                     HBLNo = string.Join(";", x.Select(i => i.HBLNo)),
                     Total = x.Sum(y => y.Total),
                     Status = x.Any(y => !string.IsNullOrEmpty(y.VoucherId) || (!string.IsNullOrEmpty(y.InvoiceNo) && y.Type == "SELL")) ? "Issued" : "New",
-                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId))? "Issued Voucher": "New"
+                    IssuedStatus = x.Any(y => !string.IsNullOrEmpty(y.InvoiceNo)) ? "Issued Invoice" : x.Any(y => !string.IsNullOrEmpty(y.VoucherId)) ? "Issued Voucher" : "New"
                 });
             cdNotesGroupByCurrency = GetByStatus(criteria.Status, cdNotesGroupByCurrency);
-            
+
             rowsCount = cdNotesGroupByCurrency.Count();
             if (size > 0)
             {
@@ -1366,23 +1442,23 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CDNoteModel> GetCDNotes(List<CDNoteModel> cdNotes, IQueryable<CDNoteModel> cdNotesGroupByCurrency)
         {
             var data = (from cd in cdNotes
-                     join charge in cdNotesGroupByCurrency on cd.ReferenceNo equals charge.ReferenceNo
-                     join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id
-                     join creator in sysUserRepo.Get() on cd.Creator equals creator.Id
-                     select new CDNoteModel
-                     {
-                         Id = cd.Id,
-                         JobId = cd.JobId,
-                         PartnerId = partner.Id,
-                         PartnerName = partner.PartnerNameEn,
-                         ReferenceNo = cd.ReferenceNo,
-                         Total = charge.Total,
-                         Currency = charge.Currency,
-                         IssuedDate = cd.IssuedDate,
-                         Creator = creator.Username,
-                         HBLNo = charge.HBLNo,
-                         Status = charge.Status
-                     })?.AsQueryable();
+                        join charge in cdNotesGroupByCurrency on cd.ReferenceNo equals charge.ReferenceNo
+                        join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id
+                        join creator in sysUserRepo.Get() on cd.Creator equals creator.Id
+                        select new CDNoteModel
+                        {
+                            Id = cd.Id,
+                            JobId = cd.JobId,
+                            PartnerId = partner.Id,
+                            PartnerName = partner.PartnerNameEn,
+                            ReferenceNo = cd.ReferenceNo,
+                            Total = charge.Total,
+                            Currency = charge.Currency,
+                            IssuedDate = cd.IssuedDate,
+                            Creator = creator.Username,
+                            HBLNo = charge.HBLNo,
+                            Status = charge.Status
+                        })?.AsQueryable();
             var results = new List<CDNoteModel>();
             foreach (var item in data)
             {

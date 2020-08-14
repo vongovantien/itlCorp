@@ -117,49 +117,118 @@ namespace eFMS.API.Documentation.DL.Services
         private string CreateJobNoByTransactionType(TransactionTypeEnum typeEnum, string transactionType)
         {
             var shipment = string.Empty;
+            SysOffice office = null;
+            var currentUserOffice = currentUser?.OfficeID ?? null;
+            if (currentUserOffice != null)
+            {
+                office = sysOfficeRepository.Get(x => x.Id == currentUserOffice).FirstOrDefault();
+                shipment = SetPrefixJobIdByOfficeCode(office?.Code);
+            }
+            var currentShipment = GetTransactionToGenerateJobNo(office, transactionType);
+
             int countNumberJob = 0;
             switch (typeEnum)
             {
                 case TransactionTypeEnum.InlandTrucking:
-                    shipment = DocumentConstants.IT_SHIPMENT;
+                    shipment += DocumentConstants.IT_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
-                    shipment = DocumentConstants.AE_SHIPMENT;
+                    shipment += DocumentConstants.AE_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirImport:
-                    shipment = DocumentConstants.AI_SHIPMENT;
+                    shipment += DocumentConstants.AI_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolExport:
-                    shipment = DocumentConstants.SEC_SHIPMENT;
+                    shipment += DocumentConstants.SEC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaConsolImport:
-                    shipment = DocumentConstants.SIC_SHIPMENT;
+                    shipment += DocumentConstants.SIC_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLExport:
-                    shipment = DocumentConstants.SEF_SHIPMENT;
+                    shipment += DocumentConstants.SEF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaFCLImport:
-                    shipment = DocumentConstants.SIF_SHIPMENT;
+                    shipment += DocumentConstants.SIF_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLExport:
-                    shipment = DocumentConstants.SEL_SHIPMENT;
+                    shipment += DocumentConstants.SEL_SHIPMENT;
                     break;
                 case TransactionTypeEnum.SeaLCLImport:
-                    shipment = DocumentConstants.SIL_SHIPMENT;
+                    shipment += DocumentConstants.SIL_SHIPMENT;
                     break;
                 default:
                     break;
             }
-            var currentShipment = DataContext.Get(x => x.TransactionType == transactionType
-                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
-                                                    .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+            
             if (currentShipment != null)
             {
                 countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(shipment.Length + 5, 5));
             }
             return GenerateID.GenerateJobID(shipment, countNumberJob);
+        }
+
+        private CsTransaction GetTransactionToGenerateJobNo(SysOffice office, string transactionType)
+        {
+            CsTransaction currentShipment = null;
+            if (office != null)
+            {
+                if (office.Code == "ITLHAN")
+                {
+                    currentShipment = DataContext.Get(x => x.TransactionType == transactionType
+                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                    && x.JobNo.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.JobNo)
+                                                    .FirstOrDefault();
+                }
+                else if (office.Code == "ITLDAD")
+                {
+                    currentShipment = DataContext.Get(x => x.TransactionType == transactionType
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("DAD"))
+                                                    .OrderByDescending(x => x.JobNo)
+                                                    .FirstOrDefault();
+                }
+                else
+                {
+                    currentShipment = DataContext.Get(x => x.TransactionType == transactionType
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && !x.JobNo.StartsWith("DAD")
+                                                        && !x.JobNo.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.JobNo)
+                                                    .FirstOrDefault();
+                }
+            }
+            else
+            {
+                currentShipment = DataContext.Get(x => x.TransactionType == transactionType
+                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                    && !x.JobNo.StartsWith("DAD")
+                                                    && !x.JobNo.StartsWith("HAN"))
+                                                    .OrderByDescending(x => x.JobNo)
+                                                    .FirstOrDefault();
+            }
+            return currentShipment;
+        }
+
+        private string SetPrefixJobIdByOfficeCode(string officeCode)
+        {
+            string prefixCode = string.Empty;
+            if (!string.IsNullOrEmpty(officeCode))
+            {
+                if (officeCode == "ITLHAN")
+                {
+                    prefixCode = "HAN-";
+                }
+                else if (officeCode == "ITLDAD")
+                {
+                    prefixCode = "DAD-";
+                }
+            }
+            return prefixCode;
         }
 
         public object AddCSTransaction(CsTransactionEditModel model)
@@ -1751,8 +1820,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             var transaction = GetDefaultJob(model);
             List<CsMawbcontainer> containers = new List<CsMawbcontainer>();
-            List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>(); 
-            List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>(); 
+            List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>();
+            List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
             if (model.CsMawbcontainers != null && model.CsMawbcontainers.Count() > 0)
             {
@@ -1844,8 +1913,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var hsTrans = transactionRepository.Add(transaction);
                 if (hsTrans.Success)
-                {   
-                    if(detailTrans != null && detailTrans.Count() > 0)
+                {
+                    if (detailTrans != null && detailTrans.Count() > 0)
                     {
                         HandleState hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
                         var hs = csTransactionDetailRepo.SubmitChanges();
@@ -1900,7 +1969,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
                 Int32.TryParse(_hbl, out count);
                 oders.Add(count);
-               
+
             }
             int maxCurrentOder = oders.Max();
             maxCurrentOder -= 1;
