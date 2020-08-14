@@ -118,5 +118,10 @@
         public static readonly string LEVEL_MANAGER = "Manager";
         public static readonly string LEVEL_ACCOUNTANT = "Accountant";
         public static readonly string LEVEL_BOD = "BOD";
+
+        public static readonly string ARGEEMENT_TYPE_TRIAL = "Trial";
+        public static readonly string ARGEEMENT_TYPE_OFFICAL = "Offical";
+        public static readonly string ARGEEMENT_TYPE_GUARANTEE = "Guarantee";
+        public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
     }
 }

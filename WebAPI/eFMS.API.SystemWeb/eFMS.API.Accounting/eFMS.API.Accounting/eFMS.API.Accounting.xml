@@ -194,6 +194,36 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">
+            <summary>
+            Get AR detail has argeement by argeement id
+            </summary>
+            <param name="argeementId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByPartnerId(System.String)">
+            <summary>
+            Get AR detail no argeement by partner id
+            </summary>
+            <param name="partnerId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AccountReceivableCriteria,System.Int32,System.Int32)">
+            <summary>
+            Paging
+            </summary>
+            <param name="criteria"></param>
+            <param name="pageNumber"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.QueryData(eFMS.API.Accounting.DL.Models.Criteria.AccountReceivableCriteria)">
+            <summary>
+            Query Data
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

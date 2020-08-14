@@ -62,6 +62,14 @@ namespace eFMS.API.Accounting.DL.Common
         [Description("Warning")]
         Warning = 7
     }
+
+    public enum ARTypeEnum
+    {
+        TrialOrOffical = 1,
+        Guarantee = 2,
+        Other = 3
+    }
+
     public static class TermData
     {
         public static readonly string Canceled = "Canceled";
@@ -84,6 +92,10 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string SeaFCLImport = "SeaFCLImport";
         public static readonly string SeaLCLExport = "SeaLCLExport";
         public static readonly string SeaLCLImport = "SeaLCLImport";
+
+        public static readonly string AR_TrialOrOffical = "AR_TrialOrOffical";
+        public static readonly string AR_Guarantee = "AR_Guarantee";
+        public static readonly string AR_Other = "AR_Other";
 
         public static readonly List<FreightTerm> FreightTerms = new List<FreightTerm>
         {
