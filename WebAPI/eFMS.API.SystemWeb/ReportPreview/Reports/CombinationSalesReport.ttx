@@ -1,0 +1,30 @@
+Department 	String	50	
+ContactName	String	150	
+PartnerName	String	150	
+Description	String	150	
+Area	String	255	
+POL	String 255
+POD	String 255
+Lines	String 150
+Agent	String 150
+NominationParty String	150
+Assigned	Boolean
+TransID	String	50
+LoadingDate	Datetime
+HWBNO	String	50
+Volume	String 255
+Qty20	Number
+Qty40	Number
+Cont40HC	Number
+KGS	Number
+CBM	Number
+SellingRate	Number
+SharedProfit	Number
+BuyingRate	Number
+OtherCharges	Number
+TpyeofService	String	50
+Shipper	String 255
+Consignee	String	255
+ShipmentSource	String	255
+
+
