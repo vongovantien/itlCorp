@@ -1128,12 +1128,211 @@ namespace eFMS.API.Documentation.DL.Services
             return crystal;
         }
 
+        private IQueryable<CombinationSaleReportResult> GetOpsShipmentCombinationReport(SaleReportCriteria criteria)
+        {
+            List<CombinationSaleReportResult> results = new List<CombinationSaleReportResult>();
+
+            IQueryable<OpsTransaction> shipment = QueryOpsSaleReport(criteria);
+            if (shipment == null) return null;
+            
+            IQueryable<CatUnit> containerData = uniRepository.Get(x => x.UnitType == "Container");
+
+            foreach (var item in shipment)
+            {
+                CombinationSaleReportResult report = new CombinationSaleReportResult
+                {
+                    ShipmentSource = string.Empty,
+                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameEn,
+                    POD = catPlaceRepository.Get(x => x.Id == item.Pod)?.FirstOrDefault()?.Code,
+                    POL = catPlaceRepository.Get(x => x.Id == item.Pol)?.FirstOrDefault()?.Code,
+                    Description = "Logistics",
+                    TransID = item?.JobNo,
+                    KGS = item.SumNetWeight == null ? 0 : (decimal)item.SumNetWeight,
+                    CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
+                    SharedProfit = 0,
+                    OtherCharges = 0,
+                    NominationParty = string.Empty,
+                    Area = string.Empty,
+                    Consignee = item.Consignee,
+                    Lines = catPartnerRepository.Get(x => x.Id == item.SupplierId).FirstOrDefault()?.PartnerNameEn,
+                    Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
+                    Shipper = item.Shipper,
+                    LoadingDate = item.ServiceDate,
+                    TpyeofService = API.Common.Globals.CustomData.Services.FirstOrDefault(c => c.Value == DocumentConstants.LG_SHIPMENT)?.Value,
+                    Assigned = false,
+                    HAWBNO = item.Hwbno,
+                    PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
+
+                };
+                string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
+                if (employeeId != null)
+                {
+                    report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                }
+
+                // Selling
+                report.SellingRate = GetChargeFee(item.Hblid, criteria.Currency, "SELL");
+                //Buying without kickBack.
+                report.BuyingRate = GetChargeFee(item.Hblid, criteria.Currency, "BUY");
+                //KickBack
+                report.SharedProfit = GetChargeFee(item.Hblid, criteria.Currency, "SHARE");
+                // Container
+                IQueryable<CsMawbcontainer> containers = null;
+                if (item != null)
+                {
+                    containers = containerRepository.Get(x => x.Mblid == item.Id);
+                }
+                else
+                {
+                    containers = containerRepository.Get(x => x.Hblid == item.Hblid);
+                }
+
+                if (containers != null)
+                {
+                    var conts = containers.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
+
+                    report.Cont40HC = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40HC".ToLower()).Sum(x => x.x.Quantity);
+                    report.Qty20 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont20DC".ToLower()).Sum(x => x.x.Quantity);
+                    report.Qty40 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40DC".ToLower()).Sum(x => x.x.Quantity);
+                }
+
+                results.Add(report);
+
+            }
+
+            return results.AsQueryable();
+        }
+
+        private IQueryable<CombinationSaleReportResult> GetCSShipmentCombinationReport(SaleReportCriteria criteria)
+        {
+            IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
+            if (shipments == null) return null;
+            IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
+
+            var data = (from shipment in shipments
+                        join housebill in housebills on shipment.Id equals housebill.JobId
+                        select new
+                        {
+                            shipment.DepartmentId,
+                            shipment.TransactionType,
+                            shipment.JobNo,
+                            shipment.ShipmentType,
+                            housebill.CustomerId,
+                            HBLID = housebill.Id,
+                            housebill.NetWeight,
+                            housebill.Cbm,
+                            housebill.SaleManId,
+                            shipment.TypeOfService,
+                            shipment.Pod,
+                            shipment.Pol,
+                            housebill.ShipperId,
+                            housebill.ConsigneeId,
+                            shipment.ColoaderId,
+                            shipment.AgentId,
+                            housebill.NotifyPartyDescription,
+                            housebill.Hwbno,
+                            housebill.GrossWeight,
+                            housebill.ShipperDescription,
+                            housebill.ConsigneeDescription,
+                            shipment.Eta,
+                            shipment.Etd,
+
+
+
+                        });
+            if (data == null) return null;
+
+            var results = new List<CombinationSaleReportResult>();
+            var containerData = uniRepository.Get(x => x.UnitType == "Container");
+            foreach (var item in data)
+            {
+                var report = new CombinationSaleReportResult
+                {
+                    Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.Code,
+                    POD = catPlaceRepository.Get(x => x.Id == item.Pod)?.FirstOrDefault()?.Code,
+                    POL = catPlaceRepository.Get(x => x.Id == item.Pol)?.FirstOrDefault()?.Code,
+
+                    PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
+                    Description = GetShipmentTypeForPreviewPL(item.TransactionType),
+                    Assigned = item.ShipmentType == "Nominated" ? true : false,
+                    TransID = item.JobNo,
+                    KGS = item.NetWeight == null ? 0 : (decimal)item.NetWeight,
+                    CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
+                    SharedProfit = 0,
+                    OtherCharges = 0,
+                    ShipmentSource = item.TransactionType,
+
+                    Lines = item.ColoaderId != null ? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn : string.Empty,
+                    Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
+                    NominationParty = item.NotifyPartyDescription ?? string.Empty,
+                    HAWBNO = item.Hwbno,
+
+                    TpyeofService = item.TypeOfService != null ? (item.TypeOfService.Contains("LCL") ? "LCL" : string.Empty) : string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
+                    Shipper = item.ShipperDescription,
+                    Consignee = item.ConsigneeDescription,
+                    LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd
+
+                };
+                string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
+                if (employeeId != null)
+                {
+                    report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
+                }
+                // Selling
+                report.SellingRate = GetChargeFee(item.HBLID, criteria.Currency, "SELL");
+                //Buying without kickBack.
+                report.BuyingRate = GetChargeFee(item.HBLID, criteria.Currency, "BUY");
+                //KickBack
+                report.SharedProfit = GetChargeFee(item.HBLID, criteria.Currency, "SHARE");
+                // Share-Profit
+                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
+
+                var contInfo = GetContainer(containerData, null, item.HBLID);
+
+                report.Cont40HC = (decimal)contInfo?.Cont40HC;
+                report.Qty20 = (decimal)contInfo?.Qty20;
+                report.Qty40 = (decimal)contInfo?.Qty40;
+                results.Add(report);
+            }
+            return results.AsQueryable();
+        }
+
+        private IQueryable<CombinationSaleReportResult> GetCombinationReport(SaleReportCriteria criteria)
+        {
+            IQueryable<CombinationSaleReportResult> opsShipments = null;
+            IQueryable<CombinationSaleReportResult> csShipments = null;
+            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains("CL"))
+            {
+                opsShipments = GetOpsShipmentCombinationReport(criteria);
+            }
+
+            csShipments = GetCSShipmentCombinationReport(criteria);
+            if (opsShipments == null)
+            {
+                if (csShipments == null)
+                {
+                    return null;
+                }
+                return csShipments;
+            }
+            else
+            {
+                if (csShipments == null)
+                {
+                    return opsShipments;
+                }
+                else
+                {
+                    return opsShipments.Union(csShipments);
+                }
+            }
+        }
+
         public Crystal PreviewCombinationSaleReport(SaleReportCriteria criteria)
         {
 
             Crystal crystal = null;
-            // IQueryable<SummarySaleReportResult> data = GetSummarySaleReport(criteria);
-            IQueryable<CombinationSaleReportResult> data = null; 
+            IQueryable<CombinationSaleReportResult> data = GetCombinationReport(criteria);
 
             DateTime _fromDate, _toDate = DateTime.Now;
 
@@ -1182,7 +1381,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 crystal = new Crystal
                 {
-                    ReportName = "TotalSalesReport.rpt",
+                    ReportName = "CombinationSalesReport.rpt",
                     AllowPrint = true,
                     AllowExport = true
                 };
@@ -1195,7 +1394,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         #endregion -- SALE REPORT SUMMARY --        
-
         public string GetShipmentTypeForPreviewPL(string transactionType)
         {
             string shipmentType = string.Empty;

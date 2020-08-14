@@ -13,10 +13,10 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string POD { get; set; }
         public string Lines { get; set; }
         public string Agent { get; set; }
-        public string NorminationParty { get; set; }
+        public string NominationParty { get; set; }
         public bool Assigned { get; set; }
         public string TransID { get; set; }
-        public DateTime LoadingDate { get; set; }
+        public DateTime? LoadingDate { get; set; }
         public string HAWBNO { get; set; }
         public decimal? Qty20 { get; set; }
         public decimal? Qty40 { get; set; }
