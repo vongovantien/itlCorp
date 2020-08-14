@@ -46,12 +46,13 @@
                                     <div class="table-actions" style="width: 70px">
                                         <app-permission-button type="detail" (click)="checkAllowDetail(incoterm.id)">
                                         </app-permission-button>
-                                        <app-permission-button type="delete" (click)="checkAllowDelete(incoterm.id)">
+                                        <app-permission-button type="delete" *ngIf="incoterm.active === false"
+                                            (click)="checkAllowDelete(incoterm.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="#">{{incoterm.code}}</a>
+                                    <a class="pointer" (click)="checkAllowDetail(incoterm.id)">{{incoterm.code}}</a>
                                 </td>
                                 <td>
                                     <span>{{incoterm.nameEn}}</span>
