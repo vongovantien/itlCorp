@@ -7,15 +7,31 @@ export enum AccountingManagementActionTypes {
     SELECT_REQUESTER = '[Accounting Management] Select Requester',
     UPDATE_CHARGE_LIST = '[Accounting Management] Update Charge List',
     UPDATE_EXCHANGE_RATE = '[Accounting Management] Update Exchange Rate',
+    GET_AGREEMENT_INVOICE = '[Accounting Management] Get Agreement Invoice',
+
 }
 
 export interface ISyncExchangeRate {
     exchangeRate: number;
 }
 
+export interface IAccMngtContractInvoiceCriteria {
+    partnerId: string;
+    service: string;
+    office: string;
+}
+
+export interface IAgreementInvoice {
+    paymentTerm: number;
+    contractNo: string;
+    contractType: string;
+}
+
+
 export const SelectPartner = createAction(AccountingManagementActionTypes.SELECT_PARTNER, props<PartnerOfAcctManagementResult>());
 export const InitPartner = createAction(AccountingManagementActionTypes.INIT_PARTNER);
 export const SelectRequester = createAction(AccountingManagementActionTypes.SELECT_REQUESTER, props<PartnerOfAcctManagementResult>());
 export const UpdateChargeList = createAction(AccountingManagementActionTypes.UPDATE_CHARGE_LIST, props<{ charges: ChargeOfAccountingManagementModel[] }>());
 export const UpdateExchangeRate = createAction(AccountingManagementActionTypes.UPDATE_EXCHANGE_RATE, props<ISyncExchangeRate>());
+export const GetAgreementForInvoice = createAction(AccountingManagementActionTypes.GET_AGREEMENT_INVOICE, props<IAgreementInvoice>());
 

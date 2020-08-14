@@ -9,6 +9,7 @@ export interface IAccountingManagementPartnerState {
     settlementRequesterId: string;
     settlementRequester: string;
     inputRefNo: string;
+    paymentTerm: number;
     charges: ChargeOfAccountingManagementModel[];
 }
 
@@ -19,7 +20,8 @@ export const initialState: IAccountingManagementPartnerState = {
     settlementRequesterId: null,
     settlementRequester: null,
     inputRefNo: null,
-    charges: []
+    charges: [],
+    paymentTerm: null
 };
 
 const accountingManagementPartnerReducer = createReducer(
@@ -46,6 +48,11 @@ const accountingManagementPartnerReducer = createReducer(
             ...state, charges: state.charges
         };
     }),
+    on(accountingManagementActions.GetAgreementForInvoice, (state: IAccountingManagementPartnerState, payload: accountingManagementActions.IAgreementInvoice) => {
+        return {
+            ...state, paymentTerm: payload.paymentTerm != null ? payload.paymentTerm : 30
+        };
+    })
 
 
 );

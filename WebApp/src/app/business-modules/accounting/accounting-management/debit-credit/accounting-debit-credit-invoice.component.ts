@@ -17,6 +17,7 @@ import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-n
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { getMenuUserPermissionState, IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountingConstants } from '@constants';
 
 
 type TAB = 'CDI' | 'VAT' | 'VOUCHER';
@@ -34,6 +35,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     cdNotes: CDNoteViewModel[] = [];
 
     menuSpecialPermission: Observable<any[]>;
+    selectedIssueType: string;
 
     constructor(
         private _router: Router,
@@ -134,18 +136,19 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     issueVatInvoice() {
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
         if (!!cdNotes.length) {
-            this.searchRef(cdNotes.map(x => x.referenceNo), 'invoice');
+            this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.INVOICE);
         }
     }
 
     issueVoucher() {
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
         if (!!cdNotes.length) {
-            this.searchRef(cdNotes.map(x => x.referenceNo), 'voucher');
+            this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.VOUCHER);
         }
     }
 
     searchRef(cdNotes: string[], type: string) {
+        this.selectedIssueType = type;
         const body: AccountingInterface.IPartnerOfAccountingManagementRef = {
             cdNotes: cdNotes,
             soaNos: null,
@@ -199,6 +202,11 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
 
     onSelectPartner() {
-        this._router.navigate(["home/accounting/management/vat-invoice/new"]);
+        if (this.selectedIssueType === AccountingConstants.ISSUE_TYPE.INVOICE) {
+            this._router.navigate(["home/accounting/management/vat-invoice/new"]);
+            return;
+        }
+        this._router.navigate(["home/accounting/management/voucher/new"]);
+
     }
 }

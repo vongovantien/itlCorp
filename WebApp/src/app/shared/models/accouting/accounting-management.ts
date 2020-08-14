@@ -33,6 +33,7 @@ export class AccAccountingManagement {
     paymentStatus: string = null;
     paymentDueDate: string = null;
     totalExchangeRate: number = null;
+    paymentTerm: number = null;
 
     constructor(object?: any) {
         const self = this;
@@ -116,6 +117,7 @@ export class PartnerOfAcctManagementResult {
     settlementRequesterId: string = null;
     settlementRequester: string = null;
     inputRefNo: string = null;
+    service: string = null;
     charges: ChargeOfAccountingManagementModel[] = new Array<ChargeOfAccountingManagementModel>();
     constructor(object?: any) {
         const self = this;

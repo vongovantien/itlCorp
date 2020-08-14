@@ -29,6 +29,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<AcctMngtVatInvoiceImportModel> CheckVatInvoiceImport(List<AcctMngtVatInvoiceImportModel> list);
         ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list);
         int CheckDetailPermission(Guid id);
+        CatContractInvoiceModel GetContractForInvoice(AccMngtContractInvoiceCriteria model);
 
     }
 }
