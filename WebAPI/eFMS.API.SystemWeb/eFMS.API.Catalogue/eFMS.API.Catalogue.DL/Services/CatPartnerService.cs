@@ -1053,6 +1053,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     item.IsValid = false;
                 }
 
+                if (string.IsNullOrEmpty(item.AddressShippingVn))
+                {
+                    item.AddressShippingVnError = stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND];
+                    item.IsValid = false;
+                }
+
                 if (!string.IsNullOrEmpty(item.AcReference))
                 {
                     if (!partners.Any(x => x.AccountNo?.ToLower() == item.AcReference?.ToLower()))
