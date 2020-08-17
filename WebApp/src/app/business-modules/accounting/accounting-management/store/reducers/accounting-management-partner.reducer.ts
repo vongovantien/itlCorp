@@ -50,7 +50,7 @@ const accountingManagementPartnerReducer = createReducer(
     }),
     on(accountingManagementActions.GetAgreementForInvoice, (state: IAccountingManagementPartnerState, payload: accountingManagementActions.IAgreementInvoice) => {
         return {
-            ...state, paymentTerm: payload.paymentTerm != null ? payload.paymentTerm : 30
+            ...state, paymentTerm: payload.paymentTerm != null ? payload.paymentTerm : 30 // * default 30 days
         };
     })
 

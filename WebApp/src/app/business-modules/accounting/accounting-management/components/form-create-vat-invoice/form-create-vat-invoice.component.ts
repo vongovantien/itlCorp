@@ -10,7 +10,7 @@ import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 import { DataService } from '@services';
 
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, getAccoutingManagementPaymentTermState } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
 import { map, debounceTime, takeUntil, distinctUntilChanged, startWith } from 'rxjs/operators';
@@ -89,7 +89,6 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: IAccountingManagementPartnerState) => {
-                    console.log(res);
                     if (!!res.partnerId) {
                         if (!this.formGroup.controls['partnerId'].value) {
                             this.formGroup.controls['partnerId'].setValue(res.partnerId);
@@ -99,9 +98,16 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                         this.attachDocInfo.setValue(null);
                         this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
                         this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
-                        if (!this.paymentTerm.value) {
-                            this.paymentTerm.setValue(res.paymentTerm);
-                        }
+                    }
+                }
+            );
+
+        this._store.select(getAccoutingManagementPaymentTermState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res) => {
+                    if (!this.paymentTerm.value) {
+                        this.paymentTerm.setValue(res);
                     }
                 }
             );
