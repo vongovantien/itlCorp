@@ -1,0 +1,138 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="m-form">
+
+            <div class="row">
+                <div class="col-lg-12 m--margin-top-20">
+                    <div class="table-wrapper table-scrollable" id="payment-table">
+                        <table class="table table-hover table-brand dataTable table-hover">
+                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                <th class="m--w-50 first table-actions-col">
+                                    Action
+                                </th>
+                            </thead>
+                            <tbody>
+                                <ng-container>
+                                    <ng-container *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                        <tr class="collapse-toggle-row">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions" style="width: 100px">
+                                                    <button type="button"
+                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                        data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
+                                                        title="Collapse">
+                                                        <i class="la la-angle-up"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td>{{ item.salesNameEn }} </td>
+                                            <td>{{ item.salesFullName }} </td>
+                                            <td>{{ item.creditLimited | number: '.0-3'}}</td>
+                                            <td>{{ item.creditAmount| number: '.0-3' }}</td>
+                                            <td>
+                                                <span
+                                                    [ngClass]="item.creditRate < 120 ? 'text-success' : 'text-danger'">
+                                                    {{ item.creditRate}}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.billing | number: '.0-3'}}
+                                            </td>
+                                            <td>{{ item.billingUnpaid | number: '.0-3'}}</td>
+                                            <td>{{ item.paid | number: '.0-3'}}</td>
+                                            <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.between1_15days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.between16_30days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.over30days | number: '.0-3' }}
+                                                </span>
+                                            </td>
+
+                                        </tr>
+                                        <tr class="collapse-panel-row" app-table-collapse-row [id]="'id-00' + (i + 1)"
+                                            [parentId]="'#obh-payment-table'">
+                                            <table class="table table-secondary dataTable">
+                                                <thead app-table-header [headers]="subHeaders"
+                                                    (onClick)="sortDetailGuaranteed($event.sortField, $event.order)">
+                                                    <th class="m--w-50 first table-actions-col">
+                                                        Action
+                                                    </th>
+                                                </thead>
+                                                <tbody>
+                                                    <ng-container>
+                                                        <tr
+                                                            *ngFor="let element of subSeedData; let j = index; trackBy: trackByFn">
+                                                            <td class="table-actions-col">
+                                                                <div class="table-actions" style="width: 70px">
+                                                                    <app-permission-button type="detail">
+                                                                    </app-permission-button>
+                                                                </div>
+                                                            </td>
+                                                            <td><a href="#">{{ element.partnerId }}</a></td>
+                                                            <td>{{ element.partnerName  }}
+                                                            </td>
+                                                            <td>{{ element.creditAmount | number: '.0-3'}}
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    [ngClass]="element.creditRate < 120 ? 'text-success' : 'text-danger'">
+                                                                    {{ element.creditRate}}
+                                                                </span>
+                                                            </td>
+                                                            <td>{{ element.billing | number: '.0-3'}}
+                                                            </td>
+                                                            <td>{{ element.billingUnpaid | number: '.0-3'}}</td>
+                                                            <td>{{ element.paid | number: '.0-3' }}</td>
+                                                            <td>{{ element.obhAmount | number: '.0-3' }}</td>
+                                                            <td>
+                                                                <span [ngClass]="'text-danger'">
+                                                                    {{ element.between1_15days | number: '.0-3' }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span [ngClass]="'text-danger'">
+                                                                    {{ element.between16_30days | number: '.0-3' }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span [ngClass]="'text-danger'">
+                                                                    {{ element.over30days | number: '.0-3' }}
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    [ngClass]="element.status ? 'text-success' : 'text-danger'">
+                                                                    {{ element.status ? 'Active' : 'Inactive'}}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    </ng-container>
+                                                    <tr app-table-none-record *ngIf="!subSeedData.length">
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </tr>
+                                    </ng-container>
+                                </ng-container>
+                                <tr app-table-none-record *ngIf="!seedData.length">
+                                </tr>
+                                <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

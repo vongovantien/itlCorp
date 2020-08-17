@@ -1,0 +1,129 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <form class="m-form m-form--state" [formGroup]="formSearch">
+            <div class="row">
+                <div class="col-lg-8">
+                    <label>Partner</label>
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                        [selectedDisplayFields]="['partnerId','abbrName', 'nameLocal', 'taxCode']"
+                        [dataSources]="seedPartner" [displayFields]="displayFieldsPartner" placeholder="Select Partner">
+                    </app-combo-grid-virtual-scroll>
+                </div>
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label>Over Due Days</label>
+                            <ng-select #s [items]="overDueDays" formControlName="overdueDays">
+                            </ng-select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label></label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" formControlName="fromOverdueDays">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label></label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" formControlName="toOverdueDays">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="row">
+                                <div class="col-lg-6">
+
+                                    <label>Debit Rate</label>
+                                    <ng-select #c [items]="debitRates" formControlName="debitRate">
+                                    </ng-select>
+
+                                </div>
+                                <div class="col-lg-3">
+                                    <label></label>
+                                    <div class="form-group">
+                                        <input type="number" min="0" class="form-control"
+                                            formControlName="fromDebitRate">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <label></label>
+                                    <div class="form-group">
+                                        <input type="number" min="0" class="form-control" formControlName="toDebitRate">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <label>Agreement Status</label>
+                            <ng-select #as [items]="agreementStatusList" formControlName="agreementStatus">
+
+                            </ng-select>
+                        </div>
+
+
+
+                    </div>
+                </div>
+                <div class="col-lg-4">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label>Agreement Expired Days</label>
+                            <ng-select #s formControlName="agreementExpiredDays">
+                            </ng-select>
+                        </div>
+                        <div class="col-lg-3">
+                            <label></label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" formControlName="fromAgreementExpiredDays">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <label></label>
+                            <div class="form-group">
+                                <input type="text" class="form-control" formControlName="toAgreementExpiredDays">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <label>Salesman</label>
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')"
+                        [selectedDisplayFields]="['userName', 'fullName']" [dataSources]="seedSalesMan"
+                        [displayFields]="displayFieldsSalesMan">
+
+                    </app-combo-grid-virtual-scroll>
+                </div>
+                <div class="col-lg-6">
+                    <label>Office</label>
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')"
+                        [selectedDisplayFields]="['abbrName', 'enName']" [dataSources]="seedOffice"
+                        [displayFields]="displayFieldsOffice">
+                        >
+
+                    </app-combo-grid-virtual-scroll>
+                </div>
+            </div>
+            <div class="form-actions">
+                <div class="row">
+                    <div class="col-lg-6"></div>
+                    <div class="col-lg-6 m--align-right c-button-actions">
+                        <app-default-button [buttonSetting]="searchlButtonSetting" (click)="onSearchRequest()">
+                        </app-default-button>
+                        <app-default-button [buttonSetting]="resetButtonSetting">
+                        </app-default-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
