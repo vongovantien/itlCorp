@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewGetMonthlySaleReport(SaleReportCriteria criteria);
         Crystal PreviewGetQuaterSaleReport(SaleReportCriteria criteria);
         Crystal PreviewSummarySaleReport(SaleReportCriteria criteria);
+        Crystal PreviewCombinationSaleReport(SaleReportCriteria criteria);
 
 
     }
