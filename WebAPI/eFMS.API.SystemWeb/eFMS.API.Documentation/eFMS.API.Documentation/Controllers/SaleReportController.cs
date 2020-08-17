@@ -74,5 +74,13 @@ namespace eFMS.API.Documentation.Controllers
             var result = saleReportService.PreviewSummarySaleReport(criteria);
             return Ok(result);
         }
+
+        [HttpPost("CombinationSaleReport")]
+        [Authorize]
+        public IActionResult CombinationSaleReport(SaleReportCriteria criteria)
+        {
+            var result = saleReportService.PreviewCombinationSaleReport(criteria);
+            return Ok(result);
+        }
     }
 }

@@ -20,12 +20,12 @@ enum OverDueDays {
 }
 
 @Component({
-    selector: 'form-search-account-receivable-payable',
-    templateUrl: './form-search-account-receivable-payable.component.html'
+    selector: 'form-search-account-payment',
+    templateUrl: './form-search-account-payment.component.html'
 })
-export class AccountReceivePayableFormSearchComponent extends AppForm implements OnInit {
+export class AccountPaymentFormSearchComponent extends AppForm implements OnInit {
 
-    @Output() onSearch: EventEmitter<Partial<ISearchAccReceivePayble>> = new EventEmitter<Partial<ISearchAccReceivePayble>>();
+    @Output() onSearch: EventEmitter<Partial<ISearchAccPayment>> = new EventEmitter<Partial<ISearchAccPayment>>();
 
     formSearch: FormGroup;
 
@@ -107,7 +107,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
-        const body: ISearchAccReceivePayble = {
+        const body: ISearchAccPayment = {
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,
@@ -162,7 +162,7 @@ export class AccountReceivePayableFormSearchComponent extends AppForm implements
     }
 }
 
-interface ISearchAccReceivePayble {
+interface ISearchAccPayment {
     referenceNos: string;
     partnerId: string;
     paymentStatus: string[];
