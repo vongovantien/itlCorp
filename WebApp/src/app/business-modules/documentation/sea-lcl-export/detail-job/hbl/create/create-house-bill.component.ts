@@ -200,7 +200,8 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             netWeight: this.goodSummaryComponent.netWeight,
             packageQty: this.goodSummaryComponent.packageQty,
             packageType: +this.goodSummaryComponent.selectedPackage,
-            contSealNo: this.goodSummaryComponent.containerDescription
+            contSealNo: this.goodSummaryComponent.containerDescription,
+            chargeWeight: this.goodSummaryComponent.totalChargeWeight
         };
 
         return formData;
