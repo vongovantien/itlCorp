@@ -87,6 +87,7 @@ export class PartnerComponent extends AppList implements OnInit {
         this.tabSelect(this.activeTab);
     }
     resetSearch(event) {
+        this.allPartnerComponent.dataSearch.accountNo = null;
         this.onSearch(event);
     }
     onSearch(event) {
@@ -97,7 +98,7 @@ export class PartnerComponent extends AppList implements OnInit {
             this.criteria = {};
             this.criteria.partnerGroup = currentTab;
             if (event.field === "id") {
-                this.criteria.id = event.searchString;
+                this.criteria.accountNo = event.searchString;
             }
             if (event.field === "shortName") {
                 this.criteria.shortName = event.searchString;
