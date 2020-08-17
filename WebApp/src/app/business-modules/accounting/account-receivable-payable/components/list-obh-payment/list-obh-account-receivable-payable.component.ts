@@ -72,6 +72,8 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paidDate', sortable: true },
             { title: 'Payment Type', field: 'paymentType', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
             { title: 'Update Person', field: 'userModifiedName', sortable: true },
             { title: 'Update Date', field: 'datetimeModified', sortable: true }
         ];
@@ -79,7 +81,6 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
 
     getPagingData() {
         this._progressRef.start();
-
 
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
@@ -130,7 +131,6 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showExtendDateModel(refId: string) {
-        //console.log(refId);
         this._accountingRepo.getOBHSOAExtendedDate(refId)
             .pipe(
                 catchError(this.catchError)
@@ -140,13 +140,10 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
                 this.updateExtendDayPopup.note.setValue(res.note);
                 this.updateExtendDayPopup.paymentType = res.paymentType;
                 this.updateExtendDayPopup.show();
-
             });
-
     }
 
     handleUpdateExtendDate($event) {
-        console.log($event);
         this._progressRef.start();
         const body: any = {
             refId: $event.refId,
@@ -171,8 +168,6 @@ export class AccountReceivablePayableListOBHPaymentComponent extends AppList imp
     }
 
     showConfirmDelete(item, index) {
-
-
         if (index < this.payments.length - 1) {
             this.infoNotAllowDelete.show();
         } else {

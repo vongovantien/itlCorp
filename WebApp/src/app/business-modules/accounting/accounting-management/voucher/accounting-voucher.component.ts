@@ -1,16 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccAccountingManagementResult } from 'src/app/shared/models/accouting/accounting-management';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
-import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { SortService } from '@services';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { AccountingConstants } from '@constants';
+import { AccAccountingManagementResult } from '@models';
+
+import { AppList } from 'src/app/app.list';
+
+import { Observable } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-accounting-voucher',
@@ -54,7 +60,9 @@ export class AccountingManagementVoucherComponent extends AppList implements OnI
             { title: 'Creator', field: 'creatorName', sortable: true },
         ];
         this.dataSearch = {
-            typeOfAcctManagement: 'Voucher'
+            typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.VOUCHER,
+            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         };
         this.getListVoucher();
     }

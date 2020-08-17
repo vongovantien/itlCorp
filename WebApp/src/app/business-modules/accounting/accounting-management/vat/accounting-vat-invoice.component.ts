@@ -1,18 +1,21 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from '@repositories';
-import { NgProgress } from '@ngx-progressbar/core';
-import { SortService } from '@services';
-import { ToastrService } from 'ngx-toastr';
-import { AccAccountingManagementResult } from '@models';
-
-import { catchError, finalize, map } from 'rxjs/operators';
-import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
-import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
+
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { SortService } from '@services';
+import { AccAccountingManagementResult } from '@models';
 import { AccountingConstants } from '@constants';
+import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+
+import { AppList } from 'src/app/app.list';
+
+import { Observable } from 'rxjs';
+import { catchError, finalize, map } from 'rxjs/operators';
 
 
 @Component({
@@ -23,7 +26,6 @@ import { AccountingConstants } from '@constants';
 export class AccountingManagementVatInvoiceComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopupDelete: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) popup403: Permission403PopupComponent;
-
 
     invoices: AccAccountingManagementResult[] = [];
     selectedInvoice: AccAccountingManagementResult;
@@ -64,7 +66,9 @@ export class AccountingManagementVatInvoiceComponent extends AppList implements 
 
         ];
         this.dataSearch = {
-            typeOfAcctManagement: 'Invoice'
+            typeOfAcctManagement: AccountingConstants.ISSUE_TYPE.INVOICE,
+            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         };
         this.getListInvoice();
     }

@@ -18,6 +18,8 @@ export class PaymentModel {
     officeId: string = '';
     companyId: string = '';
     userModifiedName: string = '';
+    paymentMethod: string = null;
+    exchangeRate: number = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
