@@ -623,6 +623,28 @@ export class AccountingRepo {
     getAgreementForInvoice(body: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/GetContractForInvoice`, body);
     }
+
+    receivablePaging(page: number, size: number, body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailReceivableByArgeementId(argeementId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByArgeementId`, { argeementId: argeementId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    // Chỉ sử dụng khi không có argeementId
+    getDetailReceivableByPartnerId(partnerId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

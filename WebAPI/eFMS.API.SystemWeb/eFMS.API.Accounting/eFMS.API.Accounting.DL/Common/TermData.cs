@@ -70,6 +70,14 @@ namespace eFMS.API.Accounting.DL.Common
         Other = 3
     }
 
+    public enum OverDueDayEnum
+    {
+        All,
+        Over1_15,
+        Over16_30,
+        Over30,
+    }
+
     public static class TermData
     {
         public static readonly string Canceled = "Canceled";

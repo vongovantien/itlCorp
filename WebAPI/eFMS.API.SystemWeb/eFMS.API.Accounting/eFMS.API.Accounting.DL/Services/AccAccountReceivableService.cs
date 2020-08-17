@@ -12,6 +12,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -851,22 +852,23 @@ namespace eFMS.API.Accounting.DL.Services
                     PartnerStatus = string.Empty, //Get data bên dưới
                     AgreementNo = s.First().contract.ContractNo,
                     AgreementType = s.First().contract.ContractType,
-                    AgreementStatus = s.First().contract.Active == true ? "Active" : "Inactive",
+                    AgreementStatus = s.First().contract.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                     AgreementSalesmanId = s.First().contract.SaleManId,
+                    AgreementCurrency = s.First().contract.CurrencyId,
                     OfficeId = s.First().contract.OfficeId, //Office of Argeement 
                     ArServiceCode = s.First().acctReceivable.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
-                    EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL ? s.First().contract.EffectiveDate : null),
-                    ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL ? s.First().contract.ExpiredDate : null),
-                    ExpriedDay = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (int?)((s.First().contract.TrialExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL ? (int?)((s.First().contract.ExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : null),
-                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditLimited : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE ? s.First().contract.CreditLimit : null),
-                    CreditTerm = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL ? s.First().contract.PaymentTerm : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE ? (int?)30 : null)),
-                    CreditRateLimit = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE ? (s.First().contract.CreditLimitRate == null || s.First().contract.CreditLimitRate == 0 ? 120 : s.First().contract.CreditLimitRate) : null,
+                    EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
+                    ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.ExpiredDate : null),
+                    ExpriedDay = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (int?)((s.First().contract.TrialExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (int?)((s.First().contract.ExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : null),
+                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditLimited : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.CreditLimit : null),
+                    CreditTerm = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.PaymentTerm : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE ? (int?)30 : null)),
+                    CreditRateLimit = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (s.First().contract.CreditLimitRate == null || s.First().contract.CreditLimitRate == 0 ? 120 : s.First().contract.CreditLimitRate) : null,
                     SaleDebitAmount = s.Select(se => se.contract).GroupBy(g => new { g.SaleManId }).Select(sel => sel.Select(sele => sele.CreditAmount).Sum()).Sum(),
                     SaleDebitRate = null, //Tính toán bên dưới
                     DebitAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum(),
                     ObhAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhAmount : null).Sum(),
-                    DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + s.First().contract.CustomerAdvanceAmount) / (s.First().contract.TrialCreditLimited != 0 ? s.First().contract.TrialCreditLimited : null)) * 100 : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + s.First().contract.CustomerAdvanceAmount) / (s.First().contract.CreditLimit != 0 ? s.First().contract.CreditLimit : null)) * 100 : null),
+                    DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + s.First().contract.CustomerAdvanceAmount) / (s.First().contract.TrialCreditLimited != 0 ? s.First().contract.TrialCreditLimited : null)) * 100 : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + s.First().contract.CustomerAdvanceAmount) / (s.First().contract.CreditLimit != 0 ? s.First().contract.CreditLimit : null)) * 100 : null),
                     CusAdvance = s.First().contract.CustomerAdvanceAmount,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : null).Sum(),
                     BillingUnpaid = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingUnpaid : null).Sum(),
@@ -874,7 +876,8 @@ namespace eFMS.API.Accounting.DL.Services
                     CreditAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.CreditAmount : null).Sum(),
                     Over1To15Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over1To15Day : null).Sum(),
                     Over16To30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over16To30Day : null).Sum(),
-                    Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : null).Sum()
+                    Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : null).Sum(),
+                    ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                 });
 
             var data = from contract in groupByContract
@@ -887,11 +890,12 @@ namespace eFMS.API.Accounting.DL.Services
                            PartnerNameLocal = partner.PartnerNameVn,
                            PartnerNameAbbr = partner.ShortName,
                            TaxCode = partner.TaxCode,
-                           PartnerStatus = partner.Active == true ? "Active" : "Inactive",
+                           PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                            AgreementNo = contract.AgreementNo,
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
+                           AgreementCurrency = contract.AgreementCurrency,
                            OfficeId = contract.OfficeId,
                            ArServiceCode = contract.ArServiceCode,
                            ArServiceName = CustomData.Services.Where(w => w.Value == contract.ArServiceCode).Select(se => se.DisplayName).FirstOrDefault(),
@@ -913,7 +917,8 @@ namespace eFMS.API.Accounting.DL.Services
                            CreditAmount = contract.CreditAmount,
                            Over1To15Day = contract.Over1To15Day,
                            Over16To30Day = contract.Over16To30Day,
-                           Over30Day = contract.Over16To30Day
+                           Over30Day = contract.Over16To30Day,
+                           ArCurrency = contract.ArCurrency
                        };
             return data;
         }
@@ -941,7 +946,8 @@ namespace eFMS.API.Accounting.DL.Services
                     CreditAmount = s.Select(se => se.CreditAmount).Sum(),
                     Over1To15Day = s.Select(se => se.Over1To15Day).Sum(),
                     Over16To30Day = s.Select(se => se.Over16To30Day).Sum(),
-                    Over30Day = s.Select(se => se.Over30Day).Sum()
+                    Over30Day = s.Select(se => se.Over30Day).Sum(),
+                    ArCurrency = s.First() != null ? s.First().ContractCurrency : null,
                 });
 
             var data = from ar in groupByPartner
@@ -953,7 +959,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PartnerNameLocal = partner.PartnerNameVn,
                            PartnerNameAbbr = partner.ShortName,
                            TaxCode = partner.TaxCode,
-                           PartnerStatus = partner.Active == true ? "Active" : "Inactive",
+                           PartnerStatus = partner.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                            OfficeId = ar.OfficeId,
                            ArServiceCode = ar.ArServiceCode,
                            ArServiceName = CustomData.Services.Where(w => w.Value == ar.ArServiceCode).Select(se => se.DisplayName).FirstOrDefault(),
@@ -965,28 +971,159 @@ namespace eFMS.API.Accounting.DL.Services
                            CreditAmount = ar.CreditAmount,
                            Over1To15Day = ar.Over1To15Day,
                            Over16To30Day = ar.Over16To30Day,
-                           Over30Day = ar.Over16To30Day
+                           Over30Day = ar.Over16To30Day,
+                           ArCurrency = ar.ArCurrency
                        };
             return data;
         }
 
-        private IQueryable<object> GetDataTrialOffical(AccountReceivableCriteria criteria)
+        private Expression<Func<AccAccountReceivable, bool>> ExpressionAcctReceivableQuery(AccountReceivableCriteria criteria)
         {
-            var acctReceivables = DataContext.Get();
+            Expression<Func<AccAccountReceivable, bool>> query = q => true;
+            if (criteria != null && !string.IsNullOrEmpty(criteria.AcRefId))
+            {
+                query = query.And(x => x.AcRef == criteria.AcRefId);
+            }
+            return query;
+        }
+
+        private Expression<Func<CatContract, bool>> ExpressionContractPartnerQuery(AccountReceivableCriteria criteria)
+        {
+            Expression<Func<CatContract, bool>> query = q => true;
+            if (!string.IsNullOrEmpty(criteria.SalesmanId))
+            {
+                query = query.And(x => x.SaleManId == criteria.SalesmanId);
+            }
+            if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
+            {
+                query = query.And(x => x.OfficeId == criteria.OfficeId.ToString());
+            }
+            if (!string.IsNullOrEmpty(criteria.AgreementStatus) && criteria.AgreementStatus != "All")
+            {
+                var _active = criteria.AgreementStatus == AccountingConstants.STATUS_ACTIVE ? true : false;
+                query = query.And(x => x.Active == _active);
+            }            
+            return query;
+        }
+
+        private Expression<Func<AccountReceivableResult, bool>> ExpressionAccountReceivableQuery(AccountReceivableCriteria criteria)
+        {
+            Expression<Func<AccountReceivableResult, bool>> query = q => true;
+            if (criteria.OverDueDay != 0)
+            {
+                if (criteria.OverDueDay == OverDueDayEnum.Over1_15)
+                {
+                    query = query.And(x => x.Over1To15Day > 0);
+                }
+                if (criteria.OverDueDay == OverDueDayEnum.Over16_30)
+                {
+                    query = query.And(x => x.Over16To30Day > 0);
+                }
+                if (criteria.OverDueDay == OverDueDayEnum.Over30)
+                {
+                    query = query.And(x => x.Over30Day > 0);
+                }
+            }
+            if (criteria.DebitRateFrom != null && criteria.DebitRateFrom > -1)
+            {
+                if (criteria.DebitRateTo != null && criteria.DebitRateTo > -1)
+                {
+                    query = query.And(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo);
+                }
+                else
+                {
+                    query = query.And(x => x.DebitRate >= criteria.DebitRateFrom);
+                }
+            }
+            else
+            {
+                if (criteria.DebitRateTo != null && criteria.DebitRateTo > -1)
+                {
+                    query = query.And(x => x.DebitRate >= criteria.DebitRateTo);
+                }
+            }
+            if (!string.IsNullOrEmpty(criteria.AgreementExpiredDay) && criteria.AgreementExpiredDay != "All")
+            {
+                if (criteria.AgreementExpiredDay == "Normal")
+                {
+                    query = query.And(x => x.ExpriedDay > 30);
+                }
+                if (criteria.AgreementExpiredDay == "30Day")
+                {
+                    query = query.And(x => x.ExpriedDay == 30);
+                }
+                if (criteria.AgreementExpiredDay == "15Day")
+                {
+                    query = query.And(x => x.ExpriedDay > 0 && x.ExpriedDay < 16);
+                }
+                if (criteria.AgreementExpiredDay == "Expried")
+                {
+                    query = query.And(x => x.ExpriedDay < 1);
+                }
+            }
+            return query;
+        }
+
+        private bool IsGetDataARNoContract(AccountReceivableCriteria criteria)
+        {
+            bool isGet = false;
+            if (string.IsNullOrEmpty(criteria.SalesmanId)
+                && (string.IsNullOrEmpty(criteria.AgreementStatus) || criteria.AgreementStatus == "All")
+                && (string.IsNullOrEmpty(criteria.AgreementExpiredDay) || criteria.AgreementExpiredDay == "All"))
+            {
+                isGet = true;
+            }
+            return isGet;
+        }
+
+        private IQueryable<CatContract> QueryContractPartner(IQueryable<CatContract> partnerContracts, AccountReceivableCriteria criteria)
+        {
+            IQueryable<CatContract> resutl = null;
+            if (partnerContracts != null)
+            {
+                var queryContractPartner = ExpressionContractPartnerQuery(criteria);
+                resutl = partnerContracts.Where(queryContractPartner);
+            }
+            return resutl;
+        }
+
+        private IQueryable<object> GetDataTrialOfficial(AccountReceivableCriteria criteria)
+        {
+            var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICAL);
+            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL);
+            var partnerContracts = QueryContractPartner(contracts, criteria);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
-            if (arPartnerContracts != null) arPartnerContracts = arPartnerContracts.Where(x => x.DebitAmount > 0);
+            if (arPartnerContracts == null || !arPartnerContracts.Any())
+            {
+                return null;
+            }
+            else
+            {
+                var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable);
+            }
             return arPartnerContracts;
         }
 
         private IQueryable<object> GetDataGuarantee(AccountReceivableCriteria criteria)
         {
-            var acctReceivables = DataContext.Get();
+            var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
+            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
+            var partnerContracts = QueryContractPartner(contracts, criteria);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
-            if (arPartnerContracts == null || !arPartnerContracts.Any()) return null;
+            if (arPartnerContracts == null || !arPartnerContracts.Any())
+            {
+                return null;
+            }
+            else
+            {
+                var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable);
+            }
             var groupBySalesman = arPartnerContracts.ToList().GroupBy(g => new { g.AgreementSalesmanId })
                 .Select(s => new AccountReceivableGroupSalemanResult
                 {
@@ -1030,12 +1167,26 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<object> GetDataOther(AccountReceivableCriteria criteria)
         {
-            var acctReceivables = DataContext.Get();
+            var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
+            var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
             var partnerContractsAll = contractPartnerRepo.Get();
-            var partnerContractsCash = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
+
+            var contractsCash = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
+            var partnerContractsCash = QueryContractPartner(contractsCash, criteria);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContractsCash, partners);
-            var arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContractsAll, partners);
+
+            IQueryable<AccountReceivableResult> arPartnerNoContracts = null;
+            if (IsGetDataARNoContract(criteria))
+            {
+                IQueryable<AccAccountReceivable> _acctReceivables = acctReceivables;
+                if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
+                {
+                    _acctReceivables = acctReceivables.Where(x => x.Office == criteria.OfficeId);
+                }
+                arPartnerNoContracts = GetARNoContract(_acctReceivables, partnerContractsAll, partners);
+            }
+
             IQueryable<AccountReceivableResult> dataResult = null;
             if (arPartnerContracts != null && arPartnerNoContracts != null)
             {
@@ -1049,6 +1200,12 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 dataResult = arPartnerNoContracts;
             }
+
+            if (dataResult != null)
+            {
+                var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
+                dataResult = dataResult.Where(queryAccountReceivable);
+            }
             return dataResult;
         }
 
@@ -1058,7 +1215,7 @@ namespace eFMS.API.Accounting.DL.Services
             var arType = DataTypeEx.GetTypeAR(criteria.ArType);
             if (arType == TermData.AR_TrialOrOffical)
             {
-                data = GetDataTrialOffical(criteria);
+                data = GetDataTrialOfficial(criteria);
             }
             else if (arType == TermData.AR_Guarantee)
             {

@@ -15,6 +15,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public string AgreementType { get; set; }
         public string AgreementStatus { get; set; }
         public string AgreementSalesmanId { get; set; }
+        public string AgreementCurrency { get; set; }
         public string OfficeId { get; set; }
         public string ArServiceCode { get; set; }
         public string ArServiceName { get; set; }
@@ -37,5 +38,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? Over1To15Day { get; set; }
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
+        public string ArCurrency { get; set; }
     }
 }

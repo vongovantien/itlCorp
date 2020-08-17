@@ -7,11 +7,11 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
     {
         public ARTypeEnum ArType { get; set; }
         public string AcRefId { get; set; }
-        public string OverDueDay { get; set; }
+        public OverDueDayEnum OverDueDay { get; set; }
         public decimal? DebitRateFrom { get; set; }
         public decimal? DebitRateTo { get; set; }
-        public bool AgreementStatus { get; set; }
-        public string AgreementExpiredDay { get; set; }
+        public string AgreementStatus { get; set; } //All, Active, Inactive
+        public string AgreementExpiredDay { get; set; } //All, Normal, 30Day, 15Day, Expried
         public string SalesmanId { get; set; }
         public Guid? OfficeId { get; set; }
     }
