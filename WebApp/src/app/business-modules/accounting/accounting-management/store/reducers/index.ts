@@ -11,6 +11,7 @@ export interface IAccountingManagementState {
 // * SELECTOR
 export const accountingManagementState = createFeatureSelector<IAccountingManagementState>('accounting-management');
 export const getAccoutingManagementPartnerState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state.partner);
+export const getAccoutingManagementPaymentTermState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state.partner.paymentTerm);
 export const getAccountingManagementPartnerChargeState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state.partner.charges);
 
 export const reducers: ActionReducerMap<IAccountingManagementState> = {
