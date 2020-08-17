@@ -82,8 +82,16 @@ export class AirExportComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .subscribe(
+                (criteria: any) => {
+                    this.dataSearch = criteria;
+                    this.requestSearchShipment();
+
+                }
+            );
     }
 
     getShipments() {
@@ -128,6 +136,9 @@ export class AirExportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
+
+        // * Store data search
+        this._store.dispatch(new fromShare.TransactionSearchListAction(this.dataSearch));
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
