@@ -11,22 +11,26 @@ import { AppForm } from 'src/app/app.form';
 
 import { Observable } from 'rxjs';
 
-enum OverDueDays {
-    All,
-    Between1_15,
-    Between16_30,
-    Over_30
-}
 
-enum DebitRates {
-    All,
-    Between0_50,
-    Between50_70,
-    Between70_100,
-    Between100_120,
-    Over_120,
-    Other
-}
+//set value to binding input
+const OverDueDaysValues = [
+    { from: null, to: null },
+    { from: 1, to: 15 },
+    { from: 16, to: 30 },
+    { from: 30, to: null },
+];
+const DebitRatesValues = [
+    { from: null, to: null },
+    { from: 0, to: 50 },
+    { from: 50, to: 70 },
+    { from: 70, to: 100 },
+    { from: 100, to: 120 },
+    { from: 120, to: null },
+    { from: null, to: null },
+];
+
+
+
 
 @Component({
     selector: 'form-search-account-receivable',
@@ -36,13 +40,17 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     @Output() onSearchReceivable: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
 
+
+
     formSearch: FormGroup;
+
+    arType: CommonEnum.TabTypeAccountReceivableEnum = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
 
     partnerId: AbstractControl;
 
     overdueDays: AbstractControl;
-    fromOverduaDays: AbstractControl;
-    toOverduaDays: AbstractControl;
+    fromOverdueDays: AbstractControl;
+    toOverdueDays: AbstractControl;
 
     debitRate: AbstractControl;
     fromDebitRate: AbstractControl;
@@ -51,8 +59,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     agreementStatus: AbstractControl;
 
     agreementExpiredDays: AbstractControl;
-    fromAgreementExpiredDays: AbstractControl;
-    toAgreementExpiredDays: AbstractControl;
+
 
     salesManId: AbstractControl;
     officalId: AbstractControl;
@@ -128,20 +135,29 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         { id: 6, text: 'Other' },
     ];
     agreementStatusList: CommonInterface.INg2Select[] = [
-        { id: '0', text: 'All' },
-        { id: 1, text: 'Active' },
-        { id: 2, text: 'Inactive' },
+        { id: 'All', text: 'All' },
+        { id: 'Active', text: 'Active' },
+        { id: 'Inactive', text: 'Inactive' },
 
+    ];
+    agreementExpiredDayList: CommonInterface.INg2Select[] = [
+        { id: 'All', text: 'All' },
+        { id: 'Normal', text: 'Normal' },
+        { id: '30Days', text: '< (-30) Days' },
+        { id: '15Days', text: '< (-15) Days' },
+        { id: 'Expired', text: 'Expired' },
     ];
     constructor(
         private _fb: FormBuilder,
     ) {
         super();
         this.requestSearch = this.submitSearch;
+
     }
 
     ngOnInit(): void {
         this.initForm();
+
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -157,9 +173,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
             agreementStatus: [[this.agreementStatusList[0]]],
 
-            agreementExpiredDays: [],
-            fromAgreementExpiredDays: [],
-            toAgreementExpiredDays: [],
+            agreementExpiredDays: [[this.agreementExpiredDayList[0]]],
+
 
             salesManId: [],
             officalId: [],
@@ -168,8 +183,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.partnerId = this.formSearch.controls["partnerId"];
 
         this.overdueDays = this.formSearch.controls["overdueDays"];
-        this.fromOverduaDays = this.formSearch.controls["fromOverduaDays"];
-        this.toOverduaDays = this.formSearch.controls["toOverduaDays"];
+        this.fromOverdueDays = this.formSearch.controls["fromOverdueDays"];
+        this.toOverdueDays = this.formSearch.controls["toOverdueDays"];
 
         this.debitRate = this.formSearch.controls["debitRate"];
         this.fromDebitRate = this.formSearch.controls["fromDebitRate"];
@@ -178,8 +193,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.agreementStatus = this.formSearch.controls["agreementStatus"];
 
         this.agreementExpiredDays = this.formSearch.controls["agreementExpiredDays"];
-        this.fromAgreementExpiredDays = this.formSearch.controls["fromAgreementExpiredDays"];
-        this.toAgreementExpiredDays = this.formSearch.controls["toAgreementExpiredDays"];
+
 
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
@@ -200,10 +214,38 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                 break;
         }
     }
+    //
+    onSelectBindingInput(item: any, fieldName: string) {
+        switch (fieldName) {
+            case 'OverDueDays':
+                this.fromOverdueDays.setValue(item.id === '0' ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
+                this.toOverdueDays.setValue(item.id === '0' ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
+                break;
+            case 'DebitRates':
+                this.fromDebitRate.setValue(item.id === '0' ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
+                this.toDebitRate.setValue(item.id === '0' ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
+                break;
+            default:
+                break;
+        }
+    }
+    //
+    //
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
+        const body = {
+            arType: this.arType,
+            acRefId: dataForm.partnerId,
+            overDueDay: dataForm.overdueDays[0].id === '0' ? 0 : dataForm.overdueDays[0].id,
+            debitRateFrom: dataForm.fromDebitRate,
+            debitRateTo: dataForm.toDebitRate,
+            agreementStatus: dataForm.agreementStatus[0].id,
+            agreementExpiredDay: dataForm.agreementExpiredDays[0].id,
+            salesmanId: dataForm.salesManId,
+            officeId: dataForm.officalId,
+        }
         //format body 
-        this.onSearchReceivable.emit(dataForm);
+        this.onSearchReceivable.emit(body);
 
     }
 

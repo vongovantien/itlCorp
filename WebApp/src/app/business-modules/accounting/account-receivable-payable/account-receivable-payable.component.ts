@@ -6,9 +6,11 @@ import { catchError, finalize } from 'rxjs/operators';
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
 import { PaymentType } from './components/form-search/account-payment/form-search-account-payment.component';
-import { AccountReceivableListTrialOfficalComponent } from './components/list-trial-offical/list-trial-offical-account-receivable.component';
+import { AccountReceivableListTrialOfficialComponent } from './components/list-trial-official/list-trial-official-account-receivable.component';
 import { AccountReceivableListGuaranteedComponent } from './components/list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableListOtherComponent } from './components/list-other/list-other-account-receivable.component';
+import { AccountReceivableFormSearchComponent } from './components/form-search/account-receivable/form-search-account-receivable.component';
+import { CommonEnum } from '@enums';
 type TAB = 'INVOICE' | 'OBH';
 
 @Component({
@@ -20,9 +22,11 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
     @ViewChild(AccountPaymentListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
     @ViewChild(AccountPaymentListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
     //
-    @ViewChild(AccountReceivableListTrialOfficalComponent, { static: false }) trialOfficalListComponent: AccountReceivableListTrialOfficalComponent;
+    @ViewChild(AccountReceivableListTrialOfficialComponent, { static: false }) trialOfficalListComponent: AccountReceivableListTrialOfficialComponent;
     @ViewChild(AccountReceivableListGuaranteedComponent, { static: false }) guaranteedListComponent: AccountReceivableListGuaranteedComponent;
     @ViewChild(AccountReceivableListOtherComponent, { static: false }) otherListComponent: AccountReceivableListOtherComponent;
+    //
+    @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent
 
     selectedTab: TAB | string = "INVOICE";
 
@@ -80,13 +84,18 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     onSelectTabAccountReceivable(tabname: string) {
         this.selectedTab = tabname;
-        if (tabname === 'TRIAL_OFFICAL') {
-            this.trialOfficalListComponent.dataSearch = this.dataSearch;
+        if (tabname === 'TRIAL_OFFICIAL') {
+            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
+            this.trialOfficalListComponent.dataSearch = {};
         } else if (tabname === 'GUARANTEED') {
-            this.guaranteedListComponent.dataSearch = this.dataSearch;
+            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Guarantee;
+            this.guaranteedListComponent.dataSearch = {};
         } else {
-            this.otherListComponent.dataSearch = this.dataSearch;
+            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Other;
+            this.otherListComponent.dataSearch = {};
         }
+        this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
+        this.accountReceivableFormComponent.initForm();
         this.requestSearchListOfReceivable();
     }
 

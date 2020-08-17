@@ -5,15 +5,17 @@
                 <div class="col-lg-8">
                     <label>Partner</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                        [selectedDisplayFields]="['partnerId','abbrName', 'nameLocal', 'taxCode']"
-                        [dataSources]="seedPartner" [displayFields]="displayFieldsPartner" placeholder="Select Partner">
+                        [currentActiveItemId]="{field:'id', value: partnerId.value}"
+                        [selectedDisplayFields]="['abbrName']" [dataSources]="seedPartner"
+                        [displayFields]="displayFieldsPartner" placeholder="Select Partner">
                     </app-combo-grid-virtual-scroll>
                 </div>
                 <div class="col-lg-4">
                     <div class="row">
                         <div class="col-lg-6">
                             <label>Over Due Days</label>
-                            <ng-select #s [items]="overDueDays" formControlName="overdueDays">
+                            <ng-select #s [items]="overDueDays" formControlName="overdueDays"
+                                (selected)="onSelectBindingInput($event, 'OverDueDays')">
                             </ng-select>
                         </div>
                         <div class="col-lg-3">
@@ -39,7 +41,8 @@
                                 <div class="col-lg-6">
 
                                     <label>Debit Rate</label>
-                                    <ng-select #c [items]="debitRates" formControlName="debitRate">
+                                    <ng-select #c [items]="debitRates" formControlName="debitRate"
+                                        (selected)="onSelectBindingInput($event, 'DebitRates')">
                                     </ng-select>
 
                                 </div>
@@ -72,25 +75,11 @@
                 </div>
                 <div class="col-lg-4">
 
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <label>Agreement Expired Days</label>
-                            <ng-select #s formControlName="agreementExpiredDays">
-                            </ng-select>
-                        </div>
-                        <div class="col-lg-3">
-                            <label></label>
-                            <div class="form-group">
-                                <input type="text" class="form-control" formControlName="fromAgreementExpiredDays">
-                            </div>
-                        </div>
-                        <div class="col-lg-3">
-                            <label></label>
-                            <div class="form-group">
-                                <input type="text" class="form-control" formControlName="toAgreementExpiredDays">
-                            </div>
-                        </div>
-                    </div>
+
+                    <label>Agreement Expired Days</label>
+                    <ng-select #s formControlName="agreementExpiredDays" [items]="agreementExpiredDayList">
+                    </ng-select>
+
 
                 </div>
             </div>
@@ -98,6 +87,7 @@
                 <div class="col-lg-6">
                     <label>Salesman</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')"
+                        [currentActiveItemId]="{field:'id', value: salesManId.value}"
                         [selectedDisplayFields]="['userName', 'fullName']" [dataSources]="seedSalesMan"
                         [displayFields]="displayFieldsSalesMan">
 
@@ -106,7 +96,8 @@
                 <div class="col-lg-6">
                     <label>Office</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')"
-                        [selectedDisplayFields]="['abbrName', 'enName']" [dataSources]="seedOffice"
+                        [currentActiveItemId]="{field:'id', value: officalId.value}"
+                        [selectedDisplayFields]="['abbrName']" [dataSources]="seedOffice"
                         [displayFields]="displayFieldsOffice">
                         >
 

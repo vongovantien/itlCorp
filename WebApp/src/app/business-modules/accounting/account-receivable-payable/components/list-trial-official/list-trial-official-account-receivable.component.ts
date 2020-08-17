@@ -18,10 +18,10 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 
 
 @Component({
-    selector: 'list-trial-offical-account-receivable',
-    templateUrl: './list-trial-offical-account-receivable.component.html',
+    selector: 'list-trial-official-account-receivable',
+    templateUrl: './list-trial-official-account-receivable.component.html',
 })
-export class AccountReceivableListTrialOfficalComponent extends AppList implements OnInit {
+export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     //seedData
     seedData: any[] = [
         {
@@ -124,6 +124,7 @@ export class AccountReceivableListTrialOfficalComponent extends AppList implemen
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
+        private _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -165,5 +166,10 @@ export class AccountReceivableListTrialOfficalComponent extends AppList implemen
         //this._progressRef.start();
         //this.isLoading = true;
         //call api
+    }
+
+    //
+    viewDetail(id: string) {
+        this._router.navigate([`/home/accounting/account-receivable-payable/detail/${id}`]);
     }
 }
