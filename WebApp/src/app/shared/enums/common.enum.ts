@@ -164,6 +164,12 @@ export namespace CommonEnum {
         FUEL = "Fuel",
         TRUCKING = "Trucking",
     }
+
+    export enum TabTypeAccountReceivableEnum {
+        TrialOrOffical = 1,
+        Guarantee = 2,
+        Other = 3,
+    }
 }
 
 
