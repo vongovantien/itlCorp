@@ -146,7 +146,7 @@ namespace eFMS.API.Setting.DL.Services
                         string _accountant = null;
                         string _bhHead = null;
 
-                        
+
                         var isAllLevelAutoOrNone = CheckAllLevelIsAutoOrNone(unlockRequest.UnlockType, unlockRequest.OfficeId);
                         if (isAllLevelAutoOrNone)
                         {
@@ -164,7 +164,7 @@ namespace eFMS.API.Setting.DL.Services
                         var mailLeaderOrManager = string.Empty;
                         List<string> mailUsersDeputy = new List<string>();
 
-                        if (leaderLevel.Role ==  SettingConstants.ROLE_AUTO || leaderLevel.Role == SettingConstants.ROLE_APPROVAL)
+                        if (leaderLevel.Role == SettingConstants.ROLE_AUTO || leaderLevel.Role == SettingConstants.ROLE_APPROVAL)
                         {
                             _leader = leaderLevel.UserId;
                             if (string.IsNullOrEmpty(_leader)) return new HandleState("Not found leader");
@@ -184,7 +184,16 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            if (
+                                (buHeadLevel.Role == SettingConstants.ROLE_NONE || buHeadLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO)
+                               )
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
                         if (managerLevel.Role == SettingConstants.ROLE_AUTO || managerLevel.Role == SettingConstants.ROLE_APPROVAL)
@@ -207,7 +216,16 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            if (
+                                (buHeadLevel.Role == SettingConstants.ROLE_NONE || buHeadLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO)
+                               )
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
                         if (accountantLevel.Role == SettingConstants.ROLE_AUTO || accountantLevel.Role == SettingConstants.ROLE_APPROVAL)
@@ -241,7 +259,16 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            if (
+                                (buHeadLevel.Role == SettingConstants.ROLE_NONE || buHeadLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO)
+                               )
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
                         if (buHeadLevel.Role == SettingConstants.ROLE_AUTO || buHeadLevel.Role == SettingConstants.ROLE_APPROVAL || buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
@@ -292,7 +319,16 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else
                         {
-                            unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            if (
+                                (buHeadLevel.Role == SettingConstants.ROLE_NONE || buHeadLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO)
+                                &&
+                                (managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO)
+                               )
+                            {
+                                unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
+                            }
                         }
 
                         var sendMailApproved = true;
@@ -889,9 +925,9 @@ namespace eFMS.API.Setting.DL.Services
                         )
                        )
                     {
-                        if (leaderLevel.Role == SettingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.LeaderApr))
+                        if (leaderLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                         {
-                            return new HandleState("Leader not approve");
+                            return new HandleState("Leader has not approved it yet");
                         }
                         if (string.IsNullOrEmpty(approve.ManagerApr))
                         {
@@ -951,7 +987,11 @@ namespace eFMS.API.Setting.DL.Services
                         )
                        )
                     {
-                        if (managerLevel.Role == SettingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.ManagerApr))
+                        if (leaderLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                        {
+                            return new HandleState("Leader has not approved it yet");
+                        }
+                        if (managerLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                         {
                             return new HandleState("The manager has not approved it yet");
                         }
@@ -1003,9 +1043,35 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         if (buHeadLevel.Role != SettingConstants.ROLE_SPECIAL)
                         {
-                            if (accountantLevel.Role == SettingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
+                            if (leaderLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                            {
+                                return new HandleState("Leader has not approved it yet");
+                            }
+                            if (managerLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                            {
+                                return new HandleState("The manager has not approved it yet");
+                            }
+                            if (accountantLevel.Role == SettingConstants.ROLE_APPROVAL && !string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                             {
                                 return new HandleState("The accountant has not approved it yet");
+                            }
+                        }
+                        else //buHeadLevel.Role == SettingConstants.ROLE_SPECIAL
+                        {
+                            if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
+                            {
+                                approve.LeaderApr = userCurrent;
+                                approve.LeaderAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
+                            {
+                                approve.ManagerApr = userCurrent;
+                                approve.ManagerAprDate = DateTime.Now;
+                            }
+                            if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
+                            {
+                                approve.AccountantApr = userCurrent;
+                                approve.AccountantAprDate = DateTime.Now;
                             }
                         }
                         if (string.IsNullOrEmpty(approve.BuheadApr))

@@ -29,7 +29,6 @@ export class UnlockRequestComponent extends AppList {
     }
 
     ngOnInit() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.headers = [
             { title: 'Subject', field: 'subject', sortable: true },
             { title: 'Request Date', field: 'requestDate', sortable: true },
@@ -38,6 +37,7 @@ export class UnlockRequestComponent extends AppList {
             { title: 'Status', field: 'statusApproval', sortable: true },
             { title: 'Created Date', field: 'datetimeCreated', sortable: true },
         ];
+        this.getUserLogged();
         this.searchUnlockRequest();
     }
 
@@ -51,7 +51,7 @@ export class UnlockRequestComponent extends AppList {
     searchUnlockRequest() {
         this._progressRef.start();
         this.isLoading = true;
-        this._settingRepo.getListUnlockRequest(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._settingRepo.getListUnlockRequest(this.page, this.pageSize, this.dataSearch) // Object.assign({}, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -74,6 +74,11 @@ export class UnlockRequestComponent extends AppList {
 
     sortUnlockRequest(sort: string): void {
         this.unlockRequests = this._sortService.sort(this.unlockRequests, sort, this.order);
+    }
+
+    getUserLogged() {
+        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        this.dataSearch = { requester: this.userLogged.id };
     }
 
     viewDetail(data: UnlockRequestResult): void {
