@@ -44,6 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.DescriptionVn = model.DescriptionVn;
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
+            entity.Active = model.Active;
             if (entity.Active == false)
             {
                 entity.InactiveOn = DateTime.Now;

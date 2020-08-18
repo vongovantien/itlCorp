@@ -912,7 +912,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DateTime? dueDate = null;
                 if (model.Date.HasValue)
                 {
-                    dueDate = model.Date.Value.AddDays(30);
+                    dueDate = model.Date.Value.AddDays(30 + (double)(model.PaymentTerm ?? 0));
                 }
                 model.PaymentDueDate = dueDate;
                 model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -1682,7 +1682,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<CatContract, bool>> queryContractByCriteria = null;
             queryContractByCriteria = x => (
             (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
-            && (x.SaleService.Contains(model.Service ?? "", StringComparison.OrdinalIgnoreCase) 
+            && (model.Service.Contains(x.SaleService ?? "", StringComparison.OrdinalIgnoreCase) 
             && x.PartnerId == partnerRef.Id));
 
             IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);

@@ -2,18 +2,38 @@
     <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
-            <form-search-account-receivable-payable (onSearch)="onSearchPayment($event)">
-            </form-search-account-receivable-payable>
-
             <tabset class="custom-class-tab">
-                <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
-                    <list-invoice-account-receivable-payable
-                        (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
-                    </list-invoice-account-receivable-payable>
+                <tab heading="Account Payment" [active]="isAccountPaymentTab" (selectTab)="changeTabAccount('Payment')">
+                    <form-search-account-payment (onSearch)="onSearchPayment($event)">
+                    </form-search-account-payment>
+
+                    <tabset class="custom-class-tab">
+                        <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
+                            <list-invoice-account-payment
+                                (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
+                            </list-invoice-account-payment>
+                        </tab>
+                        <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
+                            <list-obh-account-payment (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
+                            </list-obh-account-payment>
+                        </tab>
+                    </tabset>
                 </tab>
-                <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
-                    <list-obh-account-receivable-payable (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
-                    </list-obh-account-receivable-payable>
+                <tab heading="Account Receivable" [active]="!isAccountPaymentTab"
+                    (selectTab)="changeTabAccount('Receivable')">
+                    <form-search-account-receivable (onSearchReceivable)="onSearchReceivable($event)">
+                    </form-search-account-receivable>
+                    <tabset class="custom-class-tab">
+                        <tab heading="Trial & Official" (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
+                            <list-trial-official-account-receivable></list-trial-official-account-receivable>
+                        </tab>
+                        <tab heading="Guaranteed" (selectTab)="onSelectTabAccountReceivable('GUARANTEED')">
+                            <list-guaranteed-account-receivable></list-guaranteed-account-receivable>
+                        </tab>
+                        <tab heading="Other" (selectTab)="onSelectTabAccountReceivable('OTHER')">
+                            <list-other-account-receivable></list-other-account-receivable>
+                        </tab>
+                    </tabset>
                 </tab>
             </tabset>
         </div>
