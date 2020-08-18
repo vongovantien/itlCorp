@@ -1,15 +1,18 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { SortService } from '@services';
-import { DocumentationRepo } from '@repositories';
-import { NgProgress } from '@ngx-progressbar/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import * as fromShare from './../../share-business/store';
+import { NgProgress } from '@ngx-progressbar/core';
+
+import { SortService } from '@services';
 import { CommonEnum } from '@enums';
-import { CsTransactionDetail } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { AppList } from 'src/app/app.list';
+
+import * as fromShare from './../../share-business/store';
+
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 @Component({
@@ -17,13 +20,14 @@ import { takeUntil, catchError, finalize } from 'rxjs/operators';
     templateUrl: './air-export.component.html',
 })
 export class AirExportComponent extends AppList {
+
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-    headers: CommonInterface.IHeaderTable[];
+
     headersHBL: CommonInterface.IHeaderTable[];
 
-    shipments: any[] = [];
+    shipments: CsTransaction[] = [];
     houseBills: CsTransactionDetail[] = [];
     itemToDelete: any = null;
 
@@ -31,10 +35,13 @@ export class AirExportComponent extends AppList {
     tmpHouseBills: CsTransactionDetail[] = [];
     tmpIndex: number = -1;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: new Date(),
+        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+    };
 
     constructor(
         private _router: Router,
@@ -47,12 +54,8 @@ export class AirExportComponent extends AppList {
         this._progressRef = this._ngProgessService.ref();
         this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortShipment;
-        this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
+
+        this.isLoading = this._store.select(fromShare.getTransationLoading);
     }
 
     ngOnInit() {
@@ -85,11 +88,18 @@ export class AirExportComponent extends AppList {
         this.getShipments();
 
         this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
             .subscribe(
                 (criteria: any) => {
-                    this.dataSearch = criteria;
+                    console.log(criteria);
+                    if (!!criteria && !!Object.keys(criteria).length) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
                     this.requestSearchShipment();
-
                 }
             );
     }
@@ -137,18 +147,12 @@ export class AirExportComponent extends AppList {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
 
-        // * Store data search
-        this._store.dispatch(new fromShare.TransactionSearchListAction(this.dataSearch));
-        this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
 
     onResetShipment($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
