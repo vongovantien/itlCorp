@@ -121,7 +121,7 @@
 
         public static readonly string ARGEEMENT_TYPE_TRIAL = "Trial";
         public static readonly string ARGEEMENT_TYPE_OFFICIAL = "Official";
-        public static readonly string ARGEEMENT_TYPE_GUARANTEE = "Guarantee";
+        public static readonly string ARGEEMENT_TYPE_GUARANTEED = "Guaranteed";
         public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
 
         public static readonly string STATUS_ACTIVE = "Active";
