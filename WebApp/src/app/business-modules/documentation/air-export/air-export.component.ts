@@ -43,6 +43,7 @@ export class AirExportComponent extends AppList {
         toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
     };
 
+
     constructor(
         private _router: Router,
         private _toastService: ToastrService,
@@ -93,8 +94,7 @@ export class AirExportComponent extends AppList {
             )
             .subscribe(
                 (criteria: any) => {
-                    console.log(criteria);
-                    if (!!criteria && !!Object.keys(criteria).length) {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
                         this.dataSearch = criteria;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
@@ -153,6 +153,7 @@ export class AirExportComponent extends AppList {
     onResetShipment($event: any) {
         this.page = 1;
         this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
