@@ -845,6 +845,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     AgreementId = s.Key.Id,
                     PartnerId = s.First().acctReceivable != null ? s.First().acctReceivable.AcRef : null,
+                    PartnerCode = string.Empty, //Get data bên dưới
                     PartnerNameEn = string.Empty, //Get data bên dưới
                     PartnerNameLocal = string.Empty, //Get data bên dưới
                     PartnerNameAbbr = string.Empty, //Get data bên dưới
@@ -886,6 +887,7 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            AgreementId = contract.AgreementId,
                            PartnerId = contract.PartnerId,
+                           PartnerCode = partner.AccountNo,
                            PartnerNameEn = partner.PartnerNameEn,
                            PartnerNameLocal = partner.PartnerNameVn,
                            PartnerNameAbbr = partner.ShortName,
@@ -955,6 +957,7 @@ namespace eFMS.API.Accounting.DL.Services
                        select new AccountReceivableResult
                        {
                            PartnerId = ar.PartnerId,
+                           PartnerCode = partner.AccountNo,
                            PartnerNameEn = partner.PartnerNameEn,
                            PartnerNameLocal = partner.PartnerNameVn,
                            PartnerNameAbbr = partner.ShortName,
