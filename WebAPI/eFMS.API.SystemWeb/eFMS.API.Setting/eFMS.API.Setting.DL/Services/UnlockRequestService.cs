@@ -404,10 +404,10 @@ namespace eFMS.API.Setting.DL.Services
                 query = query.And(x => x.UnlockType == unlockType);
             }
 
-            if (!string.IsNullOrEmpty(criteria.Requester))
-            {
-                query = query.And(x => x.UserCreated == criteria.Requester);
-            }
+            //if (!string.IsNullOrEmpty(criteria.Requester))
+            //{
+            //    query = query.And(x => x.UserCreated == criteria.Requester);
+            //}
 
             if (criteria.CreatedDate != null)
             {
@@ -421,7 +421,7 @@ namespace eFMS.API.Setting.DL.Services
             return query;
         }
 
-        private IQueryable<SetUnlockRequest> GetDataUnlockRequest()
+        private IQueryable<SetUnlockRequest> GetDataUnlockRequest(UnlockRequestCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
             var unlockRequests = DataContext.Get();
@@ -432,26 +432,28 @@ namespace eFMS.API.Setting.DL.Services
                        select new { unlockRequest, unlockRequestApr };
             var result = data.Where(x =>
                 (
+                    permissionRangeRequester == PermissionRange.All ? (criteria.Requester == currentUser.UserID ? x.unlockRequest.UserCreated == criteria.Requester : false) : true
+                    &&
                     permissionRangeRequester == PermissionRange.None ? false : true
                     &&
-                    permissionRangeRequester == PermissionRange.Owner ? x.unlockRequest.UserCreated == currentUser.UserID && x.unlockRequest.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Owner ? x.unlockRequest.UserCreated == criteria.Requester : true
                     &&
                     permissionRangeRequester == PermissionRange.Group ? (x.unlockRequest.GroupId == currentUser.GroupId
                                                                         && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                                                                         && x.unlockRequest.OfficeId == currentUser.OfficeID
                                                                         && x.unlockRequest.CompanyId == currentUser.CompanyID
-                                                                        && x.unlockRequest.Requester == currentUser.UserID) : true
+                                                                        && (criteria.Requester == currentUser.UserID ? x.unlockRequest.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Department ? (x.unlockRequest.DepartmentId == currentUser.DepartmentId
                                                                               && x.unlockRequest.OfficeId == currentUser.OfficeID
                                                                               && x.unlockRequest.CompanyId == currentUser.CompanyID
-                                                                              && x.unlockRequest.Requester == currentUser.UserID) : true
+                                                                              && (criteria.Requester == currentUser.UserID ? x.unlockRequest.UserCreated == criteria.Requester : false)) : true
                     &&
                     permissionRangeRequester == PermissionRange.Office ? (x.unlockRequest.OfficeId == currentUser.OfficeID
                                                                           && x.unlockRequest.CompanyId == currentUser.CompanyID
-                                                                          && x.unlockRequest.Requester == currentUser.UserID) : true
+                                                                          && (criteria.Requester == currentUser.UserID ? x.unlockRequest.UserCreated == criteria.Requester : false)) : true
                     &&
-                    permissionRangeRequester == PermissionRange.Company ? x.unlockRequest.CompanyId == currentUser.CompanyID && x.unlockRequest.Requester == currentUser.UserID : true
+                    permissionRangeRequester == PermissionRange.Company ? x.unlockRequest.CompanyId == currentUser.CompanyID && (criteria.Requester == currentUser.UserID ? x.unlockRequest.UserCreated == criteria.Requester : false) : true
                 )
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Leader == currentUser.UserID
@@ -464,6 +466,7 @@ namespace eFMS.API.Setting.DL.Services
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
+                && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //LEADER AND DEPUTY OF LEADER
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Manager == currentUser.UserID
@@ -477,20 +480,20 @@ namespace eFMS.API.Setting.DL.Services
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
                 && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //MANANER AND DEPUTY OF MANAGER
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Accountant == currentUser.UserID
                   || x.unlockRequestApr.AccountantApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(x.unlockRequest.UnlockType, x.unlockRequestApr.Accountant, null, null, x.unlockRequest.OfficeId, x.unlockRequest.CompanyId)
                   )
-                // && x.unlockRequest.GroupId == currentUser.GroupId
-                // && x.unlockRequest.DepartmentId == currentUser.DepartmentId
                 && x.unlockRequest.OfficeId == currentUser.OfficeID
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                && (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) // ACCOUTANT AND DEPUTY OF ACCOUNTANT
                 ||
                 (x.unlockRequestApr != null && (x.unlockRequestApr.Buhead == currentUser.UserID
@@ -503,9 +506,10 @@ namespace eFMS.API.Setting.DL.Services
                 && x.unlockRequest.CompanyId == currentUser.CompanyID
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_NEW
                 && x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_DENIED
-                && (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
-                && (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
-                && (!string.IsNullOrEmpty(x.unlockRequestApr.Accountant) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED : true)
+                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Leader) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_REQUESTAPPROVAL : true)
+                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Manager) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_LEADERAPPROVED : true)
+                //&& (!string.IsNullOrEmpty(x.unlockRequestApr.Accountant) ? x.unlockRequest.StatusApproval != SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED : true)
+                && (x.unlockRequest.Requester == criteria.Requester && currentUser.UserID != criteria.Requester ? x.unlockRequest.Requester == criteria.Requester : (currentUser.UserID == criteria.Requester ? true : false))
                 ) //BOD AND DEPUTY OF BOD                
             ).Select(s => s.unlockRequest);
 
@@ -515,7 +519,7 @@ namespace eFMS.API.Setting.DL.Services
         public IQueryable<UnlockRequestResult> GetData(UnlockRequestCriteria criteria)
         {
             var queryUnlockRequest = ExpressionQuery(criteria);
-            var dataUnlockRequests = GetDataUnlockRequest();
+            var dataUnlockRequests = GetDataUnlockRequest(criteria);
             if (dataUnlockRequests == null) return null;
             var unlockRequests = dataUnlockRequests.Where(queryUnlockRequest);
 
