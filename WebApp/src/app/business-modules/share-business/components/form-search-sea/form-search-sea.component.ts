@@ -7,8 +7,8 @@ import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
 import { Store } from "@ngrx/store";
-import { IShareBussinessState, TransactionSearchListAction } from "../../store";
-import { shareReplay } from "rxjs/operators";
+import { IShareBussinessState, TransactionSearchListAction, getTransactionDataSearchState } from "../../store";
+import { shareReplay, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 
 @Component({
@@ -53,6 +53,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     agents: Observable<Customer[]>;
     creators: Observable<User[]>;
 
+    dataSearch: ISearchDataShipment;
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -74,6 +75,27 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
 
         this.setDataForFilterType();
         this.setLabelColoader();
+
+        // * Update form search from store
+        this._store.select(getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: ISearchDataShipment) => {
+                    if (!!Object.keys(criteria).length && criteria.transactionType === this.transaction) {
+                        this.dataSearch = criteria;
+
+                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo'].some(i => {
+                            if (!!this.dataSearch[i]) {
+                                this.filterType.setValue(this.filterTypes.find(d => d.value === i));
+                                this.searchText.setValue(this.dataSearch[i]);
+                                return true;
+                            }
+                        });
+                    }
+                }
+            );
     }
 
     setDataForFilterType() {
@@ -198,6 +220,17 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     expanded() {
+        if (!!this.dataSearch) {
+            const advanceSearchForm = {
+                customer: this.dataSearch.customerId,
+                supplier: this.dataSearch.coloaderId,
+                agent: this.dataSearch.agentId,
+                saleman: this.dataSearch.saleManId,
+                creator: this.dataSearch.userCreated,
+            };
+
+            this.formSearch.patchValue(advanceSearchForm);
+        }
     }
 }
 
