@@ -21,7 +21,7 @@
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a href="#">{{ item.partnerId }}</a> </td>
+                                            <td><a href="#">{{ item.partnerCode }}</a> </td>
                                             <td>{{ item.partnerNameAbbr }} </td>
 
                                             <td>{{ item.debitAmount | number: '.0-3' }}</td>
@@ -44,9 +44,9 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!otherList.length">
+                                <tr app-table-none-record *ngIf="!isLoading && !otherList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="!otherList.length"></tr>
+                                <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
                         </table>
                     </div>

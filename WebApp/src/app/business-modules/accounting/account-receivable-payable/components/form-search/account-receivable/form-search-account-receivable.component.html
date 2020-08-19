@@ -5,8 +5,9 @@
                 <div class="col-lg-8">
                     <label>Partner</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                        (remove)="resetFormControl(partnerId)"
                         [currentActiveItemId]="{field:'id', value: partnerId.value}"
-                        [selectedDisplayFields]="['abbrName']" [dataSources]="seedPartner"
+                        [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner">
                     </app-combo-grid-virtual-scroll>
                 </div>
@@ -87,8 +88,9 @@
                 <div class="col-lg-6">
                     <label>Salesman</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')"
+                        (remove)="resetFormControl(salesManId)"
                         [currentActiveItemId]="{field:'id', value: salesManId.value}"
-                        [selectedDisplayFields]="['userName', 'fullName']" [dataSources]="seedSalesMan"
+                        [selectedDisplayFields]="['username', 'employeeNameEn']" [dataSources]="salemans | async"
                         [displayFields]="displayFieldsSalesMan">
 
                     </app-combo-grid-virtual-scroll>
@@ -96,8 +98,9 @@
                 <div class="col-lg-6">
                     <label>Office</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')"
+                        (remove)="resetFormControl(officalId)"
                         [currentActiveItemId]="{field:'id', value: officalId.value}"
-                        [selectedDisplayFields]="['abbrName']" [dataSources]="seedOffice"
+                        [selectedDisplayFields]="['shortName']" [dataSources]="offices | async"
                         [displayFields]="displayFieldsOffice">
                         >
 
@@ -110,7 +113,7 @@
                     <div class="col-lg-6 m--align-right c-button-actions">
                         <app-default-button [buttonSetting]="searchlButtonSetting" (click)="onSearchRequest()">
                         </app-default-button>
-                        <app-default-button [buttonSetting]="resetButtonSetting">
+                        <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()">
                         </app-default-button>
                     </div>
                 </div>

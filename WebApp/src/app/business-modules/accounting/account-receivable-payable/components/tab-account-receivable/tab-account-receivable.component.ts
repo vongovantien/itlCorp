@@ -38,8 +38,27 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
     }
     //
-    onSearchReceivable(event) {
-        console.log("data search main: ", event);
+    onSearchReceivable(body: AccountingInterface.IAccReceivableSearch) {
+        console.log("data search: ", body);
+
+        switch (body.arType) {
+            case CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical:
+                this.setParameterToSearch(body, this.trialOfficalListComponent);
+                break;
+            case CommonEnum.TabTypeAccountReceivableEnum.Guarantee:
+                this.setParameterToSearch(body, this.guaranteedListComponent);
+                break;
+            case CommonEnum.TabTypeAccountReceivableEnum.Other:
+                this.setParameterToSearch(body, this.otherListComponent);
+                break;
+            default:
+                break;
+        }
+    }
+    //
+    setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
+        tabComponent.dataSearch = dataSearch;
+        tabComponent.getPagingList();
     }
     //
     onSelectTabAccountReceivable(tabname: string) {

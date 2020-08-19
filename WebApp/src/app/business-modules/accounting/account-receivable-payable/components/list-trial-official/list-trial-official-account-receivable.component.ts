@@ -24,7 +24,7 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     //
     trialOfficialList: any[] = [];
-
+    isLoading: boolean = true;
 
 
     constructor(
@@ -41,7 +41,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     ngOnInit() {
 
         this.headers = [
-            { title: 'Partner Id', field: 'partnerId', sortable: true },
+            { title: 'Partner Id', field: 'partnerCode', sortable: true },
             { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
             { title: 'Credit Limited', field: 'creditLimited', sortable: true },
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
@@ -80,16 +80,18 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.trialOfficialList = res.data || [];
-                    console.log("data trả về: ", res.data);
-
                     this.totalItems = res.totalItems;
                 },
             );
     }
 
     //
-    viewDetail(id: string) {
-        this._router.navigate([`/home/accounting/account-receivable-payable/detail/${id}`]);
+    viewDetail(agreementId: string) {
+        this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+            queryParams: {
+                agreementId: agreementId,
+            }
+        });
     }
 }
 

@@ -4,20 +4,19 @@
     <div class="m-content">
         <div class="m-portlet">
             <div class="m-portlet__body">
-                <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3 class="w-75">
-                        <ng-container>
-                            <h3 class="text-primary">
-                                Account Receivable Detail
-                            </h3>
-                        </ng-container>
+                <div class="d-flex align-items-center justify-content-between p-1 mb-2">
+                    <h3 class="w-75 text-primary">
+                        Account Receivable Detail
                     </h3>
+                    <app-permission-button class="mb-1" title="Back" (click)="goBack()" type="import">
+                    </app-permission-button>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
                             <div class="col-lg-8">
-                                <h5><span class="text-success">Customer:</span> 09455656 - UPS VN</h5>
+                                <h5><span class="text-success">Customer:</span> {{accReceivableDetail.partnerId}} -
+                                    {{accReceivableDetail.partnerNameEn}}</h5>
                             </div>
 
                             <div class="col-lg-4">
@@ -39,7 +38,7 @@
                                     </div>
                                     <div class="col-lg-5">
                                         <div>
-                                            <h6>UPS VN</h6>
+                                            <h6>{{accReceivableDetail.partnerNameAbbr}}</h6>
                                         </div>
 
                                     </div>
@@ -47,7 +46,7 @@
                                         <h6>Tax code </h6>
                                     </div>
                                     <div class="col-lg-4">
-                                        <h6>09455656</h6>
+                                        <h6>{{accReceivableDetail.taxCode}}</h6>
                                     </div>
                                 </div>
                                 <div class="row m--margin-top-20">
@@ -59,7 +58,7 @@
                                     </div>
                                     <div class="col-lg-5">
                                         <div>
-                                            <h6>UPS VN</h6>
+                                            <h6>{{accReceivableDetail.partnerNameLocal}}</h6>
                                         </div>
 
                                     </div>
@@ -67,8 +66,9 @@
                                         <h6>Status </h6>
                                     </div>
                                     <div class="col-lg-4">
-                                        <h6 [ngClass]=" 1  ? 'text-success' : 'text-danger'">
-                                            {{ 1 ? "Active":"Inctive"}}
+                                        <h6
+                                            [ngClass]=" accReceivableDetail.partnerStatus === 'Active'  ? 'text-success' : 'text-danger'">
+                                            {{accReceivableDetail.partnerStatus}}
                                         </h6>
                                     </div>
                                 </div>
@@ -84,10 +84,11 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ 09456656 }}</h6>
-                                            <h6 class="my-3">{{ "Contract - Offical" }}</h6>
-                                            <h6 [ngClass]=" 0  ? 'text-success' : 'text-danger'">
-                                                {{0 ? "Active":"Inactive"}}
+                                            <h6>{{ accReceivableDetail.agreementNo }}</h6>
+                                            <h6 class="my-3">{{ accReceivableDetail.agreementType }}</h6>
+                                            <h6
+                                                [ngClass]=" accReceivableDetail.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+                                                {{accReceivableDetail.agreementStatus}}
                                             </h6>
 
                                         </div>
@@ -102,9 +103,10 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>01/01/2020</h6>
-                                            <h6 class="my-3">30/06/2020</h6>
-                                            <h6 class="text-danger">{{ 8 }} Days</h6>
+                                            <h6>{{accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy'}}</h6>
+                                            <h6 class="my-3">{{accReceivableDetail.expriedDate | date: 'dd/MM/yyyy'}}
+                                            </h6>
+                                            <h6 class="text-danger">{{ accReceivableDetail.expriedDay }} days</h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
@@ -116,9 +118,9 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ 1000000000 | number: '.0-3'}} VND</h6>
-                                            <h6 class="my-3">{{ 30 }} Days</h6>
-                                            <h6 class="text-success">{{ 120 }} %</h6>
+                                            <h6>{{ accReceivableDetail.creditLimited | number: '.0-3'}}</h6>
+                                            <h6 class="my-3">{{ accReceivableDetail.creditTerm }} days</h6>
+                                            <h6 class="text-success">{{ accReceivableDetail.creditRateLimit }} %</h6>
                                         </div>
                                     </div>
                                 </div>
@@ -135,13 +137,15 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ 1200000000 | number: '.0-3'}} VND</h6>
-                                            <h6 class="my-3">{{200000000 | number: '.0-3'}} VND</h6>
-                                            <h6
-                                                [ngClass]=" 120 < 70  ? 'text-success' : 120 >= 100 ? 'text-danger' : '.text-warning'">
-                                                {{ 120 }} %
+                                            <h6>{{ accReceivableDetail.debitAmount | number: '.0-3'}}</h6>
+                                            <h6 class="my-3">{{ accReceivableDetail.obhAmount | number: '.0-3'}}
                                             </h6>
-                                            <h6 class="mt-3">{{ 10000000 | number: '.0-3'}} VND</h6>
+                                            <h6
+                                                [ngClass]=" accReceivableDetail.debitRate < 70  ? 'text-success' : accReceivableDetail.debitRate >= 100 ? 'text-danger' : '.text-warning'">
+                                                {{ accReceivableDetail.debitRate }} %
+                                            </h6>
+                                            <h6 class="mt-3">{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
+                                            </h6>
                                         </div>
 
                                     </div>
@@ -155,12 +159,15 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ 900000000 | number: '.0-3'}} VND</h6>
-                                            <h6 class="my-3">{{ 800000000 | number: '.0-3'}} VND</h6>
-                                            <h6><span class="text-danger">{{ 100000000 | number: '.0-3'}}</span> VND
+                                            <h6>{{ accReceivableDetail.billingAmount | number: '.0-3'}}</h6>
+                                            <h6 class="my-3">{{ accReceivableDetail.billingUnpaid | number: '.0-3'}}
+                                            </h6>
+                                            <h6><span
+                                                    class="text-danger">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
                                             </h6>
                                             <h6 class="mt-3"><span
-                                                    class="text-primary">{{ 100000000 | number: '.0-3'}}</span> VND</h6>
+                                                    class="text-primary">{{ accReceivableDetail.creditAmount | number: '.0-3'}}</span>
+                                            </h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
@@ -172,11 +179,14 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6><span class="text-danger">{{ 400000000 | number: '.0-3' }}</span> VND
+                                            <h6><span
+                                                    class="text-danger">{{ accReceivableDetail.over1To15Day | number: '.0-3' }}</span>
                                             </h6>
                                             <h6 class="my-3"><span
-                                                    class="text-danger">{{ 300000000 | number: '.0-3'}}</span> VND</h6>
-                                            <h6><span class="text-danger">{{ 100000000 | number: '.0-3'}}</span> VND
+                                                    class="text-danger">{{ accReceivableDetail.over16To30Day | number: '.0-3'}}</span>
+                                            </h6>
+                                            <h6><span
+                                                    class="text-danger">{{ accReceivableDetail.over30Day | number: '.0-3'}}</span>
                                             </h6>
                                         </div>
                                     </div>

@@ -2,15 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 
 import { SortService } from '@services';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
+import { CatalogueRepo, AccountingRepo } from '@repositories';
+import { ToastrService } from 'ngx-toastr';
+import { DataService } from '@services';
+import UUID from 'validator/lib/isUUID';
+import _merge from 'lodash/merge';
+import { of } from 'rxjs';
 import { NgProgress } from '@ngx-progressbar/core';
+import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'detail-account-receivable',
     templateUrl: 'detail-account-receivable.component.html'
 })
 
+
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
+
+    accReceivableDetail: any = {};
+    accReceivableMoreDetail: any = {};
     seedData: any[] = [
         {
             office: 'TP.HCM',
@@ -102,6 +114,8 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
+        private _accoutingRepo: AccountingRepo,
+        private _activedRoute: ActivatedRoute,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -109,7 +123,29 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         this.requestList = this.getPagingGuaranteed;
     }
     ngOnInit() {
+        this.initHeaders();
+        this._activedRoute.queryParams
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((p: Params) => {
+                    if (!!p.agreementId) {
+                        return this._accoutingRepo.getDetailReceivableByArgeementId(p.agreementId);
+                    }
+                    return this._accoutingRepo.getDetailReceivableByPartnerId(p.partnerId);
+                }),
+            ).subscribe(
+                (data: any) => {
 
+                    this.accReceivableDetail = data.accountReceivable;
+                    this.accReceivableMoreDetail = data.accountReceivableGrpOffices;
+                    console.log(this.accReceivableMoreDetail);
+                }
+            );
+
+
+    }
+    //
+    initHeaders() {
         this.headers = [
             { title: 'Office (branch)', field: 'salesNameEn', sortable: true },
             { title: 'Debit Amount', field: 'salesFullName', sortable: true },
@@ -133,10 +169,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             { title: 'Over 16-30 days', field: 'between16_30days', sortable: true },
             { title: 'Over 30 Days', field: 'over30days', sortable: true },
         ];
-        //seed paging
-        this.totalItems = this.seedData.length;
-        this.page = 1;
-        this.pageSize = 15;
     }
     sortGuaranteedList(sortField: string, order: boolean) {
         this.seedData = this._sortService.sort(this.seedData, sortField, order);
@@ -148,5 +180,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
     getPagingGuaranteed() {
 
+    }
+
+    goBack() {
+        window.history.back();
     }
 }

@@ -78,8 +78,8 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
             { title: 'Sales Name (En)', field: 'salesmanNameEn', sortable: true },
             { title: 'Sales Full Name', field: 'salesFullName', sortable: true },
             { title: 'Credit Limited', field: 'totalCreditLimited', sortable: true },
-            { title: 'Credit Amount', field: 'totalDebitAmount', sortable: true },
-            { title: 'Credit Rate (%)', field: 'totalDebitRate', sortable: true },
+            { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
+            { title: 'Debit Rate (%)', field: 'totalDebitRate', sortable: true },
             { title: 'Billing', field: 'totalBillingAmount', sortable: true },
             { title: 'Billing Unpaid', field: 'totalBillingUnpaid', sortable: true },
             { title: 'Paid', field: 'totalPaidAmount', sortable: true },
@@ -90,20 +90,20 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
 
         ];
         this.subHeaders = [
-            { title: 'Partner Id', field: 'partnerId', sortable: true },
-            { title: 'Partner Name', field: 'partnerName', sortable: true },
+            { title: 'Partner Id', field: 'partnerCode', sortable: true },
+            { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
 
-            { title: 'Credit Amount', field: 'creditAmount', sortable: true },
-            { title: 'Credit Rate (%)', field: 'creditRate', sortable: true },
-            { title: 'Billing', field: 'billing', sortable: true },
+            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
+
+            { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Billing Unpaid', field: 'billingUnpaid', sortable: true },
-            { title: 'Paid', field: 'paid', sortable: true },
+            { title: 'Paid', field: 'paidAmount', sortable: true },
             { title: 'OBH Amount', field: 'obhAmount', sortable: true },
-            { title: 'Over 1-15 days', field: 'between1_15days', sortable: true },
-            { title: 'Over 16-30 days', field: 'between16_30days', sortable: true },
-            { title: 'Over 30 Days', field: 'over30days', sortable: true },
+            { title: 'Over 1-15 days', field: 'over1To15Day', sortable: true },
+            { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
+            { title: 'Over 30 Days', field: 'over30Day', sortable: true },
 
-            { title: 'Status', field: 'status', sortable: true },
+            { title: 'Status', field: 'partnerStatus', sortable: true },
         ];
         //seed paging
 

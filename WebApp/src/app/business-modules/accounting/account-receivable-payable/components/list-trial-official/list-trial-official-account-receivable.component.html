@@ -18,11 +18,14 @@
                                         <tr class="">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
-                                                    <app-permission-button type="detail" (click)="viewDetail(i)">
+                                                    <app-permission-button type="detail"
+                                                        (click)="viewDetail(item.agreementId)">
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a href="#">{{ item.partnerId }}</a> </td>
+                                            <td><a class="pointer"
+                                                    (click)="viewDetail(item.agreementId)">{{ item.partnerCode }}</a>
+                                            </td>
                                             <td>{{ item.partnerNameAbbr }} </td>
                                             <td>{{ item.creditLimited  | number: '.0-3' }}</td>
                                             <td>{{ item.debitAmount | number: '.0-3' }}</td>
@@ -74,7 +77,7 @@
                                 </ng-container>
                                 <tr app-table-none-record *ngIf="!trialOfficialList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="!trialOfficialList.length"></tr>
+                                <tr app-table-row-loading *ngIf="isLoading === true"></tr>
                             </tbody>
                         </table>
                     </div>

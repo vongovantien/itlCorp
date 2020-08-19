@@ -2,10 +2,11 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
-import { CatalogueRepo } from '@repositories';
-import { Partner } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { Partner, Office } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { User } from 'src/app/shared/models';
 
 import { AppForm } from 'src/app/app.form';
 
@@ -38,7 +39,7 @@ const DebitRatesValues = [
 })
 export class AccountReceivableFormSearchComponent extends AppForm implements OnInit {
 
-    @Output() onSearchReceivable: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
+    @Output() onSearch: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
 
 
 
@@ -64,58 +65,29 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     salesManId: AbstractControl;
     officalId: AbstractControl;
     ////seedData
-    seedPartner: any[] = [
-        {
-            partnerId: '111111',
-            abbrName: 'Cristian',
-            nameLocal: 'Cris',
-            taxCode: 123
-        },
-        {
-            partnerId: '222222',
-            abbrName: 'Maple',
-            nameLocal: 'SwordArt',
-            taxCode: 456
-        }
-    ];
-    seedSalesMan: any[] = [
-        {
-            id: 'SM01',
-            userName: 'intern.007',
-            fullName: 'Thiện Nguyễn'
-        },
-        {
-            id: 'SM02',
-            userName: 'intern.00n',
-            fullName: 'Someone'
-        }
-    ];
-    seedOffice: any[] = [
-        {
-            id: 'Office01',
-            abbrName: 'ITL HCM',
-            enName: 'Indo Trans Logictis HCMC'
-        },
-        {
-            id: 'Office02',
-            abbrName: 'ITL HN',
-            enName: 'Indo Trans Logictis HNC'
-        }
-    ]
+    // partner
+    partners: Observable<Partner[]>;
+    //partners: any;
+    salemans: Observable<User[]>;
+    //salemans: any;
+    offices: Observable<Office[]>;
+    //offices: any;
+
+
     //
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'partnerId', label: 'Partner ID' },
-        { field: 'abbrName', label: 'ABBR Name' },
-        { field: 'nameLocal', label: 'Name Local' },
+        { field: 'accountNo', label: 'Partner ID' },
+        { field: 'shortName', label: 'ABBR Name' },
+        { field: 'partnerNameVn', label: 'Name Local' },
         { field: 'taxCode', label: 'Tax Code' },
     ];
     displayFieldsSalesMan: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'userName', label: 'User Name' },
-        { field: 'fullName', label: 'Full Name' },
+        { field: 'username', label: 'User Name' },
+        { field: 'employeeNameEn', label: 'Full Name' },
     ];
     displayFieldsOffice: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'abbrName', label: 'Abbr Name' },
-        { field: 'enName', label: 'En Name' },
+        { field: 'shortName', label: 'Abbr Name' },
+        { field: 'branchNameEn', label: 'En Name' },
     ];
     //model search
     overDueDays: CommonInterface.INg2Select[] = [
@@ -143,12 +115,14 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     agreementExpiredDayList: CommonInterface.INg2Select[] = [
         { id: 'All', text: 'All' },
         { id: 'Normal', text: 'Normal' },
-        { id: '30Days', text: '< (-30) Days' },
-        { id: '15Days', text: '< (-15) Days' },
-        { id: 'Expired', text: 'Expired' },
+        { id: '30Day', text: '< (-30) Days' },
+        { id: '15Day', text: '< (-15) Days' },
+        { id: 'Expried', text: 'Expired' },
     ];
     constructor(
         private _fb: FormBuilder,
+        private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
     ) {
         super();
         this.requestSearch = this.submitSearch;
@@ -157,6 +131,10 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     ngOnInit(): void {
         this.initForm();
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.salemans = this._systemRepo.getListSystemUser();
+        this.offices = this._systemRepo.getAllOffice();
+        this._systemRepo.getAllOffice().subscribe(console.log);
 
     }
     initForm() {
@@ -198,11 +176,12 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
     }
+
     //
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                this.partnerId.setValue(data.partnerId);
+                this.partnerId.setValue(data.id);
                 break;
             case 'salesMan':
                 this.salesManId.setValue(data.id);
@@ -230,10 +209,15 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         }
     }
     //
+    resetSearch() {
+        this.formSearch.patchValue(Object.assign({}));
+        this.initForm();
+        this.submitSearch();
+    }
     //
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
-        const body = {
+        const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,
             overDueDay: dataForm.overdueDays[0].id === '0' ? 0 : dataForm.overdueDays[0].id,
@@ -245,27 +229,9 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             officeId: dataForm.officalId,
         }
         //format body 
-        this.onSearchReceivable.emit(body);
+        this.onSearch.emit(body);
 
     }
 
 }
-interface ISearchAccReceivable {
-    partnerId: string;
-    overdueDays: string;
-    fromOverduaDays: string;
-    toOverduaDays: string;
 
-    debitRate: string;
-    fromDebitRate: number;
-    toDebitRate: number;
-
-    agreementStatus: number;
-
-    agreementExpiredDays: string;
-    fromAgreementExpiredDays: string;
-    toAgreementExpiredDays: string;
-
-    salesManId: string;
-    officalId: string;
-}

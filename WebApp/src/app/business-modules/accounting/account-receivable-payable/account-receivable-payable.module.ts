@@ -27,6 +27,8 @@ import { AccountPaymentListInvoicePaymentComponent } from './components/list-inv
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
 import { AccountReceivableDetailComponent } from './components/detail/detail-account-receivable.component';
 import { AccountReceivableListTrialOfficialComponent } from './components/list-trial-official/list-trial-official-account-receivable.component';
+import { AccountReceivableLazyLoadModule } from './account-receivable-lazy-load.module';
+import { AccountReceivableTabComponent } from './components/tab-account-receivable/tab-account-receivable.component';
 
 
 const routing: Routes = [
@@ -44,7 +46,7 @@ const routing: Routes = [
                 path: 'import-obh', component: AccountReceivablePayableImportOBHPaymentComponent, data: { name: "Import OBH" }
             },
             {
-                path: "detail/:id", component: AccountReceivableDetailComponent,
+                path: "detail", component: AccountReceivableDetailComponent,
 
             },
         ]
@@ -58,15 +60,13 @@ const routing: Routes = [
         AccountReceivablePayableComponent,
         AccountPaymentListInvoicePaymentComponent,
         AccountPaymentListOBHPaymentComponent,
-        AccountReceivableListTrialOfficialComponent,
-        AccountReceivableListGuaranteedComponent,
-        AccountReceivableListOtherComponent,
+
         AccountPaymentUpdateExtendDayPopupComponent,
         AccountReceivableDetailPopupComponent,
         PaymentImportComponent,
         AccountReceivablePayableImportOBHPaymentComponent,
-        AccountReceivableFormSearchComponent,
         AccountReceivableDetailComponent,
+
     ],
     imports: [
         CommonModule,
@@ -79,7 +79,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         NgxDaterangepickerMd,
         SelectModule,
-        PerfectScrollbarModule
+        PerfectScrollbarModule,
+        AccountReceivableLazyLoadModule,
     ],
     exports: [],
     providers: [],

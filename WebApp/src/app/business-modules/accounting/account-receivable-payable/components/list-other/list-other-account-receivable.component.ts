@@ -30,7 +30,7 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     }
     ngOnInit() {
         this.headers = [
-            { title: 'Partner Id', field: 'partnerId', sortable: true },
+            { title: 'Partner Id', field: 'partnerCode', sortable: true },
             { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
 
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
