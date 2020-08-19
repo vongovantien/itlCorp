@@ -13,7 +13,8 @@
                             </thead>
                             <tbody>
                                 <ng-container>
-                                    <ng-container *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                    <ng-container
+                                        *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
                                         <tr class="">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
@@ -22,45 +23,47 @@
                                                 </div>
                                             </td>
                                             <td><a href="#">{{ item.partnerId }}</a> </td>
-                                            <td>{{ item.partnerName }} </td>
+                                            <td>{{ item.partnerNameAbbr }} </td>
                                             <td>{{ item.creditLimited  | number: '.0-3' }}</td>
                                             <td>{{ item.debitAmount | number: '.0-3' }}</td>
                                             <td>
-                                                <span [ngClass]="item.debitRate < 120 ? 'text-success' : 'text-danger'">
+                                                <span
+                                                    [ngClass]="item.debitRate < 70 ? 'text-success' : item.debitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ item.debitRate}}
                                                 </span>
                                             </td>
-                                            <td>{{ item.billing | number: '.0-3' }}
+                                            <td>{{ item.billingAmount | number: '.0-3' }}
                                             </td>
                                             <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
-                                            <td>{{ item.paid | number: '.0-3'}}</td>
+                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
                                             <td>{{ item.obhAmount | number: '.0-3'}}</td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.between1_15days | number: '.0-3' }}
+                                                    {{ item.over1To15Day | number: '.0-3' }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.between16_30days | number: '.0-3' }}
+                                                    {{ item.over16To30Day | number: '.0-3' }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.over30days | number: '.0-3' }}
+                                                    {{ item.over30Day | number: '.0-3' }}
                                                 </span>
                                             </td>
-                                            <td>{{ item.contractNo}}</td>
-                                            <td>{{ item.contractType}}</td>
-                                            <td>{{ item.expiredDate }}</td>
+                                            <td>{{ item.agreementNo}}</td>
+                                            <td>{{ item.agreementType}}</td>
+                                            <td>{{ item.expriedDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.expiredDays }}
+                                                    {{ item.expriedDay }}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span [ngClass]="item.status ? 'text-success' : 'text-danger'">
-                                                    {{ item.status ? 'Active' : 'Inactive'}}
+                                                <span
+                                                    [ngClass]="item.status === 'Active' ? 'text-success' : 'text-danger'">
+                                                    {{ item.agreementStatus }}
                                                 </span>
                                             </td>
 
@@ -69,9 +72,9 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!seedData.length">
+                                <tr app-table-none-record *ngIf="!trialOfficialList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+                                <tr app-table-row-loading *ngIf="!trialOfficialList.length"></tr>
                             </tbody>
                         </table>
                     </div>

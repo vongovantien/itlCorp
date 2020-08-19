@@ -1,0 +1,14 @@
+<form-search-account-receivable (onSearchReceivable)="onSearchReceivable($event)">
+</form-search-account-receivable>
+{{selectedTab}}
+<tabset class="custom-class-tab">
+    <tab heading="Trial & Official" (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
+        <list-trial-official-account-receivable></list-trial-official-account-receivable>
+    </tab>
+    <tab heading="Guaranteed" (selectTab)="onSelectTabAccountReceivable('GUARANTEED')">
+        <list-guaranteed-account-receivable></list-guaranteed-account-receivable>
+    </tab>
+    <tab heading="Other" (selectTab)="onSelectTabAccountReceivable('OTHER')">
+        <list-other-account-receivable></list-other-account-receivable>
+    </tab>
+</tabset>

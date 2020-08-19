@@ -44,7 +44,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     formSearch: FormGroup;
 
-    arType: CommonEnum.TabTypeAccountReceivableEnum = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
+    arType: CommonEnum.TabTypeAccountReceivableEnum;
 
     partnerId: AbstractControl;
 

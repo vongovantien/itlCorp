@@ -40,7 +40,7 @@ export class CommercialIncotermComponent extends AppList implements OnInit, IPer
         this.headers = [
             { title: 'Incoterm', field: 'code', sortable: true },
             { title: 'Name En', field: 'nameEn', sortable: true },
-            { title: 'Sevice', field: 'service', sortable: true },
+            { title: 'Service', field: 'service', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'Creator', field: 'userCreatedName', sortable: true },

@@ -13,20 +13,17 @@ import { AccountReceivableFormSearchComponent } from './components/form-search/a
 import { CommonEnum } from '@enums';
 type TAB = 'INVOICE' | 'OBH';
 
+
 @Component({
     selector: 'app-account-receivable-payable',
     templateUrl: './account-receivable-payable.component.html',
+    styleUrls: ['./account-receivable.component.scss']
 })
 export class AccountReceivablePayableComponent extends AppList implements OnInit {
 
     @ViewChild(AccountPaymentListInvoicePaymentComponent, { static: false }) invoiceListComponent: AccountPaymentListInvoicePaymentComponent;
     @ViewChild(AccountPaymentListOBHPaymentComponent, { static: false }) obhSOAListComponent: AccountPaymentListOBHPaymentComponent;
-    //
-    @ViewChild(AccountReceivableListTrialOfficialComponent, { static: false }) trialOfficalListComponent: AccountReceivableListTrialOfficialComponent;
-    @ViewChild(AccountReceivableListGuaranteedComponent, { static: false }) guaranteedListComponent: AccountReceivableListGuaranteedComponent;
-    @ViewChild(AccountReceivableListOtherComponent, { static: false }) otherListComponent: AccountReceivableListOtherComponent;
-    //
-    @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent
+
 
     selectedTab: TAB | string = "INVOICE";
 
@@ -82,26 +79,7 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.requestSearchShipment();
     }
 
-    onSelectTabAccountReceivable(tabname: string) {
-        this.selectedTab = tabname;
-        if (tabname === 'TRIAL_OFFICIAL') {
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
-            this.trialOfficalListComponent.dataSearch = {};
-        } else if (tabname === 'GUARANTEED') {
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Guarantee;
-            this.guaranteedListComponent.dataSearch = {};
-        } else {
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Other;
-            this.otherListComponent.dataSearch = {};
-        }
-        this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
-        this.accountReceivableFormComponent.initForm();
-        this.requestSearchListOfReceivable();
-    }
 
-    requestSearchListOfReceivable() {
-        //call api by tabname
-    }
 
     getPaymentType() {
         let paymentType: number;
@@ -113,10 +91,6 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         return paymentType;
     }
 
-    onSearchReceivable(event) {
-        console.log("data search main: ", event);
-
-    }
 
     onSearchPayment(event) {
         this.dataSearch = event;

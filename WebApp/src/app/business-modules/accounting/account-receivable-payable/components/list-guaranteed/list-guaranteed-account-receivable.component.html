@@ -13,7 +13,8 @@
                             </thead>
                             <tbody>
                                 <ng-container>
-                                    <ng-container *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                    <ng-container
+                                        *ngFor="let item of guaranteedList; let i = index; trackBy: trackByFn">
                                         <tr class="collapse-toggle-row">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 100px">
@@ -25,34 +26,35 @@
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td>{{ item.salesNameEn }} </td>
-                                            <td>{{ item.salesFullName }} </td>
-                                            <td>{{ item.creditLimited | number: '.0-3'}}</td>
-                                            <td>{{ item.creditAmount| number: '.0-3' }}</td>
+                                            <td>{{ item.salesmanNameEn }} </td>
+                                            <td>{{ item.salesmanFullName }} </td>
+                                            <td>{{ item.totalCreditLimited | number: '.0-3'}}</td>
+                                            <td>{{ item.totalDebitAmount| number: '.0-3' }}</td>
                                             <td>
                                                 <span
-                                                    [ngClass]="item.creditRate < 120 ? 'text-success' : 'text-danger'">
-                                                    {{ item.creditRate}}
+                                                    [ngClass]="item.totalDebitRate < 70 ? 'text-success' : item.totalDebitRate < 100 ? 'text-warning':'text-danger'">
+                                                    {{ item.totalDebitRate}}
                                                 </span>
+
                                             </td>
-                                            <td>{{ item.billing | number: '.0-3'}}
+                                            <td>{{ item.totalBillingAmount | number: '.0-3'}}
                                             </td>
-                                            <td>{{ item.billingUnpaid | number: '.0-3'}}</td>
-                                            <td>{{ item.paid | number: '.0-3'}}</td>
-                                            <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                            <td>{{ item.totalBillingUnpaid | number: '.0-3'}}</td>
+                                            <td>{{ item.totalPaidAmount | number: '.0-3'}}</td>
+                                            <td>{{ item.totalObhAmount | number: '.0-3'}}</td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.between1_15days | number: '.0-3' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span [ngClass]="'text-danger'">
-                                                    {{ item.between16_30days | number: '.0-3' }}
+                                                    {{ item.totalOver1To15Day | number: '.0-3' }}
                                                 </span>
                                             </td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.over30days | number: '.0-3' }}
+                                                    {{ item.totalOver16To30Day | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.totalOver30Day | number: '.0-3' }}
                                                 </span>
                                             </td>
 
@@ -77,7 +79,7 @@
                                                                 </div>
                                                             </td>
                                                             <td><a href="#">{{ element.partnerId }}</a></td>
-                                                            <td>{{ element.partnerName  }}
+                                                            <td>{{ element.salesmanNameEn  }}
                                                             </td>
                                                             <td>{{ element.creditAmount | number: '.0-3'}}
                                                             </td>
@@ -122,9 +124,9 @@
                                         </tr>
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!seedData.length">
+                                <tr app-table-none-record *ngIf="!guaranteedList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+                                <tr app-table-row-loading *ngIf="!guaranteedList.length"></tr>
                             </tbody>
                         </table>
                     </div>
