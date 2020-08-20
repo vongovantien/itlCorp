@@ -262,7 +262,7 @@ namespace eFMS.IdentityServer.DL.Services
                 EmployeeNameEn = ldapProperties["displayname"][0].ToString(),
                 EmployeeNameVn = ldapProperties["name"][0].ToString(),
                 Tel = ldapProperties["telephonenumber"].Count == 0 ? null : ldapProperties["telephonenumber"][0].ToString(),
-                HomePhone = ldapProperties["mobile"][0].ToString(),
+                HomePhone = ldapProperties["mobile"].Count == 0 ? null : ldapProperties["mobile"][0].ToString(),
                 LdapObjectGuid = objId
             };
             return sysEmployee;

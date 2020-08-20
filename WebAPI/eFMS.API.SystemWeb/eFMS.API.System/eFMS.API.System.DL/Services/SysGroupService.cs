@@ -100,6 +100,8 @@ namespace eFMS.API.System.DL.Services
             }
             else
             {
+                departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+
                 groups = DataContext.Get(x => (x.Code ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.NameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                                || (x.NameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -107,7 +109,6 @@ namespace eFMS.API.System.DL.Services
                                         //|| (x.DepartmentId == criteria.DepartmentId || criteria.DepartmentId == 0)
                                         //|| (x.Id == criteria.Id || criteria.Id == 0)
                                         );
-                departments = departmentRepository.Get(x => (x.DeptNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
                 if (departments.Count() == 0)
                 {
                     departments = departmentRepository.Get();
@@ -137,11 +138,11 @@ namespace eFMS.API.System.DL.Services
                             DatetimeModified = g.DatetimeModified,
                             Active = g.Active,
                             InactiveOn = g.InactiveOn,
-                            DepartmentName = dept.DeptNameEn,
+                            DepartmentName = dept.DeptNameAbbr,
                             OfficeId = office.Id,
                             OfficeName = office.ShortName,
                             CompanyId = company.Id,
-                            CompanyName = company.BunameEn
+                            CompanyName = company.BunameAbbr
                         };
             var results = query.OrderByDescending(x => x.DatetimeModified);
             return results;

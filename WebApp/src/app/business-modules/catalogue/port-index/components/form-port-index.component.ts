@@ -9,6 +9,7 @@ import { CommonEnum } from '@enums';
 import { PortIndex } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 import { finalize } from 'rxjs/operators';
+import { NullVisitor } from '@angular/compiler/src/render3/r3_ast';
 
 @Component({
     selector: 'app-form-port-index',
@@ -140,14 +141,19 @@ export class FormPortIndexComponent extends PopupBase implements OnInit {
     }
 
     setFormValue(res: any) {
+        const objCountry = this.countries.find(x => x.id === res.countryId);
+        const objZone = this.areas.find(x => x.id === res.areaId);
+        const objMode = this.modes.find(x => x.id === res.modeOfTransport);
+        const objWarehouse = this.warehouses.find(x => x.id === res.warehouseId);
+
         this.portindexForm.setValue({
             code: res.code,
             portIndexeNameEN: res.nameEn,
             portIndexeNameLocal: res.nameVn,
-            country: [this.countries.find(x => x.id === res.countryId)] || [],
-            zone: res.areaId != null ? [this.areas.find(x => x.id === res.areaId)] : [] || [],
-            mode: [this.modes.find(x => x.id === res.modeOfTransport)] || [],
-            warehouseId: !!this.warehouses.length && !!res.warehouseId ? [this.warehouses.find(x => x.id === res.warehouseId)] : null,
+            country: !!objCountry ? [objCountry] : null,//[this.countries.find(x => x.id === res.countryId)] || [],
+            zone: !!objZone && res.areaId != null ? [objZone] : [] || [],
+            mode: !!objMode ? [objMode] || [] : null,
+            warehouseId: !!objWarehouse && !!this.warehouses.length && !!res.warehouseId ? [objWarehouse] : null,
             active: res.active
         });
     }
