@@ -55,7 +55,7 @@ const routing: Routes = [
                             },
                             {
                                 path: 'send-si', component: ShareBusinessReAlertComponent, data: {
-                                    name: "Send S.I", serviceId: ChargeConstants.SCE_CODE
+                                    name: "Send S.I", serviceId: ChargeConstants.SFE_CODE // Similar FCL Export
                                 }
                             },
                         ]

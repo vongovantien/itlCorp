@@ -1,11 +1,10 @@
 import { Component, ViewChild, Input } from '@angular/core';
-import { Params } from '@angular/router';
+import { Params, ActivatedRoute } from '@angular/router';
 import { ActionsSubject, Store } from '@ngrx/store';
 
 import { AppForm } from 'src/app/app.form';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
-import { getParamsRouterState } from 'src/app/store';
 import { ShareBussinessContainerListPopupComponent } from '../container-list/container-list.popup';
 
 import _uniqBy from 'lodash/uniqBy';
@@ -46,17 +45,19 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
     constructor(
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
+        protected _activedRoute: ActivatedRoute
+
     ) {
         super();
     }
     ngOnInit(): void {
-        // this.shipment.permission.allowUpdate = true;
-        this._store.select(getParamsRouterState).subscribe(
-            (p: Params) => {
-                this.hblid = p['hblId'];
-                this.mblid = p['jobId'];
-            }
-        );
+        this._activedRoute.params
+            .pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+                (p: Params) => {
+                    this.hblid = p['hblId'];
+                    this.mblid = p['jobId'];
+                }
+            );
 
         this._actionStoreSubject
             .pipe(

@@ -1,17 +1,16 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
-import { Params } from '@angular/router';
+import { Params, ActivatedRoute } from '@angular/router';
 
 import { ShareBussinessShipmentGoodSummaryComponent } from '../shipment-good-summary/shipment-good-summary.component';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
 import { Unit, HouseBill } from 'src/app/shared/models';
-import { getParamsRouterState } from 'src/app/store';
 
 import _groupBy from 'lodash/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, skip } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
 
@@ -39,9 +38,11 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     constructor(
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        protected _activedRoute: ActivatedRoute
+
     ) {
-        super(_actionStoreSubject, _store);
+        super(_actionStoreSubject, _store, _activedRoute);
 
         this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE })
             .pipe(catchError(this.catchError))
@@ -51,7 +52,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     }
 
     ngOnInit(): void {
-        this._store.select(getParamsRouterState).subscribe(
+        this._activedRoute.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
             (p: Params) => {
                 if (p['hblId'] !== null) {
                     this.hblid = p['hblId'];
