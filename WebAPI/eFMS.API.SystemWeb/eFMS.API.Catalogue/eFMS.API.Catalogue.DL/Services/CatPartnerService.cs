@@ -40,7 +40,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
         private readonly IContextBase<SysImage> sysImageRepository;
-
+        private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -54,7 +54,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
-            IContextBase<SysImage> sysImageRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysImage> sysImageRepo,
+            IContextBase<CsTransactionDetail> transactionDetailRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -67,6 +68,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
             catCountryRepository = catCountryRepo;
             sysImageRepository = sysImageRepo;
+            transactionDetailRepository = transactionDetailRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -292,6 +294,13 @@ namespace eFMS.API.Catalogue.DL.Services
         public HandleState Delete(string id)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
+            if (!string.IsNullOrEmpty(id))
+            {
+                if (transactionDetailRepository.Any(x => x.CustomerId == id))
+                {
+                    return new HandleState("Customer being used! Cannot delete!");
+                }
+            }
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success)
             {
