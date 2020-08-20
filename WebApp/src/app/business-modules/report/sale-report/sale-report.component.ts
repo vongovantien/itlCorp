@@ -7,6 +7,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { Crystal } from "@models";
 import { ReportPreviewComponent } from "@common";
 import { CommonEnum } from "@enums";
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
     selector: 'app-sale-report',
@@ -14,12 +15,13 @@ import { CommonEnum } from "@enums";
 })
 export class SaleReportComponent extends AppList {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
-    dataReport: Crystal;
+
 
     constructor(
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _documentationRepo: DocumentationRepo
+        private _documentationRepo: DocumentationRepo,
+        private _spinnerService: NgxSpinnerService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -43,14 +45,16 @@ export class SaleReportComponent extends AppList {
             case CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY:
                 this.previewSummaryReport(data);
                 break;
+            case CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION:
+                this.previewCombinationStatictisReport(data);
+                break;
         }
     }
     previewMonthlyReport(data: ReportInterface.ISaleReportCriteria) {
-
         this._documentationRepo.previewSaleMonthlyReport(data)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._spinnerService.hide(); })
             )
             .subscribe(
                 (res: any) => {
@@ -70,10 +74,11 @@ export class SaleReportComponent extends AppList {
     }
 
     previewQuaterReport(data: ReportInterface.ISaleReportCriteria) {
+        this._spinnerService.show();
         this._documentationRepo.previewSaleQuaterReport(data)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._spinnerService.hide(); })
             )
             .subscribe(
                 (res: any) => {
@@ -93,10 +98,11 @@ export class SaleReportComponent extends AppList {
     }
 
     previewDepartmentReport(data: ReportInterface.ISaleReportCriteria) {
+        this._spinnerService.show();
         this._documentationRepo.previewSaleDepartmentReport(data)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._spinnerService.hide(); })
             )
             .subscribe(
                 (res: any) => {
@@ -116,10 +122,35 @@ export class SaleReportComponent extends AppList {
     }
 
     previewSummaryReport(data: ReportInterface.ISaleReportCriteria) {
+        this._spinnerService.show();
         this._documentationRepo.previewSaleSummaryReport(data)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
+                finalize(() => { this._spinnerService.hide(); })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res.dataSource.length > 0) {
+                        this.dataReport = res;
+                        if (this.dataReport != null && res.dataSource.length > 0) {
+                            setTimeout(() => {
+                                this.reportPopup.frm.nativeElement.submit();
+                                this.reportPopup.show();
+                            }, 1000);
+                        }
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+    previewCombinationStatictisReport(data: ReportInterface.ISaleReportCriteria) {
+        this._spinnerService.show();
+        this._documentationRepo.previewCombinationSalesReport(data)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this._spinnerService.hide(); })
             )
             .subscribe(
                 (res: any) => {
