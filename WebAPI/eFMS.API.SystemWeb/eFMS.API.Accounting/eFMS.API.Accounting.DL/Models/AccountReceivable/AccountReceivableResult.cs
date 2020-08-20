@@ -6,6 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
     {
         public Guid? AgreementId { get; set; }
         public string PartnerId { get; set; }
+        public string PartnerCode { get; set; }
         public string PartnerNameEn { get; set; }
         public string PartnerNameLocal { get; set; }
         public string PartnerNameAbbr { get; set; }
