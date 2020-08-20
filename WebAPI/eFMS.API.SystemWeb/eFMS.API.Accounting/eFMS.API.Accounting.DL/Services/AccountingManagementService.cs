@@ -99,7 +99,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     AccAccountingManagement data = DataContext.Get(x => x.Id == id).FirstOrDefault();
-                    if(data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID || data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
+                    if (data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID || data.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
                     {
                         return new HandleState(data.InvoiceNoReal + " Had payment");
                     }
@@ -128,7 +128,7 @@ namespace eFMS.API.Accounting.DL.Services
                             UpdateStatusSoaAfterDeleteAcctMngt(data.Type, item);
                         }
 
-                        soaRepo.SubmitChanges();                       
+                        soaRepo.SubmitChanges();
                         surchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
@@ -458,10 +458,12 @@ namespace eFMS.API.Accounting.DL.Services
 
             //SELLING (DEBIT)
             var charges = GetChargeSellForInvoice(query);
-            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
             // Group by theo Partner
             var chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
-                new PartnerOfAcctManagementResult
+            {
+                List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+
+                return new PartnerOfAcctManagementResult
                 {
                     PartnerId = s.Key.PartnerId,
                     PartnerName = s.FirstOrDefault()?.VatPartnerName,
@@ -470,8 +472,8 @@ namespace eFMS.API.Accounting.DL.Services
                     InputRefNo = string.Empty,
                     Charges = s.ToList(),
                     Service = GetTransactionType(jobNoGrouped)
-                }
-                ).ToList();
+                };
+            }).ToList();
 
             string _inputRefNoHadFoundCharge = string.Empty;
             chargeGroupByPartner.ForEach(fe =>
@@ -814,7 +816,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var charges = GetChargeForVoucher(query);
-            List<string> jobNoGrouped = charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
 
             var chargeGroupByPartner = new List<PartnerOfAcctManagementResult>();
 
@@ -822,7 +823,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 // Group by theo RequesterId
                 chargeGroupByPartner = charges.GroupBy(g => new { SettlementRequesterId = g.RequesterId }).Select(s =>
-                    new PartnerOfAcctManagementResult
+                {
+                    List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+                    return new PartnerOfAcctManagementResult
                     {
                         PartnerId = null,
                         PartnerName = null,
@@ -832,25 +835,30 @@ namespace eFMS.API.Accounting.DL.Services
                         InputRefNo = string.Empty, //Tính toán bên dưới
                         Charges = s.ToList(),
                         Service = GetTransactionType(jobNoGrouped)
-                    }
-                    ).ToList();
+                    };
+                }).ToList();
+
             }
             else
             {
                 // Group by theo Partner
                 chargeGroupByPartner = charges.GroupBy(g => new { PartnerId = g.VatPartnerId }).Select(s =>
-                    new PartnerOfAcctManagementResult
                     {
-                        PartnerId = s.Key.PartnerId,
-                        PartnerName = s.FirstOrDefault()?.VatPartnerName,
-                        PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
-                        SettlementRequesterId = null,
-                        SettlementRequester = null,
-                        InputRefNo = string.Empty, //Tính toán bên dưới
-                        Charges = s.ToList(),
-                        Service = GetTransactionType(jobNoGrouped)
-                    }
-                    ).ToList();
+                        List<string> jobNoGrouped = s.Select(x => x.JobNo).ToList();
+
+                        return new PartnerOfAcctManagementResult
+                        {
+                            PartnerId = s.Key.PartnerId,
+                            PartnerName = s.FirstOrDefault()?.VatPartnerName,
+                            PartnerAddress = s.FirstOrDefault()?.VatPartnerAddress,
+                            SettlementRequesterId = null,
+                            SettlementRequester = null,
+                            InputRefNo = string.Empty, //Tính toán bên dưới
+                            Charges = s.ToList(),
+                            Service = GetTransactionType(jobNoGrouped)
+                        };
+                    }).ToList();
+
             }
 
             string _inputRefNoHadFoundCharge = string.Empty;
@@ -1186,7 +1194,7 @@ namespace eFMS.API.Accounting.DL.Services
             string month = (monthCurrent < 10 ? "0" : string.Empty) + monthCurrent.ToString();
             string no = "001";
 
-            IQueryable<string> voucherNewests = Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId.Substring(0, 4) == year  && x.VoucherId.Substring(11, 2) == month)
+            IQueryable<string> voucherNewests = Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month)
             .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
             string voucherNewest = voucherNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(voucherNewest))
@@ -1220,7 +1228,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetTransactionType(List<string> jobNos)
         {
             List<string> listTransactionType = new List<string>();
-            if(jobNos.Count() > 0)
+            if (jobNos.Count() > 0)
             {
                 foreach (string jobNo in jobNos)
                 {
@@ -1236,12 +1244,12 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
-            if(listTransactionType.Count() > 0)
+            if (listTransactionType.Count() > 0)
             {
-                List<string> transactionDistint  = new List<string>(listTransactionType.Distinct());
+                List<string> transactionDistint = new List<string>(listTransactionType.Distinct());
                 return transactionDistint.Aggregate((i, j) => i + ";" + j);
             }
-            
+
             return string.Empty;
         }
         #endregion -- CREATE/UPDATE ---
@@ -1360,7 +1368,8 @@ namespace eFMS.API.Accounting.DL.Services
                         else if (acct.PaymentMethod.Equals("Bank Transfer"))
                         {
                             _paymentMethod = "CK";
-                        } else if (acct.PaymentMethod.Equals("Bank Transfer / Cash"))
+                        }
+                        else if (acct.PaymentMethod.Equals("Bank Transfer / Cash"))
                         {
                             _paymentMethod = "CK/TM";
                         }
@@ -1398,8 +1407,8 @@ namespace eFMS.API.Accounting.DL.Services
                         item.ContraAccount = acct.AccountNo;
                         item.TkNoVat = charge.VatAccount;
                         item.TkCoVat = acct.AccountNo;
-                    }                  
-                    
+                    }
+
                     item.VatPartnerNameEn = vatPartner?.PartnerNameEn; //Partner Name En của Charge
                     item.VatPartnerNameVn = vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
@@ -1434,7 +1443,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                   
+
                     // Danh sách có 2 dòng Voucher ID giống nhau
                     if (list.Count(x => x.VoucherId?.ToLower() == item.VoucherId?.ToLower()) > 1)
                     {
@@ -1451,9 +1460,9 @@ namespace eFMS.API.Accounting.DL.Services
                             item.IsValid = false;
                         }
                         // Voucher ID đã thanh toán hết
-                        if (invoices.Any(x => 
-                        x.VoucherId == item.VoucherId 
-                        && !string.IsNullOrEmpty(x.PaymentStatus) 
+                        if (invoices.Any(x =>
+                        x.VoucherId == item.VoucherId
+                        && !string.IsNullOrEmpty(x.PaymentStatus)
                         && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID))
                         {
                             item.VoucherId = stringLocalizer[AccountingLanguageSub.MSG_VOUCHER_ID_HAD_PAYMENT, item.VoucherId];
@@ -1530,7 +1539,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        DataContext.Update(vatInvoice, x => x.VoucherId == item.VoucherId,false);
+                        DataContext.Update(vatInvoice, x => x.VoucherId == item.VoucherId, false);
 
                     }
                     surchargeRepo.SubmitChanges();
@@ -1616,12 +1625,12 @@ namespace eFMS.API.Accounting.DL.Services
             CatContractInvoiceModel result = new CatContractInvoiceModel { };
 
             CatPartner partner = partnerRepo.Get(p => p.Id == model.PartnerId)?.FirstOrDefault();
-            if(partner == null)
+            if (partner == null)
             {
                 return result;
             }
 
-            if(!string.IsNullOrEmpty(partner.ParentId))
+            if (!string.IsNullOrEmpty(partner.ParentId))
             {
                 acRef = partner.ParentId;
             }
@@ -1635,12 +1644,12 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<CatContract, bool>> queryContractByCriteria = null;
             queryContractByCriteria = x => (
             (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
-            && (model.Service.Contains(x.SaleService ?? "", StringComparison.OrdinalIgnoreCase) 
+            && (model.Service.Contains(x.SaleService ?? "", StringComparison.OrdinalIgnoreCase)
             && x.PartnerId == partnerRef.Id));
 
             IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);
 
-            if(agreements != null && agreements.Count() > 0)
+            if (agreements != null && agreements.Count() > 0)
             {
                 result.ContractNo = agreements.FirstOrDefault().ContractNo;
                 result.ContractType = agreements.FirstOrDefault().ContractType;
