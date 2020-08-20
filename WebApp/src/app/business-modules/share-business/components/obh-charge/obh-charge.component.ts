@@ -14,6 +14,7 @@ import { CsShipmentSurcharge, Partner, Charge } from 'src/app/shared/models';
 import * as fromStore from './../../store';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { SystemConstants } from 'src/constants/system.const';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'obh-charge',
@@ -35,6 +36,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute
+
     ) {
         super(
             _catalogueRepo,
@@ -45,7 +48,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             _ngProgressService,
             _spinner,
             _dataService,
-            _accountingRepo);
+            _accountingRepo,
+            _activedRoute);
         this._progressRef = this._ngProgressService.ref();
     }
 

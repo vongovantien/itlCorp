@@ -15,6 +15,7 @@ import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -41,8 +42,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService, _accountingRepo);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService, _accountingRepo, _activedRoute);
         this._progressRef = this._ngProgressService.ref();
 
     }

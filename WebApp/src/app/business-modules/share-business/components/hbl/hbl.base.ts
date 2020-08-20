@@ -44,7 +44,7 @@ export abstract class AppShareHBLBase extends AppList {
         protected _progressService: NgProgress,
         protected _toastService: ToastrService,
         protected _documentRepo: DocumentationRepo,
-        private _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute
 
 
     ) {

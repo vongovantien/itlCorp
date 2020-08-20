@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -26,10 +26,11 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
         protected _toastService: ToastrService,
         protected _progressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _sortService: SortService
+        protected _sortService: SortService,
+        protected _activedRoute: ActivatedRoute
 
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
     }
 
     gotoDetail(id: string) {
