@@ -6,6 +6,7 @@ import { SortService } from '@services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 
 
@@ -17,55 +18,13 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 export class AccountReceivableListGuaranteedComponent extends AppList implements OnInit {
     guaranteedList: any[] = [];
-    subSeedData: any[] = [
-        {
-            partnerId: '09455656',
-            partnerName: 'Paypal',
-            creditAmount: 1200000000,
-            creditRate: 120,
-            billing: 900000000,
-            billingUnpaid: 800000000,
-            paid: 100000000,
-            obhAmount: 200000000,
-            between1_15days: 400000000,
-            between16_30days: 300000000,
-            over30days: 100000000,
-            status: false,
-        },
-        {
-            partnerId: '0945565643',
-            partnerName: 'Momo',
-            creditAmount: 21200000000,
-            creditRate: 20,
-            billing: 2900000000,
-            billingUnpaid: 2800000000,
-            paid: 2100000000,
-            obhAmount: 2200000000,
-            between1_15days: 2400000000,
-            between16_30days: 2300000000,
-            over30days: 2100000000,
-            status: true,
-        },
-        {
-            partnerId: '094556599',
-            partnerName: 'WeScan',
-            creditAmount: 11200000000,
-            creditRate: 80,
-            billing: 1900000000,
-            billingUnpaid: 1800000000,
-            paid: 1100000000,
-            obhAmount: 1200000000,
-            between1_15days: 1400000000,
-            between16_30days: 1300000000,
-            over30days: 1100000000,
-            status: false,
-        }
-    ];
+
     subHeaders: any[];
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
+        private _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -76,7 +35,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
 
         this.headers = [
             { title: 'Sales Name (En)', field: 'salesmanNameEn', sortable: true },
-            { title: 'Sales Full Name', field: 'salesFullName', sortable: true },
+            { title: 'Sales Full Name', field: 'salesmanFullName', sortable: true },
             { title: 'Credit Limited', field: 'totalCreditLimited', sortable: true },
             { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
             { title: 'Debit Rate (%)', field: 'totalDebitRate', sortable: true },
@@ -113,7 +72,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     }
 
     sortDetailGuaranteed(sortField: string, order: boolean) {
-        this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
+        //this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
     }
 
     getPagingList() {
@@ -135,5 +94,14 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
                     this.totalItems = res.totalItems;
                 },
             );
+    }
+    //
+    viewDetail(agreementId: string) {
+        this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+            queryParams: {
+                agreementId: agreementId,
+                subTab: 'guaranteed',
+            }
+        });
     }
 }

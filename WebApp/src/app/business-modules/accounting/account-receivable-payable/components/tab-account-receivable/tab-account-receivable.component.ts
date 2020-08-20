@@ -9,6 +9,7 @@ import { AccountReceivableListTrialOfficialComponent } from '../list-trial-offic
 import { AccountReceivableListGuaranteedComponent } from '../list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableListOtherComponent } from '../list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../form-search/account-receivable/form-search-account-receivable.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'tab-account-receivable',
@@ -24,18 +25,43 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
 
     selectedTab: string = "TRIAL_OFFICIAL";
-    //dataSearch: AccountingInterface.IAccReceivableSearch;
-    constructor() {
+
+    activeTrialOffice: boolean = false;
+    activeGuaranteed: boolean = false;
+    activeOther: boolean = false;
+
+    constructor(
+        private _router: Router,
+        private _activeRouter: ActivatedRoute,
+    ) {
         super();
     }
     ngOnInit() {
+        this._activeRouter.queryParams.subscribe(param => {
+            if (param.subTab === 'guaranteed') {
+                this.changeActiveTabFlag(false, true, false);
 
+
+            } else if (param.subTab === 'other') {
+                this.changeActiveTabFlag(false, false, true);
+
+
+            } else {
+                this.changeActiveTabFlag(true, false, false);
+
+            }
+
+        });
     }
     //
     ngAfterViewInit() {
-
         this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-
+    }
+    //
+    changeActiveTabFlag(trial_official: boolean = true, guaranteed: boolean = false, other: boolean = false) {
+        this.activeTrialOffice = trial_official;
+        this.activeGuaranteed = guaranteed;
+        this.activeOther = other;
     }
     //
     onSearchReceivable(body: AccountingInterface.IAccReceivableSearch) {
@@ -62,20 +88,25 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
     //
     onSelectTabAccountReceivable(tabname: string) {
+
         this.selectedTab = tabname;
         if (tabname === 'TRIAL_OFFICIAL') {
+            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'trial_official' } });
             this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
         } else if (tabname === 'GUARANTEED') {
+            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'guaranteed' } });
             this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Guarantee;
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Guarantee, this.guaranteedListComponent);
         } else {
+
             this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Other;
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Other, this.otherListComponent);
+            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'other' } });
         }
         this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
         this.accountReceivableFormComponent.initForm();
-        this.requestSearchListOfReceivable();
+
     }
 
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
@@ -94,7 +125,5 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         tabComponent.getPagingList();
     }
 
-    requestSearchListOfReceivable() {
-        //call api by tabname
-    }
+
 }

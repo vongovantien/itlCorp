@@ -19,103 +19,19 @@ import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
 })
 
 
+
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
+    subTab: string;
 
     accReceivableDetail: any = {};
-    accReceivableMoreDetail: any = {};
-    seedData: any[] = [
-        {
-            office: 'TP.HCM',
-            debitAmount: 1500000000,
-            billing: 4900000000,
-            billingUnpaid: 4800000000,
-            paid: 4100000000,
-            obhAmount: 4200000000,
-            between1_15days: 4400000000,
-            between16_30days: 4300000000,
-            over30days: 4100000000,
-        },
-        {
-            office: 'TP.HN',
-            debitAmount: 1500000000,
-            billing: 4900000000,
-            billingUnpaid: 4800000000,
-            paid: 4100000000,
-            obhAmount: 4200000000,
-            between1_15days: 4400000000,
-            between16_30days: 4300000000,
-            over30days: 4100000000,
-        },
-        {
-            office: 'TP.HP',
-            debitAmount: 1500000000,
-            billing: 4900000000,
-            billingUnpaid: 4800000000,
-            paid: 4100000000,
-            obhAmount: 4200000000,
-            between1_15days: 4400000000,
-            between16_30days: 4300000000,
-            over30days: 4100000000,
-        },
-        {
-            office: 'TP.DN',
-            debitAmount: 1500000000,
-            billing: 4900000000,
-            billingUnpaid: 4800000000,
-            paid: 4100000000,
-            obhAmount: 4200000000,
-            between1_15days: 4400000000,
-            between16_30days: 4300000000,
-            over30days: 4100000000,
-        }
-    ];
-    subSeedData: any[] = [
-        {
-
-            service: 'Paypal',
-            creditAmount: 11200000000,
-            billing: 1900000000,
-            billingUnpaid: 1800000000,
-            paid: 1100000000,
-            obhAmount: 1200000000,
-            between1_15days: 1400000000,
-            between16_30days: 1300000000,
-            over30days: 1100000000,
-
-        },
-        {
-
-            service: 'Momo',
-            creditAmount: 11200000000,
-            billing: 1900000000,
-            billingUnpaid: 1800000000,
-            paid: 1100000000,
-            obhAmount: 1200000000,
-            between1_15days: 1400000000,
-            between16_30days: 1300000000,
-            over30days: 1100000000,
-
-        },
-        {
-
-            service: 'WeScan',
-            creditAmount: 11200000000,
-            billing: 1900000000,
-            billingUnpaid: 1800000000,
-            paid: 1100000000,
-            obhAmount: 1200000000,
-            between1_15days: 1400000000,
-            between16_30days: 1300000000,
-            over30days: 1100000000,
-
-        }
-    ];
+    accReceivableMoreDetail: any[] = [];
     subHeaders: any[];
     constructor(
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _accoutingRepo: AccountingRepo,
         private _activedRoute: ActivatedRoute,
+        private _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -127,7 +43,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         this._activedRoute.queryParams
             .pipe(
                 takeUntil(this.ngUnsubscribe),
+
                 switchMap((p: Params) => {
+                    this.subTab = p.subTab;
                     if (!!p.agreementId) {
                         return this._accoutingRepo.getDetailReceivableByArgeementId(p.agreementId);
                     }
@@ -138,44 +56,45 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
                     this.accReceivableDetail = data.accountReceivable;
                     this.accReceivableMoreDetail = data.accountReceivableGrpOffices;
-                    console.log(this.accReceivableMoreDetail);
+                    console.log(this.accReceivableDetail);
                 }
             );
+        console.log("this.subTab", this.subTab);
 
 
     }
     //
     initHeaders() {
         this.headers = [
-            { title: 'Office (branch)', field: 'salesNameEn', sortable: true },
-            { title: 'Debit Amount', field: 'salesFullName', sortable: true },
-            { title: 'Billing', field: 'billing', sortable: true },
-            { title: 'Billing Unpaid', field: 'billingUnpaid', sortable: true },
-            { title: 'Paid', field: 'paid', sortable: true },
-            { title: 'OBH Amount', field: 'obhAmount', sortable: true },
-            { title: 'Over 1-15 days', field: 'between1_15days', sortable: true },
-            { title: 'Over 16-30 days', field: 'between16_30days', sortable: true },
-            { title: 'Over 30 Days', field: 'over30days', sortable: true },
+            { title: 'Office (branch)', field: 'officeName', sortable: true },
+            { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
+            { title: 'Billing', field: 'totalBillingAmount', sortable: true },
+            { title: 'Billing Unpaid', field: 'totalBillingUnpaid', sortable: true },
+            { title: 'Paid', field: 'totalPaidAmount', sortable: true },
+            { title: 'OBH Amount', field: 'totalObhAmount', sortable: true },
+            { title: 'Over 1-15 days', field: 'totalOver1To15Day', sortable: true },
+            { title: 'Over 16-30 days', field: 'totalOver15To30Day', sortable: true },
+            { title: 'Over 30 Days', field: 'totalOver30Day', sortable: true },
 
         ];
         this.subHeaders = [
-            { title: 'Service', field: 'partnerName', sortable: true },
-            { title: 'Credit Amount', field: 'creditAmount', sortable: true },
-            { title: 'Billing', field: 'billing', sortable: true },
+            { title: 'Service', field: 'serviceName', sortable: true },
+            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
+            { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Billing Unpaid', field: 'billingUnpaid', sortable: true },
-            { title: 'Paid', field: 'paid', sortable: true },
+            { title: 'Paid', field: 'paidAmount', sortable: true },
             { title: 'OBH Amount', field: 'obhAmount', sortable: true },
-            { title: 'Over 1-15 days', field: 'between1_15days', sortable: true },
-            { title: 'Over 16-30 days', field: 'between16_30days', sortable: true },
-            { title: 'Over 30 Days', field: 'over30days', sortable: true },
+            { title: 'Over 1-15 days', field: 'over1To15Day', sortable: true },
+            { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
+            { title: 'Over 30 Days', field: 'over30Day', sortable: true },
         ];
     }
     sortGuaranteedList(sortField: string, order: boolean) {
-        this.seedData = this._sortService.sort(this.seedData, sortField, order);
+        //this.seedData = this._sortService.sort(this.seedData, sortField, order);
     }
 
     sortDetailGuaranteed(sortField: string, order: boolean) {
-        this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
+        //this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
     }
 
     getPagingGuaranteed() {
@@ -183,6 +102,13 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     goBack() {
+        console.log("clicked");
+
         window.history.back();
+        //console.log(new URLSearchParams(window.location.search));
+        //const subTab = this.subTab;
+        //this._router.navigate([`/home/accounting/account-receivable-payable`]);
+        /*this._router.navigate(['/home/accounting/account-receivable-payable'],
+            { queryParams: Object.assign({}, { tab: 'receivable', subTab: 'other' }) })*/
     }
 }

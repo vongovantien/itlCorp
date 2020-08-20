@@ -8,14 +8,15 @@
                     <h3 class="w-75 text-primary">
                         Account Receivable Detail
                     </h3>
-                    <app-permission-button class="mb-1" title="Back" (click)="goBack()" type="import">
-                    </app-permission-button>
+
+                    <app-default-button class="mb-2" [buttonSetting]="backButtonSetting" (click)="goBack()">
+                    </app-default-button>
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
                             <div class="col-lg-8">
-                                <h5><span class="text-success">Customer:</span> {{accReceivableDetail.partnerId}} -
+                                <h5><span class="text-success">Customer:</span> {{accReceivableDetail.partnerCode}} -
                                     {{accReceivableDetail.partnerNameEn}}</h5>
                             </div>
 
@@ -84,11 +85,11 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.agreementNo }}</h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.agreementType }}</h6>
+                                            <h6>{{ accReceivableDetail.agreementNo }}&nbsp;</h6>
+                                            <h6 class="my-3">{{ accReceivableDetail.agreementType }}&nbsp;</h6>
                                             <h6
                                                 [ngClass]=" accReceivableDetail.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
-                                                {{accReceivableDetail.agreementStatus}}
+                                                {{accReceivableDetail.agreementStatus}}&nbsp;
                                             </h6>
 
                                         </div>
@@ -96,31 +97,78 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Effective Date </h6>
-                                            <h6 class="my-3">Expired Date </h6>
-                                            <h6>Expired Days </h6>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-2">
-                                        <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy'}}</h6>
-                                            <h6 class="my-3">{{accReceivableDetail.expriedDate | date: 'dd/MM/yyyy'}}
+                                            <h6>
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Salesman" :"Effective Date"}}
                                             </h6>
-                                            <h6 class="text-danger">{{ accReceivableDetail.expriedDay }} days</h6>
+                                            <h6 class="my-3">
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Credit Limited" :"Expired Date"}}
+                                            </h6>
+                                            <h6>
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Term (Days)" :"Expired Days"}}
+
+                                            </h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Credit limited</h6>
-                                            <h6 class="my-3">Credit Term (Days)</h6>
-                                            <h6>Credit Rate Limit</h6>
+                                            <h6>{{accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy'}}&nbsp;</h6>
+                                            <h6 class="my-3">
+                                                {{accReceivableDetail.expriedDate | date: 'dd/MM/yyyy'}}&nbsp;
+                                            </h6>
+                                            <h6
+                                                [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? null : 'text-danger'">{{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditTerm 
+                                                : accReceivableDetail.expriedDay }}
+                                                <span
+                                                    *ngIf="(accReceivableDetail.expriedDay && accReceivableDetail.agreementType !== 'Guaranteed') || 
+                                                (accReceivableDetail.creditTerm && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                    days</span>&nbsp;
+                                            </h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.creditLimited | number: '.0-3'}}</h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.creditTerm }} days</h6>
-                                            <h6 class="text-success">{{ accReceivableDetail.creditRateLimit }} %</h6>
+                                            <h6>
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Limit Rate" :"Credit limited"}}
+                                            </h6>
+                                            <h6 class="my-3">
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Amount" :"Credit Term (Days)"}}
+
+                                            </h6>
+                                            <h6>
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Rate" :"Credit Rate Limit"}}
+                                            </h6>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2">
+                                        <div class="border border-top-0 border-left-0 border border-bottom-0">
+                                            <h6
+                                                [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-success': null ">
+                                                {{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditRateLimit : accReceivableDetail.creditLimited | number: '.0-3'}}
+                                                <span
+                                                    *ngIf="(accReceivableDetail.creditLimited && accReceivableDetail.agreementType !== 'Guaranteed' )|| 
+                                                    (accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                    {{ accReceivableDetail.agreementType === "Guaranteed" ? "%" : accReceivableDetail.agreementCurrency }}
+                                                </span>&nbsp;
+                                            </h6>
+                                            <h6 class="my-3">
+                                                {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitAmount | number: '.0-3')
+                                                : accReceivableDetail.creditTerm }}
+                                                <span
+                                                    *ngIf="(accReceivableDetail.creditTerm && accReceivableDetail.agreementType !== 'Guaranteed' )|| 
+                                                    (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guaranteed') ">
+                                                    {{accReceivableDetail.agreementType === "Guaranteed" ? "VND" : "days"}}
+                                                </span>&nbsp;
+                                            </h6>
+                                            <h6
+                                                [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-danger' : 'text-success' ">
+                                                {{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.saleDebitRate 
+                                                : accReceivableDetail.creditRateLimit }}
+                                                <span
+                                                    *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guaranteed') || 
+                                                    (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                    %
+                                                </span>&nbsp;
+                                            </h6>
                                         </div>
                                     </div>
                                 </div>
@@ -137,14 +185,29 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.debitAmount | number: '.0-3'}}</h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.obhAmount | number: '.0-3'}}
+                                            <h6>{{ accReceivableDetail.debitAmount | number: '.0-3'}}
+                                                <span *ngIf="accReceivableDetail.debitAmount">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
-                                            <h6
-                                                [ngClass]=" accReceivableDetail.debitRate < 70  ? 'text-success' : accReceivableDetail.debitRate >= 100 ? 'text-danger' : '.text-warning'">
-                                                {{ accReceivableDetail.debitRate }} %
+                                            <h6 class="my-3">{{ accReceivableDetail.obhAmount | number: '.0-3'}}
+                                                <span *ngIf="accReceivableDetail.obhAmount">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
+                                            </h6>
+                                            <h6>
+                                                <span
+                                                    [ngClass]="accReceivableDetail.debitRate < 70 ? 'text-success' : accReceivableDetail.debitRate < 100 ? 'text-warning':'text-danger'">
+                                                    {{ accReceivableDetail.debitRate}}
+                                                </span>
+                                                <span *ngIf="accReceivableDetail.debitRate !== null">
+                                                    %
+                                                </span>&nbsp;
                                             </h6>
                                             <h6 class="mt-3">{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
+                                                <span *ngIf="accReceivableDetail.cusAdvance">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                         </div>
 
@@ -159,14 +222,27 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.billingAmount | number: '.0-3'}}</h6>
+                                            <h6>{{ accReceivableDetail.billingAmount | number: '.0-3'}}
+                                                <span *ngIf="accReceivableDetail.billingAmount">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
+                                            </h6>
                                             <h6 class="my-3">{{ accReceivableDetail.billingUnpaid | number: '.0-3'}}
+                                                <span *ngIf="accReceivableDetail.billingUnpaid">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                             <h6><span
                                                     class="text-danger">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
+                                                <span *ngIf="accReceivableDetail.paidAmount">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                             <h6 class="mt-3"><span
-                                                    class="text-primary">{{ accReceivableDetail.creditAmount | number: '.0-3'}}</span>
+                                                    class="text-primary">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
+                                                <span *ngIf="accReceivableDetail.paidAmount">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                         </div>
                                     </div>
@@ -181,12 +257,21 @@
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
                                             <h6><span
                                                     class="text-danger">{{ accReceivableDetail.over1To15Day | number: '.0-3' }}</span>
+                                                <span *ngIf="accReceivableDetail.over1To15Day">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                             <h6 class="my-3"><span
                                                     class="text-danger">{{ accReceivableDetail.over16To30Day | number: '.0-3'}}</span>
+                                                <span *ngIf="accReceivableDetail.over16To30Day">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                             <h6><span
                                                     class="text-danger">{{ accReceivableDetail.over30Day | number: '.0-3'}}</span>
+                                                <span *ngIf="accReceivableDetail.over30Day">
+                                                    {{ accReceivableDetail.arCurrency }}
+                                                </span>&nbsp;
                                             </h6>
                                         </div>
                                     </div>
@@ -216,7 +301,7 @@
                                         <tbody>
                                             <ng-container>
                                                 <ng-container
-                                                    *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                                    *ngFor="let item of accReceivableMoreDetail; let i = index; trackBy: trackByFn">
                                                     <tr class="collapse-toggle-row">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions" style="width: 100px">
@@ -230,27 +315,31 @@
                                                             </div>
                                                         </td>
 
-                                                        <td>{{ item.office}}</td>
-                                                        <td>{{ item.debitAmount| number: '.0-3' }}</td>
+                                                        <td>{{ item.officeName}}</td>
+                                                        <td>{{ item.totalDebitAmount | number: '.0-3' }}
+                                                        </td>
 
-                                                        <td>{{ item.billing | number: '.0-3'}}
+                                                        <td>{{ item.totalBillingAmount | number: '.0-3'}}
                                                         </td>
-                                                        <td>{{ item.billingUnpaid | number: '.0-3'}}</td>
-                                                        <td>{{ item.paid | number: '.0-3'}}</td>
-                                                        <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                                        <td>{{ item.totalBillingUnpaid | number: '.0-3'}}
+                                                        </td>
+                                                        <td>{{ item.totalPaidAmount | number: '.0-3'}}
+                                                        </td>
+                                                        <td>{{ item.totalObhAmount | number: '.0-3'}}
+                                                        </td>
                                                         <td>
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ item.between1_15days | number: '.0-3' }}
+                                                                {{ item.totalOver1To15Day | number: '.0-3' }}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ item.between16_30days | number: '.0-3' }}
+                                                                {{ item.totalOver15To30Day | number: '.0-3' }}
                                                             </span>
                                                         </td>
                                                         <td>
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ item.over30days | number: '.0-3' }}
+                                                                {{ item.totalOver30Day | number: '.0-3' }}
                                                             </span>
                                                         </td>
 
@@ -265,40 +354,42 @@
                                                             <tbody>
                                                                 <ng-container>
                                                                     <tr
-                                                                        *ngFor="let element of subSeedData; let j = index; trackBy: trackByFn">
+                                                                        *ngFor="let element of item.accountReceivableGrpServices; let j = index; trackBy: trackByFn">
 
 
-                                                                        <td>{{ element.service  }}
+                                                                        <td>{{ element.serviceName  }}
                                                                         </td>
-                                                                        <td>{{ element.creditAmount | number: '.0-3'}}
+                                                                        <td>{{ element.debitAmount | number: '.0-3'}}
                                                                         </td>
 
-                                                                        <td>{{ element.billing | number: '.0-3'}}
+                                                                        <td>{{ element.billingAmount | number: '.0-3'}}
                                                                         </td>
                                                                         <td>{{ element.billingUnpaid | number: '.0-3'}}
                                                                         </td>
-                                                                        <td>{{ element.paid | number: '.0-3' }}</td>
+                                                                        <td>{{ element.paidAmount | number: '.0-3' }}
+                                                                        </td>
                                                                         <td>{{ element.obhAmount | number: '.0-3' }}
                                                                         </td>
                                                                         <td>
                                                                             <span [ngClass]="'text-danger'">
-                                                                                {{ element.between1_15days | number: '.0-3' }}
+                                                                                {{ element.over1To15Day | number: '.0-3' }}
                                                                             </span>
                                                                         </td>
                                                                         <td>
                                                                             <span [ngClass]="'text-danger'">
-                                                                                {{ element.between16_30days | number: '.0-3' }}
+                                                                                {{ element.over16To30Day | number: '.0-3' }}
                                                                             </span>
                                                                         </td>
                                                                         <td>
                                                                             <span [ngClass]="'text-danger'">
-                                                                                {{ element.over30days | number: '.0-3' }}
+                                                                                {{ element.over30Day | number: '.0-3' }}
                                                                             </span>
                                                                         </td>
 
                                                                     </tr>
                                                                 </ng-container>
-                                                                <tr app-table-none-record *ngIf="!subSeedData.length">
+                                                                <tr app-table-none-record
+                                                                    *ngIf="!item.accountReceivableGrpServices.length">
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -307,9 +398,9 @@
 
                                                 </ng-container>
                                             </ng-container>
-                                            <tr app-table-none-record *ngIf="!seedData.length">
+                                            <tr app-table-none-record *ngIf="!accReceivableMoreDetail.length">
                                             </tr>
-                                            <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+
                                         </tbody>
                                     </table>
                                 </div>

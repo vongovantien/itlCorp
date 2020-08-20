@@ -20,7 +20,7 @@ import { PaymentImportComponent } from './components/payment-import/payment-impo
 import { PaginationModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AccountReceivablePayableImportOBHPaymentComponent } from './components/import-obh/import-obh-account-receivable-payable.component';
-//import { AccountReceivableListTrialOfficialComponent } from ./components/list-trial-official/list-trial-official-account-receivable.componentt';
+
 import { AccountReceivableListGuaranteedComponent } from './components/list-guaranteed/list-guaranteed-account-receivable.component';
 import { AccountReceivableListOtherComponent } from './components/list-other/list-other-account-receivable.component';
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
@@ -50,7 +50,12 @@ const routing: Routes = [
 
             },
         ]
-    }
+    },
+    /*{
+        path: 'receivable',
+        loadChildren: () => import('./components/tab-account-receivable/tab-account-receivable.module').then(m => m.TabAccountReceivableModule),
+        data: { name: 'A.R' }
+    }*/
 ];
 
 

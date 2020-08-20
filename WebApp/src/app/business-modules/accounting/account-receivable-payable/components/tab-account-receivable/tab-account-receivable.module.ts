@@ -12,12 +12,14 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
+import { Routes, RouterModule } from '@angular/router';
 
 
 
 @NgModule({
     imports: [
         TabsModule.forRoot(),
+        //RouterModule.forChild(routing),
         SharedModule,
         CommonModule,
         ReactiveFormsModule,
@@ -35,7 +37,8 @@ import { SelectModule } from 'ng2-select';
     ],
     providers: [],
     entryComponents: [
-        AccountReceivableTabComponent
+        AccountReceivableTabComponent,
+        AccountReceivableListTrialOfficialComponent,
     ]
 })
 export class TabAccountReceivableModule {

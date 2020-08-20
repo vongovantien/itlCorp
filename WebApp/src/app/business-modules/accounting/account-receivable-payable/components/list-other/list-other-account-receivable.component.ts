@@ -5,6 +5,7 @@ import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
+import { Router } from '@angular/router';
 
 
 
@@ -22,6 +23,7 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     constructor(private _sortService: SortService,
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
+        private _router: Router,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -67,5 +69,25 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
                     this.totalItems = res.totalItems;
                 },
             );
+    }
+    viewDetail(agreementId: string, partnerId: string) {
+        console.log("agreementId", agreementId);
+        console.log("partnerId", partnerId);
+        if (!!agreementId) {
+            this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+                queryParams: {
+                    agreementId: agreementId,
+                    subTab: 'other',
+                }
+            });
+        } else {
+            this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+                queryParams: {
+                    partnerId: partnerId,
+                    subTab: 'other',
+                }
+            });
+        }
+
     }
 }

@@ -17,11 +17,14 @@
                                         <tr class="">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
-                                                    <app-permission-button type="detail">
+                                                    <app-permission-button type="detail"
+                                                        (click)="viewDetail(item.agreementId, item.partnerId)">
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a href="#">{{ item.partnerCode }}</a> </td>
+                                            <td><a class="pointer"
+                                                    (click)="viewDetail(item.agreementId, item.partnerId)">{{ item.partnerCode }}</a>
+                                            </td>
                                             <td>{{ item.partnerNameAbbr }} </td>
 
                                             <td>{{ item.debitAmount | number: '.0-3' }}</td>

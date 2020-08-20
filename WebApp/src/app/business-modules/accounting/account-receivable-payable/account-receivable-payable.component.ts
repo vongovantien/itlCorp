@@ -74,7 +74,12 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
 
         } else {
-            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable' } });
+            this._router.navigate(['/home/accounting/account-receivable-payable'], {
+                queryParams:
+                {
+                    tab: 'receivable'
+                }
+            });
             this.isAccountPaymentTab = false;
             this.selectedTab = 'TRIAL_OFFICAL';
             this.dataSearch = {};

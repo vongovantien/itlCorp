@@ -74,11 +74,14 @@
                                                             *ngFor="let element of item.arPartners; let j = index; trackBy: trackByFn">
                                                             <td class="table-actions-col">
                                                                 <div class="table-actions" style="width: 70px">
-                                                                    <app-permission-button type="detail">
+                                                                    <app-permission-button type="detail"
+                                                                        (click)="viewDetail(element.agreementId)">
                                                                     </app-permission-button>
                                                                 </div>
                                                             </td>
-                                                            <td><a href="#">{{ element.partnerCode }}</a></td>
+                                                            <td><a class="pointer"
+                                                                    (click)="viewDetail(element.agreementId)">{{ element.partnerCode }}</a>
+                                                            </td>
                                                             <td>{{ element.partnerNameAbbr  }}
                                                             </td>
                                                             <td>{{ element.creditAmount | number: '.0-3'}}
@@ -106,8 +109,8 @@
                                                             </td>
                                                             <td>
                                                                 <span
-                                                                    [ngClass]="element.partnerStatus === 'Active' ? 'text-success' : 'text-danger'">
-                                                                    {{ element.partnerStatus}}
+                                                                    [ngClass]="element.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+                                                                    {{ element.agreementStatus}}
                                                                 </span>
                                                             </td>
                                                         </tr>
