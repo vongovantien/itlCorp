@@ -212,9 +212,12 @@ export class JobManagementFormSearchComponent extends AppForm {
                 productService: this.productServices.find(p => p.id === this.dataSearch.productService) || null,
                 serviceMode: this.serviceModes.find(s => s.id === this.dataSearch.serviceMode) || null,
                 shipmentMode: this.shipmentModes.find(s => s.id === this.dataSearch.shipmentMode) || null,
-                user: this.users.find(u => u.id === this.dataSearch.fieldOps) || null
+                user: this.users.find(u => u.id === this.dataSearch.fieldOps) || null,
+                serviceDate: !!this.dataSearch.serviceDateFrom && !!this.dataSearch.serviceDateTo ? {
+                    startDate: new Date(this.dataSearch.serviceDateFrom),
+                    endDate: new Date(this.dataSearch.serviceDateTo)
+                } : null
             };
-            console.log(advanceSearchForm);
             this.selectedPartner = { field: 'id', value: this.dataSearch.customerId };
 
             this.formSearch.patchValue(advanceSearchForm);

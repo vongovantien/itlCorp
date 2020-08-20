@@ -227,6 +227,10 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
                 agent: this.dataSearch.agentId,
                 saleman: this.dataSearch.saleManId,
                 creator: this.dataSearch.userCreated,
+                serviceDate: !!this.dataSearch.fromDate && !!this.dataSearch.toDate ? {
+                    startDate: new Date(this.dataSearch.fromDate),
+                    endDate: new Date(this.dataSearch.toDate)
+                } : null
             };
 
             this.formSearch.patchValue(advanceSearchForm);
