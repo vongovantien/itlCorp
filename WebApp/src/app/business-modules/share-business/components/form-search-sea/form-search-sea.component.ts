@@ -1,13 +1,15 @@
 import { AppForm } from "src/app/app.form";
 import { Component, Output, EventEmitter, Input } from "@angular/core";
 import { formatDate } from "@angular/common";
-import { CommonEnum } from "src/app/shared/enums/common.enum";
 import { CatalogueRepo, SystemRepo } from "src/app/shared/repositories";
 import { FormBuilder, FormGroup, AbstractControl } from "@angular/forms";
 import { Observable } from "rxjs";
 import { Customer } from "src/app/shared/models/catalogue/customer.model";
 import { User } from "src/app/shared/models";
-import { TransactionTypeEnum } from "@enums";
+import { Store } from "@ngrx/store";
+import { IShareBussinessState, TransactionSearchListAction, getTransactionDataSearchState } from "../../store";
+import { shareReplay, takeUntil } from "rxjs/operators";
+import { CommonEnum } from "@enums";
 
 @Component({
     selector: 'form-search-sea',
@@ -18,6 +20,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Output() onReset: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Input() transaction: number = 1;
+
     filterTypes: CommonInterface.ICommonTitleValue[];
 
     formSearch: FormGroup;
@@ -29,7 +32,6 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     agent: AbstractControl;
     saleman: AbstractControl;
     creator: AbstractControl;
-    transactionType: any;
 
     labelColoader: string = 'Shipping Line/Co-Loader';
 
@@ -49,12 +51,13 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     customers: Observable<Customer[]>;
     suppliers: Observable<Customer[]>;
     agents: Observable<Customer[]>;
-    salemans: Observable<User[]>;
     creators: Observable<User[]>;
 
+    dataSearch: ISearchDataShipment;
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo) {
         super();
 
@@ -68,15 +71,35 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
         this.suppliers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
 
-        this.salemans = this._systemRepo.getSystemUsers({ active: true });
-        this.creators = this._systemRepo.getSystemUsers({ active: true });
+        this.creators = this._systemRepo.getSystemUsers({ active: true }).pipe(shareReplay());
 
         this.setDataForFilterType();
         this.setLabelColoader();
+
+        // * Update form search from store
+        this._store.select(getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: ISearchDataShipment) => {
+                    if (!!Object.keys(criteria).length && criteria.transactionType === this.transaction) {
+                        this.dataSearch = criteria;
+
+                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo'].some(i => {
+                            if (!!this.dataSearch[i]) {
+                                this.filterType.setValue(this.filterTypes.find(d => d.value === i));
+                                this.searchText.setValue(this.dataSearch[i]);
+                                return true;
+                            }
+                        });
+                    }
+                }
+            );
     }
 
     setDataForFilterType() {
-        if (this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport) {
+        if (this.transaction === CommonEnum.TransactionTypeEnum.AirExport || this.transaction === CommonEnum.TransactionTypeEnum.AirImport) {
             this.filterTypes = [
                 { title: 'Job ID', value: 'jobNo' },
                 { title: 'MAWB No', value: 'mawb' },
@@ -100,7 +123,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     setLabelColoader() {
-        if (this.transaction === TransactionTypeEnum.AirExport || this.transaction === TransactionTypeEnum.AirImport) {
+        if (this.transaction === CommonEnum.TransactionTypeEnum.AirExport || this.transaction === CommonEnum.TransactionTypeEnum.AirImport) {
             this.labelColoader = "Airline/Co-Loader";
         }
     }
@@ -171,6 +194,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
             transactionType: null
         };
         this.onSearch.emit(body);
+        this._store.dispatch(new TransactionSearchListAction(body));
     }
 
     resetSearch() {
@@ -196,6 +220,21 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     expanded() {
+        if (!!this.dataSearch) {
+            const advanceSearchForm = {
+                customer: this.dataSearch.customerId,
+                supplier: this.dataSearch.coloaderId,
+                agent: this.dataSearch.agentId,
+                saleman: this.dataSearch.saleManId,
+                creator: this.dataSearch.userCreated,
+                serviceDate: !!this.dataSearch.fromDate && !!this.dataSearch.toDate ? {
+                    startDate: new Date(this.dataSearch.fromDate),
+                    endDate: new Date(this.dataSearch.toDate)
+                } : null
+            };
+
+            this.formSearch.patchValue(advanceSearchForm);
+        }
     }
 }
 

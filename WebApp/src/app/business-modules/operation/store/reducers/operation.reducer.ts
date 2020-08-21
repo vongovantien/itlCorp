@@ -3,18 +3,46 @@ import { OPSActions, OPSActionTypes } from "../actions/operation.action";
 
 export interface IOPSTransactionState {
     opstransaction: OpsTransaction;
+    opsTransations: any;
+    dataSearch: any;
     isLoading: boolean;
     isLoaded: boolean;
 };
 
 const initialState: IOPSTransactionState = {
     opstransaction: new OpsTransaction(),
+    opsTransations: {
+        data: {
+            opsTransactions: [],
+        },
+        toTalFinish: 0,
+        toTalInProcessing: 0,
+        totalCanceled: 0,
+        totalOverdued: 0
+    },
+    dataSearch: {},
     isLoaded: false,
-    isLoading: false
+    isLoading: false,
 };
+
 
 export function opsReducer(state = initialState, action: OPSActions): IOPSTransactionState {
     switch (action.type) {
+        case OPSActionTypes.SEARCH_LIST: {
+            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false };
+        }
+        case OPSActionTypes.LOAD_LIST: {
+            return { ...state, isLoading: true, isLoaded: false };
+        }
+
+        case OPSActionTypes.LOAD_LIST_SUCCESS: {
+            return { ...state, opsTransations: action.payload, isLoading: false, isLoaded: true };
+        }
+
+        case OPSActionTypes.LOAD_LIST_FAIL: {
+            return { ...state, isLoading: false, isLoaded: false };
+        }
+
         case OPSActionTypes.GET_DETAIL: {
             return { ...state, isLoading: true, isLoaded: false };
         }

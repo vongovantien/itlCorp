@@ -8,7 +8,7 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransactionDetail } from 'src/app/shared/models';
+import { CsTransactionDetail, CsTransaction } from 'src/app/shared/models';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class SeaFCLExportComponent extends AppList {
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
-    shipments: any[] = [];
+    shipments: CsTransaction[] = [];
     houseBills: CsTransactionDetail[] = [];
     tmpHouseBills: CsTransactionDetail[] = [];
     tmpIndex: number = -1;
@@ -37,10 +37,13 @@ export class SeaFCLExportComponent extends AppList {
     itemToDelete: any = null;
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaFCLExport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: new Date(),
+        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+    };
 
     constructor(
         private _router: Router,
@@ -58,13 +61,6 @@ export class SeaFCLExportComponent extends AppList {
         this.requestSort = this.sortShipment;
 
         this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
-
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
-
     }
 
     ngOnInit() {
@@ -94,8 +90,22 @@ export class SeaFCLExportComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
     }
 
 
@@ -141,16 +151,14 @@ export class SeaFCLExportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetShipment($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
@@ -220,8 +228,6 @@ export class SeaFCLExportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-
-
                     this._router.navigate(["/home/documentation/sea-fcl-export", id]);
                 } else {
                     this.permissionPopup.show();

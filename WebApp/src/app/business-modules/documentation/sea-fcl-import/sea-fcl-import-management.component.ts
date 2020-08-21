@@ -38,10 +38,13 @@ export class SeaFCLImportManagementComponent extends AppList {
     deleteMessage: string = '';
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaFCLImport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: new Date(),
+        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+    };
 
     constructor(
         private _router: Router,
@@ -89,14 +92,23 @@ export class SeaFCLImportManagementComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
 
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
     }
 
     getShipments() {
@@ -146,16 +158,14 @@ export class SeaFCLImportManagementComponent extends AppList {
         this.page = 1; // reset page.
         data.transactionType = this.transactionService;
         this.dataSearch = data;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetMasterBills($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+
+        this.dataSearch = this.defaultDataSearch;
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
