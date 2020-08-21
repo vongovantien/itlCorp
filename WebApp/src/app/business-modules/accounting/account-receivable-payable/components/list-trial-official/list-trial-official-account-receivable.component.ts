@@ -13,7 +13,9 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 
 
-import { PaymentModel, AccountingPaymentModel } from '@models';
+import { TrialOfficialOtherModel } from '@models';
+
+
 
 
 
@@ -23,7 +25,7 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     //
-    trialOfficialList: any[] = [];
+    trialOfficialList: TrialOfficialOtherModel[] = [];
     isLoading: boolean = true;
 
 
@@ -79,7 +81,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
-                    this.trialOfficialList = res.data || [];
+                    this.trialOfficialList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
                     this.totalItems = res.totalItems;
                 },
             );
@@ -90,7 +92,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
             queryParams: {
                 agreementId: agreementId,
-                subTab: 'trial_official',
+
             }
         });
     }

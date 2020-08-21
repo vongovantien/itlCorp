@@ -6,6 +6,7 @@ import { SortService } from '@services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
+import { TrialOfficialOtherModel } from '@models';
 
 
 
@@ -63,9 +64,7 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
-                    this.otherList = res.data || [];
-
-
+                    this.otherList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
                     this.totalItems = res.totalItems;
                 },
             );

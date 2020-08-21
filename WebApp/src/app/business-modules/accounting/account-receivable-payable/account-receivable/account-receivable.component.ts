@@ -95,7 +95,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this.selectedSubTab = tabname;
 
         if (tabname === 'TRIAL_OFFICIAL') {
-            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'trial_official' } });
+            this._router.navigate(['/home/accounting/account-receivable-payable/receivable']);
 
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
         } else if (tabname === 'GUARANTEED') {

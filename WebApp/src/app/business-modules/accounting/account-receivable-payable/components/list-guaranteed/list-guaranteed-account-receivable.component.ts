@@ -7,6 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { GuaranteedModel } from '@models';
 
 
 
@@ -62,7 +63,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 Days', field: 'over30Day', sortable: true },
 
-            { title: 'Status', field: 'partnerStatus', sortable: true },
+            { title: 'Status', field: 'agreementStatus', sortable: true },
         ];
 
 
@@ -88,9 +89,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
-                    this.guaranteedList = res.data || [];
-
-
+                    this.guaranteedList = (res.data || []).map((item: GuaranteedModel) => new GuaranteedModel(item));
                     this.totalItems = res.totalItems;
                 },
             );

@@ -12,6 +12,7 @@ import _merge from 'lodash/merge';
 import { of } from 'rxjs';
 import { NgProgress } from '@ngx-progressbar/core';
 import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
+import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
 
 @Component({
     selector: 'detail-account-receivable',
@@ -23,8 +24,8 @@ import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
     subTab: string;
 
-    accReceivableDetail: any = {};
-    accReceivableMoreDetail: any[] = [];
+    accReceivableDetail: AccReceivableDetailModel = new AccReceivableDetailModel();
+    accReceivableMoreDetail: AccReceivableOfficesDetailModel[] = [];
     subHeaders: any[];
     constructor(
         private _sortService: SortService,
@@ -54,8 +55,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             ).subscribe(
                 (data: any) => {
 
-                    this.accReceivableDetail = data.accountReceivable;
-                    this.accReceivableMoreDetail = data.accountReceivableGrpOffices;
+                    this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
+                    this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
+                        .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
 
                 }
             );
