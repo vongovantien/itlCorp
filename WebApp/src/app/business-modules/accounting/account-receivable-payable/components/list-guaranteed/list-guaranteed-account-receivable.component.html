@@ -63,7 +63,7 @@
                                             [parentId]="'#guaranteed-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead app-table-header [headers]="subHeaders"
-                                                    (onClick)="sortDetailGuaranteed($event.sortField, $event.order)">
+                                                    (onClick)="sortDetailGuaranteed(item, $event.sortField, $event.order)">
                                                     <th class="m--w-50 first table-actions-col">
                                                         Action
                                                     </th>

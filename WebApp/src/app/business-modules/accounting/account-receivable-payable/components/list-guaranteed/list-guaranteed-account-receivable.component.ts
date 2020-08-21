@@ -64,15 +64,15 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
 
             { title: 'Status', field: 'partnerStatus', sortable: true },
         ];
-        //seed paging
+
 
     }
     sortGuaranteedList(sortField: string, order: boolean) {
         this.guaranteedList = this._sortService.sort(this.guaranteedList, sortField, order);
     }
 
-    sortDetailGuaranteed(sortField: string, order: boolean) {
-        //this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
+    sortDetailGuaranteed(item: any, sortField: string, order: boolean) {
+        item.arPartners = this._sortService.sort(item.arPartners, sortField, order);
     }
 
     getPagingList() {
@@ -89,7 +89,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.guaranteedList = res.data || [];
-                    console.log("data trả về: ", res.data);
+
 
                     this.totalItems = res.totalItems;
                 },

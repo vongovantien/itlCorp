@@ -39,7 +39,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        console.log(1);
+
     }
     //
     ngAfterViewInit() {
@@ -52,18 +52,13 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 } else {
                     this.selectedSubTab = 'trial_official'.toUpperCase();
                     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-                    //this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+
                 }
 
             });
         this._cd.detectChanges();
 
-        console.log(2);
-        // if (this.selectedSubTab === null || this.selectedSubTab === 'TRIAL_OFFICIAL') {
-        //     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-        // }
 
-        //this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
     }
 
     //
@@ -96,7 +91,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
     //
     onSelectTabAccountReceivable(tabname: string) {
-        console.log(3);
+
         this.selectedSubTab = tabname;
 
         if (tabname === 'TRIAL_OFFICIAL') {
@@ -119,9 +114,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
-        console.log(4);
-        console.log("tab", tab);
-        console.log("tabComponent", tabComponent);
+
 
         this.accountReceivableFormComponent.arType = tab;
         //

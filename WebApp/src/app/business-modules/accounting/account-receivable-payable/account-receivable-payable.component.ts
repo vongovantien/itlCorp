@@ -46,7 +46,7 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this._activeRouter.queryParams
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(param => {
-                //console.log(param);
+
 
                 if (param.tab) {
                     this.selectedTabAR = param.tab;
@@ -120,13 +120,13 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     requestSearchShipment() {
         this._progressRef.start();
-        // this.invoiceListComponent.isLoading = true;
+
         this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    // this.invoiceListComponent.isLoading = false;
+
 
                 })
             ).subscribe(

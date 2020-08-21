@@ -35,7 +35,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        this.requestSort = this.sortGuaranteedList;
+        this.requestSort = this.sortDetailList;
         this.requestList = this.getPagingGuaranteed;
     }
     ngOnInit() {
@@ -56,7 +56,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
                     this.accReceivableDetail = data.accountReceivable;
                     this.accReceivableMoreDetail = data.accountReceivableGrpOffices;
-                    console.log(this.accReceivableDetail);
+
                 }
             );
 
@@ -88,12 +88,13 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             { title: 'Over 30 Days', field: 'over30Day', sortable: true },
         ];
     }
-    sortGuaranteedList(sortField: string, order: boolean) {
-        //this.seedData = this._sortService.sort(this.seedData, sortField, order);
+    sortDetailList(sortField: string, order: boolean) {
+        this.accReceivableMoreDetail = this._sortService.sort(this.accReceivableMoreDetail, sortField, order);
     }
 
-    sortDetailGuaranteed(sortField: string, order: boolean) {
-        //this.subSeedData = this._sortService.sort(this.subSeedData, sortField, order);
+    sortDetailMoreGuaranteed(item: any, sortField: string, order: boolean) {
+
+        item.accountReceivableGrpServices = this._sortService.sort(item.accountReceivableGrpServices, sortField, order);
     }
 
     getPagingGuaranteed() {
@@ -103,11 +104,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     goBack() {
 
 
-        window.history.back();
-        //console.log(new URLSearchParams(window.location.search));
-        //const subTab = this.subTab;
-        //this._router.navigate([`/home/accounting/account-receivable-payable`]);
-        /*this._router.navigate(['/home/accounting/account-receivable-payable/receivable'],
-            { queryParams: { subTab: this.subTab } });*/
+        //window.history.back();
+
+        this._router.navigate(['/home/accounting/account-receivable-payable/receivable'],
+            { queryParams: { subTab: this.subTab } });
     }
 }

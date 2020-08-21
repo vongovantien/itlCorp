@@ -134,7 +134,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.salemans = this._systemRepo.getListSystemUser();
         this.offices = this._systemRepo.getAllOffice();
-        this._systemRepo.getAllOffice().subscribe(console.log);
 
     }
     initForm() {

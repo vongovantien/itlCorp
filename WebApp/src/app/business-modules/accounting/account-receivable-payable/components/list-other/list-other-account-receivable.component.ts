@@ -64,15 +64,14 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
                     this.otherList = res.data || [];
-                    console.log("data trả về: ", res.data);
+
 
                     this.totalItems = res.totalItems;
                 },
             );
     }
     viewDetail(agreementId: string, partnerId: string) {
-        console.log("agreementId", agreementId);
-        console.log("partnerId", partnerId);
+
         if (!!agreementId) {
             this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
                 queryParams: {
