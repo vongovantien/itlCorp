@@ -62,6 +62,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
             catDepartmentRepository = catDepartmentRepo;
             ApiUrl = apiurl;
+
         }
 
         public IQueryable<CatContract> GetContracts()
@@ -132,6 +133,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = entity.SaleService;
+
+                    model.ContractService = GetContractServicesName(model.ContractService);
+
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
                     SendMailActiveSuccess(model, string.Empty);
@@ -140,6 +144,51 @@ namespace eFMS.API.Catalogue.DL.Services
                 Get();
             }
             return hs;
+        }
+
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export;";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import;";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export;";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export;";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import;";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic;";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking;";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export;Air Import;Sea FCL Export;Sea LCL Export;Sea LCL Import;Custom Logistic;Trucking ";
+                            break;
+                    }
+                }
+          
+            }
+            if(!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
+            }
+            return ContractServicesName;
         }
 
         public HandleState Update(CatContractModel model)
@@ -159,6 +208,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
+                    modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -286,7 +336,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     // send email
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = objUpdate.SaleService;
+                    model.ContractService = GetContractServicesName( objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     SendMailActiveSuccess(model, "active");
                 }
