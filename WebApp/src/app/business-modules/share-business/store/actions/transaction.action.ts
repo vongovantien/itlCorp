@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 
 export enum TransactionActionTypes {
+    SEARCH_LIST = '[Transaction] Search List',
     LOAD_LIST = '[Transaction] Load List',
     LOAD_LIST_SUCCESS = '[Transaction] Load Success',
     LOAD_LIST_FAIL = '[Transaction] Load Fail',
@@ -17,6 +18,11 @@ export enum TransactionActionTypes {
     GET_PROFIT = '[Transaction] Get Profit',
     GET_PROFIT_SUCCESS = '[Transaction] Get Profit Success',
     GET_PROFIT_FAIL = '[Transaction] Get Profit Fail',
+}
+
+export class TransactionSearchListAction implements Action {
+    readonly type = TransactionActionTypes.SEARCH_LIST;
+    constructor(public payload: any) { }
 }
 
 export class TransactionLoadListAction implements Action {
@@ -89,7 +95,8 @@ export class TransactionGetProfitFailFailAction implements Action {
 }
 
 export type TransactionActions =
-    TransactionLoadListAction
+    TransactionSearchListAction
+    | TransactionLoadListAction
     | TransactionLoadListSuccessAction
     | TransactionLoadListFailAction
     | TransactionGetProfitAction

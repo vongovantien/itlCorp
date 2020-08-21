@@ -31,10 +31,14 @@ export class SeaLCLExportComponent extends AppList {
     tmpHouseBills: CsTransactionDetail[] = [];
     tmpIndex: number = -1;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
 
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: new Date(),
+        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+    };
 
     constructor(
         private _router: Router,
@@ -51,12 +55,6 @@ export class SeaLCLExportComponent extends AppList {
         this.requestSort = this.sortShipment;
 
         this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
-
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
     }
 
     ngOnInit() {
@@ -85,8 +83,22 @@ export class SeaLCLExportComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
     }
 
     getShipments() {
@@ -131,16 +143,14 @@ export class SeaLCLExportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetShipment($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }

@@ -38,6 +38,7 @@ export const getCSMawbcontainersState = createSelector(shareBussinessState, (sta
 export const getContainerSaveState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.csMawbcontainers.containers);
 
 // * CsTransation
+export const getTransactionDataSearchState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction.dataSearch);
 export const getTransactionState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction);
 export const getTransactionProfitState = createSelector(shareBussinessState, (state: IShareBussinessState) => state.transaction && state.transaction.profits);
 export const getTransactionProfitLoadingState = createSelector(shareBussinessState, (state: IShareBussinessState) => state && state.transaction && state.transaction.isLoading);

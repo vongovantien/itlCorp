@@ -23,7 +23,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" (collapsed)="collapsed()">
+                <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" (collapsed)="collapsed()"
+                    (expanded)="expanded()">
                     <div class="div-inside bg-secondary">
                         <div class="row">
                             <div class="col-lg-4">
@@ -34,7 +35,7 @@
                                     <select class="form-control" formControlName="productService">
                                         <option value="null">Select Product Service</option>
                                         <option *ngFor="let productService of productServices"
-                                            [ngValue]="productService">{{productService.displayName}}</option>
+                                            [ngValue]="productService">{{productService.text}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -46,7 +47,7 @@
                                     <select class="form-control" formControlName="serviceMode">
                                         <option value="null">Select Service Mode</option>
                                         <option *ngFor="let serviceMode of serviceModes" [ngValue]="serviceMode">
-                                            {{serviceMode.displayName}}
+                                            {{serviceMode.text}}
                                         </option>
                                     </select>
                                 </div>
@@ -59,7 +60,7 @@
                                     <select class="form-control" formControlName="shipmentMode">
                                         <option value="null">Select Service Mode</option>
                                         <option *ngFor="let shipmentMode of shipmentModes" [ngValue]="shipmentMode">
-                                            {{shipmentMode.displayName}}
+                                            {{shipmentMode.text}}
                                         </option>
                                     </select>
                                 </div>
@@ -99,9 +100,8 @@
                                     </label>
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true"
-                                        formControlName="serviceDate" name="daterange" placeholder="From date - to date"
-                                        readonly />
+                                        [ranges]="ranges" [alwaysShowCalendars]="true" formControlName="serviceDate"
+                                        name="daterange" placeholder="From date - to date" readonly />
                                 </div>
                             </div>
                         </div>

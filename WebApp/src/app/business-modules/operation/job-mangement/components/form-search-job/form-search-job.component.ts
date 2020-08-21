@@ -1,13 +1,18 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { CatalogueRepo, SystemRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { SystemConstants } from 'src/constants/system.const';
-import { DataService } from 'src/app/shared/services';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { User } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
+import { Store } from '@ngrx/store';
+
+import { User } from '@models';
+import { DocumentationRepo, SystemRepo, CatalogueRepo } from '@repositories';
+import { DataService } from '@services';
+import { SystemConstants, JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+
+import { AppForm } from 'src/app/app.form';
+
+import * as fromOpsStore from './../../../store';
+import { catchError, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'job-management-form-search',
@@ -16,11 +21,13 @@ import { formatDate } from '@angular/common';
 
 export class JobManagementFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
+    @Output() onReset: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
 
     filterTypes: CommonInterface.ICommonTitleValue[];
-    productServices: CommonInterface.IValueDisplay[] = [];
-    serviceModes: CommonInterface.IValueDisplay[] = [];
-    shipmentModes: CommonInterface.IValueDisplay[] = [];
+
+    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
+    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
 
     formSearch: FormGroup;
     searchText: AbstractControl;
@@ -41,46 +48,52 @@ export class JobManagementFormSearchComponent extends AppForm {
     users: User[] = [];
     selectedPartner: any = {};
 
+    dataSearch: ISearchDataShipment;
+
     constructor(
         private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _dataService: DataService,
         private _sysRepo: SystemRepo,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<fromOpsStore.IOperationState>
     ) {
         super();
+
+        this.requestReset = this.resetSearch;
     }
 
     ngOnInit() {
         this.initFormSearch();
         this.getPartner();
         this.getUser();
-        this.getCommondata();
 
         this.filterTypes = [
-            { title: 'Job Id', value: 'jobId' },
-            { title: 'HBL', value: 'hbl' },
-            { title: 'Custom No', value: 'customno' },
-            { title: 'MBL', value: 'mbl' },
-            { title: 'Credit\/Debit\/Invoice\ No', value: 'code' },
-
-
-
+            { title: 'Job Id', value: 'jobNo' },
+            { title: 'HBL', value: 'hwbno' },
+            { title: 'Custom No', value: 'clearanceNo' },
+            { title: 'MBL', value: 'mblno' },
+            { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
         ];
         this.filterType.setValue(this.filterTypes[0]);
-    }
 
-    getCommondata() {
-        this._documentRepo.getShipmentCommonData()
-            .pipe(
-                catchError(this.catchError)
-            ).subscribe(
-                (response: CommonInterface.ICommonShipmentData) => {
-                    this.productServices = response.productServices;
-                    this.serviceModes = response.serviceModes;
-                    this.shipmentModes = response.shipmentModes;
-                },
-            );
+        this._store.select(fromOpsStore.getOperationTransationDataSearch)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (criteria: ISearchDataShipment) => {
+                    if (!!Object.keys(criteria).length) {
+                        this.dataSearch = criteria;
+
+                        ['jobNo', 'hwbno', 'clearanceNo', 'mblno', 'creditDebitInvoice'].some((i: string) => {
+                            if (!!this.dataSearch[i]) {
+                                this.filterType.setValue(this.filterTypes.find(d => d.value === i));
+                                this.searchText.setValue(this.dataSearch[i]);
+                                return true;
+                            }
+                        });
+                    }
+                }
+            )
     }
 
     getPartner() {
@@ -88,7 +101,7 @@ export class JobManagementFormSearchComponent extends AppForm {
             this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
 
         } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL, active: true })
+            this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.ALL, active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataPartner: any) => {
@@ -147,7 +160,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                this.selectedPartner = { field: data.partnerNameEn, value: data.id };
+                this.selectedPartner = { field: 'id', value: data.id };
                 break;
             default:
                 break;
@@ -157,30 +170,31 @@ export class JobManagementFormSearchComponent extends AppForm {
     searchShipment() {
         const body: ISearchDataShipment = {
             all: null,
-            jobNo: this.filterType.value.value === 'jobId' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            hwbno: this.filterType.value.value === 'hbl' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            mblno: this.filterType.value.value === 'mbl' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            clearanceNo: this.filterType.value.value === 'customno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            creditDebitInvoice: this.filterType.value.value === 'code' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            productService: !!this.productService.value ? this.productService.value.value : null,
-            serviceMode: !!this.serviceMode.value ? this.serviceMode.value.value : null,
-            shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.value : null,
+            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            mblno: this.filterType.value.value === 'mblno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            clearanceNo: this.filterType.value.value === 'clearanceNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            creditDebitInvoice: this.filterType.value.value === 'creditDebitInvoice' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+
+            productService: !!this.productService.value ? this.productService.value.id : null,
+            serviceMode: !!this.serviceMode.value ? this.serviceMode.value.id : null,
+            shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.id : null,
             serviceDateFrom: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             customerId: !!this.selectedPartner.value ? this.selectedPartner.value : null,
             fieldOps: !!this.user.value ? this.user.value.id : null,
         };
         this.onSearch.emit(body);
+
+        this._store.dispatch(new fromOpsStore.OPSTransactionSearchListAction(body));
     }
 
     resetSearch() {
         this.formSearch.reset();
         this.selectedPartner = {};
         this.filterType.setValue(this.filterTypes[0]);
-        //  this.onSearch.emit(<any>{});
-        // if(this.searchText.value == ''){
-        //     this.onSearch.emit(<any>{});
-        // }
+
+        this.onReset.emit(<any>{});
     }
 
     collapsed() {
@@ -190,6 +204,24 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.resetFormControl(this.user);
         this.resetFormControl(this.serviceDate);
         this.selectedPartner = { field: 'id', value: null };
+    }
+
+    expanded() {
+        if (!!this.dataSearch) {
+            const advanceSearchForm = {
+                productService: this.productServices.find(p => p.id === this.dataSearch.productService) || null,
+                serviceMode: this.serviceModes.find(s => s.id === this.dataSearch.serviceMode) || null,
+                shipmentMode: this.shipmentModes.find(s => s.id === this.dataSearch.shipmentMode) || null,
+                user: this.users.find(u => u.id === this.dataSearch.fieldOps) || null,
+                serviceDate: !!this.dataSearch.serviceDateFrom && !!this.dataSearch.serviceDateTo ? {
+                    startDate: new Date(this.dataSearch.serviceDateFrom),
+                    endDate: new Date(this.dataSearch.serviceDateTo)
+                } : null
+            };
+            this.selectedPartner = { field: 'id', value: this.dataSearch.customerId };
+
+            this.formSearch.patchValue(advanceSearchForm);
+        }
     }
 }
 

@@ -20,7 +20,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         "Last 30 Days": [new Date(new Date().setDate(new Date().getDate() - 29)), new Date()],
         // "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)],
         "This Month": [new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date()],
-        "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)]
+        "Last Month": [new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), new Date(new Date().getFullYear(), new Date().getMonth(), 0)],
+        "Next Month": [new Date(), new Date(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate())]
     };
 
     maxDate: any = moment();
