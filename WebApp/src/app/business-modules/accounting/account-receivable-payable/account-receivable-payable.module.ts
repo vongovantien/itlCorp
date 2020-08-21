@@ -10,12 +10,10 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 
 import { AccountPaymentFormSearchComponent } from './components/form-search/account-payment/form-search-account-payment.component';
-import { AccountReceivableFormSearchComponent } from './components/form-search/account-receivable/form-search-account-receivable.component';
 import { AccountReceivablePayableComponent } from './account-receivable-payable.component';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AccountPaymentUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
-import { AccountReceivableDetailPopupComponent } from './components/popup/detail-account-receivable/detail-account-receivable.popup';
 import { PaymentImportComponent } from './components/payment-import/payment-import.component';
 import { PaginationModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';

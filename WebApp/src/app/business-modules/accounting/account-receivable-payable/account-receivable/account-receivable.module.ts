@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 
-import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { AccountReceivableTabComponent } from './account-receivable.component';
 import { TabsModule } from 'ngx-bootstrap';
 import { SharedModule } from 'src/app/shared/shared.module';

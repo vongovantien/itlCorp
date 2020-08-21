@@ -1,8 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 import { CommonEnum } from '@enums';
 import { ActivatedRoute, Router } from '@angular/router';

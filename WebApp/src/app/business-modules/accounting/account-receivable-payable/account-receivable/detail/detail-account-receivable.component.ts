@@ -4,14 +4,10 @@ import { AppList } from 'src/app/app.list';
 import { SortService } from '@services';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
-import { CatalogueRepo, AccountingRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
-import { DataService } from '@services';
-import UUID from 'validator/lib/isUUID';
+import { AccountingRepo } from '@repositories';
 import _merge from 'lodash/merge';
-import { of } from 'rxjs';
 import { NgProgress } from '@ngx-progressbar/core';
-import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
+import { takeUntil, switchMap } from 'rxjs/operators';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
 
 @Component({
