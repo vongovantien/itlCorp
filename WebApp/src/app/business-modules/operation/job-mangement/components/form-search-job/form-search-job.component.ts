@@ -195,6 +195,9 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.filterType.setValue(this.filterTypes[0]);
 
         this.onReset.emit(<any>{});
+
+        this._store.dispatch(new fromOpsStore.OPSTransactionSearchListAction({}));
+
     }
 
     collapsed() {
