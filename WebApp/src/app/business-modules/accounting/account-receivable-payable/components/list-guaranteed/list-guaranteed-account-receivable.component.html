@@ -4,7 +4,7 @@
 
             <div class="row">
                 <div class="col-lg-12 m--margin-top-20">
-                    <div class="table-wrapper table-scrollable" id="payment-table">
+                    <div class="table-wrapper table-scrollable" id="guaranteed-table">
                         <table class="table table-hover table-brand dataTable table-hover">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <th class="m--w-50 first table-actions-col">
@@ -60,7 +60,7 @@
 
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row [id]="'id-00' + (i + 1)"
-                                            [parentId]="'#obh-payment-table'">
+                                            [parentId]="'#guaranteed-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead app-table-header [headers]="subHeaders"
                                                     (onClick)="sortDetailGuaranteed($event.sortField, $event.order)">

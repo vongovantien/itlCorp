@@ -16,8 +16,9 @@
                     <div class="col-lg-12">
                         <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
                             <div class="col-lg-8">
-                                <h5><span class="text-success">Customer:</span> {{accReceivableDetail.partnerCode}} -
-                                    {{accReceivableDetail.partnerNameEn}}</h5>
+                                <h6><span class="text-success font-weight-bold">Customer:</span>
+                                    {{accReceivableDetail.partnerCode}} -
+                                    {{accReceivableDetail.partnerNameEn}}</h6>
                             </div>
 
                             <div class="col-lg-4">
@@ -33,77 +34,84 @@
                                 <div class="row m--margin-top-20">
                                     <div class="col-lg-2">
                                         <div>
-                                            <h6>Partner Name (ABBR) </h6>
+                                            <h6 class="font-weight-bold">Partner Name (ABBR) </h6>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-5">
                                         <div>
-                                            <h6>{{accReceivableDetail.partnerNameAbbr}}</h6>
+                                            <span>{{accReceivableDetail.partnerNameAbbr}}</span>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-1">
-                                        <h6>Tax code </h6>
+                                        <h6 class="font-weight-bold">Tax code </h6>
                                     </div>
                                     <div class="col-lg-4">
-                                        <h6>{{accReceivableDetail.taxCode}}</h6>
+                                        <span>{{accReceivableDetail.taxCode}}</span>
                                     </div>
                                 </div>
                                 <div class="row m--margin-top-20">
                                     <div class="col-lg-2">
                                         <div>
-                                            <h6>Partner Name (Local) </h6>
+                                            <h6 class="font-weight-bold">Partner Name (Local) </h6>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-5">
                                         <div>
-                                            <h6>{{accReceivableDetail.partnerNameLocal}}</h6>
+                                            <span>{{accReceivableDetail.partnerNameLocal}}</span>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-1">
-                                        <h6>Status </h6>
+                                        <h6 class="font-weight-bold">Status </h6>
                                     </div>
                                     <div class="col-lg-4">
-                                        <h6
+                                        <span
                                             [ngClass]=" accReceivableDetail.partnerStatus === 'Active'  ? 'text-success' : 'text-danger'">
                                             {{accReceivableDetail.partnerStatus}}
-                                        </h6>
+                                        </span>
                                     </div>
                                 </div>
                                 <hr />
                                 <div class="row m--margin-top-20">
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Agreement No</h6>
-                                            <h6 class="my-3">Type</h6>
-                                            <h6>Status</h6>
+                                            <h6 class="font-weight-bold">Agreement No</h6>
+                                            <h6 class="my-3 font-weight-bold">Type</h6>
+                                            <h6 class="font-weight-bold">Status</h6>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.agreementNo }}&nbsp;</h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.agreementType }}&nbsp;</h6>
-                                            <h6
+                                            <div>
+                                                {{ accReceivableDetail.agreementNo }}&nbsp;
+                                            </div>
+                                            <div class="my-3">
+                                                {{ accReceivableDetail.agreementType }}&nbsp;
+                                            </div>
+                                            <div
                                                 [ngClass]=" accReceivableDetail.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+
                                                 {{accReceivableDetail.agreementStatus}}&nbsp;
-                                            </h6>
+
+                                            </div>
+
 
                                         </div>
 
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>
+                                            <h6 class="font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Salesman" :"Effective Date"}}
                                             </h6>
-                                            <h6 class="my-3">
+                                            <h6 class="my-3 font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Credit Limited" :"Expired Date"}}
                                             </h6>
-                                            <h6>
+                                            <h6 class="font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Term (Days)" :"Expired Days"}}
 
                                             </h6>
@@ -111,37 +119,45 @@
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy'}}&nbsp;</h6>
-                                            <h6 class="my-3">
-                                                {{accReceivableDetail.expriedDate | date: 'dd/MM/yyyy'}}&nbsp;
-                                            </h6>
-                                            <h6
+                                            <div>{{accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.agreementSalesmanName
+                                                : (accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy')}}&nbsp;
+                                            </div>
+                                            <div class="my-3">
+                                                {{accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleCreditLimited | number: '.0-3')
+                                                : (accReceivableDetail.expriedDate | date: 'dd/MM/yyyy')}}
+                                                <span
+                                                    *ngIf="(accReceivableDetail.agreementType === 'Guaranteed' && accReceivableDetail.saleCreditLimited)">
+                                                    VND
+                                                </span>
+                                                &nbsp;
+                                            </div>
+                                            <div
                                                 [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? null : 'text-danger'">{{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditTerm 
                                                 : accReceivableDetail.expriedDay }}
                                                 <span
                                                     *ngIf="(accReceivableDetail.expriedDay && accReceivableDetail.agreementType !== 'Guaranteed') || 
                                                 (accReceivableDetail.creditTerm && accReceivableDetail.agreementType === 'Guaranteed')">
                                                     days</span>&nbsp;
-                                            </h6>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>
+                                            <h6 class="font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Limit Rate" :"Credit limited"}}
                                             </h6>
-                                            <h6 class="my-3">
+                                            <h6 class="my-3 font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Amount" :"Credit Term (Days)"}}
 
                                             </h6>
-                                            <h6>
+                                            <h6 class="font-weight-bold">
                                                 {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Rate" :"Credit Rate Limit"}}
                                             </h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6
+                                            <div
                                                 [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-success': null ">
                                                 {{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditRateLimit : accReceivableDetail.creditLimited | number: '.0-3'}}
                                                 <span
@@ -149,8 +165,8 @@
                                                     (accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType === 'Guaranteed')">
                                                     {{ accReceivableDetail.agreementType === "Guaranteed" ? "%" : accReceivableDetail.agreementCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="my-3">
+                                            </div>
+                                            <div class="my-3">
                                                 {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitAmount | number: '.0-3')
                                                 : accReceivableDetail.creditTerm }}
                                                 <span
@@ -158,17 +174,17 @@
                                                     (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guaranteed') ">
                                                     {{accReceivableDetail.agreementType === "Guaranteed" ? "VND" : "days"}}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6
+                                            </div>
+                                            <div
                                                 [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-danger' : 'text-success' ">
-                                                {{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.saleDebitRate 
+                                                {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitRate | number: '.0-3')
                                                 : accReceivableDetail.creditRateLimit }}
                                                 <span
                                                     *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guaranteed') || 
                                                     (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guaranteed')">
                                                     %
                                                 </span>&nbsp;
-                                            </h6>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -176,26 +192,26 @@
                                 <div class="row m--margin-top-20">
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Debit Amount</h6>
-                                            <h6 class="my-3">OBH Amount</h6>
-                                            <h6 class="mb-3">Debit Rate (%)</h6>
-                                            <h6>Cus Advance</h6>
+                                            <h6 class="font-weight-bold">Debit Amount</h6>
+                                            <h6 class="my-3 font-weight-bold">OBH Amount</h6>
+                                            <h6 class="mb-3 font-weight-bold">Debit Rate (%)</h6>
+                                            <h6 class="font-weight-bold">Cus Advance</h6>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.debitAmount | number: '.0-3'}}
+                                            <div>{{ accReceivableDetail.debitAmount | number: '.0-3'}}
                                                 <span *ngIf="accReceivableDetail.debitAmount">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.obhAmount | number: '.0-3'}}
+                                            </div>
+                                            <div class="my-3">{{ accReceivableDetail.obhAmount | number: '.0-3'}}
                                                 <span *ngIf="accReceivableDetail.obhAmount">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6>
+                                            </div>
+                                            <div>
                                                 <span
                                                     [ngClass]="accReceivableDetail.debitRate < 70 ? 'text-success' : accReceivableDetail.debitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ accReceivableDetail.debitRate}}
@@ -203,76 +219,76 @@
                                                 <span *ngIf="accReceivableDetail.debitRate !== null">
                                                     %
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="mt-3">{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
+                                            </div>
+                                            <div class="mt-3">{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
                                                 <span *ngIf="accReceivableDetail.cusAdvance">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
+                                            </div>
                                         </div>
 
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Billing </h6>
-                                            <h6 class="my-3">Billing Unpaid </h6>
-                                            <h6>Paid </h6>
-                                            <h6 class="mt-3">Credit Amount</h6>
+                                            <h6 class="font-weight-bold">Billing </h6>
+                                            <h6 class="my-3 font-weight-bold">Billing Unpaid </h6>
+                                            <h6 class="font-weight-bold">Paid </h6>
+                                            <h6 class="mt-3 font-weight-bold">Credit Amount</h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>{{ accReceivableDetail.billingAmount | number: '.0-3'}}
+                                            <div>{{ accReceivableDetail.billingAmount | number: '.0-3'}}
                                                 <span *ngIf="accReceivableDetail.billingAmount">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="my-3">{{ accReceivableDetail.billingUnpaid | number: '.0-3'}}
+                                            </div>
+                                            <div class="my-3">{{ accReceivableDetail.billingUnpaid | number: '.0-3'}}
                                                 <span *ngIf="accReceivableDetail.billingUnpaid">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6><span
+                                            </div>
+                                            <div><span
                                                     class="text-danger">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
                                                 <span *ngIf="accReceivableDetail.paidAmount">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="mt-3"><span
+                                            </div>
+                                            <div class="mt-3"><span
                                                     class="text-primary">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
                                                 <span *ngIf="accReceivableDetail.paidAmount">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6>Over 1-15 days</h6>
-                                            <h6 class="my-3">Over 16-30 days</h6>
-                                            <h6>Over 30 days</h6>
+                                            <h6 class="font-weight-bold">Over 1-15 days</h6>
+                                            <h6 class="my-3 font-weight-bold">Over 16-30 days</h6>
+                                            <h6 class="font-weight-bold">Over 30 days</h6>
                                         </div>
                                     </div>
                                     <div class="col-lg-2">
                                         <div class="border border-top-0 border-left-0 border border-bottom-0">
-                                            <h6><span
+                                            <div><span
                                                     class="text-danger">{{ accReceivableDetail.over1To15Day | number: '.0-3' }}</span>
                                                 <span *ngIf="accReceivableDetail.over1To15Day">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6 class="my-3"><span
+                                            </div>
+                                            <div class="my-3"><span
                                                     class="text-danger">{{ accReceivableDetail.over16To30Day | number: '.0-3'}}</span>
                                                 <span *ngIf="accReceivableDetail.over16To30Day">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
-                                            <h6><span
+                                            </div>
+                                            <div><span
                                                     class="text-danger">{{ accReceivableDetail.over30Day | number: '.0-3'}}</span>
                                                 <span *ngIf="accReceivableDetail.over30Day">
                                                     {{ accReceivableDetail.arCurrency }}
                                                 </span>&nbsp;
-                                            </h6>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -285,7 +301,7 @@
                     <div class="col-lg-12">
                         <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
                             <div class="col-lg-12">
-                                <h5>More Detail</h5>
+                                <h6>More Detail</h6>
                             </div>
                         </div>
                         <div class="row">

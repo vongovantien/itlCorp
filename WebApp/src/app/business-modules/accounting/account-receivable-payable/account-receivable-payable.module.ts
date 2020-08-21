@@ -25,10 +25,9 @@ import { AccountReceivableListGuaranteedComponent } from './components/list-guar
 import { AccountReceivableListOtherComponent } from './components/list-other/list-other-account-receivable.component';
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
-import { AccountReceivableDetailComponent } from './components/detail/detail-account-receivable.component';
+import { AccountReceivableDetailComponent } from './account-receivable/detail/detail-account-receivable.component';
 import { AccountReceivableListTrialOfficialComponent } from './components/list-trial-official/list-trial-official-account-receivable.component';
 import { AccountReceivableLazyLoadModule } from './account-receivable-lazy-load.module';
-import { AccountReceivableTabComponent } from './components/tab-account-receivable/tab-account-receivable.component';
 
 
 const routing: Routes = [
@@ -46,16 +45,11 @@ const routing: Routes = [
                 path: 'import-obh', component: AccountReceivablePayableImportOBHPaymentComponent, data: { name: "Import OBH" }
             },
             {
-                path: "detail", component: AccountReceivableDetailComponent,
+                path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
 
-            },
+            }
         ]
     },
-    /*{
-        path: 'receivable',
-        loadChildren: () => import('./components/tab-account-receivable/tab-account-receivable.module').then(m => m.TabAccountReceivableModule),
-        data: { name: 'A.R' }
-    }*/
 ];
 
 
@@ -65,12 +59,9 @@ const routing: Routes = [
         AccountReceivablePayableComponent,
         AccountPaymentListInvoicePaymentComponent,
         AccountPaymentListOBHPaymentComponent,
-
         AccountPaymentUpdateExtendDayPopupComponent,
-        AccountReceivableDetailPopupComponent,
         PaymentImportComponent,
         AccountReceivablePayableImportOBHPaymentComponent,
-        AccountReceivableDetailComponent,
 
     ],
     imports: [
@@ -85,7 +76,6 @@ const routing: Routes = [
         NgxDaterangepickerMd,
         SelectModule,
         PerfectScrollbarModule,
-        AccountReceivableLazyLoadModule,
     ],
     exports: [],
     providers: [],

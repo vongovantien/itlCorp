@@ -59,7 +59,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     console.log(this.accReceivableDetail);
                 }
             );
-        console.log("this.subTab", this.subTab);
 
 
     }
@@ -102,13 +101,13 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     goBack() {
-        console.log("clicked");
+
 
         window.history.back();
         //console.log(new URLSearchParams(window.location.search));
         //const subTab = this.subTab;
         //this._router.navigate([`/home/accounting/account-receivable-payable`]);
-        /*this._router.navigate(['/home/accounting/account-receivable-payable'],
-            { queryParams: Object.assign({}, { tab: 'receivable', subTab: 'other' }) })*/
+        /*this._router.navigate(['/home/accounting/account-receivable-payable/receivable'],
+            { queryParams: { subTab: this.subTab } });*/
     }
 }

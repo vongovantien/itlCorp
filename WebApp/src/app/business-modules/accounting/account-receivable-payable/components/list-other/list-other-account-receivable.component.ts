@@ -74,14 +74,14 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         console.log("agreementId", agreementId);
         console.log("partnerId", partnerId);
         if (!!agreementId) {
-            this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+            this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
                 queryParams: {
                     agreementId: agreementId,
                     subTab: 'other',
                 }
             });
         } else {
-            this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+            this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
                 queryParams: {
                     partnerId: partnerId,
                     subTab: 'other',

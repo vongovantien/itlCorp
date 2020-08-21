@@ -3,7 +3,7 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Account Payment" [active]="isAccountPaymentTab" (selectTab)="changeTabAccount('Payment')">
+                <tab heading="Account Payment" [active]="true" (selectTab)="changeTabAccount('payment')">
                     <form-search-account-payment (onSearch)="onSearchPayment($event)">
                     </form-search-account-payment>
 
@@ -18,11 +18,10 @@
                             </list-obh-account-payment>
                         </tab>
                     </tabset>
+
                 </tab>
-                <tab heading="Account Receivable" [active]="!isAccountPaymentTab"
-                    (selectTab)="changeTabAccount('Receivable')">
-                    <ng-container *ngIf="!isAccountPaymentTab" loadModule="Acc_Receivable">
-                    </ng-container>
+                <tab heading="Account Receivable" (selectTab)="changeTabAccount('receivable')">
+
                 </tab>
             </tabset>
         </div>

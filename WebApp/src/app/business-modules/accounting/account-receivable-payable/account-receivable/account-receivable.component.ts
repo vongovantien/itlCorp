@@ -2,18 +2,18 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import { CommonEnum } from '@enums';
-import { AccountReceivableListTrialOfficialComponent } from '../list-trial-official/list-trial-official-account-receivable.component';
-import { AccountReceivableListGuaranteedComponent } from '../list-guaranteed/list-guaranteed-account-receivable.component';
-import { AccountReceivableListOtherComponent } from '../list-other/list-other-account-receivable.component';
-import { AccountReceivableFormSearchComponent } from '../form-search/account-receivable/form-search-account-receivable.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AccountReceivableListTrialOfficialComponent } from '../components/list-trial-official/list-trial-official-account-receivable.component';
+import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
+import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
+import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 
 @Component({
-    selector: 'tab-account-receivable',
-    templateUrl: './tab-account-receivable.component.html',
+    selector: 'app-account-receivable',
+    templateUrl: './account-receivable.component.html',
 })
 export class AccountReceivableTabComponent extends AppList implements OnInit {
 
@@ -24,7 +24,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     //
     @ViewChild(AccountReceivableFormSearchComponent, { static: false }) accountReceivableFormComponent: AccountReceivableFormSearchComponent;
 
-    selectedTab: string = "TRIAL_OFFICIAL";
+    selectedSubTab: string = "TRIAL_OFFICIAL";
 
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
@@ -33,39 +33,41 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     constructor(
         private _router: Router,
         private _activeRouter: ActivatedRoute,
+        private _cd: ChangeDetectorRef
     ) {
         super();
     }
+
     ngOnInit() {
-        this._activeRouter.queryParams.subscribe(param => {
-            if (param.subTab === 'guaranteed') {
-                this.changeActiveTabFlag(false, true, false);
-
-
-            } else if (param.subTab === 'other') {
-                this.changeActiveTabFlag(false, false, true);
-
-
-            } else {
-                this.changeActiveTabFlag(true, false, false);
-
-            }
-
-        });
+        console.log(1);
     }
     //
     ngAfterViewInit() {
-        this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+        this._activeRouter
+            .queryParams
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((param: { [key: string]: any }) => {
+                if (param.subTab) {
+                    this.selectedSubTab = param.subTab.toUpperCase();
+                } else {
+                    this.selectedSubTab = 'trial_official'.toUpperCase();
+                    this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+                    //this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+                }
+
+            });
+        this._cd.detectChanges();
+
+        console.log(2);
+        // if (this.selectedSubTab === null || this.selectedSubTab === 'TRIAL_OFFICIAL') {
+        //     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+        // }
+
+        //this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
     }
-    //
-    changeActiveTabFlag(trial_official: boolean = true, guaranteed: boolean = false, other: boolean = false) {
-        this.activeTrialOffice = trial_official;
-        this.activeGuaranteed = guaranteed;
-        this.activeOther = other;
-    }
+
     //
     onSearchReceivable(body: AccountingInterface.IAccReceivableSearch) {
-        console.log("data search: ", body);
 
         switch (body.arType) {
             case CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical:
@@ -82,27 +84,34 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         }
     }
     //
+    changeTabAccount(tab: string) {
+        if (tab === 'payment') {
+            this._router.navigate([`/home/accounting/account-receivable-payable`]);
+        }
+    }
+    //
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
     }
     //
     onSelectTabAccountReceivable(tabname: string) {
+        console.log(3);
+        this.selectedSubTab = tabname;
 
-        this.selectedTab = tabname;
         if (tabname === 'TRIAL_OFFICIAL') {
-            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'trial_official' } });
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical;
+            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'trial_official' } });
+
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
         } else if (tabname === 'GUARANTEED') {
-            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'guaranteed' } });
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Guarantee;
+            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'guaranteed' } });
+
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Guarantee, this.guaranteedListComponent);
         } else {
+            this._router.navigate(['/home/accounting/account-receivable-payable/receivable'], { queryParams: { subTab: 'other' } });
 
-            this.accountReceivableFormComponent.arType = CommonEnum.TabTypeAccountReceivableEnum.Other;
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Other, this.otherListComponent);
-            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'receivable', subTab: 'other' } });
+
         }
         this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
         this.accountReceivableFormComponent.initForm();
@@ -110,6 +119,10 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
+        console.log(4);
+        console.log("tab", tab);
+        console.log("tabComponent", tabComponent);
+
         this.accountReceivableFormComponent.arType = tab;
         //
         const dataSearch: AccountingInterface.IAccReceivableSearch = {

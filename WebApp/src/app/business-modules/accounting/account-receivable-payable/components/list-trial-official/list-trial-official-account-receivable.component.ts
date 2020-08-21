@@ -87,7 +87,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
     //
     viewDetail(agreementId: string) {
-        this._router.navigate([`/home/accounting/account-receivable-payable/detail`], {
+        this._router.navigate([`/home/accounting/account-receivable-payable/receivable/detail`], {
             queryParams: {
                 agreementId: agreementId,
                 subTab: 'trial_official',

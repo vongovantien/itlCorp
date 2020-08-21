@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
 import { PaymentType } from './components/form-search/account-payment/form-search-account-payment.component';
@@ -27,7 +27,7 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
 
     selectedTab: TAB | string = "INVOICE";
-
+    selectedTabAR: string = 'payment';
     //selectedTab:
     isAccountPaymentTab: boolean = true;
 
@@ -43,14 +43,16 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
 
     ngOnInit() {
 
-        this._activeRouter.queryParams.subscribe(param => {
-            if (param.tab === 'receivable') {
-                this.isAccountPaymentTab = false;
-            }
-            else {
-                this.isAccountPaymentTab = true;
-            }
-        });
+        this._activeRouter.queryParams
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(param => {
+                //console.log(param);
+
+                if (param.tab) {
+                    this.selectedTabAR = param.tab;
+                }
+
+            });
 
     }
 
@@ -64,25 +66,16 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this._cd.detectChanges();
 
     }
-    //when selected tab
+    // when selected tab
     changeTabAccount(tab: string) {
-        if (tab === 'Payment') {
-            this._router.navigate(['/home/accounting/account-receivable-payable'], { queryParams: { tab: 'payment' } });
-            this.isAccountPaymentTab = true;
+        this.selectedTabAR = tab;
+
+        if (tab === 'payment') {
+            this._router.navigate(['/home/accounting/account-receivable-payable']);
             this.selectedTab = 'INVOICE';
             this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
-
-
         } else {
-            this._router.navigate(['/home/accounting/account-receivable-payable'], {
-                queryParams:
-                {
-                    tab: 'receivable'
-                }
-            });
-            this.isAccountPaymentTab = false;
-            this.selectedTab = 'TRIAL_OFFICAL';
-            this.dataSearch = {};
+            this._router.navigate(['/home/accounting/account-receivable-payable/receivable']);
 
         }
     }
