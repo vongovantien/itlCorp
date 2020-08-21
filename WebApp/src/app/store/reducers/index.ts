@@ -15,7 +15,7 @@ export interface IRouterStateUrl {
 }
 
 export interface IAppState {
-    routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
+    // routerReducer: fromRouter.RouterReducerState<IRouterStateUrl>;
     // spinnerReducer: ISpinnerState;
     catalogueReducer: ICatalogueState;
     // claimReducer: IClaimUserState;
@@ -23,7 +23,7 @@ export interface IAppState {
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
-    routerReducer: fromRouter.routerReducer,
+    // routerReducer: fromRouter.routerReducer,
     // spinnerReducer: spinnerReducer,
     catalogueReducer: catalogueReducer,
     // claimReducer: claimUserReducer,
@@ -50,17 +50,11 @@ export class CustomSerializer implements fromRouter.RouterStateSerializer<IRoute
 
 // * Selector
 
-export const routerState = createFeatureSelector<fromRouter.RouterReducerState<IRouterStateUrl>>('routerReducer');
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
 // export const claimUserState = createFeatureSelector<any>('claimReducer');
 export const menuState = createFeatureSelector<any>('menuReducer');
 
 
-export const getRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state);
-export const getQueryParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.queryParams);
-export const getParamsRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.params);
-export const getUrlRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.url);
-export const getDataRouterState = createSelector(routerState, (state: fromRouter.RouterReducerState<IRouterStateUrl>) => state.state && state.state.data);
 
 // * CATALOGUE 
 
