@@ -14,6 +14,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -41,8 +42,8 @@ export class SeaFCLExportComponent extends AppList {
 
     defaultDataSearch = {
         transactionType: this.transactionService,
-        fromDate: new Date(),
-        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     };
 
     constructor(

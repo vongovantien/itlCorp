@@ -11,6 +11,7 @@ import { CommonEnum } from '@enums';
 import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-air-import',
@@ -37,8 +38,8 @@ export class AirImportComponent extends AppList {
 
     defaultDataSearch = {
         transactionType: this.transactionService,
-        fromDate: new Date(),
-        toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     };
 
     constructor(
