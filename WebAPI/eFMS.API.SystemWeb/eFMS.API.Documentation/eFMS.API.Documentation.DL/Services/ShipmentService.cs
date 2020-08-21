@@ -648,11 +648,14 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal _totalSellAmountHandling = 0;
                 decimal _totalSellAmountOther = 0;
                 var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
+
                 foreach (var charge in _chargeSell)
                 {
 
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //SELL
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -698,6 +701,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var chargeObj = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     var charGroupObj = catChargeGroupRepo.Get(x => x.Id == chargeObj.ChargeGroup).FirstOrDefault();
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     //BUY
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
@@ -1375,7 +1380,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _revenue += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    _revenue += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
                 }
                 data.Revenue = _revenue;
                 #endregion -- Phí Selling trước thuế --
@@ -1387,7 +1393,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _cost += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    _cost += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
                 }
                 data.Cost = _cost;
                 #endregion -- Phí Buying trước thuế --
@@ -1622,9 +1629,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var _chargeSell = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == item.HblId);
                 foreach (var charge in _chargeSell)
                 {
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _revenue += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    _revenue += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
                 }
                 data.Revenue = _revenue;
                 #endregion -- Phí Selling trước thuế --
@@ -1634,9 +1642,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var _chargeBuy = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == item.HblId);
                 foreach (var charge in _chargeBuy)
                 {
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
                     //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
                     var _rate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-                    _cost += charge.Quantity * charge.UnitPrice * _rate ?? 0; // Phí Selling trước thuế
+                    _cost += charge.Quantity * UnitPrice * _rate; // Phí Selling trước thuế
                 }
                 data.Cost = _cost;
                 #endregion -- Phí Buying trước thuế --
@@ -2078,8 +2087,8 @@ namespace eFMS.API.Documentation.DL.Services
                     data.ChargeName = _charge?.ChargeNameEn;
 
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, criteria.Currency);
-
-                    decimal? _amount = charge.Quantity * charge.UnitPrice;
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    decimal? _amount = charge.Quantity * UnitPrice;
                     var _taxInvNoRevenue = string.Empty;
                     var _voucherRevenue = string.Empty;
                     decimal? _usdRevenue = 0;
@@ -2189,11 +2198,12 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in dataShipment)
             {
                 var _charges = chargeData;
-             
+
                 _charges = chargeData.Where(x => x.JobId == item.JobNo);
-                
+
                 foreach (var charge in _charges)
                 {
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                     SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
                     var _partnerId = charge.CustomerID;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
@@ -2208,10 +2218,12 @@ namespace eFMS.API.Documentation.DL.Services
                     data.CBM = charge.CBM;
                     data.PackageContainer = charge.PackageContainer;
                     decimal? percent = 0;
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     if (charge.VATRate > 0)
                     {
                         percent = (charge.VATRate * 10) / 100;
-                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
                         if (charge.Currency != "VND")
                         {
                             charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
@@ -2221,7 +2233,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         charge.VATAmount = charge.VATRate;
                     }
-                    charge.NetAmount = charge.UnitPrice * charge.Quantity;
+                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
                     data.NetAmount = charge.NetAmount;
                     data.VATAmount = charge.VATAmount;
                     data.Type = charge.Type;
@@ -2268,6 +2280,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _charges = chargeData.Where(x => x.HBLID == item.HBLID);
                 foreach (var charge in _charges)
                 {
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                     SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
                     var _partnerId = charge.CustomerID;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
@@ -2282,10 +2295,12 @@ namespace eFMS.API.Documentation.DL.Services
                     data.CBM = charge.CBM;
                     data.PackageContainer = charge.PackageContainer;
                     decimal? percent = 0;
+                    decimal UnitPrice = charge.UnitPrice ?? 0;
+                    charge.UnitPrice = Math.Round(UnitPrice, 3);
                     if (charge.VATRate > 0)
                     {
                         percent = (charge.VATRate * 10) / 100;
-                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity);
+                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
                         if (charge.Currency != "VND")
                         {
                             charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
@@ -2295,7 +2310,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         charge.VATAmount = charge.VATRate;
                     }
-                    charge.NetAmount = charge.UnitPrice * charge.Quantity;
+                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
                     data.NetAmount = charge.NetAmount;
                     data.VATAmount = charge.VATAmount;
                     data.Type = charge.Type;
@@ -2571,7 +2586,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<SummaryOfRevenueExportResult> dataList = new List<SummaryOfRevenueExportResult>();
             Expression<Func<SummaryOfCostsIncurredExportResult, bool>> query = chg => chg.CustomerID == criteria.CustomerId;
             var chargeData = !string.IsNullOrEmpty(criteria.CustomerId) ? GetChargeOBHSellPayerJob(query, null) : GetChargeOBHSellPayerJob(null, null);
-            var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID}).AsQueryable();
+            var results = chargeData.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             if (results == null)
                 return null;
             foreach (var item in dataShipment)
@@ -2587,7 +2602,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var commodityGroup = opsRepository.Get(x => x.JobNo == group.Key.JobId).Select(t => t.CommodityGroupId).FirstOrDefault();
                     string commodityName = string.Empty;
                     var _partnerId = group.Select(t => t.CustomerID).FirstOrDefault();
-                    var _partner = catPartnerRepo.Get(x => _partnerId != null && x.Id == _partnerId ).FirstOrDefault();
+                    var _partner = catPartnerRepo.Get(x => _partnerId != null && x.Id == _partnerId).FirstOrDefault();
                     SummaryRevenue.SupplierCode = _partner?.AccountNo;
                     SummaryRevenue.SuplierName = _partner?.PartnerNameVn;
                     if (commodity != null)
@@ -2623,11 +2638,14 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 foreach (var it in item.SummaryOfCostsIncurredExportResults)
                 {
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal? percent = 0;
+                    decimal UnitPrice = it.UnitPrice ?? 0;
+                    it.UnitPrice = Math.Round(UnitPrice, 3);
                     if (it.VATRate > 0)
                     {
                         percent = (it.VATRate * 10) / 100;
-                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
+                        it.VATAmount = percent * (UnitPrice * it.Quantity) * _exchangeRate;
                         if (it.Currency != "VND")
                         {
                             it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
@@ -2638,7 +2656,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         it.VATAmount = it.VATRate;
                     }
-                    it.NetAmount = it.UnitPrice * it.Quantity;
+                    it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
 
                 }
             }
@@ -2648,7 +2666,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = SummaryOfRevenueIncurred(criteria);
             SummaryOfRevenueModel obj = new SummaryOfRevenueModel();
-  
+
             if (criteria.Service.Contains("CL"))
             {
                 var dataOperation = SummaryOfRevenueIncurredOperation(criteria);
@@ -2715,11 +2733,11 @@ namespace eFMS.API.Documentation.DL.Services
                     SummaryRevenue.CBM = group.Select(t => t.CBM).FirstOrDefault();
                     SummaryRevenue.GrossWeight = group.Select(t => t.GrossWeight).FirstOrDefault();
                     SummaryRevenue.PackageContainer = group.Select(t => t.PackageContainer).FirstOrDefault();
-                    foreach(var ele in group)
+                    foreach (var ele in group)
                     {
-                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t=>t.PartnerNameVn).FirstOrDefault();
+                        ele.SuplierName = catPartnerRepo.Get(x => x.Id == ele.CustomerID).Select(t => t.PartnerNameVn).FirstOrDefault();
                     }
-                    
+
                     SummaryRevenue.SummaryOfCostsIncurredExportResults.AddRange(group.Select(t => t));
                     dataList.Add(SummaryRevenue);
                 }
@@ -2727,13 +2745,16 @@ namespace eFMS.API.Documentation.DL.Services
             ObjectSummaryRevenue.summaryOfRevenueExportResults = dataList;
             foreach (var item in ObjectSummaryRevenue.summaryOfRevenueExportResults)
             {
-                foreach(var it in item.SummaryOfCostsIncurredExportResults)
+                foreach (var it in item.SummaryOfCostsIncurredExportResults)
                 {
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
                     decimal? percent = 0;
+                    decimal UnitPrice = it.UnitPrice ?? 0;
+                    it.UnitPrice = Math.Round(UnitPrice, 3);
                     if (it.VATRate > 0)
                     {
                         percent = (it.VATRate * 10) / 100;
-                        it.VATAmount = percent * (it.UnitPrice * it.Quantity);
+                        it.VATAmount = percent * (UnitPrice * it.Quantity) * _exchangeRate;
                         if (it.Currency != "VND")
                         {
                             it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
@@ -2744,7 +2765,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         it.VATAmount = it.VATRate;
                     }
-                    it.NetAmount = it.UnitPrice * it.Quantity;
+                    it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
 
                 }
             }

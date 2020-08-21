@@ -952,4 +952,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    previewCombinationSalesReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/CombinationSaleReport`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
