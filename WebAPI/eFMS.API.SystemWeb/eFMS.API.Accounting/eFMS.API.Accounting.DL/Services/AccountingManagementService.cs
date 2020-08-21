@@ -1644,7 +1644,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<CatContract, bool>> queryContractByCriteria = null;
             queryContractByCriteria = x => (
             (x.OfficeId ?? "").Contains(model.Office ?? "", StringComparison.OrdinalIgnoreCase)
-            && (model.Service.Contains(x.SaleService ?? "", StringComparison.OrdinalIgnoreCase)
+            && (x.SaleService.Contains(model.Service ?? "", StringComparison.OrdinalIgnoreCase)
             && x.PartnerId == partnerRef.Id));
 
             IQueryable<CatContract> agreements = catContractRepository.Get(queryContractByCriteria);
