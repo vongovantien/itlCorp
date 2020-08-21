@@ -12,7 +12,8 @@
 <div class="m-content">
     <div class="row">
         <div class="col-xl-12">
-            <job-management-form-search (onSearch)="onSearchShipment($event)"></job-management-form-search>
+            <job-management-form-search (onSearch)="onSearchShipment($event)" (onReset)="onResetSearchShipment($event)">
+            </job-management-form-search>
             <!-- <div class="m-portlet">
                 <div class="alert-block alert-block-red">
                     <div class="alert-block__heading">
@@ -62,26 +63,22 @@
                                                             (click)="showCustomClearance(item.jobNo, i)">
                                                             <i class="la la-angle-up"></i>
                                                         </button>
-                                                        <!-- <button type="button"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            [routerLink]="['/home/operation/job-edit/' + item.id]"
-                                                            title="Edit">
-                                                            <i class="la la-edit"></i>
-                                                        </button> -->
-                                                        <button type="button"
-                                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            (click)="showDetail(item.id)" title="Edit">
-                                                            <i class="la la-edit"></i>
-                                                        </button>
+
+                                                        <app-permission-button (onClick)="showDetail(item.id)"
+                                                            type="detail">
+                                                        </app-permission-button>
+
                                                         <button type="button" *ngIf="item.isLocked"
                                                             class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                                             <i class="fa fa-lock"></i>
                                                         </button>
-                                                        <button type="button" *ngIf="!item.isLocked"
-                                                            class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                                            title="Remove" (click)="deleteSipment(item)">
-                                                            <i class="la la-trash"></i>
-                                                        </button>
+
+                                                        <ng-container *ngIf="!item.isLocked">
+                                                            <app-permission-button (onClick)="deleteSipment(item)"
+                                                                type="delete">
+                                                            </app-permission-button>
+                                                        </ng-container>
+
                                                     </div>
                                                 </td>
                                                 <td>
@@ -126,7 +123,7 @@
                                                         (onClick)="sortClassCustomClearance($event.sortField)">
                                                     </thead>
                                                     <tbody>
-                                                        <ng-container *ngIf="!isLoading && !!customClearances.length">
+                                                        <ng-container *ngIf="!!customClearances.length">
                                                             <tr
                                                                 *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn">
                                                                 <td>
@@ -158,45 +155,23 @@
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
-                                                        <tr *ngIf="!isLoading && !customClearances.length"
-                                                            app-table-none-record
+                                                        <tr *ngIf="!customClearances.length" app-table-none-record
                                                             [colspan]="headerCustomClearance.length">
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </tr>
                                         </ng-container>
-                                        <tr *ngIf="!isLoading && !shipments.length" app-table-none-record
-                                            [colspan]="headers.length + 1"></tr>
-                                        <tr *ngIf="isLoading" app-table-row-loading></tr>
+
+                                        <tr app-table-none-record *ngIf="!(isLoading | async) && !shipments.length">
+                                        </tr>
+                                        <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="pagination-nav">
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="tatable__pager-size">
-                                            <div class="select-box">
-                                                <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                                    (change)="selectPageSize(pageSize, dataSearch)" name="pagesize">
-                                                    <ng-container
-                                                        *ngFor="let item of numberToShow; let i = index; trackBy: trackByFn">
-                                                        <option [ngValue]="item">{{item}} line / screen</option>
-                                                    </ng-container>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                        <div class="float-right">
-                                            <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                                [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                                [(ngModel)]="page">
-                                            </pagination>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+                            <app-pagination [itemPerPage]="pageSize" [pageNum]="page" [total]="totalItems"
+                                (onChange)="updatePagingData($event)"></app-pagination>
                         </div>
                     </tab>
                 </tabset>

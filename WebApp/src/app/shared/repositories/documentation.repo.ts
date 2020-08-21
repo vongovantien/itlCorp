@@ -255,9 +255,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
+        });
     }
 
     getListHouseBillOfJob(data: any = {}) {
@@ -949,6 +947,12 @@ export class DocumentationRepo {
 
     previewSISummaryByJobId(id: string) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShippingInstruction/PreviewSISummaryByJobId/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewCombinationSalesReport(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/SaleReport/CombinationSaleReport`, body).pipe(
             map((data: any) => data)
         );
     }

@@ -527,8 +527,8 @@ export class FormAddPartnerComponent extends AppForm {
 
     copyShippingAddress() {
         this.countryId.setValue(this.countryShippingId.value);
+        //this.getBillingProvinces(!!this.countryShippingId.value && this.countryShippingId.value.length > 0 ? this.countryShippingId.value[0].id : null, !!this.provinceId.value && this.provinceShippingId.value.length > 0 ? this.provinceId.value[0].id : null);
         this.provinceId.setValue(this.provinceShippingId.value);
-        this.getBillingProvinces(!!this.countryShippingId.value && this.countryShippingId.value.length > 0 ? this.countryShippingId.value[0].id : null, !!this.provinceId.value && this.provinceShippingId.value.length > 0 ? this.provinceId.value[0].id : null);
         this.zipCode.setValue(this.zipCodeShipping.value);
         this.addressEn.setValue(this.addressShippingEn.value);
         this.addressVn.setValue(this.addressShippingVn.value);

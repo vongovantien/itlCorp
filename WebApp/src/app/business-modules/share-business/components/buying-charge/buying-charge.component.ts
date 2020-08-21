@@ -17,12 +17,12 @@ import { Observable } from 'rxjs';
 import { catchError, takeUntil, finalize, share, skip, map, shareReplay } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
-import * as fromRoot from 'src/app/store';
 
 import { getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCatalogueUnitState, GetCatalogueUnitAction } from 'src/app/store';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'buying-charge',
@@ -88,6 +88,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         protected _spinner: NgxSpinnerService,
         protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute
 
     ) {
         super();
@@ -97,7 +98,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getSurcharge();
 
-        this._store.select(fromRoot.getDataRouterState)
+        this._activedRoute.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (dataParam: CommonInterface.IDataParam) => {

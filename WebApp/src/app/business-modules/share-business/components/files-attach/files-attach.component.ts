@@ -5,8 +5,8 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState, IAppState } from '@store';
-import { Params } from '@angular/router';
+import { IAppState } from '@store';
+import { Params, ActivatedRoute } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
 
@@ -30,7 +30,9 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _activedRoute: ActivatedRoute
+
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -42,7 +44,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     }
 
     ngOnInit(): void {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((params: Params) => {
                 if (params.jobId) {

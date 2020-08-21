@@ -116,7 +116,8 @@ export namespace CommonEnum {
         SR_MONTHLY = 'SR_MONTHLY',
         SR_DEPARTMENT = 'SR_DEPARTMENT',
         SR_QUARTER = 'SR_QUARTER',
-        SR_SUMMARY = 'SR_SUMMARY'
+        SR_SUMMARY = 'SR_SUMMARY',
+        SR_COMBINATION = 'SR_COMBINATION'
     }
 
     export enum SHEET_DEBIT_REPORT_TYPE {
@@ -162,6 +163,12 @@ export namespace CommonEnum {
         LOGISTICS = "Logistics",
         FUEL = "Fuel",
         TRUCKING = "Trucking",
+    }
+
+    export enum TabTypeAccountReceivableEnum {
+        TrialOrOffical = 1,
+        Guarantee = 2,
+        Other = 3,
     }
 }
 

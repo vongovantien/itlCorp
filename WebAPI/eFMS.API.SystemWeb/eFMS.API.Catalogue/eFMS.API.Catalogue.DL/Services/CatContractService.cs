@@ -33,7 +33,6 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
-
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
 

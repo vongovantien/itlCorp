@@ -1,5 +1,5 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Params, Router } from '@angular/router';
+import { Params, Router, ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { DocumentationRepo } from '@repositories';
-import { getParamsRouterState } from '@store';
+
 import { SortService } from '@services';
 import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
 
@@ -50,7 +50,9 @@ export class SeaConsolExportManifestComponent extends AppList {
         private _sortService: SortService,
         private _toastService: ToastrService,
         protected _router: Router,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _activedRouter: ActivatedRoute
+
 
     ) {
         super();
@@ -76,7 +78,7 @@ export class SeaConsolExportManifestComponent extends AppList {
 
     }
     ngAfterViewInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRouter.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {

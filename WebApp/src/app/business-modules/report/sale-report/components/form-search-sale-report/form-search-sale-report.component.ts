@@ -578,6 +578,8 @@ export class SaleReportFormSearchComponent extends AppForm {
             { text: 'Sale Report By Department', id: CommonEnum.SALE_REPORT_TYPE.SR_DEPARTMENT },
             { text: 'Sale Report By Quarter', id: CommonEnum.SALE_REPORT_TYPE.SR_QUARTER },
             { text: 'Summary Sale Report', id: CommonEnum.SALE_REPORT_TYPE.SR_SUMMARY },
+            { text: 'Combination Statistic Report', id: CommonEnum.SALE_REPORT_TYPE.SR_COMBINATION },
+
         ];
         // Default value: Monthly Sale Report
         this.typeReportActive = [this.typeReportList[0]];

@@ -14,7 +14,7 @@ import {
 import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.popup';
 
 import * as fromStore from './../../store/index';
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
@@ -142,7 +142,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
         this.carries = this._store.select(getCatalogueCarrierState)
 
         this.listUsers = this._systemRepo.getSystemUsers();
-        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR });
+        this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR })
+            .pipe(shareReplay());
         this._catalogueRepo.getPlace({ active: true, placeType: CommonEnum.PlaceTypeEnum.Warehouse }).subscribe(
             (res: Warehouse[]) => {
                 if (!!res) {

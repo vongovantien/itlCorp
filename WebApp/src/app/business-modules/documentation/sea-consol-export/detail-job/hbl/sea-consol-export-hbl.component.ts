@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -23,9 +23,11 @@ export class SeaConsolExportHBLComponent extends AppShareHBLBase implements OnIn
         protected _toastService: ToastrService,
         protected _progressService: NgProgress,
         protected _sortService: SortService,
-        protected _spinner: NgxSpinnerService
+        protected _spinner: NgxSpinnerService,
+        protected _activedRoute: ActivatedRoute,
+
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
     }
 
     configHBL() {

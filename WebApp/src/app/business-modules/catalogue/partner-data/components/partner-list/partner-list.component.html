@@ -21,7 +21,7 @@
                                     title="Edit" (click)="showDetail(partner)">
                                     <i class="la la-edit"></i>
                                 </button>
-                                <button (click)="showConfirmDelete(partner)"
+                                <button *ngIf="!partner.active" (click)="showConfirmDelete(partner)"
                                     class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
                                     <i class="la la-trash"></i>
                                 </button>

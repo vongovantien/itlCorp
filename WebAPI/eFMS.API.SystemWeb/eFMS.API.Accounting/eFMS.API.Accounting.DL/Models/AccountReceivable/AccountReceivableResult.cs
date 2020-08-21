@@ -6,6 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
     {
         public Guid? AgreementId { get; set; }
         public string PartnerId { get; set; }
+        public string PartnerCode { get; set; }
         public string PartnerNameEn { get; set; }
         public string PartnerNameLocal { get; set; }
         public string PartnerNameAbbr { get; set; }
@@ -15,6 +16,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public string AgreementType { get; set; }
         public string AgreementStatus { get; set; }
         public string AgreementSalesmanId { get; set; }
+        public string AgreementSalesmanName { get; set; }
         public string AgreementCurrency { get; set; }
         public string OfficeId { get; set; }
         public string ArServiceCode { get; set; }
@@ -25,6 +27,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? CreditLimited { get; set; }
         public int? CreditTerm { get; set; }
         public decimal? CreditRateLimit { get; set; }
+        public decimal? SaleCreditLimited { get; set; }
         public decimal? SaleDebitAmount { get; set; }
         public decimal? SaleDebitRate { get; set; }
         public decimal? DebitAmount { get; set; }
