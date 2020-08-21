@@ -12,6 +12,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 
 
@@ -33,8 +34,8 @@ export class JobManagementComponent extends AppList implements OnInit {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     defaultDataSearch = {
-        serviceDateFrom: new Date(),
-        serviceDateTo: new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()),
+        serviceDateFrom: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        serviceDateTo: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     };
 
     constructor(
