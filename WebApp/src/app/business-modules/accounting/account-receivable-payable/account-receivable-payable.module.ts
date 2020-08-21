@@ -20,13 +20,11 @@ import { PaymentImportComponent } from './components/payment-import/payment-impo
 import { PaginationModule } from 'ngx-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AccountReceivablePayableImportOBHPaymentComponent } from './components/import-obh/import-obh-account-receivable-payable.component';
-//import { AccountReceivableListTrialOfficialComponent } from ./components/list-trial-official/list-trial-official-account-receivable.componentt';
-import { AccountReceivableListGuaranteedComponent } from './components/list-guaranteed/list-guaranteed-account-receivable.component';
-import { AccountReceivableListOtherComponent } from './components/list-other/list-other-account-receivable.component';
+
+
 import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
 import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
-import { AccountReceivableDetailComponent } from './components/detail/detail-account-receivable.component';
-import { AccountReceivableListTrialOfficialComponent } from './components/list-trial-official/list-trial-official-account-receivable.component';
+
 
 
 const routing: Routes = [
@@ -44,11 +42,11 @@ const routing: Routes = [
                 path: 'import-obh', component: AccountReceivablePayableImportOBHPaymentComponent, data: { name: "Import OBH" }
             },
             {
-                path: "detail/:id", component: AccountReceivableDetailComponent,
+                path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
 
-            },
+            }
         ]
-    }
+    },
 ];
 
 
@@ -58,15 +56,10 @@ const routing: Routes = [
         AccountReceivablePayableComponent,
         AccountPaymentListInvoicePaymentComponent,
         AccountPaymentListOBHPaymentComponent,
-        AccountReceivableListTrialOfficialComponent,
-        AccountReceivableListGuaranteedComponent,
-        AccountReceivableListOtherComponent,
         AccountPaymentUpdateExtendDayPopupComponent,
-        AccountReceivableDetailPopupComponent,
         PaymentImportComponent,
         AccountReceivablePayableImportOBHPaymentComponent,
-        AccountReceivableFormSearchComponent,
-        AccountReceivableDetailComponent,
+
     ],
     imports: [
         CommonModule,
@@ -79,7 +72,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         NgxDaterangepickerMd,
         SelectModule,
-        PerfectScrollbarModule
+        PerfectScrollbarModule,
     ],
     exports: [],
     providers: [],

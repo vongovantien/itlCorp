@@ -30,6 +30,10 @@ export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAc
 export * from './accouting/cdnoteview.model';
 export * from './accouting/payment.model';
 export * from './accouting/accounting-payment.model';
+export {
+    TrialOfficialOtherModel, GuaranteedModel, AccReceivableDetailModel,
+    AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
+} from './accouting/accounting-receivable.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
@@ -75,6 +79,7 @@ export * from './tool-setting/unlock-request';
 
 export * from './commercial/charge-incoterm';
 export { Incoterm, IncotermUpdateModel, IncotermModel } from './commercial/incoterm';
+
 
 
 
