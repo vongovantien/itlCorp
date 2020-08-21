@@ -207,6 +207,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
         this.resetFormControl(this.creator);
         this.filterType.setValue(this.filterTypes[0]);
         this.onReset.emit(<any>{ transactionType: null });
+
+        this._store.dispatch(new TransactionSearchListAction({}));
+
     }
 
     collapsed() {
