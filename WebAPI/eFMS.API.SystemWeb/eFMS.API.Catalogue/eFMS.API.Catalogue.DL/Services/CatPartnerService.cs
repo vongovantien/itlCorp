@@ -298,7 +298,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (transactionDetailRepository.Any(x => x.CustomerId == id))
                 {
-                    return new HandleState("Customer being used! Cannot delete!");
+                    return new HandleState("This partner is already in use so you can not delete it");
                 }
             }
             var hs = DataContext.Delete(x => x.Id == id);
