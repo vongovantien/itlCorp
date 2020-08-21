@@ -14,15 +14,18 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-sea-lcl-import',
     templateUrl: './sea-lcl-import.component.html'
 })
 export class SeaLCLImportComponent extends AppList implements OnInit {
+
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+
     headers: CommonInterface.IHeaderTable[];
     headerHouseBills: CommonInterface.IHeaderTable[];
 
@@ -35,10 +38,13 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
     deleteMessage: string = '';
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaLCLImport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private _router: Router,
@@ -86,14 +92,24 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
             { title: 'G.W', field: 'gw', sortable: true },
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
 
-        this.requestSearchShipment();
+
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
     }
 
     getShipments() {
@@ -143,16 +159,14 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
         this.page = 1; // reset page.
         data.transactionType = this.transactionService;
         this.dataSearch = data;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetMasterBills($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }

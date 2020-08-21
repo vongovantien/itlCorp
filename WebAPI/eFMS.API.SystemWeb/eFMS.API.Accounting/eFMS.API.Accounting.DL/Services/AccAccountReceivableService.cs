@@ -834,12 +834,23 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- LIST & PAGING ---
         private IQueryable<AccountReceivableResult> GetARHasContract(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
         {
+            var users = userRepo.Get();
+            var employees = employeeRepo.Get();
+
             var selectQuery = from contract in partnerContracts
                               join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
                               where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId == acctReceivable.Office.ToString()
                               select new { acctReceivable, contract };
             if (selectQuery == null || !selectQuery.Any()) return null;
+
+            var contractsGuaranteed = selectQuery.Where(x => x.contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED)
+                .Select(s => new AccountReceivableResult
+                {
+                    AgreementSalesmanId = s.contract.SaleManId,
+                    DebitAmount = s.acctReceivable.DebitAmount
+                }).ToList();
+
             var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id })
                 .Select(s => new AccountReceivableResult
                 {
@@ -862,10 +873,11 @@ namespace eFMS.API.Accounting.DL.Services
                     EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
                     ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.ExpiredDate : null),
                     ExpriedDay = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? (int?)((s.First().contract.TrialExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (int?)((s.First().contract.ExpiredDate ?? DateTime.Today) - DateTime.Today).TotalDays : null),
-                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditLimited : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.CreditLimit : null),
+                    CreditLimited = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditLimited : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.CreditLimit : null),
                     CreditTerm = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialCreditDays : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.PaymentTerm : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED ? (int?)30 : null)),
                     CreditRateLimit = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEED || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? (s.First().contract.CreditLimitRate == null || s.First().contract.CreditLimitRate == 0 ? 120 : s.First().contract.CreditLimitRate) : null,
-                    SaleDebitAmount = s.Select(se => se.contract).GroupBy(g => new { g.SaleManId }).Select(sel => sel.Select(sele => sele.CreditAmount).Sum()).Sum(),
+                    SaleCreditLimited = null, //Get data bên dưới
+                    SaleDebitAmount = contractsGuaranteed.Where(w => w.AgreementSalesmanId == s.First().contract.SaleManId).Sum(su => su.DebitAmount),
                     SaleDebitRate = null, //Tính toán bên dưới
                     DebitAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum(),
                     ObhAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhAmount : null).Sum(),
@@ -883,6 +895,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
+                       join user in users on contract.AgreementSalesmanId equals user.Id into users2
+                       from user in users2.DefaultIfEmpty()
+                       join employee in employees on user.EmployeeId equals employee.Id into employees2
+                       from employee in employees2.DefaultIfEmpty()
                        select new AccountReceivableResult
                        {
                            AgreementId = contract.AgreementId,
@@ -897,6 +913,7 @@ namespace eFMS.API.Accounting.DL.Services
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
+                           AgreementSalesmanName = employee.EmployeeNameVn,
                            AgreementCurrency = contract.AgreementCurrency,
                            OfficeId = contract.OfficeId,
                            ArServiceCode = contract.ArServiceCode,
@@ -907,8 +924,9 @@ namespace eFMS.API.Accounting.DL.Services
                            CreditLimited = contract.CreditLimited,
                            CreditTerm = contract.CreditTerm,
                            CreditRateLimit = contract.CreditRateLimit,
+                           SaleCreditLimited = user.CreditLimit,
                            SaleDebitAmount = contract.SaleDebitAmount,
-                           SaleDebitRate = (contract.SaleDebitAmount / contract.CreditLimited) * 100,
+                           SaleDebitRate = (contract.SaleDebitAmount / user.CreditLimit) * 100,
                            DebitAmount = contract.DebitAmount,
                            ObhAmount = contract.ObhAmount,
                            DebitRate = contract.DebitRate,
@@ -1005,7 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var _active = criteria.AgreementStatus == AccountingConstants.STATUS_ACTIVE ? true : false;
                 query = query.And(x => x.Active == _active);
-            }            
+            }
             return query;
         }
 

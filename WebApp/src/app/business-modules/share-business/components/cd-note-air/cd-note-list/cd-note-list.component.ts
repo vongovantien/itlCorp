@@ -6,13 +6,11 @@ import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
-import { Store } from '@ngrx/store';
-import { TransactionActions } from '../../../store';
-import { getParamsRouterState, getDataRouterState } from 'src/app/store';
 import { combineLatest } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'cd-note-list-air',
@@ -40,17 +38,17 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _store: Store<TransactionActions>,
+        private _activedRoute: ActivatedRoute
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        // this.requestSort = this.sortCdNotes;
     }
 
     ngOnInit(): void {
         combineLatest([
-            this._store.select(getParamsRouterState),
-            this._store.select(getDataRouterState),
+            this._activedRoute.params,
+            this._activedRoute.data,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             take(1)

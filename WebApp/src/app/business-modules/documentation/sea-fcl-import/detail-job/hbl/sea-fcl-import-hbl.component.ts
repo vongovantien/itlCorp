@@ -24,9 +24,10 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
         protected _progressService: NgProgress,
         protected _store: Store<IShareBussinessState>,
         protected _activedRoute: ActivatedRoute,
-        protected _spinner: NgxSpinnerService
+        protected _spinner: NgxSpinnerService,
+
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
     }
 
     onSelectTab(tabName: string) {

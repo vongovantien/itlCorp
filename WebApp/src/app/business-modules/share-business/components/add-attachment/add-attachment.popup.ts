@@ -3,10 +3,10 @@ import { OnInit, Component, Output, EventEmitter } from "@angular/core";
 import { DocumentationRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
-import { IAppState, getParamsRouterState } from "@store";
+import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { Params } from "@angular/router";
+import { Params, ActivatedRoute } from "@angular/router";
 
 
 @Component({
@@ -23,6 +23,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
+        private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>
     ) {
         super();
@@ -31,7 +32,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     }
 
     ngOnInit(): void {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((params: Params) => {
                 if (params.jobId) {

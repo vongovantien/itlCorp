@@ -15,18 +15,12 @@ import { ConfirmPopupComponent } from '@common';
 export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
-    headers: CommonInterface.IHeaderTable[];
-
     criteria: any = {};
     bookingNotes: any = [];
 
     idBookingNote: string = '';
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-    sortLocal(sort: string): void {
-        this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
-    }
+
 
     constructor(private _progressService: NgProgress,
         private _toastService: ToastrService,
@@ -57,9 +51,13 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         this.dataSearch = {
             type: 'All'
         };
-        this.criteria.fromDate = this._fromDate;
-        this.criteria.toDate = this._toDate;
+        this.criteria.fromDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        this.criteria.toDate = new Date();
         this.searchBookingNote();
+    }
+
+    sortLocal(sort: string): void {
+        this.bookingNotes = this._sortService.sort(this.bookingNotes, sort, this.order);
     }
 
     searchBookingNote() {
@@ -94,29 +92,9 @@ export class SeaLCLExportBookingNoteComponent extends AppList implements OnInit 
         this.dataSearch = dataSearch;
         this.page = 1;
         this.criteria = {};
-        if (this.dataSearch.type === 'All') {
-            this.criteria.all = this.dataSearch.keyword;
-        } else {
-            this.criteria.all = null;
-        }
-        if (this.dataSearch.type === 'creatorName') {
-            this.criteria.creatorName = this.dataSearch.keyword;
-        }
-        if (this.dataSearch.type === 'bookingNo') {
-            this.criteria.bookingNo = this.dataSearch.keyword;
-        }
-        if (this.dataSearch.type === 'shipperName') {
-            this.criteria.shipperName = this.dataSearch.keyword;
-        }
-        if (this.dataSearch.type === 'consigneeName') {
-            this.criteria.consigneeName = this.dataSearch.keyword;
-        }
-        if (this.dataSearch.type === 'polName') {
-            this.criteria.polName = this.dataSearch.keyword;
-        }
-        if (this.dataSearch.type === 'podName') {
-            this.criteria.podName = this.dataSearch.keyword;
-        }
+
+        this.criteria[this.dataSearch.type] = this.dataSearch.keyword;
+
         this.criteria.fromDate = this.dataSearch.fromDate;
         this.criteria.toDate = this.dataSearch.toDate;
         this.searchBookingNote();

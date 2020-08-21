@@ -6,14 +6,14 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize, map, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAppState, getParamsRouterState, getDataRouterState } from '@store';
+import { IAppState } from '@store';
 import { combineLatest } from 'rxjs';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { EmailContent } from 'src/app/shared/models/document/emailContent';
 import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
-import { Router, Params } from '@angular/router';
+import { Router, Params, ActivatedRoute } from '@angular/router';
 import * as fromShareBussiness from '@share-bussiness';
 @Component({
     selector: 'share-pre-alert',
@@ -67,6 +67,7 @@ export class ShareBusinessReAlertComponent extends AppList {
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _store: Store<IAppState>,
+        private _activedRouter: ActivatedRoute,
         private _fb: FormBuilder,
         private _router: Router) {
         super();
@@ -75,13 +76,14 @@ export class ShareBusinessReAlertComponent extends AppList {
 
     ngOnInit(): void {
         combineLatest([
-            this._store.select(getParamsRouterState),
-            this._store.select(getDataRouterState),
+            this._activedRouter.params,
+            this._activedRouter.data,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             take(1)
         ).subscribe(
             (params: Params) => {
+                console.log(params);
                 if (params.jobId) {
                     this.jobId = params.jobId;
                     this.hblId = params.hblId;

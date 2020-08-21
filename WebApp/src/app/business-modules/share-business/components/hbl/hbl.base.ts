@@ -4,8 +4,7 @@ import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
 import { getHBLSState, IShareBussinessState, GetDetailHBLSuccessAction, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction } from "../../store";
 import { Store } from "@ngrx/store";
 import { takeUntil, take, catchError, finalize } from "rxjs/operators";
-import { getParamsRouterState } from "@store";
-import { Params } from "@angular/router";
+import { Params, ActivatedRoute } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ViewChild } from "@angular/core";
@@ -44,7 +43,9 @@ export abstract class AppShareHBLBase extends AppList {
         protected _spinner: NgxSpinnerService,
         protected _progressService: NgProgress,
         protected _toastService: ToastrService,
-        protected _documentRepo: DocumentationRepo
+        protected _documentRepo: DocumentationRepo,
+        protected _activedRoute: ActivatedRoute
+
 
     ) {
         super();
@@ -53,7 +54,7 @@ export abstract class AppShareHBLBase extends AppList {
     }
 
     ngOnInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe((param: Params) => {
                 if (param.jobId && isUUID(param.jobId)) {

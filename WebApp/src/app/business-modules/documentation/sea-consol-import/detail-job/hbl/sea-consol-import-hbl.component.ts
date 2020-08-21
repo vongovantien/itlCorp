@@ -26,7 +26,7 @@ export class SeaConsolImportHBLComponent extends AppShareHBLBase {
         protected _activedRoute: ActivatedRoute,
         protected _spinner: NgxSpinnerService
     ) {
-        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo);
+        super(_sortService, _store, _spinner, _progressService, _toastService, _documentRepo, _activedRoute);
     }
 
     onSelectTab(tabName: string) {

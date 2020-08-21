@@ -10,7 +10,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 import { User, csBookingNote, CsTransaction } from 'src/app/shared/models';
 
-import { takeUntil, skip, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, skip, distinctUntilChanged, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../share-business/store';
@@ -98,7 +98,7 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
 
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
-        this.ports = this._store.select(getCataloguePortState);
+        this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.listUsers = this._systemRepo.getListSystemUser();
 
         this.getUserLogged();
