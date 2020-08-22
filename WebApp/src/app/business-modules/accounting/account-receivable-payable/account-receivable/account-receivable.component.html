@@ -1,0 +1,30 @@
+<div class="acc-receive-payable-wrapper  m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+    <div class="m-content">
+        <div class="m-portlet__body">
+            <tabset class="custom-class-tab">
+                <tab heading="Account Payment" (selectTab)="changeTabAccount('payment')">
+
+                </tab>
+                <tab heading="Account Receivable" [active]="true" (selectTab)="changeTabAccount('receivable')">
+                    <form-search-account-receivable (onSearch)="onSearchReceivable($event)">
+                    </form-search-account-receivable>
+                    <tabset class="custom-class-tab">
+                        <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'" heading="Trial & Official"
+                            (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
+                            <list-trial-official-account-receivable></list-trial-official-account-receivable>
+                        </tab>
+                        <tab [active]="selectedSubTab === 'GUARANTEED'" heading="Guaranteed"
+                            (selectTab)="onSelectTabAccountReceivable('GUARANTEED')">
+                            <list-guaranteed-account-receivable></list-guaranteed-account-receivable>
+                        </tab>
+                        <tab [active]="selectedSubTab === 'OTHER'" heading="Other"
+                            (selectTab)="onSelectTabAccountReceivable('OTHER')">
+                            <list-other-account-receivable></list-other-account-receivable>
+                        </tab>
+                    </tabset>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

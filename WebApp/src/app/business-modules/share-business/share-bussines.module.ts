@@ -60,7 +60,8 @@ import {
     ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBussinessHBLFCLContainerPopupComponent,
-    ShareGoodsImportComponent
+    ShareGoodsImportComponent,
+
 
 } from './components';
 
@@ -71,6 +72,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
+
+
 
 
 const COMPONENTS = [
@@ -121,7 +124,9 @@ const COMPONENTS = [
     ShareBusinessReAlertComponent,
     ShareBusinessAddAttachmentPopupComponent,
     ShareBussinessBillInstructionSeaExportComponent,
-    ShareBussinessBillInstructionHousebillsSeaExportComponent
+    ShareBussinessBillInstructionHousebillsSeaExportComponent,
+
+
 
 ];
 
@@ -162,7 +167,8 @@ const customCurrencyMaskConfig = {
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
-        NgxSpinnerModule
+        NgxSpinnerModule,
+
     ],
     exports: [
         ...COMPONENTS

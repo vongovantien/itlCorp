@@ -276,7 +276,9 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             deliveryOrderPrintedDate: null,
             dofooter: null,
             dosentTo1: null,
-            dosentTo2: null
+            dosentTo2: null,
+            chargeWeight: this.hblGoodSummaryComponent.totalChargeWeight
+
         };
         return body;
     }
@@ -367,5 +369,5 @@ export interface ITransactionDetail {
     packageQty: number;
     packageType: number;
     contSealNo: string;
-
+    chargeWeight: number;
 }

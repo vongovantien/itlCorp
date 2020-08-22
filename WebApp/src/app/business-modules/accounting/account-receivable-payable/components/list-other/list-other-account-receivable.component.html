@@ -13,28 +13,32 @@
                             </thead>
                             <tbody>
                                 <ng-container>
-                                    <ng-container *ngFor="let item of seedData; let i = index; trackBy: trackByFn">
+                                    <ng-container *ngFor="let item of otherList; let i = index; trackBy: trackByFn">
                                         <tr class="">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
-                                                    <app-permission-button type="detail">
+                                                    <app-permission-button type="detail"
+                                                        (click)="viewDetail(item.agreementId, item.partnerId)">
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a href="#">{{ item.partnerId }}</a> </td>
-                                            <td>{{ item.partnerName }} </td>
+                                            <td><a class="pointer"
+                                                    (click)="viewDetail(item.agreementId, item.partnerId)">{{ item.partnerCode }}</a>
+                                            </td>
+                                            <td>{{ item.partnerNameAbbr }} </td>
 
                                             <td>{{ item.debitAmount | number: '.0-3' }}</td>
 
-                                            <td>{{ item.billing | number: '.0-3' }}
+                                            <td>{{ item.billingAmount | number: '.0-3' }}
                                             </td>
                                             <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
-                                            <td>{{ item.paid | number: '.0-3'}}</td>
+                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
                                             <td>{{ item.obhAmount | number: '.0-3'}}</td>
 
                                             <td>
-                                                <span [ngClass]="item.status ? 'text-success' : 'text-danger'">
-                                                    {{ item.status ? 'Active' : 'Inactive'}}
+                                                <span
+                                                    [ngClass]="item.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+                                                    {{ item.agreementStatus }}
                                                 </span>
                                             </td>
 
@@ -43,9 +47,9 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!seedData.length">
+                                <tr app-table-none-record *ngIf="!isLoading && !otherList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="!seedData.length"></tr>
+                                <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
                         </table>
                     </div>
