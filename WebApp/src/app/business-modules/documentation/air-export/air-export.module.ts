@@ -18,6 +18,7 @@ import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.
 import { AirExportManifestComponent } from './detail-job/manifest/air-export-manifest.component';
 import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.component';
 import { ShareAirExportModule } from './share-air-export.module';
+import { DeactivateGuardService } from 'src/app/core/guards/deactivate.guard';
 
 const routing: Routes = [
     {
@@ -34,7 +35,7 @@ const routing: Routes = [
                 data: { transactionType: CommonEnum.TransactionTypeEnum.AirExport, name: "Job Detail" },
                 children: [
                     {
-                        path: '', component: AirExportDetailJobComponent, data: { name: "" }
+                        path: '', component: AirExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
                     },
                     {
                         path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),

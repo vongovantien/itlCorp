@@ -4,21 +4,23 @@ import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { SelectModule } from 'ng2-select';
+import { CommonEnum } from '@enums';
+import { DeactivateGuardService } from '@core';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { ChargeConstants } from '@constants';
 
-import { SeaLCLExportComponent } from './sea-lcl-export.component';
+import { SeaLCLExportLazyLoadModule } from './sea-lcl-export-lazy-load.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { SeaLCLExportComponent } from './sea-lcl-export.component';
+
 import { SeaLCLExportCreateJobComponent } from './create-job/create-job-lcl-export.component';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { SeaLCLExportDetailJobComponent } from './detail-job/detail-job-lcl-export.component';
-import { SeaLCLExportLazyLoadModule } from './sea-lcl-export-lazy-load.module';
 import { SeaLclExportManifestComponent } from './detail-job/manifest/sea-lcl-export-manifest.component';
 import { SeaLclExportShippingInstructionComponent } from './detail-job/shipping-instruction/sea-lcl-export-shipping-instruction.component';
-import { SelectModule } from 'ng2-select';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
-import { ChargeConstants } from 'src/constants/charge.const';
 
 const routing: Routes = [
     {
@@ -43,7 +45,7 @@ const routing: Routes = [
         data: { transactionType: CommonEnum.TransactionTypeEnum.SeaLCLExport, name: "Job Detail" },
         children: [
             {
-                path: '', component: SeaLCLExportDetailJobComponent, data: { name: "" }
+                path: '', component: SeaLCLExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
             },
             {
                 path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-lcl-export-hbl.module').then(m => m.SeaLCLExportHBLModule),

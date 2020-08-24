@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { NgForm, AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -8,7 +8,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { CatalogueRepo } from 'src/app/shared/repositories';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { CsTransactionDetail, Container, CsTransaction } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
@@ -24,12 +23,15 @@ import { formatDate } from '@angular/common';
 import { CommonEnum } from '@enums';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { AppForm } from 'src/app/app.form';
+import { ICanComponentDeactivate } from '@core';
+import { Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
 })
-export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit {
+export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit, ICanComponentDeactivate {
+
     @ViewChild(PlSheetPopupComponent, { static: false }) plSheetPopup: PlSheetPopupComponent;
     @ViewChild('confirmCancelUpdate', { static: false }) confirmCancelJobPopup: ConfirmPopupComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
@@ -52,7 +54,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     deleteMessage: string = '';
 
-
+    nextState: RouterStateSnapshot;
+    isCancelFormPopupSuccess: boolean = false;
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -72,15 +75,17 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     ngOnInit() {
 
-        this.route.params.subscribe((params: any) => {
-            this.tab = 'job-edit';
-            this.tabCharge = 'buying';
+        this.route.params
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((params: any) => {
+                this.tab = 'job-edit';
+                this.tabCharge = 'buying';
 
-            if (!!params && !!params.id) {
-                this.jobId = params.id;
-                this.getShipmentDetails(params.id);
-            }
-        });
+                if (!!params && !!params.id) {
+                    this.jobId = params.id;
+                    this.getShipmentDetails(params.id);
+                }
+            });
 
         this._actionStoreSubject
             .pipe(
@@ -181,7 +186,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.confirmCancelJobPopup.show();
     }
 
-
     saveShipment() {
         this.lstMasterContainers.forEach((c: Container) => {
             c.mblid = this.jobId;
@@ -198,6 +202,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.onSubmitData();
         this.updateShipment();
     }
+
     checkValidateForm() {
         [this.editForm.commodityGroupId,
         this.editForm.packageTypeId,
@@ -217,6 +222,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         }
         return valid;
     }
+
     onSubmitData() {
         const form: any = this.editForm.formEdit.getRawValue();
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
@@ -373,4 +379,44 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 break;
         }
     }
+
+    gotoList() {
+        this._router.navigate(["home/operation/job-management"]);
+    }
+
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
+        if (isEdited) {
+            this.confirmCancelJobPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelJobPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
+    }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
+        if (this.isCancelFormPopupSuccess) {
+            return of(true);
+        }
+        if (isEdited && !this.isCancelFormPopupSuccess) {
+            this.confirmCancelJobPopup.show();
+            return;
+        }
+        return of(!isEdited);
+    }
+
 }
