@@ -255,9 +255,7 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/Paging`, body, {
             page: '' + page,
             size: '' + size
-        }).pipe(
-            map((data: any) => data)
-        );
+        });
     }
 
     getListHouseBillOfJob(data: any = {}) {

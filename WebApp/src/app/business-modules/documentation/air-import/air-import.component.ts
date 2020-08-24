@@ -8,22 +8,25 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import * as fromShare from './../../share-business/store';
 import { CommonEnum } from '@enums';
-import { CsTransactionDetail } from '@models';
+import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-air-import',
     templateUrl: './air-import.component.html',
 })
 export class AirImportComponent extends AppList {
+
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+
     headers: CommonInterface.IHeaderTable[];
     headersHBL: CommonInterface.IHeaderTable[];
 
-    shipments: any[] = [];
+    shipments: CsTransaction[] = [];
     houseBills: CsTransactionDetail[] = [];
     itemToDelete: any = null;
     tmpHouseBills: CsTransactionDetail[] = [];
@@ -31,10 +34,13 @@ export class AirImportComponent extends AppList {
 
     transactionService: number = CommonEnum.TransactionTypeEnum.AirImport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private _router: Router,
@@ -44,15 +50,13 @@ export class AirImportComponent extends AppList {
         private _ngProgessService: NgProgress,
         private _store: Store<fromShare.IShareBussinessState>) {
         super();
+
         this._progressRef = this._ngProgessService.ref();
         this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortShipment;
+
         this.isLoading = <any>this._store.select(fromShare.getTransationLoading);
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
+
     }
 
     ngOnInit() {
@@ -82,8 +86,22 @@ export class AirImportComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(fromShare.getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
     }
 
     getShipments() {
@@ -128,16 +146,14 @@ export class AirImportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetShipment($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
