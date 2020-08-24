@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
@@ -54,6 +54,8 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
+    //
+    @ViewChild('focusInput', { static: false }) internalReferenceRef: ElementRef;
 
 
     constructor(
@@ -258,5 +260,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                     }
                 );
         }
+    }
+    //
+    handleFocusInternalReference() {
+        this.setFocusInput(this.internalReferenceRef);
     }
 }
