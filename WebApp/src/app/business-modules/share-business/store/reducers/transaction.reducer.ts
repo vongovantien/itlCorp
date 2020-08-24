@@ -22,6 +22,7 @@ export interface ITransactionState {
     cstransactions: CsTransaction[];
     isLoading: boolean;
     isLoaded: boolean;
+    dataSearch: any;
 }
 
 export const initState: ITransactionState = {
@@ -29,13 +30,16 @@ export const initState: ITransactionState = {
     cstransaction: new CsTransaction(),
     cstransactions: [],
     isLoading: false,
-    isLoaded: false
+    isLoaded: false,
+    dataSearch: {}
 };
 
 
 export function TransactionReducer(state = initState, action: TransactionActions): ITransactionState {
     switch (action.type) {
-
+        case TransactionActionTypes.SEARCH_LIST: {
+            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false };
+        }
         case TransactionActionTypes.LOAD_LIST: {
             return { ...state, isLoading: true, isLoaded: false };
         }

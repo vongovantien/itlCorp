@@ -1,13 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
-import { AppList } from 'src/app/app.list';
-import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { Shipment, CustomDeclaration } from 'src/app/shared/models';
-import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+
+import { Shipment, CustomDeclaration } from '@models';
+import { SortService } from '@services';
+import { DocumentationRepo, OperationRepo } from '@repositories';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+
+import { AppList } from 'src/app/app.list';
+import * as fromOperationStore from './../store';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
+
+
 
 @Component({
     selector: 'app-job-mangement',
@@ -24,9 +31,12 @@ export class JobManagementComponent extends AppList implements OnInit {
     customClearances: any[] = [];
     deleteMessage: string = '';
 
-    headers: CommonInterface.IHeaderTable[];
     headerCustomClearance: CommonInterface.IHeaderTable[];
-    dataSearch: any = {};
+
+    defaultDataSearch = {
+        serviceDateFrom: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        serviceDateTo: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private sortService: SortService,
@@ -34,12 +44,15 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
         private _operationRepo: OperationRepo,
-        private _router: Router
+        private _router: Router,
+        private _store: Store<fromOperationStore.IOperationState>
     ) {
         super();
         this.requestSort = this.sortShipment;
-        this.requestList = this.getShipments;
+        this.requestList = this.requestSearchShipment;
         this._progressRef = this._ngProgressService.ref();
+
+        this.isLoading = this._store.select(fromOperationStore.getOperationTransationLoadingState);
     }
 
     ngOnInit() {
@@ -67,21 +80,38 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-        this.dataSearch.serviceDateFrom = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-        this.dataSearch.serviceDateTo = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
-        this.getShipments(this.dataSearch);
+
+        this.getShipments();
+
+        this._store.select(fromOperationStore.getOperationTransationDataSearch)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
+    }
+
+    requestSearchShipment() {
+        this._store.dispatch(new fromOperationStore.OPSTransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     showCustomClearance(jobNo: string, indexsShipment: number) {
-        if (this.shipments[indexsShipment].customClearances.length) {
+        if (!!this.shipments[indexsShipment].customClearances && this.shipments[indexsShipment].customClearances.length) {
             this.customClearances = this.shipments[indexsShipment].customClearances;
         } else {
             this._progressRef.start();
-            this.isLoading = true;
             this._operationRepo.getCustomDeclaration(jobNo)
                 .pipe(
                     catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); this.isLoading = false; })
+                    finalize(() => { this._progressRef.complete(); })
                 ).subscribe(
                     (res: CustomDeclaration[]) => {
                         this.customClearances = (res || []).map((item: CustomDeclaration) => new CustomDeclaration(item));
@@ -124,7 +154,8 @@ export class JobManagementComponent extends AppList implements OnInit {
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
                         this._toastService.success(respone.message, 'Delete Success !');
-                        this.getShipments();
+                        this.requestSearchShipment();
+
                     }
                 },
             );
@@ -145,6 +176,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 },
             );
     }
+
     sortShipment() {
         if (!!this.shipments.length) {
             this.shipments = this.sortService.sort(this.shipments, this.sort, this.order);
@@ -172,30 +204,32 @@ export class JobManagementComponent extends AppList implements OnInit {
         return '';
     }
 
-    getShipments(dataSearch?: any) {
-        this._progressRef.start();
-        this.isLoading = true;
-        this._documentRepo.getListShipment(this.page, this.pageSize, dataSearch)
+    getShipments() {
+        this._store.select(fromOperationStore.getOperationTransationListShipment)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
-            ).subscribe(
-                (responses: any) => {
-                    if (!!responses.data) {
-                        this.shipments = responses.data.opsTransactions.map((shipment: Shipment) => new Shipment(shipment));
-                        this.totalItems = responses.totalItems || 0;
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
+                    if (!!res.data) {
+                        this.shipments = res.data.opsTransactions || [];
+                        this.totalItems = res.totalItems;
                     } else {
-                        this.totalItems = 0;
                         this.shipments = [];
                     }
-                },
+                }
             );
     }
 
     onSearchShipment(dataSearch: any) {
         this.dataSearch = dataSearch;
+    }
 
-        this.getShipments(this.dataSearch);
+    onResetSearchShipment($event: any) {
+        this.page = 1;
+        this.dataSearch = this.defaultDataSearch;
+
+        this.requestSearchShipment();
     }
 
     gotoCreateJob() {
