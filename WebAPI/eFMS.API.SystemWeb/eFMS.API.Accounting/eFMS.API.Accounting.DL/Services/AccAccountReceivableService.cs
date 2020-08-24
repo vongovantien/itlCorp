@@ -840,7 +840,7 @@ namespace eFMS.API.Accounting.DL.Services
             var selectQuery = from contract in partnerContracts
                               join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
-                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId == acctReceivable.Office.ToString()
+                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString())
                               select new { acctReceivable, contract };
             if (selectQuery == null || !selectQuery.Any()) return null;
 
@@ -850,8 +850,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AgreementSalesmanId = s.contract.SaleManId,
                     DebitAmount = s.acctReceivable.DebitAmount
                 }).ToList();
-
-            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id })
+            // Group by Contract ID, Service AR, Office AR
+            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office })
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
@@ -867,8 +867,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AgreementStatus = s.First().contract.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                     AgreementSalesmanId = s.First().contract.SaleManId,
                     AgreementCurrency = s.First().contract.CurrencyId,
-                    OfficeId = s.First().contract.OfficeId, //Office of Argeement 
-                    ArServiceCode = s.First().acctReceivable.Service,
+                    OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
+                    ArServiceCode = s.Key.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
                     EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
                     ExpriedDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialExpiredDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.ExpiredDate : null),
@@ -937,7 +937,7 @@ namespace eFMS.API.Accounting.DL.Services
                            CreditAmount = contract.CreditAmount,
                            Over1To15Day = contract.Over1To15Day,
                            Over16To30Day = contract.Over16To30Day,
-                           Over30Day = contract.Over16To30Day,
+                           Over30Day = contract.Over30Day,
                            ArCurrency = contract.ArCurrency
                        };
             return data;
@@ -992,7 +992,7 @@ namespace eFMS.API.Accounting.DL.Services
                            CreditAmount = ar.CreditAmount,
                            Over1To15Day = ar.Over1To15Day,
                            Over16To30Day = ar.Over16To30Day,
-                           Over30Day = ar.Over16To30Day,
+                           Over30Day = ar.Over30Day,
                            ArCurrency = ar.ArCurrency
                        };
             return data;
@@ -1017,7 +1017,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.OfficeId != null && criteria.OfficeId != Guid.Empty)
             {
-                query = query.And(x => x.OfficeId == criteria.OfficeId.ToString());
+                query = query.And(x => x.OfficeId.Contains(criteria.OfficeId.ToString()));
             }
             if (!string.IsNullOrEmpty(criteria.AgreementStatus) && criteria.AgreementStatus != "All")
             {
@@ -1161,7 +1161,24 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalOver1To15Day = s.Select(se => se.Over1To15Day).Sum(),
                     TotalOver16To30Day = s.Select(se => se.Over16To30Day).Sum(),
                     TotalOver30Day = s.Select(se => se.Over30Day).Sum(),
-                    ArPartners = s.ToList()
+                    ArPartners = s.ToList().GroupBy(g => new { g.AgreementId }).Select(se => new AccountReceivableResult {
+                        AgreementId = se.Key.AgreementId,
+                        AgreementNo = se.First().AgreementNo,
+                        AgreementStatus = se.First().AgreementStatus,
+                        PartnerId = se.First().PartnerId,
+                        PartnerCode = se.First().PartnerCode,
+                        PartnerNameAbbr = se.First().PartnerNameAbbr,
+                        PartnerNameEn = se.First().PartnerNameEn,
+                        PartnerNameLocal = se.First().PartnerNameLocal,
+                        DebitAmount = se.Sum(sum => sum.DebitAmount),
+                        BillingAmount = se.Sum(sum => sum.BillingAmount),
+                        BillingUnpaid = se.Sum(sum => sum.BillingUnpaid),
+                        PaidAmount = se.Sum(sum => sum.PaidAmount),
+                        ObhAmount = se.Sum(sum => sum.ObhAmount),
+                        Over1To15Day = se.Sum(sum => sum.Over1To15Day),
+                        Over16To30Day = se.Sum(sum => sum.Over16To30Day),
+                        Over30Day = se.Sum(sum => sum.Over30Day)
+                    }).ToList()
                 });
             var data = from contract in groupBySalesman
                        join user in userRepo.Get() on contract.SalesmanId equals user.Id
@@ -1294,7 +1311,7 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeName = string.Empty,
                     TotalDebitAmount = se.Select(sel => sel.DebitAmount).Sum(),
                     TotalBillingAmount = se.Select(sel => sel.BillingAmount).Sum(),
-                    TotalBillingUnpaid = se.Select(sel => sel.BillingAmount).Sum(),
+                    TotalBillingUnpaid = se.Select(sel => sel.BillingUnpaid).Sum(),
                     TotalPaidAmount = se.Select(sel => sel.PaidAmount).Sum(),
                     TotalObhAmount = se.Select(sel => sel.ObhAmount).Sum(),
                     TotalOver1To15Day = se.Select(sel => sel.Over1To15Day).Sum(),
