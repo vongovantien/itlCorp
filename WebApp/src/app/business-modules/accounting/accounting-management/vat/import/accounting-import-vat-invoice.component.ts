@@ -22,7 +22,6 @@ export class AccountingManagementImportVatInvoiceComponent extends AppList imple
 
     data: IImportVatInvoice[] = [];
     tempData: IImportVatInvoice[] = [];
-    inValidItems: IImportVatInvoice[] = [];
 
     isShowInvalid: boolean = true;
 

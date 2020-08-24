@@ -63,7 +63,9 @@ namespace eFMS.API.Accounting.DL.Services
                 DatetimeCreated = x.DatetimeCreated,
                 UserModified = x.UserModified,
                 DatetimeModified = x.DatetimeModified,
-                UserModifiedName = y.Username
+                UserModifiedName = y.Username,
+                PaymentMethod = x.PaymentMethod,
+                ExchangeRate = x.ExchangeRate
             });
             return results;
         }
@@ -551,11 +553,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccountingPaymentImportModel> CheckValidImportInvoicePayment(List<AccountingPaymentImportModel> list)
         {
-            var partners = partnerRepository.Get();
-            var invoices = accountingManaRepository.Get();
+            IQueryable<CatPartner> partners = partnerRepository.Get();
+            IQueryable<AccAccountingManagement> invoices = accountingManaRepository.Get();
+
             list.ForEach(item =>
             {
-                var partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
+                CatPartner partner = partners.Where(x => x.AccountNo == item.PartnerAccount)?.FirstOrDefault();
                 if(partner == null)
                 {
                     item.PartnerAccountError = "Not found partner " + item.PartnerAccount;
@@ -563,11 +566,17 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
+                    item.PartnerName = partner.ShortName;
                     var accountManagement = invoices.FirstOrDefault(x => x.Serie == item.SerieNo && x.InvoiceNoReal == item.InvoiceNo && x.PartnerId == partner.Id);
                     if (accountManagement == null)
                     {
                         item.PartnerAccountError = "Not found " + item.SerieNo + " and " + item.InvoiceNo + " of " + item.PartnerAccount;
                         item.IsValid = false;
+                    }
+                    else if (accountManagement.Currency != item.CurrencyId)
+                    {
+                        item.IsValid = false;
+                        item.CurrencyIdError = "Currency not match with invoice";
                     }
                     else
                     {
@@ -580,7 +589,8 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             item.PartnerId = partner.Id;
                             item.RefId = accountManagement.Id.ToString();
-                            var lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
+
+                            AccAccountingPayment lastItem = DataContext.Get(x => x.RefId == item.RefId)?.OrderByDescending(x => x.PaidDate).FirstOrDefault();
                             if (lastItem != null)
                             {
                                 if (item.PaidDate < lastItem.PaidDate)
@@ -621,7 +631,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             isPaid = true;
                         }
-                        var payment = new AccAccountingPayment
+                        AccAccountingPayment payment = new AccAccountingPayment
                         {
                             Id = Guid.NewGuid(),
                             RefId = item.RefId,
@@ -639,7 +649,10 @@ namespace eFMS.API.Accounting.DL.Services
                             GroupId = currentUser.GroupId,
                             DepartmentId = currentUser.DepartmentId,
                             OfficeId = currentUser.OfficeID,
-                            CompanyId = currentUser.CompanyID
+                            CompanyId = currentUser.CompanyID,
+
+                            PaymentMethod = item.PaymentMethod,
+                            ExchangeRate = item.ExchangeRate
                         };
                         results.Add(payment);
                     }
@@ -712,9 +725,10 @@ namespace eFMS.API.Accounting.DL.Services
             var groups = list.GroupBy(x => x.RefId);
             foreach (var group in groups)
             {
-                var refSOA = soaRepository.Get(x => x.Id == Convert.ToInt32(group.Key)).FirstOrDefault();
-                var surcharges = surchargeRepository.Get(x => x.Soano == refSOA.Soano && x.Type == "OBH");
-                var existedPayments = DataContext.Get(x => x.RefId == refSOA.Id.ToString());
+                AcctSoa refSOA = soaRepository.Get(x => x.Id == Convert.ToInt32(group.Key)).FirstOrDefault();
+                IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get(x => x.Soano == refSOA.Soano && x.Type == "OBH");
+                IQueryable<AccAccountingPayment> existedPayments = DataContext.Get(x => x.RefId == refSOA.Id.ToString());
+
                 decimal? totalExistedPayment = 0;
                 if (group.Any())
                 {
@@ -732,7 +746,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             isPaid = true;
                         }
-                        var payment = new AccAccountingPayment
+                        AccAccountingPayment payment = new AccAccountingPayment
                         {
                             Id = Guid.NewGuid(),
                             RefId = item.RefId,
@@ -750,7 +764,11 @@ namespace eFMS.API.Accounting.DL.Services
                             GroupId = currentUser.GroupId,
                             DepartmentId = currentUser.DepartmentId,
                             OfficeId = currentUser.OfficeID,
-                            CompanyId = currentUser.CompanyID
+                            CompanyId = currentUser.CompanyID,
+
+                            PaymentMethod = item.PaymentMethod,
+                            ExchangeRate = item.ExchangeRate,
+
                         };
                         results.Add(payment);
                     }
@@ -796,11 +814,12 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> list)
         {
-            var partners = partnerRepository.Get();
-            var soas = soaRepository.Get();
+            IQueryable<CatPartner> partners = partnerRepository.Get();
+            IQueryable<AcctSoa> soas = soaRepository.Get();
+
             list.ForEach(item =>
             {
-                var partner = partners.Where(x => x.AccountNo == item.PartnerId)?.FirstOrDefault();
+                CatPartner partner = partners.Where(x => x.AccountNo == item.PartnerId)?.FirstOrDefault();
                 if (partner == null)
                 {
                     item.PartnerAccountError = "'" + item.PartnerId + "' Not found";
@@ -808,11 +827,17 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
+                    item.PartnerName = partner.ShortName;
                     var soa = soas.FirstOrDefault(x => x.Soano == item.SoaNo && x.Customer == partner.Id);
                     if (soa == null)
                     {
                         item.SoaNoError = "Not found SOA No '" + item.SoaNo + "' of '" + item.PartnerId + "'";
                         item.IsValid = false;
+                    }
+                    else if (soa.Currency.Trim() != item.CurrencyId.Trim())
+                    {
+                        item.IsValid = false;
+                        item.CurrencyIdError = "Currency not match with soa";
                     }
                     else
                     {
