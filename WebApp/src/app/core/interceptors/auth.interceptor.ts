@@ -1,12 +1,12 @@
-import { Injectable, InjectionToken, Inject } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, TimeoutError } from 'rxjs';
-import { catchError, timeout, retry } from 'rxjs/operators';
+import { catchError, timeout } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { SystemConstants } from 'src/constants/system.const';
+import { DEFAULT_TIMEOUT } from '../inject/default-timeout.token';
 
-export const DEFAULT_TIMEOUT = new InjectionToken<number>('defaultTimeout');
 
 @Injectable({
     providedIn: 'root'
