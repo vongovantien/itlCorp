@@ -17,12 +17,21 @@ import { AccountReceivableDetailComponent } from './detail/detail-account-receiv
 
 const routing: Routes = [
     {
-        path: "", component: AccountReceivableTabComponent,
-        data: { name: '' }
+        path: "",
+        data: { name: '' },
+        children: [
+            {
+                path: '',
+                component: AccountReceivableTabComponent,
+                data: { name: '' },
+            },
+            {
+                path: ":key", component: AccountReceivableDetailComponent,
+                data: { name: 'Detail' }
+            },
+        ]
     },
-    {
-        path: ":key", component: AccountReceivableDetailComponent
-    },
+
 ];
 
 @NgModule({

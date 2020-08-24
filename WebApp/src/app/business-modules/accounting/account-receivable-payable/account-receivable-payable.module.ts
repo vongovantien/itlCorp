@@ -33,7 +33,8 @@ const routing: Routes = [
         data: { name: "", title: 'eFMS Receivable Payable' },
         children: [
             {
-                path: '', component: AccountReceivablePayableComponent
+                path: '', component: AccountReceivablePayableComponent,
+                data: { name: 'Account Payment' }
             },
             {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
@@ -43,7 +44,7 @@ const routing: Routes = [
             },
             {
                 path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
-
+                data: { name: 'A.R' }
             }
         ]
     },
