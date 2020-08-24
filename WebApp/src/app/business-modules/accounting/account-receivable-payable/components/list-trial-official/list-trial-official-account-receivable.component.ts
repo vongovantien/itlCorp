@@ -1,23 +1,12 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo } from '@repositories';
 import { SortService } from '@services';
-import { Store } from '@ngrx/store';
-import { getMenuUserSpecialPermissionState, IAppState } from '@store';
-import { SystemConstants } from 'src/constants/system.const';
 import { catchError, finalize } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
-
-
 import { TrialOfficialOtherModel } from '@models';
-
-
-
-
 
 @Component({
     selector: 'list-trial-official-account-receivable',
