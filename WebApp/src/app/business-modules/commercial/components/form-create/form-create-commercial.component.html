@@ -50,7 +50,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || internalReferenceNo.dirty) && !internalReferenceNo.valid}">
                                 <label>Internal Reference</label>
-                                <input type="text" class="form-control" formControlName="internalReferenceNo">
+                                <input #focusInput type="text" class="form-control"
+                                    formControlName="internalReferenceNo">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && 
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">

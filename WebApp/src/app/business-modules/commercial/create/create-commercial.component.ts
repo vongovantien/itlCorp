@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from '@repositories';
-import { InfoPopupComponent } from '@common';
+import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { Partner } from '@models';
 
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
@@ -26,7 +26,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
     @ViewChild(CommercialContractListComponent, { static: false }) contractList: CommercialContractListComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild('taxCodeInfo', { static: false }) infoPopupTaxCode: InfoPopupComponent;
-
+    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
 
     invalidTaxCode: string;
 
@@ -94,8 +94,10 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 if (!!value) {
                     if (!!body.internalReferenceNo) {
                         this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                        this.infoPopupTaxCode.show();
                     } else {
                         this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
+                        this.confirmTaxcode.show();
                     }
                     throw new Error("TaxCode Duplicated: ");
                 }
@@ -144,7 +146,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         ).subscribe(
             (res) => {
                 if (res === false) {
-                    this.infoPopupTaxCode.show();
+                    //this.infoPopupTaxCode.show();
                     this.formCreate.isExistedTaxcode = true;
                     return;
                 }
@@ -161,6 +163,12 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                 console.log(err);
             }
         );
+    }
+
+    onFocusInternalReference() {
+        this.confirmTaxcode.hide();
+        //
+        this.formCreate.handleFocusInternalReference();
     }
 }
 
