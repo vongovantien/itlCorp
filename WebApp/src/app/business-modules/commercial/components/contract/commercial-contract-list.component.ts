@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Input, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -29,11 +29,15 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     indexlstContract: number = null;
     contract: Contract = new Contract();
 
+    type: string = '';
+
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
+        protected _activeRoute: ActivatedRoute
+
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -41,6 +45,10 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     ngOnInit(): void {
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            this.type = result.type;
+
+        });
         this.headers = [
             { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Contract No', field: 'contractNo', sortable: true },
@@ -95,8 +103,18 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.salesmanId.setValue(userLogged.id);
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+
+
+
         this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
         this.formContractPopup.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
+
+        if (this.type === 'Agent') {
+            this.formContractPopup.vas.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
+            this.formContractPopup.saleService.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
+            this.formContractPopup.type = this.type;
+
+        }
 
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
