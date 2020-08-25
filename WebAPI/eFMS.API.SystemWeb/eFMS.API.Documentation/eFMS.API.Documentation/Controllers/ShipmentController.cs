@@ -181,7 +181,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetDataSummaryOfCostsIncurred")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             var data = shipmentService.GetDataSummaryOfCostsIncurred(criteria);
@@ -193,7 +193,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetDataSummaryOfRevenueIncurred")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetDataSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
         {
             var data = shipmentService.GetDataSummaryOfRevenueIncurred(criteria);

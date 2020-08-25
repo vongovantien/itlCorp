@@ -322,7 +322,8 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<SummaryOfCostsIncurredModel>>();
             if (dataObjects.Result == null || !dataObjects.Result.Any())
@@ -349,7 +350,8 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
         {
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl);
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SummaryOfRevenueModel>();
             if (dataObjects.Result == null || !dataObjects.Result.summaryOfRevenueExportResults.Any())
