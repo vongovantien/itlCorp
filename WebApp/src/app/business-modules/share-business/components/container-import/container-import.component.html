@@ -85,17 +85,9 @@
                             </div>
                             <div class="table-wrapper table-scrollable" id="">
                                 <table class="table table-striped table-brand dataTable">
-                                    <thead>
-                                        <tr>
-                                            <th class="sorting_asc">No</th>
-
-                                            <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                                [class]="sortClass(header.sortable ? header.field : '')"
-                                                (click)="sortBy(header.sortable ? header.field : '')">
-                                                <span>{{header.title}}</span>
-                                                <span class="sort-indicator"></span>
-                                            </th>
-                                        </tr>
+                                    <thead app-table-header [headers]="headers"
+                                        (click)="sortBy($event.sortable ? $event.field : '')">
+                                        <th class="sorting_asc first">No</th>
                                     </thead>
                                     <tbody *ngIf="importedData.length > 0">
                                         <tr *ngFor="let item of importedData; let i = index; trackBy: trackByFn"
