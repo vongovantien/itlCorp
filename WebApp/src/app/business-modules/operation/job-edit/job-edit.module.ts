@@ -17,10 +17,11 @@ import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
-        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "", serviceId: ChargeConstants.CL_CODE }
+        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "", serviceId: ChargeConstants.CL_CODE }, canDeactivate: [DeactivateGuardService]
     },
 
 ];

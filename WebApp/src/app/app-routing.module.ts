@@ -3,10 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './404/404-page.component';
-import { AuthGuardService } from 'src/app/shared/services/auth-guard.service';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { MenuResolveGuard } from './menu.resolve';
 import { ForbiddenPageComponent } from './403/403.component';
+import { MenuResolveGuard, AuthGuardService } from '@core';
 
 const routes: Routes = [
     {

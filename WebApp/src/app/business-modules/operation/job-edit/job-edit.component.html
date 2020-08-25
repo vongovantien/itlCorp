@@ -51,7 +51,7 @@
     </ng-container>
 
 
-    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
+    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=handleCancelForm()></app-default-button>
 
 </app-sub-header>
 
@@ -126,7 +126,7 @@
 
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
 
-<confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"
+<confirm-popup #confirmCancelUpdate (onSubmit)="confirmCancel()"
     [body]="'Unsaved data will be lost. Are you sure want to leave?'" [labelConfirm]="'Yes'"></confirm-popup>
 
 <confirm-popup *ngIf="!!opsTransaction" #confirmDelete (onSubmit)="onDeleteJob()" [body]="deleteMessage">
@@ -143,4 +143,5 @@
         <span class="no-data-text">No records found</span>
     </div>
 </ng-template>
+
 <info-popup #notAllowUpdate [body]="invalidFormText" [title]="'Cannot Create Job'"></info-popup>

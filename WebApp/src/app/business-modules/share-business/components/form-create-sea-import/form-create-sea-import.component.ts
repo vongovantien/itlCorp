@@ -132,6 +132,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                                 coloader: this.fclImportDetail.coloaderId,
                                 deliveryPlace: this.fclImportDetail.deliveryPlace
                             });
+
+                            this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
                         } catch (error) {
                             console.log(error);
 

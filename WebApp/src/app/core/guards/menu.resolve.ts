@@ -1,18 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { Observable, throwError } from 'rxjs';
-import { SystemRepo } from './shared/repositories/system.repo';
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable } from 'rxjs';
+import { SystemRepo } from '@repositories';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
-import { IAppState } from './store/reducers';
-import { MenuUpdatePermissionAction } from './store/actions';
+import { IAppState } from '../../store/reducers';
+import { MenuUpdatePermissionAction } from '../../store/actions';
 
 @Injectable()
 export class MenuResolveGuard implements Resolve<any> {
 
     constructor(
         private _systemRepo: SystemRepo,
-        private _router: Router,
         private _store: Store<IAppState>
     ) {
     }
