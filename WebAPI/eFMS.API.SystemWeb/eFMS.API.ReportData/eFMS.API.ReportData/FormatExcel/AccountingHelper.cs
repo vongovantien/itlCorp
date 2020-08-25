@@ -91,6 +91,23 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
+        private void SetWidthColumnExcelAdvancePaymentShipment(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 5; //Cột A
+            workSheet.Column(2).Width = 12; //Cột B
+            workSheet.Column(3).Width = 15; //Cột C
+            workSheet.Column(4).Width = 20; //Cột D
+            workSheet.Column(5).Width = 20; //Cột E
+            workSheet.Column(6).Width = 10; //Cột F
+            workSheet.Column(7).Width = 14; //Cột G
+            workSheet.Column(8).Width = 18; //Cột H
+            workSheet.Column(9).Width = 19; //Cột I
+            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 13; //Cột L
+            workSheet.Column(13).Width = 12; //Cột M            
+        }
+
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
         {
             List<string> headers = new List<string>()
@@ -109,6 +126,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Approve Date",
                 "Settle Date",
             };
+            
             try
             {
                 int addressStartContent = 4;
@@ -118,7 +136,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     var worksheet = excelPackage.Workbook.Worksheets[1];
 
                     BuildHeader(worksheet, headers, "Advance Payment");
-
+                    SetWidthColumnExcelAdvancePaymentShipment(worksheet);
 
                     for (int i = 0; i < listObj.Count; i++)
                     {
@@ -129,6 +147,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 3].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 4].Value = item.Requester;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.Amount;
+                        worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0";
                         worksheet.Cells[i + addressStartContent, 6].Value = item.RequestCurrency;
                         worksheet.Cells[i + addressStartContent, 7].Value = item.JobId;
                         worksheet.Cells[i + addressStartContent, 8].Value = item.Mbl;
@@ -136,7 +155,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 10].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 11].Value = item.Description;
                         worksheet.Cells[i + addressStartContent, 12].Value = item.ApproveDate;
-                        worksheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = "dd/MM/yyyy  HH:mm:ss AM/PM";
+                        worksheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 13].Value = item.SettleDate;
                         worksheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = "dd/MM/yyyy";
 
