@@ -11,8 +11,7 @@
                 </button>
                 <ng-container *ngIf="!(isLocked | async)">
                     <div class="modal-actions c-button-actions" *ngIf="!!isShowGetFromHAWB">
-                        <button class="btn btn-sm btn-primary m-btn--square m-btn--icon"
-                            (click)="confirmGetFromHAWB.show()">
+                        <button class="btn btn-sm btn-primary  m-btn--icon" (click)="confirmGetFromHAWB.show()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>

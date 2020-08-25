@@ -98,7 +98,8 @@
                         <div class="form-group row" *ngIf="commodity.id">
                             <label class="col-lg-4 col-form-label form-control-label"> Active </label>
                             <div class="col-lg-8">
-                                <app-switch [(toggle)]="commodityActive.value" (toggleChange)="commodityActive.setValue($event)">
+                                <app-switch [(toggle)]="commodityActive.value"
+                                    (toggleChange)="commodityActive.setValue($event)">
                                 </app-switch>
                             </div>
                         </div>
@@ -106,7 +107,7 @@
                     <!--end:add-commodity-form -->
                 </div>
                 <div class="modal-footer m--align-center">
-                    <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveCommodity()">
+                    <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="saveCommodity()">
                         <span>
                             <i class="la la-save"></i>
                             <span>
@@ -114,8 +115,7 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="closePopup()">
+                    <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="closePopup()">
                         <span>
                             <i class="la la-ban"></i>
                             <span>

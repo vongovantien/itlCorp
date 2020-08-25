@@ -13,7 +13,7 @@
                     <div class="col-md-1">
                         <div class="form-group">
                             <button *ngIf="(isLocked | async) === false"
-                                class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase" (click)="sendMail()">
+                                class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="sendMail()">
                                 <i class="fa fa-envelope fa-2x" aria-hidden="true"></i>
                                 <span style="margin-top: 5px;">{{sendMailButtonName}}</span>
                             </button>
@@ -24,7 +24,7 @@
                             <div class="col-md-1">
                                 <div class="form-group">
                                     <button style="width:54px;" type="label"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                        class="btn btn-default  m-btn--icon m-btn--uppercase ">
                                         from...
                                     </button>
                                 </div>
@@ -38,8 +38,7 @@
                         <div class="row">
                             <div class="col-md-1">
                                 <div class="form-group">
-                                    <button style="width:54px;"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    <button style="width:54px;" class="btn btn-default  m-btn--icon m-btn--uppercase ">
                                         to...
                                     </button>
                                 </div>
@@ -54,8 +53,7 @@
                         <div class="row">
                             <div class="col-md-1">
                                 <div class="form-group">
-                                    <button style="width:54px;"
-                                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                                    <button style="width:54px;" class="btn btn-default  m-btn--icon m-btn--uppercase ">
                                         cc...
                                     </button>
                                 </div>
@@ -70,7 +68,7 @@
                         <div class="row">
                             <div class="col-md-1">
                                 <div class="form-group">
-                                    <button style="width:54px;" class="btn m-btn--square m-btn--icon m-btn--uppercase">
+                                    <button style="width:54px;" class="btn  m-btn--icon m-btn--uppercase">
                                         subject:
                                     </button>
                                 </div>
@@ -99,7 +97,7 @@
         <div class="col-lg-6 m--align-right">
             <div class="">
                 <button *ngIf="(isLocked | async) === false" style="float:right"
-                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="showPopup()">
+                    class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="showPopup()">
                     <span>
                         <i class="la la-plus"></i>
                         <span>

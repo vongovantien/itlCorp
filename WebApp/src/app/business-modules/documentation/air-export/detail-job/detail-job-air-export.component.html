@@ -21,7 +21,7 @@
             </div>
 
             <ng-container *ngIf="!!shipmentDetail && !shipmentDetail.isLocked">
-                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                     (click)="showDuplicateConfirm()" [disabled]="ACTION === 'COPY'"
                     *ngIf="!!shipmentDetail && shipmentDetail.permission.allowUpdate">
                     <span>
@@ -31,9 +31,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="prepareDeleteJob()" [disabled]="ACTION === 'COPY'"
-                    *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
+                <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="prepareDeleteJob()"
+                    [disabled]="ACTION === 'COPY'" *ngIf="!!shipmentDetail && shipmentDetail.permission.allowDelete">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -72,7 +71,7 @@
                         </div>
                         <ng-container *ngIf="!shipmentDetail.isLocked">
                             <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">
-                                <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                                <button class="btn btn-info  m-btn--icon m-btn--uppercase" type="button"
                                     (click)="confirmSyncHBL.show()">
                                     <span><i class="la la-refresh"></i>
                                         <span> Sync HAWB </span>

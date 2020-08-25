@@ -48,8 +48,7 @@
                     <div class="col-lg-12">
                         <div class="text-center m--margin-top-20" *ngIf="!!settlementPayment">
                             <div class="c-button-actions">
-                                <button
-                                    class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                <button class="btn btn-primary  m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Approve" (click)="showModalApprove()"
                                     *ngIf="settlementPayment.settlement.statusApproval !== 'New' && settlementPayment.settlement.statusApproval !== 'Denied' && settlementPayment.settlement.statusApproval !== 'Done' && settlementPayment.settlement.isManager && !settlementPayment.settlement.isApproved">
                                     <span>
@@ -59,8 +58,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button
-                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                <button class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Deny" *ngIf="settlementPayment.settlement.isShowBtnDeny"
                                     (click)="showDenyPopup()">
                                     <span>
@@ -72,7 +70,7 @@
                                 </button>
                                 <button
                                     *ngIf="settlementPayment.settlement.statusApproval === 'Request Approval' && settlementPayment.settlement.isRequester"
-                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                                    class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
                                     title="Recall" (click)="recall()">
                                     <span>
                                         <i class="la la-undo"></i>
@@ -120,8 +118,7 @@
         </div>
     </div>
     <div class="modal-footer m--align-center c-button-actions">
-        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="onConfirmDenied()">
+        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onConfirmDenied()">
             <span>
                 <i class="la la-save"></i>
                 <span>
@@ -129,8 +126,7 @@
                 </span>
             </span>
         </button>
-        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-            (click)="modalRef.hide()">
+        <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="modalRef.hide()">
             <span>
                 <i class="la la-ban"></i>
                 <span>

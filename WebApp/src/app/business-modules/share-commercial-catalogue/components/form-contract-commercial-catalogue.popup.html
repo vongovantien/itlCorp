@@ -345,7 +345,7 @@
                                     <input style="display:none" type="file" #file (change)="handleFileInput($event)">
                                     <div class="form-group ">
                                         <button (click)="file.click()" type="button"
-                                            class=" btn btn-success m-btn--square m-btn--icon m-btn--uppercase margin-right-10">
+                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
                                             <span>
                                                 <i class="la la-plus"></i>
                                                 <span>
@@ -391,8 +391,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
-                    <button (click)="onSubmit()"
-                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                    <button (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>
                             <span> Save </span>
@@ -400,7 +399,7 @@
                     </button>
                     <button (click)="onSubmit(true)"
                         *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) && this.partnerId != null) || (!isCreateNewCommercial && !isUpdate)   "
-                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-send"></i>
                             <span> Request Approval </span>
@@ -408,14 +407,14 @@
                     </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"
                         *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <span> Active </span>
                         </span>
                     </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"
                         *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <span> Inactive </span>
                         </span>

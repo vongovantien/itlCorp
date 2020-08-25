@@ -50,10 +50,9 @@
                             </label>
                             <div class="m-input-icon m-input-icon--right down daterange-ltr">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                    formControlName="importDate" [ranges]="ranges" [maxDate]="maxDate"
-                                    [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
-                                    readonly />
+                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" formControlName="importDate"
+                                    [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                    placeholder="From date - to date" readonly />
                                 <span class="m-input-icon__icon m-input-icon__icon--right">
                                     <span>
                                         <i class="la la-calendar"></i>
@@ -89,7 +88,7 @@
                     <div class="row">
                         <div class="col-lg-6"></div>
                         <div class="col-lg-6 m--align-right">
-                            <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
                                 (click)="searchCustomClearance()">
                                 <span>
                                     <i class="la la-search"></i>
@@ -98,7 +97,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                            <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
                                 (click)="resetSearch()">
                                 <span>
                                     <i class="la la-refresh"></i>

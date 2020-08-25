@@ -112,7 +112,7 @@
                             <div class="c-button-actions">
                                 <button title="Save" type="button"
                                     *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && unlockRequest.isRequester"
-                                    class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="save()">
+                                    class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="save()">
                                     <span>
                                         <i class="la la-save"></i>
                                         <span>
@@ -122,8 +122,7 @@
                                 </button>
                                 <button title="Send Request" type="button"
                                     *ngIf="(unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied') && unlockRequest.isRequester"
-                                    class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="sendRequest()">
+                                    class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="sendRequest()">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -133,7 +132,7 @@
                                 </button>
                                 <button title="Cancel Request" type="button"
                                     *ngIf="unlockRequest.statusApproval === 'Request Approval' && unlockRequest.isRequester"
-                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                    class="btn btn-danger  m-btn--icon m-btn--uppercase"
                                     (click)="confirmCancelRequest()">
                                     <span>
                                         <i class="la la-download"></i>
@@ -144,8 +143,7 @@
                                 </button>
                                 <button title="Confirm" type="button"
                                     *ngIf="unlockRequest.statusApproval !== 'New' && unlockRequest.statusApproval !== 'Denied' && unlockRequest.statusApproval !== 'Done' && unlockRequest.isManager && !unlockRequest.isApproved"
-                                    class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="confirmRequest()">
+                                    class="btn btn-primary  m-btn--icon m-btn--uppercase" (click)="confirmRequest()">
                                     <span>
                                         <i class="la la-download"></i>
                                         <span>
@@ -154,7 +152,7 @@
                                     </span>
                                 </button>
                                 <button title="Deny" type="button" *ngIf="unlockRequest.isShowBtnDeny"
-                                    class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                    class="btn btn-danger  m-btn--icon m-btn--uppercase"
                                     (click)="showInputCommentDeny()">
                                     <span>
                                         <i class="la la-download"></i>
