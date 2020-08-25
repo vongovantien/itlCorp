@@ -15,7 +15,7 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
 import cloneDeep from 'lodash/cloneDeep';
@@ -95,6 +95,9 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     applyDIM: string;
     roundUp: string;
 
+    currentFormValue: any;
+
+
     constructor(
         private _fb: FormBuilder,
         private _store: Store<fromStore.IShareBussinessState>,
@@ -118,6 +121,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 }
             );
     }
+
+
 
     ngOnInit() {
         // this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
@@ -216,6 +221,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                             };
                             this.formGroup.patchValue(formData);
 
+
                             if (!!res.packageType) {
                                 this.formGroup.patchValue({ packageType: [this.units.find(u => u.id === +res.packageType)] });
                             }
@@ -239,6 +245,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                             });
                             // * Update Form
                             this.formGroup.patchValue({ commodity: commoditiesTemp });
+
+                            this.currentFormValue = this.formGroup.getRawValue();
 
                         } catch (error) {
                             console.log(error + '');

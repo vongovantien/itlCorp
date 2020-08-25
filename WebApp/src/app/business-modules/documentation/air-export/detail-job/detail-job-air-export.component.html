@@ -49,7 +49,7 @@
 
             </ng-container>
 
-            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancelPopup.show()">
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="handleCancelForm()">
             </app-default-button>
 
         </div>
@@ -139,7 +139,8 @@
 </confirm-popup>
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
-    (onSubmit)="confirmCancelPopup.hide(); gotoList()"></confirm-popup>
+    (onSubmit)="confirmCancel()" labelConfirm="Yes"></confirm-popup>
 
 <info-popup [body]="'You are not allowed to delete this job'"></info-popup>
+
 <permission-403-popup></permission-403-popup>

@@ -13,6 +13,7 @@ import { AirImportComponent } from './air-import.component';
 import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
 import { AirImportCreateJobComponent } from './create-job/create-job-air-import.component';
 import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -29,7 +30,7 @@ const routing: Routes = [
                 data: { transactionType: CommonEnum.TransactionTypeEnum.AirImport, name: "Job Detail" },
                 children: [
                     {
-                        path: '', component: AirImportDetailJobComponent, data: { name: "" }
+                        path: '', component: AirImportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
                     },
                     {
                         path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),

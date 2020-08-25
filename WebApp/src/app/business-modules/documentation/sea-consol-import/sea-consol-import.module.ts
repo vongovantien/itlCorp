@@ -15,6 +15,7 @@ import { CommonEnum } from '@enums';
 import { SeaConsolImportDetailJobComponent } from './detail-job/detail-job-consol-import.component';
 import { SeaConsolImportManifestComponent } from './manifest/sea-consol-import-manifest.component';
 import { SeaConsolImportLazyLoadModule } from './sea-consol-import-lazy-load.module';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -31,7 +32,7 @@ const routing: Routes = [
         data: { transactionType: CommonEnum.TransactionTypeEnum.SeaConsolImport, name: "Job Detail" },
         children: [
             {
-                path: '', component: SeaConsolImportDetailJobComponent, data: { name: "" }
+                path: '', component: SeaConsolImportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
             },
             {
                 path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-consol-import-hbl.module').then(m => m.SeaConsolImportHBLModule),

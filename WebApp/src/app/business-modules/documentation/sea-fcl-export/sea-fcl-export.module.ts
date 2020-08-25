@@ -19,6 +19,7 @@ import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-
 import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-export-manifest.component';
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -35,7 +36,7 @@ const routing: Routes = [
         data: { transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport, name: "Job Detail" },
         children: [
             {
-                path: '', component: SeaFCLExportDetailJobComponent, data: { name: "" }
+                path: '', component: SeaFCLExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
             },
             {
                 path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),

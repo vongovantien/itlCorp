@@ -18,6 +18,7 @@ import { SeaConsolExportManifestComponent } from './detail-job/manifest/sea-cons
 import { SeaConsolExportShippingInstructionComponent } from './detail-job/si/sea-consol-si.component';
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 import { FormsModule } from '@angular/forms';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -34,7 +35,7 @@ const routing: Routes = [
                 data: { transactionType: CommonEnum.TransactionTypeEnum.SeaConsolExport, name: "Job Detail" },
                 children: [
                     {
-                        path: '', component: SeaConsolExportDetailJobComponent, data: { name: "" }
+                        path: '', component: SeaConsolExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
                     },
                     {
                         path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-consol-export-hbl.module').then(m => m.SeaConsolExportHBLModule),

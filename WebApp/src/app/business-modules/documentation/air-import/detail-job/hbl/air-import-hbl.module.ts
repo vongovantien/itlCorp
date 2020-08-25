@@ -16,7 +16,6 @@ import { AirImportCreateHBLComponent } from './create/create-house-bill.componen
 import { AirImportDetailHBLComponent } from './detail/detail-house-bill.component';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ShareBusinessReAlertComponent } from 'src/app/business-modules/share-business/components/pre-alert/pre-alert.component';
-import { AirImportDetailJobComponent } from '../detail-job-air-import.component';
 
 
 

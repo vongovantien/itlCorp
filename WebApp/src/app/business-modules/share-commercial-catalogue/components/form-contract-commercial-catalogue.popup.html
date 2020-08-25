@@ -142,8 +142,9 @@
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
                                     <ng-select #sv [items]="serviceTypes" (selected)="selectedService($event)"
-                                        [allowClear]="true" [active]="activeServices" (opened)="closeOtherSelects(sv)"
-                                        formControlName="saleService" [multiple]="true" placeholder="Please select">
+                                        [disabled]="type === 'Agent'" [allowClear]="true" [active]="activeServices"
+                                        (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
+                                        placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon
                                         *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)">
@@ -158,8 +159,8 @@
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <ng-select #pm [items]="paymentMethods" [allowClear]="true"
-                                    (opened)="closeOtherSelects(pm)" formControlName="paymentMethod"
-                                    placeholder="Please select">
+                                    [disabled]="type === 'Agent'" (opened)="closeOtherSelects(pm)"
+                                    formControlName="paymentMethod" placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
@@ -176,7 +177,7 @@
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
-                                    <ng-select #vas [items]="vaslst" [allowClear]="true"
+                                    <ng-select #vas [items]="vaslst" [allowClear]="true" [disabled]="type === 'Agent'"
                                         (selected)="selectedVas($event)" (opened)="closeOtherSelects(vas)"
                                         [active]="activeVas" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">

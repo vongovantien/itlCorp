@@ -1,21 +1,21 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 import { AirExportCreateJobComponent } from '../create-job/create-job-air-export.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { DocumentationRepo } from '@repositories';
+import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { DIM, CsTransaction } from '@models';
+import { ICanComponentDeactivate } from '@core';
 
-import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
+import { combineLatest, of, Observable } from 'rxjs';
+import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from '../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
-import { NgxSpinnerService } from 'ngx-spinner';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
@@ -24,7 +24,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
     templateUrl: './detail-job-air-export.component.html'
 })
 
-export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit {
+export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate {
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
@@ -33,6 +33,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild('confirmCancelPopup', { static: false }) confirmCancelPopup: ConfirmPopupComponent;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -40,9 +41,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     shipmentDetail: CsTransaction;
-    dataReport: any = null;
 
     dimensionDetails: DIM[];
+
+    isCancelFormPopupSuccess: boolean = false;
+
+    nextState: RouterStateSnapshot;
 
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -60,6 +64,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
         this._progressRef = this._ngProgressService.ref();
     }
+
+
 
     ngOnInit() { }
 
@@ -237,30 +243,32 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
-            .subscribe((value: boolean) => {
-                if (value) {
-                    this.deleteJob();
-                } else {
+            .pipe(
+                concatMap((isAllowDelete: boolean) => {
+                    if (isAllowDelete) {
+                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                    }
+                    return of(403);
+                }),
+                concatMap((isValid) => {
+                    if (isValid) {
+                        return of(200);
+                    }
+                    return of(201);
+                })
+            )
+            .subscribe((value: number) => {
+                if (value === 403) {
                     this.permissionPopup.show();
+                    return;
+                }
+                if (value === 200) {
+                    this.confirmDeleteJobPopup.show();
+                    return;
+                } else {
+                    this.canNotDeleteJobPopup.show();
                 }
             });
-    }
-
-    deleteJob() {
-        this._progressRef.start();
-        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmDeleteJobPopup.show();
-                    } else {
-                        this.canNotDeleteJobPopup.show();
-                    }
-                },
-            );
     }
 
     onDeleteJob() {
@@ -363,6 +371,40 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             );
     }
 
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+        if (isEdited) {
+            this.confirmCancelPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
+    }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+        if (this.isCancelFormPopupSuccess) {
+            return of(true);
+        }
+        if (isEdited && !this.isCancelFormPopupSuccess) {
+            this.confirmCancelPopup.show();
+            return;
+        }
+        return of(!isEdited);
+    }
 
 }
 

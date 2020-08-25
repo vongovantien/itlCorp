@@ -146,6 +146,8 @@ export class ShareBussinessFormCreateSeaExportComponent extends AppForm implemen
                                 notes: res.notes,
                                 pono: res.pono
                             });
+
+                            this.currentFormValue = this.formGroup.getRawValue(); // For CanDeactivate.
                         } catch (error) {
                             console.log(error);
                         }
