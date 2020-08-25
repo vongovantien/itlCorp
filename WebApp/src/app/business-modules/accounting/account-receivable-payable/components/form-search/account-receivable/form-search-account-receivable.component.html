@@ -47,19 +47,32 @@
                                     </ng-select>
 
                                 </div>
-                                <div class="col-lg-3">
-                                    <label></label>
-                                    <div class="form-group">
-                                        <input type="number" min="0" class="form-control"
-                                            formControlName="fromDebitRate">
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <label></label>
-                                    <div class="form-group">
-                                        <input type="number" min="0" class="form-control" formControlName="toDebitRate">
-                                    </div>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <label></label>
+                                            <div class="form-group"
+                                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                                <input type="number" min="0" class="form-control"
+                                                    formControlName="fromDebitRate">
+                                            </div>
 
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <label></label>
+                                            <div class="form-group"
+                                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                                <input type="number" min="0" class="form-control"
+                                                    formControlName="toDebitRate">
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-control-feedback text-danger"
+                                        *ngIf="isSubmitted && (fromDebitRate.value > toDebitRate.value)">
+                                        The value of fromDebitRate must be smaller than toDebitRate
+                                    </div>
                                 </div>
                             </div>
                         </div>

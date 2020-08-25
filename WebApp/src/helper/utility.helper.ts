@@ -40,6 +40,42 @@ export class UtilityHelper {
 
         return seenDuplicate;
     }
+    checkDuplicateInObjectByKeys(inputArray: any[] = [], propertyNameArray: string[], dupArray: any[] = [], flag: boolean = false): boolean {
+
+        if (propertyNameArray.length <= 0) {
+            return;
+        }
+        //
+        if (dupArray.length <= 0) {
+            dupArray = [...inputArray];
+        }
+        //
+        let obj = dupArray.reduce((a, e) => {
+            a[e[propertyNameArray[0]]] = ++a[e[propertyNameArray[0]]] || 0;
+            return a;
+        }, {});
+        //
+        const arrayDup = dupArray.filter((e) => obj[e[propertyNameArray[0]]] >= 1);
+
+        inputArray.forEach((element) => {
+            if (arrayDup.map(e => e.key).includes(element.key)) {
+                console.log("vo");
+
+                flag = true;
+                element.duplicate = true;
+            } else {
+                element.duplicate = false;
+            }
+        });
+        propertyNameArray.shift();
+
+
+        if (flag === false) {
+            return;
+        } else {
+            this.checkDuplicateInObjectByKeys(inputArray, propertyNameArray, arrayDup, flag);
+        }
+    }
 
     calculateHeightWeight(width: number, height: number, length: number, packg: number, hwConstant: number) {
         return +((width * height * length / hwConstant) * packg).toFixed(3);

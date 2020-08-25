@@ -240,9 +240,9 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
         console.log("con: ", this.initContainers);
 
         if (this.type === 'import') {
+            this.utility.checkDuplicateInObjectByKeys(this.initContainers, ['containerNo', 'sealNo']);
             if (
-                this.utility.checkDuplicateInObject("containerNo", this.initContainers)
-                && this.utility.checkDuplicateInObject("sealNo", this.initContainers)
+                this.initContainers.filter(e => e.duplicate === true).length >= 1
             ) {
                 this.isDuplicateContPakage = true;
                 valid = false;
@@ -253,9 +253,9 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                 this.isDuplicateContPakage = false;
             }
         } else {
+            this.utility.checkDuplicateInObjectByKeys(this.initContainers, ['containerNo', 'sealNo']);
             if (
-                this.utility.checkDuplicateInObject("containerNo", this.initContainers)
-                && this.utility.checkDuplicateInObject("sealNo", this.initContainers)
+                this.initContainers.filter(e => e.duplicate === true).length >= 1
             ) {
                 this.isDuplicateContPakage = true;
                 valid = false;
