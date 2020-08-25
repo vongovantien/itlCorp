@@ -25,14 +25,10 @@
                 <div class="row">
                     <div class="col col-lg-5">
                         <div class="m-input-icon m-input-icon--right down">
-                            <input type="text" class="form-control m-input m-input--square"
-                                ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                [(ngModel)]="selectedRange"
-                                [ranges]="ranges"
-                                [maxDate]="maxDate"
-                                [alwaysShowCalendars]="true"
-                                name="daterange" 
-                                placeholder="From date - to date" readonly/>
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [(ngModel)]="selectedRange"
+                                [ranges]="ranges" [maxDate]="maxDate" [alwaysShowCalendars]="true" name="daterange"
+                                placeholder="From date - to date" readonly />
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
@@ -41,7 +37,7 @@
                         </div>
                     </div>
                     <div class="col-md-auto c-button-actions">
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase">
                             <span>
                                 <i class="la la-search"></i>
                                 <span>
@@ -49,7 +45,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase ">
+                        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase ">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -163,16 +159,15 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)"
+                                role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>
                                 <button type="button" class="btn btn-secondary">Year</button>
                             </div>
                         </div>
-                        <highcharts-chart
-                            style="width: 100%; display: block; height: 400px;"
-                            [Highcharts]="Highcharts"
+                        <highcharts-chart style="width: 100%; display: block; height: 400px;" [Highcharts]="Highcharts"
                             [options]="chartOptions1">
                         </highcharts-chart>
                     </div>
@@ -219,16 +214,15 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)"
+                                role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>
                                 <button type="button" class="btn btn-secondary">Year</button>
                             </div>
                         </div>
-                        <highcharts-chart
-                            style="width: 100%; display: block; height: 400px;"
-                            [Highcharts]="Highcharts"
+                        <highcharts-chart style="width: 100%; display: block; height: 400px;" [Highcharts]="Highcharts"
                             [options]="chartOptions2">
                         </highcharts-chart>
                     </div>
@@ -267,7 +261,7 @@
         </div>
     </div>
     <!--end::m-portlet-->
-    
+
     <!--begin:: m-portlet-->
     <div class="m-portlet">
         <div class="m-portlet__body">
@@ -275,16 +269,15 @@
                 <div class="col-lg-9">
                     <div class="chart-wrapper">
                         <div class="pull-right">
-                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)" role="group" aria-label="...">
+                            <div class="btn-group btn-group fms-btn-group" (click)="onButtonGroupClick($event)"
+                                role="group" aria-label="...">
                                 <button type="button" class="btn btn-secondary">Day</button>
                                 <button type="button" class="btn btn-secondary active">Month</button>
                                 <button type="button" class="btn btn-secondary">Quater</button>
                                 <button type="button" class="btn btn-secondary">Year</button>
                             </div>
                         </div>
-                        <highcharts-chart
-                            style="width: 100%; display: block; height: 400px;"
-                            [Highcharts]="Highcharts"
+                        <highcharts-chart style="width: 100%; display: block; height: 400px;" [Highcharts]="Highcharts"
                             [options]="chartOptions3">
                         </highcharts-chart>
                     </div>

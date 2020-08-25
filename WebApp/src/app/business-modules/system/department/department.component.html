@@ -1,7 +1,7 @@
 <div class="department-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                 [routerLink]="'/home/system/department/new'">
                 <span>
                     <i class="la la-plus"></i>
@@ -10,7 +10,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase" (click)="export()">
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="export()">
                 <span>
                     <i class="la la-upload"></i>
                     <span>
@@ -39,13 +39,13 @@
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
                                                 <button type="button" title="Detail"
-                                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                    class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only pointer"
                                                     (click)="gotoDetailDepartment(department.id)">
                                                     <i class="la la-edit"></i>
                                                 </button>
                                                 <!-- <ng-container *ngIf="!department.active"> -->
                                                 <button type="button" [disabled]="department.active" title="Delete"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only pointer"
                                                     (click)="showDeletePopup(department)">
                                                     <i class="la la-trash"></i>
                                                 </button>

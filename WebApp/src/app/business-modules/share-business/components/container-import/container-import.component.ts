@@ -38,8 +38,8 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
 
     ngOnInit() {
         this.headers = [
-            { title: 'Cont Type *', field: 'containerTypeName', sortable: true },
-            { title: 'Cont Qty *', field: 'quantity', sortable: true },
+            { title: 'Cont Type', field: 'containerTypeName', sortable: true, required: true },
+            { title: 'Cont Qty', field: 'quantity', sortable: true, required: true },
             { title: 'Cont No', field: 'containerNo', sortable: true },
             { title: 'Seal No', field: 'sealNo', sortable: true },
             { title: 'GW', field: 'gw', sortable: true },

@@ -621,6 +621,8 @@ table.dataTable {
 
 //m-portlet
 .m-portlet {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
     &.m-portlet--danger.m-portlet--head-solid-bg {
         border-color: #f2dedf;
     }

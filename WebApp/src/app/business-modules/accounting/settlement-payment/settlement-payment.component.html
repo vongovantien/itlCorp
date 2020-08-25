@@ -49,8 +49,7 @@
                                                             (change)="onChangeSelectedSettlement(settlePayment);">
                                                         <span></span>
                                                     </label>
-                                                    <button
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                    <button class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
                                                         [attr.data-target]="'#ops-shipment-00' + (settlePayment.id+1)"
                                                         title="Collapse"
@@ -59,8 +58,7 @@
                                                     </button>
                                                     <ng-container
                                                         *ngIf="settlePayment.statusApproval === 'New' || settlePayment.statusApproval === 'Denied'">
-                                                        <button
-                                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                             title="Delete"
                                                             (click)="prepareDeleteAdvance(settlePayment)">
                                                             <i class="la la-trash text-danger"></i>

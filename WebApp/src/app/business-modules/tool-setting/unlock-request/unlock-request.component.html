@@ -3,7 +3,7 @@
         <div class="c-button-actions">
             <!-- <app-permission-button title="Create Request" (onClick)="openPopupAddAuthorization()" type="add">
             </app-permission-button> -->
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                 [routerLink]="'/home/tool/unlock-request/new'">
                 <span>
                     <i class="la la-plus"></i>
@@ -37,7 +37,7 @@
                                                 </app-permission-button> -->
                                                 <button type="button" title="Delete"
                                                     *ngIf="userLogged.id === unlockRequest.requester && (unlockRequest.statusApproval === 'New' || unlockRequest.statusApproval === 'Denied')"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only pointer"
+                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only pointer"
                                                     (click)="deleteUnlockRequest(unlockRequest.id)">
                                                     <i class="la la-trash"></i>
                                                 </button>

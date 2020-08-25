@@ -9,15 +9,14 @@
             <div class="form-actions m--align-right">
                 <ng-container *ngIf="tariff.setTariff.permission.allowDelete">
                     <a [routerLink]="[]" [queryParams]="{action: 'copy'}"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" title="Duplicate"
-                        role="button">
+                        class="btn btn-success  m-btn--icon m-btn--uppercase" title="Duplicate" role="button">
                         <i class="la la-copy"></i>
                         Duplicate
                     </a>
                 </ng-container>
                 <ng-container *ngIf="tariff.setTariff.permission.allowDelete">
-                    <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                        (click)="deleteTariff()" [disabled]="tariff.setTariff.status">
+                    <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="deleteTariff()"
+                        [disabled]="tariff.setTariff.status">
                         <span>
                             <i class="la la-remove"></i>
                             <span>
@@ -50,8 +49,7 @@
 
                         <div class="form-actions m--align-center">
                             <ng-container *ngIf="tariff.setTariff.permission.allowUpdate">
-                                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="updateTafiff()">
+                                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="updateTafiff()">
                                     <span>
                                         <i class="la la-save"></i>
                                         <span>
@@ -60,8 +58,7 @@
                                     </span>
                                 </button>
                             </ng-container>
-                            <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                                (click)="back()">
+                            <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="back()">
                                 <span>
                                     <i class="la la-ban"></i>
                                     <span>

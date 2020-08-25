@@ -6,7 +6,7 @@
                     (onClick)="saveRole()">
                 </app-default-button>
                 <button (click)="cancelSave()" type="button"
-                    class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                    class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -27,12 +27,11 @@
                         <tr *ngFor="let item of listRoles;let i = index; trackBy: trackByFn">
                             <td class="table-actions-col fixed-side">
                                 <button (click)="gotoUserPermission(item.id)" *ngIf="!!item.id"
-                                    class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                    class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                     title="Detail"><i class="la la-list"></i>
                                 </button>
                                 <button (click)="deleteRole(i,item.id)" type="button"
-                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                    title="Remove">
+                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove">
                                     <i class="la la-trash"></i>
                                 </button>
                             </td>

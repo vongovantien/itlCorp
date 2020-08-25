@@ -63,7 +63,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 Days', field: 'over30Day', sortable: true },
 
-            { title: 'Status', field: 'agreementStatus', sortable: true },
+            { title: 'Agreement Status', field: 'agreementStatus', sortable: true },
         ];
 
 

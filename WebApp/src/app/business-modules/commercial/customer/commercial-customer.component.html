@@ -49,20 +49,20 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <button type="button" (click)="showSaleman(customer.id)"
-                                                class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                 data-toggle="collapse"
                                                 [attr.data-target]="'#commercial-customer-00' + customer.id | removeTrim"
                                                 title="Collapse">
                                                 <i class="la la-angle-up"></i>
                                             </button>
                                             <button (click)="showDetail(customer)"
-                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Edit">
                                                 <i class="la la-edit"></i>
                                             </button>
                                             <ng-container *ngIf="!customer.active">
                                                 <button (click)="showConfirmDelete(customer)"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </ng-container>

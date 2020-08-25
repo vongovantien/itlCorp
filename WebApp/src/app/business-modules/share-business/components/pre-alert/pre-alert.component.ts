@@ -15,6 +15,7 @@ import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import * as fromShareBussiness from '@share-bussiness';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -105,7 +106,8 @@ export class ShareBusinessReAlertComponent extends AppList {
             from: [],
             to: ['',
                 Validators.compose([
-                    Validators.required
+                    Validators.required,
+                    Validators.pattern(SystemConstants.CPATTERN.EMAIL_MULTIPLE)
                 ])
             ],
             cc: ['',
