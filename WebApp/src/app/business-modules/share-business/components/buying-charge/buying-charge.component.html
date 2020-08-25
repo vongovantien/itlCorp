@@ -378,7 +378,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIddate">
+                                    <input type="text" class="form-control" disabled
+                                        [value]="charge.voucherIddate | date: 'dd/MM/yyyy'">
                                 </div>
                             </td>
                             <td class="disabled">
@@ -389,7 +390,7 @@
                             <td class="disabled">
                                 <div class="form-group ">
                                     <input type="text" class="form-control" disabled
-                                        [value]="charge.voucherIddate | date: 'dd/MM/yyyy'">
+                                        [value]="charge.voucherIdredate | date: 'dd/MM/yyyy'">
                                 </div>
                             </td>
                         </tr>

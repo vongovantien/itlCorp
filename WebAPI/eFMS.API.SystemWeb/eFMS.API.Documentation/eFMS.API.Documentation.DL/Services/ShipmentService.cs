@@ -1736,6 +1736,11 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(q => q.Hwbno == criteria.Hawb);
             }
 
+            if (!string.IsNullOrEmpty(criteria.CustomerId))
+            {
+                query = query.And(q => q.CustomerId == criteria.CustomerId);
+            }
+
             if (!string.IsNullOrEmpty(criteria.OfficeId))
             {
                 query = query.And(q => criteria.OfficeId.Contains(q.OfficeId.ToString()));
