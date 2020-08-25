@@ -41,7 +41,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     @Output() onSearch: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
 
-
+    isSubmitted: boolean = false;
 
     formSearch: FormGroup;
 
@@ -216,6 +216,10 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     //
     submitSearch() {
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
+        this.isSubmitted = true;
+        if (dataForm.toDebitRate < dataForm.fromDebitRate) {
+            return;
+        }
         const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,

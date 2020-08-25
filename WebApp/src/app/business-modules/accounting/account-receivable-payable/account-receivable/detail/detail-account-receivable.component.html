@@ -197,7 +197,7 @@
                                                 : (accReceivableDetail.expriedDate | date: 'dd/MM/yyyy')}}
                                                         <span
                                                             *ngIf="(accReceivableDetail.agreementType === 'Guaranteed' && accReceivableDetail.saleCreditLimited)">
-                                                            VND
+                                                            {{accReceivableDetail.agreementCurrency}}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -222,7 +222,7 @@
                                                         <span
                                                             *ngIf="(accReceivableDetail.creditTerm && accReceivableDetail.agreementType !== 'Guaranteed' )|| 
                                                     (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guaranteed') ">
-                                                            {{accReceivableDetail.agreementType === "Guaranteed" ? "VND" : "days"}}
+                                                            {{accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.agreementCurrency : "days"}}
                                                         </span>
                                                     </div>
 
@@ -533,8 +533,8 @@
                                             <div class="col-lg-7">
                                                 <div>
                                                     <div><span
-                                                            class="text-primary">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
-                                                        <span *ngIf="accReceivableDetail.paidAmount">
+                                                            class="text-primary">{{ accReceivableDetail.creditAmount | number: '.0-3'}}</span>
+                                                        <span *ngIf="accReceivableDetail.creditAmount">
                                                             {{ accReceivableDetail.arCurrency }}
                                                         </span>
                                                     </div>

@@ -1,3 +1,5 @@
+import { random } from "lodash";
+
 export class Container {
   id: string = "00000000-0000-0000-0000-000000000000";
   mblid: string = "00000000-0000-0000-0000-000000000000";
@@ -30,6 +32,8 @@ export class Container {
 
   // * Custom
   isPartOfContainer: boolean = false; // để generate vào inWord HBL hàng FCL.
+  duplicate: boolean = false;
+  key: number = Math.random();
 
   constructor(object?: any) {
     const self = this;
