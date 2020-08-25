@@ -5,7 +5,7 @@ import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
 import { SystemRepo, CatalogueRepo } from '@repositories';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
@@ -70,6 +70,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     selectedContract: Contract = new Contract();
 
     idContract: string = SystemConstants.EMPTY_GUID;
+    type: string = '';
 
     indexDetailContract: number = null;
 
@@ -126,21 +127,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
         this.initForm();
         this.initDataForm();
+
         if (!this.isUpdate) {
             const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
             this.companyId.setValue(userLogged.companyId);
             this.formGroup.controls['paymentTerm'].setValue(30);
             this.formGroup.controls['creditLimitRate'].setValue(120);
-            this.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
 
-        } else {
+
         }
-
 
         this.formGroup.get("effectiveDate").valueChanges
             .pipe(
