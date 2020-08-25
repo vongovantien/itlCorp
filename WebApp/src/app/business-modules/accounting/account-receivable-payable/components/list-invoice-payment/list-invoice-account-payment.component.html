@@ -6,8 +6,7 @@
                     <div class="form-group">
                         <div class="c-button-actions">
                             <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'UpdateInvoice'">
-                                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                                    (click)="import()">
+                                <button class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="import()">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -39,7 +38,7 @@
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <button type="button"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                        class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
                                                         [attr.data-target]="'#id-00' + (item.refId)" title="Collapse"
                                                         (click)="getPayments(item.refId)">
@@ -92,7 +91,7 @@
                                                             <td class="table-actions-col">
                                                                 <div class="table-actions">
                                                                     <button (click)="showConfirmDelete(payment, j)"
-                                                                        class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                                        class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                                         <i class="la la-trash"></i>
                                                                     </button>
                                                                 </div>

@@ -26,8 +26,8 @@
                         </div>
                     </div>
                     <div class="col-md-8 text-right">
-                        <button class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
-                            title="Sync" (click)="syncShipment()">
+                        <button class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10" title="Sync"
+                            (click)="syncShipment()">
                             <span>
                                 <i class="la la-refresh"></i>
                                 <span>
@@ -36,7 +36,7 @@
                             </span>
                         </button>
 
-                        <button class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+                        <button class="btn btn-primary  m-btn--icon m-btn--uppercase m--margin-right-10"
                             *ngIf="hblid != null || mblid != null" title="Import" (click)="showImportPopup()">
                             <span>
                                 <i class="la la-cloud-download"></i>
@@ -45,7 +45,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" title="Save"
+                        <button class="btn btn-success  m-btn--icon m-btn--uppercase" title="Save"
                             (click)="addNewContainer()">
                             <span>
                                 <i class="la la-plus-square"></i>
@@ -70,11 +70,11 @@
                                     <td class="table-actions-col fixed-side">
                                         <div class="table-actions">
                                             <button (click)="duplicate(i)"
-                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                                 title="Duplicate"><i class="la la-copy"></i>
                                             </button>
                                             <button type="button" (click)="deleteContainerItem(i,container)"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Remove">
                                                 <i class="la la-trash"></i>
                                             </button>

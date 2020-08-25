@@ -28,7 +28,7 @@ export abstract class AppForm extends AppPage {
         buttonAttribute: {
             type: 'button',
             titleButton: "Save",
-            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn btn-brand  m-btn--icon m-btn--uppercase",
             icon: "la la-save"
         },
         typeButton: ButtonType.save,

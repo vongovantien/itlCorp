@@ -1,6 +1,6 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
             [routerLink]="'/home/accounting/statement-of-account/edit'"
             [queryParams]="{ no: soa.soano, currency: 'VND' }"
             *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
@@ -23,7 +23,7 @@
                 <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Standard</a></li>
             </ul>
         </div>
-        <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
             (click)="previewAccountStatementFull(soa.soano)">
             <span>
                 <i class="la la-eye"></i>
@@ -296,7 +296,7 @@
     <soa-summary [data]="soa"></soa-summary>
 
     <div class="form-actions m--align-center">
-        <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
+        <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="back()">
             <span>
                 <i class="la la-ban"></i>
                 <span>

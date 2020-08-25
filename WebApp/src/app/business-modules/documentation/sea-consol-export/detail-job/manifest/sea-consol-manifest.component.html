@@ -18,7 +18,7 @@
             <ng-container *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
                     <button type="button" (click)="showRefreshPopup()"
-                        class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase">
+                        class="btn btn-default  m-btn--icon m-btn--uppercase">
                         <span>
                             <i class="la la-refresh"></i>
                             <span>
@@ -58,8 +58,7 @@
                         <div class="col-lg-8 m--align-right">
                             <div class="form-group">
                                 <div class="c-button-actions">
-                                    <button type="button"
-                                        class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase"
                                         (click)="onRemove()">
                                         <span>
                                             <i class="la la-trash"></i>
@@ -69,7 +68,7 @@
                                         </span>
                                     </button>
                                     <button (click)="showPopupAddHbl()" type="button" style="float:right"
-                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-success  m-btn--icon m-btn--uppercase">
                                         <span>
                                             <i class="la la-plus"></i>
                                             <span>

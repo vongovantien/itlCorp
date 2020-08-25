@@ -106,7 +106,7 @@
 
                     </div>
                     <div class="col-lg-6 m--align-right">
-                        <button type="reset" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        <button type="reset" class="btn btn-danger  m-btn--icon m-btn--uppercase"
                             (click)="removeCharge()"
                             *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                             <span>
@@ -116,8 +116,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button"
-                            class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-left-10"
+                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-left-10"
                             (click)="addMoreCharge()"
                             *ngIf="soa.status !== 'Issued Invoice' && soa.status !== 'Issued Voucher' && soa.paymentStatus !== 'Paid' && soa.paymentStatus !== 'Paid A Part'">
                             <span>

@@ -9,7 +9,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button type="button" class="btn btn-sm btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                    <button type="button" class="btn btn-sm btn-default  m-btn--icon m-btn--uppercase"
                         (click)="refreshData(); checkAllNotImported = false; changeAllNotImported()">
                         <span>
                             <i class="la la-refresh"></i>
@@ -36,7 +36,7 @@
                                         </div>
                                     </div>
                                 </form>
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                                     data-toggle="modal" (click)='showPopupSearch()'>
                                     <span>
                                         <i class="la la-plus"></i>
@@ -156,8 +156,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="updateJobToClearance()">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="updateJobToClearance()">
                     <span>
                         <i class="la la-save"></i>
                         <span>
@@ -165,7 +164,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
+                <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase"
                     (click)="checkAllNotImported = false;changeAllNotImported();close()">
                     <span>
                         <i class="la la-ban"></i>

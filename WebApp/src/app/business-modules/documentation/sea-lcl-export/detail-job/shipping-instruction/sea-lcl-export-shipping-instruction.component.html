@@ -25,7 +25,7 @@
         </div>
         <ng-container *ngIf="(isLocked | async) === false">
             <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
                     (click)="confirmRefresh.show()">
                     <span>
                         <i class="la la-refresh"></i>
@@ -37,7 +37,7 @@
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="save()"></app-default-button>
             </ng-container>
         </ng-container>
-        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
+        <button type="button" class="btn  m-btn--icon m-btn--uppercase" (click)="back()">
             <span>
                 <i class="la la-ban"></i>
                 <span>

@@ -3,13 +3,14 @@
         <div class="modal-content" *ngIf="!!CdNoteDetail">
             <div class="modal-header">
                 <h5 class="modal-title">Detail
-                    <b><span class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
-                No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b></h5>
+                    <b><span
+                            class="text-warning">{{CdNoteDetail.cdNote.type === 'CREDIT' ? 'Credit Note': CdNoteDetail.cdNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                    No: <b class="text-warning">{{CdNoteDetail.cdNote.code}}</b></h5>
                 <button type="button" class="close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div class="modal-actions c-button-actions">
-                    <button class="btn btn-sm btn-default m-btn--square m-btn--icon" (click)="preview()">
+                    <button class="btn btn-sm btn-default  m-btn--icon" (click)="preview()">
                         <span>
                             <i class="la la-file-text-o"></i>
                             <span>
@@ -240,9 +241,9 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer m--align-center">               
-                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
-                (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
+                    (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
                         <span>
@@ -250,8 +251,8 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                [disabled]="CdNoteDetail.isLoocked" (click)="openPopupEdit()">
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase" [disabled]="CdNoteDetail.isLoocked"
+                    (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
@@ -259,8 +260,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="closePopup()">
+                <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="closePopup()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

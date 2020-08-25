@@ -34,7 +34,7 @@ export class WarehouseImportComponent extends AppPage implements OnInit {
         typeButton: ButtonType.cancel,
         buttonAttribute: {
             titleButton: "close",
-            classStyle: "btn m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn  m-btn--icon m-btn--uppercase",
             icon: "la la-ban"
         }
     };
