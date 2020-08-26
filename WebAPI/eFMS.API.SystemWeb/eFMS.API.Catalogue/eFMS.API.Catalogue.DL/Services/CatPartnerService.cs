@@ -41,6 +41,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatCountry> catCountryRepository;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
+        private readonly IContextBase<CatDepartment> catDepartmentRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -55,7 +56,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatCountry> catCountryRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysImage> sysImageRepo,
-            IContextBase<CsTransactionDetail> transactionDetailRepo) : base(repository, cacheService, mapper)
+            IContextBase<CsTransactionDetail> transactionDetailRepo,
+            IContextBase<CatDepartment> catDepartmentRepo) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -69,6 +71,7 @@ namespace eFMS.API.Catalogue.DL.Services
             catCountryRepository = catCountryRepo;
             sysImageRepository = sysImageRepo;
             transactionDetailRepository = transactionDetailRepo;
+            catDepartmentRepository = catDepartmentRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -159,7 +162,39 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
             string fullNameCreatetor = sysEmployeeRepository.Get(e => e.Id == employeeId).Select(t => t.EmployeeNameVn)?.FirstOrDefault();
-            string address = webUrl.Value.Url + "/en/#/home/catalogue/partner-data/detail/" + partner.Id;
+            string url = string.Empty;
+            List<string> lstToAR = new List<string>();
+            List<string> lstToAccountant = new List<string>();
+
+
+            // info send to and cc
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+
+            if (listEmailAR != null && listEmailAR.Any())
+            {
+                lstToAR = listEmailAR.Split(";").ToList();
+            }
+
+            if (listEmailAccountant != null && listEmailAccountant.Any())
+            {
+                lstToAccountant = listEmailAccountant.Split(";").ToList();
+            }
+
+            switch (partner.PartnerType)
+            {
+                case "Customer":
+                    url = "home/commercial/customer/";
+                    break;
+                case "Agent":
+                    url = "home/commercial/agent/";
+                    break;
+                default:
+                    url = "home/catalogue/partner-data/detail/";
+                    break;
+            }
+
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
             string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
             string subject = "eFMS - Partner Approval Request From " + fullNameCreatetor;
@@ -173,7 +208,24 @@ namespace eFMS.API.Catalogue.DL.Services
                 "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "eFMS System </div>");
-            SendMail.Send(subject, body, new List<string> { "samuel.an@logtechub.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" }, null, null);
+
+            if(partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+            {
+                if (lstToAccountant.Any())
+                {
+                    SendMail.Send(subject, body, lstToAccountant, null, null);
+                }
+            }
+
+            if(partner.PartnerType == "Customer"  || partner.PartnerType == "Agent")
+            {
+                lstToAccountant.AddRange(lstToAR);
+                if (lstToAccountant.Any())
+                {
+                    SendMail.Send(subject, body, lstToAccountant, null, null);
+                }
+            }
+
         }
         private async void UploadFileContract(ContractFileUploadModel model)
         {

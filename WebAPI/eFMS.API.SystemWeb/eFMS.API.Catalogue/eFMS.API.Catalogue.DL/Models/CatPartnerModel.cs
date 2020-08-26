@@ -13,6 +13,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string ProvinceShippingName { get; set; }
         public string ContractType { get; set; }
         public string ContractNo { get; set; }
+        public string SalesmanId { get; set; }
 
         public string ContractService { get; set; }
         public PermissionAllowBase Permission { get; set; }
