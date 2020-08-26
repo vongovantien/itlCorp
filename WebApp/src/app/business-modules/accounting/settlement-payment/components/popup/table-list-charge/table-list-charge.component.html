@@ -203,7 +203,7 @@
                                             <div class="form-group "
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && charge.isDuplicate}">
                                                 <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                                    (ngModelChange)="isDuplicateInvoice = false">
+                                                    (ngModelChange)="charge.isDuplicate = false">
                                             </div>
                                         </td>
                                         <td>
@@ -218,16 +218,10 @@
                                                         ngxDaterangepickerMd
                                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" readonly
                                                         [autoApply]="true" [singleDatePicker]="true"
-                                                        [alwaysShowCalendars]="true" [(ngModel)]="charge.invoiceDate" />
-                                                    <span class="m-input-icon_clear" (click)="charge.invoiceDate = null"
-                                                        *ngIf="!!charge.invoiceDate">
-                                                        <i class="la la-times"></i>
-                                                    </span>
-                                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                        <span>
-                                                            <i class="la la-calendar"></i>
-                                                        </span>
-                                                    </span>
+                                                        [alwaysShowCalendars]="true" [(ngModel)]="charge.invoiceDate"
+                                                        calendar
+                                                        [allowRemove]="!!charge.invoiceDate && !!charge.invoiceDate.startDate"
+                                                        (remove)="charge.invoiceDate = null" />
                                                 </div>
                                             </div>
                                         </td>
@@ -237,8 +231,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group "
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted && isDuplicatedContNo}">
+                                            <div class="form-group ">
                                                 <input type="text" class="form-control" [(ngModel)]="charge.contNo">
                                             </div>
                                         </td>

@@ -34,6 +34,7 @@ export {
     TrialOfficialOtherModel, GuaranteedModel, AccReceivableDetailModel,
     AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
 } from './accouting/accounting-receivable.model';
+export * from './accouting/accounting-approve';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

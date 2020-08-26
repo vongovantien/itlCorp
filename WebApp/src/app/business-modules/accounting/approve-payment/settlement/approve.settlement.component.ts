@@ -14,7 +14,7 @@ import { SettlementListChargeComponent } from '../../settlement-payment/componen
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
 import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
 
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, takeUntil } from 'rxjs/operators';
 import { switchMap, tap } from 'rxjs/operators';
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 
@@ -61,12 +61,14 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param.id) {
-                this.settlementId = param.id;
-                this.getDetailSettlement(this.settlementId);
-            }
-        });
+        this._activedRouter.params
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((param: any) => {
+                if (!!param.id) {
+                    this.settlementId = param.id;
+                    this.getDetailSettlement(this.settlementId);
+                }
+            });
     }
 
     onChangeCurrency(currency: string) {
@@ -264,6 +266,14 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     showInfoDenied() {
         this.historyDeniedPopup.getDeniedComment('Settlement', this.settlementPayment.settlement.settlementNo);
         this.historyDeniedPopup.show();
+    }
+
+    back() {
+        if (!this.approveInfo.requesterAprDate) {
+            this._router.navigate([`home/accounting/settlement-payment/${this.settlementId}`]);
+        } else {
+            window.history.back();
+        }
     }
 }
 
