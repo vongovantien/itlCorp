@@ -8,7 +8,7 @@ import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { InjectViewContainerRefDirective } from '@directives';
 import { AppPage } from 'src/app/app.base';
-import { timeoutD } from '@decorators';
+import { delayTime } from '@decorators';
 
 import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
@@ -216,7 +216,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 },
             );
     }
-    @timeoutD(1000)
+    @delayTime(1000)
     showPreview() {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
