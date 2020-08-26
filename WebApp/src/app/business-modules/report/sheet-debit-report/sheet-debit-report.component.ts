@@ -5,6 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { ExportRepo } from "@repositories";
 import { CommonEnum } from "@enums";
 import { catchError, finalize } from "rxjs/operators";
+import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 
 @Component({
     selector: 'app-sheet-debit-report',

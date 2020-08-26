@@ -8,12 +8,14 @@ import { Crystal } from "@models";
 import { ReportPreviewComponent } from "@common";
 import { CommonEnum } from "@enums";
 import { NgxSpinnerService } from "ngx-spinner";
+import { ICrystalReport, ReportInterface } from "src/app/shared/interfaces/report-interface";
+import { delayTime } from "@decorators";
 
 @Component({
     selector: 'app-sale-report',
     templateUrl: './sale-report.component.html',
 })
-export class SaleReportComponent extends AppList {
+export class SaleReportComponent extends AppList implements ICrystalReport {
     @ViewChild(ReportPreviewComponent, { static: false }) reportPopup: ReportPreviewComponent;
 
 
@@ -27,7 +29,14 @@ export class SaleReportComponent extends AppList {
         this._progressRef = this._progressService.ref();
     }
 
+
     ngOnInit() {
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.reportPopup.frm.nativeElement.submit();
+        this.reportPopup.show();
     }
 
     onSearchSaleReport(data: ReportInterface.ISaleReportCriteria) {
@@ -61,10 +70,7 @@ export class SaleReportComponent extends AppList {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.showReport();
                         }
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -85,10 +91,7 @@ export class SaleReportComponent extends AppList {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.showReport();
                         }
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -109,10 +112,7 @@ export class SaleReportComponent extends AppList {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.showReport();
                         }
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -133,10 +133,7 @@ export class SaleReportComponent extends AppList {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.showReport();
                         }
                     } else {
                         this._toastService.warning('There is no data to display preview');
@@ -157,10 +154,7 @@ export class SaleReportComponent extends AppList {
                     if (res != null && res.dataSource.length > 0) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.showReport();
                         }
                     } else {
                         this._toastService.warning('There is no data to display preview');
