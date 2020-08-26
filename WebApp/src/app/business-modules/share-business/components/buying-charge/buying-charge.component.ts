@@ -598,17 +598,20 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
                 chargeItem.partnerShortName = this.hbl.customerName;
                 if (!chargeItem.partnerShortName) {
-                    chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).partnerNameEn;
+                    chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
                 }
                 chargeItem.paymentObjectId = this.hbl.customerId;
                 break;
             case CommonEnum.PartnerGroupEnum.CARRIER:
-                chargeItem.partnerShortName = this.shipment.supplierName;
+                // chargeItem.partnerShortName = this.shipment.supplierName;
+                chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.shipment.coloaderId).shortName;
                 chargeItem.paymentObjectId = this.shipment.coloaderId;
                 break;
             case CommonEnum.PartnerGroupEnum.AGENT:
-                chargeItem.partnerShortName = this.shipment.agentName;
+                // chargeItem.partnerShortName = this.shipment.agentName;
                 chargeItem.paymentObjectId = this.shipment.agentId;
+                chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.shipment.agentId).shortName;
+
                 break;
             default:
                 break;

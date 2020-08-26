@@ -30,6 +30,7 @@ export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAc
 export * from './accouting/cdnoteview.model';
 export * from './accouting/payment.model';
 export * from './accouting/accounting-payment.model';
+export * from './accouting/accounting-approve';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
