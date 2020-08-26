@@ -195,7 +195,7 @@
                         },
                         "uat-en": {
                             "optimization": true,
-                            "outputHashing": "none",
+                            "outputHashing": "all",
                             "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/en/",
@@ -223,7 +223,7 @@
                         },
                         "uat-vi": {
                             "optimization": true,
-                            "outputHashing": "none",
+                            "outputHashing": "all",
                             "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/vi/",
