@@ -124,14 +124,18 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
 
     searchShipment() {
         const keywords: string[] = this.keywordSearchShipment.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()).filter(i => Boolean(i));
-        console.log(keywords);
 
         this._documentRepo.getShipmentBySearchOption(this.selectedOption.value, keywords)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: IShipmentBySearch[]) => {
-                    this.shipments = res || [];
-                    this.onChangeCheckBoxShipment();
+                (res: any) => { // IShipmentBySearch[]
+                    if (!!res) {
+                        this.shipments = res.data || [];
+                        this.onChangeCheckBoxShipment();
+                        if (!res.status) {
+                            this._toastService.warning(res.message);
+                        }
+                    }
                 },
                 (errors: any) => { }
             );

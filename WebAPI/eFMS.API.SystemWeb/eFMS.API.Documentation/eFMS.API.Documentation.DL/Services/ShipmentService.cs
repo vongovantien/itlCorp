@@ -197,20 +197,19 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(searchOption) || keywords == null || keywords.Count == 0 || keywords.Any(x => x == null)) return dataList;
 
             var surcharge = surCharge.Get();
-            var cstran = from cstd in DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
-                         join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
-                         where osa.MainPersonInCharge == userCurrent
-                         select cstd;
-
-            var cstrandel = detailRepository.Get();
-            //var opstran = opsRepository.Get(x => x.CurrentStatus != Constants.CURRENT_STATUS_CANCELED);
-
+            
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            var opstran = from ops in opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+            var opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+
+            //OPS assign
+            var opstranAssign = from ops in opstransaction
                           join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId //So sánh bằng
                           where osa.MainPersonInCharge == userCurrent
                           select ops;
+            //OPS is BillingOps
+            var opstranPic = opstransaction.Where(x => x.BillingOpsId == userCurrent);
+            var opstran = opstranAssign.Union(opstranPic);
             var shipmentOperation = from ops in opstran
                                     join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
                                     from sur in sur2.DefaultIfEmpty()
@@ -237,8 +236,20 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOperation = shipmentOperation.Distinct();
             //End change request
 
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            //Transaction assign
+            var cstranAssign = from cstd in transactions
+                         join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
+                         where osa.MainPersonInCharge == userCurrent
+                         select cstd;
+            //Transaction is Person In Charge
+            var cstranPic = transactions.Where(x => x.PersonIncharge == userCurrent);
+            var cstrans = cstranAssign.Union(cstranPic);
+
+            var cstrandel = detailRepository.Get();
+
             var shipmentDoc = from cstd in cstrandel
-                              join cst in cstran on cstd.JobId equals cst.Id into cst2
+                              join cst in cstrans on cstd.JobId equals cst.Id into cst2
                               from cst in cst2.DefaultIfEmpty()
                               join sur in surcharge on cstd.Id equals sur.Hblid into sur2
                               from sur in sur2.DefaultIfEmpty()
@@ -291,6 +302,7 @@ namespace eFMS.API.Documentation.DL.Services
             }).ToList();
             return dataList;
         }
+
         private IQueryable<CsTransaction> GetShipmentServicesByTime(IQueryable<CsTransaction> csTransactions, ShipmentCriteria criteria)
         {
             switch (criteria.TransactionType)
