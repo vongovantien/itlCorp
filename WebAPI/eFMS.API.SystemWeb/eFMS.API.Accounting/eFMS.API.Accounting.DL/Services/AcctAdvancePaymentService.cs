@@ -390,8 +390,9 @@ namespace eFMS.API.Accounting.DL.Services
                     CustomNo = se.First().CustomNo,
                     Amount = se.Sum(s => s.Amount),
                     RequestCurrency = se.First().RequestCurrency,
-                    StatusPayment = se.First().StatusPayment
-                }).ToList();
+                    StatusPayment = se.First().StatusPayment,
+                    DatetimeModified = se.First().DatetimeModified
+                }).ToList().OrderByDescending(o => o.DatetimeModified);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             return datamap;
         }
@@ -411,7 +412,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
                     Description = se.FirstOrDefault().Description,
-                }).ToList();
+                    DatetimeModified = se.First().DatetimeModified
+                }).ToList().OrderByDescending(o => o.DatetimeModified);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
 
