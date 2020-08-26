@@ -123,7 +123,7 @@
                         },
                         "test-en": {
                             "optimization": true,
-                            "outputHashing": "none",
+                            "outputHashing": "all",
                             "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/en/",
@@ -195,11 +195,11 @@
                         },
                         "uat-en": {
                             "optimization": true,
-                            "outputHashing": "none",
+                            "outputHashing": "all",
                             "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/en/",
-                            "namedChunks": true,
+                            "namedChunks": false,
                             "aot": true,
                             "extractLicenses": true,
                             "vendorChunk": true,
@@ -223,11 +223,11 @@
                         },
                         "uat-vi": {
                             "optimization": true,
-                            "outputHashing": "none",
+                            "outputHashing": "all",
                             "sourceMap": false,
                             "extractCss": true,
                             "baseHref": "/vi/",
-                            "namedChunks": true,
+                            "namedChunks": false,
                             "aot": true,
                             "extractLicenses": true,
                             "vendorChunk": true,
@@ -239,7 +239,7 @@
                                     "with": "src/environments/environment.uat.ts"
                                 }
                             ],
-                            "serviceWorker": false,
+                            "serviceWorker": true,
                             "budgets": [
                                 {
                                     "type": "bundle",
