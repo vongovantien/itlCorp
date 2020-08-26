@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.ForPartner</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.ForPartner.Controllers.DemoController.GetValue">
+            <summary>
+            Get all value
+            </summary>
+        </member>
+    </members>
+</doc>
