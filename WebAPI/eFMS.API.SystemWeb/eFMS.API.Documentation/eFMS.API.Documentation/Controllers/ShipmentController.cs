@@ -74,7 +74,33 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetShipmentsCopyListBySearchOption(string searchOption, List<string> keywords)
         {
             var data = shipmentService.GetListShipmentBySearchOptions(searchOption, keywords);
-            return Ok(data);
+            List<string> shipmentNotExits = new List<string>();
+            if (searchOption == "JobNo")
+            {
+                shipmentNotExits = keywords.Where(x => !data.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+            }
+            else if (searchOption == "Hwbno")
+            {
+                shipmentNotExits = keywords.Where(x => !data.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
+            }
+            else if (searchOption == "Mawb")
+            {
+                shipmentNotExits = keywords.Where(x => !data.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
+            }
+            else if (searchOption == "ClearanceNo")
+            {
+                shipmentNotExits = keywords.Where(x => !data.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+            }
+
+            var _status = true;
+            var _message = string.Empty;
+            if (shipmentNotExits.Count > 0)
+            {
+                _status = false;
+                _message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT_COPY, string.Join(", ", shipmentNotExits.Distinct())].Value;
+            }
+            ResultHandle result = new ResultHandle { Status = _status, Message = _message, Data = data };
+            return Ok(result);
         }
 
         [HttpGet("GetShipmentNotExist")]
@@ -87,13 +113,11 @@ namespace eFMS.API.Documentation.Controllers
             {
                 shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
             }
-
-            if (typeSearch == "MBL")
+            else if (typeSearch == "MBL")
             {
                 shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
             }
-
-            if (typeSearch == "HBL")
+            else if (typeSearch == "HBL")
             {
                 shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
             }
@@ -103,7 +127,7 @@ namespace eFMS.API.Documentation.Controllers
             if(shipmentNotExits.Count > 0)
             {
                 _status = true;
-                _message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT].Value + string.Join(", ",shipmentNotExits) + " !";
+                _message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_EXIST_SHIPMENT, string.Join(", ", shipmentNotExits)].Value;
             }
             ResultHandle result = new ResultHandle { Status = _status, Message = _message };
             return Ok(result);

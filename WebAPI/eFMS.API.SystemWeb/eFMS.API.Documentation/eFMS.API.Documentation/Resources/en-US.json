@@ -59,8 +59,9 @@
   "MSG_PODELI_DIFFERENT_POL": "Place of Delivery must be different from Port of Loading",
   "MSG_SERVICE_TYPE_REQUIRED": "Service Type is required!",
   "MSG_PERSON_IN_CHARGE_REQUIRED": "Person In Charge is required!",
-  "MSG_NOT_EXIST_SHIPMENT": "These shipment don't exist on system: ",
+  "MSG_NOT_EXIST_SHIPMENT": "These shipment don't exist on system: {0}!",
   "DO_NOT_HAVE_PERMISSION": "Do not have permission", //403
   "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!",
-  "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !"
+  "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
+  "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!"
 }
