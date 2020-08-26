@@ -5,8 +5,8 @@ import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment, Currency } from 'src/app/shared/models';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { AdvancePayment, Currency, AccountingApprove } from 'src/app/shared/models';
 import { AdvancePaymentFormCreateComponent } from '../../advance-payment/components/form-create-advance-payment/form-create-advance-payment.component';
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
@@ -47,12 +47,14 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param && param.id) {
-                this.idAdvPayment = param.id;
-                this.getDetail(this.idAdvPayment);
-            }
-        });
+        this._activedRouter.params
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((param: any) => {
+                if (!!param && param.id) {
+                    this.idAdvPayment = param.id;
+                    this.getDetail(this.idAdvPayment);
+                }
+            });
     }
 
     getDetail(idAdvance: string) {
@@ -176,7 +178,11 @@ export class ApproveAdvancePaymentComponent extends AppPage {
     }
 
     back() {
-        this._router.navigate(['home/accounting/advance-payment']);
+        if (!this.approveInfo.requesterAprDate) {
+            this._router.navigate([`home/accounting/advance-payment/${this.idAdvPayment}`]);
+        } else {
+            window.history.back();
+        }
     }
 
     showModalApprove() {
