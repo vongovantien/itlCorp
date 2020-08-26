@@ -20,6 +20,11 @@
                                     (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
+
+                    <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
+                            of Delivery</a></li>
+                    <li role="menuitem"><a class="dropdown-item pointer"
+                            (click)="onPreview('DOCUMENT_RELEASE_FORM')">Document Release Form</a></li>
                     <li role="menuitem" dropdown triggers="mouseover" placement="right" container="body">
                         <a dropdownToggle class="dropdown-item dropdown-toggle pointer"
                             (click)="isClickSubMenu = true">Authorize Letter
@@ -32,10 +37,6 @@
                                     (click)="onPreview('AUTHORIZE_LETTER2')">A.L (Form 2)</a></li>
                         </ul>
                     </li>
-                    <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
-                            of Delivery</a></li>
-                    <li role="menuitem"><a class="dropdown-item pointer"
-                            (click)="onPreview('DOCUMENT_RELEASE_FORM')">Document Release Form</a></li>
                 </ul>
             </div>
             <ng-container *ngIf="(isLocked | async) === false">
