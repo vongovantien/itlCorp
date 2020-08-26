@@ -64,12 +64,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     charges: Surcharge[] = [];
 
     isUpdate: boolean = false;
-    isDuplicateChargeCode: boolean = false;
-    isDuplicateInvoice: boolean = false;
-    isDuplicatedContNo: boolean = false;
 
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[];
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
@@ -341,7 +339,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     onSelectDataTableInfo(data: any, chargeItem: Surcharge, type: string) {
         this.isSubmitted = false;
-        [this.isDuplicateChargeCode, this.isDuplicateInvoice, this.isDuplicatedContNo] = [false, false, false];
+        chargeItem.isDuplicate = false;
 
         switch (type) {
             case 'charge':
