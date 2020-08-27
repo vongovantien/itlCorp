@@ -54,5 +54,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Mblno { get; set; }
         public string Hblno { get; set; }
         public Guid? AcctManagementId { get; set; }
+        public Guid? ChargeGroup { get; set; }
+        public string TransactionType { get; set; }
+        public Guid? OfficeId { get; set; }
     }
 }
