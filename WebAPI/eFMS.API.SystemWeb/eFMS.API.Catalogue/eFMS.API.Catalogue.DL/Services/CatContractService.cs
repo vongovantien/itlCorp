@@ -138,6 +138,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
+                    model.SalesmanId = entity.SaleManId;
                     SendMailActiveSuccess(model, string.Empty);
                 }
                 ClearCache();
@@ -211,6 +212,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
+                    modelPartner.SalesmanId = entity.SaleManId;
                     SendMailActiveSuccess(modelPartner, string.Empty);
                 }
                 ClearCache();
@@ -338,6 +340,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = GetContractServicesName( objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
+                    model.SalesmanId = objUpdate.SaleManId;
                     SendMailActiveSuccess(model, "active");
                 }
             }
@@ -677,85 +680,98 @@ namespace eFMS.API.Catalogue.DL.Services
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
             string url = string.Empty;
+            string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
             List<string> lstTo = new List<string>();
+
             // info send to and cc
-            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            if(listEmailAR.Any())
+            var listEmailAR = catDepartmentRepository.Get(x => ( x.DeptType == "AR" || x.DeptType == "ACCOUNTANT") && x.BranchId == currentUser.OfficeID )?.Select(t => t.Email).FirstOrDefault();
+
+            if (listEmailAR != null &&  listEmailAR.Any())
             {
                 lstTo = listEmailAR.Split(";").ToList();
             }
 
-            List<string> lstCc = new List<string>
+            string emailCreator = objInfoCreator.Email;
+
+            switch (partner.PartnerType)
             {
-
-            };
-            if (lstTo.Any())
-            {
-                string emailCreator = objInfoCreator.Email;
-
-                switch (partner.PartnerType)
-                {
-                    case "Customer":
-                        url = "home/commercial/customer/";
-                        break;
-                    case "Agent":
-                        url = "home/commercial/agent/";
-                        break;
-                    default:
-                        url = "home/catalogue/partner-data/detail/";
-                        break;
-                }
-
-                string linkVn = string.Empty;
-                string linkEn = string.Empty;
-                string subject = string.Empty;
-                string body = string.Empty;
-                string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-                if (type == "active")
-                {
-                    linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
-                    linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                    subject = "Actived Agent - " + partner.ShortName;
-                    body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
-
-                        "<i> You Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
-                        "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
-
-                        "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-                        "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                        "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
-                        "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
-                        + linkEn + "</br>" + linkVn + "</br> </br>" +
-                        "<i> Thanks and Regards </i>" + "</br> </br>" +
-                        "eFMS System </div>");
-                }
-                else
-                {
-                    linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
-                    linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                    subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
-
-                    body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
-
-                      "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
-                      "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
-
-                      "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
-                      "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-                      "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-
-                      "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
-                      "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
-                      "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
-                      "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
-
-                      + linkEn + "</br>" + linkVn + "</br> </br>" +
-                      "<i> Thanks and Regards </i>" + "</br> </br>" +
-                      "eFMS System </div>");
-                }
-
-                SendMail.Send(subject, body, lstTo, null, null);
+                case "Customer":
+                    url = "home/commercial/customer/";
+                    break;
+                case "Agent":
+                    url = "home/commercial/agent/";
+                    break;
+                default:
+                    url = "home/catalogue/partner-data/detail/";
+                    break;
             }
+
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string subject = string.Empty;
+            string body = string.Empty;
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+            if (type == "active")
+            {
+                linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+                linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+                subject = "Actived Agent - " + partner.ShortName;
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
+
+                    "<i> You Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
+                    "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
+
+                    "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                    "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+                    "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
+                    + linkEn + "</br>" + linkVn + "</br> </br>" +
+                    "<i> Thanks and Regards </i>" + "</br> </br>" +
+                    "eFMS System </div>");
+                List<string> lstCc = new List<string>
+                {
+                };
+                if (lstTo.Any())
+                {
+                    lstCc = lstTo;
+                }
+                SendMail.Send(subject, body, emailCreator, null, lstCc);
+            }
+            else
+            {
+                linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+                linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+                subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
+
+                body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+
+                  "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+                  "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+
+                  "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+                  "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                  "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+
+                  "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+                  "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
+                  "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
+                  "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
+
+                  + linkEn + "</br>" + linkVn + "</br> </br>" +
+                  "<i> Thanks and Regards </i>" + "</br> </br>" +
+                  "eFMS System </div>");
+
+                List<string> lstCc = new List<string>
+                {
+                };
+
+                lstCc.Add(objInfoSalesman?.Email);
+                SendMail.Send(subject, body, lstTo ,null , lstCc);
+
+            }
+
+
         }
 
         public SysImage GetFileContract(string partnerId, string contractId)

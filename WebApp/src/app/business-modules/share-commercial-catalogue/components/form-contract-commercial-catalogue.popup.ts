@@ -517,7 +517,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             customerAmount: this.selectedContract.customerAdvanceAmount,
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
-            saleService: [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }],
+            saleService: !!this.selectedContract.saleService ? [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }] : null,
             vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null,
             currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
