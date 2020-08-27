@@ -201,9 +201,10 @@ export class ShareBussinessHBLFCLContainerPopupComponent extends PopupBase {
                     container.containerTypeName = this.getContainerTypeName(container.containerTypeId);
                     container.description = this.getDescriptionName(container.containerTypeId);
                     container.packageTypeName = this.getPackageTypeName(container.packageTypeId);
-                    if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
-                        container.quantity = 1;
-                    }
+                    /* update rule detail package & package */
+                    // if (!!container.containerNo || !!container.markNo || !!container.sealNo) {
+                    //     container.quantity = 1;
+                    // }
                 }
                 this._store.dispatch(new SaveContainerAction(this.containers));
                 this.onChange.emit(this.containers);

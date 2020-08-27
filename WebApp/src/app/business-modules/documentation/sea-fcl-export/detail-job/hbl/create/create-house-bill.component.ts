@@ -10,6 +10,7 @@ import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
+import _groupBy from 'lodash/groupBy';
 import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
@@ -234,6 +235,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     updateInwordField(containers: Container[]): string {
+        console.log(containers);
         let containerDetail = '';
 
         const contObject = (containers || []).map((container: Container) => ({
@@ -242,25 +244,47 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             isPartContainer: container.isPartOfContainer || false
         }));
 
+        const contObject1 = (containers || []).map((container: Container) => ({
+            containerTypeName: container.containerTypeName || '',
+            contName: container.description || '',
+            quantity: container.quantity,
+            isPartContainer: container.isPartOfContainer || false
+        }));
+
+
         const contObjectFCL: any[] = (containers || []).map((container: Container | any) => ({
             contName: container.description || '',
             quantity: container.quantity,
             isPartContainer: container.isPartOfContainer || false
         }));
-        // const contData = [];
-        // for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
-        //     contData.push({
-        //         contName: keyName,
-        //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-        //     });
+
+        const contData = [];
+        for (const item of Object.keys(_groupBy(contObject1, 'containerTypeName'))) {
+            contData.push({
+                contName: item,
+                quantity: _groupBy(contObject1, 'containerTypeName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+                isPartContainer: _groupBy(contObject1, 'containerTypeName')[item].map(i => i.isPartContainer)
+            });
+        }
+        console.log(contData);
+
+        // for (const item of contObject1) {
+        //     if (!item.isPartContainer) {
+        //         for (const it of contData) {
+        //             containerDetail += this.handleStringCont(it);
+        //         }
+        //     }
         // }
-        for (const item of contObjectFCL) {
-            if (!item.isPartContainer) {
-                containerDetail += this.handleStringCont(item);
+        for (const item of contObject1) {
+            for (const it of contData) {
+                if (item.isPartContainer === false && it.contName === item.containerTypeName) {
+                    it.quantity = item.quantity;
+                    containerDetail += this.handleStringCont(it);
+                }
             }
         }
 
-        for (const item of contObject) {
+        for (const item of contObject1) {
             if (item.isPartContainer) {
                 containerDetail += "A Part Of ";
                 containerDetail += this.handleStringPackage(item);

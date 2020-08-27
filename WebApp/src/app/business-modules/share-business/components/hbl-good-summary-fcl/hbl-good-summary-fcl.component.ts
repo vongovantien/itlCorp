@@ -160,11 +160,18 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
             });
         }
 
+        let count = 0;
         for (const item of contObject) {
+            count++;
+            if (count > 1) {
+                break;
+            }
             if (item.isPartOfContainer) {
                 this.containerDetail += "A Part Of ";
             }
-            this.containerDetail += this.handleStringCont(item);
+            for (const it of contData) {
+                this.containerDetail += this.handleStringCont(it);
+            }
         }
         this.containerDetail = this.containerDetail.trim().replace(/\,$/, "");
     }
