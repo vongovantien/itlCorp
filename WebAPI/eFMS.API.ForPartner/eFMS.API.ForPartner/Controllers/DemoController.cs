@@ -9,10 +9,19 @@ namespace eFMS.API.ForPartner.Controllers
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class DemoController : ControllerBase
     {
+
+        /// <summary>
+        /// Contructor controller Accounting Report
+        /// </summary>
+        public DemoController()
+        {
+        }
         /// <summary>
         /// Get all value
         /// </summary>
-        public IActionResult GetValue()
+        /// 
+        [HttpGet]
+        public IActionResult Get()
         {
             return Ok("Ok");
         }
