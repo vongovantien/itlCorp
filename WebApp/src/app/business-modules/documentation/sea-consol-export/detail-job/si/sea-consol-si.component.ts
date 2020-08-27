@@ -36,6 +36,8 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
     jobId: string;
     houseBills: any[] = [];
 
+    displayPreview: boolean = false;
+
     constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
@@ -273,6 +275,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
+                        this.displayPreview = true;
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -295,6 +298,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList {
 
     refresh() {
         this.setDataBillInstructionComponent(null);
+        this.displayPreview = false;
     }
 
     previewSummaryReport() {

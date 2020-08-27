@@ -37,6 +37,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
 
     jobId: string;
     houseBills: any[] = [];
+    displayPreview: boolean = false;
 
     constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
@@ -263,6 +264,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        //
+                        this.displayPreview = true;
+                        //
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
                     } else {
@@ -284,6 +288,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         return valid;
     }
     refresh() {
+        this.displayPreview = false;
         this.setDataBillInstructionComponent(null);
     }
     previewSummaryReport() {
