@@ -203,7 +203,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + fullNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
                 "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
                 "\t  Partner Name  / <i> Tên đối tượng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-                "\t  Catagory  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+                "\t  Category  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
                 "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                 "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
                 "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + fullNameCreatetor + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +

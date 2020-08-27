@@ -43,7 +43,7 @@ export class Contract {
     file: File = null;
     currencyId: string = null;
     isRequestApproval: boolean = false;
-
+    partnerStatus: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
