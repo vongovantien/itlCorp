@@ -1047,6 +1047,13 @@ namespace eFMS.API.Accounting.DL.Services
                 opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno));
                 csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno));
             }
+            if (criteria.customNos != null)
+            {
+                var join = from ops in opsTrans
+                           join cd in customsDeclarationRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)) on ops.JobNo equals cd.JobNo
+                           select ops;
+                opsTrans = join;
+            }
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
@@ -1087,6 +1094,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment
                                 };
+
+            if (criteria.customNos != null)
+            {
+                return dataOperation.ToList();
+            }
 
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2

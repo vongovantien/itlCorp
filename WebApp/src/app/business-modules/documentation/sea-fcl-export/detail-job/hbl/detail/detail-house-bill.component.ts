@@ -169,4 +169,24 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
             );
     }
 
+    previewAttachList() {
+        this._documentationRepo.previewAirAttachList(this.hblId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.reportPopup.frm.nativeElement.submit();
+                            this.reportPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
 }

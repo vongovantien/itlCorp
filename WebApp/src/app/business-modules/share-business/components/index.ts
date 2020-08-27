@@ -60,7 +60,7 @@ export * from './date-time-modified/date-time-modified.component';
 
 export * from './bill-instruction-sea-export/bill-instruction-sea-export.component';
 export * from './bill-instruction-housebills-sea-export/bill-instruction-housebills-sea-export.component';
-
+export * from './attach-list/attach-list-house-bill.component';
 // TODO export components from shareBussiness.
 
 
