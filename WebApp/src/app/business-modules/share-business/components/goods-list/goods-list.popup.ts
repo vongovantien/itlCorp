@@ -14,7 +14,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'goods-list-popup',
-    templateUrl: './goods-list.popup.html'
+    templateUrl: './goods-list.popup.html',
+    styleUrls: ['./../container-list/container-list.popup.scss']
 })
 
 export class ShareBussinessGoodsListPopupComponent extends ShareBussinessContainerListPopupComponent implements OnInit {
