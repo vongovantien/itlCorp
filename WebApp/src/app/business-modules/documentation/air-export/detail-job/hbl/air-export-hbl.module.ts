@@ -67,7 +67,7 @@ const LIB = [
         allowNegative: true,
         allowZero: true,
         decimal: ".",
-        precision: 2,
+        precision: 3,
         prefix: "",
         suffix: "",
         thousands: ",",
