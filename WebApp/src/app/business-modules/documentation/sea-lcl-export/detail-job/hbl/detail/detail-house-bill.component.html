@@ -15,6 +15,7 @@
                     <a class="dropdown-item pointer" (click)="preview('ITL_KESCO')">ITL H-B/L KESKO Preview</a>
                     <a class="dropdown-item pointer" (click)="preview('ITL_FRAME_SAMKIP')">ITL (Frame) H-B/L SAMKIP
                         Preview</a>
+                    <a class="dropdown-item pointer" (click)="previewAttachList()">Attach List Preview</a>
                 </div>
             </div>
             <app-default-button (click)="showCreatepoup()" [buttonSetting]="saveButtonSetting"
@@ -25,9 +26,17 @@
     </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
-            <form-create-house-bill-export [isUpdate]="true" type="SLE"></form-create-house-bill-export>
+            <tabset class="custom-class-tab">
+                <tab heading="HAWB Detail">
+                    <form-create-house-bill-export [isUpdate]="true" type="SLE"></form-create-house-bill-export>
 
-            <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary </hbl-goods-summary-lcl>
+                    <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
+                    </hbl-goods-summary-lcl>
+                </tab>
+                <tab heading="Attach List">
+                    <attach-list-house-bill></attach-list-house-bill>
+                </tab>
+            </tabset>
         </div>
     </div>
 </div>

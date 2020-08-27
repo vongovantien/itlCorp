@@ -3,7 +3,7 @@
         <span *ngIf="(isLocked | async) === true" class="m--margin-right-10 align-middle">
             <i class="fa fa-lock text-danger fa-3x"></i>
         </span>
-        <div class="dropdown m-dropdown m-dropdown--inline">
+        <div *ngIf="displayPreview" class="dropdown m-dropdown m-dropdown--inline">
             <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
                 Preview SI
             </button>
@@ -13,7 +13,7 @@
                 <a class="dropdown-item pointer" (click)="previewSIContReport()">Preview SI Detail (Cont)</a>
             </div>
         </div>
-        <div class="dropdown m-dropdown m-dropdown--inline">
+        <div *ngIf="displayPreview" class="dropdown m-dropdown m-dropdown--inline">
             <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
                 Preview OCL
             </button>

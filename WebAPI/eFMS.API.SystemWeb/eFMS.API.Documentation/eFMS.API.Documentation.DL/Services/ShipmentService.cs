@@ -170,12 +170,18 @@ namespace eFMS.API.Documentation.DL.Services
             if (services.Contains("CL"))
             {
                 var shipmentOperation = opsRepository.Get(x => x.IsLocked == false && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
-                var shipmentsOperation = surcharge.Join(shipmentOperation, x => x.Hblid, y => y.Hblid, (x, y) => new { x, y }).Select(x => new Shipments
-                {
-                    JobId = x.y.JobNo,
-                    HBL = x.y.Hwbno,
-                    MBL = x.y.Mblno,
-                });
+                var shipmentsOperation = from ops in shipmentOperation
+                                         join customNo in customsDeclarationRepo.Get() on ops.JobNo equals customNo.JobNo into opsCustom
+                                         from opsC in opsCustom.DefaultIfEmpty()
+                                         join sur in surcharge on ops.Hblid equals sur.Hblid into opsSurcharge
+                                         from opsSur in opsCustom.DefaultIfEmpty()
+                                         select new Shipments
+                                         {
+                                             JobId = ops.JobNo,
+                                             HBL = ops.Hwbno,
+                                             MBL = ops.Mblno,
+                                         };
+
                 shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
@@ -480,18 +486,20 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Get list shipment operation: Current Status != 'Canceled'
             var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                                      .Join(customsDeclarationRepo.Get(), x => x.JobNo, y => y.JobNo, (x, y) => new { x, y })
                                      select new Shipments
                                      {
-                                         Id = ops.Id,
-                                         JobId = ops.JobNo,
-                                         HBL = ops.Hwbno,
-                                         MBL = ops.Mblno,
-                                         CustomerId = ops.CustomerId,
-                                         AgentId = ops.AgentId,
-                                         CarrierId = ops.SupplierId,
-                                         HBLID = ops.Hblid
+                                         Id = ops.x.Id,
+                                         JobId = ops.x.JobNo,
+                                         HBL = ops.x.Hwbno,
+                                         MBL = ops.x.Mblno,
+                                         CustomerId = ops.x.CustomerId,
+                                         AgentId = ops.x.AgentId,
+                                         CarrierId = ops.x.SupplierId,
+                                         HBLID = ops.x.Hblid,
+                                         CustomNo = ops.y.ClearanceNo
                                      };
-            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID }).Select(s => new Shipments
+            shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID, x.CustomNo}).Select(s => new Shipments
             {
                 Id = s.Key.Id,
                 JobId = s.Key.JobId,
@@ -501,7 +509,8 @@ namespace eFMS.API.Documentation.DL.Services
                 AgentId = s.Key.AgentId,
                 CarrierId = s.Key.CarrierId,
                 HBLID = s.Key.HBLID,
-                Service = "CL"
+                Service = "CL",
+                CustomNo = s.Key.CustomNo
             });
             //Get list shipment document: Current Status != 'Canceled'
             var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
