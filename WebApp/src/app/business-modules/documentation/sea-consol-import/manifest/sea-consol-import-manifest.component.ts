@@ -47,6 +47,9 @@ export class SeaConsolImportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
+    //
+    displayPreview: boolean = false;
+
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -117,6 +120,7 @@ export class SeaConsolImportManifestComponent extends AppList {
     onRefresh() {
         this.confirmCreatePopup.hide();
         this.refreshManifest();
+        this.displayPreview = false;
     }
 
     showRefreshPopup() {
@@ -185,6 +189,7 @@ export class SeaConsolImportManifestComponent extends AppList {
                             this._toastService.success(res.message, '');
                             this.getManifest(this.jobId);
                             this.getHblList(this.jobId);
+                            this.displayPreview = true;
                         } else {
                             this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                         }
