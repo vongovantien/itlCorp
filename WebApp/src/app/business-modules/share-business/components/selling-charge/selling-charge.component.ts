@@ -199,7 +199,15 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.chargeId = c.debitCharge;
                         c.id = SystemConstants.EMPTY_GUID;
                         c.type = CommonEnum.SurchargeTypeEnum.SELLING_RATE;
-
+                        c.invoiceDate = null;
+                        c.creditNo = null;
+                        c.debitNo = null;
+                        c.settlementCode = null;
+                        c.voucherId = null;
+                        c.voucherIddate = null;
+                        c.voucherIdre = null;
+                        c.voucherIdredate = null;
+                        c.isFromShipment = true;
                         this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                     });
 
