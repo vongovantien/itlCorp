@@ -9,8 +9,9 @@ namespace OperationInteface {
         carrierId?: string;
         hblid?: string;
         service?: string;
+        customNo?: string;
     }
-    
+
     export interface IInputShipment {
         type: string;
         keyword: string;

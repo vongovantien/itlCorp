@@ -215,16 +215,19 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             _jobIds = this.mapShipment("JOBID");
             _hbls = this.mapShipment("HBL");
             _mbls = this.mapShipment("MBL");
+            const _customNo: any[] = this.mapShipment("CustomNo");
             if (this.selectedShipmentData) {
                 _jobIds.push(this.selectedShipmentData.jobId);
                 _hbls.push(this.selectedShipmentData.hbl);
                 _mbls.push(this.selectedShipmentData.mbl);
+                _customNo.push(this.selectedShipmentData.customNo);
             }
             const body = {
                 partnerId: this.selectedPartnerData.id,
-                jobIds: _jobIds,
-                hbls: _hbls,
-                mbls: _mbls
+                jobIds: _jobIds || [],
+                hbls: _hbls || [],
+                mbls: _mbls || [],
+                customNos: _customNo || []
             };
             this._accoutingRepo.getExistingCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
@@ -246,6 +249,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 }
             }
         }
+        console.log(_shipment)
         return _shipment;
     }
 
