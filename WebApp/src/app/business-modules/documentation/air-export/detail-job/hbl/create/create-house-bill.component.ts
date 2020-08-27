@@ -14,9 +14,7 @@ import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operat
 import { formatDate } from '@angular/common';
 import { HouseBill, DIM } from '@models';
 import { AbstractControl } from '@angular/forms';
-import { ShareBusinessImportHouseBillDetailComponent } from '@share-bussiness';
-
-import { AirExportHBLAttachListComponent } from '../components/attach-list/attach-list-house-bill-air-export.component';
+import { ShareBusinessImportHouseBillDetailComponent, ShareBusinessAttachListHouseBillComponent } from '@share-bussiness';
 import { getDimensionVolumesState, getDetailHBlState, GetDetailHBLSuccessAction, getTransactionPermission } from './../../../../../share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
@@ -36,7 +34,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmPopup: ConfirmPopupComponent;
     @ViewChild('confirmSaveExistedHbl', { static: false }) confirmExistedHbl: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
-    @ViewChild(AirExportHBLAttachListComponent, { static: false }) attachListComponent: AirExportHBLAttachListComponent;
+    @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
 
     jobId: string;
