@@ -10,5 +10,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public List<string> jobIds { get; set; }
         public List<string> hbls { get; set; }
         public List<string> mbls { get; set; }
+        public List<string> customNos { get; set; }
     }
 }
