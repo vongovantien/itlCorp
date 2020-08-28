@@ -76,7 +76,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.partnerMode = 'External';
         modelAdd.partnerLocation = 'Domestic';
         modelAdd.partnerType = this.type;
-        this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER;AGENT';
+        this.type === 'Customer' ? modelAdd.partnerGroup = 'CUSTOMER' : modelAdd.partnerGroup = 'CUSTOMER; AGENT';
         modelAdd.contracts = [...this.contractList.contracts];
 
 
