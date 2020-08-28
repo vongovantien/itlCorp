@@ -144,6 +144,13 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this.updatePartner(modelAdd);
     }
 
+    updateStatusPartner($event) {
+        console.log('oh day ne:', $event);
+        if (this.partner.active === false) {
+            this.partner.active = $event;
+        }
+    }
+
     updatePartner(body: Partner) {
         const bodyValidateTaxcode = {
             id: body.id,

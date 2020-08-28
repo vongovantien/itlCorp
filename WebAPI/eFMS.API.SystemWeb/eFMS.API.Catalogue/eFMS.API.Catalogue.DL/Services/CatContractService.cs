@@ -337,6 +337,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     // send email
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+                    ObjPartner.Active = true;
+                    catPartnerRepository.Update(ObjPartner, x => x.Id == partnerId);
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = GetContractServicesName( objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
@@ -675,7 +677,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private void SendMailActiveSuccess(CatPartnerModel partner, string type)
         {
-            string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
+            string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
@@ -685,7 +687,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
 
             // info send to and cc
-            var listEmailAR = catDepartmentRepository.Get(x => ( x.DeptType == "AR" || x.DeptType == "ACCOUNTANT") && x.BranchId == currentUser.OfficeID )?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID )?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null &&  listEmailAR.Any())
             {
@@ -719,7 +721,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 subject = "Actived Agent - " + partner.ShortName;
                 body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
 
-                    "<i> You Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
+                    "<i> Your Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
 
                     "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
@@ -736,6 +738,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     lstCc = lstTo;
                 }
+                lstCc.Add(objInfoSalesman?.Email);
                 SendMail.Send(subject, body, emailCreator, null, lstCc);
             }
             else
