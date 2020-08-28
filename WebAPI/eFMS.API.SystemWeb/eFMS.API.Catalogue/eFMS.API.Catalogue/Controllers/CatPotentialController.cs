@@ -6,6 +6,7 @@ using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -19,8 +20,11 @@ using Microsoft.Extensions.Localization;
 
 namespace eFMS.API.Catalogue.Controllers
 {
-    [Route("api/[controller]")]
+    
     [ApiController]
+    [ApiVersion("1.0")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class CatPotentialController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
@@ -123,6 +127,29 @@ namespace eFMS.API.Catalogue.Controllers
             HandleState hs = catPotentialService.Update(model);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        //
+        [HttpDelete]
+        [Route("delete/{id}")]
+        [Authorize]
+        public IActionResult Delete(Guid id)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
+
+            /*if (!catPotentialService.CheckAllowPermissionAction(id, permissionRange))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }*/
+
+            HandleState hs = catPotentialService.Delete(id);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {

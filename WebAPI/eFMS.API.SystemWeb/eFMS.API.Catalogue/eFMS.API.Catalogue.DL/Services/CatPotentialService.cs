@@ -66,7 +66,21 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Delete(Guid Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var hs = new HandleState();
+                hs = DataContext.Delete(x => x.Id == Id);
+                if (!hs.Success)
+                {
+                    return new HandleState("Delete Potential Failed!");
+                }
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+            
         }
 
         public CatPotentialModel GetDetail(Guid id)
@@ -95,6 +109,16 @@ namespace eFMS.API.Catalogue.DL.Services
         private IQueryable<CatPotentialModel> GetQueryBy(CatPotentialCriteria criteria)
         {
             Expression<Func<CatPotentialModel, bool>> query = q => true;
+            if (!string.IsNullOrEmpty(criteria.All))
+            {
+                var listUserIdByUserName = sysUserRepository.Get(u => u.Username.Contains(criteria.All))
+                    .Select(r => r.Id).ToList();
+                query = (x => x.NameEn.Contains(criteria.All) || x.NameLocal.Contains(criteria.All)
+                || x.Address.Contains(criteria.All) || x.Taxcode.Contains(criteria.Taxcode) || x.Tel.Contains(criteria.All)
+                || x.Email.Contains(criteria.All) || x.PotentialType.Contains(criteria.All)
+                || listUserIdByUserName.Any(val => val == x.UserCreated));
+                
+            }
             if (!string.IsNullOrEmpty(criteria.NameEn))
             {
                 query = (x => x.NameEn.Contains(criteria.NameEn));
@@ -103,9 +127,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = (x => x.NameLocal.Contains(criteria.NameLocal));
             }
-            if (!string.IsNullOrEmpty(criteria.TaxCode))
+            if (!string.IsNullOrEmpty(criteria.Taxcode))
             {
-                query = (x => x.Taxcode.Contains(criteria.TaxCode));
+                query = (x => x.Taxcode.Contains(criteria.Taxcode));
             }
             if (!string.IsNullOrEmpty(criteria.Tel))
             {
@@ -122,6 +146,10 @@ namespace eFMS.API.Catalogue.DL.Services
             if (criteria.Active.HasValue)
             {
                 query = (x => x.Active.Value == criteria.Active.Value);
+            }
+            if (!string.IsNullOrEmpty(criteria.Type))
+            {
+                query = (x => x.PotentialType == criteria.Type);
             }
             if (!string.IsNullOrEmpty(criteria.Creator))
             {
@@ -211,7 +239,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public HandleState Update(CatPotentialEditModel model)
         {
-            /*try
+            try
             {
                 CatPotential catPotential = DataContext.Get(x => x.Id == model.Potential.Id)?.FirstOrDefault();
                 HandleState hs = null;
@@ -219,18 +247,27 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     hs = new HandleState("Not found Potential Customer");
                 }
-                model.Incoterm.GroupId = catIncoterm.GroupId;
-                model.Incoterm.DepartmentId = catIncoterm.DepartmentId;
-                model.Incoterm.OfficeId = catIncoterm.OfficeId;
-                model.Incoterm.CompanyId = catIncoterm.CompanyId;
+                model.Potential.GroupId = catPotential.GroupId;
+                model.Potential.DepartmentId = catPotential.DepartmentId;
+                model.Potential.OfficeId = catPotential.OfficeId;
+                model.Potential.CompanyId = catPotential.CompanyId;
 
+                model.Potential.UserModified = currentUser.UserID;
+                model.Potential.DatetimeModified = DateTime.Now;
 
+                hs = DataContext.Update(model.Potential, x => x.Id == model.Potential.Id, false);
+                if (hs.Success == false)
+                {
+                    return hs;
+                }
+                DataContext.SubmitChanges();
+                return hs;
             }
             catch(Exception ex)
             {
                 return new HandleState(ex.Message);
-            }*/
-            throw new NotImplementedException();
+            }
+            
         }
 
         IQueryable<CatPotentialModel> IPermissionBaseService<CatPotential, CatPotentialModel>.QueryByPermission(IQueryable<CatPotentialModel> data, PermissionRange range, ICurrentUser currentUser)

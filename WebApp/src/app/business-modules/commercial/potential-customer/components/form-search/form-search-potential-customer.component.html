@@ -40,8 +40,8 @@
                         </button>
                         <div class="dropdown-menu">
                             <ng-container *ngFor="let item of settingFields">
-                                <a class="dropdown-item" href="javascript:void(0)"
-                                    (click)="searchTypeChange(item,$event)" attr.id="{{item.fieldName}}Field">
+                                <a class="dropdown-item" href="javascript:void(0)" (click)="searchTypeChange(item)"
+                                    attr.id="{{item.fieldName}}Field">
                                     {{ item.displayName }}
                                 </a>
                             </ng-container>

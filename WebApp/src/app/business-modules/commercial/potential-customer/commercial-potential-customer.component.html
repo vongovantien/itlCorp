@@ -5,7 +5,7 @@
         </div>
         <div class="c-button-actions">
             <ng-container>
-                <app-permission-button title="add new">
+                <app-permission-button title="add new" (click)="addNew()">
                 </app-permission-button>
             </ng-container>
             <ng-container>
@@ -22,8 +22,9 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="m-form">
-                form search
-                <!--form search-->
+                <form-search-potential-customer #formSearch [configSearch]="configSearch"
+                    (onSearch)="onSearchPotentialCustomer($event)" (onReset)="onResetPotentialCustomer($event)">
+                </form-search-potential-customer>
             </div>
         </div>
     </div>
@@ -37,7 +38,54 @@
                         </th>
                     </thead>
                     <tbody>
+                        <tr *ngFor="let item of potentialCustomers;let i = index;">
+                            <td class="table-actions-col">
+                                <div class="table-actions" style="width: 70px">
+                                    <app-permission-button type="detail" (click)="checkAllowDetail(item.id)">
+                                    </app-permission-button>
+                                    <app-permission-button type="delete" *ngIf="item.active === false"
+                                        (click)="checkAllowDelete(item.id)">
+                                    </app-permission-button>
+                                </div>
+                            </td>
+                            <td>
+                                <a class="pointer" (click)="checkAllowDetail(item.id)">{{item.nameEn}}</a>
+                            </td>
+                            <td>
+                                <span>{{item.nameLocal}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.taxcode}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.tel}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.address}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.email}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.margin}}</span>
+                            </td>
+                            <td>
+                                <span>{{item.quotation}}</span>
+                            </td>
+                            <td>
+                                <span>{{ item.userCreatedName}}</span>
+                            </td>
+                            <td>
+                                <span [ngClass]="item.active ? 'text-success' : 'text-danger'">
+                                    {{ item.active ? 'Active' : 'Inactive'}}
+                                </span>
+                            </td>
 
+
+                        </tr>
+                        <tr app-table-none-record *ngIf="!isLoading && !potentialCustomers.length">
+                        </tr>
+                        <tr app-table-row-loading *ngIf="isLoading"></tr>
                     </tbody>
                 </table>
             </div>
@@ -47,3 +95,4 @@
         </div>
     </div>
 </div>
+<potential-customer-commercial-popup #popupPotential></potential-customer-commercial-popup>

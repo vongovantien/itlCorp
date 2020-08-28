@@ -1152,5 +1152,11 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
-
+    //
+    getPotentialCustomerListPaging(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        });
+    }
 }

@@ -9,6 +9,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
 
 import { TabsModule, PaginationModule } from 'ngx-bootstrap';
 import { CommercialPotentialCustomerComponent } from './commercial-potential-customer.component';
+import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
+import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';
 
 
 const routing: Routes = [
@@ -25,6 +27,8 @@ const routing: Routes = [
 @NgModule({
     declarations: [
         CommercialPotentialCustomerComponent,
+        CommercialFormSearchPotentialCustomerComponent,
+        CommercialPotentialCustomerPopupComponent,
     ],
     imports: [
         SharedModule,
