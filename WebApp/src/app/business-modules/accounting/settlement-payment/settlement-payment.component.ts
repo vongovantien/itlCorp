@@ -123,14 +123,14 @@ export class SettlementPaymentComponent extends AppList {
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: any) => new SettlementPayment(item)),
+                        data: !!data.data ? data.data.map((item: any) => new SettlementPayment(item)) : [],
                         totalItems: data.totalItems,
                     };
                 })
             ).subscribe(
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
-                    this.settlements = res.data;
+                    this.settlements = res.data || [];
                 },
             );
     }

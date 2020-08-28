@@ -33,7 +33,7 @@
                                             <td>
                                                 <span
                                                     [ngClass]="item.totalDebitRate < 70 ? 'text-success' : item.totalDebitRate < 100 ? 'text-warning':'text-danger'">
-                                                    {{ item.totalDebitRate}}
+                                                    {{ item.totalDebitRate | number: '.0-3'}}
                                                 </span>
 
                                             </td>

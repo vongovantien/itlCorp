@@ -35,7 +35,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     ngOnInit() {
 
         this.headers = [
-            { title: 'Sales Name (En)', field: 'salesmanNameEn', sortable: true },
+            { title: 'Sales Name (EN)', field: 'salesmanNameEn', sortable: true },
             { title: 'Sales Full Name', field: 'salesmanFullName', sortable: true },
             { title: 'Credit Limited', field: 'totalCreditLimited', sortable: true },
             { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },

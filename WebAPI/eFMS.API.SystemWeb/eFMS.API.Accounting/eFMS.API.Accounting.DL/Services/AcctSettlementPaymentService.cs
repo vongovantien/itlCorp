@@ -298,6 +298,13 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
             }
+            else
+            {
+                if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+                {
+                    settlementPayments = null;
+                }
+            }
             return settlementPayments;
         }
 
