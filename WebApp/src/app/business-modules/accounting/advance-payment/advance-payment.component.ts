@@ -107,7 +107,7 @@ export class AdvancePaymentComponent extends AppList {
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: any) => new AdvancePayment(item)),
+                        data: !!data.data ? data.data.map((item: any) => new AdvancePayment(item)) : [],
                         totalItems: data.totalItems,
                     };
                 })

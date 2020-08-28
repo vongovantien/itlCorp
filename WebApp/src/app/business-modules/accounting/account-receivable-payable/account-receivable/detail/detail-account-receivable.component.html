@@ -51,7 +51,7 @@
                                     <div class="col-lg-5">
                                         <div class="row">
                                             <div class="col-lg-3">
-                                                <h6 class="font-weight-bold">Tax code: </h6>
+                                                <h6 class="font-weight-bold">Tax Code: </h6>
                                             </div>
                                             <div class="col-lg-9">
                                                 <span>{{accReceivableDetail.taxCode}}</span>
@@ -141,7 +141,7 @@
                                             <div class="col-lg-6">
                                                 <div>
                                                     <h6 class="font-weight-bold">
-                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Limit Rate:" :"Credit limited:"}}
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Limit Rate:" :"Credit Limited:"}}
                                                     </h6>
 
                                                 </div>
@@ -289,7 +289,7 @@
                                                     <div
                                                         [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-danger' : 'text-success' ">
                                                         {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitRate | number: '.0-3')
-                                                : accReceivableDetail.creditRateLimit }}
+                                                : (accReceivableDetail.creditRateLimit | number: '.0-3') }}
                                                         <span
                                                             *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guaranteed') || 
                                                     (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guaranteed')">
@@ -453,7 +453,7 @@
                                                     <div>
                                                         <span
                                                             [ngClass]="accReceivableDetail.debitRate < 70 ? 'text-success' : accReceivableDetail.debitRate < 100 ? 'text-warning':'text-danger'">
-                                                            {{ accReceivableDetail.debitRate}}
+                                                            {{ accReceivableDetail.debitRate | number: '.0-3'}}
                                                         </span>
                                                         <span *ngIf="accReceivableDetail.debitRate !== null">
                                                             %
