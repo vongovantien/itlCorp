@@ -310,10 +310,10 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             packageType: [],
 
             // * Combogrid.
-            agentId: [],
+            agentId: [null, this.type === 'import' ? Validators.required : null],
             pol: [null, this.type !== 'import' ? Validators.required : null],
             pod: [null, this.type === 'import' ? Validators.required : null],
-            coloaderId: [null, Validators.required],
+            coloaderId: [null, this.type !== 'import' ? Validators.required : null],
             warehouseId: [],
 
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
