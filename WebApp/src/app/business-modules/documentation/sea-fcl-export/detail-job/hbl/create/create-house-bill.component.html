@@ -13,16 +13,17 @@
 </div>
 
 <div class="m-content">
-    <tabset class="custom-class-tab">
-        <tab heading="HAWB Detail">
-            <form-create-house-bill-export></form-create-house-bill-export>
-
-            <hbl-goods-summary-fcl type="export">HBL Goods Summary</hbl-goods-summary-fcl>
-        </tab>
-        <tab heading="Attach List">
-            <attach-list-house-bill></attach-list-house-bill>
-        </tab>
-    </tabset>
+    <div class="m-portlet__body">
+        <tabset class="custom-class-tab">
+            <tab heading="HAWB Detail">
+                <form-create-house-bill-export></form-create-house-bill-export>
+                <hbl-goods-summary-fcl type="export">HBL Goods Summary</hbl-goods-summary-fcl>
+            </tab>
+            <tab heading="Attach List">
+                <attach-list-house-bill></attach-list-house-bill>
+            </tab>
+        </tabset>
+    </div>
 </div>
 <import-house-bill-detail (onImport)="onImport($event)" [jobId]="jobId" [typeTransaction]="6">
 </import-house-bill-detail>

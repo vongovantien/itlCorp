@@ -14,7 +14,8 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
     ShareBusinessFormCreateHouseBillExportComponent,
-    getTransactionPermission
+    getTransactionPermission,
+    ShareBusinessAttachListHouseBillComponent
 } from 'src/app/business-modules/share-business';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -34,6 +35,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBusinessFormCreateHouseBillExportComponent, { static: false }) formCreateHBLComponent: ShareBusinessFormCreateHouseBillExportComponent;
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent, { static: false }) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent, { static: false }) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareBusinessAttachListHouseBillComponent, { static: false }) attachListComponent: ShareBusinessAttachListHouseBillComponent;
 
     jobId: string;
     containers: Container[] = [];
@@ -179,8 +181,8 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             packageQty: this.goodSummaryComponent.packageQty,
             packageType: +this.goodSummaryComponent.selectedPackage,
             contSealNo: this.goodSummaryComponent.containerDescription,
-            chargeWeight: this.goodSummaryComponent.totalChargeWeight
-
+            chargeWeight: this.goodSummaryComponent.totalChargeWeight,
+            attachList: this.attachListComponent.attachList,
         };
 
         return formData;
