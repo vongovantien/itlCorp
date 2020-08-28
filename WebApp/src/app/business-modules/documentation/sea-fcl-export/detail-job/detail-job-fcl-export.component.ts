@@ -352,6 +352,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
                         this._toastService.success(r.message);
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
                         this._toastService.error(r.message);
                     }

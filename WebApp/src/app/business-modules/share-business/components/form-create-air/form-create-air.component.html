@@ -48,8 +48,11 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':isSubmitted  && !coloaderId.value}">
-                            <label required>Airline/Co-Loader</label>
+                            [ngClass]="{'m-form__group has-danger':isSubmitted  && type !== 'import' && !coloaderId.value}">
+                            <label>
+                                Airline/Co-Loader
+                                <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
+                            </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
                                 [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
@@ -59,8 +62,12 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Agent</label>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted  && type === 'import' && !agentId.value}">
+                            <label>
+                                Agent
+                                <span class="text-danger" *ngIf="type === 'import'">(*)</span>
+                            </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                 [currentActiveItemId]="{ field: 'id', value: agentId.value}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"

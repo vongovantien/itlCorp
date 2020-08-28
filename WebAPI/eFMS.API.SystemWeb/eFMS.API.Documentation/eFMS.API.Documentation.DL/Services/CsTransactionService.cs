@@ -580,7 +580,7 @@ namespace eFMS.API.Documentation.DL.Services
                             result.WarehousePOD = new WarehouseData
                             {
                                 NameEn = warehouse.NameEn,
-                                NameVn = warehouse.NameEn,
+                                NameVn = warehouse.NameVn,
                                 NameAbbr = warehouse.DisplayName,
                             };
                         }
@@ -613,7 +613,7 @@ namespace eFMS.API.Documentation.DL.Services
                             result.WarehousePOL = new WarehouseData
                             {
                                 NameEn = warehouse.NameEn,
-                                NameVn = warehouse.NameEn,
+                                NameVn = warehouse.NameVn,
                                 NameAbbr = warehouse.DisplayName,
                             };
                         }
