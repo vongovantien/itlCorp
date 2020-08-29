@@ -243,22 +243,10 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     }
 
     updateInwordField(containers: Container[]): string {
-
-        // tach ra 2 arr.
         const objApartOf = containers.filter(x => x.isPartOfContainer === true);
         const contObject1 = this.mapObjectData(objApartOf);
-
-        const contDataAPartOf = [];
-        for (const item of Object.keys(_groupBy(contObject1, 'contName'))) {
-            contDataAPartOf.push({
-                contName: item,
-                quantity: contObject1.find(x => x.contName === item).quantity,
-            });
-        }
-
         const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
         const contObject2 = this.mapObjectData(objNotApartOf);
-
         const contDataNotAprtOf = [];
         for (const item of Object.keys(_groupBy(contObject2, 'contName'))) {
             contDataNotAprtOf.push({
@@ -272,12 +260,10 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
         for (const item of contDataNotAprtOf) {
             containerDetail += this.handleStringCont(item);
         }
-
         for (const item of contObject1) {
             containerDetail += "A Part Of ";
             containerDetail += this.handleStringPackage(item);
         }
-
         containerDetail = containerDetail.trim().replace(/\&$/, "");
         containerDetail += " Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';
