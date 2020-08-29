@@ -234,61 +234,48 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             );
     }
 
-    updateInwordField(containers: Container[]): string {
-        console.log(containers);
-        let containerDetail = '';
-
+    mapObjectData(containers: Container[]) {
         const contObject = (containers || []).map((container: Container) => ({
-            contName: container.description || '',
+            contName: container.containerTypeName || '',
             quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
         }));
+        return contObject;
+    }
 
-        const contObject1 = (containers || []).map((container: Container) => ({
-            containerTypeName: container.containerTypeName || '',
-            contName: container.description || '',
-            quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
-        }));
+    updateInwordField(containers: Container[]): string {
 
+        // tach ra 2 arr.
+        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+        const contObject1 = this.mapObjectData(objApartOf);
 
-        const contObjectFCL: any[] = (containers || []).map((container: Container | any) => ({
-            contName: container.description || '',
-            quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
-        }));
-
-        const contData = [];
-        for (const item of Object.keys(_groupBy(contObject1, 'containerTypeName'))) {
-            contData.push({
+        const contDataAPartOf = [];
+        for (const item of Object.keys(_groupBy(contObject1, 'contName'))) {
+            contDataAPartOf.push({
                 contName: item,
-                quantity: _groupBy(contObject1, 'containerTypeName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-                isPartContainer: _groupBy(contObject1, 'containerTypeName')[item].map(i => i.isPartContainer)
+                quantity: contObject1.find(x => x.contName === item).quantity,
             });
         }
-        console.log(contData);
 
-        // for (const item of contObject1) {
-        //     if (!item.isPartContainer) {
-        //         for (const it of contData) {
-        //             containerDetail += this.handleStringCont(it);
-        //         }
-        //     }
-        // }
-        for (const item of contObject1) {
-            for (const it of contData) {
-                if (item.isPartContainer === false && it.contName === item.containerTypeName) {
-                    it.quantity = item.quantity;
-                    containerDetail += this.handleStringCont(it);
-                }
-            }
+        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+        const contObject2 = this.mapObjectData(objNotApartOf);
+
+        const contDataNotAprtOf = [];
+        for (const item of Object.keys(_groupBy(contObject2, 'contName'))) {
+            contDataNotAprtOf.push({
+                contName: item,
+                quantity: _groupBy(contObject2, 'contName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+        console.log(contDataNotAprtOf);
+        let containerDetail = '';
+
+        for (const item of contDataNotAprtOf) {
+            containerDetail += this.handleStringCont(item);
         }
 
         for (const item of contObject1) {
-            if (item.isPartContainer) {
-                containerDetail += "A Part Of ";
-                containerDetail += this.handleStringPackage(item);
-            }
+            containerDetail += "A Part Of ";
+            containerDetail += this.handleStringPackage(item);
         }
 
         containerDetail = containerDetail.trim().replace(/\&$/, "");
