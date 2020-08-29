@@ -131,7 +131,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
         this.hblGoodsSummaryComponent.initContainer();
         this.hblGoodsSummaryComponent.description = "AS PER BILL";
-
+        this.hblGoodsSummaryComponent.containerDetail = 'A PART OF CONTAINER S.T.C';
         this.formHouseBill.notifyPartyDescription.setValue("SAME AS CONSIGNEE");
         this.formHouseBill.type = 'SLI';
         this._cd.detectChanges();
