@@ -19,7 +19,7 @@ namespace eFMS.API.ForPartner
             var environmentValue = appSettings["Environment"].ToString();
 
             var webHostBuilder = CreateWebHostBuilder(args);
-
+             
             if (!String.IsNullOrEmpty(environmentValue))
             {
                 webHostBuilder.UseEnvironment(environmentValue);
