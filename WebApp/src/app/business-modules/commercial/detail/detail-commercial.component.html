@@ -33,7 +33,7 @@
                 <form-create-commercial [isUpdate]="true"></form-create-commercial>
             </div>
         </div>
-        <commercial-contract-list></commercial-contract-list>
+        <commercial-contract-list (onActiveContract)="updateStatusPartner($event)"></commercial-contract-list>
     </div>
 </div>
 

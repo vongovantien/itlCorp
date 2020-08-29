@@ -499,7 +499,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
             saleService: !!this.selectedContract.saleService ? [<CommonInterface.INg2Select>{ id: this.selectedContract.saleService, text: '' }] : null,
-            vas: [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }],
+            vas: !!this.selectedContract.vas ? [<CommonInterface.INg2Select>{ id: this.selectedContract.vas, text: '' }] : null,
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null,
             currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
         });
@@ -587,6 +587,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             message = 'Active success !!';
                         }
                         this._toastService.success(message);
+                        this.selectedContract.partnerStatus = true;
                         this.onRequest.emit(this.selectedContract);
 
                     } else {

@@ -121,6 +121,10 @@ namespace eFMS.API.Documentation.Controllers
             {
                 shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
             }
+            else if(typeSearch == "CustomNo")
+            {
+                shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+            }
 
             var _status = false;
             var _message = string.Empty;

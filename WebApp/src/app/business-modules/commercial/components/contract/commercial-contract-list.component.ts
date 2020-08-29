@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
+    @Output() onActiveContract: EventEmitter<any> = new EventEmitter<any>();
     contracts: Contract[] = [];
     //
     isActiveNewContract: boolean = true;
@@ -255,6 +256,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             }
         }
         this.formContractPopup.contracts = this.contracts;
+        this.onActiveContract.emit(this.contract.partnerStatus);
     }
 
 

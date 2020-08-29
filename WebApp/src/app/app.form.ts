@@ -5,6 +5,8 @@ import { ButtonType } from './shared/enums/type-button.enum';
 import { SelectComponent } from 'ng2-select';
 import { ViewChildren, QueryList, HostListener, ElementRef } from '@angular/core';
 import { ComboGridVirtualScrollComponent } from './shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component';
+import { Observable, fromEvent, merge, combineLatest } from 'rxjs';
+import { distinctUntilChanged, share, filter } from 'rxjs/operators';
 
 export abstract class AppForm extends AppPage {
     @ViewChildren(SelectComponent) selectElements: QueryList<SelectComponent>;
@@ -154,6 +156,27 @@ export abstract class AppForm extends AppPage {
                     a.value = '';
                 }
             }
+        );
+    }
+
+    createShortcut = (shortcuts: string[]): Observable<KeyboardEvent[]> => {
+        const keyDown$: Observable<KeyboardEvent> = fromEvent<KeyboardEvent>(document as Document, 'keydown');
+        const keyUp$: Observable<KeyboardEvent> = fromEvent<KeyboardEvent>(document as Document, 'keyup');
+
+        // * Create KeyboardEvent Observable for specified KeyCode
+        const createKeyPressStream = (charCode: string) =>
+            merge(keyDown$, keyUp$).pipe(
+                distinctUntilChanged((a: KeyboardEvent, b: KeyboardEvent) => a.code === b.code && a.type === b.type),
+                share()
+            ).pipe(filter((event: KeyboardEvent) => event.code === charCode));
+
+        // * Create Event Stream for every KeyCode in shortcut
+        const keyCodeEvents$: Observable<KeyboardEvent>[] = shortcuts.map((shortcut: string) => createKeyPressStream(shortcut));
+
+        // * Emit when specified keys are pressed (keydown).
+        // * Emit only when all specified keys are pressed at the same time.
+        return combineLatest(keyCodeEvents$).pipe(
+            filter<KeyboardEvent[]>((arr) => arr.every((a) => a.type === 'keydown'))
         );
     }
 

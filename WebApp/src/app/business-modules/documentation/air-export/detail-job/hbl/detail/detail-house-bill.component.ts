@@ -12,11 +12,10 @@ import * as fromShareBussiness from '@share-bussiness';
 
 import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { getDetailHBlPermissionState } from '@share-bussiness';
 import { SystemConstants } from 'src/constants/system.const';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { InputBookingNotePopupComponent } from '../components/input-booking-note/input-booking-note.popup';
-
+import { merge } from 'rxjs';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -55,6 +54,8 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         );
     }
 
+
+
     ngOnInit() {
         this._activedRoute.params.subscribe((param: Params) => {
             if (isUUID(param.hblId)) {
@@ -72,6 +73,17 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             }
         });
         this.isLocked = this._store.select(fromShareBussiness.getTransactionLocked);
+
+
+        // * Shortcut
+        merge(
+            this.createShortcut(['ControlLeft', 'KeyI']),
+            this.createShortcut(['ControlRight', 'KeyI'])
+        ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
+            () => {
+                this.preview('HAWB_FRAME');
+            }
+        );
     }
 
     getDetailHbl() {
@@ -85,14 +97,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CsTransactionDetail) => {
                     if (!!res) {
                         this.hblDetail = res;
-                        // if (!isNaN(parseInt(this.hblDetail.rateCharge))) {
-                        //     this.formCreateHBLComponent.rateChargeIsNumber = true;
-                        // } else {
-                        //     this.formCreateHBLComponent.asArranged.setValue(true);
-                        // }
-                        // if (this.hblDetail.rateCharge != Number(this.hblDetail.rateCharge)) {
-                        //     this.formCreateHBLComponent.asArranged.setValue(true);
-                        // }
                     }
                 },
             );
@@ -162,11 +166,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        // if (!isSeparate) {
-                        //     // this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl`]);
-                        // } else {
-                        //     // this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
-                        // }
                     } else {
                         this._toastService.error(res.message);
                     }
