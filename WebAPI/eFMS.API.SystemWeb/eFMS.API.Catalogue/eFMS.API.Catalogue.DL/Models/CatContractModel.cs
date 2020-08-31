@@ -17,7 +17,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UserModifiedName { get; set; }
         //public string FolderName { get; set; }
         //public string ChildId { get; set; }
-        public bool? isRequestApproval { get; set; }
+        public bool? IsRequestApproval { get; set; }
         public IFormFile File { get; set; }
     }
 }
