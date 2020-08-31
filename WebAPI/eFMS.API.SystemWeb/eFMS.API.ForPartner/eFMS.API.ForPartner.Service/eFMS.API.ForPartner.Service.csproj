@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
+    <PackageReference Include="mongocsharpdriver" Version="2.7.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="eFMS.API.Common">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Common">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Connection">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
