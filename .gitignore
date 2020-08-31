@@ -397,3 +397,7 @@ WebApp/.vscode/settings.json
 /WebApp/src/environments/environment.ts
 WebApp/src/environments/environment.ts
 WebAPI/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server/sqlite3/db.lock
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/eFMS.API.ForPartner.Service/obj
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/eFMS.API.ForPartner/obj
+/WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/eFMS.API.ForPartner.DL/obj

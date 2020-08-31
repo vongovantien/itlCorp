@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.ForPartner</name>
+    </assembly>
+    <members>
+        <member name="T:eFMS.API.ForPartner.Controllers.AccountingController">
+            <summary>
+            Accounting Controller
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor">
+            <summary>
+            333333
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test">
+            <summary>
+            aaaa
+            </summary>
+            <remarks>
+            idifuf
+            </remarks>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
