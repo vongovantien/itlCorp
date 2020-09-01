@@ -602,6 +602,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
                         item.IsValid = false;
                     }
+                    if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
+                        item.IsValid = false;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(item.SaleService))
