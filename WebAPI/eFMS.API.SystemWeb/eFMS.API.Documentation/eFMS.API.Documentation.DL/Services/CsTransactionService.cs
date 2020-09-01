@@ -2283,7 +2283,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.FreightColoader = 0; //NOT USE
                         charge.PayableAccount = surcharge.PartnerName?.ToUpper();//Partner name of charge
                         charge.Description = surcharge.ChargeNameEn; //Charge name of charge
-                        charge.Curr = surcharge.CurrencyId; //Currency of charge
+                        charge.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
                         charge.VAT = 0; //NOT USE
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost; //Phí chi của charge
@@ -2402,8 +2402,8 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.CurrDecimalNo = 2;
-            parameter.DecimalNo = 2;
+            parameter.CurrDecimalNo = 3;
+            parameter.DecimalNo = 0;
             parameter.HBLList = _hblNoList?.ToUpper();
 
             result = new Crystal
