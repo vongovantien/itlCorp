@@ -11,17 +11,18 @@
         </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor">
             <summary>
-            333333
+            Accounting Contructor
             </summary>
         </member>
         <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.Test">
             <summary>
-            aaaa
+            Test
             </summary>
             <remarks>
-            idifuf
+            Remark
             </remarks>
             <returns></returns>
+            <response></response>
         </member>
     </members>
 </doc>
