@@ -9,5 +9,6 @@ namespace eFMS.API.System.DL.IService
     public interface ISysPartnerAPIService : IRepositoryBase<SysPartnerApi, SysPartnerAPIModel>
     {
         string GenerateAPIKey();
+        HandleState Add(string apiKey);
     }
 }

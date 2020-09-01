@@ -7,6 +7,7 @@ using eFMS.API.System.DL.IService;
 using eFMS.API.System.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -43,6 +44,18 @@ namespace eFMS.API.System.Controllers
             var apiKey = sysPartnerAPIService.GenerateAPIKey();
 
             return Ok(new { apiKey });
+        }
+
+        [HttpPost("AddNew")]
+        [Authorize]
+        public IActionResult AddNew(string apiKey)
+        {
+            HandleState result = sysPartnerAPIService.Add(apiKey);
+            if(result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
         }
     }
 }
