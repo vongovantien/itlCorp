@@ -79,7 +79,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     files: any = {};
 
-    serviceNames: string = '';
 
     menuSpecialPermission: Observable<any[]>;
 
@@ -119,6 +118,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         protected _router: Router,
         protected _toastService: ToastrService,
         private _ngProgressService: NgProgress,
+        protected _activeRoute: ActivatedRoute,
         private _store: Store<IAppState>
 
     ) {
@@ -140,8 +140,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.formGroup.controls['paymentTerm'].setValue(30);
             this.formGroup.controls['creditLimitRate'].setValue(120);
 
-
         }
+
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            this.type = result.type;
+        });
 
         this.formGroup.get("effectiveDate").valueChanges
             .pipe(
@@ -359,8 +362,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         if (this.formGroup.valid) {
             this.asignValueToModel();
-            if (isRequestApproval) {
+            if (isRequestApproval === true) {
                 this.selectedContract.isRequestApproval = true;
+            } else {
+                this.selectedContract.isRequestApproval = false;
             }
             if (!this.isUpdate && !this.isCreateNewCommercial) {
                 this._catalogueRepo.createContract(this.selectedContract)

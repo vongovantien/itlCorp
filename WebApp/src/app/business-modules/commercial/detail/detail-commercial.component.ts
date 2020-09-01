@@ -145,7 +145,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     updateStatusPartner($event) {
-        console.log('oh day ne:', $event);
         if (this.partner.active === false) {
             this.partner.active = $event;
         }

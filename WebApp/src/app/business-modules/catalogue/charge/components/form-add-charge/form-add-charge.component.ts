@@ -130,6 +130,7 @@ export class FormAddChargeComponent extends AppForm {
         let valid: boolean = true;
         this.setError(this.service);
         this.setError(this.chargeGroup);
+        this.setError(this.formGroup.controls['productDept']);
         if (!this.formGroup.valid) {
             valid = false;
         }
