@@ -1309,6 +1309,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 else
                 {
                     string taxCode = item.TaxCode.Replace(" ", "");
+                    string internalReferenceNo = item.InternalReferenceNo.Replace(" ", "");
+
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
                     var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
                     if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
@@ -1316,14 +1318,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1 && list.Count(x=>x.InternalReferenceNo == internalReferenceNo) > 1 )
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode == taxCode))
+                        if (partners.Any(x => x.TaxCode == taxCode) && string.IsNullOrEmpty(item.InternalReferenceNo.Replace(" ", "")))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
