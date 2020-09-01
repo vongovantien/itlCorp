@@ -5,7 +5,7 @@ using System;
 
 namespace eFMS.API.ForPartner.DL.IService
 {
-    public interface IAccountingManagementService: IRepositoryBase<AccAccountingManagement, AccAccountingManagementModel>
+    public interface IAccountingManagementService: IRepositoryBase<AccAccountingManagement, AccAccountingManagementModel>, IForPartnerApiService
     {
         AccAccountingManagementModel GetById(Guid id);
     }

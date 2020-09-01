@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using eFMS.API.Accounting.DL.Common;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ namespace eFMS.API.ForPartner.Infrastructure.Filters
 {
     public class APIKeyAuthAttribute : Attribute, IAsyncActionFilter
     {
-        private const string APIKeyHeaderName = "efms-api-key";
+        private  string APIKeyHeaderName = AccountingConstants.API_KEY_HEADER;
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
