@@ -9,7 +9,7 @@
             Accounting Controller
             </summary>
         </member>
-        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor">
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.#ctor(eFMS.API.ForPartner.DL.IService.IAccountingManagementService)">
             <summary>
             Accounting Contructor
             </summary>

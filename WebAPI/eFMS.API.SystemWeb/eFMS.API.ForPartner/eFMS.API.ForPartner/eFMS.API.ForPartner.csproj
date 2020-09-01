@@ -65,4 +65,8 @@
     <None Include="wwwroot\swagger-ui\Custom.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.ForPartner.Service\eFMS.API.ForPartner.Service.csproj" />
+  </ItemGroup>
+
 </Project>

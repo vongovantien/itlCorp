@@ -7,7 +7,8 @@ namespace eFMS.API.ForPartner.Infrastructure.Filters
 {
     public class APIKeyAuthAttribute : Attribute, IAsyncActionFilter
     {
-        private const string APIKeyHeaderName = "x-api-key";
+        private const string APIKeyHeaderName = "efms-api-key";
+
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (!context.HttpContext.Request.Headers.TryGetValue(APIKeyHeaderName, out var clientAPIKey))
