@@ -128,7 +128,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
-                if (entity.isRequestApproval == true)
+                if (entity.IsRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
@@ -204,7 +204,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
-                if (model.isRequestApproval == true)
+                if (model.IsRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);

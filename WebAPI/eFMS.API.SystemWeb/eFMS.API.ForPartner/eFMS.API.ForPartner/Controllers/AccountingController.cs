@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <returns></returns>
         /// <response></response>
         [HttpGet("Test")]
+        [APIKeyAuth]
         public IActionResult Test()
         {
             return Ok("OK");

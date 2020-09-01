@@ -1100,13 +1100,13 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<CatContract> QueryContractPartner(IQueryable<CatContract> partnerContracts, AccountReceivableCriteria criteria)
         {
-            IQueryable<CatContract> resutl = null;
+            IQueryable<CatContract> result = null;
             if (partnerContracts != null)
             {
                 var queryContractPartner = ExpressionContractPartnerQuery(criteria);
-                resutl = partnerContracts.Where(queryContractPartner);
+                result = partnerContracts.Where(queryContractPartner);
             }
-            return resutl;
+            return result;
         }
 
         private IQueryable<object> GetDataTrialOfficial(AccountReceivableCriteria criteria)
@@ -1123,53 +1123,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                var groupbyAgreement = arPartnerContracts.ToList()
-                    .GroupBy(g => new { g.AgreementId })
-                    .Select(s => new AccountReceivableResult
-                    {
-                        AgreementId = s.Key.AgreementId,
-                        PartnerId = s.First().PartnerId,
-                        PartnerCode = s.First().PartnerCode,
-                        PartnerNameEn = s.First().PartnerNameEn,
-                        PartnerNameLocal = s.First().PartnerNameLocal,
-                        PartnerNameAbbr = s.First().PartnerNameAbbr,
-                        TaxCode = s.First().TaxCode,
-                        PartnerStatus = s.First().PartnerStatus,
-                        AgreementNo = s.First().AgreementNo,
-                        AgreementType = s.First().AgreementType,
-                        AgreementStatus = s.First().AgreementStatus,
-                        AgreementSalesmanId = s.First().AgreementSalesmanId,
-                        AgreementSalesmanName = s.First().AgreementSalesmanName,
-                        AgreementCurrency = s.First().AgreementCurrency,
-                        OfficeId = s.First().OfficeId,
-                        ArServiceCode = s.First().ArServiceCode,
-                        ArServiceName = s.First().ArServiceName,
-                        EffectiveDate = s.First().EffectiveDate,
-                        ExpriedDate = s.First().ExpriedDate,
-                        ExpriedDay = s.First().ExpriedDay,
-                        CreditLimited = s.First().CreditLimited,
-                        CreditTerm = s.First().CreditTerm,
-                        CreditRateLimit = s.First().CreditRateLimit,
-                        SaleCreditLimited = s.First().SaleCreditLimited,
-                        SaleDebitAmount = s.First().SaleDebitAmount,
-                        SaleDebitRate = s.First().SaleDebitRate,
-                        DebitAmount = s.Sum(sum => sum.DebitAmount),
-                        ObhAmount = s.Sum(sum => sum.ObhAmount),
-                        DebitRate = s.Sum(sum => sum.DebitRate),
-                        CusAdvance = s.First().CusAdvance,
-                        BillingAmount = s.Sum(sum => sum.BillingAmount),
-                        BillingUnpaid = s.Sum(sum => sum.BillingUnpaid),
-                        PaidAmount = s.Sum(sum => sum.PaidAmount),
-                        CreditAmount = s.Sum(sum => sum.CreditAmount),
-                        Over1To15Day = s.Sum(sum => sum.Over1To15Day),
-                        Over16To30Day = s.Sum(sum => sum.Over16To30Day),
-                        Over30Day = s.Sum(sum => sum.Over30Day),
-                        ArCurrency = s.First().ArCurrency
-                    }).AsQueryable();
+                arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
-                arPartnerContracts = groupbyAgreement.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0);
             }
-
             return arPartnerContracts;
         }
 
@@ -1259,6 +1216,7 @@ namespace eFMS.API.Accounting.DL.Services
             var contractsCash = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
             var partnerContractsCash = QueryContractPartner(contractsCash, criteria);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContractsCash, partners);
+            arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
 
             IQueryable<AccountReceivableResult> arPartnerNoContracts = null;
             if (IsGetDataARNoContract(criteria))
@@ -1291,6 +1249,55 @@ namespace eFMS.API.Accounting.DL.Services
                 dataResult = dataResult.Where(queryAccountReceivable);
             }
             return dataResult;
+        }
+
+        private IQueryable<AccountReceivableResult> GetArPartnerContractGroupByAgreementId(IQueryable<AccountReceivableResult> arPartnerContracts)
+        {
+            if (arPartnerContracts == null) return null;
+            var groupbyAgreementId = arPartnerContracts.ToList()
+                    .GroupBy(g => new { g.AgreementId })
+                    .Select(s => new AccountReceivableResult
+                    {
+                        AgreementId = s.Key.AgreementId,
+                        PartnerId = s.First().PartnerId,
+                        PartnerCode = s.First().PartnerCode,
+                        PartnerNameEn = s.First().PartnerNameEn,
+                        PartnerNameLocal = s.First().PartnerNameLocal,
+                        PartnerNameAbbr = s.First().PartnerNameAbbr,
+                        TaxCode = s.First().TaxCode,
+                        PartnerStatus = s.First().PartnerStatus,
+                        AgreementNo = s.First().AgreementNo,
+                        AgreementType = s.First().AgreementType,
+                        AgreementStatus = s.First().AgreementStatus,
+                        AgreementSalesmanId = s.First().AgreementSalesmanId,
+                        AgreementSalesmanName = s.First().AgreementSalesmanName,
+                        AgreementCurrency = s.First().AgreementCurrency,
+                        OfficeId = s.First().OfficeId,
+                        ArServiceCode = s.First().ArServiceCode,
+                        ArServiceName = s.First().ArServiceName,
+                        EffectiveDate = s.First().EffectiveDate,
+                        ExpriedDate = s.First().ExpriedDate,
+                        ExpriedDay = s.First().ExpriedDay,
+                        CreditLimited = s.First().CreditLimited,
+                        CreditTerm = s.First().CreditTerm,
+                        CreditRateLimit = s.First().CreditRateLimit,
+                        SaleCreditLimited = s.First().SaleCreditLimited,
+                        SaleDebitAmount = s.First().SaleDebitAmount,
+                        SaleDebitRate = s.First().SaleDebitRate,
+                        DebitAmount = s.Sum(sum => sum.DebitAmount),
+                        ObhAmount = s.Sum(sum => sum.ObhAmount),
+                        DebitRate = s.Sum(sum => sum.DebitRate),
+                        CusAdvance = s.First().CusAdvance,
+                        BillingAmount = s.Sum(sum => sum.BillingAmount),
+                        BillingUnpaid = s.Sum(sum => sum.BillingUnpaid),
+                        PaidAmount = s.Sum(sum => sum.PaidAmount),
+                        CreditAmount = s.Sum(sum => sum.CreditAmount),
+                        Over1To15Day = s.Sum(sum => sum.Over1To15Day),
+                        Over16To30Day = s.Sum(sum => sum.Over16To30Day),
+                        Over30Day = s.Sum(sum => sum.Over30Day),
+                        ArCurrency = s.First().ArCurrency
+                    }).AsQueryable();
+            return groupbyAgreementId;
         }
 
         public IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria)
