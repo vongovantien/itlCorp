@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h5 class="modal-title" style="margin-right:10px;">
-                        {{isUpdate == false ? 'Create Agreement Info' : 'Customer - Agreement Info'}}
+                        {{isUpdate == false ? 'Create Contract Info' : type === 'Customer' ?  'Customer - Contract Info'   : type === 'Agent' ? 'Agent - Contract Info' : 'Contract Info'}}
                     </h5>
                     <ng-container *ngIf="!!this.selectedContract">
                         <ng-container *ngIf="this.selectedContract.active else inactive">
@@ -398,8 +398,8 @@
                         </span>
                     </button>
                     <button (click)="onSubmit(true)"
-                        *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) && this.partnerId != null) || (!isCreateNewCommercial && !isUpdate)   "
-                        class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active) )  "
+                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-send"></i>
                             <span> Request Approval </span>

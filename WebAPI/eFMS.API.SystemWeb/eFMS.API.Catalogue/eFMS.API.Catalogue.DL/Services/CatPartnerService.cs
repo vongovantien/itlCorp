@@ -112,11 +112,26 @@ namespace eFMS.API.Catalogue.DL.Services
                 });
                 partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
                 contractRepository.Add(contracts, false);
+            
             }
             DataContext.Add(partner, false);
 
             DataContext.SubmitChanges();
             contractRepository.SubmitChanges();
+            if(entity.Contracts.Count > 0)
+            {
+                foreach (var item in entity.Contracts)
+                {
+                    if (item.IsRequestApproval == true)
+                    {
+                        entity.ContractService = item.SaleService;
+                        entity.ContractType = item.ContractType;
+                        entity.SalesmanId = item.SaleManId;
+                        entity.UserCreated = partner.UserCreated;
+                        SendMailRequestApproval(entity);
+                    }
+                }
+            }
             ClearCache();
             Get();
             SendMailCreatedSuccess(partner);
@@ -156,6 +171,70 @@ namespace eFMS.API.Catalogue.DL.Services
             partner.OfficeId = currentUser.OfficeID;
             partner.CompanyId = currentUser.CompanyID;
             return partner;
+        }
+
+        private void SendMailRequestApproval(CatPartnerModel partner)
+        {
+            string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
+            List<string> lstTo = new List<string>();
+
+            // info send to and cc
+            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+
+            if (listEmailAR != null && listEmailAR.Any())
+            {
+                lstTo = listEmailAR.Split(";").ToList();
+            }
+            string url = string.Empty;
+            string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoSalesman = sysEmployeeRepository.Get(e => e.Id == employeeIdSalemans)?.FirstOrDefault();
+            switch (partner.PartnerType)
+            {
+                case "Customer":
+                    url = "home/commercial/customer/";
+                    break;
+                case "Agent":
+                    url = "home/commercial/agent/";
+                    break;
+            }
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string subject = string.Empty;
+            string body = string.Empty;
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+
+
+            linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
+
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear Accountant/AR Team, " + " </br> </br>" +
+
+              "<i> You have a Customer Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+              "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+
+              "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+              "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+              "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+
+              "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+              "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
+              "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
+              "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
+
+              + linkEn + "</br>" + linkVn + "</br> </br>" +
+              "<i> Thanks and Regards </i>" + "</br> </br>" +
+              "eFMS System </div>");
+
+            List<string> lstCc = new List<string>
+            {
+            };
+
+            lstCc.Add(objInfoSalesman?.Email);
+            SendMail.Send(subject, body, lstTo, null, lstCc);
+
         }
 
         private void SendMailCreatedSuccess(CatPartner partner)
