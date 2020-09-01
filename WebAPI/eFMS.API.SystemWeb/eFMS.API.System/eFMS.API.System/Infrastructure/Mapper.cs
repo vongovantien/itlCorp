@@ -33,6 +33,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysUser, SysUserModel>();
             CreateMap<SysSettingFlow, SysSettingFlowModel>();
             CreateMap<SetLockingDateShipment, SetLockingDateShipmentModel>();
+            CreateMap<SysPartnerApi, SysPartnerAPIModel>();
+
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
@@ -54,6 +56,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysUserPermissionGeneralModel, SysUserPermissionGeneral>();
             CreateMap<SysSettingFlowModel,SysSettingFlow >();
             CreateMap<SetLockingDateShipmentModel, SetLockingDateShipment>();
+            CreateMap<SysPartnerAPIModel, SysPartnerApi>();
+
 
         }
     }

@@ -25,6 +25,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysMenu> SysMenu { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysPermissionSample> SysPermissionSample { get; set; }
         public virtual DbSet<SysPermissionSampleGeneral> SysPermissionSampleGeneral { get; set; }
         public virtual DbSet<SysPermissionSampleSpecial> SysPermissionSampleSpecial { get; set; }
@@ -670,6 +671,31 @@ namespace eFMS.API.System.Service.Models
                     .HasForeignKey(d => d.Buid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_sysBranch_sysBU");
+            });
+
+            modelBuilder.Entity<SysPartnerApi>(entity =>
+            {
+                entity.ToTable("sysPartnerAPI");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Company).HasMaxLength(100);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(10);
+
+                entity.Property(e => e.Environment).HasMaxLength(150);
+
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
             modelBuilder.Entity<SysPermissionSample>(entity =>
