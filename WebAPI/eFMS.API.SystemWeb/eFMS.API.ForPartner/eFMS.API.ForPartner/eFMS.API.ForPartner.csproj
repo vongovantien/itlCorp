@@ -12,33 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\docs\favicon-16x16.png" />
-    <Content Remove="wwwroot\docs\favicon-32x32.png" />
-    <Content Remove="wwwroot\docs\favicon.ico" />
-    <Content Remove="wwwroot\swagger-ui\Custom.css" />
-    <Content Remove="wwwroot\swagger-ui\Custom.js" />
-    <Content Remove="wwwroot\swagger-ui\resources\logo-efms.png" />
+    <None Remove="eFMS.API.ForPartner.xml" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="wwwroot\docs\favicon-16x16.png">
+    <Content Include="eFMS.API.ForPartner.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="wwwroot\docs\favicon-32x32.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="wwwroot\docs\favicon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="wwwroot\swagger-ui\Custom.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="wwwroot\swagger-ui\Custom.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="wwwroot\swagger-ui\resources\logo-efms.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -79,6 +59,10 @@
 
   <ItemGroup>
     <Folder Include="Resources\Files\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\swagger-ui\Custom.js" />
   </ItemGroup>
 
 </Project>

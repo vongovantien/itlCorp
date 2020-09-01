@@ -96,8 +96,8 @@ namespace eFMS.API.ForPartner
                         $"{swaggerJsonBasePath}/docs/{description.GroupName}/docs.json",
                         description.GroupName.ToUpperInvariant());
                     options.RoutePrefix = "docs";
-                    options.InjectStylesheet("/swagger-ui/custom.css");
-                    options.InjectJavascript("/swagger-ui/custom.js", "text/javascript");
+                    options.InjectStylesheet($"{swaggerJsonBasePath}/swagger-ui/custom.css");
+                    options.InjectJavascript($"{swaggerJsonBasePath}/swagger-ui/custom.js", "text/javascript");
                     options.DocumentTitle = "Accounting Public Api";                    
                 }
             });
