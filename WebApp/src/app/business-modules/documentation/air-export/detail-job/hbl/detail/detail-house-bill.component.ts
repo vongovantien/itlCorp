@@ -81,7 +81,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             this.createShortcut(['ControlRight', 'KeyI'])
         ).pipe(takeUntil(this.ngUnsubscribe)).subscribe(
             () => {
-                this.preview('HAWB_FRAME');
+                this.preview('LASTEST_ITL_FRAME');
             }
         );
     }
