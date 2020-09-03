@@ -6,7 +6,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, TabsModule, CollapseModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { JobManagementCreateJobComponent } from './create/create-job.component';
 import { JobManagementFormSearchComponent } from './components/form-search-job/form-search-job.component';

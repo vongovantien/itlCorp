@@ -8,7 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ToastrService } from 'ngx-toastr';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ModalDirective } from 'ngx-bootstrap';
+import { ModalDirective } from 'ngx-bootstrap/modal';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { environment } from 'src/environments/environment';

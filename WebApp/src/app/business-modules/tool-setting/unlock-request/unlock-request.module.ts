@@ -2,7 +2,10 @@ import { UnlockRequestComponent } from "./unlock-request.component";
 import { Route, RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
-import { ModalModule, PaginationModule } from "ngx-bootstrap";
+
+import { ModalModule } from "ngx-bootstrap/modal";
+import { PaginationModule } from "ngx-bootstrap/pagination";
+
 import { SharedModule } from "src/app/shared/shared.module";
 import { SelectModule } from "ng2-select";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";

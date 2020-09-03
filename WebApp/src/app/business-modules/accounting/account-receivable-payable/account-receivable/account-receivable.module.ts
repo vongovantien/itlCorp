@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 
 import { AccountReceivableTabComponent } from './account-receivable.component';
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';

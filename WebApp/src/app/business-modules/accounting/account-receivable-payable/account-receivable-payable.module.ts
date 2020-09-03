@@ -15,7 +15,7 @@ import { AccountReceivablePayableComponent } from './account-receivable-payable.
 import { SharedModule } from 'src/app/shared/shared.module';
 import { AccountPaymentUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
 import { PaymentImportComponent } from './components/payment-import/payment-import.component';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AccountReceivablePayableImportOBHPaymentComponent } from './components/import-obh/import-obh-account-receivable-payable.component';
 

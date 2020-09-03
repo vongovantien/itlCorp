@@ -3,7 +3,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { SelectModule } from 'ng2-select';
 import { CommonEnum } from '@enums';

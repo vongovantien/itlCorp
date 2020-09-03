@@ -7,7 +7,13 @@ import { StatementOfAccountAddnewComponent } from './add-new/add-new-soa.compone
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { TabsModule, ModalModule, CollapseModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
+
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { StatementOfAccountSearchComponent } from './components/search-box-soa/search-box-soa.component';
 import { StatementOfAccountAddChargeComponent } from './components/poup/add-charge/add-charge.popup';

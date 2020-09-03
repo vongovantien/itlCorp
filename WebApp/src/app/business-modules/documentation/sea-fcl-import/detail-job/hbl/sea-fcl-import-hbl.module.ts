@@ -6,7 +6,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
 import { FroalaViewModule, FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { TabsModule, ModalModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
+
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
 
 import { SeaFCLImportHBLComponent } from './sea-fcl-import-hbl.component';
 import { SharedModule } from 'src/app/shared/shared.module';

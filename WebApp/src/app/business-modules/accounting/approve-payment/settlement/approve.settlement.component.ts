@@ -2,7 +2,7 @@ import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo, ExportRepo } from '@repositories';

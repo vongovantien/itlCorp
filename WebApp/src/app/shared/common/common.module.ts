@@ -1,7 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubHeaderComponent, InputTableLayoutComponent, BreadcrumbComponent, DefaultButtonComponent, SearchOptionsComponent, ReportPreviewComponent, ComboGridVirtualScrollComponent, AppMultipleSelectComponent, TableNoneRecordComponent, TableHeaderComponent, TableRowLoadingComponent, TableCollapseRowComponent, AppTableComponent, AppComboGridComponent, SwitchToggleComponent, TableBodyComponent, AppPermissionButtonComponent, ExportCrystalComponent, AppComboGridIconComponent } from '.';
-import { ModalModule, CollapseModule, TooltipModule, PaginationModule, BsDropdownModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from './popup';
 import { SelectModule } from 'ng2-select';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -12,6 +16,7 @@ import { TableCellComponent } from './table-cell/table-cell.component';
 import { PipeModule } from '../pipes/pipe.module';
 import { RouterModule } from '@angular/router';
 import { AppCombogridItemComponent } from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.component';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 const COMPONENTS = [
     SubHeaderComponent,
     InputTableLayoutComponent,
