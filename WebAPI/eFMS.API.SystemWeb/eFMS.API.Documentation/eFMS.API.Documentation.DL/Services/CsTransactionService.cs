@@ -2141,6 +2141,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency)
         {
+            double _doubleNumber = 0.000000001;
             Crystal result = null;
             var _currentUser = currentUser.UserName;
             var shipment = DataContext.First(x => x.Id == jobId);
@@ -2236,6 +2237,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             isOBH = true;
                             partnerName = surcharge.PayerName;
+                            cost = surcharge.Total;
                         }
                         if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
@@ -2257,7 +2259,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo?.ToUpper(); //JobNo of shipment
                         charge.TransDate = _transDate;
-                        charge.HWBNO = surcharge.Hwbno?.ToUpper();
+                        charge.HWBNO = surcharge.Hblno?.ToUpper();
                         charge.MAWB = shipment.Mawb?.ToUpper(); //MasterBill of shipment
                         charge.PartnerName = string.Empty; //NOT USE
                         charge.ContactName = userSaleman?.Username; //Saleman đầu tiên của list housebill
@@ -2283,21 +2285,25 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.FreightColoader = 0; //NOT USE
                         charge.PayableAccount = surcharge.PartnerName?.ToUpper();//Partner name of charge
                         charge.Description = surcharge.ChargeNameEn; //Charge name of charge
-                        charge.Curr = surcharge.CurrencyId; //Currency of charge
+                        charge.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
                         charge.VAT = 0; //NOT USE
                         charge.VATAmount = 0; //NOT USE
-                        charge.Cost = cost; //Phí chi của charge
-                        charge.Revenue = revenue; //Phí thu của charge
-                        charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0; //Exchange phí của charge về USD
-                        charge.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : 0;
+                        charge.Cost = cost + (decimal)_doubleNumber; //Phí chi của charge
+                        charge.Revenue = revenue + (decimal)_doubleNumber; //Phí thu của charge
+                        charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
+                        charge.Exchange = charge.Exchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                        charge.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : _exchangeRateUSD;
+                        charge.VNDExchange = charge.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = surcharge.InvoiceNo; //InvoiceNo of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
+                        charge.SalesProfit = charge.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                         charge.Quantity = surcharge.Quantity;
-                        charge.UnitPrice = surcharge.UnitPrice ?? 0;
+                        charge.UnitPrice = (surcharge.UnitPrice ?? 0);
+                        charge.UnitPrice = charge.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
@@ -2402,8 +2408,8 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
-            parameter.CurrDecimalNo = 2;
-            parameter.DecimalNo = 2;
+            parameter.CurrDecimalNo = 3;
+            parameter.DecimalNo = 0;
             parameter.HBLList = _hblNoList?.ToUpper();
 
             result = new Crystal
