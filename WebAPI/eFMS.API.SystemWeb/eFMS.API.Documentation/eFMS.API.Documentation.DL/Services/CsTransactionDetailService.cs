@@ -1383,10 +1383,14 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Qty = hbConstainers?.ToUpper();
                 housebill.MaskNos = markNo?.ToUpper();
                 housebill.Description = data.DesOfGoods?.ToUpper();//Description of goods
-                housebill.GrossWeight = conts.Select(s => s.Gw).Sum() ?? 0;//Tổng grossweight trong list cont;
+                var _totalGwCont = conts.Select(s => s.Gw).Sum() ?? 0; //Tổng grossweight trong list cont;
+                var _totalGwHbl = data.GrossWeight ?? 0; //Grossweight of housebill
+                housebill.GrossWeight = _totalGwCont != 0 ? _totalGwCont : _totalGwHbl;
                 housebill.GrwDecimal = 3;
                 housebill.Unit = "KGS"; //Đang gán cứng (PKS update thành KGS)
-                housebill.CBM = conts.Select(s => s.Cbm).Sum() ?? 0;//Tổng cbm trong list cont;
+                var _totalCbmCont = conts.Select(s => s.Cbm).Sum() ?? 0;//Tổng cbm trong list cont;
+                var _totalCbmHBL = data.Cbm ?? 0; //Cbm of housebill
+                housebill.CBM = _totalCbmCont != 0 ? _totalCbmCont : _totalCbmHBL;
                 housebill.CBMDecimal = 3;
                 housebill.SpecialNote = data.ShippingMark; //Shipping Mark
                 housebill.TotalPackages = string.Empty; //NOT USE
