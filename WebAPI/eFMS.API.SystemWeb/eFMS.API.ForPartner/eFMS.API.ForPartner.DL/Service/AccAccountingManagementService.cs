@@ -8,6 +8,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using AutoMapper;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
+using eFMS.API.ForPartner.DL.Models.Criteria;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -16,19 +17,22 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IHostingEnvironment environment;
+        private readonly IContextBase<CatUnit> catUnitRepository;
 
 
-        public AccAccountingManagementService(  
+        public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
             IContextBase<SysPartnerApi> sysPartnerApiRep,
             IHostingEnvironment env,
             IMapper mapper,
-            ICurrentUser cUser
+            ICurrentUser cUser,
+            IContextBase<CatUnit> catUnitRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
             sysPartnerApiRepository = sysPartnerApiRep;
             environment = env;
+            catUnitRepository = catUnitRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -38,11 +42,15 @@ namespace eFMS.API.ForPartner.DL.Service
             return result;
         }
 
+        public ChargeOfAcctMngtResult GetChargeInvoice(SearchAccMngtCriteria dataSearch)
+        {
+        }
+
         public bool ValidateApiKey(string apiKey)
         {
             bool isValid = false;
             SysPartnerApi partnerAPiInfo = sysPartnerApiRepository.Get(x => x.ApiKey == apiKey).FirstOrDefault();
-            if(partnerAPiInfo != null && partnerAPiInfo.Active == true && partnerAPiInfo.Environment.ToLower() == environment.EnvironmentName.ToLower())
+            if(partnerAPiInfo != null && partnerAPiInfo.Active == true)
             {
                 isValid = true;
             }

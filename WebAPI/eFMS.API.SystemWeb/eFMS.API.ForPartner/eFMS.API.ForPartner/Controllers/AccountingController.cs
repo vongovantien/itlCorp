@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
+using eFMS.API.ForPartner.DL.Models.Criteria;
 using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
 using eFMS.API.ForPartner.Service.Models;
@@ -60,6 +61,20 @@ namespace eFMS.API.ForPartner.Controllers
                 return Unauthorized();
             }
             AccAccountingManagementModel data = accountingManagementService.GetById(Guid.NewGuid());
+            return Ok(data);
+        }
+
+        [HttpPost("GetChargeInvoice")]
+        // [APIKeyAuth]
+        public IActionResult GetChargeInvoice([FromBody]SearchAccMngtCriteria model)
+        {
+            //string apiKey = Request.Headers[AccountingConstants.API_KEY_HEADER];
+            //if (!accountingManagementService.ValidateApiKey(apiKey))
+            //{
+            //    return Unauthorized();
+            //}
+
+            ChargeOfAcctMngtResult data = accountingManagementService.GetChargeInvoice(model);
             return Ok(data);
         }
 
