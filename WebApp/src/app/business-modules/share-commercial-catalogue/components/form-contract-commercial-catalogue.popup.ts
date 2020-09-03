@@ -5,7 +5,7 @@ import { Office, Company, User } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
 import { SystemRepo, CatalogueRepo } from '@repositories';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
@@ -78,6 +78,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     files: any = {};
 
+    type: string = '';
+
     menuSpecialPermission: Observable<any[]>;
 
     listCurrency: Observable<CommonInterface.INg2Select[]>;
@@ -116,6 +118,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         protected _router: Router,
         protected _toastService: ToastrService,
         private _ngProgressService: NgProgress,
+        protected _activeRoute: ActivatedRoute,
         private _store: Store<IAppState>
 
     ) {
@@ -124,6 +127,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
@@ -136,9 +140,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.formGroup.controls['creditLimitRate'].setValue(120);
             this.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
 
-        } else {
         }
 
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            this.type = result.type;
+        });
 
         this.formGroup.get("effectiveDate").valueChanges
             .pipe(
@@ -358,8 +364,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         if (this.formGroup.valid) {
             this.asignValueToModel();
-            if (isRequestApproval) {
+            if (isRequestApproval === true) {
                 this.selectedContract.isRequestApproval = true;
+            } else {
+                this.selectedContract.isRequestApproval = false;
             }
             if (!this.isUpdate && !this.isCreateNewCommercial) {
                 this._catalogueRepo.createContract(this.selectedContract)

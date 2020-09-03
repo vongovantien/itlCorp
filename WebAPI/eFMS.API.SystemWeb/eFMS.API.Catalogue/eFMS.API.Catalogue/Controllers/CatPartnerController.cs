@@ -226,6 +226,16 @@ namespace eFMS.API.Catalogue.Controllers
                 model.idsContract = idsContract;
             }
             var partner = mapper.Map<CatPartnerModel>(model);
+            foreach(var item in partner.Contracts)
+            {
+               foreach(var it in model.Contracts)
+               {
+                    if(item.Id == it.Id)
+                    {
+                        item.IsRequestApproval = it.IsRequestApproval;
+                    }
+               }
+            }
             var hs = catPartnerService.Add(partner);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
