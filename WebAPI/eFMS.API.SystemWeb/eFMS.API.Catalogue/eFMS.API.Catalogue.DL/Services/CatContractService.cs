@@ -101,7 +101,20 @@ namespace eFMS.API.Catalogue.DL.Services
                 //    saleman.OfficeNameEn = office.BranchNameEn;
                 //    saleman.OfficeNameAbbr = office.ShortName;
                 //    saleman.OfficeNameVn = office.BranchNameVn;
-                //}
+                //}\
+                var officeIds = saleman.OfficeId.Split(";").ToList();
+                if(officeIds.Count() > 0)
+                {
+                    foreach (var officeId in officeIds)
+                    {
+                        saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + ";";
+                    }
+                }
+                if (saleman.OfficeNameAbbr.Length > 0)
+                {
+                    saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
+                }
+
 
                 saleman.Username = item.user.Username;
                 results.Add(saleman);

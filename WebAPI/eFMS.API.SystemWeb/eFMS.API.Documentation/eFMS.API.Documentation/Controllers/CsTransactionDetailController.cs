@@ -223,7 +223,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
                 //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
-                var masterBillIds = csTransactionService.Get(x=>x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Select(x=>x.Id).ToList();
+                var masterBillIds = csTransactionService.Get(x=>x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Where(x=>x.CurrentStatus != "Canceled").Select(x=>x.Id).ToList();
                 var houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId));
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
                 {
