@@ -818,6 +818,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewFormPLsheet(Guid id, string currency)
         {
+            double _doubleNumber = 0.000000001;
             var shipment = DataContext.First(x => x.Id == id);
             Crystal result = null;
             var parameter = new FormPLsheetReportParameter
@@ -828,8 +829,8 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress1 = "CompanyAddress1",
                 CompanyAddress2 = "CompanyAddress2",
                 Website = "Website",
-                CurrDecimalNo = 2,
-                DecimalNo = 2,
+                CurrDecimalNo = 3,
+                DecimalNo = 0,
                 HBLList = shipment.Hwbno
             };
 
@@ -864,6 +865,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         isOBH = true;
                         partnerName = item.PayerName;
+                        cost = item.Total;
                     }
                     if(item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
@@ -881,79 +883,83 @@ namespace eFMS.API.Documentation.DL.Services
                     decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
                     decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
 
-                    var surchargeRpt = new FormPLsheetReport
-                    {
-                        COSTING = "COSTING Test",
-                        TransID = shipment.JobNo?.ToUpper(),
-                        TransDate = (DateTime)shipment.DatetimeCreated,
-                        HWBNO = shipment.Hwbno?.ToUpper(),
-                        MAWB = shipment.Mblno?.ToUpper(),
-                        PartnerName = "PartnerName",
-                        ContactName = user?.Username,
-                        ShipmentType = "Logistics",
-                        NominationParty = string.Empty,
-                        Nominated = true,
-                        POL = polName?.ToUpper(),
-                        POD = podName?.ToUpper(),
-                        Commodity = string.Empty,
-                        Volumne = string.Empty,
-                        Carrier = supplier?.PartnerNameEn?.ToUpper(),
-                        Agent = agent?.PartnerNameEn?.ToUpper(),
-                        ContainerNo = item.ContNo,
-                        OceanVessel = string.Empty,
-                        LocalVessel = string.Empty,
-                        FlightNo = shipment.FlightVessel?.ToUpper(),
-                        SeaImpVoy = string.Empty,
-                        LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd' 'MMM' 'yyyy"),
-                        ArrivalDate = shipment.FinishDate!= null?((DateTime)shipment.FinishDate).ToString("dd' 'MM' 'yyyy"): null,
-                        FreightCustomer = "FreightCustomer",
-                        FreightColoader = 128,
-                        PayableAccount = item.PartnerName?.ToUpper(),
-                        Description = item.ChargeNameEn,
-                        Curr = item.CurrencyId,
-                        VAT = item.Vatrate ?? 0,
-                        VATAmount = 12,
-                        Cost = cost,
-                        Revenue = revenue,
-                        Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : 0, //Exchange phí của charge về USD
-                        VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : 0,
-                        Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true,
-                        DatePaid = DateTime.Now,
-                        Docs = item.InvoiceNo,
-                        Notes = item.Notes,
-                        InputData = "InputData",
-                        SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT, //Non VAT
-                        Quantity = item.Quantity,
-                        UnitPrice = item.UnitPrice ?? 0,
-                        Unit = unitCode,
-                        LastRevised = string.Empty,
-                        OBH = isOBH,
-                        ExtRateVND = 34,
-                        KBck = true,
-                        NoInv = true,
-                        Approvedby = string.Empty,
-                        ApproveDate = DateTime.Now,
-                        SalesCurr = currency,
-                        GW = shipment.SumGrossWeight ?? 0,
-                        MCW = 13,
-                        HCW = shipment.SumChargeWeight ?? 0,
-                        PaymentTerm = string.Empty,
-                        DetailNotes = string.Empty,
-                        ExpressNotes = string.Empty,
-                        InvoiceNo = "InvoiceNo",
-                        CodeVender = "CodeVender",
-                        CodeCus = "CodeCus",
-                        Freight = true,
-                        Collect = true,
-                        FreightPayableAt = "FreightPayableAt",
-                        PaymentTime = 1,
-                        PaymentTimeCus = 1,
-                        Noofpieces = 12,
-                        UnitPieaces = "UnitPieaces",
-                        TpyeofService = "TpyeofService",
-                        ShipmentSource = "FREE-HAND",
-                        RealCost = true
-                    };
+                    var surchargeRpt = new FormPLsheetReport();
+
+                    surchargeRpt.COSTING = "COSTING Test";
+                    surchargeRpt.TransID = shipment.JobNo?.ToUpper();
+                    surchargeRpt.TransDate = (DateTime)shipment.DatetimeCreated;
+                    surchargeRpt.HWBNO = shipment.Hwbno?.ToUpper();
+                    surchargeRpt.MAWB = shipment.Mblno?.ToUpper();
+                    surchargeRpt.PartnerName = "PartnerName";
+                    surchargeRpt.ContactName = user?.Username;
+                    surchargeRpt.ShipmentType = "Logistics";
+                    surchargeRpt.NominationParty = string.Empty;
+                    surchargeRpt.Nominated = true;
+                    surchargeRpt.POL = polName?.ToUpper();
+                    surchargeRpt.POD = podName?.ToUpper();
+                    surchargeRpt.Commodity = string.Empty;
+                    surchargeRpt.Volumne = string.Empty;
+                    surchargeRpt.Carrier = supplier?.PartnerNameEn?.ToUpper();
+                    surchargeRpt.Agent = agent?.PartnerNameEn?.ToUpper();
+                    surchargeRpt.ContainerNo = item.ContNo;
+                    surchargeRpt.OceanVessel = string.Empty;
+                    surchargeRpt.LocalVessel = string.Empty;
+                    surchargeRpt.FlightNo = shipment.FlightVessel?.ToUpper();
+                    surchargeRpt.SeaImpVoy = string.Empty;
+                    surchargeRpt.LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd' 'MMM' 'yyyy");
+                    surchargeRpt.ArrivalDate = shipment.FinishDate != null ? ((DateTime)shipment.FinishDate).ToString("dd' 'MM' 'yyyy") : null;
+                    surchargeRpt.FreightCustomer = "FreightCustomer";
+                    surchargeRpt.FreightColoader = 128;
+                    surchargeRpt.PayableAccount = item.PartnerName?.ToUpper();
+                    surchargeRpt.Description = item.ChargeNameEn;
+                    surchargeRpt.Curr = item.CurrencyId;
+                    surchargeRpt.VAT = item.Vatrate ?? 0;
+                    surchargeRpt.VATAmount = 12;
+                    surchargeRpt.Cost = cost + (decimal)_doubleNumber; //Phí chi của charge
+                    surchargeRpt.Revenue = revenue + (decimal)_doubleNumber;
+                    surchargeRpt.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
+                    surchargeRpt.Exchange = surchargeRpt.Exchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : _exchangeRateUSD;
+                    surchargeRpt.VNDExchange = surchargeRpt.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
+                    surchargeRpt.DatePaid = DateTime.Now;
+                    surchargeRpt.Docs = item.InvoiceNo;
+                    surchargeRpt.Notes = item.Notes;
+                    surchargeRpt.InputData = "InputData";
+                    surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
+                    surchargeRpt.SalesProfit = surchargeRpt.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.Quantity = item.Quantity;
+                    surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
+                    surchargeRpt.UnitPrice = surchargeRpt.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.Unit = unitCode;
+                    surchargeRpt.LastRevised = string.Empty;
+                    surchargeRpt.OBH = isOBH;
+                    surchargeRpt.ExtRateVND = 34;
+                    surchargeRpt.KBck = true;
+                    surchargeRpt.NoInv = true;
+                    surchargeRpt.Approvedby = string.Empty;
+                    surchargeRpt.ApproveDate = DateTime.Now;
+                    surchargeRpt.SalesCurr = currency;
+                    surchargeRpt.GW = shipment.SumGrossWeight ?? 0;
+                    surchargeRpt.MCW = 13;
+                    surchargeRpt.HCW = shipment.SumChargeWeight ?? 0;
+                    surchargeRpt.PaymentTerm = string.Empty;
+                    surchargeRpt.DetailNotes = string.Empty;
+                    surchargeRpt.ExpressNotes = string.Empty;
+                    surchargeRpt.InvoiceNo = "InvoiceNo";
+                    surchargeRpt.CodeVender = "CodeVender";
+                    surchargeRpt.CodeCus = "CodeCus";
+                    surchargeRpt.Freight = true;
+                    surchargeRpt.Collect = true;
+                    surchargeRpt.FreightPayableAt = "FreightPayableAt";
+                    surchargeRpt.PaymentTime = 1;
+                    surchargeRpt.PaymentTimeCus = 1;
+                    surchargeRpt.Noofpieces = 12;
+                    surchargeRpt.UnitPieaces = "UnitPieaces";
+                    surchargeRpt.TpyeofService = "TpyeofService";
+                    surchargeRpt.ShipmentSource = "FREE-HAND";
+                    surchargeRpt.RealCost = true;
+                    
                     dataSources.Add(surchargeRpt);
                 }
             }
