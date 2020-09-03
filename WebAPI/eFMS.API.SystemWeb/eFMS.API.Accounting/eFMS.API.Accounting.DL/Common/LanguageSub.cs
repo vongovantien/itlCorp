@@ -158,6 +158,8 @@ namespace eFMS.API.Accounting.DL.Common
 
         public static readonly string MSG_INVOICE_NO_EXISTED = "MSG_INVOICE_NO_EXISTED";
         public static readonly string MSG_SERIE_NO_EXISTED = "MSG_SERIE_NO_EXISTED";
+        public static readonly string MSG_PAYMENT_STATUS_INVALID = "MSG_PAYMENT_STATUS_INVALID";
+
 
 
 

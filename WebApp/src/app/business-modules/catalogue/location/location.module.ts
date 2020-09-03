@@ -10,7 +10,9 @@ import { LocationImportComponent } from '../location-import/location-import.comp
 import { SharedModule } from 'src/app/shared/shared.module';
 import { LocationComponent } from './location.component';
 import { FormCountryPopupComponent } from './country/add-country/add-country.component';
-import { ModalModule, TabsModule, PaginationModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { AddProvincePopupComponent } from './province/add-province/add-province.component';
 import { AddDistrictPopupComponent } from './district/add-district/add-district.component';
 import { AddWardPopupComponent } from './ward/add-ward/add-ward.component';

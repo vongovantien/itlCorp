@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { SeaLCLImportCreateJobComponent } from '../create-job/create-job-lcl-import.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
-import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
+import { DocumentationRepo } from '@repositories';
+import { ICanComponentDeactivate } from '@core';
+import { CsTransaction } from '@models';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
 
-import { combineLatest, of } from 'rxjs';
-import { switchMap, map, tap, skip, takeUntil, catchError, finalize } from 'rxjs/operators';
+import { combineLatest, of, Observable } from 'rxjs';
+import { switchMap, map, tap, skip, takeUntil, catchError, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
@@ -24,11 +24,13 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
     templateUrl: './detail-job-lcl-import.component.html'
 })
 
-export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit {
+export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobComponent implements OnInit, ICanComponentDeactivate {
+
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild("deleteConfirmTemplate", { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild("confirmCancelPopup", { static: false }) confirmCancelPopup: ConfirmPopupComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
@@ -41,7 +43,10 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     action: any = {};
-    dataReport: any = null;
+
+    nextState: RouterStateSnapshot;
+    isCancelFormPopupSuccess: boolean = false;
+
     constructor(
         protected _router: Router,
         protected _documenRepo: DocumentationRepo,
@@ -135,6 +140,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
             this.saveJob(modelAdd);
         }
     }
+
     duplicateJob(body: any) {
         this._documenRepo.importCSTransaction(body)
             .pipe(
@@ -195,30 +201,32 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     prepareDeleteJob() {
         this._documenRepo.checkPermissionAllowDeleteShipment(this.jobId)
-            .subscribe((value: boolean) => {
-                if (value) {
-                    this.deleteJob();
-                } else {
+            .pipe(
+                concatMap((isAllowDelete: boolean) => {
+                    if (isAllowDelete) {
+                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                    }
+                    return of(403);
+                }),
+                concatMap((isValid) => {
+                    if (isValid) {
+                        return of(200);
+                    }
+                    return of(201);
+                })
+            )
+            .subscribe((value: number) => {
+                if (value === 403) {
                     this.permissionPopup.show();
+                    return;
+                }
+                if (value === 200) {
+                    this.confirmDeletePopup.show();
+                    return;
+                } else {
+                    this.canNotDeleteJobPopup.show();
                 }
             });
-    }
-
-    deleteJob() {
-        this._progressRef.start();
-        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmDeletePopup.show();
-                    } else {
-                        this.canNotDeleteJobPopup.show();
-                    }
-                },
-            );
     }
 
     onDeleteJob() {
@@ -353,4 +361,40 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 },
             );
     }
+
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
+        if (isEdited) {
+            this.confirmCancelPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
+    }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
+        if (this.isCancelFormPopupSuccess) {
+            return of(true);
+        }
+        if (isEdited && !this.isCancelFormPopupSuccess) {
+            this.confirmCancelPopup.show();
+            return;
+        }
+        return of(!isEdited);
+    }
+
 }

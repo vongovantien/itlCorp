@@ -60,6 +60,15 @@ namespace eFMS.API.Infrastructure
             services.Configure<ApiUrl>(option => {
                 option.Url = configuration.GetSection("ApiUrl").Value;
             });
+            services.Configure<AuthenticationSetting>(authSetting => {
+
+                authSetting.ApiKey
+                    = configuration.GetSection("Authentication:ApiKey").Value;
+                //authSetting.Authority = configuration["Authentication.Authority").Value;
+                //authSetting.ApiSecret = configuration"Authentication.ApiSecret").Value;
+                //authSetting.ApiName = configuration.GetSection("Authentication.ApiName").Value;
+                //authSetting.RequireHttpsMetadata = configuration.GetSection("Authentication.RequireHttpsMetadata").Value;
+            });
             return services;
         }
         static IServiceCollection AddCrossOrigin(this IServiceCollection services)

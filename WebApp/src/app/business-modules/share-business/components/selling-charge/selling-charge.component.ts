@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
 import { SortService, DataService } from 'src/app/shared/services';
 import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
 import { SystemConstants } from 'src/constants/system.const';
@@ -15,6 +15,7 @@ import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -39,10 +40,11 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService
-
+        protected _dataService: DataService,
+        protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService, _accountingRepo, _activedRoute);
         this._progressRef = this._ngProgressService.ref();
 
     }
@@ -98,6 +100,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Total', field: 'total', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
@@ -143,6 +146,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // Tính công nợ
+                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
 

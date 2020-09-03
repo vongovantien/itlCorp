@@ -30,5 +30,7 @@ namespace eFMS.API.System.DL.ViewModels
         public string Tel { get; set; }
         public string Email { get; set; }
         public string Description { get; set; }
+        public decimal? CreditLimit { get; set; }
+        public decimal? CreditRate { get; set; }
     }
 }

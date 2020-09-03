@@ -7,7 +7,6 @@ export * from './operation/custom-declaration';
 export * from './operation/shipment';
 export * from './catalogue/partner.model';
 export * from './catalogue/catCurrency.model';
-export * from './catalogue/catCharge.model';
 export * from './catalogue/catUnit.model';
 export * from './catalogue/port-index.model';
 export * from './catalogue/customer.model';
@@ -21,6 +20,7 @@ export * from './catalogue/catChartOfAccounts.model';
 export * from './catalogue/saleman.model';
 export * from './catalogue/province.model';
 export * from './catalogue/catContract.model';
+export { ChargeGroup, Charge } from './catalogue/catCharge.model';
 
 export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -30,6 +30,10 @@ export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAc
 export * from './accouting/cdnoteview.model';
 export * from './accouting/payment.model';
 export * from './accouting/accounting-payment.model';
+export {
+    TrialOfficialOtherModel, GuaranteedModel, AccReceivableDetailModel,
+    AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
+} from './accouting/accounting-receivable.model';
 export * from './accouting/accounting-approve';
 
 export * from './document/csShipmentSurcharge';
@@ -73,6 +77,10 @@ export * from './report/crystal.model';
 export * from './system/authorization';
 
 export * from './tool-setting/unlock-request';
+
+export * from './commercial/charge-incoterm';
+export { Incoterm, IncotermUpdateModel, IncotermModel } from './commercial/incoterm';
+
 
 
 

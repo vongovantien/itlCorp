@@ -33,7 +33,7 @@
                                                 <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"
                                                     value="{{charges}}" [(ngModel)]="charges.isSelected"
                                                     name="{{charges.hwbno}}">
-                                                    HAWB No: {{charges.hwbno}}
+                                                HAWB No: {{charges.hwbno}}
                                                 <span></span>
                                             </label>
                                         </td>
@@ -94,7 +94,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="addCharge()">
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="addCharge()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
@@ -102,8 +102,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal" (click)="closePopup()">
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="closePopup()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

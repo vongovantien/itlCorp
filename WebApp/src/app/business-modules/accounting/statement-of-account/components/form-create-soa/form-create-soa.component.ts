@@ -8,7 +8,7 @@ import { formatDate } from '@angular/common';
 import _includes from 'lodash/includes';
 import _uniq from 'lodash/uniq';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
-import { DataService } from 'src/app/shared/services';
+import { DataService, SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { ShareAccountingInputShipmentPopupComponent } from '../../../components/input-shipment/input-shipment.popup';
 
@@ -77,7 +77,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         private _toastService: ToastrService,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
-        private _sysRepo: SystemRepo
+        private _sysRepo: SystemRepo,
+        private _sortService: SortService,
     ) {
         super();
     }
@@ -153,6 +154,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     if (!!res) {
 
                         this.services = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
+                        //
+                        // sort A -> Z theo text services 
+                        this.sortIncreaseServices('text', true);
+
                         this.services.unshift({ id: 'All', text: 'All' });
 
                         this.selectedService = [this.services[0]];
@@ -163,6 +168,10 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     }
                 },
             );
+    }
+
+    sortIncreaseServices(sortField: string, order: boolean) {
+        this.services = this._sortService.sort(this.services, sortField, order);
     }
 
     getCurrency() {

@@ -16,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,8 +48,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysCompany> sysCompanyRepo,
             IContextBase<SysImage> sysImageRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
-            ICacheServiceBase<CatContract> cacheService,
-            IContextBase<CatDepartment> catDepartmentRepo, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
+            IContextBase<CatDepartment> catDepartmentRepo,
+            ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -59,8 +60,9 @@ namespace eFMS.API.Catalogue.DL.Services
             webUrl = url;
             sysImageRepository = sysImageRepo;
             sysEmployeeRepository = sysEmployeeRepo;
-            ApiUrl = apiurl;
             catDepartmentRepository = catDepartmentRepo;
+            ApiUrl = apiurl;
+
         }
 
         public IQueryable<CatContract> GetContracts()
@@ -84,6 +86,8 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 CatContractModel saleman = mapper.Map<CatContractModel>(item.sale);
                 SysCompany company = sysCompanyRepository.Get(x => x.Id == saleman.CompanyId)?.FirstOrDefault();
+                //var arrToQuery = saleman.OfficeId.ToArray();
+                //SysOffice office = sysOfficeRepository.Get(x => arrToQuery.Contains(x.Id))?.FirstOrDefault();
                 //SysOffice office = sysOfficeRepository.Get(x => x.Id == saleman.OfficeId)?.FirstOrDefault();
                 if (company != null)
                 {
@@ -142,6 +146,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = entity.SaleService;
+
+                    model.ContractService = GetContractServicesName(model.ContractService);
+
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
                     model.SalesmanId = entity.SaleManId;
@@ -151,6 +158,51 @@ namespace eFMS.API.Catalogue.DL.Services
                 Get();
             }
             return hs;
+        }
+
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export;";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import;";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export;";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export;";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import;";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic;";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking;";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export;Air Import;Sea FCL Export;Sea LCL Export;Sea LCL Import;Custom Logistic;Trucking ";
+                            break;
+                    }
+                }
+          
+            }
+            if(!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
+            }
+            return ContractServicesName;
         }
 
         public HandleState Update(CatContractModel model)
@@ -170,6 +222,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
+                    modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
@@ -273,13 +326,21 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState ActiveInActiveContract(Guid id, string partnerId)
+        public HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit)
         {
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             if (objUpdate != null)
             {
                 objUpdate.Active = objUpdate.Active == true ? false : true;
+                if (credit.CreditLimit != null)
+                {
+                    objUpdate.CreditLimit = credit.CreditLimit;
+                }
+                if (credit.CreditRate != null)
+                {
+                    objUpdate.CreditLimitRate = credit.CreditRate;
+                }
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
@@ -292,13 +353,344 @@ namespace eFMS.API.Catalogue.DL.Services
                     ObjPartner.Active = true;
                     catPartnerRepository.Update(ObjPartner, x => x.Id == partnerId);
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = objUpdate.SaleService;
+                    model.ContractService = GetContractServicesName( objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
                     SendMailActiveSuccess(model, "active");
                 }
             }
             return isUpdateDone;
+        }
+
+        public HandleState Import(List<CatContractImportModel> data)
+        {
+            try
+            {
+                var contracts = new List<CatContract>();
+                foreach (var item in data)
+                {
+                    DateTime? inactiveDate = DateTime.Now;
+                    var contract = mapper.Map<CatContract>(item);
+                    contract.UserCreated = contract.UserModified = currentUser.UserID;
+                    contract.DatetimeModified = DateTime.Now;
+                    contract.DatetimeCreated = DateTime.Now;
+                    contract.EffectiveDate = item.EffectDate;
+                    contract.ExpiredDate = item.ExpireDate;
+                    contract.TrialCreditDays = !string.IsNullOrEmpty(item.PaymentTermTrialDay) ? Convert.ToInt16(item.PaymentTermTrialDay) : (int?)null;
+                    contract.PaymentTerm = contract.TrialCreditDays;
+                    contract.CompanyId = sysCompanyRepository.Get(x => x.Code == item.Company).Select(t => t.Id)?.FirstOrDefault();
+                    var sale = item.SaleService.Split(";").ToArray();
+                    contract.SaleService = string.Empty;
+                    foreach (var it in sale)
+                    {
+                        if (it.Trim() == "Air Import")
+                        {
+                            contract.SaleService += "AI;";
+                        }
+                        if (it.Trim() == "Air Export")
+                        {
+                            contract.SaleService += "AE;";
+                        }
+                        if (it.Trim() == "Sea FCL Export")
+                        {
+                            contract.SaleService += "SFE;";
+                        }
+                        if (it.Trim() == "Sea LCL Export")
+                        {
+                            contract.SaleService += "SLE;";
+                        }
+                        if (it.Trim() == "Sea FCL Import")
+                        {
+                            contract.SaleService += "SFI;";
+                        }
+                        if (it.Trim() == "Sea LCL Import")
+                        {
+                            contract.SaleService += "SLI;";
+                        }
+                        if (it.Trim() == "Custom Logistic")
+                        {
+                            contract.SaleService += "CL;";
+                        }
+                        if (it.Trim() == "Trucking")
+                        {
+                            contract.SaleService += "IT;";
+                        }
+                        if(it.Trim() == "All")
+                        {
+                            contract.SaleService = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                        }
+                    }
+                    var vas = item.Vas.Split(";").ToArray();
+                    contract.Vas = string.Empty;
+                    foreach (var it in vas)
+                    {
+                        if (it.Trim() == "Air Import")
+                        {
+                            contract.Vas += "AI;";
+                        }
+                        if (it.Trim() == "Air Export")
+                        {
+                            contract.Vas += "AE;";
+                        }
+                        if (it.Trim() == "Sea FCL Export")
+                        {
+                            contract.Vas += "SFE;";
+                        }
+                        if (it.Trim() == "Sea LCL Export")
+                        {
+                            contract.Vas += "SLE;";
+                        }
+                        if (it.Trim() == "Sea FCL Import")
+                        {
+                            contract.Vas += "SFI;";
+                        }
+                        if (it.Trim() == "Sea LCL Import")
+                        {
+                            contract.Vas += "SLI;";
+                        }
+                        if (it.Trim() == "Custom Logistic")
+                        {
+                            contract.Vas += "CL;";
+                        }
+                        if (it.Trim() == "Trucking")
+                        {
+                            contract.Vas += "IT;";
+                        }
+                        if (it.Trim() == "All")
+                        {
+                            contract.Vas = "AE;SFE;SLE;SFI;SLI;CL;IT";
+                        }
+                    }
+                    if(!string.IsNullOrEmpty(contract.Vas))
+                    {
+                        if (contract.Vas.Length > 0)
+                        {
+                            contract.Vas = contract.Vas.Remove(contract.Vas.Length - 1);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(contract.SaleService))
+                    {
+                        if (contract.SaleService.Length > 0)
+                        {
+                            contract.SaleService = contract.SaleService.Remove(contract.SaleService.Length - 1);
+                        }
+                    }
+                  
+                    var arrOffice = item.Office.Split(";").ToArray();
+                    string officeStr = string.Empty;
+                    if (arrOffice.Length > 1)
+                    {
+                        var dataOffice = sysOfficeRepository.Get().ToList();
+                        foreach (var office in dataOffice.GroupBy(x => x.Code))
+                        {
+                            foreach (var o in arrOffice)
+                            {
+                                if (o == office.Key)
+                                {
+                                    officeStr += office.Select(t => t.Id)?.FirstOrDefault() + ";";
+                                }
+                            }
+                        }
+                    }
+                    contract.OfficeId = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Get(x => x.Code == arrOffice[0].ToString()).Select(t => t.Id.ToString())?.FirstOrDefault();
+                    contract.SaleManId = sysUserRepository.Get(x => x.Username == item.Salesman).Select(t => t.Id)?.FirstOrDefault();
+                    contract.CreditLimit = !string.IsNullOrEmpty(item.CreditLimited) ? Convert.ToDecimal(item.CreditLimited) : (Decimal?)null;
+                    if (contract.ContractType == "Trial")
+                    {
+                        contract.TrialCreditLimited = contract.CreditLimit;
+                        contract.TrialEffectDate = contract.EffectiveDate;
+                        contract.TrialExpiredDate = contract.ExpiredDate;
+                        contract.TrialCreditDays = contract.PaymentTerm;
+                    }
+                    contract.CreditLimitRate = !string.IsNullOrEmpty(item.CreditLimitedRated) ? Convert.ToInt32(item.CreditLimitedRated) : (int?)null;
+                    contract.Active = item.Status == "Active" ? true : false;
+                    contract.PartnerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
+                    contract.Id = Guid.NewGuid();
+                    contracts.Add(contract);
+                }
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var hs = DataContext.Add(contracts);
+                        if (hs.Success)
+                        {
+                            trans.Commit();
+                        }
+                        else
+                        {
+                            trans.Rollback();
+                        }
+                        return new HandleState();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState(ex.Message);
+                    }
+                    finally
+                    {
+                        ClearCache();
+                        Get();
+                        trans.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list)
+        {
+            list.ForEach(item =>
+            {
+                if (string.IsNullOrEmpty(item.CustomerId))
+                {
+                    item.CustomerIdError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PARTNER_ID_EMPTY]);
+                    item.IsValid = false;
+
+                }
+
+                else if (!catPartnerRepository.Any(x => x.AccountNo == item.CustomerId))
+                {
+                    item.CustomerIdError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PARTNER_ID_NOT_FOUND], item.CustomerId);
+                    item.IsValid = false;
+                }
+
+                if (string.IsNullOrEmpty(item.ContractType))
+                {
+                    item.AgreementTypeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_AGREEMENT_TYPE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                else if (item.ContractType != "Trial" && item.ContractType != "Official" && item.ContractType != "Guaranteed" && item.ContractType != "Cash")
+                {
+                    item.AgreementTypeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND], item.ContractType);
+                    item.IsValid = false;
+                }
+
+                else
+                {
+                    if (string.IsNullOrEmpty(item.ContractNo) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACTNO_EMPTY]);
+
+                        item.IsValid = false;
+                    }
+                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    {
+                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_EMPTY]);
+                        item.IsValid = false;
+
+                    }
+                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    {
+                        item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
+                        item.IsValid = false;
+                    }
+                    if (string.IsNullOrEmpty(item.CreditLimited) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    {
+                        item.CreditLimitError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CREDIT_LIMIT_EMPTY]);
+                        item.IsValid = false;
+                    }
+                    if (string.IsNullOrEmpty(item.PaymentTermTrialDay) && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    {
+                        item.PaymentTermError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_TERM_EMPTY]);
+                        item.IsValid = false;
+                    }
+                }
+                if (!string.IsNullOrEmpty(item.ContractNo))
+                {
+                    var customerId = catPartnerRepository.Get(x => x.AccountNo == item.CustomerId).Select(t => t.Id)?.FirstOrDefault();
+                    if (DataContext.Any(x => x.PartnerId == customerId && x.ContractNo == item.ContractNo))
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], item.ContractNo);
+                        item.IsValid = false;
+                    }
+                    if (list.Count(x => x.ContractNo == item.ContractNo) > 1)
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
+                        item.IsValid = false;
+                    }
+                    if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
+                        item.IsValid = false;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(item.SaleService))
+                {
+                    item.SaleServiceError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_SALE_SERVICE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                if (string.IsNullOrEmpty(item.Company))
+                {
+                    item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_EMPTY]);
+                    item.IsValid = false;
+                }
+                else if (!sysCompanyRepository.Any(x => x.Code == item.Company))
+                {
+                    item.CompanyError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_COMPANY_NOT_FOUND]);
+                    item.IsValid = false;
+                }
+                var officeArr = item.Office.Split(";").ToArray();
+
+                if (string.IsNullOrEmpty(item.Office))
+                {
+                    item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_EMPTY]);
+                    item.IsValid = false;
+                }
+
+                else if (!sysOfficeRepository.Any(x => officeArr.Contains(x.Code)))
+                {
+                    item.OfficeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_OFFICE_NOT_FOUND], item.Office);
+                    item.IsValid = false;
+                }
+
+                if (string.IsNullOrEmpty(item.PaymentMethod))
+                {
+                    item.PaymentMethodError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_METHOD_EMPTY]);
+                    item.IsValid = false;
+                }
+                else if (item.PaymentMethod != "All" && item.PaymentMethod != "Collect" && item.PaymentMethod != "Prepaid")
+                {
+                    item.PaymentMethodError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND], item.PaymentMethod);
+                    item.IsValid = false;
+                }
+
+                if (!string.IsNullOrEmpty(item.Salesman))
+                {
+                    if (!sysUserRepository.Any(x => x.Username == item.Salesman))
+                    {
+                        item.SalesmanError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_SALESMAN_NOT_FOUND], item.Salesman);
+                        item.IsValid = false;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(item.Status))
+                {
+                    if (item.Status.ToLower() != "active" && item.Status.ToLower() != "inactive")
+                    {
+                        item.ActiveError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_ACTIVE_NOT_FOUND], item.Status);
+                        item.IsValid = false;
+                    }
+                }
+
+                if(item.EffectDate.HasValue && item.ExpireDate.HasValue)
+                {
+                    if(item.ExpireDate.Value < item.EffectDate.Value)
+                    {
+                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_NOT_VALID]);
+                        item.IsValid = false;
+                    }
+                }
+            });
+            return list;
         }
 
         private void SendMailActiveSuccess(CatPartnerModel partner, string type)

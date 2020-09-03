@@ -1,0 +1,690 @@
+<div class="create-commercial-page">
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <div class="d-flex align-items-center justify-content-between p-1 mb-2">
+                    <h3 class="w-75 text-primary">
+                        Account Receivable Detail
+                    </h3>
+
+                    <app-default-button class="mb-2" [buttonSetting]="backButtonSetting" (click)="goBack()">
+                    </app-default-button>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
+                            <div class="col-lg-8">
+                                <h6><span class="text-success font-weight-bold">Customer:</span>
+                                    {{accReceivableDetail.partnerCode}} -
+                                    {{accReceivableDetail.partnerNameEn}}</h6>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <span class="collapse-toggle" data-toggle="collapse"
+                                    data-target="#acc-receivable-detail">
+                                    <i class="la la-angle-up m--margin-right-5 float-right"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="row collapse show" id="acc-receivable-detail">
+                            <div class="col-lg-12">
+                                <div class="row m--margin-top-20">
+                                    <div class="col-lg-7">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Partner Name (ABBR): </h6>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div>
+                                                    <span>{{accReceivableDetail.partnerNameAbbr}}</span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <h6 class="font-weight-bold">Tax Code: </h6>
+                                            </div>
+                                            <div class="col-lg-9">
+                                                <span>{{accReceivableDetail.taxCode}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row m--margin-top-20">
+                                    <div class="col-lg-7">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Partner Name (Local): </h6>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-8">
+                                                <div>
+                                                    <span>{{accReceivableDetail.partnerNameLocal}}</span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="row">
+                                            <div class="col-lg-3">
+                                                <h6 class="font-weight-bold">Status: </h6>
+                                            </div>
+                                            <div class="col-lg-9">
+                                                <span
+                                                    [ngClass]=" accReceivableDetail.partnerStatus === 'Active'  ? 'text-success' : 'text-danger'">
+                                                    {{accReceivableDetail.partnerStatus}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <!--Agreement Info Section-->
+                                <!--row - 1-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Agreement No:</h6>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>
+                                                        {{ accReceivableDetail.agreementNo }}
+                                                    </div>
+
+
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Salesman:" :"Effective Date:"}}
+                                                    </h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>{{accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.agreementSalesmanName
+                                                : (accReceivableDetail.effectiveDate | date: 'dd/MM/yyyy')}}
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Limit Rate:" :"Credit Limited:"}}
+                                                    </h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <div
+                                                        [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-success': null ">
+                                                        {{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditRateLimit : accReceivableDetail.creditLimited | number: '.0-3'}}
+                                                        <span
+                                                            *ngIf="(accReceivableDetail.creditLimited && accReceivableDetail.agreementType !== 'Guaranteed' )|| 
+                                                    (accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                            {{ accReceivableDetail.agreementType === "Guaranteed" ? "%" : accReceivableDetail.agreementCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--row - 2-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Type:</h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>
+                                                        {{ accReceivableDetail.agreementType }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Credit Limited:" :"Expired Date:"}}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleCreditLimited | number: '.0-3')
+                                                : (accReceivableDetail.expriedDate | date: 'dd/MM/yyyy')}}
+                                                        <span
+                                                            *ngIf="(accReceivableDetail.agreementType === 'Guaranteed' && accReceivableDetail.saleCreditLimited)">
+                                                            {{accReceivableDetail.agreementCurrency}}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Amount:" :"Credit Term (Days):"}}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+
+                                                    <div>
+                                                        {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitAmount | number: '.0-3')
+                                                : accReceivableDetail.creditTerm }}
+                                                        <span
+                                                            *ngIf="(accReceivableDetail.creditTerm && accReceivableDetail.agreementType !== 'Guaranteed' )|| 
+                                                    (accReceivableDetail.saleDebitAmount && accReceivableDetail.agreementType === 'Guaranteed') ">
+                                                            {{accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.agreementCurrency : "days"}}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--row - 3-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Status:</h6>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div
+                                                        [ngClass]=" accReceivableDetail.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+
+                                                        {{accReceivableDetail.agreementStatus}}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Credit Term (Days):" :"Expired Days:"}}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div
+                                                        [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? null : 'text-danger'">{{ accReceivableDetail.agreementType === "Guaranteed" ? accReceivableDetail.creditTerm 
+                                                : accReceivableDetail.expriedDay }}
+                                                        <span
+                                                            *ngIf="(accReceivableDetail.expriedDay && accReceivableDetail.agreementType !== 'Guaranteed') || 
+                                                (accReceivableDetail.creditTerm && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                            days</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <h6 class="font-weight-bold">
+                                                        {{accReceivableDetail.agreementType === "Guaranteed" ? "Sales Debit Rate:" :"Credit Rate Limit:"}}
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <div
+                                                        [ngClass]="accReceivableDetail.agreementType === 'Guaranteed' ? 'text-danger' : 'text-success' ">
+                                                        {{ accReceivableDetail.agreementType === "Guaranteed" ? (accReceivableDetail.saleDebitRate | number: '.0-3')
+                                                : (accReceivableDetail.creditRateLimit | number: '.0-3') }}
+                                                        <span
+                                                            *ngIf="(accReceivableDetail.creditRateLimit && accReceivableDetail.agreementType !== 'Guaranteed') || 
+                                                    (accReceivableDetail.saleDebitRate && accReceivableDetail.agreementType === 'Guaranteed')">
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr />
+                                <!--Debit Info Section-->
+                                <!--row - 1-->
+                                <div class="row m--margin-top-20">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Debit Amount:</h6>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>{{ accReceivableDetail.debitAmount | number: '.0-3'}}
+                                                        <span *ngIf="accReceivableDetail.debitAmount">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Billing: </h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>{{ accReceivableDetail.billingAmount | number: '.0-3'}}
+                                                        <span *ngIf="accReceivableDetail.billingAmount">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Over 1-15 days:</h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <div><span
+                                                            class="text-danger">{{ accReceivableDetail.over1To15Day | number: '.0-3' }}</span>
+                                                        <span *ngIf="accReceivableDetail.over1To15Day">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--row - 2-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+
+                                                    <h6 class="font-weight-bold">OBH Amount:</h6>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+
+                                                    <div>{{ accReceivableDetail.obhAmount | number: '.0-3'}}
+                                                        <span *ngIf="accReceivableDetail.obhAmount">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+
+                                                    <h6 class="font-weight-bold">Billing Unpaid: </h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+
+                                                    <div>{{ accReceivableDetail.billingUnpaid | number: '.0-3'}}
+                                                        <span *ngIf="accReceivableDetail.billingUnpaid">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+
+                                                    <h6 class="font-weight-bold">Over 16-30 days:</h6>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+
+                                                    <div><span
+                                                            class="text-danger">{{ accReceivableDetail.over16To30Day | number: '.0-3'}}</span>
+                                                        <span *ngIf="accReceivableDetail.over16To30Day">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--row - 3-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Debit Rate (%):</h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>
+                                                        <span
+                                                            [ngClass]="accReceivableDetail.debitRate < 70 ? 'text-success' : accReceivableDetail.debitRate < 100 ? 'text-warning':'text-danger'">
+                                                            {{ accReceivableDetail.debitRate | number: '.0-3'}}
+                                                        </span>
+                                                        <span *ngIf="accReceivableDetail.debitRate !== null">
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Paid: </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div><span
+                                                            class="text-danger">{{ accReceivableDetail.paidAmount | number: '.0-3'}}</span>
+                                                        <span *ngIf="accReceivableDetail.paidAmount">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Over 30 days:</h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div>
+                                                    <div><span
+                                                            class="text-danger">{{ accReceivableDetail.over30Day | number: '.0-3'}}</span>
+                                                        <span *ngIf="accReceivableDetail.over30Day">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--row - 4-->
+                                <div class="row m--margin-top-5">
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Cus Advance:</h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div>{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
+                                                        <span *ngIf="accReceivableDetail.cusAdvance">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-5">
+                                                <div>
+                                                    <h6 class="font-weight-bold">Credit Amount:</h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7">
+                                                <div>
+                                                    <div><span
+                                                            class="text-primary">{{ accReceivableDetail.creditAmount | number: '.0-3'}}</span>
+                                                        <span *ngIf="accReceivableDetail.creditAmount">
+                                                            {{ accReceivableDetail.arCurrency }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="row">
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--end-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row m--margin-top-20">
+                    <div class="col-lg-12">
+                        <div class="alert-block__heading font-weight-bold row m-0 pl-0 pr-0">
+                            <div class="col-lg-12">
+                                <h6>More Detail</h6>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 m--margin-top-20">
+                                <div class="table-wrapper table-scrollable" id="obh-payment-table">
+                                    <table class="table table-hover table-brand dataTable table-hover">
+                                        <thead app-table-header [headers]="headers"
+                                            (onClick)="sortBy($event.sortField)">
+                                            <th class="m--w-50 first table-actions-col">
+                                                Action
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                            <ng-container>
+                                                <ng-container
+                                                    *ngFor="let item of accReceivableMoreDetail; let i = index; trackBy: trackByFn">
+                                                    <tr class="collapse-toggle-row">
+                                                        <td class="table-actions-col">
+                                                            <div class="table-actions" style="width: 100px">
+                                                                <button type="button"
+                                                                    class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
+                                                                    data-toggle="collapse"
+                                                                    [attr.data-target]="'#id-00' + (i+1)"
+                                                                    title="Collapse">
+                                                                    <i class="la la-angle-up"></i>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+
+                                                        <td>{{ item.officeName}}</td>
+                                                        <td>{{ item.totalDebitAmount | number: '.0-3' }}
+                                                        </td>
+
+                                                        <td>{{ item.totalBillingAmount | number: '.0-3'}}
+                                                        </td>
+                                                        <td>{{ item.totalBillingUnpaid | number: '.0-3'}}
+                                                        </td>
+                                                        <td>{{ item.totalPaidAmount | number: '.0-3'}}
+                                                        </td>
+                                                        <td>{{ item.totalObhAmount | number: '.0-3'}}
+                                                        </td>
+                                                        <td>
+                                                            <span [ngClass]="'text-danger'">
+                                                                {{ item.totalOver1To15Day | number: '.0-3' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span [ngClass]="'text-danger'">
+                                                                {{ item.totalOver15To30Day | number: '.0-3' }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <span [ngClass]="'text-danger'">
+                                                                {{ item.totalOver30Day | number: '.0-3' }}
+                                                            </span>
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr class="collapse-panel-row" app-table-collapse-row
+                                                        [id]="'id-00' + (i + 1)" [parentId]="'#obh-payment-table'">
+                                                        <table class="table table-secondary dataTable">
+                                                            <thead app-table-header [headers]="subHeaders"
+                                                                (onClick)="sortDetailMoreGuaranteed(item ,$event.sortField, $event.order)">
+
+                                                            </thead>
+                                                            <tbody>
+                                                                <ng-container>
+                                                                    <tr
+                                                                        *ngFor="let element of item.accountReceivableGrpServices; let j = index; trackBy: trackByFn">
+
+
+                                                                        <td>{{ element.serviceName  }}
+                                                                        </td>
+                                                                        <td>{{ element.debitAmount | number: '.0-3'}}
+                                                                        </td>
+
+                                                                        <td>{{ element.billingAmount | number: '.0-3'}}
+                                                                        </td>
+                                                                        <td>{{ element.billingUnpaid | number: '.0-3'}}
+                                                                        </td>
+                                                                        <td>{{ element.paidAmount | number: '.0-3' }}
+                                                                        </td>
+                                                                        <td>{{ element.obhAmount | number: '.0-3' }}
+                                                                        </td>
+                                                                        <td>
+                                                                            <span [ngClass]="'text-danger'">
+                                                                                {{ element.over1To15Day | number: '.0-3' }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span [ngClass]="'text-danger'">
+                                                                                {{ element.over16To30Day | number: '.0-3' }}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td>
+                                                                            <span [ngClass]="'text-danger'">
+                                                                                {{ element.over30Day | number: '.0-3' }}
+                                                                            </span>
+                                                                        </td>
+
+                                                                    </tr>
+                                                                </ng-container>
+                                                                <tr app-table-none-record
+                                                                    *ngIf="!item.accountReceivableGrpServices.length">
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </tr>
+
+
+                                                </ng-container>
+                                            </ng-container>
+                                            <tr app-table-none-record *ngIf="!accReceivableMoreDetail.length">
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                                    (onChange)="updatePagingData($event)"></app-pagination>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>

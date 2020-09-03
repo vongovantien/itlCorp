@@ -10,6 +10,7 @@ import { formatDate } from "@angular/common";
 import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
+import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 
 @Component({
     selector: 'sheet-debit-report-form-search',
@@ -573,9 +574,9 @@ export class SheetDebitReportFormSearchComponent extends AppForm {
     getTypeReport() {
         this.typeReportList = [
             { text: 'Accountant P/L Sheet', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.ACCNT_PL_SHEET },
+            { text: 'Job Profit Analysis', id: CommonEnum.JOB_PROFIT_ANALYSIS_TYPE.JOB_PROFIT_ANALYSIS },
             { text: 'Summary Of Costs Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_COST },
             { text: 'Summary Of Revenue Incurred', id: CommonEnum.SHEET_DEBIT_REPORT_TYPE.SUMMARY_OF_REVENUE }
-
         ];
         // Default value: Accountant P/L Sheet
         this.typeReportActive = [this.typeReportList[0]];

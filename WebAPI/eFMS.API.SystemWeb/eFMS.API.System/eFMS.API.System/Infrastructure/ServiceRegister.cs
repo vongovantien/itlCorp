@@ -55,6 +55,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysAuthorizedApprovalService, SysAuthorizedApprovalService>();
             services.AddTransient<ISysSettingFlowService, SysSettingFlowService>();
             services.AddTransient<ISetLockingDateShipment, SetLockingDateShipmentService>();
+            services.AddTransient<ISysPartnerAPIService, SysPartnerAPIService>();
 
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>

@@ -15,7 +15,7 @@
     <div class="col-md-8">
         <div class="m--align-right">
             <ng-container *ngIf="!!permission && permission.allowUpdate">
-                <button class="btn btn-info m-btn--square m-btn--icon m-btn--uppercase" type="button"
+                <button class="btn btn-info  m-btn--icon m-btn--uppercase" type="button"
                     (click)="openAddChargePopupTariff()">
                     <span>
                         <i class="la la-plus"></i>
@@ -38,11 +38,11 @@
                             <ng-container *ngIf="!!permission && permission.allowUpdate">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
-                                        <a class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only text-white"
+                                        <a class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                             title="Duplicate" (click)="viewDetailTariffCharge(charge, i, 'COPY')">
                                             <i class="la la-copy"></i>
                                         </a>
-                                        <button class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                        <button class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                             title="Delete" (click)="deleteTariff(i)">
                                             <i class="la la-trash"></i>
                                         </button>

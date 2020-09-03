@@ -30,8 +30,6 @@ export class SettlementPaymentComponent extends AppList {
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
 
-    dataSearch: any = {};
-
     customClearances: any[] = [];
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
@@ -74,8 +72,7 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Currency', field: 'chargeCurrency', sortable: true }
         ];
         this.getUserLogged();
-        this.getListSettlePayment(this.dataSearch);
-
+        this.getListSettlePayment();
     }
 
     showSurcharge(settlementNo: string, indexsSettle: number) {
@@ -104,10 +101,10 @@ export class SettlementPaymentComponent extends AppList {
         this.dataSearch = { requester: this.userLogged.id };
     }
 
-
     onSearchSettlement(data: any) {
-        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListSettlePayment(this.dataSearch);
+        this.page = 1;
+        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
+        this.getListSettlePayment();
     }
 
 
@@ -117,23 +114,23 @@ export class SettlementPaymentComponent extends AppList {
         }
     }
 
-    getListSettlePayment(dataSearch?: any) {
+    getListSettlePayment() {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListSettlementPayment(this.page, this.pageSize, dataSearch)
+        this._accoutingRepo.getListSettlementPayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: any) => new SettlementPayment(item)),
+                        data: !!data.data ? data.data.map((item: any) => new SettlementPayment(item)) : [],
                         totalItems: data.totalItems,
                     };
                 })
             ).subscribe(
                 (res: any) => {
                     this.totalItems = res.totalItems || 0;
-                    this.settlements = res.data;
+                    this.settlements = res.data || [];
                 },
             );
     }
@@ -166,7 +163,7 @@ export class SettlementPaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
-                        this.getListSettlePayment(this.dataSearch);
+                        this.getListSettlePayment();
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }

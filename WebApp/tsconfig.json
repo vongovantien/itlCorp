@@ -31,7 +31,8 @@
             "@share-bussiness": ["src/app/business-modules/share-business"],
             "@store": ["src/app/store"],
             "@system-constants": ["src/constants"],
-            "@decorators": ["src/app/shared/decorators"]
+            "@decorators": ["src/app/shared/decorators"],
+            "@core": ["src/app/core"]
         }
     }
 }

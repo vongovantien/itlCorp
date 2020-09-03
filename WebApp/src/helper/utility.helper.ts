@@ -40,6 +40,42 @@ export class UtilityHelper {
 
         return seenDuplicate;
     }
+    checkDuplicateInObjectByKeys(inputArray: any[] = [], propertyNameArray: string[], dupArray: any[] = [], flag: boolean = false): boolean {
+
+        if (propertyNameArray.length <= 0) {
+            return;
+        }
+        //
+        if (dupArray.length <= 0) {
+            dupArray = [...inputArray];
+        }
+        //
+        let obj = dupArray.reduce((a, e) => {
+            a[e[propertyNameArray[0]]] = ++a[e[propertyNameArray[0]]] || 0;
+            return a;
+        }, {});
+        //
+        const arrayDup = dupArray.filter((e) => obj[e[propertyNameArray[0]]] >= 1);
+
+        inputArray.forEach((element) => {
+            if (arrayDup.map(e => e.key).includes(element.key)) {
+                console.log("vo");
+
+                flag = true;
+                element.duplicate = true;
+            } else {
+                element.duplicate = false;
+            }
+        });
+        propertyNameArray.shift();
+
+
+        if (flag === false) {
+            return;
+        } else {
+            this.checkDuplicateInObjectByKeys(inputArray, propertyNameArray, arrayDup, flag);
+        }
+    }
 
     calculateHeightWeight(width: number, height: number, length: number, packg: number, hwConstant: number) {
         return +((width * height * length / hwConstant) * packg).toFixed(3);
@@ -158,6 +194,8 @@ export class UtilityHelper {
             [ChargeConstants.SLE_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLExport]],
             [ChargeConstants.SLI_CODE, [CommonEnum.TransactionTypeEnum.SeaLCLImport]],
             [ChargeConstants.CL_CODE, [CommonEnum.TransactionTypeEnum.CustomLogistic]],
+            [ChargeConstants.SCE_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolExport]],
+            [ChargeConstants.SCI_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolImport]],
             [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
         ]).get(type)[0];
     }
@@ -172,6 +210,16 @@ export class UtilityHelper {
             [ChargeConstants.SLI_CODE, [ChargeConstants.SLI_DES]],
             [ChargeConstants.CL_CODE, [ChargeConstants.CL_DES]],
             [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
+            [ChargeConstants.SCE_CODE, [ChargeConstants.SCE_DES]],
+            [ChargeConstants.SCI_CODE, [ChargeConstants.SCI_DES]],
+        ]).get(type)[0];
+    }
+
+    getChargeType(type: string) {
+        return new Map([
+            ['BUY', [CommonEnum.CHARGE_TYPE.DEBIT]],
+            ['SELL', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['OBH', [CommonEnum.CHARGE_TYPE.OBH]],
         ]).get(type)[0];
     }
     findDuplicates = (arr: any) => arr.filter((item: any, index: number) => arr.indexOf(item) != index);

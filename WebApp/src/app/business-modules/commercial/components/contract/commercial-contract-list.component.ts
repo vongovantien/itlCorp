@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -10,7 +10,6 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from '@constants';
 import { SortService } from '@services';
-import { SelectComponent } from 'ng2-select';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -31,19 +30,26 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     indexlstContract: number = null;
     contract: Contract = new Contract();
 
+    type: string = '';
+
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
+        protected _activeRoute: ActivatedRoute
+
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.requestSort = this.sortLocal;
-
     }
 
     ngOnInit(): void {
+        this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
+            this.type = result.type;
+
+        });
         this.headers = [
             { title: 'Salesman', field: 'username', sortable: true },
             { title: 'Contract No', field: 'contractNo', sortable: true },
@@ -52,7 +58,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Effective Date', field: 'trialEffectDate', sortable: true },
             { title: 'Expired Date', field: 'trialExpiredDate', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
-            { title: 'Office', field: 'officeNameAbbr', sortable: true },
+            { title: 'Office', field: 'officeNameEn', sortable: true },
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
         ];
     }
@@ -98,17 +104,23 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.salesmanId.setValue(userLogged.id);
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+
+
+
         this.formContractPopup.contractType.setValue([<CommonInterface.INg2Select>{ id: 'Trial', text: 'Trial' }]);
         this.formContractPopup.currencyId.setValue([<CommonInterface.INg2Select>{ id: 'VND', text: 'VND' }]);
+
+        if (this.type === 'Agent') {
+            this.formContractPopup.vas.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
+            this.formContractPopup.saleService.setValue([<CommonInterface.INg2Select>{ id: 'All', text: 'All' }]);
+            this.formContractPopup.type = this.type;
+
+        }
 
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
 
         this.formContractPopup.show();
-    }
-
-    handleSearchContract($event: any) {
-        console.log("keyword: ", $event.target.value);
     }
 
     getDetailContract(id: string, index: number) {
@@ -123,12 +135,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
                 .subscribe(
                     (res: Contract) => {
-                        this.selectedContract = res;
-                        this.formContractPopup.idContract = this.selectedContract.id;
-                        this.formContractPopup.selectedContract = res;
-                        this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
-                        this.formContractPopup.pachValueToFormContract();
-                        this.formContractPopup.show();
+                        if (!!res) {
+                            this.selectedContract = res;
+                            this.formContractPopup.idContract = this.selectedContract.id;
+                            this.formContractPopup.selectedContract = res;
+                            this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
+                            this.formContractPopup.pachValueToFormContract();
+                            this.formContractPopup.show();
+                        }
                     }
                 );
         } else {
@@ -176,7 +190,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.contracts.splice(this.indexToRemove, 1);
+                        this.getListContract(this.partnerId);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -200,33 +214,49 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     this.contracts = res || [];
                     console.log(this.contracts);
                     this.contracts.forEach(element => {
-                        if (element.saleService.includes(';')) {
-                            const arr = element.saleService.split(';');
-                            element.saleService = '';
-                            arr.forEach(item => {
-                                element.saleService += item + '; ';
-                            });
-                            if (element.saleService.charAt(element.saleService.length - 2) === ';') {
-                                element.saleService = element.saleService.substr(0, element.saleService.length - 2);
-                            }
-                        }
-                        if (!!element.officeId) {
-                            if (element.officeId.includes(';')) {
-                                const arrayOffice = element.officeId.split(';');
-                                element.officeNameEn = '';
-                                arrayOffice.forEach(itemOffice => {
-                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                        setTimeout(() => {
+                            if (element.saleService.includes(';')) {
+                                const arr = element.saleService.split(';');
+                                element.saleService = '';
+                                arr.forEach(item => {
+                                    element.saleService += item + '; ';
                                 });
-                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
-                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                element.saleServiceName = '';
+                                arr.forEach(item => {
+                                    element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
+                                });
+                                if (element.saleService.charAt(element.saleService.length - 2) === ';') {
+                                    element.saleService = element.saleService.substr(0, element.saleService.length - 2);
                                 }
-                            } else {
-                                element.officeId = element.officeId.toLowerCase();
-                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
-
-                                element.officeNameEn = !!obj ? obj.text : null;
+                                if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
+                                    element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
+                                }
                             }
-                        }
+                            else {
+                                element.saleServiceName = element.saleService.toLowerCase();
+                                const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
+
+                                element.saleServiceName = !!obj ? obj.text : null;
+                            }
+                            if (!!element.officeId) {
+                                if (element.officeId.includes(';')) {
+                                    const arrayOffice = element.officeId.split(';');
+                                    element.officeNameEn = '';
+                                    arrayOffice.forEach(itemOffice => {
+                                        element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                                    });
+                                    if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                                        element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                    }
+                                } else {
+                                    element.officeId = element.officeId.toLowerCase();
+                                    const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                    element.officeNameEn = !!obj ? obj.text : null;
+                                }
+                            }
+                        }, 300);
+
 
                     });
                 }

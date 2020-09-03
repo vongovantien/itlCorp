@@ -6,6 +6,17 @@
         <div class="c-button-actions">
             <app-permission-button title="add new" [routerLink]="['/home/commercial/agent/new']">
             </app-permission-button>
+            <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
+                <app-permission-button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Import"
+                    type="import">
+                </app-permission-button>
+                <div class="dropdown-menu" aria-labelledby="">
+                    <a routerLink="/home/commercial/agent/import" class="dropdown-item" href="javascript:void(0)">Import
+                        Agent</a>
+                    <a routerLink="/home/commercial/agent/importContract" class="dropdown-item"
+                        href="javascript:void(0)">Import Contract</a>
+                </div>
+            </div>
             <app-permission-button title="Export" (onClick)="export()" type="export"></app-permission-button>
         </div>
     </div>
@@ -37,20 +48,20 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <button type="button" (click)="showSaleman(agent.id)"
-                                                class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                 data-toggle="collapse"
                                                 [attr.data-target]="'#commercial-agent-00' + agent.id | removeTrim"
                                                 title="Collapse">
                                                 <i class="la la-angle-up"></i>
                                             </button>
                                             <button (click)="showDetail(agent)"
-                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Edit">
                                                 <i class="la la-edit"></i>
                                             </button>
                                             <ng-container *ngIf="!agent.active">
                                                 <button (click)="showConfirmDelete(agent)"
-                                                    class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </ng-container>

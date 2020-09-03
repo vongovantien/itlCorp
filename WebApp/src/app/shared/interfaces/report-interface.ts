@@ -1,4 +1,4 @@
-namespace ReportInterface {
+export namespace ReportInterface {
     export interface ISaleReportCriteria {
         serviceDateFrom: string;
         serviceDateTo: string;
@@ -22,4 +22,8 @@ namespace ReportInterface {
         pod: string;
         typeReport: string;
     }
+}
+
+export interface ICrystalReport {
+    showReport(): void;
 }

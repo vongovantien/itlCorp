@@ -403,6 +403,13 @@ namespace eFMS.API.Documentation.DL.Services
                             item.UserCreated = currentUser.UserID;
                             item.Id = Guid.NewGuid();
                             item.ExchangeDate = DateTime.Now;
+                            
+                            item.TransactionType = GetTransactionType(item.JobNo);
+                            if(item.Hblid != Guid.Empty)
+                            {
+                                CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
+                                item.OfficeId = hbl.OfficeId ?? null;
+                            }
                             var t = DataContext.Add(item, true);
                         }
                         else
@@ -527,5 +534,34 @@ namespace eFMS.API.Documentation.DL.Services
                 });
             return result;
         }
+
+        private string GetTransactionType(string jobNo)
+        {
+            string transactionType = null;
+            if(!string.IsNullOrEmpty(jobNo))
+            {
+                IQueryable<CsTransaction> docTransaction = csTransactionRepository.Get(x => x.JobNo == jobNo);
+                if (docTransaction != null && docTransaction.Count() > 0)
+                {
+                    transactionType = docTransaction?.FirstOrDefault()?.TransactionType;
+                }
+                else
+                {
+                    IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get(x => x.JobNo == jobNo);
+                    if (opsTransaction != null && opsTransaction.Count() > 0)
+                    {
+                        transactionType = "CL";
+                    }
+                    else
+                    {
+                        return string.Empty;
+                    }
+                }
+                return transactionType;
+            }
+            return string.Empty;
+
+        }
     }
 }
+

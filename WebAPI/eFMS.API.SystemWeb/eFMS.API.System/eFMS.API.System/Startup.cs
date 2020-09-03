@@ -49,6 +49,7 @@ namespace eFMS.API.System
             services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")));
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

@@ -2,18 +2,26 @@
     <app-sub-header> </app-sub-header>
     <div class="m-content">
         <div class="m-portlet__body">
-            <form-search-account-receivable-payable (onSearch)="onSearchPayment($event)">
-            </form-search-account-receivable-payable>
-
             <tabset class="custom-class-tab">
-                <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
-                    <list-invoice-account-receivable-payable
-                        (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
-                    </list-invoice-account-receivable-payable>
+                <tab heading="Account Payment" [active]="true" (selectTab)="changeTabAccount('payment')">
+                    <form-search-account-payment (onSearch)="onSearchPayment($event)">
+                    </form-search-account-payment>
+
+                    <tabset class="custom-class-tab">
+                        <tab heading="Invoice Payment" (selectTab)="onSelectTabLocation('INVOICE')">
+                            <list-invoice-account-payment
+                                (onUpdateExtendDateOfInvoice)="handleUpdateExtendDateOfInvoice()">
+                            </list-invoice-account-payment>
+                        </tab>
+                        <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
+                            <list-obh-account-payment (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
+                            </list-obh-account-payment>
+                        </tab>
+                    </tabset>
+
                 </tab>
-                <tab heading="OBH Payment" (selectTab)="onSelectTabLocation('OBH')">
-                    <list-obh-account-receivable-payable (onUpdateExtendDateOfOBH)="handleUpdateExtendDateOfOBH()">
-                    </list-obh-account-receivable-payable>
+                <tab heading="Account Receivable" (selectTab)="changeTabAccount('receivable')">
+
                 </tab>
             </tabset>
         </div>

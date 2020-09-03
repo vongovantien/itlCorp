@@ -5,7 +5,14 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { NgxCurrencyModule } from 'ngx-currency';
-import { ModalModule, BsDropdownModule, PaginationModule, TooltipModule, CollapseModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+
+
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
@@ -72,6 +79,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ShareBusinessReAlertComponent } from './components/pre-alert/pre-alert.component';
 import { ShareBusinessAddAttachmentPopupComponent } from './components/add-attachment/add-attachment.popup';
+
+
 
 
 const COMPONENTS = [
@@ -163,7 +172,8 @@ const customCurrencyMaskConfig = {
         StoreModule.forFeature('share-bussiness', reducers),
         EffectsModule.forFeature(effects),
         CollapseModule.forRoot(),
-        NgxSpinnerModule
+        NgxSpinnerModule,
+
     ],
     exports: [
         ...COMPONENTS

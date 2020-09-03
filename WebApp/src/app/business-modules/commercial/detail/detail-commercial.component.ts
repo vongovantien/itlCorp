@@ -11,6 +11,8 @@ import { CommercialCreateComponent } from '../create/create-commercial.component
 
 import { finalize, catchError, concatMap, map } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
+import { ConfirmPopupComponent } from '@common';
+import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 
 
 @Component({
@@ -18,7 +20,8 @@ import { of, combineLatest } from 'rxjs';
     templateUrl: './detail-commercial.component.html',
 })
 export class CommercialDetailComponent extends CommercialCreateComponent implements OnInit {
-
+    @ViewChild(CommercialFormCreateComponent, { static: false }) formCommercialComponent: CommercialFormCreateComponent;
+    @ViewChild('internalReferenceConfirmPopup', { static: false }) confirmTaxcode: ConfirmPopupComponent;
     partnerId: string;
     partner: Partner;
 
@@ -59,6 +62,12 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             });
         this._cd.detectChanges();
 
+    }
+
+    onFocusInternalReference() {
+        this.confirmTaxcode.hide();
+        //
+        this.formCommercialComponent.handleFocusInternalReference();
     }
 
     getDetailCustomer(partnerId: string) {
@@ -153,8 +162,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (!!value) {
                         if (!!body.internalReferenceNo) {
                             this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                            this.infoPopupTaxCode.show();
                         } else {
                             this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
+                            this.confirmTaxcode.show();
                         }
                         throw new Error("TaxCode Duplicated: ");
                     }
@@ -184,7 +195,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: any) => {
                     console.log(res);
                     if (res === false) {
-                        this.infoPopupTaxCode.show();
+                        //this.infoPopupTaxCode.show();
                         this.formCreate.isExistedTaxcode = true;
                         return;
                     }

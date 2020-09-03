@@ -66,6 +66,11 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public DateTime? VoucherIddate { get; set; }
         public string VoucherIdre { get; set; }
         public DateTime? VoucherIdredate { get; set; }
+        public Guid? ChargeGroup { get; set; }
+        public Guid? OfficeId { get; set; }
+        public string TransactionType { get; set; }
         public Guid? AcctManagementId { get; set; }
+
+
     }
 }

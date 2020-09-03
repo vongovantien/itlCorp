@@ -278,13 +278,14 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfCostsIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportJobProfitAnalysis(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
-            Export Shipment Overview
+            Export Job Profit Analysis
             </summary>
-            <param name="criteria">Id of shipment</param>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfCostsIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)" -->
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportSummaryOfRevenueIncurred(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Export Shipment Overview
@@ -421,6 +422,15 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateJobProfitAnalysisExportExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.JobProfitAnalysisExport},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
+            <summary>
+            
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <param name="stream"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateStandardGeneralReportExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.GeneralReportResult},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.IO.Stream)">
             <summary>
             Generate Standard General Report Excel
@@ -429,6 +439,7 @@
             <param name="criteria"></param>
             <param name="stream"></param>
             <returns></returns>
+            
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>

@@ -33,13 +33,13 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <button type="button"
-                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
                                                 [routerLink]="user.id" title="Detail">
                                                 <i class="la la-edit"></i>
                                             </button>
 
                                             <button type="button" *ngIf="!user.active"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Remove" (click)="showDeletePopup(user)">
                                                 <i class="la la-trash"></i>
                                             </button>

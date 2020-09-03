@@ -13,5 +13,9 @@ namespace eFMS.API.Accounting.DL.Models
         public string UserNameModified { get; set; }
         public string RequesterName { get; set; }
         public List<string> advancePaymentIds { get; set; }
+        public bool IsRequester { get; set; }
+        public bool IsManager { get; set; }
+        public bool IsApproved { get; set; }
+        public bool IsShowBtnDeny { get; set; }
     }
 }

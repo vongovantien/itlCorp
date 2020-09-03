@@ -15,13 +15,14 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
 
-        IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria);
+        IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceId(Guid advanceId);
 
         List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo);
+
         List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNoList(string[] advanceNoList);
 
         List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceId(Guid advanceId);
@@ -40,9 +41,7 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal Preview(Guid advanceId);
 
         Crystal Preview(AcctAdvancePaymentModel advance);
-
-        HandleState CheckExistsInfoManagerOfRequester(AcctApproveAdvanceModel approve);
-
+        
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
         HandleState UpdateApproval(Guid advanceId);
@@ -51,8 +50,12 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctApproveAdvanceModel GetInfoApproveAdvanceByAdvanceNo(string advanceNo);
 
+        List<DeniedInfoResult> GetHistoryDeniedAdvance(string advanceNo);
+
         List<AcctAdvanceRequestModel> GetAdvancesOfShipment();
+
         LockedLogResultModel GetAdvanceToUnlock(List<string> keyWords);
+
         HandleState UnLock(List<LockedLogModel> advancePayments);
 
         bool CheckDetailPermissionByAdvanceNo(string advanceNo);
@@ -70,11 +73,19 @@ namespace eFMS.API.Accounting.DL.IService
         void UpdateStatusPaymentOfAdvanceRequest(string settlementCode);
 
         HandleState RecallRequest(Guid advanceId);
+
         HandleState UpdatePaymentVoucher(AcctAdvancePaymentModel model);
+
         List<AccAdvancePaymentVoucherImportModel> CheckValidImport(List<AccAdvancePaymentVoucherImportModel> list, bool validDate);
+
         HandleState Import(List<AccAdvancePaymentVoucherImportModel> data);
 
+        HandleState CheckExistSettingFlow(string type, Guid? officeId);
 
+        HandleState CheckExistUserApproval(string type, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
 
+        List<Guid> GetSurchargeIdByHblId(Guid? hblId);
+
+        List<AcctAdvanceRequestModel> GetAdvanceRequestByAdvanceNo(string advanceNo);
     }
 }

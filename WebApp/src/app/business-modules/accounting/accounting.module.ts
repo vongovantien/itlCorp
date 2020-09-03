@@ -5,7 +5,9 @@ import { AccountingRouting } from './accounting-routing.module';
   imports: [
     AccountingRouting
   ],
-  declarations: [],
+  declarations: [
+
+  ],
   bootstrap: [],
   providers: [
   ],

@@ -28,7 +28,7 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 100px">
                                             <button type="button"
-                                                class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                 data-toggle="collapse" [attr.data-target]="'#id-00' + (i+1)"
                                                 title="Collapse" (click)="getListHouseBill(shipment.id,i)">
                                                 <i class="la la-angle-up"></i>
@@ -36,7 +36,7 @@
                                             <app-permission-button (onClick)="viewDetail(shipment.id)" type="detail">
                                             </app-permission-button>
                                             <button type="button" *ngIf="shipment.isLocked"
-                                                class="btn btn-fault btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
                                                 <i class="fa fa-lock"></i>
                                             </button>
                                             <ng-container *ngIf="!shipment.isLocked">

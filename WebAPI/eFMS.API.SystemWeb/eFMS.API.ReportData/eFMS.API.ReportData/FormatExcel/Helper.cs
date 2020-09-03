@@ -37,6 +37,52 @@ namespace eFMS.API.ReportData
             return null;
         }
 
+        public Stream GenerateIncotermListExcel(List<CatIncotermModel> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+
+                "Incoterm",
+                "Name En",
+                "Service",
+                "Status",
+                "Create Date",
+                "Creator",
+                
+            };
+            try
+            {
+                int addressStartContent = 4;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Incoterm List");
+                    var worksheet = excelPackage.Workbook.Worksheets[1];
+
+                    BuildHeader(worksheet, headers, "INCOTERM INFORMATION");
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+
+                        worksheet.Cells[addressStartContent, 1].Value = item.Code;
+
+                        worksheet.Cells[addressStartContent, 2].Value = item.NameEn;
+                        worksheet.Cells[addressStartContent, 3].Value = item.Service;
+                        worksheet.Cells[addressStartContent, 4].Value = item.Active.Value ?"Active":"Inactive";
+                        worksheet.Cells[addressStartContent, 5].Value = item.DatetimeCreated.HasValue ? item.DatetimeCreated.Value.ToString("dd/MM/yyyy") : "";
+                        worksheet.Cells[addressStartContent, 6].Value = item.UserCreatedName;
+                        
+                        addressStartContent++;
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public void BindingFormatForCountryExcel(ExcelWorksheet worksheet, List<CatCountry> listItems)
         {
             // Tạo header

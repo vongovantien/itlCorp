@@ -29,6 +29,10 @@ export class AdvancePayment {
     voucherNo: string = '';
     voucherDate: string = '';
 
+    isRequester: boolean = false;
+    isManager: boolean = false;
+    isApproved: boolean = false;
+    isShowBtnDeny: boolean = false;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -60,6 +64,21 @@ export class AdvancePaymentRequest {
 
     isSelected?: boolean;
 
+    constructor(object?: any) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}
+
+export class DeniedInfoResult {
+    no: string = null;
+    nameAndTimeDeny: string = null;
+    levelApprove: string = null;
+    comment: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

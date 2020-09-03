@@ -29,12 +29,12 @@
 
                 <settle-payment-list-charge (onChangeType)="updateSettlement()"></settle-payment-list-charge>
 
-                <div class="row height-row-12">
+                <div class="row height-row-12" *ngIf="!!settlementPayment">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <div class="c-button-actions">
                                 <ng-container
-                                    *ngIf="!!settlementPayment && (settlementPayment.settlement.statusApproval == 'Denied' || settlementPayment.settlement.statusApproval === 'New')">
+                                    *ngIf="(settlementPayment.settlement.statusApproval === 'New' || settlementPayment.settlement.statusApproval === 'Denied') && settlementPayment.settlement.isRequester">
                                     <app-permission-button type="save" title="Save" (onClick)="updateSettlement()">
                                     </app-permission-button>
                                     <app-permission-button type="save-and-send" title="Save & Send Request"

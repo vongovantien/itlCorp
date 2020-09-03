@@ -29,9 +29,6 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
 
-
-
-
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -41,20 +38,13 @@ export class AdvancePaymentComponent extends AppList {
     groupRequest: AdvancePaymentRequest[] = [];
     userLogged: User;
 
-    dataSearch: any = {};
-
     advancePaymentIds: string[] = [];
 
     menuSpecialPermission: Observable<any[]>;
 
-
     checkAll = false;
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
-
-
-
-
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -85,8 +75,8 @@ export class AdvancePaymentComponent extends AppList {
             { title: 'Status Payment', field: 'statusApproval', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Description', field: 'advanceNote', sortable: true },
-            { title: 'VoucherNo', field: 'voucherNo', sortable: true },
-            { title: 'VoucherDate', field: 'voucherDate', sortable: true },
+            { title: 'Voucher No', field: 'voucherNo', sortable: true },
+            { title: 'Voucher Date', field: 'voucherDate', sortable: true },
         ];
 
         this.headerGroupRequest = [
@@ -99,24 +89,25 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        this.getListAdvancePayment(this.dataSearch);
+        this.getListAdvancePayment();
     }
 
     onSearchAdvPayment(data: any) {
-        this.dataSearch = Object.assign({}, data, { requester: this.userLogged.id });
-        this.getListAdvancePayment(this.dataSearch);
+        this.page = 1;
+        this.dataSearch = data; // Object.assign({}, data, { requester: this.userLogged.id });
+        this.getListAdvancePayment();
     }
 
-    getListAdvancePayment(dataSearch?: any) {
+    getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
-        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, dataSearch)
+        this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
                 map((data: any) => {
                     return {
-                        data: data.data.map((item: any) => new AdvancePayment(item)),
+                        data: !!data.data ? data.data.map((item: any) => new AdvancePayment(item)) : [],
                         totalItems: data.totalItems,
                     };
                 })
@@ -156,7 +147,7 @@ export class AdvancePaymentComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, 'Delete Success');
-                        this.getListAdvancePayment(this.dataSearch);
+                        this.getListAdvancePayment();
                     }
                 },
             );
@@ -341,7 +332,7 @@ export class AdvancePaymentComponent extends AppList {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.checkAll = false;
-                        this.getListAdvancePayment(this.dataSearch);
+                        this.getListAdvancePayment();
                     } else {
                         this._toastService.error(res.message, '');
                     }

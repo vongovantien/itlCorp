@@ -10,9 +10,9 @@ import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-not
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { Store } from '@ngrx/store';
 import { TransactionActions } from '../../../store';
-import { getParamsRouterState, getDataRouterState } from 'src/app/store';
 import { combineLatest } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'cd-note-list',
@@ -41,22 +41,23 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _store: Store<TransactionActions>,
+        private _activedRouter: ActivatedRoute
     ) {
         super();
         this._progressRef = this._progressService.ref();
-        //this.requestSort = this.sortCdNotes;
     }
 
     ngOnInit(): void {
         combineLatest([
-            this._store.select(getParamsRouterState),
-            this._store.select(getDataRouterState),
+            this._activedRouter.params,
+            this._activedRouter.data
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             take(1)
         ).subscribe(
             (params: any) => {
                 const jobId = params.id || params.jobId;
+                console.log(jobId);
                 if (jobId) {
                     this.transactionType = +params.transactionType || 0;
                     this.idMasterBill = jobId;

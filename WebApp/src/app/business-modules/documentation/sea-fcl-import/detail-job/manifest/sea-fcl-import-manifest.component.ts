@@ -6,8 +6,7 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params, Router } from '@angular/router';
+import { Params, Router, ActivatedRoute } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -48,6 +47,9 @@ export class SeaFclImportManifestComponent extends AppList {
     fistOpen: boolean = true;
     dataReport: Crystal;
 
+    //
+    displayPreview: boolean = false;
+
     constructor(
         protected _store: Store<any>,
         private _progressService: NgProgress,
@@ -55,7 +57,8 @@ export class SeaFclImportManifestComponent extends AppList {
         private _sortService: SortService,
         private _toastService: ToastrService,
         protected _router: Router,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _activedRoute: ActivatedRoute
 
     ) {
         super();
@@ -81,7 +84,7 @@ export class SeaFclImportManifestComponent extends AppList {
 
     }
     ngAfterViewInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {
@@ -117,6 +120,7 @@ export class SeaFclImportManifestComponent extends AppList {
     onRefresh() {
         this.confirmCreatePopup.hide();
         this.refreshManifest();
+        this.displayPreview = false;
     }
 
     showRefreshPopup() {
@@ -185,6 +189,8 @@ export class SeaFclImportManifestComponent extends AppList {
                             this._toastService.success(res.message, '');
                             this.getManifest(this.jobId);
                             this.getHblList(this.jobId);
+                            //
+                            this.displayPreview = true;
                         } else {
                             this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                         }

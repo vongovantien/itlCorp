@@ -4,6 +4,7 @@ import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
+import { IncotermUpdateModel } from "../models/commercial/incoterm";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -175,6 +176,19 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    importCustomerAgent(body: any, type: string) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/ImportCustomerAgent/${type}`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    importContract(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/Import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getPartnerGroup() {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerGroup`).pipe(
             map((res: any) => {
@@ -540,8 +554,31 @@ export class CatalogueRepo {
     upLoadPartnerFile(files: any) {
         return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFile`, files, "uploadedFile");
     }
+
+    upLoadCustomerAgentFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/uploadFileCustomerAgent`, files, "uploadedFile");
+    }
+
+    upLoadContractFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/uploadFile`, files, "uploadedFile");
+    }
+
     downloadPartnerExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcel`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadCommercialExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/DownloadExcelCommercial`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    downloadContractExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/DownloadExcel`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -578,8 +615,8 @@ export class CatalogueRepo {
         );
     }
 
-    activeInactiveContract(id: string, partnerId: string) {
-        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}/${partnerId}`).pipe(
+    activeInactiveContract(id: string, partnerId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/ActiveInactiveContract/${id}/${partnerId}`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -1072,5 +1109,48 @@ export class CatalogueRepo {
         );
     }
 
+    createIncoterm(body: IncotermUpdateModel) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Add`, body);
+    }
+
+    updateIncoterm(body: IncotermUpdateModel) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Update`, body);
+    }
+
+    deleteIncoterm(incotermId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/delete/${incotermId}`);
+    }
+
+    getDetailIncoterm(id: string): any {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/GetById/${id}`);
+
+    }
+    //
+    getIncotermListPaging(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatIncoterm/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        })
+    }
+    //
+    downloadIncotermListExcel(body: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi//Catalogue/ExportIncotermList`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+
+    }
+    //
+    checkAllowGetDetailIncoterm(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkAllowDeleteIncoterm(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
 
 }

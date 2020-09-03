@@ -5,8 +5,8 @@
                 <ng-content></ng-content>
             </h3>
             <div *ngIf="!(isLocked | async)">
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="refresh()" title="Refresh">
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="refresh()"
+                    title="Refresh">
                     <span><i class="la la-refresh"></i>
                         <span> Refresh </span>
                     </span>
@@ -85,8 +85,7 @@
                             </li>
                         </ul>
                         <ng-container *ngIf="(isLocked | async) === false">
-                            <button type="button"
-                                class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-top-10"
+                            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-top-10"
                                 (click)="openContainerListPopup()">
                                 <span>
                                     <i class="la la-list"></i>

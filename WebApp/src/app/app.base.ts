@@ -55,8 +55,18 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         buttonAttribute: {
             type: 'button',
             titleButton: "Cancel",
-            classStyle: "btn btn-default m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn btn-default  m-btn--icon m-btn--uppercase",
             icon: "la la-ban"
+        },
+        typeButton: ButtonType.cancel,
+    };
+
+    backButtonSetting: ButtonModalSetting = {
+        buttonAttribute: {
+            type: 'button',
+            titleButton: "BACK",
+            classStyle: "btn btn-default  m-btn--icon m-btn--uppercase",
+            icon: "la la-undo"
         },
         typeButton: ButtonType.cancel,
     };
@@ -65,7 +75,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         buttonAttribute: {
             type: 'button',
             titleButton: "Search",
-            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn btn-brand  m-btn--icon m-btn--uppercase",
             icon: "la la-search"
         },
         typeButton: ButtonType.search,
@@ -75,7 +85,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         buttonAttribute: {
             type: 'button',
             titleButton: "Import",
-            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn btn-brand  m-btn--icon m-btn--uppercase",
             icon: "la la-download"
         },
         typeButton: ButtonType.search,

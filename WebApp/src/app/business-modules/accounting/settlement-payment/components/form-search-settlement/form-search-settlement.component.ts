@@ -4,8 +4,9 @@ import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { User, Currency } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'settle-payment-form-search',
@@ -31,9 +32,12 @@ export class SettlementFormSearchComponent extends AppForm {
     userLogged: User;
 
     currencies: Observable<Currency[]>;
+    requesters: any[] = [];
+    requesterActive: any[] = [];
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
 
     ) {
         super();
@@ -47,8 +51,7 @@ export class SettlementFormSearchComponent extends AppForm {
     }
 
     getCurrency() {
-        this.currencies = this._catalogueRepo.getListCurrency()
-
+        this.currencies = this._catalogueRepo.getListCurrency();
     }
 
 
@@ -58,7 +61,7 @@ export class SettlementFormSearchComponent extends AppForm {
             //     Validators.pattern(/^[\w '_"/*\\\.,-]*$/),
             // ])],
             referenceNo: [],
-            requester: [],
+            requester: [this.requesterActive],
             requestDate: [],
             modifiedDate: [],
             statusApproval: [],
@@ -82,6 +85,7 @@ export class SettlementFormSearchComponent extends AppForm {
         this.paymentMethods = this.getMethod();
 
         this.getUserLogged();
+        this.getUsers();
     }
 
     onSubmit() {
@@ -94,24 +98,22 @@ export class SettlementFormSearchComponent extends AppForm {
             paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value.value : 'All',
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value.value : 'All',
             currencyId: !!this.currencyId.value ? this.currencyId.value.id : 'All',
-
-            requester: this.userLogged.id
+            requester: this.requester.value.length > 0 ? this.requester.value[0].id : this.userLogged.id
         };
         this.onSearch.emit(body);
     }
 
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.requester.setValue(this.userLogged.preferred_username);
     }
 
     getStatusApproval(): CommonInterface.ICommonTitleValue[] {
         return [
             { title: 'New', value: 'New' },
-            { title: 'Request Approval', value: 'RequestApproval' },
-            { title: 'Leader Approved', value: 'LeaderApproved' },
-            { title: 'Department Manager Approved', value: 'DepartmentManagerApproved' },
-            { title: 'Accountant Manager Approved', value: 'AccountantManagerApproved' },
+            { title: 'Request Approval', value: 'Request Approval' },
+            { title: 'Leader Approved', value: 'Leader Approved' },
+            { title: 'Department Manager Approved', value: 'Department Manager Approved' },
+            { title: 'Accountant Manager Approved', value: 'Accountant Manager Approved' },
             { title: 'Done ', value: 'Done' },
             { title: 'Denied  ', value: 'Denied' },
         ];
@@ -145,7 +147,29 @@ export class SettlementFormSearchComponent extends AppForm {
         this.resetFormControl(this.statusApproval);
         this.resetFormControl(this.currencyId);
 
-        this.onSearch.emit(<any>{});
+        this.onSearch.emit(<any>{ requester: this.userLogged.id });
+    }
+
+    getUsers() {
+        this._systemRepo.getSystemUsers({})
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (users: any) => {
+                    if (!!users) {
+                        this.requesters = users.map((item: any) => ({ text: item.username, id: item.id }));
+                        this.requesterActive = [this.requesters.filter(stf => stf.id === this.userLogged.id)[0]];
+                        this.requester.setValue(this.requesterActive);
+                    }
+                },
+            );
+    }
+
+    onRemoveDataFormInfo(data: any, type: string) {
+        if (type === 'requester') {
+            this.requester.setValue([]);
+        }
     }
 }
 

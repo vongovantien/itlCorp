@@ -4,11 +4,11 @@ import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from 'src/app/app.form';
-import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from 'src/app/business-modules/share-business';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ShareBussinessFormCreateSeaImportComponent, ShareBussinessShipmentGoodSummaryLCLComponent, ShareBusinessImportJobDetailPopupComponent } from '@share-bussiness';
+import { CsTransaction } from '@models';
+import { CommonEnum } from '@enums';
+import { DocumentationRepo } from '@repositories';
+import { InfoPopupComponent } from '@common';
 
 import { catchError } from 'rxjs/operators';
 

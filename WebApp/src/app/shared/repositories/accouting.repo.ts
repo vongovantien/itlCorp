@@ -594,8 +594,56 @@ export class AccountingRepo {
         );
     }
 
+    getHistoryDeniedAdvancePayment(advanceNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetHistoryDeniedAdvancePayment`, { advanceNo: advanceNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getHistoryDeniedSettlementPayment(settlementNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetHistoryDeniedSettlementPayment`, { settlementNo: settlementNo }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    // Tính công nợ theo {surchargeId, partnerId, office, service}
+    calculatorReceivable(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/CalculatorReceivable`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    // Tính công nợ theo {partnerId, office, service}
+    insertOrUpdateReceivable(body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountReceivable/InsertOrUpdateReceivable`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     getAgreementForInvoice(body: any) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/GetContractForInvoice`, body);
+    }
+
+    receivablePaging(page: number, size: number, body: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailReceivableByArgeementId(argeementId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByArgeementId`, { argeementId: argeementId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    // Chỉ sử dụng khi không có argeementId
+    getDetailReceivableByPartnerId(partnerId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/GetDetailAccountReceivableByPartnerId`, { partnerId: partnerId }).pipe(
+            map((data: any) => data)
+        );
     }
 }
 

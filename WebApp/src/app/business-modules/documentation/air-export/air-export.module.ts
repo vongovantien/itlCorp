@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { TabsModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -18,6 +20,7 @@ import { AirExportDetailJobComponent } from './detail-job/detail-job-air-export.
 import { AirExportManifestComponent } from './detail-job/manifest/air-export-manifest.component';
 import { AirExportMAWBFormComponent } from './detail-job/mawb/air-export-mawb.component';
 import { ShareAirExportModule } from './share-air-export.module';
+import { DeactivateGuardService } from 'src/app/core/guards/deactivate.guard';
 
 const routing: Routes = [
     {
@@ -34,7 +37,7 @@ const routing: Routes = [
                 data: { transactionType: CommonEnum.TransactionTypeEnum.AirExport, name: "Job Detail" },
                 children: [
                     {
-                        path: '', component: AirExportDetailJobComponent, data: { name: "" }
+                        path: '', component: AirExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
                     },
                     {
                         path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-export-hbl.module').then(m => m.AirExportHBLModule),
@@ -66,7 +69,6 @@ const LIB = [
     PerfectScrollbarModule,
     TabsModule.forRoot(),
     CollapseModule.forRoot(),
-    PaginationModule.forRoot(),
 ];
 
 @NgModule({

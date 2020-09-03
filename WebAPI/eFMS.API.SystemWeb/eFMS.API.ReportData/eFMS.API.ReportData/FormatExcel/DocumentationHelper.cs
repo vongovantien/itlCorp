@@ -1619,7 +1619,170 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(31).Width = 19; //Cột AE
             workSheet.Column(32).Width = 24; //Cột AF
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public Stream GenerateJobProfitAnalysisExportExcel(List<JobProfitAnalysisExport> listData, GeneralReportCriteria criteria, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Accounting PL Sheet (" + criteria.Currency + ")");
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataAJobProfitAnalysisExportExcel(workSheet, listData, criteria);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
 
+            }
+            return null;
+        }
+        private void BindingDataAJobProfitAnalysisExportExcel(ExcelWorksheet workSheet, List<JobProfitAnalysisExport> listData, GeneralReportCriteria criteria)
+        {
+            List<string> headers = new List<string>
+            {
+               "INDO TRANS LOGISTICS CORPORATION", //0
+               "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+               "JOB PROFIT ANALYSIS", //2
+               "Job No.", //3
+               "Service", //4
+               "MBL/MAWB", //5
+               "HBL/HAWB", //6
+               "ETD", //7
+               "ETA", //8
+               "Q'TY", //9
+               "20'", //10
+               "40'", //11
+               "40'HC", //12
+               "45'", //13
+               "Cont", //14
+               "GW", //15
+               "CW", //16
+               "CBM", //17
+               "Charge Code", //18
+               "Revenue", //19
+               "Cost", //20
+               "Job Profit", //21
+            };
+
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 2, column B
+                excelImage.SetPosition(1, 0, 1, 0);
+            }
+
+            workSheet.Column(1).Width = 14; //Cột A
+            workSheet.Column(2).Width = 14; //Cột B
+            workSheet.Column(3).Width = 14; //Cột C
+            workSheet.Column(4).Width = 15; //Cột D
+            workSheet.Column(5).Width = 15; //Cột E
+            workSheet.Column(6).Width = 13; //Cột F.
+            workSheet.Column(7).Width = 13; //Cột G
+            workSheet.Column(16).Width = 13; //Cột P
+            workSheet.Column(17).Width = 13; //Cột P
+            workSheet.Column(18).Width = 13; //Cột P
+            workSheet.Column(19).Width = 13; //Cột P
+
+
+
+            workSheet.Cells["M1:S1"].Merge = true;
+            workSheet.Cells["M1"].Value = headers[0];
+            workSheet.Cells["M1"].Style.Font.Bold = true;
+            workSheet.Cells["M1"].Style.Font.Italic = true;
+
+            workSheet.Row(2).Height = 64.5;
+            workSheet.Cells["M2:S2"].Merge = true;
+            workSheet.Cells["M2:S2"].Style.WrapText = true;
+            workSheet.Cells["M2"].Value = headers[1];
+            workSheet.Cells["M2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+            workSheet.Cells["A4:S4"].Merge = true;
+            workSheet.Cells["A4"].Value = headers[2];
+            workSheet.Cells["A4"].Style.Font.Bold = true;
+            workSheet.Cells["A4"].Style.Font.Size = 13;
+            workSheet.Cells["A4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            DateTime? _fromDate = criteria.CreatedDateFrom != null ? criteria.CreatedDateFrom : criteria.ServiceDateFrom;
+            DateTime? _toDate = criteria.CreatedDateTo != null ? criteria.CreatedDateTo : criteria.ServiceDateTo;
+
+            workSheet.Cells["A5:S5"].Merge = true;
+            workSheet.Cells["A5"].Value = "From: " + _fromDate.Value.ToString("dd MMM, yyyy") + " to: " + _toDate.Value.ToString("dd MMM, yyyy");
+            workSheet.Cells["A5"].Style.Font.Bold = true;
+            workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A6:S6"].Style.Font.Bold = true;
+            workSheet.Cells["A6:S6"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int c = 3; c < 22; c++)
+            {
+                workSheet.Cells[6, c-2].Value = headers[c];
+            }
+            int rowStart = 7;
+            for (int i = 0; i < listData.Count; i++)
+            {
+                workSheet.Cells[rowStart, 1].Value = listData[i].JobNo;
+                workSheet.Cells[rowStart, 2].Value = listData[i].Service;
+                workSheet.Cells[rowStart, 3].Value = listData[i].Mbl;
+                workSheet.Cells[rowStart, 4].Value = listData[i].Hbl;
+                workSheet.Cells[rowStart, 5].Value = listData[i].Etd;
+                workSheet.Cells[rowStart, 5].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 6].Value = listData[i].Eta;
+                workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 7].Value = listData[i].Quantity;
+                workSheet.Cells[rowStart, 8].Value = listData[i].Cont20;
+                workSheet.Cells[rowStart, 9].Value = listData[i].Cont40;
+                workSheet.Cells[rowStart, 10].Value = listData[i].Cont40HC;
+                workSheet.Cells[rowStart, 11].Value = listData[i].Cont45;
+                workSheet.Cells[rowStart, 12].Value = listData[i].Cont;
+                workSheet.Cells[rowStart, 13].Value = listData[i].GW;
+                workSheet.Cells[rowStart, 14].Value = listData[i].CW;
+                workSheet.Cells[rowStart, 15].Value = listData[i].CBM;
+                workSheet.Cells[rowStart, 16].Value = listData[i].ChargeCode;
+                if (listData[i].TotalRevenue != null)
+                {
+                    workSheet.Cells[rowStart, 17].Value = listData[i].TotalRevenue;
+                    workSheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
+                }
+                if (listData[i].TotalCost != null )
+                {
+                    workSheet.Cells[rowStart, 18].Value = listData[i].TotalCost;
+                    workSheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat;
+                }
+
+                if (listData[i].JobProfit != null)
+                {
+                    workSheet.Cells[rowStart, 19].Value = listData[i].JobProfit;
+                    workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
+                }
+
+                rowStart += 1;
+            }
+            workSheet.Cells[rowStart, 1, rowStart , 16].Merge = true;
+            workSheet.Cells[rowStart, 1, rowStart , 16].Value = "TOTAL";
+            workSheet.Cells[rowStart, 1, rowStart , 16].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart , 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[rowStart , 17].Value = listData.Select(t => t.TotalRevenue).Sum();
+            workSheet.Cells[rowStart , 17].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 17].Style.Font.Bold = true;
+            workSheet.Cells[rowStart , 18].Value = listData.Select(t => t.TotalCost).Sum();
+            workSheet.Cells[rowStart , 18].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 18].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 19].Value = listData.Select(t => t.JobProfit).Sum();
+            workSheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[rowStart, 19].Style.Font.Bold = true;
+
+
+            workSheet.Cells[6, 1, rowStart, 19].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, rowStart, 19].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, rowStart, 19].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+        }
         private void BindingDataAccountingPLSheetExportExcel(ExcelWorksheet workSheet, List<AccountingPlSheetExport> listData, GeneralReportCriteria criteria)
         {
             SetWidthColumnExcelAccountingPLSheetExport(workSheet);
@@ -1925,6 +2088,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="criteria"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
+        /// 
         public Stream GenerateStandardGeneralReportExcel(List<GeneralReportResult> listData, GeneralReportCriteria criteria, Stream stream = null)
         {
             try

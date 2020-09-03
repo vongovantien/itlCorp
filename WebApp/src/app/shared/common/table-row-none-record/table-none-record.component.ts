@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: '[app-table-none-record]',
@@ -6,14 +6,15 @@ import { Component, Input } from '@angular/core';
             <td [attr.colspan]="colspan">
                 <div class="no-data">
                     <i class="flaticon-coins"></i>
-                    <span class="no-data-text">No records found</span>
+                    <span class="no-data-text">{{title}}</span>
                 </div>
             </td>
-    `
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class TableNoneRecordComponent {
     @Input() colspan: number = 100;
-
+    @Input() title: string = 'No records found';
 }
 

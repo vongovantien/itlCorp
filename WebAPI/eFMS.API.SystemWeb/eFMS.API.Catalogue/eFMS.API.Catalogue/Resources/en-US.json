@@ -18,6 +18,7 @@
 
   //------------start: partner data
   "MSG_PARTNER_TAXCODE_EMPTY": "Tax code is not allow empty!",
+  "MSG_PARTNER_INTERNAL_REFERENCENO_INVALID": "Internal Reference '{0}' is invalid",
   "MSG_PARTNER_TAXCODE_NOT_NUMBER": "Tax code must be number type and greater than 0!",
   "MSG_PARTNER_TAXCODE_EXISTED": "Tax code '{0}' has been existed!",
   "MSG_PARTNER_TAXCODE_INVALID": "Tax code '{0}' is invalid",
@@ -43,10 +44,40 @@
   "MSG_PARTNER_PROVINCE_SHIPPING_NOT_FOUND": "City shipping '{0}' is not found!",
   "MSG_PARTNER_ADDRESS_BILLING_EN_NOT_FOUND": "Billing address is not allow empty. Please check again!",
   "MSG_PARTNER_ADDRESS_BILLING_VN_NOT_FOUND": "Billing address local is not allow empty. Please check again!",
+  "MSG_PARTNER_AC_REFERENCE_NOT_FOUND": "A/c reference '{0}' is not found!",
+
   "MSG_PARTNER_ADDRESS_SHIPPING_EN_NOT_FOUND": "Shipping address is not allow empty. Please check again!",
   "MSG_PARTNER_ADDRESS_SHIPPING_VN_NOT_FOUND": "Shipping address local is not allow empty. Please check again!",
   "MSG_PARTNER_WORKPLACE_NOT_FOUND": "Workplace '{0}' is not found!",
+  "MSG_PARTNER_TAXCODE_LENGTH": "Tax Code include 8 - 14 characters!",
+  "MSG_PARTNER_INTERNAL_REFERENCENO_LENGTH": "Internal Reference No include 3 - 10 characters",
   //------------end  : partner data
+
+  // contract
+  "MSG_CONTRACT_PARTNER_ID_EMPTY": "Customer Id is not allow empty!",
+  "MSG_CONTRACT_PARTNER_ID_NOT_FOUND": "Customer Id '{0}' is not found!",
+  "MSG_CONTRACT_AGREEMENT_TYPE_NOT_FOUND": "Agreement '{0}' is not found!",
+  "MSG_CONTRACTNO_EMPTY": "Agreement/Contract No is not allow empty with agreement type Trial or Official!",
+  "MSG_SALE_SERVICE_EMPTY": "Sale service is not allow empty!",
+  "MSG_CONTRACT_COMPANY_EMPTY": "Company is not allow empty!",
+  "MSG_CONTRACT_COMPANY_NOT_FOUND": "Company '{0} is not found!'",
+  "MSG_CONTRACT_OFFICE_EMPTY": "Office is not allow empty!",
+  "MSG_CONTRACT_OFFICE_NOT_FOUND": "Office '{0} is not found!'",
+  "MSG_CONTRACT_PAYMENT_METHOD_EMPTY": "Payment method is not allow empty!",
+  "MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND": "Payment method {0} is not found!",
+  "MSG_CONTRACT_SALESMAN_NOT_FOUND": "Salesman {0} is not found!",
+  "MSG_CONTRACT_ACTIVE_NOT_FOUND": "Status {0} is not found!",
+  "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY": "Effective Date is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACT_EXPERIED_DATE_EMPTY": "Experied Date is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACT_CREDIT_LIMIT_EMPTY": "Credit Limit is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACT_PAYMENT_TERM_EMPTY": "Payment term is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACT_CONTRACT_NO_DUPLICATE": "Contract No {0} has been duplicate!|wrong",
+  "MSG_CONTRACT_CONTRACT_NO_EXISTED": "Contract No {0} has been existed!|wrong",
+  "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID": "Experied Date must be after or equal Effective Date!",
+  "MSG_CONTRACT_CONTRACTNO_LENGTH": "Contract No include 3 - 50 characters!",
+
+
+  //-----------end contract
 
   //------------start: place
   "MSG_PLACE_NAME_EN_EMPTY": "NameEn is not allow empty!|wrong",

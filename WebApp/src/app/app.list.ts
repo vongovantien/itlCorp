@@ -84,3 +84,8 @@ export abstract class AppList extends AppPage {
     }
 
 }
+
+export interface IPermissionBase {
+    checkAllowDetail(T: any): void;
+    checkAllowDelete(T: any): void;
+}

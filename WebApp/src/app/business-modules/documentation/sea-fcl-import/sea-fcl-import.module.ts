@@ -4,7 +4,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { SelectModule } from 'ng2-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { TabsModule, PaginationModule, ModalModule, CollapseModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 import { SharedModule } from 'src/app/shared/shared.module';
 import { SeaFCLImportManagementComponent } from './sea-fcl-import-management.component';
@@ -14,6 +18,7 @@ import { SeaFCLImportLazyLoadModule } from './sea-fcl-import-lazy-load.module';
 import { SeaFclImportManifestComponent } from './detail-job/manifest/sea-fcl-import-manifest.component';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -30,7 +35,7 @@ const routing: Routes = [
         data: { transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport, name: "Job Detail" },
         children: [
             {
-                path: '', component: SeaFCLImportDetailJobComponent, data: { name: "" }
+                path: '', component: SeaFCLImportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
             },
             {
                 path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-import-hbl.module').then(m => m.SeaFCLImportHBLModule),

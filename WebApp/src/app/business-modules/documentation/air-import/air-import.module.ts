@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TabsModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -13,7 +14,7 @@ import { AirImportComponent } from './air-import.component';
 import { AirImportLazyLoadModule } from './air-import-lazy-load.module';
 import { AirImportCreateJobComponent } from './create-job/create-job-air-import.component';
 import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
-import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -30,7 +31,7 @@ const routing: Routes = [
                 data: { transactionType: CommonEnum.TransactionTypeEnum.AirImport, name: "Job Detail" },
                 children: [
                     {
-                        path: '', component: AirImportDetailJobComponent, data: { name: "" }
+                        path: '', component: AirImportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
                     },
                     {
                         path: 'hbl', loadChildren: () => import('./detail-job/hbl/air-import-hbl.module').then(m => m.AirImportHBLModule),
@@ -51,7 +52,6 @@ const LIB = [
     PerfectScrollbarModule,
     TabsModule.forRoot(),
     CollapseModule.forRoot(),
-    PaginationModule.forRoot(),
 ];
 
 @NgModule({

@@ -30,7 +30,7 @@ export abstract class AppForm extends AppPage {
         buttonAttribute: {
             type: 'button',
             titleButton: "Save",
-            classStyle: "btn btn-brand m-btn--square m-btn--icon m-btn--uppercase",
+            classStyle: "btn btn-brand  m-btn--icon m-btn--uppercase",
             icon: "la la-save"
         },
         typeButton: ButtonType.save,
@@ -44,7 +44,7 @@ export abstract class AppForm extends AppPage {
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
     errorETA: string = 'ETA must be greater than or equal ETD';
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
-
+    currentFormValue: any;
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }
