@@ -2176,6 +2176,7 @@ namespace eFMS.API.Accounting.DL.Services
         #region -- Preview --
         public Crystal PreviewAccountStatementFull(string soaNo)
         {
+            double _decimalNumber = 0.000000001;
             //SOANo: type charge is SELL or OBH-SELL (DEBIT)
             //PaySOANo: type charge is BUY or OBH-BUY (CREDIT)
             Crystal result = null;
@@ -2236,9 +2237,9 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
                 soaCharge.Order = string.Empty; //NOT USE
                 soaCharge.InvID = cdNote?.Code; //CD Note Code
-                soaCharge.Amount = _amount;
+                soaCharge.Amount = _amount + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
-                soaCharge.Dpt = !string.IsNullOrEmpty(soa.Soano) ? true : false; //Is Debit charge?
+                soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;//!string.IsNullOrEmpty(soa.Soano) ? true : false; //Is Debit charge?
                 soaCharge.Vessel = string.Empty; //NOT USE
                 soaCharge.Routine = string.Empty; //NOT USE
                 soaCharge.LoadingDate = null; //NOT USE
@@ -2261,6 +2262,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.Volumne = string.Empty; //NOT USE
                 soaCharge.POBH = null; //NOT USE
                 soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
+                soaCharge.ROBH = soaCharge.ROBH + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.CustomNo = _customNo;
 
                 soaCharges.Add(soaCharge);
