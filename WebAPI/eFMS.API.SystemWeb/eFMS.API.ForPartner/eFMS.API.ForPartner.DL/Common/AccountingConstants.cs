@@ -1,4 +1,4 @@
-﻿namespace eFMS.API.Accounting.DL.Common
+﻿namespace eFMS.API.ForPartner.DL.Common
 {
     public static class AccountingConstants
     {

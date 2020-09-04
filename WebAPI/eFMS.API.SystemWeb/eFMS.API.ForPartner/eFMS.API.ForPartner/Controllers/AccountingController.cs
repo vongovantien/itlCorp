@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using eFMS.API.Accounting.DL.Common;
+using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.DL.Models.Criteria;
@@ -74,7 +74,7 @@ namespace eFMS.API.ForPartner.Controllers
             //    return Unauthorized();
             //}
 
-            ChargeOfAcctMngtResult data = accountingManagementService.GetChargeInvoice(model);
+            List<ChargeOfAcctMngtResult> data = accountingManagementService.GetChargeInvoice(model);
             return Ok(data);
         }
 
