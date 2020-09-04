@@ -51,7 +51,7 @@
                 </thead>
                 <tbody>
                     <ng-container *ngIf="!!charges.length">
-                        <tr *ngFor="let charge of charges  | filter: keyword: ['partnerShortName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','soano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
+                        <tr *ngFor="let charge of charges  | filter: keyword: ['partnerShortName','chargeNameEn','invoiceNo','notes','invoiceNo','seriesNo','paySoano','cdno','settlementCode'] ; let i = index; trackBy: trackByFn"
                             class="m-form m-form--state" [ngClass]="!charge.isFromShipment ? 'bg-warning' : ''">
                             <ng-container *ngIf="(isLocked | async) === false">
                                 <td class="table-actions-col fixed-side"
@@ -62,7 +62,7 @@
                                             title="Duplicate"><i class="la la-copy"></i>
                                         </button>
                                         <ng-container *ngIf="
-                                        !charge.soano 
+                                        !charge.paySoano 
                                         && !charge.creditNo
                                         && !charge.settlementCode
                                         && !charge.voucherId
@@ -79,7 +79,7 @@
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" [ngClass]="{'m-form__group has-danger': isSubmitted && 
                                     !charge.partnerShortName 
-                                    && !charge.soano 
+                                    && !charge.paySoano
                                     && !charge.creditNo
                                     && !charge.settlementCode
                                     && !charge.voucherId
@@ -88,7 +88,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" readonly
@@ -112,18 +112,18 @@
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
-                                                || !!charge.soano
+                                                || !!charge.paySoano
                                                 || !charge.isFromShipment 
                                                 || (isLocked | async) === true">
                                             <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
                                                     charge.partnerShortName = null"
                                                 (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName 
-                                                && !charge.soano 
+                                                && !charge.paySoano 
                                                 && !charge.creditNo
                                                 && !charge.settlementCode
                                                 && !charge.voucherId
                                                 && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName 
-                                                && !charge.soano 
+                                                && !charge.paySoano 
                                                 && !charge.creditNo
                                                 && !charge.settlementCode
                                                 && !charge.voucherId
@@ -152,18 +152,18 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true">
                                     <combo-grid-icon (onDelete)="charge.chargeId = null; 
                                             charge.chargeNameEn = null"
                                         (onDropdown)="loadDynamicComboGridCharge(charge,i)" [showDelete]="!!charge.chargeId 
-                                        && !charge.soano 
+                                            && !charge.paySoano 
                                             && !charge.creditNo
                                             && !charge.settlementCode
                                             && !charge.voucherId
                                             && !charge.voucherIddate" [showDropdown]="!!charge.chargeId 
-                                            && !charge.soano 
+                                            && !charge.paySoano 
                                             && !charge.creditNo
                                             && !charge.settlementCode
                                             && !charge.voucherId
@@ -185,7 +185,7 @@
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
-                                                || !!charge.soano
+                                                || !!charge.paySoano
                                                 || !charge.isFromShipment ? 'disabled': null" numeric
                                                 [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
@@ -194,12 +194,12 @@
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
-                                                || !!charge.soano
+                                                || !!charge.paySoano
                                                 || !charge.isFromShipment 
                                                 || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
-                                                        {{!!charge.quantityType ? charge.quantityType : '-'}}
+                                                        {{!!charge.quantityType ? (charge.quantityType | uppercase) : '-'}}
                                                     </option>
                                                 </select>
                                             </ng-container>
@@ -222,7 +222,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else unit">
                                         <input type="text" class="dropdown-toggle form-control" disabled
@@ -249,7 +249,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else unitPrice">
                                         <input type="text" class="form-control" disabled [value]="charge.unitPrice">
@@ -268,7 +268,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else currency">
                                         <select class="form-control" disabled>
@@ -292,7 +292,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true; else vatrate">
                                         <input type="text" class="form-control" disabled [value]="charge.vatrate">
@@ -317,7 +317,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -330,7 +330,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -341,7 +341,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment ? 'disabled': null">
                                 </div>
                             </td>
@@ -351,7 +351,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true;else invoiceDate">
                                         <input type="text" class="form-control" disabled
@@ -380,7 +380,7 @@
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
-                                        || !!charge.soano
+                                        || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true;else exchangeDate">
                                         <input type="text" class="form-control" disabled
@@ -414,14 +414,14 @@
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
-                                    || !!charge.soano
+                                    || !!charge.paySoano
                                     || !charge.isFromShipment ? 'disabled': null">
                                 </app-switch>
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control"
-                                        [(ngModel)]="charge.soano ? charge.soano : charge.paySoano" disabled>
+                                    <input type="text" class="form-control text-primary" [(ngModel)]="charge.paySoano"
+                                        disabled>
                                 </div>
                             </td>
                             <td class="disabled">
@@ -438,7 +438,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherId">
+                                    <input type="text" class="form-control  text-primary" disabled
+                                        [(ngModel)]="charge.voucherId">
                                 </div>
                             </td>
                             <td class="disabled">
