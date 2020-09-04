@@ -475,14 +475,16 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
             IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
             IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
+            IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get();
+
 
             AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return null;
             //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
-                var maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
@@ -494,6 +496,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 from settle in settle2.DefaultIfEmpty()
                                 join advanceRequest in advanceRequests on opst.Hblid equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
                                 from adGroup in adGroups.DefaultIfEmpty()
+                                join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                                from advGroup in advGroups.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
                                 {
@@ -507,7 +511,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = "OPS",
                                     CustomNo = cdNoGroup.ClearanceNo,
                                     AdvanceNo = adGroup.AdvanceNo,
-                                    AdvanceAmount = adGroup.Amount,
+                                    AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency), // Quy tỉ giá về settle
                                 };
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id
@@ -517,6 +521,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from settle in settle2.DefaultIfEmpty()
                                join advanceRequest in advanceRequests on cstd.Id equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
                                from adGroup in adGroups.DefaultIfEmpty()
+                               join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                               from advGroup in advGroups.DefaultIfEmpty()
                                where sur.SettlementCode == settlementNo
                                select new ShipmentSettlement
                                {
@@ -530,7 +536,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    ShipmentId = cst.Id,
                                    Type = "DOC",
                                    AdvanceNo = adGroup.AdvanceNo,
-                                   AdvanceAmount = adGroup.Amount,
+                                   AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency),
                                };
             IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
 
