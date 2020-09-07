@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 
 @Component({
@@ -16,14 +15,13 @@ export class SettlementShipmentItemComponent extends AppList {
     @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlVND: EventEmitter<any> = new EventEmitter<any>();
 
-    @Input() data: any = null;
+    @Input() data: ISettlementShipmentGroup = null;
 
     headers: CommonInterface.IHeaderTable[];
 
     initCheckbox: boolean = false;
 
     constructor(
-        private _documenRepo: DocumentationRepo
     ) {
         super();
     }
@@ -76,4 +74,21 @@ export class SettlementShipmentItemComponent extends AppList {
         this.onPrintPlUSD.emit(this.data);
     }
 
+}
+
+interface ISettlementShipmentGroup {
+    advanceAmount: number;
+    advanceNo: string;
+    balance: number;
+    chargeSettlements: any[]
+    currencyShipment: string;
+    customNo: string;
+    hbl: string;
+    hblId: string;
+    jobId: string;
+    mbl: string;
+    settlementNo: string;
+    shipmentId: string;
+    totalAmount: number;
+    type: string;
 }
