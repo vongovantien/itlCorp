@@ -7,7 +7,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { SelectModule } from 'ng2-select';
-import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 import { NgProgressModule } from '@ngx-progressbar/core';
 
 const routing: Routes = [

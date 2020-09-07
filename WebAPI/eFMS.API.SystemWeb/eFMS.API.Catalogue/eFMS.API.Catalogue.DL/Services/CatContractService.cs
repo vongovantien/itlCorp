@@ -101,7 +101,20 @@ namespace eFMS.API.Catalogue.DL.Services
                 //    saleman.OfficeNameEn = office.BranchNameEn;
                 //    saleman.OfficeNameAbbr = office.ShortName;
                 //    saleman.OfficeNameVn = office.BranchNameVn;
-                //}
+                //}\
+                var officeIds = saleman.OfficeId.Split(";").ToList();
+                if(officeIds.Count() > 0)
+                {
+                    foreach (var officeId in officeIds)
+                    {
+                        saleman.OfficeNameAbbr += sysOfficeRepository.Get(x => x.Id == new Guid(officeId)).Select(t => t.ShortName).FirstOrDefault() + ";";
+                    }
+                }
+                if (saleman.OfficeNameAbbr.Length > 0)
+                {
+                    saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
+                }
+
 
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
@@ -128,7 +141,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
-                if (entity.isRequestApproval == true)
+                if (entity.IsRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
@@ -204,7 +217,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 DataContext.SubmitChanges();
-                if (model.isRequestApproval == true)
+                if (model.IsRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
@@ -600,6 +613,11 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (list.Count(x => x.ContractNo == item.ContractNo) > 1)
                     {
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
+                        item.IsValid = false;
+                    }
+                    if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
+                    {
+                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
                         item.IsValid = false;
                     }
                 }

@@ -15,4 +15,13 @@
     {
         public string Url;
     }
+
+    public class AuthenticationSetting
+    {
+        public string Authority;
+        public string RequireHttpsMetadata;
+        public string ApiName;
+        public string ApiSecret;
+        public string ApiKey;
+    }
 }

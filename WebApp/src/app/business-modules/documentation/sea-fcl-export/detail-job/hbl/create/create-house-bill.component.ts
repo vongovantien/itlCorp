@@ -10,6 +10,7 @@ import { InfoPopupComponent, ConfirmPopupComponent } from 'src/app/shared/common
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { Container } from 'src/app/shared/models/document/container.model';
 import { SystemConstants } from 'src/constants/system.const';
+import _groupBy from 'lodash/groupBy';
 import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
@@ -236,40 +237,36 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             );
     }
 
+    mapObjectData(containers: Container[]) {
+        const contObject = (containers || []).map((container: Container) => ({
+            contName: container.containerTypeName || '',
+            quantity: container.quantity,
+        }));
+        return contObject;
+    }
+
     updateInwordField(containers: Container[]): string {
+        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+        const contObject1 = this.mapObjectData(objApartOf);
+        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+        const contObject2 = this.mapObjectData(objNotApartOf);
+        const contDataNotAprtOf = [];
+        for (const item of Object.keys(_groupBy(contObject2, 'contName'))) {
+            contDataNotAprtOf.push({
+                contName: item,
+                quantity: _groupBy(contObject2, 'contName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+        console.log(contDataNotAprtOf);
         let containerDetail = '';
 
-        const contObject = (containers || []).map((container: Container) => ({
-            contName: container.description || '',
-            quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
-        }));
-
-        const contObjectFCL: any[] = (containers || []).map((container: Container | any) => ({
-            contName: container.description || '',
-            quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
-        }));
-        // const contData = [];
-        // for (const keyName of Object.keys(groupBy(contObject, 'contName'))) {
-        //     contData.push({
-        //         contName: keyName,
-        //         quantity: groupBy(contObject, 'contName')[keyName].map(i => i.quantity).reduce((a: any, b: any) => a += b),
-        //     });
-        // }
-        for (const item of contObjectFCL) {
-            if (!item.isPartContainer) {
-                containerDetail += this.handleStringCont(item);
-            }
+        for (const item of contDataNotAprtOf) {
+            containerDetail += this.handleStringCont(item);
         }
-
-        for (const item of contObject) {
-            if (item.isPartContainer) {
-                containerDetail += "A Part Of ";
-                containerDetail += this.handleStringPackage(item);
-            }
+        for (const item of contObject1) {
+            containerDetail += "A Part Of ";
+            containerDetail += this.handleStringPackage(item);
         }
-
         containerDetail = containerDetail.trim().replace(/\&$/, "");
         containerDetail += " Only." + "\n" + " SHIPPER´S LOAD, STOW, COUNT & SEAL. ";
         return containerDetail || '';

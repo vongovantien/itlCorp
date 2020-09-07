@@ -3,7 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TabsModule, ModalModule } from 'ngx-bootstrap';
+
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 import { ChargeConstants } from '@constants';
 import { NgxSpinnerModule } from 'ngx-spinner';
 

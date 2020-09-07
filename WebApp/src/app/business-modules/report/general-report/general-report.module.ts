@@ -5,7 +5,11 @@ import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, ModalModule, BsDropdownModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { GeneralReportComponent } from './general-report.component';
 import { GeneralReportFormSearchComponent } from './components/form-search-general-report/form-search-general-report.component';

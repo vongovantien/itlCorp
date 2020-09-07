@@ -63,7 +63,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     //
     initHeaders() {
         this.headers = [
-            { title: 'Office (branch)', field: 'officeName', sortable: true },
+            { title: 'Office (Branch)', field: 'officeName', sortable: true },
             { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
             { title: 'Billing', field: 'totalBillingAmount', sortable: true },
             { title: 'Billing Unpaid', field: 'totalBillingUnpaid', sortable: true },

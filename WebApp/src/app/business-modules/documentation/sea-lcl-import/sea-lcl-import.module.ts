@@ -3,7 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { TabsModule, PaginationModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 import { DeactivateGuardService } from '@core';
 import { CommonEnum } from '@enums';
 

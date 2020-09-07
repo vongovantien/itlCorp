@@ -12,7 +12,9 @@ import { CommercialDetailIncotermComponent } from './detail/detail-incoterm-comm
 import { CommercialFormIncotermComponent } from './components/form-incoterm/form-incoterm.component';
 import { CommercialListChargeIncotermComponent } from './components/list-charge/list-charge-incoterm.component';
 import { CommercialFormSearchIncotermComponent } from './components/form-search-incoterm/form-search-incoterm.component';
-import { TabsModule, PaginationModule } from 'ngx-bootstrap';
+
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 
 const routing: Routes = [

@@ -5,7 +5,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, ModalModule } from 'ngx-bootstrap';
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SheetDebitReportComponent } from './sheet-debit-report.component';
 import { SheetDebitReportFormSearchComponent } from './components/form-search-sheet-debit-report/form-search-sheet-debit-report.component';

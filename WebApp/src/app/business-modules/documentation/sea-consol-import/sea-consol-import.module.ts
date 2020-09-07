@@ -10,7 +10,7 @@ import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { SeaConsolImportComponent } from './sea-consol-import.component';
 import { DirectiveModule } from 'src/app/shared/directives/directive.module';
 import { SeaConsolImportCreateJobComponent } from './create-job/create-job-consol-import.component';
-import { TabsModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonEnum } from '@enums';
 import { SeaConsolImportDetailJobComponent } from './detail-job/detail-job-consol-import.component';
 import { SeaConsolImportManifestComponent } from './manifest/sea-consol-import-manifest.component';

@@ -9,7 +9,8 @@ import { DepartmentDetailComponent } from './detail/detail-department.component'
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'ng2-select';
-import { PaginationModule, TabsModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ShareSystemModule } from '../../share-system/share-system.module';
 import { ShareSystemDetailPermissionComponent } from '../../share-system/components/permission/permission-detail.component';
 const routing: Routes = [
