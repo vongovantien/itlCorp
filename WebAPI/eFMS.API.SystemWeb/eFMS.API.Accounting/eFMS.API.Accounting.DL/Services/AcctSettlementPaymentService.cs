@@ -511,26 +511,36 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
-            var settlement = DataContext.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransD = csTransactionDetailRepo.Get();
-            var csTrans = csTransactionRepo.Get();
+            IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get();
+            IQueryable<AcctSettlementPayment> settlement = DataContext.Get();
+            IQueryable<OpsTransaction> opsTrans = opsTransactionRepo.Get();
+            IQueryable<CsTransactionDetail> csTransD = csTransactionDetailRepo.Get();
+            IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
+            IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
+            IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
+            IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get();
 
-            var settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
+
+            AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return null;
             //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
-                var maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
-            var dataOperation = from sur in surcharge
+            IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                join cd in cdNos on opst.JobNo equals cd.JobNo into cdNoGroups // list các tờ khai theo job
+                                from cdNoGroup in cdNoGroups.DefaultIfEmpty()
                                 join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                 from settle in settle2.DefaultIfEmpty()
+                                join advanceRequest in advanceRequests on opst.Hblid equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
+                                from adGroup in adGroups.DefaultIfEmpty()
+                                join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                                from advGroup in advGroups.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
                                 {
@@ -541,14 +551,21 @@ namespace eFMS.API.Accounting.DL.Services
                                     CurrencyShipment = settle.SettlementCurrency,
                                     TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                     ShipmentId = opst.Id,
-                                    Type = "OPS"
+                                    Type = "OPS",
+                                    CustomNo = cdNoGroup.ClearanceNo,
+                                    AdvanceNo = adGroup.AdvanceNo,
+                                    AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency), // Quy tỉ giá về settle
                                 };
-            var dataDocument = from sur in surcharge
+            IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                from settle in settle2.DefaultIfEmpty()
+                               join advanceRequest in advanceRequests on cstd.Id equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
+                               from adGroup in adGroups.DefaultIfEmpty()
+                               join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                               from advGroup in advGroups.DefaultIfEmpty()
                                where sur.SettlementCode == settlementNo
                                select new ShipmentSettlement
                                {
@@ -560,12 +577,14 @@ namespace eFMS.API.Accounting.DL.Services
                                    TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                    HblId = cstd.Id,
                                    ShipmentId = cst.Id,
-                                   Type = "DOC"
+                                   Type = "DOC",
+                                   AdvanceNo = adGroup.AdvanceNo,
+                                   AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency),
                                };
-            var dataQuery = dataOperation.Union(dataDocument);
+            IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
 
             var dataGroup = dataQuery.ToList()
-                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId })
+                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo})
                         .Select(x => new ShipmentSettlement
                         {
                             SettlementNo = x.Key.SettlementNo,
@@ -576,11 +595,15 @@ namespace eFMS.API.Accounting.DL.Services
                             TotalAmount = x.Sum(su => su.TotalAmount),
                             HblId = x.Key.HblId,
                             Type = x.Key.Type,
-                            ShipmentId = x.Key.ShipmentId
+                            ShipmentId = x.Key.ShipmentId,
+                            CustomNo = x.Key.CustomNo,
+                            AdvanceNo = x.Key.AdvanceNo,
+                            AdvanceAmount = x.Sum(a => a.AdvanceAmount),
+                            Balance = x.Sum(su => su.TotalAmount) - x.Sum(a => a.AdvanceAmount), // settleAmount - AdvanceAmount
                         });
 
-            var shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (var item in dataGroup)
+            List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
+            foreach (ShipmentSettlement item in dataGroup)
             {
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
@@ -593,10 +616,14 @@ namespace eFMS.API.Accounting.DL.Services
                     ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
-                    Type = item.Type
-                }
-                );
+                    Type = item.Type,
+                    CustomNo =item.CustomNo,
+                    AdvanceNo = item.AdvanceNo,
+                    AdvanceAmount = item.AdvanceAmount,
+                    Balance = item.Balance
+                });
             }
+
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
         }
 
