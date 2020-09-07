@@ -11,9 +11,9 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shar
 import { ReportPreviewComponent } from 'src/app/shared/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
-import { IAppState } from '@store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
-import { SelectPartner, SelectRequester } from '../accounting-management/store';
+import { SelectRequester } from '../accounting-management/store';
 
 @Component({
     selector: 'app-settlement-payment',
@@ -75,6 +75,8 @@ export class SettlementPaymentComponent extends AppList {
         ];
         this.getUserLogged();
         this.getListSettlePayment(this.dataSearch);
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
     }
 

@@ -345,6 +345,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.isFromShipment = true;
         newSurCharge.invoiceDate = null;
         newSurCharge.invoiceNo = null;
+        newSurCharge.soano = null;
+        newSurCharge.paySoano = null;
 
         this.addSurcharges(type, newSurCharge);
     }
