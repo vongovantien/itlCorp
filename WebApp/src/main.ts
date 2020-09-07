@@ -7,6 +7,7 @@ import { environment } from './environments/environment';
 if (environment.production) {
   enableProdMode();
 
+  // * Open when release
   if (window) {
     // * Clear console.log
     window.console.log = function () { };
