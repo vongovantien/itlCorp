@@ -304,6 +304,10 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             containerDetail = containerDetail.substring(0, containerDetail.length - 5);
         }
 
+        containerDetail = containerDetail += " Only.";
+
+
+
         return containerDetail;
     }
 

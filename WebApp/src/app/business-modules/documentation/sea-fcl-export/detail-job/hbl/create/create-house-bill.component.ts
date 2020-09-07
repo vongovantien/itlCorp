@@ -238,7 +238,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
     mapObjectData(containers: Container[]) {
         const contObject = (containers || []).map((container: Container) => ({
-            contName: container.containerTypeName || '',
+            contName: container.description || '',
             quantity: container.quantity,
         }));
         return contObject;
