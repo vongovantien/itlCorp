@@ -1108,6 +1108,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     Type = sur.Type,
                                     SettlementCode = sur.SettlementCode,
                                     ChargeId = sur.ChargeId,
+                                    ChargeCode = cc.Code,
                                     ChargeName = cc.ChargeNameEn,
                                     Quantity = sur.Quantity,
                                     UnitId = sur.UnitId,
@@ -1155,6 +1156,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    Type = sur.Type,
                                    SettlementCode = sur.SettlementCode,
                                    ChargeId = sur.ChargeId,
+                                   ChargeCode = cc.Code,
                                    ChargeName = cc.ChargeNameEn,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
@@ -1619,17 +1621,33 @@ namespace eFMS.API.Accounting.DL.Services
                            Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn.ToUpper() : string.Empty,
                            Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn.ToUpper() : string.Empty,
                            ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : string.Empty,
-                           GW = opst.SumGrossWeight.HasValue ? opst.SumGrossWeight.Value : 0,
-                           NW = opst.SumNetWeight.HasValue ? opst.SumNetWeight.Value : 0,
+                           GW = (opst.SumGrossWeight ?? cstd.GrossWeight),
+                           NW = (opst.SumNetWeight ?? cstd.NetWeight),
                            CustomsId = (sur.ClearanceNo == null ? string.Empty : sur.ClearanceNo),
-                           PSC = opst.SumPackages.HasValue ? opst.SumPackages.Value : 0,
-                           CBM = opst.SumCbm.HasValue ? opst.SumCbm.Value : 0,
+                           PSC = (opst.SumPackages ?? cstd.PackageQty),
+                           CBM = (opst.SumCbm ?? cstd.Cbm),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            MBL = (opst.Mblno == null ? (cst.Mawb ?? string.Empty) : opst.Mblno),
                            StlCSName = string.Empty
                        };
-
-            return data.OrderByDescending(x => x.JobId).FirstOrDefault();
+            data = data.OrderByDescending(x => x.JobId);
+            var result = new AscSettlementPaymentRequestReportParams();
+            result.JobId = data.First().JobId;
+            result.AdvDate = data.First().AdvDate;
+            result.SettlementNo = data.First().SettlementNo;
+            result.Customer = data.First().Customer;
+            result.Consignee = data.First().Consignee;
+            result.Consigner = data.First().Consigner;
+            result.ContainerQty = data.First().ContainerQty;
+            result.GW = data.Sum(sum => sum.GW);
+            result.NW = data.Sum(sum => sum.NW);
+            result.CustomsId = data.First().CustomsId;
+            result.PSC = data.Sum(sum => sum.PSC);
+            result.CBM = data.Sum(sum => sum.CBM);
+            result.HBL = data.First().HBL;
+            result.MBL = data.First().MBL;
+            result.StlCSName = data.First().StlCSName;
+            return result;
         }
 
         public IQueryable<AscSettlementPaymentRequestReport> GetChargeOfSettlement(string settlementNo, string currency)
