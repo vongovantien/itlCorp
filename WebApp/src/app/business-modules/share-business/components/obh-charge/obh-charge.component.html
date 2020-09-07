@@ -79,6 +79,7 @@
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment || (isLocked | async) === true;else  payerCharge">
@@ -122,6 +123,7 @@
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -167,6 +169,7 @@
                                     || !!charge.debitNo 
                                     || !!charge.settlementCode
                                     || !!charge.soano
+                                    || !!charge.paySoano
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
                                     || !charge.isFromShipment 
@@ -203,6 +206,7 @@
                                                 || !!charge.creditNo 
                                                 || !!charge.settlementCode
                                                 || !!charge.soano
+                                                || !!charge.paySoano
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !charge.isFromShipment 
@@ -215,6 +219,7 @@
                                                 || !!charge.creditNo 
                                                 || !!charge.settlementCode
                                                 || !!charge.soano
+                                                || !!charge.paySoano
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !charge.isFromShipment ? 'disabled': null">
@@ -233,6 +238,7 @@
                                         || !!charge.debitNo  
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment || (isLocked | async) === true; else unit">
@@ -259,6 +265,7 @@
                                         || !!charge.debitNo  
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -279,6 +286,7 @@
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -304,6 +312,7 @@
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -330,6 +339,7 @@
                                         || !!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment ? 'disabled': null">
@@ -344,6 +354,7 @@
                                         || !!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment ? 'disabled': null">
@@ -356,6 +367,7 @@
                                         || !!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment ? 'disabled': null">
@@ -367,6 +379,7 @@
                                         || !!charge.creditNo  
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -405,8 +418,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.settlementCode" disabled
-                                        readonly>
+                                    <input type="text" class="form-control text-primary"
+                                        [(ngModel)]="charge.settlementCode" disabled readonly>
                                 </div>
                             </td>
                             <td>
@@ -415,6 +428,7 @@
                                         || !!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.soano
+                                        || !!charge.paySoano
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment 
@@ -447,7 +461,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherId">
+                                    <input type="text" class="form-control text-primary" disabled
+                                        [(ngModel)]="charge.voucherId">
                                 </div>
                             </td>
                             <td class="disabled">
@@ -458,7 +473,8 @@
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">
-                                    <input type="text" class="form-control" disabled [(ngModel)]="charge.voucherIdre">
+                                    <input type="text" class="form-control text-primary" disabled
+                                        [(ngModel)]="charge.voucherIdre">
                                 </div>
                             </td>
                             <td class="disabled">
