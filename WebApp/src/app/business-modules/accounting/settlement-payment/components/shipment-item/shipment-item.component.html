@@ -42,16 +42,51 @@
         </div>
     </div>
     <div class="col-lg-2">
-        <div class="d-flex align-items-center">
-            <span class="font-weight-bold">Total Amount:</span>
-            &nbsp;
-            <span> {{data.totalAmount | number: '.0-3'}} </span>
-            &nbsp;
-            <span> {{ data.currencyShipment | uppercase }} </span>
+        <div class="d-flex">
+            <span class="font-weight-bold">Cus No:</span>
+            <span> {{data.customNo}} </span>
         </div>
     </div>
+
     <div class="col-lg-2">
         <a (click)="showPaymentManagement($event, data)" class="text-underline text-primary">Payment
             Management</a>
+    </div>
+    <div class="col-lg-2">
+    </div>
+    <div class="col-lg-2">
+        <div class="d-flex align-items-center">
+            <span class="font-weight-bold">Total:</span>
+            &nbsp;
+            <span> {{data.totalAmount | number: '.0-3'}} </span>
+            <!-- &nbsp; -->
+            <!-- <span> {{ data.currencyShipment | uppercase }} </span> -->
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="d-flex align-items-center">
+            <span class="font-weight-bold">Adv No:</span>
+            &nbsp;
+            <span> {{data.advanceNo}}</span>
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="d-flex align-items-center">
+            <span class="font-weight-bold">Adv Amount:</span>
+            &nbsp;
+            <span> {{data.advanceAmount | number: '.0-3'}} </span>
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="d-flex align-items-center">
+            <span class="font-weight-bold">Balance:</span>
+            &nbsp;
+            <ng-container *ngIf="data.balance >= 0 ; else negativeBalance">
+                <span> {{data.balance | negativeNumber | number: '.0-3'}} </span>
+            </ng-container>
+            <ng-template #negativeBalance>
+                <span> ({{data.balance | abs | number: '.0-3'}}) </span>
+            </ng-template>
+        </div>
     </div>
 </div>

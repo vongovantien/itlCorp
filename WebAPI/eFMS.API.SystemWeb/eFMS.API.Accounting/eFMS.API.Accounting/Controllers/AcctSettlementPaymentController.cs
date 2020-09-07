@@ -173,7 +173,7 @@ namespace eFMS.API.Accounting.Controllers
                 chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo);
                 chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).ToList();
             }
-            var data = new { settlement = settlement, chargeGrpSettlement = chargeGrpSettlement, chargeNoGrpSettlement = chargeNoGrpSettlement };
+            var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
         }
 
