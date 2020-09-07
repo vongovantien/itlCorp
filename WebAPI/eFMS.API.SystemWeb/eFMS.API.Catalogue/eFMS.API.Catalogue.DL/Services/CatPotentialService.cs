@@ -40,6 +40,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             try
             {
+                model.Potential.Active = true;
                 model.Potential.Id = Guid.NewGuid();
                 model.Potential.UserCreated = currentUser.UserID;
                 model.Potential.DatetimeCreated = DateTime.Now;

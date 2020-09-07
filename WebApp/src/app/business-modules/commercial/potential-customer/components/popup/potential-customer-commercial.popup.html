@@ -1,5 +1,5 @@
-<div class="modal fade" role="dialog" bsModal>
-    <div class="modal-dialog modal-xs" role="document">
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} currency</h5>
@@ -9,35 +9,123 @@
             </div>
             <div class="modal-body">
                 <form class="m-form m-form--state">
-                    <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
-                        <label class="col-lg-4 col-form-label form-control-label" required> Currency Code </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square"
-                                placeholder="Please enter currency code"
-                                [attr.disabled]="!isUpdate ? null : 'disabled'">
-                        </div>
-                    </div>
-                    <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
-                        <label class="col-lg-4 col-form-label form-control-label" required> Currency name </label>
-                        <div class="col-lg-8">
-                            <input type="text" class="form-control m-input m-input--square"
-                                placeholder="Please enter currency name">
-                        </div>
-                    </div>
-                    <ng-container *ngIf="isUpdate">
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label"> Default </label>
-                            <div class="col-lg-8">
-
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                                <label class="col-lg-4 col-form-label form-control-label"> English Name
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter English Name"
+                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label class="col-lg-4 col-form-label form-control-label"> Active </label>
-                            <div class="col-lg-8">
-
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                                <label class="col-lg-4 col-form-label form-control-label"> Local Name
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Local Name">
+                                </div>
                             </div>
                         </div>
-                    </ng-container>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                                <label class="col-lg-4 col-form-label form-control-label"> Taxcode
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Taxcode"
+                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                                <label class="col-lg-4 col-form-label form-control-label"> Tel
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Tel">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                                <label class="col-lg-4 col-form-label form-control-label"> Address
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Address"
+                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                                <label class="col-lg-4 col-form-label form-control-label"> Email
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Email">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                                <label class="col-lg-4 col-form-label form-control-label"> Margin
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Margin"
+                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                                <label class="col-lg-4 col-form-label form-control-label"> Quotation
+                                </label>
+                                <div class="col-lg-8">
+                                    <input type="text" class="form-control m-input m-input--square"
+                                        placeholder="Please enter Quotation">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                                <label class="col-lg-4 col-form-label form-control-label"> Type
+                                </label>
+                                <div class="col-lg-8">
+
+                                    <ng-select [items]="potentialTypes">
+                                    </ng-select>
+
+                                </div>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="isUpdate">
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 col-form-label form-control-label"> Active </label>
+                                    <div class="col-lg-8">
+                                        <app-switch [(toggle)]="active.value" (toggleChange)="active.setValue($event)">
+                                        </app-switch>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

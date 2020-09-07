@@ -77,7 +77,9 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     }
     //
     checkAllowDetail(T: any): void {
-        throw new Error("Method not implemented.");
+        //throw new Error("Method not implemented.");
+        [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [true, false];
+        this.potentialCustomerPopup.show();
     }
     //
     checkAllowDelete(T: any): void {
@@ -96,6 +98,7 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     }
     //
     addNew() {
+        [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [false, false];
         this.potentialCustomerPopup.show();
     }
 }
