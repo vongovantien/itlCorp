@@ -20,14 +20,13 @@ namespace eFMS.API.ForPartner.DL.Models
         public decimal? ExchangeRate { get; set; }
         public string VatPartnerId { get; set; }
         public string VatPartnerName { get; set; }
-        public string CdNoteNo { get; set; }
+        public string DebitNo { get; set; }
         public string SoaNo { get; set; }
         public string InvoiceNo { get; set; }
         public string Serie { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
-        public Guid? AcctManagementId { get; set; }
         public string PartnerMode { get; set; }
         public string PartnerLocation { get; set; }
         public string PartnerReference { get; set; }
