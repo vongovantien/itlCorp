@@ -3,12 +3,13 @@ import { AppList, IPermissionBase } from 'src/app/app.list';
 import { POTENTIALCUSTOMERCOLUMNSETTING } from './commercial-potential-customer.component.columns';
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
-import { CatPotentialModel } from '@models';
+import { CatPotentialModel, PotentialUpdateModel } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-commercial-potential-customer',
@@ -76,8 +77,30 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
         this.potentialCustomers = this._sortService.sort(this.potentialCustomers, sortField, order);
     }
     //
-    checkAllowDetail(T: any): void {
-        //throw new Error("Method not implemented.");
+    checkAllowDetail(potentialId: string): void {
+        this._catalogueRepo.checkAllowGetDetailPotential(potentialId)
+            .pipe(
+                switchMap(
+                    (res: boolean) => {
+                        if (res) {
+                            this._progressRef.start();
+                            return this._catalogueRepo.getDetailPotential(potentialId);
+                        } else {
+                            return of(false);
+                        }
+                    }
+                ),
+            )
+            .subscribe(
+                (res: PotentialUpdateModel | boolean) => {
+                    if (typeof res === "boolean") {
+
+                    }
+                    else {
+
+                    }
+                }
+            );
         [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [true, false];
         this.potentialCustomerPopup.show();
     }
@@ -99,7 +122,14 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     //
     addNew() {
         [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [false, false];
+        this.potentialCustomerPopup.initForm();
         this.potentialCustomerPopup.show();
     }
+    //
+    handleChangePotentialPopup(event: any) {
+        this.dataSearch = {};
+        this.getPotentialCustomerListPaging();
+    }
+
 }
 

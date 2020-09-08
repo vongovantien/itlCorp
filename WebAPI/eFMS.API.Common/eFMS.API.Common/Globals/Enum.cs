@@ -178,7 +178,7 @@
         commercialCustomer,
         commercialAgent,
         commercialIncoterm,
-        catPotential,
+        commercialPotential,
     }
     public enum UnlockTypeEnum
     {

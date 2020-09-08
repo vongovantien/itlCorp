@@ -10,13 +10,13 @@ export class CatPotentialCustomer {
     tel: string = null;
     email: string = null;
     active?: boolean = null;
-    margin: string = null;
-    quotation: string = null;
+    margin: number = null;
+    quotation: number = null;
     potentialType: string = null;
     datetimeCreated?: Date = null;
     datetimeModified?: Date = null;
-    userCreated: string = SystemConstants.EMPTY_GUID;
-    userModified: string = SystemConstants.EMPTY_GUID;
+    userCreated: string = null;
+    userModified: string = null;
 
     // Custom
 
@@ -28,6 +28,19 @@ export class CatPotentialModel extends CatPotentialCustomer {
 
     constructor(object: Object) {
         super();
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key)) {
+                self[key] = object[key];
+            }
+        }
+    }
+};
+
+export class PotentialUpdateModel {
+    potential: CatPotentialModel = null;
+    constructor(object: Object) {
+
         const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key)) {

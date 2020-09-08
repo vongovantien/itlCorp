@@ -43,7 +43,7 @@
                                 <div class="table-actions" style="width: 70px">
                                     <app-permission-button type="detail" (click)="checkAllowDetail(item.id)">
                                     </app-permission-button>
-                                    <app-permission-button type="delete" *ngIf="item.active === false"
+                                    <app-permission-button type="delete" *ngIf="item.active === true"
                                         (click)="checkAllowDelete(item.id)">
                                     </app-permission-button>
                                 </div>
@@ -95,4 +95,5 @@
         </div>
     </div>
 </div>
-<potential-customer-commercial-popup #popupPotential></potential-customer-commercial-popup>
+<potential-customer-commercial-popup (onChange)="handleChangePotentialPopup($event)">
+</potential-customer-commercial-popup>

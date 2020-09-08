@@ -5,6 +5,7 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Provider.Services.IService;
 using eFMS.IdentityServer.DL.UserManager;
@@ -84,9 +85,37 @@ namespace eFMS.API.Catalogue.DL.Services
             
         }
 
-        public CatPotentialModel GetDetail(Guid id)
+        public CatPotentialEditModel GetDetail(Guid id)
         {
-            throw new NotImplementedException();
+            CatPotentialEditModel potentialDataViewModel = new CatPotentialEditModel();
+            CatPotential potential = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            CatPotentialModel potentialModel = mapper.Map<CatPotentialModel>(potential);
+
+            // Update permission
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            PermissionRange permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = potential.UserCreated,
+                CompanyId = potential.CompanyId,
+                DepartmentId = potential.DepartmentId,
+                OfficeId = potential.OfficeId,
+                GroupId = potential.GroupId
+            };
+            potentialDataViewModel.Permission = new PermissionAllowBase
+            {
+                AllowUpdate = PermissionExtention.GetPermissionDetail(permissionRangeWrite, baseModel, currentUser),
+            };
+            SysUser userCreated = sysUserRepository.Get(u => u.Id == potentialModel.UserCreated).FirstOrDefault();
+            SysUser userModified = sysUserRepository.Get(u => u.Id == potentialModel.UserModified).FirstOrDefault();
+
+            potentialDataViewModel.Potential = new CatPotentialModel();
+            potentialDataViewModel.Potential = potentialModel;
+            potentialDataViewModel.Potential.UserCreatedName = userCreated != null ? userCreated.Username : "Admin";
+            potentialDataViewModel.Potential.UserModified = userModified != null ? userModified.Username : "Admin";
+
+            return potentialDataViewModel;
         }
 
         public IQueryable<CatPotentialModel> Paging(CatPotentialCriteria criteria, int page, int size, out int rowsCount)
@@ -278,7 +307,25 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public bool CheckAllowPermissionAction(Guid id, PermissionRange range)
         {
-            throw new NotImplementedException();
+            CatPotential potential = DataContext.Get(o => o.Id == id).FirstOrDefault();
+            if (potential == null)
+            {
+                return false;
+            }
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = potential.UserCreated,
+                CompanyId = potential.CompanyId,
+                DepartmentId = potential.DepartmentId,
+                OfficeId = potential.OfficeId,
+                GroupId = potential.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, range, currentUser);
+
+            if (code == 403) return false;
+
+            return true;
         }
     }
 }

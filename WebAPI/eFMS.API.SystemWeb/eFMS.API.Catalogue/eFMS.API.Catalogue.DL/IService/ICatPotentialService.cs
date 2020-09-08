@@ -18,6 +18,6 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState Update(CatPotentialEditModel model);
         HandleState AddNew(CatPotentialEditModel model);
         HandleState Delete(Guid Id);
-        CatPotentialModel GetDetail(Guid id);
+        CatPotentialEditModel GetDetail(Guid id);
     }
 }

@@ -2,116 +2,143 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} currency</h5>
+                <h5 class="modal-title">{{isUpdate ? 'Update' : 'Add'}} Potential Customer</h5>
                 <button type="button" class="close" aria-label="Close" (click)=hide()>
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form class="m-form m-form--state">
+                <form class="m-form m-form--state" [formGroup]="formPotential">
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
-                                <label class="col-lg-4 col-form-label form-control-label"> English Name
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !nameEn.valid}">
+                                <label class="col-lg-4 col-form-label form-control-label" required> English Name
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter English Name"
-                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                        formControlName="nameEn" placeholder="Please enter English Name">
+                                    <div class="form-control-feedback text-danger" *ngIf="isSubmitted && !nameEn.valid">
+                                        English name field was required!
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                            <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Local Name
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Local Name">
+                                        formControlName="nameLocal" placeholder="Please enter Local Name">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
-                                <label class="col-lg-4 col-form-label form-control-label"> Taxcode
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !taxcode.valid}">
+                                <label class="col-lg-4 col-form-label form-control-label" required> Taxcode
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Taxcode"
-                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                        formControlName="taxcode" placeholder="Please enter Taxcode">
+                                    <div class="form-control-feedback text-danger"
+                                        *ngIf="isSubmitted && !taxcode.value">
+                                        Taxcode field was required!
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && 
+                                        ((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength'))">
+                                        Tax Code include 8 - 14 characters!
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && taxcode.errors  | equalError:'pattern'">
+                                        Tax Code invalid
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                            <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Tel
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Tel">
+                                        formControlName="tel" placeholder="Please enter Tel">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                            <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Address
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Address"
-                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                        formControlName="address" placeholder="Please enter Address">
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                            <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Email
                                 </label>
                                 <div class="col-lg-8">
                                     <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Email">
+                                        formControlName="email" placeholder="Please enter Email">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !margin.valid}">
                                 <label class="col-lg-4 col-form-label form-control-label"> Margin
                                 </label>
                                 <div class="col-lg-8">
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Margin"
-                                        [attr.disabled]="!isUpdate ? null : 'disabled'">
+                                    <input type="number" class="form-control m-input m-input--square"
+                                        formControlName="margin" placeholder="Please enter Margin">
+
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && 
+                                        ((margin.errors | equalError:'max') || (margin.errors | equalError:'min'))">
+                                        Margin must be from 0 to 100 %
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted }">
+                            <div class="form-group row"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && !quotation.valid}">
                                 <label class="col-lg-4 col-form-label form-control-label"> Quotation
                                 </label>
                                 <div class="col-lg-8">
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        placeholder="Please enter Quotation">
+                                    <input type="number" class="form-control m-input m-input--square"
+                                        formControlName="quotation" placeholder="Please enter Quotation">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && quotation.errors  | equalError:'pattern'">
+                                        Quotation invalid
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group row" [ngClass]="{ 'm-form__group has-danger': isSubmitted}">
+                            <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Type
                                 </label>
                                 <div class="col-lg-8">
-
-                                    <ng-select [items]="potentialTypes">
+                                    <ng-select [items]="potentialTypes" bindLabel="text"
+                                        formControlName="potentialType">
                                     </ng-select>
-
                                 </div>
+
                             </div>
                         </div>
                         <ng-container *ngIf="isUpdate">
@@ -129,8 +156,8 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <app-default-button [buttonSetting]="saveButtonSetting"></app-default-button>
-                <app-default-button [buttonSetting]="cancelButtonSetting"></app-default-button>
+                <app-default-button [buttonSetting]="saveButtonSetting" (click)="handleSubmit()"></app-default-button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="hide()"></app-default-button>
             </div>
         </div>
     </div>

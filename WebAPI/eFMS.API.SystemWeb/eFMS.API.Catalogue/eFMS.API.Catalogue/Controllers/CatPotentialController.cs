@@ -62,7 +62,7 @@ namespace eFMS.API.Catalogue.Controllers
             PermissionRange permissionRange;
             ICurrentUser _user = null;
 
-            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPotential);
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
 
             /*if(_user.UserMenuPermission == null)
             {
@@ -156,6 +156,31 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+        //
+        [HttpDelete]
+        [Route("GetById/{id}")]
+        [Authorize]
+        public IActionResult GetById(Guid id)
+        {
+            CatPotentialEditModel result = catPotentialService.GetDetail(id);
+            return Ok(result);
+        }
+        //
+        [HttpGet("CheckAllowDetail/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            var charge = catPotentialService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            return Ok(catPotentialService.CheckAllowPermissionAction(id, permissionRange));
         }
         //
         private bool CheckExistPotential(Guid Id, string Taxcode)
