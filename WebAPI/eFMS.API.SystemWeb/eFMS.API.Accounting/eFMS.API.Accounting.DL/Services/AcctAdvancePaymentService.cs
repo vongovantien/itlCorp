@@ -2949,7 +2949,10 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AcctAdvanceRequestModel> GetAdvancesOfShipment()
         {
-            var request = acctAdvanceRequestRepo.Get();
+            //Advance Payment has Status Approve is Done
+            var request = from ar in acctAdvanceRequestRepo.Get()
+                          join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
+                          select ar;
             var opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             var docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             var surcharge = csShipmentSurchargeRepo.Get();
