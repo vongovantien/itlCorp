@@ -71,7 +71,7 @@
         "ngx-cookie-service": "^2.1.0",
         "ngx-currency": "^2.0.0",
         "ngx-daterangepicker-material": "^2.1.8",
-        "ngx-mask": "^10.0.1",
+        "ngx-mask": "^8.2.0",
         "ngx-perfect-scrollbar": "^7.0.0",
         "ngx-spinner": "^8.0.3",
         "ngx-toastr": "^9.1.0",

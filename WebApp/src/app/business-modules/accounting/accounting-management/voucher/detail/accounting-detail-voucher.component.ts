@@ -103,7 +103,10 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             return;
         }
 
-        this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.voucherId)
+        console.log(this.listChargeComponent.charges);
+
+
+        /* this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.voucherId)
             .pipe(
                 switchMap(
                     (res: boolean) => {
@@ -154,7 +157,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                         this.listChargeComponent.updateTotalAmount();
                     }
                 },
-            );
+            ); */
     }
 
     saveVoucher(body: AccAccountingManagementModel) {
