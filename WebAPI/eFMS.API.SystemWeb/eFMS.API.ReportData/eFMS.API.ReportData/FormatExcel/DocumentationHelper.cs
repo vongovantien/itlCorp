@@ -1092,23 +1092,23 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[1, 1, 28, 14].Style.Font.Name = "MS Sans Serif";
             workSheet.Cells[1, 1, 28, 14].Style.Font.Size = 10;
 
+            workSheet.Cells["B1:F4"].Merge = true;
+            workSheet.Cells["B1:F4"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Cells["B1"].Style.Font.Bold = true;
-            workSheet.Cells["B1"].Value = "INDO TRANS LOGISTICS CORPORATION";
+            workSheet.Cells["B1"].Style.WrapText = true;
+            workSheet.Cells["B1"].Value = airwayBillExport.Shipper?.ToUpper();
 
-            workSheet.Cells["B2"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
-            workSheet.Cells["B3"].Value = "HOCHIMINH CITY, VIETNAM.";
+            workSheet.Cells["B7"].Style.Font.Bold = true;
+            workSheet.Cells["B7"].Value = "INDO TRANS LOGISTICS CORPORATION";
+
+            workSheet.Cells["B8"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST,";
+            workSheet.Cells["B9"].Value = "HOCHIMINH CITY, VIETNAM.";
 
             workSheet.Row(4).Height = 29.25;
             workSheet.Row(4).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Cells["B4"].Value = "84 8 39486888";
             workSheet.Cells["D4"].Value = "84 8 8488593";
-
-            workSheet.Cells["B7:F10"].Merge = true;
-            workSheet.Cells["B7:F10"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Cells["B7"].Style.Font.Bold = true;
-            workSheet.Cells["B7"].Style.WrapText = true;
-            workSheet.Cells["B7"].Value = airwayBillExport.Shipper?.ToUpper();
-
+           
             workSheet.Cells["B14:F17"].Merge = true;
             workSheet.Cells["B14:F17"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Cells["B14"].Style.Font.Bold = true;
@@ -1152,15 +1152,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[1, 1, 19, 14].Style.Font.Name = "MS Sans Serif";
             workSheet.Cells[1, 1, 19, 14].Style.Font.Size = 10;
             workSheet.Cells[1, 1, 19, 14].Style.Font.Bold = true;
+            
+            workSheet.Cells["B2:F6"].Merge = true;
+            workSheet.Cells["B2:F6"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["B2"].Style.WrapText = true;
+            workSheet.Cells["B2"].Value = airwayBillExport.Shipper?.ToUpper();
 
-            workSheet.Cells["B2"].Value = "INDO TRANS LOGISTICS (ITL) .MST: 0301909173";
-            workSheet.Cells["B3"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST, HOCHIMINH CITY";
-            workSheet.Cells["B4"].Value = "TEL: 84 8 8488567. FAX: 84 8 8488593";
-
-            workSheet.Cells["B8:F12"].Merge = true;
-            workSheet.Cells["B8:F12"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            workSheet.Cells["B8"].Style.WrapText = true;
-            workSheet.Cells["B8"].Value = airwayBillExport.Shipper?.ToUpper();
+            workSheet.Cells["B9"].Value = "INDO TRANS LOGISTICS (ITL) .MST: 0301909173";
+            workSheet.Cells["B10"].Value = "52-54-56 TRUONG SON STR., TAN BINH DIST, HOCHIMINH CITY";
+            workSheet.Cells["B11"].Value = "TEL: 84 8 8488567. FAX: 84 8 8488593";
 
             workSheet.Cells["C15:G19"].Merge = true;
             workSheet.Cells["C15:G19"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
