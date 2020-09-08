@@ -851,7 +851,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in dataOpertation)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
-                data.ServiceName = item.ProductService;
+                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 data.JobNo = item.JobNo;
                 data.PolPod = catPlaceRepo.Get(x => x.Id == item.Pol).Select(t => t.Code).FirstOrDefault() + "/" + catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.Code).FirstOrDefault();
                 data.Shipper = catPartnerRepo.Get(x => x.Id == item.Shipper).FirstOrDefault()?.PartnerNameEn;
