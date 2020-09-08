@@ -541,7 +541,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
 
             var dataGroup = dataQuery.ToList()
-                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo})
+                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo, x.TotalAmount})
                         .Select(x => new ShipmentSettlement
                         {
                             SettlementNo = x.Key.SettlementNo,
@@ -549,7 +549,7 @@ namespace eFMS.API.Accounting.DL.Services
                             HBL = x.Key.HBL,
                             MBL = x.Key.MBL,
                             CurrencyShipment = x.Key.CurrencyShipment,
-                            TotalAmount = x.Sum(su => su.TotalAmount),
+                            TotalAmount = x.Key.TotalAmount,
                             HblId = x.Key.HblId,
                             Type = x.Key.Type,
                             ShipmentId = x.Key.ShipmentId,
