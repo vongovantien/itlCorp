@@ -212,15 +212,18 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             let _jobIds = [];
             let _hbls = [];
             let _mbls = [];
+            let _customNo = [];
             _jobIds = this.mapShipment("JOBID");
             _hbls = this.mapShipment("HBL");
             _mbls = this.mapShipment("MBL");
-            const _customNo: any[] = this.mapShipment("CustomNo");
+            _customNo = this.mapShipment("CustomNo");
             if (this.selectedShipmentData) {
                 _jobIds.push(this.selectedShipmentData.jobId);
                 _hbls.push(this.selectedShipmentData.hbl);
                 _mbls.push(this.selectedShipmentData.mbl);
-                _customNo.push(this.selectedShipmentData.customNo);
+                if (!!this.selectedShipmentData.customNo) {
+                    _customNo.push(this.selectedShipmentData.customNo);
+                }
             }
             const body = {
                 partnerId: this.selectedPartnerData.id,
