@@ -35,8 +35,8 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
                 { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
                 { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
-                { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-                { title: 'Serie', field: 'serie', sortable: true },
+                { title: 'Invoice No', field: 'invoiceNo', sortable: true, width: 100 },
+                { title: 'Serie', field: 'serie', sortable: true, width: 100 },
                 { title: 'Invoice Date', field: 'invoiceDate', sortable: true, width: 150 },
                 { title: 'OBH Partner', field: 'obhPartner', sortable: true },
                 { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
@@ -117,9 +117,9 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
                         this.charges.forEach(c => {
                             if (!!c.invoiceDate) {
-                                c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd-MM-yyyy', 'en');
+                                c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
                             }
-                        })
+                        });
                     } else {
                         this._toastService.warning("Charge has existed in list");
                         return;

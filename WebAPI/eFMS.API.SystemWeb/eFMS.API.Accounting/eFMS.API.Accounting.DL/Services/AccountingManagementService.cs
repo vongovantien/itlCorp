@@ -1045,6 +1045,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     surchargeOfAcct.VoucherId = null;
                                     surchargeOfAcct.VoucherIddate = null;
+
+                                    // CR: 14344
+                                    surchargeOfAcct.InvoiceNo = null;
+                                    surchargeOfAcct.InvoiceDate = null;
+                                    surchargeOfAcct.SeriesNo = null;
+
                                 }
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                                 {
@@ -1070,6 +1076,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.VoucherId = accounting.VoucherId;
                                     charge.VoucherIddate = accounting.Date;
+
+                                    // CR: 14344
+                                    charge.InvoiceNo = chargeOfAcct.InvoiceNo;
+                                    charge.InvoiceDate = chargeOfAcct.InvoiceDate;
+                                    charge.SeriesNo = chargeOfAcct.Serie;
                                 }
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                                 {

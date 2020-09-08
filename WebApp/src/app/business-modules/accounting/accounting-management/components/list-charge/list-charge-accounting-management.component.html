@@ -73,13 +73,16 @@
                             <td>{{charge.amountVnd | number: '.0-3'}}</td>
                             <td>{{charge.vatAmountVnd | number: '.0-3'}}</td>
                             <ng-container *ngIf="type !== 'invoice'">
-                                <td>{{charge.invoiceNo}}</td>
-                                <td>{{charge.serie}}</td>
-                                <!-- <td>{{charge.invoiceDate | date: 'dd/MM/yyyy'}}</td> -->
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="charge.serie">
+                                </td>
                                 <td>
                                     <input type="text" mask="d0/M0/0000" class="form-control"
-                                        [(ngModel)]="charge.invoiceDate"
-                                        [value]="charge.invoiceDate | mask:'00/00/0000'" />
+                                        [(ngModel)]="charge.invoiceDate" />
+                                    <!-- [value]="charge.invoiceDate | mask:'00/00/0000'" -->
                                 </td>
                                 <td>{{charge.obhPartner}}</td>
                             </ng-container>
