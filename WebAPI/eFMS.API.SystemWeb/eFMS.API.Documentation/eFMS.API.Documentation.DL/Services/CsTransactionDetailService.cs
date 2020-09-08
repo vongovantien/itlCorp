@@ -1374,7 +1374,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         var packageUnit = catUnitRepo.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
-                        _pkgsConts += cont.PackageQuantity + " " + packageUnit.UnitNameEn?.ToUpper() + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
+                        _pkgsConts += cont.PackageQuantity + " " + packageUnit?.UnitNameEn?.ToUpper() + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
                     }         
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
@@ -1419,7 +1419,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ExportReferences = data.ExportReferenceNo; //NOT USE
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
                 housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
-                if (data.SailingDate != null)
+                if (data?.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE
                 }
@@ -1458,7 +1458,7 @@ namespace eFMS.API.Documentation.DL.Services
             var freightCharges = new List<FreightCharge>() {
                 new FreightCharge()
                 {
-                    FreightCharges = "FREIGHT " + data.FreightPayment?.ToUpper(),
+                    FreightCharges = "FREIGHT " + data?.FreightPayment?.ToUpper(),
                     Collect = data.FreightPayment == "Collect" ? true : false,
                     RateCharges = "AS ARRANGED",
                     RevenueTons = "AS ARRANGED"

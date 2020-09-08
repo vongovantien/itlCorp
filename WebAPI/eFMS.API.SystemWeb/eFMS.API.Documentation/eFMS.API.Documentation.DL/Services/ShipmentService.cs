@@ -483,21 +483,23 @@ namespace eFMS.API.Documentation.DL.Services
 
         public IQueryable<Shipments> GetShipmentNotDelete()
         {
-
             //Get list shipment operation: Current Status != 'Canceled'
+            //Left join với customsDeclaration
             var shipmentsOperation = from ops in opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
-                                      .Join(customsDeclarationRepo.Get(), x => x.JobNo, y => y.JobNo, (x, y) => new { x, y })
+                                     //.Join(customsDeclarationRepo.Get(), x => x.JobNo, y => y.JobNo, (x, y) => new { x, y })
+                                     join cus in customsDeclarationRepo.Get() on ops.JobNo equals cus.JobNo into cus2
+                                     from cus in cus2.DefaultIfEmpty()
                                      select new Shipments
                                      {
-                                         Id = ops.x.Id,
-                                         JobId = ops.x.JobNo,
-                                         HBL = ops.x.Hwbno,
-                                         MBL = ops.x.Mblno,
-                                         CustomerId = ops.x.CustomerId,
-                                         AgentId = ops.x.AgentId,
-                                         CarrierId = ops.x.SupplierId,
-                                         HBLID = ops.x.Hblid,
-                                         CustomNo = ops.y.ClearanceNo
+                                         Id = ops.Id,
+                                         JobId = ops.JobNo,
+                                         HBL = ops.Hwbno,
+                                         MBL = ops.Mblno,
+                                         CustomerId = ops.CustomerId,
+                                         AgentId = ops.AgentId,
+                                         CarrierId = ops.SupplierId,
+                                         HBLID = ops.Hblid,
+                                         CustomNo = cus.ClearanceNo
                                      };
             shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID, x.CustomNo}).Select(s => new Shipments
             {
