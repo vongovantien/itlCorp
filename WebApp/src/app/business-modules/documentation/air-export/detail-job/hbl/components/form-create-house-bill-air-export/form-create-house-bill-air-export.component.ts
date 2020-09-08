@@ -61,7 +61,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     issueHblplace: AbstractControl;
     warehouseId: AbstractControl;
     rateCharge: AbstractControl;
-
+    handingInformation: AbstractControl;
 
     customers: Observable<Customer[]>;
     saleMans: Observable<User[]>;
@@ -364,6 +364,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
         this.rclass = this.formCreate.controls["rclass"];
         this.rateCharge = this.formCreate.controls["rateCharge"];
+        this.handingInformation = this.formCreate.controls["handingInformation"];
+
         this.formCreate.get('dimensionDetails')
             .valueChanges
             .pipe(
@@ -463,6 +465,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             case 'agent':
                 this.forwardingAgentId.setValue(data.id);
                 this.forwardingAgentDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+                this.handingInformation.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
+
                 break;
             case 'sale':
                 this.saleManId.setValue(data.id);
