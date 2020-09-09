@@ -16,8 +16,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? Cw { get; set; }
         public decimal? Pcs { get; set; }
         public decimal? Cbm { get; set; }
-        public decimal? AdvanceAmount { get; set; }
-        public DateTime? AdvanceRequestDate { get; set; }
         public List<InfoShipmentChargeSettlementExport> ShipmentCharges { get; set; }
+        public List<InfoAdvanceExport> InfoAdvanceExports { get; set; }
     }
 }

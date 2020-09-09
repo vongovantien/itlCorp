@@ -589,7 +589,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     checkDuplicate() {
         let valid: boolean = true;
-        const chargeIdInvoiceGroup = this.charges.map(c => c.chargeId + c.invoiceNo);   // * charge + Invoice
+        const chargeIdInvoiceGroup = this.charges.map(c => {
+            if (!!c.invoiceNo) {
+                return c.chargeId + c.invoiceNo;
+            }
+            return null;
+        }).filter(x => Boolean(x));   // * charge + Invoice
+
         const isDup: boolean = new Set(chargeIdInvoiceGroup).size !== chargeIdInvoiceGroup.length;
 
         if (isDup) {
