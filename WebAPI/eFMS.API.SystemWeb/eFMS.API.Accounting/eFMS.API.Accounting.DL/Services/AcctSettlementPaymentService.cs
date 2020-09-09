@@ -488,16 +488,15 @@ namespace eFMS.API.Accounting.DL.Services
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
-            // TODO: join từng thằng.
             IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                join cd in cdNos on opst.JobNo equals cd.JobNo into cdNoGroups // list các tờ khai theo job
+                                join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
                                 from cdNoGroup in cdNoGroups.DefaultIfEmpty()
                                 join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                 from settle in settle2.DefaultIfEmpty()
                                 join adv in advances on sur.AdvanceNo equals adv.AdvanceNo into advGroups
                                 from advGroup in advGroups.DefaultIfEmpty()
-                                join advanceRequest in advanceRequests on advGroup.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
+                                join advanceRequest in advanceRequests on sur.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
                                 from adGroup in adGroups.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
@@ -506,14 +505,16 @@ namespace eFMS.API.Accounting.DL.Services
                                     JobId = opst.JobNo,
                                     HBL = opst.Hwbno,
                                     MBL = opst.Mblno,
+                                    HblId = opst.Hblid,
                                     CurrencyShipment = settle.SettlementCurrency,
                                     TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                     ShipmentId = opst.Id,
                                     Type = "OPS",
-                                    CustomNo = cdNoGroup.ClearanceNo,
-                                    AdvanceNo = sur.AdvanceNo,
+                                    CustomNo = adGroup.CustomNo,
+                                    AdvanceNo = advGroup.AdvanceNo,
                                     AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency), // Quy tỉ giá về settle
                                 };
+
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
@@ -539,9 +540,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    AdvanceNo = adGroup.AdvanceNo,
                                    AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency),
                                };
-            IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
+            IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
-            var dataGroup = dataQuery.ToList()
+            var dataGroupTotalAmount = dataQueryUnionService.ToList()
                         .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo, x.TotalAmount})
                         .Select(x => new ShipmentSettlement
                         {
@@ -557,11 +558,30 @@ namespace eFMS.API.Accounting.DL.Services
                             CustomNo = x.Key.CustomNo,
                             AdvanceNo = x.Key.AdvanceNo,
                             AdvanceAmount = x.Sum(a => a.AdvanceAmount),
-                            Balance = x.Sum(su => su.TotalAmount) - x.Sum(a => a.AdvanceAmount), // settleAmount - AdvanceAmount
+                            //Balance = x.Key.TotalAmount - x.Sum(a => a.AdvanceAmount), // settleAmount - AdvanceAmount
                         });
 
+
+            var dataGroupAdvanceAmount = dataGroupTotalAmount.GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.CustomNo, x.AdvanceNo, x.AdvanceAmount })
+                .Select(x => new ShipmentSettlement
+            {
+                SettlementNo = x.Key.SettlementNo,
+                JobId = x.Key.JobId,
+                HBL = x.Key.HBL,
+                MBL = x.Key.MBL,
+                CurrencyShipment = x.Key.CurrencyShipment,
+                TotalAmount = x.Sum(t => t.TotalAmount),
+                HblId = x.Key.HblId,
+                Type = x.Key.Type,
+                ShipmentId = x.Key.ShipmentId,
+                CustomNo = x.Key.CustomNo,
+                AdvanceNo = x.Key.AdvanceNo,
+                AdvanceAmount = x.Key.AdvanceAmount,
+                //Balance = x.Sum(t => t.TotalAmount) - x.Sum(a => a.AdvanceAmount), // settleAmount - AdvanceAmount
+            });
+
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (ShipmentSettlement item in dataGroup)
+            foreach (ShipmentSettlement item in dataGroupAdvanceAmount)
             {
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
@@ -578,7 +598,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CustomNo =item.CustomNo,
                     AdvanceNo = item.AdvanceNo,
                     AdvanceAmount = item.AdvanceAmount,
-                    Balance = item.Balance
+                    Balance = item.TotalAmount - item.Balance // settleAmount - AdvanceAmount
                 });
             }
 
