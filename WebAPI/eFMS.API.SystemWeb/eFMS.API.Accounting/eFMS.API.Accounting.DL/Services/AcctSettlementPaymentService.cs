@@ -518,7 +518,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
             IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
             IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
-            IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get();
+            IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
 
             AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
@@ -531,16 +531,17 @@ namespace eFMS.API.Accounting.DL.Services
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
+            // TODO: join từng thằng.
             IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 join cd in cdNos on opst.JobNo equals cd.JobNo into cdNoGroups // list các tờ khai theo job
                                 from cdNoGroup in cdNoGroups.DefaultIfEmpty()
                                 join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                 from settle in settle2.DefaultIfEmpty()
-                                join advanceRequest in advanceRequests on opst.Hblid equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
-                                from adGroup in adGroups.DefaultIfEmpty()
-                                join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                                join adv in advances on sur.AdvanceNo equals adv.AdvanceNo into advGroups
                                 from advGroup in advGroups.DefaultIfEmpty()
+                                join advanceRequest in advanceRequests on advGroup.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
+                                from adGroup in adGroups.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
                                 {
@@ -553,7 +554,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     ShipmentId = opst.Id,
                                     Type = "OPS",
                                     CustomNo = cdNoGroup.ClearanceNo,
-                                    AdvanceNo = adGroup.AdvanceNo,
+                                    AdvanceNo = sur.AdvanceNo,
                                     AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency), // Quy tỉ giá về settle
                                 };
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -562,10 +563,10 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                from settle in settle2.DefaultIfEmpty()
-                               join advanceRequest in advanceRequests on cstd.Id equals advanceRequest.Hblid into adGroups // list các advance request theo số hblID
-                               from adGroup in adGroups.DefaultIfEmpty()
-                               join adv in advances on adGroup.AdvanceNo equals adv.AdvanceNo into advGroups
+                               join adv in advances on sur.AdvanceNo equals adv.AdvanceNo into advGroups
                                from advGroup in advGroups.DefaultIfEmpty()
+                               join advanceRequest in advanceRequests on advGroup.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
+                               from adGroup in adGroups.DefaultIfEmpty()
                                where sur.SettlementCode == settlementNo
                                select new ShipmentSettlement
                                {
@@ -584,7 +585,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
 
             var dataGroup = dataQuery.ToList()
-                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo})
+                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo, x.TotalAmount})
                         .Select(x => new ShipmentSettlement
                         {
                             SettlementNo = x.Key.SettlementNo,
@@ -592,7 +593,7 @@ namespace eFMS.API.Accounting.DL.Services
                             HBL = x.Key.HBL,
                             MBL = x.Key.MBL,
                             CurrencyShipment = x.Key.CurrencyShipment,
-                            TotalAmount = x.Sum(su => su.TotalAmount),
+                            TotalAmount = x.Key.TotalAmount,
                             HblId = x.Key.HblId,
                             Type = x.Key.Type,
                             ShipmentId = x.Key.ShipmentId,
