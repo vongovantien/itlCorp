@@ -601,7 +601,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     activeInactiveContract(id: string) {
         if (this.contractType.value[0].id === 'Guaranteed'
-            && (this.formGroup.controls['creditLimit'].value === 0
+            && (this.formGroup.controls['creditLimit'].value <= 0
                 || !this.formGroup.controls['creditLimit'].value
                 && this.statusContract === false)) {
             this.salesmanCreditLimitPopup.show();
