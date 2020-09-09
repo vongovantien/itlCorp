@@ -33,6 +33,7 @@ import { AccountingManagementDetailVoucherComponent } from './voucher/detail/acc
 import { AccountingManagementImportVatInvoiceComponent } from './vat/import/accounting-import-vat-invoice.component';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { ShareAccountingModule } from '../share-accouting.module';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 const routing: Routes = [
     {
@@ -76,6 +77,12 @@ const routing: Routes = [
 
 ];
 
+const maskConfig: Partial<IConfig> = {
+    validation: false,
+    showMaskTyped: true,
+    dropSpecialCharacters: false
+};
+
 @NgModule({
     imports: [
         CommonModule,
@@ -101,6 +108,7 @@ const routing: Routes = [
             thousands: ",",
             nullable: true
         }),
+        NgxMaskModule.forRoot(maskConfig),
         ShareAccountingModule
     ],
     declarations: [
