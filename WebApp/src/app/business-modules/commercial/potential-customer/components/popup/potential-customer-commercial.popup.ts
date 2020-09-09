@@ -38,6 +38,13 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
     potentialType: AbstractControl;
     active: AbstractControl;
 
+    //detail
+    id: string = SystemConstants.EMPTY_GUID;
+    userCreatedName: string = null;
+    userModifiedName: string = null;
+    datetimeCreated: Date = null;
+    datatimeModified: Date = null;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -97,11 +104,14 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
             const potential: CatPotentialModel = new CatPotentialModel({
                 ...dataForm,
                 potentialType: dataForm.potentialType.id,
+                id: this.id,
             });
             const body: PotentialUpdateModel = {
                 potential: potential,
 
             };
+
+
 
 
 
@@ -139,6 +149,21 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
                     );
             }
         }
+
+    }
+    //
+    handleBindPotentialDetail(data: PotentialUpdateModel) {
+        this.formPotential.patchValue({
+            ...data.potential,
+            potentialType: { id: data.potential.potentialType, text: data.potential.potentialType }
+        });
+
+
+        this.id = data.potential.id;
+        this.userCreatedName = data.potential.userCreatedName;
+        this.userModifiedName = !!data.potential.userModifiedName ? data.potential.userModifiedName : data.potential.userCreatedName;
+        this.datetimeCreated = data.potential.datetimeCreated;
+        this.datatimeModified = !!data.potential.datetimeModified ? data.potential.datetimeModified : data.potential.datetimeCreated;
 
     }
     //

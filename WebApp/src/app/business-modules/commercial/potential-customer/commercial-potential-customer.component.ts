@@ -10,13 +10,21 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from '@services';
 import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';
 import { of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
+import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
 
 @Component({
     selector: 'app-commercial-potential-customer',
     templateUrl: './commercial-potential-customer.component.html',
 })
 export class CommercialPotentialCustomerComponent extends AppList implements OnInit, IPermissionBase {
+    @ViewChild(CommercialFormSearchPotentialCustomerComponent, { static: false }) formSearch: CommercialFormSearchPotentialCustomerComponent;
     @ViewChild(CommercialPotentialCustomerPopupComponent, { static: false }) potentialCustomerPopup: CommercialPotentialCustomerPopupComponent;
+    @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
+    //
+    selectedPotentialId: string;
     //
     searchPotentialSettings: ColumnSetting[] = POTENTIALCUSTOMERCOLUMNSETTING;
     configSearch: any = {
@@ -30,6 +38,7 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this.requestList = this.getPotentialCustomerListPaging;
@@ -86,27 +95,64 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
                             this._progressRef.start();
                             return this._catalogueRepo.getDetailPotential(potentialId);
                         } else {
-                            return of(false);
+                            return of(null);
                         }
                     }
                 ),
             )
             .subscribe(
-                (res: PotentialUpdateModel | boolean) => {
-                    if (typeof res === "boolean") {
-
+                (res: PotentialUpdateModel) => {
+                    this._progressRef.complete();
+                    if (res === null) {
+                        this.permissionPopup.show();
                     }
                     else {
-
+                        this.potentialCustomerPopup.handleBindPotentialDetail(res);
+                        [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [true, false];
+                        this.potentialCustomerPopup.show();
                     }
                 }
             );
-        [this.potentialCustomerPopup.isUpdate, this.potentialCustomerPopup.isSubmitted] = [true, false];
-        this.potentialCustomerPopup.show();
+
     }
     //
-    checkAllowDelete(T: any): void {
-        throw new Error("Method not implemented.");
+    checkAllowDelete(potentialId: string): void {
+        this.selectedPotentialId = potentialId;
+        this._catalogueRepo.checkAllowDeletePotential(potentialId)
+            .pipe(
+                catchError(this.catchError),
+            ).subscribe((res: boolean) => {
+                if (res) {
+                    this.confirmDeletePopup.show();
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    }
+    //
+    onDelete() {
+        this._progressRef.start();
+        this._catalogueRepo.deletePotential(this.selectedPotentialId)
+            .pipe(catchError(this.catchError),
+                finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.confirmDeletePopup.hide();
+                        this._toastService.success(res.message);
+                        this.formSearch.searchObject = {
+                            field: 'all',
+                            displayName: 'All',
+                            searchString: ""
+                        }
+                        this.onResetPotentialCustomer({});
+
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+
     }
     //
     onSearchPotentialCustomer(event) {

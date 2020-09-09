@@ -64,7 +64,7 @@ namespace eFMS.API.Catalogue.Controllers
 
             _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
 
-            /*if(_user.UserMenuPermission == null)
+            if(_user.UserMenuPermission == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -81,7 +81,7 @@ namespace eFMS.API.Catalogue.Controllers
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });
-            }*/
+            }
 
             HandleState hs = catPotentialService.AddNew(model);
 
@@ -103,7 +103,7 @@ namespace eFMS.API.Catalogue.Controllers
             PermissionRange permissionRange;
             ICurrentUser _user = null;
 
-            /*_user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
 
             if (_user.UserMenuPermission == null)
             {
@@ -122,7 +122,7 @@ namespace eFMS.API.Catalogue.Controllers
             if (checkExistMessage)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value });
-            }*/
+            }
 
             HandleState hs = catPotentialService.Update(model);
 
@@ -143,10 +143,10 @@ namespace eFMS.API.Catalogue.Controllers
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
 
-            /*if (!catPotentialService.CheckAllowPermissionAction(id, permissionRange))
+            if (!catPotentialService.CheckAllowPermissionAction(id, permissionRange))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }*/
+            }
 
             HandleState hs = catPotentialService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -158,7 +158,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         //
-        [HttpDelete]
+        [HttpGet]
         [Route("GetById/{id}")]
         [Authorize]
         public IActionResult GetById(Guid id)
@@ -179,6 +179,21 @@ namespace eFMS.API.Catalogue.Controllers
 
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+
+            return Ok(catPotentialService.CheckAllowPermissionAction(id, permissionRange));
+        }
+        //
+        [HttpGet("CheckAllowDelete/{id}")]
+        [Authorize]
+        public IActionResult CheckAllowDelete(Guid id)
+        {
+            var charge = catPotentialService.First(x => x.Id == id);
+            if (charge == null)
+            {
+                return Ok(false);
+            }
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
+            PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
 
             return Ok(catPotentialService.CheckAllowPermissionAction(id, permissionRange));
         }

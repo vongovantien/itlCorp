@@ -153,6 +153,21 @@
                             </div>
                         </ng-container>
                     </div>
+                    <div class="row">
+                        <ng-container *ngIf="isUpdate">
+
+                            <div class="col-6">
+                                Created: {{datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by <span
+                                    class="text-success">{{userCreatedName}}</span>
+                            </div>
+                            <div class="col-6">
+                                Modified: {{datatimeModified | date: 'dd/MM/yyyy HH:mm'}} by <span
+                                    class="text-success">{{userModifiedName}}</span>
+                            </div>
+
+
+                        </ng-container>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

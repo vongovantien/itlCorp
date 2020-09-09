@@ -24,7 +24,7 @@ export class CatPotentialCustomer {
 }
 export class CatPotentialModel extends CatPotentialCustomer {
     userCreatedName: string = null;
-    UserModifiedName: string = null;
+    userModifiedName: string = null;
 
     constructor(object: Object) {
         super();

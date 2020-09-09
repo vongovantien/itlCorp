@@ -113,7 +113,7 @@ namespace eFMS.API.Catalogue.DL.Services
             potentialDataViewModel.Potential = new CatPotentialModel();
             potentialDataViewModel.Potential = potentialModel;
             potentialDataViewModel.Potential.UserCreatedName = userCreated != null ? userCreated.Username : "Admin";
-            potentialDataViewModel.Potential.UserModified = userModified != null ? userModified.Username : "Admin";
+            potentialDataViewModel.Potential.UserModifiedName = userModified != null ? userModified.Username : "Admin";
 
             return potentialDataViewModel;
         }
@@ -281,6 +281,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 model.Potential.DepartmentId = catPotential.DepartmentId;
                 model.Potential.OfficeId = catPotential.OfficeId;
                 model.Potential.CompanyId = catPotential.CompanyId;
+                //
+                model.Potential.UserCreated = catPotential.UserCreated;
+                model.Potential.DatetimeCreated = catPotential.DatetimeCreated;
+
 
                 model.Potential.UserModified = currentUser.UserID;
                 model.Potential.DatetimeModified = DateTime.Now;

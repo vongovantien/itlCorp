@@ -1171,6 +1171,12 @@ export class CatalogueRepo {
         );
     }
     //
+    checkAllowDeletePotential(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    //
     updatePotential(body: PotentialUpdateModel) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/Update`, body);
     }
