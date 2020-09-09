@@ -603,7 +603,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CustomNo =item.CustomNo,
                     AdvanceNo = item.AdvanceNo,
                     AdvanceAmount = item.AdvanceAmount,
-                    Balance = item.TotalAmount - item.Balance // settleAmount - AdvanceAmount
+                    Balance = item.TotalAmount - item.AdvanceAmount // settleAmount - AdvanceAmount
                 });
             }
 
