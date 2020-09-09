@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models.ReportResults
 {
@@ -73,7 +71,6 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public bool SltCSStickDeny { get; set; }
         public bool SltCSStickApp { get; set; }
         public DateTime? SltCSSignDate { get; set; }
-
         public string SettlementNo { get; set; }
     }
 
@@ -85,7 +82,6 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string Website { get; set; }
         public string Contact { get; set; }
         public string Inword { get; set; }
-
         public string JobId { get; set; }
         public string SettleRequester { get; set; }
         public string SettleRequestDate { get; set; }

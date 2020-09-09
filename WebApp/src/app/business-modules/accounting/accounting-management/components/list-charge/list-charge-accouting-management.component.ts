@@ -11,6 +11,7 @@ import { AppList } from 'src/app/app.list';
 import { IAccountingManagementState, getAccountingManagementPartnerChargeState } from '../../store';
 
 import { takeUntil } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'list-charge-accounting-management',
@@ -34,9 +35,9 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
                 { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
                 { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
-                { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-                { title: 'Serie', field: 'serie', sortable: true },
-                { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+                { title: 'Invoice No', field: 'invoiceNo', sortable: true, width: 100 },
+                { title: 'Serie', field: 'serie', sortable: true, width: 100 },
+                { title: 'Invoice Date', field: 'invoiceDate', sortable: true, width: 150 },
                 { title: 'OBH Partner', field: 'obhPartner', sortable: true },
                 { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
                 { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
@@ -67,7 +68,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     contentConfirmRemoveCharge: string;
 
-    headers = [
+    headers: CommonInterface.IHeaderTable[] = [
         { title: 'Code', field: 'chargeCode', sortable: true, },
         { title: 'Charge Name', field: 'chargeName', sortable: true, },
         { title: 'Job No', field: 'jobNo', sortable: true },
@@ -110,8 +111,15 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 (charges: ChargeOfAccountingManagementModel[]) => {
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
                         this.charges = [...this.charges, ...charges];
+                        console.log(this.charges);
 
                         this.updateTotalAmount();
+
+                        this.charges.forEach(c => {
+                            if (!!c.invoiceDate) {
+                                c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+                            }
+                        });
                     } else {
                         this._toastService.warning("Charge has existed in list");
                         return;
