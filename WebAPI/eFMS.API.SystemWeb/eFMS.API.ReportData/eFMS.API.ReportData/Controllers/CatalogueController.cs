@@ -281,8 +281,9 @@ namespace eFMS.API.ReportData.Controllers
         [HttpPost]
         public async Task<IActionResult> ExportCustomClearance(CustomsDeclarationCriteria customsDeclarationCriteria)
         {
+            var accessToken = Request.Headers["Authorization"].ToString();
             Helper helper = new Helper();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.HostStaging + Urls.CustomClearance.CustomClearanceUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(customsDeclarationCriteria, aPis.HostStaging + Urls.CustomClearance.CustomClearanceUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CustomsDeclaration>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateCustomClearanceExcelFile(dataObjects.Result);

@@ -302,7 +302,8 @@ export class CustomClearanceComponent extends AppList {
     }
 
     export() {
-        this._exportRepo.exportCustomClearance(this.searchObject)
+        const body = this.dataSearch || {};
+        this._exportRepo.exportCustomClearance(body)
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", 'CustomClearance.xlsx');

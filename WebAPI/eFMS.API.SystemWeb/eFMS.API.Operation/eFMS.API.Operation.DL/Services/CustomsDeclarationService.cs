@@ -429,30 +429,58 @@ namespace eFMS.API.Operation.DL.Services
         }
         public IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria)
         {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
+            {
+                return null;
+            }
 
+            Expression<Func<CustomsDeclarationModel, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
+                                                                                    && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
+                                                                                    && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
+                                                                                    && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
+                                                                                    && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
+                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null);
 
-
-            Func<CustomsDeclarationModel, bool> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
-                                                                                       && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
-                                                                                       && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
-                                                                                       && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
-                                                                                       && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                       && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
-                                                                                       && (x.DatetimeCreated <= criteria.ToImportDate || criteria.ToImportDate == null);
-            var results = Get().Where(query);
             if (criteria.ImPorted == true)
             {
-                results = results.Where(x => x.JobNo != null);
+                query = query.And(x => x.JobNo != null);
             }
             else if (criteria.ImPorted == false)
             {
-                results = results.Where(x => x.JobNo == null);
+                query = query.And(x => x.JobNo == null);
             }
-            results = MapClearancesToClearanceModels(results?.AsQueryable());
+
+            // Query with Permission Range.
+            switch (rangeSearch)
+            {
+                case PermissionRange.Owner:
+                    query = query.And(x => x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Group:
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Department:
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Office:
+                    query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Company:
+                    query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
+                    break;
+                default:
+                    break;
+            }
+            var results = Get().Where(query).AsEnumerable();
+            results = MapClearancesToClearanceModels(results.AsQueryable());
             return results?.AsQueryable();
         }
 
-       private List<sp_GetCustomDeclaration> GetCustomClearanceViewList(string jobNo)
+        private List<sp_GetCustomDeclaration> GetCustomClearanceViewList(string jobNo)
         {
             DbParameter[] parameters =
             {
