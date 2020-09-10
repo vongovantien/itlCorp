@@ -1729,8 +1729,8 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyName = DocumentConstants.COMPANY_NAME_LOCAL,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS_LOCAL,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
                 DecimalNo = 2,
@@ -1784,8 +1784,8 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = DocumentConstants.COMPANY_NAME,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyName = DocumentConstants.COMPANY_NAME_LOCAL,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS_LOCAL,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_TAXCODE,//DocumentConstants.COMPANY_WEBSITE, (Sửa lại thành MST)
                 DecimalNo = 2,
