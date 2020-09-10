@@ -6,7 +6,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { IAccountingManagementState, UpdateChargeList } from '../../store';
-import { AccAccountingManagementModel } from '@models';
+import { AccAccountingManagementModel, ChargeOfAccountingManagementModel } from '@models';
 
 import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
 
@@ -14,6 +14,7 @@ import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators'
 import { of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-accounting-detail-voucher',
@@ -114,6 +115,12 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
                             modelAdd.charges = [...this.listChargeComponent.charges];
 
+                            modelAdd.charges.forEach(c => {
+                                if (!!c.invoiceDate) {
+                                    const [day, month, year]: string[] = c.invoiceDate.split("/");
+                                    c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+                                }
+                            });
                             //  * Update field
                             modelAdd.id = this.voucherId;
                             modelAdd.status = this.accountingManagement.status;
@@ -150,7 +157,8 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                         this.updateFormVoucher((res as AccAccountingManagementModel));
 
                         // * Update list charge & total amount without dispatch action UpdateChargeList.
-                        this.listChargeComponent.charges = res.charges;
+                        this.listChargeComponent.charges = this.formatInvoiceDate(res.charges);
+
                         this.listChargeComponent.updateTotalAmount();
                     }
                 },
@@ -182,9 +190,14 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
             );
     }
 
-
-
     gotoList() {
         this._router.navigate(["home/accounting/management/voucher"]);
+    }
+
+    formatInvoiceDate(charges: ChargeOfAccountingManagementModel[]) {
+        charges.forEach(c => {
+            c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+        });
+        return charges;
     }
 }

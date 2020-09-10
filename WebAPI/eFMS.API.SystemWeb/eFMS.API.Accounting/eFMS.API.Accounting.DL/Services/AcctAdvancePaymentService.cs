@@ -3093,7 +3093,12 @@ namespace eFMS.API.Accounting.DL.Services
             if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
             {
                 //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
-                var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                if (currencyExchange.Count == 0)
+                {
+                    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                }
                 var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
                 _advanceAmount = _advanceAmount * _rate;
             }
@@ -3220,7 +3225,12 @@ namespace eFMS.API.Accounting.DL.Services
                 if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
                 {
                     //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
-                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                    if (currencyExchange.Count == 0)
+                    {
+                        DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                        currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                    }
                     var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
                     shipmentAdvance.NormAmount = shipmentAdvance.NormAmount * _rate;
                     shipmentAdvance.InvoiceAmount = shipmentAdvance.InvoiceAmount * _rate;
