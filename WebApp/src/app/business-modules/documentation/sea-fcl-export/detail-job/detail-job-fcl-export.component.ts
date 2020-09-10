@@ -161,6 +161,8 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+
+                        this.isDuplicate = true;
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -421,15 +423,15 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
 
-        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
-        if (isEdited && !this.isCancelFormPopupSuccess) {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
             this.confirmCancelPopup.show();
             return;
         }
         return of(!isEdited);
-
     }
 }

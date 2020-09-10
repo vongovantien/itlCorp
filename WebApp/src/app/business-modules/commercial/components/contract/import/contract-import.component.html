@@ -236,7 +236,9 @@
                                         *ngIf="item.paymentTermError !== null">{{ item.paymentTermError }}</span>
                                 </td>
                                 <td>
-                                    {{item.creditLimited}}
+                                    <span *ngIf="item.creditLimitError === null"> {{item.creditLimited}}</span>
+                                    <span class="m--font-danger" *ngIf="item.creditLimitError !== null">
+                                        {{item.creditLimitError}}</span>
                                 </td>
                                 <td>
                                     {{item.creditLimitedRated}}

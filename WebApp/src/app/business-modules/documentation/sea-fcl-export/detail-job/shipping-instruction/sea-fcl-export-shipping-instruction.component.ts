@@ -67,7 +67,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBills = res;
                 this.billDetail.housebills = res;
 
@@ -84,6 +83,12 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
+                    if (!!res) {
+                        this.displayPreview = true;
+                    }
+                    else {
+                        this.displayPreview = false;
+                    }
                     this.setDataBillInstructionComponent(res);
                 },
             );
