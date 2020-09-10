@@ -112,7 +112,7 @@ export class AirExportManifestComponent extends AppList {
     refreshManifest() {
         //this.getManifest(this.jobId);
 
-        this.formManifest.getShipmentDetail(this.jobId);
+        this.formManifest.getShipmentDetail();
 
         this.getHblList(this.jobId);
     }
@@ -154,7 +154,8 @@ export class AirExportManifestComponent extends AppList {
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
                 } else {
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+                    this.isShowUpdate = false;
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );

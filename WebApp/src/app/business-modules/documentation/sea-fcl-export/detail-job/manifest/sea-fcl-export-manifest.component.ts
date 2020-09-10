@@ -90,7 +90,7 @@ export class SeaFclExportManifestComponent extends AppList {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getHblList(this.jobId);
@@ -151,6 +151,9 @@ export class SeaFclExportManifestComponent extends AppList {
                     this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
+                }
+                else {
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );

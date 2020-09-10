@@ -79,7 +79,7 @@ export class ShareBusinessFormManifestComponent extends AppForm {
         this._cd.detectChanges();
     }
 
-    getShipmentDetail(id: any) {
+    getShipmentDetail() {
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -129,6 +129,8 @@ export class ShareBusinessFormManifestComponent extends AppForm {
     }
 
     updateDataToForm(res: CsManifest) {
+        console.log(res);
+
         this.formGroup.setValue({
             referenceNo: !!res.refNo ? res.refNo : null,
             supplier: !!res.supplier ? res.supplier : null,
@@ -145,6 +147,9 @@ export class ShareBusinessFormManifestComponent extends AppForm {
             pol: !!res.pol ? res.pol : null,
             pod: !!res.pod ? res.pod : null
         });
+
+        console.log(this.formGroup.value);
+
     }
 
     initForm() {

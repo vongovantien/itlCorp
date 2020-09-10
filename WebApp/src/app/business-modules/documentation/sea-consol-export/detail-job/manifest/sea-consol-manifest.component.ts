@@ -84,9 +84,10 @@ export class SeaConsolExportManifestComponent extends AppList {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
+                    // this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
                     this.cdRef.detectChanges();
@@ -141,9 +142,13 @@ export class SeaConsolExportManifestComponent extends AppList {
         this._documentationRepo.getManifest(id).subscribe(
             (res: any) => {
                 if (!!res) {
+                    console.log("res manifest: ", res);
+
                     this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
+                } else {
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );
