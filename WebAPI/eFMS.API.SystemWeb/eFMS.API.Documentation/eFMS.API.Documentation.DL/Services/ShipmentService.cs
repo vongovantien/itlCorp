@@ -2322,23 +2322,22 @@ namespace eFMS.API.Documentation.DL.Services
                     data.GrossWeight = charge.GrossWeight;
                     data.CBM = charge.CBM;
                     data.PackageContainer = charge.PackageContainer;
-                    decimal? percent = 0;
+                    //decimal? percent = 0;
                     decimal UnitPrice = charge.UnitPrice ?? 0;
                     charge.UnitPrice = Math.Round(UnitPrice, 3);
+                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
                     if (charge.VATRate > 0)
                     {
-                        percent = (charge.VATRate * 10) / 100;
-                        charge.VATAmount = percent * (charge.UnitPrice * charge.Quantity) * _exchangeRate;
-                        if (charge.Currency != "VND")
-                        {
-                            charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
-                        }
+                        charge.VATAmount = (charge.VATRate * charge.NetAmount )/ 100;
                     }
                     else
                     {
-                        charge.VATAmount = charge.VATRate;
+                        charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0 ;
                     }
-                    charge.NetAmount = charge.UnitPrice * charge.Quantity * _exchangeRate;
+                    if (charge.Currency != "VND")
+                    {
+                        charge.VATAmount = Math.Round(charge.VATAmount ?? 0, 3);
+                    }
                     data.NetAmount = charge.NetAmount;
                     data.VATAmount = charge.VATAmount;
                     data.Type = charge.Type;
@@ -2776,25 +2775,21 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var it in item.SummaryOfCostsIncurredExportResults)
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
-                    decimal? percent = 0;
                     decimal UnitPrice = it.UnitPrice ?? 0;
                     it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
-                        percent = (it.VATRate * 10) / 100;
-                        it.VATAmount = percent * (UnitPrice * it.Quantity) * _exchangeRate;
-                        if (it.Currency != "VND")
-                        {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
-
-                        }
+                        it.VATAmount = (it.VATRate * it.NetAmount) / 100;
                     }
                     else
                     {
-                        it.VATAmount = it.VATRate;
+                        it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
                     }
-                    it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
-
+                    if (it.Currency != "VND")
+                    {
+                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                    }
                 }
             }
             return ObjectSummaryRevenue;
