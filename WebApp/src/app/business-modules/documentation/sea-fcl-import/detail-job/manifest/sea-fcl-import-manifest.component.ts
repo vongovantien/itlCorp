@@ -91,7 +91,7 @@ export class SeaFclImportManifestComponent extends AppList {
                     this.formManifest.isImport = true;
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
 
@@ -153,7 +153,13 @@ export class SeaFclImportManifestComponent extends AppList {
             (res: any) => {
                 if (!!res) {
                     this.manifest = res;
+                    this.displayPreview = true;
                     this.formManifest.updateDataToForm(this.manifest);
+
+                }
+                else {
+                    this.displayPreview = false;
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );
