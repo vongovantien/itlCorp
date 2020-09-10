@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList, IPermissionBase } from 'src/app/app.list';
-import { POTENTIALCUSTOMERCOLUMNSETTING } from './commercial-potential-customer.component.columns';
+
 import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
 import { TypeSearch } from 'src/app/shared/enums/type-search.enum';
 import { CatPotentialModel, PotentialUpdateModel } from '@models';
@@ -26,11 +26,8 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     //
     selectedPotentialId: string;
     //
-    searchPotentialSettings: ColumnSetting[] = POTENTIALCUSTOMERCOLUMNSETTING;
-    configSearch: any = {
-        settingFields: this.searchPotentialSettings.filter(x => x.allowSearch === true).map(x => ({ "fieldName": x.primaryKey, "displayName": x.header })),
-        typeSearch: TypeSearch.intab
-    };
+
+
     //
     potentialCustomers: CatPotentialModel[] = [];
 
@@ -58,6 +55,11 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
             { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
+        this.configSearch = {
+            settingFields: this.headers.filter(x => x.field !== 'margin' || 'quotation')
+                .map(x => ({ "fieldName": x.field === 'userCreatedName' ? 'creator' : x.field, "displayName": x.title })),
+            typeSearch: TypeSearch.intab
+        };
         this.getPotentialCustomerListPaging();
     }
     //
