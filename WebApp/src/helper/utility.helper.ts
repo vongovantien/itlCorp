@@ -41,7 +41,14 @@ export class UtilityHelper {
         return seenDuplicate;
     }
     checkDuplicateInObjectByKeys(inputArray: any[] = [], propertyNameArray: string[], dupArray: any[] = [], flag: boolean = false): boolean {
-
+        //format fields === null thì gán = "";
+        inputArray.forEach(e => {
+            propertyNameArray.forEach(ele => {
+                if (e[ele] === null) {
+                    e[ele] = "";
+                }
+            });
+        });
         if (propertyNameArray.length <= 0) {
             return;
         }
@@ -49,27 +56,37 @@ export class UtilityHelper {
         if (dupArray.length <= 0) {
             dupArray = [...inputArray];
         }
-        //
+        //remove elements have value by fields = null;
+        if (propertyNameArray.length > 1) {
+            dupArray = dupArray.filter(e => {
+                return propertyNameArray.reduce((str, ele) => {
+                    return str + e[ele];
+                }, "") !== "";
+            });
+        }
+
         let obj = dupArray.reduce((a, e) => {
             a[e[propertyNameArray[0]]] = ++a[e[propertyNameArray[0]]] || 0;
             return a;
         }, {});
+
         //
-        const arrayDup = dupArray.filter((e) => obj[e[propertyNameArray[0]]] >= 1);
+        const arrayDup = dupArray.filter((e) => {
+            return obj[e[propertyNameArray[0]]] >= 1;
+        });
 
+        const arrayKeyDup = arrayDup.map(e => e.key);
         inputArray.forEach((element) => {
-            if (arrayDup.map(e => e.key).includes(element.key)) {
-                console.log("vo");
-
+            if (arrayKeyDup.includes(element.key)) {
                 flag = true;
                 element.duplicate = true;
+
             } else {
                 element.duplicate = false;
+
             }
         });
         propertyNameArray.shift();
-
-
         if (flag === false) {
             return;
         } else {
