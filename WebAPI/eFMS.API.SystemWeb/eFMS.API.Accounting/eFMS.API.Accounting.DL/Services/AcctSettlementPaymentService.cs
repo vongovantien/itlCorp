@@ -624,13 +624,17 @@ namespace eFMS.API.Accounting.DL.Services
         public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, string _hbl, string _SettleCurrency)
         {
             AdvanceInfo result = new AdvanceInfo();
-
+            string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
-            var surchargeGrpHbl = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
+            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
 
-            string advNo = surchargeGrpHbl.Where(x => x.Key.Hblno == _hbl && x.Key.Mblno == _mbl).First().Key.AdvanceNo;
-            string customNo = surchargeGrpHbl.Where(x => x.Key.Hblno == _hbl && x.Key.Mblno == _mbl).First().Key.ClearanceNo;
-
+            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblno == _hbl && x.Key.Mblno == _mbl);
+            if(surchargeGrp != null && surchargeGrp.Count() > 0)
+            {
+                 advNo = surchargeGrp?.FirstOrDefault().Key.AdvanceNo;
+                 customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
+            }
+          
 
             if (!string.IsNullOrEmpty(advNo))
             {
