@@ -593,7 +593,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var advData = from advP in acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                               join advR in acctAdvanceRequestRepo.Get() on advP.AdvanceNo equals advR.AdvanceNo
-                              where advR.Mbl == _mbl && advR.Hbl == _hbl
+                              where advR.Mbl == _mbl && advR.Hbl == _hbl && advR.AdvanceNo == advNo
                               select new
                               {
                                   AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, _SettleCurrency), // tính theo tỷ giá ngày request adv và currency settlement
