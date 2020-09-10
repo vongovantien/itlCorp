@@ -65,8 +65,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._progressRef = this._ngProgressService.ref();
     }
 
-
-
     ngOnInit() { }
 
     ngAfterViewInit() {
@@ -170,6 +168,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
                         this._router.navigate([`home/documentation/air-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+                        this.isDuplicate = true;
+
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -397,11 +397,14 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
 
-        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        // * Trường hợp user duplicate thành công đi từ màn hình job detail - job detail khác hoặc nhấn confirm cancel.
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
-        if (isEdited && !this.isCancelFormPopupSuccess) {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        // * Trường hợp user confirm cancel
+        if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
             this.confirmCancelPopup.show();
             return;
         }

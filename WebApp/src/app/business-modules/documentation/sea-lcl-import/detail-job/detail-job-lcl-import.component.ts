@@ -385,11 +385,11 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
 
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
-
-        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formCreate.getRawValue());
+
         if (isEdited && !this.isCancelFormPopupSuccess) {
             this.confirmCancelPopup.show();
             return;

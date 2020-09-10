@@ -47,6 +47,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     dimensionDetails: DIM[];
     isCancelFormPopupSuccess: boolean = false;
+
     nextState: RouterStateSnapshot;
 
     constructor(
@@ -164,6 +165,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
                         this._router.navigate([`home/documentation/air-import/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = "SHIPMENT";
+
+                        this.isDuplicate = true;
+
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -386,12 +390,12 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
-
-        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
-        if (isEdited && !this.isCancelFormPopupSuccess) {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
             this.confirmCancelPopup.show();
             return;
         }
