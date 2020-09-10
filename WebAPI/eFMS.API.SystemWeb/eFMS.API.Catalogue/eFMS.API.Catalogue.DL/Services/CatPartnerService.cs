@@ -1309,7 +1309,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 else
                 {
                     string taxCode = item.TaxCode.Replace(" ", "");
-                    string internalReferenceNo = item.InternalReferenceNo.Replace(" ", "");
+                    string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Replace(" ", "") : string.Empty;
 
                     var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
                     var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
@@ -1325,7 +1325,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode == taxCode) && string.IsNullOrEmpty(item.InternalReferenceNo.Replace(" ", "")))
+                        if (partners.Any(x => x.TaxCode == taxCode) && string.IsNullOrEmpty(internalReferenceNo))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;

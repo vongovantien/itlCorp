@@ -420,7 +420,9 @@ namespace eFMS.API.Catalogue.Controllers
                     else
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPase = DateTime.Parse(dateEffect, culture);
+                        if(dateEffect != null) {
+                            dateToPase = DateTime.Parse(dateEffect, culture);
+                        }
                     }
 
                     string dateExpired = worksheet.Cells[row, 8].Value?.ToString().Trim();
@@ -433,7 +435,10 @@ namespace eFMS.API.Catalogue.Controllers
                     else
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        dateToPaseExpired = DateTime.Parse(dateExpired, culture);
+                        if(dateExpired != null)
+                        {
+                            dateToPaseExpired = DateTime.Parse(dateExpired, culture);
+                        }
                     }
 
 
