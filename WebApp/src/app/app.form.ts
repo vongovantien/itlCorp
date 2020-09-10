@@ -18,6 +18,7 @@ export abstract class AppForm extends AppPage {
     isDisabled: boolean = null;
     isSubmitted: boolean = false;
     isCollapsed: boolean = true;
+    isDuplicate: boolean = false;
     isReadonly: any = false;
 
     selectedRange: any;

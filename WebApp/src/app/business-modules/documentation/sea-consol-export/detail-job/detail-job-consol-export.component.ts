@@ -45,6 +45,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, ETA, MBL, Vessel, Voy, POL, POD, Booking No to House Bill?<span>`;
 
     isCancelFormPopupSuccess: boolean = false;
+
     nextState: RouterStateSnapshot;
 
     constructor(
@@ -161,6 +162,8 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-consol-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+
+                        this.isDuplicate = true;
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -420,14 +423,17 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
 
-        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
-        if (this.isCancelFormPopupSuccess) {
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
             return of(true);
         }
-        if (isEdited && !this.isCancelFormPopupSuccess) {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
             this.confirmCancelPopup.show();
             return;
         }
+
+
         return of(!isEdited);
     }
 }
