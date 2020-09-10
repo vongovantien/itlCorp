@@ -83,6 +83,12 @@ export class SeaLclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
+                    if (!!res) {
+                        this.displayPreview = true;
+                    }
+                    else {
+                        this.displayPreview = false;
+                    }
                     this.setDataBillInstructionComponent(res);
                 },
             );
