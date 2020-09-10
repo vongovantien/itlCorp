@@ -586,7 +586,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.IsValid = false;
 
                     }
-                    if (!item.ExpireDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
+                    if (!item.EffectDate.HasValue && (item.ContractType == "Trial" || item.ContractType == "Official"))
                     {
                         item.EffectDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EFFECTIVE_DATE_EMPTY]);
                         item.IsValid = false;
