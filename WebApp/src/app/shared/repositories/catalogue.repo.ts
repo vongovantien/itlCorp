@@ -5,6 +5,7 @@ import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { IncotermUpdateModel } from "../models/commercial/incoterm";
+import { PotentialUpdateModel } from "../models/commercial/potential-customer";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -1152,5 +1153,39 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
-
+    //
+    getPotentialCustomerListPaging(page: number, size: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Paging`, body, {
+            page: '' + page,
+            size: '' + size
+        });
+    }
+    //
+    createPotential(body: PotentialUpdateModel) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Create`, body);
+    }
+    //
+    checkAllowGetDetailPotential(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/CheckAllowDetail/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    //
+    checkAllowDeletePotential(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/CheckAllowDelete/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    //
+    updatePotential(body: PotentialUpdateModel) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/Update`, body);
+    }
+    //
+    deletePotential(potentialId: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPotential/delete/${potentialId}`);
+    }
+    //
+    getDetailPotential(id: string): any {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/GetById/${id}`);
+    }
 }
