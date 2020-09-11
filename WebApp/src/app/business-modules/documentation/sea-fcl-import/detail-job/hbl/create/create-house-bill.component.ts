@@ -19,7 +19,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { CsTransaction } from 'src/app/shared/models';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
-
+import _groupBy from 'lodash/groupBy';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission, getTransactionDetailCsTransactionState } from '@share-bussiness';
 import { DataService } from '@services';
 enum HBL_TAB {
@@ -284,18 +284,23 @@ export class CreateHouseBillComponent extends AppForm {
     updateInwordField(containers: Container[]): string {
         let containerDetail = '';
 
-        const contObject = (containers || []).map((container: Container) => ({
-            contType: container.containerTypeId,
-            contName: container.description || '',
-            quantity: container.quantity,
-            isPartContainer: container.isPartOfContainer || false
-        }));
-
-        for (const item of contObject) {
-            if (item.isPartContainer) {
-                containerDetail += "A Part Of ";
-            }
+        const objApartOf = containers.filter(x => x.isPartOfContainer === true);
+        const contObject1 = this.mapObjectData(objApartOf);
+        const objNotApartOf = containers.filter(x => x.isPartOfContainer === false);
+        const contObject2 = this.mapObjectData(objNotApartOf);
+        const contDataNotAprtOf = [];
+        for (const item of Object.keys(_groupBy(contObject2, 'contName'))) {
+            contDataNotAprtOf.push({
+                contName: item,
+                quantity: _groupBy(contObject2, 'contName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b),
+            });
+        }
+        for (const item of contDataNotAprtOf) {
             containerDetail += this.handleStringCont(item);
+        }
+        for (const item of contObject1) {
+            containerDetail += "A Part Of ";
+            containerDetail += this.handleStringPackage(item);
         }
         containerDetail = containerDetail.trim().replace(/\&$/, "");
         containerDetail += " Onlys." + "\n" + "THC/CSC AND OTHER SURCHARGES AT DESTINATION ARE FOR RECEIVER'S ACCOUNT. ";
@@ -303,9 +308,22 @@ export class CreateHouseBillComponent extends AppForm {
         return containerDetail || '';
     }
 
+    mapObjectData(containers: Container[]) {
+        const contObject = (containers || []).map((container: Container) => ({
+            contName: container.description || '',
+            quantity: container.quantity,
+        }));
+        return contObject;
+    }
+
     handleStringCont(contOb: { contName: string, quantity: number }) {
         return this.utility.convertNumberToWords(contOb.quantity) + '' + contOb.contName + ' & ';
     }
+
+    handleStringPackage(contOb: { contName: string, quantity: number }) {
+        return contOb.quantity + ' ' + contOb.contName + ' & ';
+    }
+
 }
 
 

@@ -132,7 +132,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
             "Time new Roman": 'Time new Roman',
             "Tahoma": 'Tahoma'
         },
-        toolbarButtons: ['fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', '|', 'fontFamily', 'fontSize', 'color', 'inlineClass', 'inlineStyle', 'paragraphStyle', 'lineHeight', '|', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', '-', 'insertLink', 'insertTable', '|', 'emoticons', 'fontAwesome', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', '|', 'spellChecker', 'help', 'html', '|', 'undo', 'redo'],
+        toolbarButtons: ['print', 'fullscreen', 'bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', ' | ', 'fontFamily', 'fontSize', 'color', 'inlineClass', 'inlineStyle', 'paragraphStyle', 'lineHeight', ' | ', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'quote', ' - ', 'insertLink', 'insertTable', ' | ', 'emoticons', 'fontAwesome', 'specialCharacters', 'insertHR', 'selectAll', 'clearFormatting', ' | ', 'spellChecker', 'help', 'html', ' | ', 'undo', 'redo'],
         quickInsertButtons: ['table', 'ul', 'ol', 'hr'],
         fontFamilySelection: true,
         language: 'vi',

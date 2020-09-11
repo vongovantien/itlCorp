@@ -53,10 +53,12 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     sumCbm: AbstractControl;
     containerDescription: AbstractControl;
     packageTypeId: AbstractControl;
+    shipmentType: AbstractControl;
 
     productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
     shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
 
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -160,6 +162,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         }
 
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
+        const sType = this.shipmentTypes.find(type => type.id === this.opsTransaction.shipmentType);
+        if (!!sType) { this.formEdit.controls['shipmentType'].setValue([sType]); }
     }
 
     getCommodityGroup() {
@@ -218,6 +222,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             clearanceLocation: [null],
             shipper: [null],
             consignee: [null],
+            shipmentType: [null, Validators.required],
             sumGrossWeight: [null],
             sumNetWeight: [null],
             sumContainers: [null],
@@ -257,7 +262,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.containerDescription = this.formEdit.controls['containerDescription'];
         this.packageTypeId = this.formEdit.controls['packageTypeId'];
         this.commodityGroupId = this.formEdit.controls['commodityGroupId'];
+        this.shipmentType = this.formEdit.controls['shipmentType'];
+
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
@@ -300,6 +308,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 break;
         }
     }
+
     showListContainer() {
         this.containerPopup.mblid = this.opsTransaction.id;
         this.containerPopup.show();

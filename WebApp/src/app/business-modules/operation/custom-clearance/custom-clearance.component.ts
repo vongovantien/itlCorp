@@ -9,7 +9,6 @@ import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import _map from 'lodash/map';
 import { NgProgress } from '@ngx-progressbar/core';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { Router } from '@angular/router';
 import { IAppState, getMenuUserPermissionState } from '@store';
 import { Store } from '@ngrx/store';
@@ -19,7 +18,6 @@ import { formatDate } from '@angular/common';
 @Component({
     selector: 'app-custom-clearance',
     templateUrl: './custom-clearance.component.html',
-    styleUrls: ['./custom-clearance.component.scss']
 })
 export class CustomClearanceComponent extends AppList {
     @ViewChild('confirmConvertPopup', { static: false }) confirmConvertPopup: ConfirmPopupComponent;

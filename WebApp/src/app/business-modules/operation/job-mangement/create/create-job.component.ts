@@ -46,6 +46,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             serviceMode: !!form.serviceMode && !!form.serviceMode.length ? form.serviceMode[0].id : null,
             productService: !!form.productService && !!form.productService.length ? form.productService[0].id : null,
             shipmentMode: !!form.shipmentMode && !!form.shipmentMode.length ? form.shipmentMode[0].id : null,
+            shipmentType: !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null,
 
             agentId: form.agentId,
             pol: form.pol,
