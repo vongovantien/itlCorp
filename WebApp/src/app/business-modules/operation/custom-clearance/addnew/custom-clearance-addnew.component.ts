@@ -31,6 +31,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     addClearance() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = false;
+
         this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
         this.detailComponent.formGroup.controls['route'].setErrors(null);
         if (this.detailComponent.isDisableCargo) {
@@ -57,6 +58,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
     convertClearance() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
+
         this.detailComponent.formGroup.controls['serviceType'].setErrors(null);
         this.detailComponent.formGroup.controls['route'].setErrors(null);
         if (this.detailComponent.isDisableCargo) {
