@@ -333,6 +333,16 @@
 						formControlName="consignee" placeholder="Enter text">
 				</div>
 			</div>
+			<div class="col-lg-4">
+				<div class="form-group">
+					<label class="form-control-label" required>
+						Shipment Type
+					</label>
+					<ng-select #smt [items]="shipmentTypes" placeholder="Package Type" [allowClear]="true"
+						(opened)="closeOtherSelects(smt)" formControlName="shipmentType">
+					</ng-select>
+				</div>
+			</div>
 		</div>
 		<div class="row" *ngIf="opsTransaction">
 			<div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
