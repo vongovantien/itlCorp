@@ -1141,7 +1141,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 CombinationSaleReportResult report = new CombinationSaleReportResult
                 {
-                    ShipmentSource = string.Empty,
+                    ShipmentSource = item.ShipmentType.ToUpper(),
                     Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameAbbr,
                     POD = catPlaceRepository.Get(x => x.Id == item.Pod)?.FirstOrDefault()?.Code,
                     POL = catPlaceRepository.Get(x => x.Id == item.Pol)?.FirstOrDefault()?.Code,
@@ -1162,7 +1162,6 @@ namespace eFMS.API.Documentation.DL.Services
                     Assigned = false,
                     HAWBNO = item.Hwbno,
                     PartnerName = catPartnerRepository.Get(x => x.Id == item.CustomerId).FirstOrDefault()?.PartnerNameEn,
-
                 };
                 string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
                 if (employeeId != null)
