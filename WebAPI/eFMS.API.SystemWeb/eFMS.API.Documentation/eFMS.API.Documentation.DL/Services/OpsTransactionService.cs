@@ -609,7 +609,8 @@ namespace eFMS.API.Documentation.DL.Services
                 DatetimeCreated = DateTime.Now,
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
-                UserModified = currentUser.UserID
+                UserModified = currentUser.UserID,
+                ShipmentType = "Freehand",
             };
             var customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
             if (customer != null)

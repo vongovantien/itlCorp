@@ -53,5 +53,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string Shipper { get; set; }
         public string Consignee { get; set; }
         public string LockedUser { get; set; }
+        public string ShipmentType { get; set; }
     }
 }

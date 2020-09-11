@@ -36,7 +36,7 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.save,
     };
 
-    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx';
+    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
 
     digitDecimal: number = 5;
 
