@@ -3,27 +3,25 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm, AbstractControl } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
-
+import { formatDate } from '@angular/common';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { CatalogueRepo } from 'src/app/shared/repositories';
-import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
-import { CsTransactionDetail, Container, CsTransaction } from 'src/app/shared/models';
 import { DocumentationRepo } from 'src/app/shared/repositories/documentation.repo';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '../../share-business';
-
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-
-import * as fromShareBussiness from './../../share-business/store';
-import _groupBy from 'lodash/groupBy';
-import { OPSTransactionGetDetailSuccessAction } from '../store';
-import { formatDate } from '@angular/common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { OpsTransaction, CsTransactionDetail, CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
+import * as fromShareBussiness from './../../share-business/store';
+import { OPSTransactionGetDetailSuccessAction } from '../store';
+
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { AppForm } from 'src/app/app.form';
+import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
+
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import _groupBy from 'lodash/groupBy';
+
 
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -52,8 +50,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
 
     deleteMessage: string = '';
 
-
-
     constructor(
         private _spinner: NgxSpinnerService,
         private route: ActivatedRoute,
@@ -71,7 +67,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
-
         this.route.params.subscribe((params: any) => {
             this.tab = 'job-edit';
             this.tabCharge = 'buying';
@@ -83,9 +78,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         });
 
         this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
@@ -198,6 +191,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.onSubmitData();
         this.updateShipment();
     }
+
     checkValidateForm() {
         [this.editForm.commodityGroupId,
         this.editForm.packageTypeId,
@@ -217,6 +211,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         }
         return valid;
     }
+
     onSubmitData() {
         const form: any = this.editForm.formEdit.getRawValue();
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
@@ -250,6 +245,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         this.opsTransaction.packageTypeId = !!form.packageTypeId && !!form.packageTypeId.length ? form.packageTypeId[0].id : null;
         this.opsTransaction.commodityGroupId = !!form.commodityGroupId && !!form.commodityGroupId.length ? form.commodityGroupId[0].id : null;
         this.opsTransaction.containerDescription = form.containerDescription;
+        this.opsTransaction.shipmentType = !!form.shipmentType && !!form.shipmentType.length ? form.shipmentType[0].id : null;
     }
 
     updateShipment() {

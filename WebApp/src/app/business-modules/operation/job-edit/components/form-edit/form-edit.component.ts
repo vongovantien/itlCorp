@@ -161,7 +161,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             if (!!packageType) { this.formEdit.controls['packageTypeId'].setValue([packageType]); }
         }
         const sType = this.shipmentTypes.find(type => type.id === this.opsTransaction.shipmentType);
-        if (!!sType) { this.formEdit.controls['packageTypeId'].setValue([sType]); }
+        if (!!sType) { this.formEdit.controls['shipmentType'].setValue([sType]); }
     }
 
     getCommodityGroup() {
@@ -220,7 +220,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             clearanceLocation: [null],
             shipper: [null],
             consignee: [null],
-            shipmentType: [],
+            shipmentType: [null, Validators.required],
             sumGrossWeight: [null],
             sumNetWeight: [null],
             sumContainers: [null],

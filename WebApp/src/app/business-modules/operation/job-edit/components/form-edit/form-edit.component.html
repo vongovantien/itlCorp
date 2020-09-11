@@ -334,7 +334,7 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group">
+				<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !shipmentType.valid}">
 					<label class="form-control-label" required>
 						Shipment Type
 					</label>
