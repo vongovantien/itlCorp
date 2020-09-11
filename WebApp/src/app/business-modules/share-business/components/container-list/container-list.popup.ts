@@ -116,7 +116,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         const duplicatedContainer = cloneDeep(this.initContainers[index]);
         // * RESET ID.
         duplicatedContainer.id = SystemConstants.EMPTY_GUID;
-        this.initContainers = [...this.initContainers, duplicatedContainer];
+        this.initContainers = [...this.initContainers, { ...duplicatedContainer, key: Math.random() }];
 
     }
 
@@ -219,8 +219,8 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
     checkDuplicate() {
         let valid: boolean = true;
 
-        //format
-        this.utility.checkDuplicateInObjectByKeys(this.initContainers, ['containerNo', 'sealNo']);
+        //
+        this.utility.checkDuplicateInObjectByKeys(this.initContainers, ['containerNo', 'sealNo'], 2);
 
         if (
             this.initContainers.filter(e => e.duplicate === true).length >= 1
