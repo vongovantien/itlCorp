@@ -317,7 +317,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
             // * Select
             hbltype: [],
-            freightPayment: [],
+            freightPayment: [null, Validators.required],
             currencyId: [],
             originBlnumber: [],
             wtorValpayment: [[this.wts[0]]],
@@ -327,7 +327,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             etd: [],
             eta: [],
             flightDate: [],
-            issueHbldate: [{ startDate: new Date(), endDate: new Date() }],
+            issueHbldate: [{ startDate: new Date(), endDate: new Date() }, Validators.required],
 
             // * Array
             dimensionDetails: this._fb.array([])
@@ -378,7 +378,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
         this.freightPayment.valueChanges.subscribe(
             (c: SelectItem[]) => {
-                if (!!c) {
+                if (!!c && c.length > 0) {
                     if (c[0].id === "Prepaid") {
                         this.wtorValpayment.setValue([this.wts[0]]);
                     } else if (c[0].id === "Collect") {
@@ -398,6 +398,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     updateFormValue(data: HouseBill, isImport: boolean = false) {
+
         const formValue = {
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
