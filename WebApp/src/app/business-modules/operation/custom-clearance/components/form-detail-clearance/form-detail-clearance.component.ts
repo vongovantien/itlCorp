@@ -1,16 +1,16 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
-import { CatalogueRepo, OperationRepo, DocumentationRepo } from '@repositories';
+import { CatalogueRepo } from '@repositories';
 import { Observable } from 'rxjs';
 import { Customer, PortIndex, CountryModel, Commodity, Unit } from '@models';
 import { CommonEnum } from '@enums';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCatalogueUnitState, GetCatalogueUnitAction, GetCataloguePackageAction, getCataloguePackageState } from '@store';
+import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState, GetCatalogueCommodityAction, getCatalogueCommodityState, GetCataloguePackageAction, getCataloguePackageState } from '@store';
 import { IShareBussinessState } from '@share-bussiness';
 import { Store } from '@ngrx/store';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { formatDate } from '@angular/common';
-import { ToastrService } from 'ngx-toastr';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'custom-clearance-form-detail',
@@ -46,10 +46,10 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     countries: Observable<CountryModel[]>;
-    serviceTypes: CommonInterface.INg2Select[] = [];
-    typeClearances: CommonInterface.INg2Select[] = [];
-    routeClearances: CommonInterface.INg2Select[] = [];
-    cargoTypes: CommonInterface.INg2Select[] = [];
+    serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    typeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    routeClearances: CommonInterface.INg2Select[] = [{ id: 'Red', text: 'Red' }, { id: 'Green', text: 'Green' }, { id: 'Blue', text: 'Blue' }];
+    cargoTypes: CommonInterface.INg2Select[] = [{ id: 'FCL', text: 'FCL' }, { id: 'LCL', text: 'LCL' }];
     commodities: Observable<Commodity[]>;
     units: Observable<Unit[]>;
 
@@ -82,9 +82,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareBussinessState>,
-        private _operationRepo: OperationRepo,
-        private _toart: ToastrService,
-        private _documentation: DocumentationRepo) {
+    ) {
         super();
     }
 
@@ -156,6 +154,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.consignee = this.formGroup.controls['consignee'];
         this.note = this.formGroup.controls['note'];
     }
+
     setFormValue() {
         console.log(this.customDeclaration);
         this.formGroup.patchValue({
@@ -178,30 +177,29 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             consignee: this.customDeclaration.consignee,
             note: this.customDeclaration.note
         });
-        setTimeout(() => {
 
-            if (!!this.customDeclaration.serviceType) {
-                if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express') {
-                    this.isDisableCargo = true;
-                } else {
-                    this.isDisableCargo = false;
-                }
-                this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(type => type.id === this.customDeclaration.serviceType)]);
+        if (!!this.customDeclaration.serviceType) {
+            if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express') {
+                this.isDisableCargo = true;
+            } else {
+                this.isDisableCargo = false;
             }
-            if (!!this.customDeclaration.route) {
-                this.formGroup.controls['route'].setValue([this.routeClearances.find(type => type.id === this.customDeclaration.route)]);
+            this.formGroup.controls['serviceType'].setValue([this.serviceTypes.find(type => type.id === this.customDeclaration.serviceType)]);
+        }
+        if (!!this.customDeclaration.route) {
+            this.formGroup.controls['route'].setValue([this.routeClearances.find(type => type.id === this.customDeclaration.route)]);
+        }
+        if (!!this.customDeclaration.type) {
+            this.formGroup.controls['type'].setValue([this.typeClearances.find(type => type.id === this.customDeclaration.type)]);
+        }
+        if (!!this.customDeclaration.cargoType) {
+            const value = this.cargoTypes.find(type => type.id === this.customDeclaration.cargoType);
+            if (!!value) {
+                this.formGroup.controls['cargoType'].setValue([value]);
             }
-            if (!!this.customDeclaration.type) {
-                this.formGroup.controls['type'].setValue([this.typeClearances.find(type => type.id === this.customDeclaration.type)]);
-            }
-            if (!!this.customDeclaration.cargoType) {
-                const value = this.cargoTypes.find(type => type.id === this.customDeclaration.cargoType);
-                if (!!value) {
-                    this.formGroup.controls['cargoType'].setValue([value]);
-                }
-            }
-        }, 30);
+        }
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
@@ -224,6 +222,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 break;
         }
     }
+
     selectedServiceType(event, type: string) {
         switch (type) {
             case 'service-type':
@@ -245,6 +244,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
                 break;
         }
     }
+
     getClearance() {
         const form = this.formGroup.getRawValue();
         console.log(form);

@@ -11,6 +11,7 @@ import { map, share, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { FormValidators } from '@validators';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -35,10 +36,12 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     purchaseOrderNo: AbstractControl;
     billingOpsId: AbstractControl;
     commodityGroupId: AbstractControl;
+    shipmentType: AbstractControl;
 
-    productServices: Observable<CommonInterface.INg2Select[]>;
-    serviceModes: Observable<CommonInterface.INg2Select[]>;
-    shipmentModes: Observable<CommonInterface.INg2Select[]>;
+    productServices: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
+    serviceModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SERVICEMODES;
+    shipmentModes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
+    shipmentTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
     commodityGroups: Observable<CommonInterface.INg2Select[]>;
 
     customers: Observable<Customer[]>;
@@ -73,7 +76,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
-        this.getCommonData();
         this.getUser();
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
@@ -127,19 +129,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         }
     }
 
-    getCommonData() {
-        this.commonData$ = this._documentRepo.getOPSShipmentCommonData().pipe(share(), takeUntil(this.ngUnsubscribe));
-        this.productServices = this.commonData$.pipe(
-            map((data: any) => this.utility.prepareNg2SelectData(data.productServices, 'value', 'displayName'))
-        );
-        this.serviceModes = this.commonData$.pipe(
-            map((data: any) => this.utility.prepareNg2SelectData(data.serviceModes, 'value', 'displayName'))
-        );
-        this.shipmentModes = this.commonData$.pipe(
-            map((data: any) => this.utility.prepareNg2SelectData(data.shipmentModes, 'value', 'displayName'))
-        );
-    }
-
     initForm() {
         this.formCreate = this._fb.group({
             hwbno: [null, Validators.required],
@@ -153,6 +142,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             serviceMode: [],
             shipmentMode: [],
             commodityGroupId: [],
+            shipmentType: [[this.shipmentTypes[0]]],
 
             customerId: [null, Validators.required],
             pol: [],
@@ -175,6 +165,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.supplierId = this.formCreate.controls['supplierId'];
         this.agentId = this.formCreate.controls['agentId'];
         this.billingOpsId = this.formCreate.controls['billingOpsId'];
+        this.shipmentType = this.formCreate.controls['shipmentType'];
 
         if (!!this.userLogged) {
             this.billingOpsId.setValue(this.userLogged.id);

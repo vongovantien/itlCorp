@@ -142,15 +142,16 @@ export class JobConstants {
             { id: "Import", text: "Import" }
         ],
         PRODUCTSERVICE: <CommonInterface.INg2Select[]>[
-            { id: "SeaFCL", text: "SeaFCL" },
-            { id: "SeaLCL", text: "SeaLCL" },
+            { id: "SeaFCL", text: "Sea FCL" },
+            { id: "SeaLCL", text: "Sea LCL" },
             { id: "Air", text: "Air" },
             { id: "Trucking", text: "Trucking" },
-            { id: "Crossborder", text: "Crossborder" },
+            { id: "Crossborder", text: "Cross border" },
             { id: "Warehouse", text: "Warehouse" },
             { id: "Railway", text: "Railway" },
             { id: "Express", text: "Express" },
-            { id: "Other", text: "Other" }
+            { id: "BondedWarehouse", text: "Bonded Warehouse" },
+            { id: "Other", text: "Other" },
         ],
     };
 

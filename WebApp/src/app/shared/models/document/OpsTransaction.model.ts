@@ -51,7 +51,7 @@ export class OpsTransaction extends BaseModel {
         currentStatus: string = '';
         shipper: string = '';
         consignee: string = '';
-
+        shipmentType: string = null;
 
         permission: PermissionShipment = new PermissionShipment();
 
