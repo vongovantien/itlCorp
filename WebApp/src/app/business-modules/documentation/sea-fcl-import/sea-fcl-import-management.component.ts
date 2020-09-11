@@ -15,7 +15,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
-import { formatDate } from '@angular/common';
+import { JobConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-fcl-import-management',
@@ -43,8 +43,7 @@ export class SeaFCLImportManagementComponent extends AppList {
 
     defaultDataSearch = {
         transactionType: this.transactionService,
-        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+        ...JobConstants.DEFAULT_RANGE_DATE_SEARCH
     };
 
     constructor(
