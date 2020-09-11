@@ -250,8 +250,9 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Air Freight</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted && !freightPayment.value) || (isSubmitted && freightPayment.value.length <= 0)}">
+                                <label required>Air Freight</label>
                                 <ng-select #airFreight [items]="termTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(airFreight)" formControlName="freightPayment"
                                     placeholder="Air freight">
@@ -348,8 +349,9 @@
                             </div>
                         </div>
                         <div class="col-md-6 eta-date-picker">
-                            <div class="form-group">
-                                <label>Issued Date</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !issueHbldate.value.startDate}">
+                                <label required>Issued Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"

@@ -266,9 +266,9 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.shipper = !!form.shipper ? form.shipper.trim() : null;
         this.customDeclaration.consignee = !!form.consignee ? form.consignee.trim() : null;
         this.customDeclaration.note = !!form.note ? form.note.trim() : null;
-        this.customDeclaration.cargoType = !!form.cargoType ? (form.cargoType.length > 0 ? form.cargoType[0].id : null) : null;
-        this.customDeclaration.route = !!form.route ? (form.route.length > 0 ? form.route[0].id : null) : null;
-        this.customDeclaration.serviceType = !!form.serviceType ? (form.serviceType.length > 0 ? form.serviceType[0].id : null) : null;
-        this.customDeclaration.type = !!form.type ? (form.type.length > 0 ? form.type[0].id : null) : null;
+        this.customDeclaration.cargoType = !!form.cargoType ? (form.cargoType.length > 0 && !!form.cargoType[0].id ? form.cargoType[0].id : null) : null;
+        this.customDeclaration.route = !!form.route ? (form.route.length > 0 && !!form.route[0].id ? form.route[0].id : null) : null;
+        this.customDeclaration.serviceType = !!form.serviceType ? (form.serviceType.length > 0 && !!form.serviceType[0] ? form.serviceType[0].id : null) : null;
+        this.customDeclaration.type = !!form.type ? (form.type.length > 0 && !!form.type[0].id ? form.type[0].id : null) : null;
     }
 }

@@ -1,14 +1,17 @@
 <app-sub-header>
     <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-        <button type="button" class="btn btn-warning  m-btn--icon m-btn--uppercase m--margin-right-10"
-            (click)="lockShipment()">
-            <span>
-                <i class="la la-lock"></i>
+        <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowLock">
+            <button type="button" class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10"
+                (click)="lockShipment()">
                 <span>
-                    Lock
+                    <i class="la la-lock"></i>
+                    <span>
+                        Lock
+                    </span>
                 </span>
-            </span>
-        </button>
+            </button>
+        </ng-container>
+
     </div>
     <span *ngIf="!!opsTransaction && !!opsTransaction.isLocked" class="m--margin-right-10">
         <i class="fa fa-lock text-danger fa-3x"></i>

@@ -2666,6 +2666,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         charge.VATAmount = charge.VATRate != null ? Math.Abs(charge.VATRate.Value) : 0 ;
+                        charge.VATAmount = charge.VATAmount * _exchangeRate;
                     }
                     if (charge.Currency != "VND")
                     {
@@ -3118,6 +3119,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
+                        it.VATAmount = it.VATAmount * _exchangeRate;
                     }
                     if (it.Currency != "VND")
                     {
