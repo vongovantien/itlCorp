@@ -27,7 +27,7 @@ export class CommercialFormSearchPotentialCustomerComponent extends AppForm impl
     constructor(
     ) {
         super();
-
+        this.requestReset = this.resetSearch;
     }
 
     ngOnInit() {
