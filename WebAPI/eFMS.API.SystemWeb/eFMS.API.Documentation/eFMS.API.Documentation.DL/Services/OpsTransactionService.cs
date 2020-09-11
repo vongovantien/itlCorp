@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetBy(id);
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Detail);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = detail.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
             return code;
         }
         private OpsTransactionModel GetBy(Guid id)
@@ -984,7 +984,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState Update(OpsTransactionModel model)
         {
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
-            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
+            int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId,  OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new HandleState(403);
             model.UserModified = currentUser.UserID;
             model.DatetimeModified = DateTime.Now;
