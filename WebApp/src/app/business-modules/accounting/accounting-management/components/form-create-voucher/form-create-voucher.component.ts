@@ -4,7 +4,7 @@ import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/fo
 import { AccountingConstants } from '@constants';
 import { Partner, ChartOfAccounts } from '@models';
 
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
 import { CommonEnum } from '@enums';
@@ -14,6 +14,7 @@ import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState }
 
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
+import { SelectItem } from 'ng2-select';
 
 
 @Component({
@@ -60,8 +61,8 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
-        private _dataService: DataService
-
+        private _dataService: DataService,
+        private _accountingRepo: AccountingRepo,
     ) {
         super();
     }
@@ -173,5 +174,21 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
             return cur;
         }
         return `${pre}, ${cur}`;
+    }
+
+    generateVoucherId(voucherType: string) {
+        // Call generate when VoucherId is null or empty
+        if (!this.voucherId.value) {
+            this._accountingRepo.generateVoucherId('Voucher', voucherType)
+                .subscribe(
+                    (res: any) => {
+                        this.voucherId.setValue(res.voucherId);
+                    }
+                );
+        }
+    }
+
+    selectedVoucherType(e: SelectItem) {
+        this.generateVoucherId(e.id);
     }
 }

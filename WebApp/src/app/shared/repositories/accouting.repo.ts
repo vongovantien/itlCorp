@@ -464,8 +464,8 @@ export class AccountingRepo {
             );
     }
 
-    generateVoucherId() {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateVoucherId`)
+    generateVoucherId(acctMngtType: string, voucherType: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/GenerateVoucherId`, { acctMngtType: acctMngtType, voucherType: voucherType })
             .pipe(
                 map((data: any) => data)
             );
