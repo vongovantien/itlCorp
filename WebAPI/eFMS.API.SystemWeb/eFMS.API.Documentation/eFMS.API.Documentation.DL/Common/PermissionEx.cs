@@ -21,6 +21,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Owner:
                     if (model.BillingOpsId == currentUser.UserID 
+                        || model.SaleManId == currentUser.UserID
                         || authorizeUserIds.Contains(model.BillingOpsId))
                     {
                         code = 200;
@@ -28,6 +29,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Group:
                     if (model.BillingOpsId == currentUser.UserID
+                        || model.SaleManId == currentUser.UserID
                         || (model.GroupId == currentUser.GroupId
                             && model.DepartmentId == currentUser.DepartmentId
                             && model.OfficeId == currentUser.OfficeID
@@ -39,6 +41,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Department:
                     if (model.BillingOpsId == currentUser.UserID
+                        || model.SaleManId == currentUser.UserID
                         || (model.DepartmentId == currentUser.DepartmentId 
                             && model.OfficeId == currentUser.OfficeID 
                             && model.CompanyId == currentUser.CompanyID)
@@ -49,6 +52,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Office:
                     if (model.BillingOpsId == currentUser.UserID
+                        || model.SaleManId == currentUser.UserID
                         || (model.OfficeId == currentUser.OfficeID 
                             && model.CompanyId == currentUser.CompanyID)
                         || authorizeUserIds.Contains(model.BillingOpsId))
@@ -58,6 +62,7 @@ namespace eFMS.API.Documentation.DL.Common
                     break;
                 case PermissionRange.Company:
                     if (model.BillingOpsId == currentUser.UserID
+                        || model.SaleManId == currentUser.UserID
                         || model.CompanyId == currentUser.CompanyID
                         || authorizeUserIds.Contains(model.BillingOpsId))
                     {
@@ -77,7 +82,7 @@ namespace eFMS.API.Documentation.DL.Common
                     code = 200;
                     break;
                 case PermissionRange.Owner:
-                    if (model.BillingOpsId == currentUser.UserID)
+                    if (model.BillingOpsId == currentUser.UserID || model.SaleManId == currentUser.UserID)
                     {
                         code = 200;
                     }
