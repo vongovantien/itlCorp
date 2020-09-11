@@ -26,7 +26,7 @@ export class AccountingManagementEffects {
             map((payload: PartnerOfAcctManagementResult) =>
                 ({
                     partnerId: payload.partnerId,
-                    service: payload.service,
+                    service: (!!payload.service && payload.service.split(";").length > 1) ? payload.service.split(";")[0] : payload.service,
                     office: this.getOfficeByCurrentUser()
                 })
             ),
