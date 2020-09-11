@@ -15,6 +15,8 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
+import { formatDate } from '@angular/common';
+import { getTransactionDataSearchState } from './../../share-business/store';
 
 @Component({
     selector: 'app-sea-consol-import',
@@ -38,9 +40,11 @@ export class SeaConsolImportComponent extends AppList {
     deleteMessage: string = '';
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaConsolImport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    };
     jobIdSelected: string = null;
 
     constructor(
@@ -89,14 +93,23 @@ export class SeaConsolImportComponent extends AppList {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
-
-        this.requestSearchShipment();
         this.getShipments();
+
+        this._store.select(getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
+
     }
 
     getShipments() {
@@ -146,16 +159,14 @@ export class SeaConsolImportComponent extends AppList {
         this.page = 1; // reset page.
         data.transactionType = this.transactionService;
         this.dataSearch = data;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetMasterBills($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }

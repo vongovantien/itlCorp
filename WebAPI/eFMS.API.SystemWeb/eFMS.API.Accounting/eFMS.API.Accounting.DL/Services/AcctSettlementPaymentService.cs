@@ -356,7 +356,12 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransDe = csTransactionDetailRepo.Get();
             //Quy đổi tỉ giá theo ngày Request Date
             var settle = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.RequestDate.Value.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             var dataOperation = from set in settlement
                                 join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
@@ -524,24 +529,19 @@ namespace eFMS.API.Accounting.DL.Services
             AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return null;
             //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
-            List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
-            // TODO: join từng thằng.
             IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                join cd in cdNos on opst.JobNo equals cd.JobNo into cdNoGroups // list các tờ khai theo job
+                                join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
                                 from cdNoGroup in cdNoGroups.DefaultIfEmpty()
                                 join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                 from settle in settle2.DefaultIfEmpty()
-                                join adv in advances on sur.AdvanceNo equals adv.AdvanceNo into advGroups
-                                from advGroup in advGroups.DefaultIfEmpty()
-                                join advanceRequest in advanceRequests on advGroup.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
-                                from adGroup in adGroups.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
                                 {
@@ -549,24 +549,19 @@ namespace eFMS.API.Accounting.DL.Services
                                     JobId = opst.JobNo,
                                     HBL = opst.Hwbno,
                                     MBL = opst.Mblno,
+                                    HblId = opst.Hblid,
                                     CurrencyShipment = settle.SettlementCurrency,
                                     TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                     ShipmentId = opst.Id,
                                     Type = "OPS",
-                                    CustomNo = cdNoGroup.ClearanceNo,
-                                    AdvanceNo = sur.AdvanceNo,
-                                    AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency), // Quy tỉ giá về settle
                                 };
+
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
                                join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                from settle in settle2.DefaultIfEmpty()
-                               join adv in advances on sur.AdvanceNo equals adv.AdvanceNo into advGroups
-                               from advGroup in advGroups.DefaultIfEmpty()
-                               join advanceRequest in advanceRequests on advGroup.AdvanceNo equals advanceRequest.AdvanceNo into adGroups // list các advance request theo số hblID
-                               from adGroup in adGroups.DefaultIfEmpty()
                                where sur.SettlementCode == settlementNo
                                select new ShipmentSettlement
                                {
@@ -579,33 +574,30 @@ namespace eFMS.API.Accounting.DL.Services
                                    HblId = cstd.Id,
                                    ShipmentId = cst.Id,
                                    Type = "DOC",
-                                   AdvanceNo = adGroup.AdvanceNo,
-                                   AdvanceAmount = adGroup.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advGroup.RequestDate, adGroup.RequestCurrency, settle.SettlementCurrency),
                                };
-            IQueryable<ShipmentSettlement> dataQuery = dataOperation.Union(dataDocument);
+            IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
-            var dataGroup = dataQuery.ToList()
-                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId , x.CustomNo, x.AdvanceNo, x.TotalAmount})
-                        .Select(x => new ShipmentSettlement
-                        {
-                            SettlementNo = x.Key.SettlementNo,
-                            JobId = x.Key.JobId,
-                            HBL = x.Key.HBL,
-                            MBL = x.Key.MBL,
-                            CurrencyShipment = x.Key.CurrencyShipment,
-                            TotalAmount = x.Key.TotalAmount,
-                            HblId = x.Key.HblId,
-                            Type = x.Key.Type,
-                            ShipmentId = x.Key.ShipmentId,
-                            CustomNo = x.Key.CustomNo,
-                            AdvanceNo = x.Key.AdvanceNo,
-                            AdvanceAmount = x.Sum(a => a.AdvanceAmount),
-                            Balance = x.Sum(su => su.TotalAmount) - x.Sum(a => a.AdvanceAmount), // settleAmount - AdvanceAmount
-                        });
+            var dataGroups = dataQueryUnionService.ToList()
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId})
+                .Select(x => new ShipmentSettlement
+            {
+                SettlementNo = x.Key.SettlementNo,
+                JobId = x.Key.JobId,
+                HBL = x.Key.HBL,
+                MBL = x.Key.MBL,
+                CurrencyShipment = x.Key.CurrencyShipment,
+                TotalAmount = x.Sum(t => t.TotalAmount),
+                HblId = x.Key.HblId,
+                Type = x.Key.Type,
+                ShipmentId = x.Key.ShipmentId,
+            });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (ShipmentSettlement item in dataGroup)
+            foreach (ShipmentSettlement item in dataGroups)
             {
+                // Lấy thông tin advance theo group settlement.
+                AdvanceInfo advInfo = GetAdvanceInfo(item.SettlementNo, item.MBL, item.HBL, item.CurrencyShipment);
+
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
                     SettlementNo = item.SettlementNo,
@@ -618,14 +610,52 @@ namespace eFMS.API.Accounting.DL.Services
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
-                    CustomNo =item.CustomNo,
-                    AdvanceNo = item.AdvanceNo,
-                    AdvanceAmount = item.AdvanceAmount,
-                    Balance = item.Balance
+
+                    AdvanceNo = advInfo.AdvanceNo,
+                    AdvanceAmount = advInfo.AdvanceAmount,
+                    Balance = item.TotalAmount - advInfo.AdvanceAmount,
+                    CustomNo = advInfo.CustomNo
                 });
             }
 
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+        }
+
+        public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, string _hbl, string _SettleCurrency)
+        {
+            AdvanceInfo result = new AdvanceInfo();
+            string advNo = null, customNo = null;
+            IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
+            var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
+
+            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblno == _hbl && x.Key.Mblno == _mbl);
+            if(surchargeGrp != null && surchargeGrp.Count() > 0)
+            {
+                 advNo = surchargeGrp?.FirstOrDefault().Key.AdvanceNo;
+                 customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
+            }
+          
+
+            if (!string.IsNullOrEmpty(advNo))
+            {
+                var advData = from advP in acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                              join advR in acctAdvanceRequestRepo.Get() on advP.AdvanceNo equals advR.AdvanceNo
+                              where advR.Mbl == _mbl && advR.Hbl == _hbl && advR.AdvanceNo == advNo
+                              select new
+                              {
+                                  AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, _SettleCurrency), // tính theo tỷ giá ngày request adv và currency settlement
+                              };
+                result.AdvanceNo = advNo;
+                result.AdvanceAmount = advData.ToList().Sum(x => x.AdvAmount);
+            }
+
+            if (!string.IsNullOrEmpty(customNo))
+            {
+                result.CustomNo = customNo;
+            }
+
+            return result;
+
         }
 
         public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL)
@@ -914,8 +944,13 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
-            //Quy đổi tỉ giá theo ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            //Quy đổi tỉ giá theo ngày hiện tại, nếu tỉ giá ngày hiện tại không có thì lấy ngày mới nhất
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             //Chỉ lấy ra những settlement có status là done     
             var dataOperation = from settle in settlement
@@ -1564,7 +1599,12 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Chỉ lấy ra các charge có status advance là done
             //Quy đổi tỉ giá theo ngày hiện tại
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == DateTime.Now.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
             var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
             var request = acctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
             var query = from adv in advance
@@ -1661,8 +1701,13 @@ namespace eFMS.API.Accounting.DL.Services
 
             var settle = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
 
-            //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settle.RequestDate.Value.Date).ToList();
+            //Quy đổi tỉ giá theo ngày Request Date, nếu không có thì lấy exchange rate mới nhất
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             var data = from sur in surcharge
                        join cat in charge on sur.ChargeId equals cat.Id into cat2
@@ -1694,7 +1739,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Description = cat.ChargeNameEn,
                            InvoiceNo = sur.InvoiceNo == null ? string.Empty : sur.InvoiceNo,
                            Amount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
-                           Debt = false,
+                           Debt = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false,
                            Currency = string.Empty,
                            Note = sur.Notes,
                            AdvDpManagerID = string.Empty,
@@ -3625,7 +3670,12 @@ namespace eFMS.API.Accounting.DL.Services
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -3726,7 +3776,12 @@ namespace eFMS.API.Accounting.DL.Services
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -3802,7 +3857,12 @@ namespace eFMS.API.Accounting.DL.Services
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -4213,8 +4273,13 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var listData = new List<InfoShipmentSettlementExport>();
 
-            //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeModified.Value.Date == settlementPayment.RequestDate.Value.Date).ToList();
+            //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
+            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlementPayment.RequestDate.Value.Date).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
@@ -4222,6 +4287,14 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
+
+                #region -- CHANRGE AND ADVANCE OF SETTELEMENT --
+                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
+                var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
+                shipmentSettlement.ShipmentCharges = _shipmentCharges;
+                shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
+                #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
+
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
                 if (ops != null)
                 {
@@ -4234,51 +4307,6 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Cw = ops.SumChargeWeight;
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
-                    var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo
-                                                                       && x.Mbl == shipmentSettlement.MBL
-                                                                       && x.Hbl == shipmentSettlement.HBL);
-
-                    var advanceRequest = advanceRequests.FirstOrDefault();
-
-                    //Chỉ lấy những advance đã được phê duyệt
-                    if (advanceRequest != null)
-                    {
-                        var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault();
-                        if (advancePayment != null && advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                        {
-                            shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
-                            shipmentSettlement.AdvanceRequestDate = advancePayment.RequestDate;
-                        }
-                    }
-
-                    var list = new List<InfoShipmentChargeSettlementExport>();
-                    var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == houseBillId.hblId);
-                    foreach (var sur in surChargeByHblId)
-                    {
-                        var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
-                        infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
-                        //Quy đổi theo currency của Settlement
-                        infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementPayment.SettlementCurrency);
-                        infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
-                        infoShipmentCharge.ChargeNote = sur.Notes;
-                        string _chargeType = string.Empty;
-                        if (sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
-                        {
-                            _chargeType = "OBH";
-                        }
-                        else if (sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
-                        {
-                            _chargeType = "INVOICE";
-                        }
-                        else
-                        {
-                            _chargeType = "NO_INVOICE";
-                        }
-                        infoShipmentCharge.ChargeType = _chargeType;
-
-                        list.Add(infoShipmentCharge);
-                    }
-                    shipmentSettlement.ShipmentCharges = list;
 
                     listData.Add(shipmentSettlement);
                 }
@@ -4287,10 +4315,10 @@ namespace eFMS.API.Accounting.DL.Services
                     var tranDetail = csTransactionDetailRepo.Get(x => x.Id == houseBillId.hblId).FirstOrDefault();
                     if (tranDetail != null)
                     {
-                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault().JobNo;
-                        shipmentSettlement.CustomNo = houseBillId.customNo;
+                        shipmentSettlement.JobNo = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.JobNo;
+                        shipmentSettlement.CustomNo = string.Empty; //Hàng Documentation không có CustomNo
                         shipmentSettlement.HBL = tranDetail.Hwbno;
-                        shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault().Mawb;
+                        shipmentSettlement.MBL = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault()?.Mawb;
                         shipmentSettlement.Customer = catPartnerRepo.Get(x => x.Id == tranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
                         shipmentSettlement.Shipper = catPartnerRepo.Get(x => x.Id == tranDetail.ShipperId).FirstOrDefault()?.PartnerNameVn;
                         shipmentSettlement.Consignee = catPartnerRepo.Get(x => x.Id == tranDetail.ConsigneeId).FirstOrDefault()?.PartnerNameVn;
@@ -4298,58 +4326,69 @@ namespace eFMS.API.Accounting.DL.Services
                         shipmentSettlement.Cw = tranDetail.ChargeWeight;
                         shipmentSettlement.Pcs = tranDetail.PackageQty;
                         shipmentSettlement.Cbm = tranDetail.Cbm;
-                        var advanceRequests = acctAdvanceRequestRepo.Get(x => x.JobId == shipmentSettlement.JobNo
-                                                                           && x.Mbl == shipmentSettlement.MBL
-                                                                           && x.Hbl == shipmentSettlement.HBL);
-
-                        var advanceRequest = advanceRequests.FirstOrDefault();
-
-                        //Chỉ lấy những advance đã được phê duyệt
-                        if (advanceRequest != null)
-                        {
-                            var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceRequest.AdvanceNo).FirstOrDefault();
-                            if (advancePayment != null && advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                            {
-                                shipmentSettlement.AdvanceAmount = advanceRequests.Select(s => s.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementPayment.SettlementCurrency)).Sum();
-                                shipmentSettlement.AdvanceRequestDate = advancePayment.RequestDate;
-                            }
-                        }
-
-                        var list = new List<InfoShipmentChargeSettlementExport>();
-                        var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == houseBillId.hblId);
-                        foreach (var sur in surChargeByHblId)
-                        {
-                            var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
-                            infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
-                            //Quy đổi theo currency của Settlement
-                            infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementPayment.SettlementCurrency);
-                            infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
-                            infoShipmentCharge.ChargeNote = sur.Notes;
-                            string _chargeType = string.Empty;
-                            if (sur.Type == "OBH" || (sur.IsFromShipment == false && sur.TypeOfFee == "OBH"))
-                            {
-                                _chargeType = "OBH";
-                            }
-                            else if (sur.TypeOfFee == "Invoice" || (sur.IsFromShipment == true && sur.Type != "OBH"))
-                            {
-                                _chargeType = "INVOICE";
-                            }
-                            else
-                            {
-                                _chargeType = "NO_INVOICE";
-                            }
-                            infoShipmentCharge.ChargeType = _chargeType;
-
-                            list.Add(infoShipmentCharge);
-                        }
-                        shipmentSettlement.ShipmentCharges = list;
-
+                        
                         listData.Add(shipmentSettlement);
                     }
                 }
             }
             return listData;
         }
+
+        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        {
+            var shipmentSettlement = new InfoShipmentSettlementExport();
+            var listCharge = new List<InfoShipmentChargeSettlementExport>();
+            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId);
+            foreach (var sur in surChargeByHblId)
+            {
+                var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
+                infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
+                //Quy đổi theo currency của Settlement
+                infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
+                infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
+                infoShipmentCharge.ChargeNote = sur.Notes;
+                string _chargeType = string.Empty;
+                if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    _chargeType = AccountingConstants.TYPE_CHARGE_OBH;
+                }
+                else if (!string.IsNullOrEmpty(sur.InvoiceNo) && sur.Type != AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    _chargeType = "INVOICE";
+                }
+                else
+                {
+                    _chargeType = "NO_INVOICE";
+                }
+                infoShipmentCharge.ChargeType = _chargeType;
+
+                listCharge.Add(infoShipmentCharge);
+            }            
+            return listCharge;
+        }
+
+        private List<InfoAdvanceExport> GetAdvanceOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        {
+            var listAdvance = new List<InfoAdvanceExport>();
+            // Gom surcharge theo AdvanceNo & HBLID
+            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList();
+            foreach (var item in groupAdvanceNoAndHblID)
+            {
+                //Advance Payment có Status Approve là Done
+                var advanceIsDone = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == item.Key.AdvanceNo
+                && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).FirstOrDefault();
+                if (advanceIsDone != null)
+                {
+                    var advance = new InfoAdvanceExport();
+                    var advanceAmountByHbl = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceIsDone.AdvanceNo && x.Hblid == item.Key.Hblid)
+                        .Select(s => s.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementCurrency)).Sum();
+                    advance.AdvanceAmount = advanceAmountByHbl;
+                    advance.RequestDate = advanceIsDone.RequestDate;
+                    listAdvance.Add(advance);
+                }
+            }
+            return listAdvance;
+        } 
 
         public List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode)
         {
@@ -4550,3 +4589,4 @@ namespace eFMS.API.Accounting.DL.Services
         }
     }
 }
+

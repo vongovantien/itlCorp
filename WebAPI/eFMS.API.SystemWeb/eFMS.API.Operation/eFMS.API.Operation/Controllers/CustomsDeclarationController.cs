@@ -79,6 +79,7 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("Query")]
+        [AuthorizeEx(Menu.opsCustomClearance, UserPermission.AllowAccess)]
         public IActionResult Query(CustomsDeclarationCriteria criteria)
         {
             var data = customsDeclarationService.Query(criteria);

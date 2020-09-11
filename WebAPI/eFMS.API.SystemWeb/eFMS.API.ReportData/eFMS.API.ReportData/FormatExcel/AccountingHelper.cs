@@ -19,7 +19,8 @@ namespace eFMS.API.ReportData.FormatExcel
     {
         const double minWidth = 0.00;
         const double maxWidth = 500.00;
-        const string numberFormat = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-_(_)";
+        //const string numberFormat = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-_(_)";
+        const string numberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
         const string numberFormatUSD = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
 
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
@@ -2507,6 +2508,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     workSheet.Cells[k, 4].Value = _no;
                     workSheet.Cells[k, 5].Value = invoice.ChargeName;
+                    workSheet.Cells[k, 5].Style.WrapText = true;
 
                     workSheet.Cells[k, 6].Value = invoice.ChargeAmount;
                     workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
@@ -2530,6 +2532,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     workSheet.Cells[k, 4].Value = _no;
                     workSheet.Cells[k, 5].Value = no_invoice.ChargeName;
+                    workSheet.Cells[k, 5].Style.WrapText = true;
 
                     workSheet.Cells[k, 6].Value = no_invoice.ChargeAmount;
                     workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
@@ -2553,6 +2556,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     workSheet.Cells[k, 4].Value = _no;
                     workSheet.Cells[k, 5].Value = obh.ChargeName;
+                    workSheet.Cells[k, 5].Style.WrapText = true;
 
                     workSheet.Cells[k, 6].Value = obh.ChargeAmount;
                     workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
@@ -2659,7 +2663,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j - 1, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total advanced amount (số tiền đã tạm ứng)
-                var _advanceAmount = settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
+                var _advanceAmount = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
                 workSheet.Cells[j - 1, 9].Value = _advanceAmount;
                 workSheet.Cells[j - 1, 9].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[j - 1, 9].Style.Font.Bold = true;
@@ -2682,14 +2686,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 1, j - 1, 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 workSheet.Cells[p, 9, j - 2, 9].Merge = true;
-                workSheet.Cells[p, 9, j - 2, 9].Value = settlementExport.ShipmentsSettlement[i].AdvanceAmount; //Value Số tiền đã tạm ứng
+                workSheet.Cells[p, 9, j - 2, 9].Value = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount); //Value Số tiền đã tạm ứng
                 workSheet.Cells[p, 9, j - 2, 9].Style.Numberformat.Format = numberFormat;
                 workSheet.Cells[p, 9, j - 2, 9].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 9, j - 2, 9].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 9, j - 2, 9].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
+                var _requestDateAdvance = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Select(s => s.RequestDate).FirstOrDefault();
                 workSheet.Cells[p, 10, j - 2, 10].Merge = true;
-                workSheet.Cells[p, 10, j - 2, 10].Value = settlementExport.ShipmentsSettlement[i].AdvanceRequestDate.HasValue ? settlementExport.ShipmentsSettlement[i].AdvanceRequestDate.Value.ToString("dd/MM/yyyy") : string.Empty; //Value Ngày tạm ứng
+                workSheet.Cells[p, 10, j - 2, 10].Value = _requestDateAdvance.HasValue ? _requestDateAdvance.Value.ToString("dd/MM/yyyy") : string.Empty; //Value Ngày tạm ứng
                 workSheet.Cells[p, 10, j - 2, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 10, j - 2, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 10, j - 2, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -2705,7 +2710,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 ////
 
                 _sumTotalAmount += (settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum() ?? 0);
-                _sumTotalAdvancedAmount += (settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0);
+                _sumTotalAdvancedAmount += settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//(settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0);
                 _sumTotalDifference = _sumTotalAmount - _sumTotalAdvancedAmount;
             }
 
@@ -2741,6 +2746,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
             for (var i = 8; i < p + 1; i++)
             {
+                //In đậm border bên trái của Cột 1
+                workSheet.Cells[i, 1].Style.Border.Left.Style = ExcelBorderStyle.Medium;
                 //In đậm border Cột 3
                 workSheet.Cells[i, 3].Style.Border.Right.Style = ExcelBorderStyle.Medium;
                 //In đậm border Cột 8

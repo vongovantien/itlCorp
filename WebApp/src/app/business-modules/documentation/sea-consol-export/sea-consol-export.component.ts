@@ -9,10 +9,11 @@ import { CommonEnum } from '@enums';
 import { SortService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
-import { IShareBussinessState, getTransationLoading, getTransactionListShipment, TransactionLoadListAction } from '@share-bussiness';
+import { IShareBussinessState, getTransationLoading, getTransactionListShipment, TransactionLoadListAction, getTransactionDataSearchState } from '@share-bussiness';
 
 import { AppList } from 'src/app/app.list';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -35,10 +36,13 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     itemToDelete: { id: string } = null;
     transactionService: number = CommonEnum.TransactionTypeEnum.SeaConsolExport;
 
-    _fromDate: Date = this.createMoment().startOf('month').toDate();
-    _toDate: Date = this.createMoment().endOf('month').toDate();
-
     jobIdSelected: string = null;
+
+    defaultDataSearch = {
+        transactionType: this.transactionService,
+        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+    };
 
     constructor(
         private _router: Router,
@@ -57,11 +61,6 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
 
         this.isLoading = this._store.select(getTransationLoading);
 
-        this.dataSearch = {
-            transactionType: this.transactionService,
-            fromDate: this._fromDate,
-            toDate: this._toDate,
-        };
     }
 
     ngOnInit() {
@@ -91,10 +90,23 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
             { title: 'CBM', field: 'cbm', sortable: true },
         ];
 
-        this.requestSearchShipment();
         this.getShipments();
-    }
 
+        this._store.select(getTransactionDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (criteria: any) => {
+                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
+                        this.dataSearch = criteria;
+                    } else {
+                        this.dataSearch = this.defaultDataSearch;
+                    }
+                    this.requestSearchShipment();
+                }
+            );
+    }
 
     getShipments() {
         this._store.select(getTransactionListShipment)
@@ -138,16 +150,14 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
-        this.requestSearchShipment();
+
         this.loadListHouseBillExpanding();
     }
 
     onResetShipment($event: any) {
         this.page = 1;
-        $event.transactionType = this.transactionService;
-        $event.fromDate = this._fromDate;
-        $event.toDate = this._toDate;
-        this.dataSearch = $event;
+        this.dataSearch = this.defaultDataSearch;
+
         this.requestSearchShipment();
         this.loadListHouseBillExpanding();
     }
