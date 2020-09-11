@@ -546,8 +546,19 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 
                 var opsTransaction = GetNewShipmentToConvert(productService, model);
-                int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+                //int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
+                //opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
+                SysOffice office = null;
+                string prefixJob = string.Empty;
+                var currentUserOffice = currentUser?.OfficeID ?? null;
+                if (currentUserOffice != null)
+                {
+                    office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
+                    prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
+                }
+                prefixJob += DocumentConstants.OPS_SHIPMENT;
+                int countNumberJob = GetNumberOpsToGenerateJobNo(office);
+                opsTransaction.JobNo = GenerateID.GenerateOPSJobID(prefixJob, countNumberJob);
                 DataContext.Add(opsTransaction, false);
 
                 if (model.Id > 0)
@@ -598,7 +609,8 @@ namespace eFMS.API.Documentation.DL.Services
                 DatetimeCreated = DateTime.Now,
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
-                UserModified = currentUser.UserID
+                UserModified = currentUser.UserID,
+                ShipmentType = "Freehand",
             };
             var customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
             if (customer != null)

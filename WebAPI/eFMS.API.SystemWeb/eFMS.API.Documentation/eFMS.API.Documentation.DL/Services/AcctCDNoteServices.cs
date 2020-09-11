@@ -153,8 +153,6 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             int count = 0;
-            //var cdCode = DataContext.Get(x => x.Code.StartsWith(code) && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
-            //    .OrderByDescending(x => x.DatetimeCreated).FirstOrDefault()?.Code;
             var cdCode = GetCdNoteToGenerateCode(office, code)?.Code;
             if (cdCode != null)
             {
@@ -168,46 +166,30 @@ namespace eFMS.API.Documentation.DL.Services
         private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code)
         {
             AcctCdnote currentCdNote = null;
+            var currentCdNotes = DataContext.Get(x => x.Code.StartsWith(code)
+                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
+                                                    .OrderByDescending(x => x.DatetimeCreated);
             if (office != null)
             {
                 if (office.Code == "ITLHAN")
                 {
-                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
-                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && x.Code.StartsWith("HAN"))
-                                                    .OrderByDescending(x => x.DatetimeCreated)
-                                                    .FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("HAN")).FirstOrDefault();
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
-                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                      && x.Code.StartsWith("DAD"))
-                                                    .OrderByDescending(x => x.DatetimeCreated)
-                                                    .FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("DAD")).FirstOrDefault();
                 }
                 else
                 {
-                    currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
-                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.Code.StartsWith("DAD")
-                                                        && !x.Code.StartsWith("HAN"))
-                                                    .OrderByDescending(x => x.DatetimeCreated)
-                                                    .FirstOrDefault();
+                    currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("DAD")
+                                                           && !x.Code.StartsWith("HAN")).FirstOrDefault();
                 }
             }
             else
             {
-                currentCdNote = DataContext.Get(x => x.Code.StartsWith(code)
-                                                  && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                  && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                  && !x.Code.StartsWith("DAD")
-                                                  && !x.Code.StartsWith("HAN"))
-                                                    .OrderByDescending(x => x.DatetimeCreated)
-                                                    .FirstOrDefault();
+                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("DAD")
+                                                       && !x.Code.StartsWith("HAN")).FirstOrDefault();
             }
             return currentCdNote;
         }

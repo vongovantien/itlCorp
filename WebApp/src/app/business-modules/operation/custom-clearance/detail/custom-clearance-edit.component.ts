@@ -14,6 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class CustomClearanceEditComponent extends AppPage implements OnInit {
     @ViewChild(CustomClearanceFormDetailComponent, { static: false }) detailComponent: CustomClearanceFormDetailComponent;
+
     isImported: boolean = false;
     customDeclaration: CustomClearance;
 
@@ -32,16 +33,6 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
                 this.getCustomCleanranceById(+prams.id);
             }
         });
-        this._operationRepo.getClearanceTypes()
-            .subscribe((res: any) => {
-                if (!!res) {
-
-                    this.detailComponent.serviceTypes = res.serviceTypes.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.detailComponent.typeClearances = res.types.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.detailComponent.routeClearances = res.routes.map(x => ({ "text": x.displayName, "id": x.value }));
-                    this.detailComponent.cargoTypes = res.cargoTypes.map(x => ({ "text": x.displayName, "id": x.value }));
-                }
-            });
     }
 
     getCustomCleanranceById(id: number) {
@@ -57,6 +48,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
                 }
             );
     }
+
     saveCustomClearance() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = false;
@@ -71,13 +63,17 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.detailComponent.getClearance();
         this.updateCustomClearance();
     }
-    async updateCustomClearance() {
-        const respone = await this._operationRepo.updateCustomDeclaration(this.customDeclaration).toPromise();
-        if (respone['status'] === true) {
-            this._toart.success(respone['message']);
-            this.getCustomCleanranceById(this.customDeclaration.id);
-        }
+
+    updateCustomClearance() {
+        this._operationRepo.updateCustomDeclaration(this.customDeclaration)
+            .subscribe((respone) => {
+                if (respone['status'] === true) {
+                    this._toart.success(respone['message']);
+                    this.getCustomCleanranceById(this.customDeclaration.id);
+                }
+            });
     }
+
     saveAndConvert() {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
@@ -102,11 +98,14 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.detailComponent.getClearance();
         this.updateAndConvertClearance();
     }
-    async updateAndConvertClearance() {
-        const response = await this._documentation.convertExistedClearanceToJob([this.customDeclaration]).toPromise();
-        if (response.status) {
-            this._toart.success("Convert Successfull!!!");
-            this.getCustomCleanranceById(this.customDeclaration.id);
-        }
+
+    updateAndConvertClearance() {
+        this._documentation.convertExistedClearanceToJob([this.customDeclaration])
+            .subscribe((response) => {
+                if (response.status) {
+                    this._toart.success("Convert Successfull!!!");
+                    this.getCustomCleanranceById(this.customDeclaration.id);
+                }
+            });
     }
 }

@@ -40,6 +40,8 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string COMPANY_WEBSITE = "www‎.‎itlvn‎.‎com‎";
         public static readonly string COMPANY_CONTACT = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
         public static readonly string COMPANY_TAXCODE = "0301909173";
+        public static readonly string COMPANY_NAME_LOCAL = "Công ty CP Giao Nhận và Vận Chuyển Indo Trần";
+        public static readonly string COMPANY_ADDRESS_LOCAL = "52‎-‎54‎-‎56 ‎Trường Sơn, Quận Tân Bình, TP. HCM‎";
         #endregion
         public static readonly string CURRENCY_LOCAL = "VND";
         public static readonly string CURRENCY_USD = "USD";
