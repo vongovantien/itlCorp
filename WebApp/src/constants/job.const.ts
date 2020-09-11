@@ -145,6 +145,7 @@ export class JobConstants {
             { id: "SeaFCL", text: "Sea FCL" },
             { id: "SeaLCL", text: "Sea LCL" },
             { id: "Air", text: "Air" },
+            { id: "Sea", text: "Sea" },
             { id: "Trucking", text: "Trucking" },
             { id: "Crossborder", text: "Cross border" },
             { id: "Warehouse", text: "Warehouse" },
