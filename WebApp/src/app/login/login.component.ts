@@ -107,8 +107,8 @@ export class LoginComponent {
 
                             // save username & password into cookies.
                             const userInfoEncrypted = this.encryptUserInfo(this.username, this.password);
-                            this.cookieService.set("__u", userInfoEncrypted.username_encrypt, null, "/", window.location.hostname);
-                            this.cookieService.set("__p", userInfoEncrypted.password_encrypt, null, "/", location.hostname);
+                            this.cookieService.set("__u", userInfoEncrypted.username_encrypt, 1, "/", window.location.hostname); // * 1 days.
+                            this.cookieService.set("__p", userInfoEncrypted.password_encrypt, 1, "/", location.hostname);
 
                             this.toastr.info("Welcome back, " + userInfo.userName.toUpperCase() + " !", "Login Success");
                         }
@@ -127,8 +127,8 @@ export class LoginComponent {
     rememberMe() {
         if (this.remember_me) {
             const userInfo = this.encryptUserInfo(this.username, this.password);
-            this.cookieService.set("_u", userInfo.username_encrypt, null, "/", window.location.hostname);
-            this.cookieService.set("_p", userInfo.password_encrypt, null, "/", location.hostname);
+            this.cookieService.set("_u", userInfo.username_encrypt, 1, "/", window.location.hostname);
+            this.cookieService.set("_p", userInfo.password_encrypt, 1, "/", location.hostname);
         } else {
             this.cookieService.deleteAll("/", window.location.hostname);
         }
