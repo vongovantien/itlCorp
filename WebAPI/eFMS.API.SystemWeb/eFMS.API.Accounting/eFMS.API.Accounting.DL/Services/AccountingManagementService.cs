@@ -1198,15 +1198,34 @@ namespace eFMS.API.Accounting.DL.Services
             return total;
         }
 
-        public string GenerateVoucherId()
+        /// <summary>
+        /// Generate Voucher ID
+        /// </summary>
+        /// <param name="acctMngtType">Invoice or Voucher</param>
+        /// <param name="voucherType">Voucher Type of Voucher</param>
+        /// <returns></returns>
+        public string GenerateVoucherId(string acctMngtType, string voucherType)
         {
+            if (string.IsNullOrEmpty(acctMngtType)) return string.Empty;
             int monthCurrent = DateTime.Now.Month;
             string year = DateTime.Now.Year.ToString();
-            string month = (monthCurrent < 10 ? "0" : string.Empty) + monthCurrent.ToString();
+            string month = monthCurrent.ToString().PadLeft(2, '0');//Nếu tháng < 10 thì gắn thêm số 0 phía trước, VD: 09
             string no = "001";
 
-            IQueryable<string> voucherNewests = Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month)
-            .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
+            IQueryable<string> voucherNewests = null;
+            string _prefixVoucher = string.Empty;
+            if (acctMngtType == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+            {
+                _prefixVoucher = "FDT";                
+            }
+            else if (acctMngtType == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+            {
+                if (string.IsNullOrEmpty(voucherType)) return string.Empty;
+                _prefixVoucher = GetPrefixVoucherByVoucherType(voucherType);
+            }
+            voucherNewests = Get(x => x.Type == acctMngtType && x.VoucherId.Contains(_prefixVoucher) && x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month)
+                .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
+
             string voucherNewest = voucherNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(voucherNewest))
             {
@@ -1217,8 +1236,39 @@ namespace eFMS.API.Accounting.DL.Services
                     no = no.PadLeft(3, '0');
                 }
             }
-            string voucher = year + "FDT" + no + "/" + month;
+            string voucher = year + _prefixVoucher + no + "/" + month;
             return voucher;
+        }
+
+        private string GetPrefixVoucherByVoucherType(string voucherType)
+        {
+            string _prefixVoucher = string.Empty;
+            if (string.IsNullOrEmpty(voucherType)) return _prefixVoucher;
+            switch (voucherType.Trim().ToUpper())
+            {
+                case "CASH RECEIPT":
+                    _prefixVoucher = "FPT";
+                    break;
+                case "CASH PAYMENT":
+                    _prefixVoucher = "FPC";
+                    break;
+                case "DEBIT SLIP":
+                    _prefixVoucher = "FBN";
+                    break;
+                case "CREDIT SLIP":
+                    _prefixVoucher = "FBC";
+                    break;
+                case "PURCHASING NOTE":
+                    _prefixVoucher = "FNM";
+                    break;
+                case "OTHER ENTRY":
+                    _prefixVoucher = "FPK";
+                    break;
+                default:
+                    _prefixVoucher = string.Empty;
+                    break;
+            }
+            return _prefixVoucher;
         }
 
         public string GenerateInvoiceNoTemp()

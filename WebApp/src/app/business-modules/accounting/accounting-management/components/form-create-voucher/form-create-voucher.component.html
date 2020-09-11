@@ -72,7 +72,8 @@
                             <div class="form-group">
                                 <label>Voucher Type</label>
                                 <ng-select #v [items]="voucherTypes" [allowClear]="true" (opened)="closeOtherSelects(v)"
-                                    formControlName="voucherType" placeholder="Select Type">
+                                    formControlName="voucherType" placeholder="Select Type"
+                                    (selected)="selectedVoucherType($event)">
                                 </ng-select>
                             </div>
                         </div>

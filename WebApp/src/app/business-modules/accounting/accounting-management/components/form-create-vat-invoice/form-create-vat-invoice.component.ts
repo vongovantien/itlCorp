@@ -190,7 +190,7 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
     generateVoucherId() {
         forkJoin([
-            this._accountingRepo.generateVoucherId(),
+            this._accountingRepo.generateVoucherId('Invoice', null),
             this._accountingRepo.generateInvoiceNoTemp(),
         ])
             .subscribe(
