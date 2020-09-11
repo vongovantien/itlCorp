@@ -1,3 +1,5 @@
+import { formatDate } from "@angular/common";
+
 export class JobConstants {
     public static readonly Overdued: string = "Overdued";
     public static readonly Processing: string = "Processing";
@@ -174,6 +176,12 @@ export class JobConstants {
             { field: 'code', label: 'City Code' },
             { field: 'name_EN', label: 'Name En' },
         ]
+    };
+
+    // * 60 days -> current day
+    public static readonly DEFAULT_RANGE_DATE_SEARCH = {
+        fromDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
     };
 
 }
