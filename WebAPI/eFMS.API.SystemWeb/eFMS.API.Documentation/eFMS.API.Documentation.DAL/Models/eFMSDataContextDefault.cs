@@ -235,6 +235,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.ProductDept)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")
                     .HasMaxLength(250)
@@ -2722,6 +2726,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);

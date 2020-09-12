@@ -260,9 +260,9 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("GenerateVoucherId")]
-        public IActionResult GenerateVoucherId()
+        public IActionResult GenerateVoucherId(string acctMngtType, string voucherType)
         {
-            var voucherId = accountingService.GenerateVoucherId();
+            var voucherId = accountingService.GenerateVoucherId(acctMngtType, voucherType);
             return Ok(new { VoucherId = voucherId });
         }
 

@@ -1034,7 +1034,7 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.DebitNo = criteria.CreditDebitNo;
             parameter.IssuedDate = data != null && data.CDNote != null && data.CDNote.DatetimeCreated != null ? data.CDNote.DatetimeCreated.Value.ToString("dd MMM, yyyy") : string.Empty;//Lấy ngày tạo CDNote
             parameter.DBTitle = data.CDNote.Type == "CREDIT" ? "CREDIT NOTE" : data.CDNote.Type == "DEBIT" ? "DEBIT NOTE" : "INVOICE";
-            parameter.ReviseNotice = "Revised: " + DateTime.Now.ToString("dd/MM/yyyy");
+            parameter.ReviseNotice = DateTime.Now.ToString("dd/MM/yyyy"); //Bỏ chữ Revised
 
             var _totalDebit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Debit).Value) : Math.Round(listCharge.Sum(x => x.Debit).Value, 3);
             var _totalCredit = (criteria.Currency == DocumentConstants.CURRENCY_LOCAL) ? Math.Round(listCharge.Sum(x => x.Credit).Value) : Math.Round(listCharge.Sum(x => x.Credit).Value, 3);

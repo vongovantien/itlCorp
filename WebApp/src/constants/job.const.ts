@@ -1,3 +1,5 @@
+import { formatDate } from "@angular/common";
+
 export class JobConstants {
     public static readonly Overdued: string = "Overdued";
     public static readonly Processing: string = "Processing";
@@ -142,15 +144,17 @@ export class JobConstants {
             { id: "Import", text: "Import" }
         ],
         PRODUCTSERVICE: <CommonInterface.INg2Select[]>[
-            { id: "SeaFCL", text: "SeaFCL" },
-            { id: "SeaLCL", text: "SeaLCL" },
+            { id: "SeaFCL", text: "Sea FCL" },
+            { id: "SeaLCL", text: "Sea LCL" },
             { id: "Air", text: "Air" },
+            { id: "Sea", text: "Sea" },
             { id: "Trucking", text: "Trucking" },
-            { id: "Crossborder", text: "Crossborder" },
+            { id: "Crossborder", text: "Cross border" },
             { id: "Warehouse", text: "Warehouse" },
             { id: "Railway", text: "Railway" },
             { id: "Express", text: "Express" },
-            { id: "Other", text: "Other" }
+            { id: "BondedWarehouse", text: "Bonded Warehouse" },
+            { id: "Other", text: "Other" },
         ],
     };
 
@@ -173,6 +177,12 @@ export class JobConstants {
             { field: 'code', label: 'City Code' },
             { field: 'name_EN', label: 'Name En' },
         ]
+    };
+
+    // * 60 days -> current day
+    public static readonly DEFAULT_RANGE_DATE_SEARCH = {
+        fromDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+        toDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
     };
 
 }
