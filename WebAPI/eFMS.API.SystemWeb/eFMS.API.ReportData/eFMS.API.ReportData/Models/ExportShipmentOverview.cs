@@ -62,5 +62,7 @@ namespace eFMS.API.ReportData.Models
         public string ShipmentNotes { get; set; }
         public DateTime? Created { get; set; }
         public Guid? HblId { get; set; }
+        public string ProductService { get; set; }
+        public string CustomNo { get; set; }
     }
 }
