@@ -599,9 +599,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             message = 'Inactive success !!'
                         } else {
                             message = 'Active success !!';
+                            this.selectedContract.partnerStatus = true;
                         }
                         this._toastService.success(message);
-                        this.selectedContract.partnerStatus = true;
                         this.onRequest.emit(this.selectedContract);
 
                     } else {

@@ -295,6 +295,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.ContractService = objUpdate.SaleService;
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
+                    ClearCache();
+                    Get();
                     SendMailActiveSuccess(model, "active");
                 }
             }
@@ -339,18 +341,30 @@ namespace eFMS.API.Catalogue.DL.Services
             string linkEn = string.Empty;
             string subject = string.Empty;
             string body = string.Empty;
+            string Title = string.Empty;
+            string Name = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             if (type == "active")
             {
+                if(partner.PartnerType == "Customer")
+                {
+                    subject = "Actived Customer - " + partner.ShortName;
+                    Title = "<i> Your Customer - " + partner.PartnerNameVn + " is active with info below </i> </br>";
+                    Name = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+                }
+                else
+                {
+                    subject = "Actived Agent - " + partner.ShortName;
+                    Title = "<i> Your Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>";
+                    Name = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+                }
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                subject = "Actived Agent - " + partner.ShortName;
+              
                 body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
-
-                    "<i> Your Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
+                    Title +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
-
-                    "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                    Name +
                     "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                     "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
                     "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"
