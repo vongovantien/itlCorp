@@ -421,7 +421,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataSell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -630,7 +630,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataBuySell.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });
@@ -765,7 +765,7 @@ namespace eFMS.API.Accounting.DL.Services
             dataObhBuy.ForEach(fe =>
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
-                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : (fe.OrgAmount + Math.Abs(fe.Vat ?? 0)) : 0;
+                fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
                 fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
                 fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
             });

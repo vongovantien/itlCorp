@@ -10,9 +10,9 @@ import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from
 import { CommonEnum } from '@enums';
 import { DataService } from '@services';
 
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+import { getAccoutingManagementPartnerState } from '../../store';
 
-import { Observable } from 'rxjs';
+import { Observable, merge } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { SelectItem } from 'ng2-select';
 
@@ -77,31 +77,43 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.initForm();
 
         this._store.select(getAccoutingManagementPartnerState)
-            .pipe(takeUntil(this.ngUnsubscribe))
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+            )
             .subscribe(
-                (res: IAccountingManagementPartnerState) => {
-                    if (!!res.partnerId) {
-                        if (!this.partnerId.value) {
-                            this.partnerId.setValue(res.partnerId);
-                            if (!this.formGroup.controls['personalName'].value) {
-                                this.formGroup.controls['personalName'].setValue(res.partnerName);
+                (res: any) => {
+                    if (!!res) {
+                        if (!!res.partnerId) {
+                            if (!this.partnerId.value) {
+                                this.partnerId.setValue(res.partnerId);
+                                if (!this.formGroup.controls['personalName'].value) {
+                                    this.formGroup.controls['personalName'].setValue(res.partnerName);
+                                }
+                                this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
                             }
-                            this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
+
+                        } else {
+                            if (!this.formGroup.controls['personalName'].value) {
+                                if (!this.formGroup.controls['personalName'].value) {
+                                    this.formGroup.controls['personalName'].setValue(res.settlementRequester);
+                                }
+                            }
                         }
 
-                    } else {
-                        if (!this.formGroup.controls['personalName'].value) {
-                            if (!this.formGroup.controls['personalName'].value) {
-                                this.formGroup.controls['personalName'].setValue(res.settlementRequester);
+                        if (!this.attachDocInfo.value) {
+                            if (this.attachDocInfo.value !== res.inputRefNo) {
+                                this.attachDocInfo.setValue(null);
+                                this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
+                                this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                             }
+                        } else if (!!res.inputRefNo && !this.attachDocInfo.value.includes(res.inputRefNo)) {
+                            this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
+                            this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
                         }
-                    }
 
-                    this.attachDocInfo.setValue(null);
-                    this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
-                    this.description.setValue(`Hoạch Toán Phí : ${this.attachDocInfo.value}`);
-                    if (!this.paymentTerm.value) {
-                        this.paymentTerm.setValue(res.paymentTerm);
+                        if (!this.paymentTerm.value) {
+                            this.paymentTerm.setValue(res.paymentTerm);
+                        }
                     }
                 }
             );
@@ -173,7 +185,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         if (!pre) {
             return cur;
         }
-        return `${pre}, ${cur}`;
+        return `${pre}${!!cur ? ', ' + cur : ''}`;
     }
 
     generateVoucherId(voucherType: string) {
