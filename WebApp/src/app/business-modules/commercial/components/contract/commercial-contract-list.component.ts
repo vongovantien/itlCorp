@@ -176,7 +176,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.contracts.splice(this.indexToRemove, 1);
+                        this.getListContract(this.partnerId);
                     } else {
                         this._toastService.error(res.message);
                     }
