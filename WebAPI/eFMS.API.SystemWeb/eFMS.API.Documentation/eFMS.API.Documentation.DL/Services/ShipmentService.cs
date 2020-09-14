@@ -983,12 +983,18 @@ namespace eFMS.API.Documentation.DL.Services
                 data.SalesOffice = sysOfficeRepo.Get(x => x.Id == OfficeSaleman).Select(t => t.Code).FirstOrDefault();
                 data.BKRefNo = item.JobNo;
                 data.ServiceMode = item.ServiceMode;//chua co thong tin
+                data.ProductService = item.ProductService;
+                data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
         }
 
-
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
+            return customNos.FirstOrDefault();
+        }
 
         private IQueryable<GeneralExportShipmentOverviewResult> QueryDataShipmentOverview(GeneralReportCriteria criteria)
         {
