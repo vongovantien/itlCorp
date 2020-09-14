@@ -173,10 +173,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
+                    ClearCache();
+                    Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
                 }
-                ClearCache();
-                Get();
             }
             return hs;
         }
@@ -295,8 +295,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.ContractService = objUpdate.SaleService;
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
-                    ClearCache();
-                    Get();
                     SendMailActiveSuccess(model, "active");
                 }
             }
