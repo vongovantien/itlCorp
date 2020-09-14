@@ -95,9 +95,18 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                             this.formGroup.controls['personalName'].setValue(res.partnerName);
                             this.formGroup.controls['partnerAddress'].setValue(res.partnerAddress);
                         }
-                        this.attachDocInfo.setValue(null);
-                        this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
-                        this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
+
+                        if (!this.attachDocInfo.value) {
+                            if (this.attachDocInfo.value !== res.inputRefNo) {
+                                this.attachDocInfo.setValue(null);
+                                this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
+                                this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
+                            }
+                        } else if (!!res.inputRefNo && !this.attachDocInfo.value.includes(res.inputRefNo)) {
+                            this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
+                            this.description.setValue(`Hóa Đơn Thu Ph : ${this.attachDocInfo.value}`);
+
+                        }
                     }
                 }
             );
@@ -216,6 +225,6 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         if (!pre) {
             return cur;
         }
-        return `${pre}, ${cur}`;
+        return `${pre}${!!cur ? ', ' + cur : ''}`;
     }
 }

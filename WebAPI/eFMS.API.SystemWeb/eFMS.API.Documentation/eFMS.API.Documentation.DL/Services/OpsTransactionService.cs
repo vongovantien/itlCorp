@@ -935,7 +935,7 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.VNDExchange = surchargeRpt.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                     surchargeRpt.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                     surchargeRpt.DatePaid = DateTime.Now;
-                    surchargeRpt.Docs = item.InvoiceNo;
+                    surchargeRpt.Docs = item.InvoiceNo ?? ((item.Soano ?? item.PaySoano) ?? (item.CreditNo ?? item.DebitNo)); //Ưu tiên: InvoiceNo >> Soa No >> CD Note Code  of charge
                     surchargeRpt.Notes = item.Notes;
                     surchargeRpt.InputData = "InputData";
                     surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
