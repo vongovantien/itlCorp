@@ -216,6 +216,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
+                        this.totalItems = 0;
                     }
                 }
             );
