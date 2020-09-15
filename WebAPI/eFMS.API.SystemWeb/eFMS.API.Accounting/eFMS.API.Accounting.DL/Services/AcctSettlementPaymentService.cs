@@ -666,7 +666,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                if(surchargeGrp != null && surchargeGrp.Count() > 0)
+                {
+                    result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                }
+                else
+                {
+                    result.TotalAmount = surcharges.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                }
             }
 
 

@@ -337,7 +337,7 @@ namespace eFMS.API.Accounting.DL.Services
                                          OrgAmount = sur.Quantity * sur.UnitPrice,
                                          Vat = sur.Vatrate,
                                          OrgVatAmount = 0, //Tính toán bên dưới
-                                         VatAccount = chgDef.DebitVat,
+                                         VatAccount = chgDef.CreditVat, //Account Credit No (VAT)
                                          Currency = sur.CurrencyId,
                                          ExchangeDate = sur.ExchangeDate,
                                          FinalExchangeRate = sur.FinalExchangeRate,
@@ -388,7 +388,7 @@ namespace eFMS.API.Accounting.DL.Services
                                              OrgAmount = sur.Quantity * sur.UnitPrice,
                                              Vat = sur.Vatrate,
                                              OrgVatAmount = 0, //Tính toán bên dưới
-                                             VatAccount = chgDef.DebitVat,
+                                             VatAccount = chgDef.CreditVat, //Account Credit No (VAT)
                                              Currency = sur.CurrencyId,
                                              ExchangeDate = sur.ExchangeDate,
                                              FinalExchangeRate = sur.FinalExchangeRate,
@@ -540,11 +540,11 @@ namespace eFMS.API.Accounting.DL.Services
                                             ChargeName = chg.ChargeNameVn,
                                             JobNo = ops.JobNo,
                                             Hbl = ops.Hwbno,
-                                            ContraAccount = chgDef.CreditAccountNo,
+                                            ContraAccount = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? chgDef.CreditAccountNo : chgDef.DebitAccountNo,
                                             OrgAmount = sur.Quantity * sur.UnitPrice,
                                             Vat = sur.Vatrate,
                                             OrgVatAmount = 0, //Tính toán bên dưới
-                                            VatAccount = chgDef.DebitVat,
+                                            VatAccount = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? chgDef.CreditVat : chgDef.DebitVat,
                                             Currency = sur.CurrencyId,
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
@@ -593,11 +593,11 @@ namespace eFMS.API.Accounting.DL.Services
                                                 ChargeName = chg.ChargeNameVn,
                                                 JobNo = cst.JobNo,
                                                 Hbl = cstd.Hwbno,
-                                                ContraAccount = chgDef.CreditAccountNo,
+                                                ContraAccount = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? chgDef.CreditAccountNo : chgDef.DebitAccountNo,
                                                 OrgAmount = sur.Quantity * sur.UnitPrice,
                                                 Vat = sur.Vatrate,
                                                 OrgVatAmount = 0, //Tính toán bên dưới
-                                                VatAccount = chgDef.DebitVat,
+                                                VatAccount = sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? chgDef.CreditVat : chgDef.DebitVat,
                                                 Currency = sur.CurrencyId,
                                                 ExchangeDate = sur.ExchangeDate,
                                                 FinalExchangeRate = sur.FinalExchangeRate,
@@ -673,11 +673,11 @@ namespace eFMS.API.Accounting.DL.Services
                                            ChargeName = chg.ChargeNameVn,
                                            JobNo = ops.JobNo,
                                            Hbl = ops.Hwbno,
-                                           ContraAccount = chgDef.CreditAccountNo,
+                                           ContraAccount = chgDef.CreditAccountNo ?? chgDef.DebitAccountNo,
                                            OrgAmount = sur.Quantity * sur.UnitPrice,
                                            Vat = sur.Vatrate,
                                            OrgVatAmount = 0, //Tính toán bên dưới
-                                           VatAccount = chgDef.DebitVat,
+                                           VatAccount = chgDef.CreditVat ?? chgDef.DebitVat,
                                            Currency = sur.CurrencyId,
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
@@ -728,11 +728,11 @@ namespace eFMS.API.Accounting.DL.Services
                                                ChargeName = chg.ChargeNameVn,
                                                JobNo = cst.JobNo,
                                                Hbl = cstd.Hwbno,
-                                               ContraAccount = chgDef.CreditAccountNo,
+                                               ContraAccount = chgDef.CreditAccountNo ?? chgDef.DebitAccountNo,
                                                OrgAmount = sur.Quantity * sur.UnitPrice,
                                                Vat = sur.Vatrate,
                                                OrgVatAmount = 0, //Tính toán bên dưới
-                                               VatAccount = chgDef.DebitVat,
+                                               VatAccount = chgDef.CreditVat ?? chgDef.DebitVat,
                                                Currency = sur.CurrencyId,
                                                ExchangeDate = sur.ExchangeDate,
                                                FinalExchangeRate = sur.FinalExchangeRate,
