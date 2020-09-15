@@ -66,13 +66,14 @@ export class CustomClearanceComponent extends AppList {
             );
         this.headers = [
             { title: 'Clearance No', field: 'clearanceNo', sortable: true },
+            { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Clearance Location', field: 'gatewayName', sortable: true },
             { title: 'Partner Name', field: 'customerName', sortable: true },
             { title: 'Import Country', field: 'importCountryName', sortable: true },
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
-            { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
+
             { title: 'creator', field: 'userCreatedName', sortable: true },
             { title: 'Status', field: 'jobNo', sortable: true },
         ];
@@ -154,8 +155,6 @@ export class CustomClearanceComponent extends AppList {
                     }
                     this.getListCustomsDeclaration();
                 },
-                (errors: any) => { },
-                () => { }
             );
     }
 

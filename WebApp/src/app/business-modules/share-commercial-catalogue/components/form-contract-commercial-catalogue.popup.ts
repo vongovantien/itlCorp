@@ -92,14 +92,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
-        { id: "Air Import", text: "Air Import" },
-        { id: "Air Export", text: "Air Export" },
-        { id: "Sea FCL Export", text: "Sea FCL Export" },
-        { id: "Sea LCL Export", text: "Sea LCL Export" },
-        { id: "Sea FCL Import", text: "Sea FCL Import" },
-        { id: "Sea LCL Import", text: "Sea LCL Import" },
-        { id: "Custom Logistic", text: "Custom Logistic" },
-        { id: "Trucking", text: "Trucking" }
+        { id: "AI", text: "Air Import" },
+        { id: "AE", text: "Air Export" },
+        { id: "SFE", text: "Sea FCL Export" },
+        { id: "SLE", text: "Sea LCL Export" },
+        { id: "SFI", text: "Sea FCL Import" },
+        { id: "SLI", text: "Sea LCL Import" },
+        { id: "CL", text: "Custom Logistic" },
+        { id: "IT", text: "Trucking" }
     ];
 
 
@@ -560,6 +560,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             }
         }
 
+        if (this.contractType.value[0].id === 'Official') {
+            this.trialEffectDate.setValue(null);
+            this.trialCreditDays.setValue(null);
+            this.trialExpiredDate.setValue(null);
+        }
+
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
@@ -593,9 +599,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             message = 'Inactive success !!'
                         } else {
                             message = 'Active success !!';
+                            this.selectedContract.partnerStatus = true;
                         }
                         this._toastService.success(message);
-                        this.selectedContract.partnerStatus = true;
                         this.onRequest.emit(this.selectedContract);
 
                     } else {

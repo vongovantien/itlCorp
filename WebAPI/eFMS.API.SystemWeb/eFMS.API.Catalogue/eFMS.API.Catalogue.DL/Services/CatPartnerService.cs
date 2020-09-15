@@ -739,6 +739,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var sysUsers = sysUserRepository.Get();
+            ClearCache();
             var partners = Get(x => (x.PartnerGroup ?? "").IndexOf(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
 
             if (partners == null) return null;
@@ -819,6 +820,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public CatPartnerModel GetDetail(string id)
         {
+            ClearCache();
             CatPartnerModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
             if (queryDetail == null)
             {
@@ -1246,6 +1248,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
         {
+            ClearCache();
             string group = PlaceTypeEx.GetPartnerGroup(partnerGroup);
             IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             return data;

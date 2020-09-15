@@ -111,7 +111,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
                 }
 
-
+                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
             }
@@ -153,6 +153,51 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export;";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import;";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export;";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export;";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import;";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic;";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking;";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export;Air Import;Sea FCL Export;Sea LCL Export;Sea LCL Import;Custom Logistic;Trucking ";
+                            break;
+                    }
+                }
+
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
+            }
+            return ContractServicesName;
+        }
+
         public HandleState Update(CatContractModel model)
         {
             var entity = mapper.Map<CatContract>(model);
@@ -173,10 +218,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
+                    ClearCache();
+                    Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
                 }
-                ClearCache();
-                Get();
             }
             return hs;
         }
@@ -339,18 +384,30 @@ namespace eFMS.API.Catalogue.DL.Services
             string linkEn = string.Empty;
             string subject = string.Empty;
             string body = string.Empty;
+            string Title = string.Empty;
+            string Name = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             if (type == "active")
             {
+                if(partner.PartnerType == "Customer")
+                {
+                    subject = "Actived Customer - " + partner.ShortName;
+                    Title = "<i> Your Customer - " + partner.PartnerNameVn + " is active with info below </i> </br>";
+                    Name = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+                }
+                else
+                {
+                    subject = "Actived Agent - " + partner.ShortName;
+                    Title = "<i> Your Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>";
+                    Name = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+                }
                 linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
                 linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-                subject = "Actived Agent - " + partner.ShortName;
+              
                 body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + EnNameCreatetor + ", </br> </br>" +
-
-                    "<i> Your Agent - " + partner.PartnerNameVn + " is active with info below </i> </br>" +
+                    Title +
                     "<i> Khách hàng - " + partner.PartnerNameVn + " đã được duyệt với thông tin như sau: </i> </br> </br>" +
-
-                    "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+                    Name +
                     "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
                     "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
                     "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br> </br>"

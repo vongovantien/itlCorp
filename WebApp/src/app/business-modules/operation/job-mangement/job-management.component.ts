@@ -33,7 +33,10 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
-    defaultDataSearch = JobConstants.DEFAULT_RANGE_DATE_SEARCH;
+    defaultDataSearch = {
+        serviceDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
+        serviceDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
+    };
 
     constructor(
         private sortService: SortService,
@@ -63,6 +66,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: "Pack Q'ty", field: 'sumPackages', sortable: true },
             { title: 'G.W', field: 'sumGrossWeight', sortable: true },
             { title: 'CBM', field: 'sumCbm', sortable: true },
+            { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Modified Date', field: 'modifiedDate', sortable: true },
         ];
 
@@ -213,6 +217,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
+                        this.totalItems = 0;
                     }
                 }
             );
