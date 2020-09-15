@@ -6,6 +6,7 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatContractModel : CatContract
     {
+        public string SaleServiceName { get; set; }
         public string Username { get; set; }
         public string OfficeNameEn { get; set; }
         public string OfficeNameVn { get; set; }

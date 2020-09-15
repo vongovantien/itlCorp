@@ -111,7 +111,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
                 }
 
-
+                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
             }
