@@ -5,6 +5,7 @@ export class Contract {
     officeId: string = null;
     companyId: string = null;
     saleService: string = null;
+    saleServiceName: string = null;
     partnerId: string = null;
     username: string = null;
     officeNameEn: string = null;
