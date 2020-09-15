@@ -69,28 +69,29 @@
                         <div class="row">
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="form-control-label" for="">
+                                    <label class="form-control-label">
                                         Customer (Payer)
                                     </label>
-                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartner"
-                                        (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                                        [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                                        [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200"
-                                        placeholder="Select customer">
+                                    <app-combo-grid-virtual-scroll
+                                        [currentActiveItemId]="{field:'id',value:customerId.value}"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                                        [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
+                                        [displayFields]="displayFieldsCustomer" placeholder="Select customer"
+                                        (remove)="resetFormControl(customerId)">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
-                                    <label class="form-control-label" for="">
+                                    <label class="form-control-label">
                                         Field OPS
                                     </label>
-                                    <select class="form-control" formControlName="user">
-                                        <option value="null">Select User</option>
-                                        <option *ngFor="let user of users" [ngValue]="user">{{user.username}}
-                                        </option>
-                                    </select>
+                                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'user')"
+                                        [currentActiveItemId]="{ field: 'id', value: fieldOps.value}"
+                                        [selectedDisplayFields]="['username']" [dataSources]="users | async"
+                                        [displayFields]="[{field: 'username', label: 'User Name'}]"
+                                        (remove)="resetFormControl(fieldOps)" placeholder="Select OPS" size="15">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-4">

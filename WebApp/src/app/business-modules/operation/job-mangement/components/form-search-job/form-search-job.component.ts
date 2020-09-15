@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
 import { Store } from '@ngrx/store';
 
-import { User } from '@models';
+import { Customer, User } from '@models';
 import { DocumentationRepo, SystemRepo, CatalogueRepo } from '@repositories';
 import { DataService } from '@services';
 import { SystemConstants, JobConstants } from '@constants';
@@ -13,6 +13,7 @@ import { AppForm } from 'src/app/app.form';
 
 import * as fromOpsStore from './../../../store';
 import { catchError, takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'job-management-form-search',
@@ -35,25 +36,19 @@ export class JobManagementFormSearchComponent extends AppForm {
     productService: AbstractControl;
     serviceMode: AbstractControl;
     shipmentMode: AbstractControl;
-    user: AbstractControl;
     serviceDate: AbstractControl;
+    customerId: AbstractControl;
+    fieldOps: AbstractControl;
 
-    configPartner: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-
-    users: User[] = [];
-    selectedPartner: any = {};
+    displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     dataSearch: ISearchDataShipment;
 
+    customers: Observable<Customer[]>;
+    users: Observable<User[]>;
+
     constructor(
-        private _documentRepo: DocumentationRepo,
         private _fb: FormBuilder,
-        private _dataService: DataService,
         private _sysRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<fromOpsStore.IOperationState>
@@ -64,9 +59,11 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 
     ngOnInit() {
+
+        this.customers = this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.ALL, active: true });
+        this.users = this._sysRepo.getListSystemUser();
+
         this.initFormSearch();
-        this.getPartner();
-        this.getUser();
 
         this.filterTypes = [
             { title: 'Job Id', value: 'jobNo' },
@@ -93,47 +90,7 @@ export class JobManagementFormSearchComponent extends AppForm {
                         });
                     }
                 }
-            )
-    }
-
-    getPartner() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
-            this.getPartnerData(this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER));
-
-        } else {
-            this._catalogueRepo.getListPartner(null, null, { partnerGroup: CommonEnum.PartnerGroupEnum.ALL, active: true })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataPartner: any) => {
-                        this.getPartnerData(dataPartner);
-                    },
-                );
-        }
-    }
-
-    getUser() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER)) {
-            this.users = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SYSTEM_USER);
-
-        } else {
-            this._sysRepo.getListSystemUser()
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataUser: any) => {
-                        this.users = dataUser;
-                    },
-                );
-        }
-    }
-
-    getPartnerData(data: any) {
-        this.configPartner.dataSource = data;
-        this.configPartner.displayFields = [
-            { field: 'taxCode', label: 'Taxcode' },
-            { field: 'shortName', label: 'Name' },
-            { field: 'partnerNameVn', label: 'Customer Name' },
-        ];
-        this.configPartner.selectedDisplayFields = ['shortName'];
+            );
     }
 
     initFormSearch() {
@@ -143,8 +100,9 @@ export class JobManagementFormSearchComponent extends AppForm {
             'productService': [],
             'serviceMode': [],
             'shipmentMode': [],
-            'user': [],
             'serviceDate': [],
+            'customerId': [],
+            'fieldOps': []
 
         });
 
@@ -153,14 +111,18 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.productService = this.formSearch.controls['productService'];
         this.serviceMode = this.formSearch.controls['serviceMode'];
         this.shipmentMode = this.formSearch.controls['shipmentMode'];
-        this.user = this.formSearch.controls['user'];
         this.serviceDate = this.formSearch.controls['serviceDate'];
+        this.customerId = this.formSearch.controls['customerId'];
+        this.fieldOps = this.formSearch.controls['fieldOps'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
-            case 'partner':
-                this.selectedPartner = { field: 'id', value: data.id };
+            case 'customer':
+                this.customerId.setValue(data.id);
+                break;
+            case 'user':
+                this.fieldOps.setValue(data.id);
                 break;
             default:
                 break;
@@ -181,8 +143,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.id : null,
             serviceDateFrom: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             serviceDateTo: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: !!this.selectedPartner.value ? this.selectedPartner.value : null,
-            fieldOps: !!this.user.value ? this.user.value.id : null,
+            customerId: this.customerId.value,
+            fieldOps: this.fieldOps.value,
         };
         this.onSearch.emit(body);
 
@@ -191,7 +153,6 @@ export class JobManagementFormSearchComponent extends AppForm {
 
     resetSearch() {
         this.formSearch.reset();
-        this.selectedPartner = {};
         this.filterType.setValue(this.filterTypes[0]);
 
         this.onReset.emit(<any>{});
@@ -204,9 +165,10 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.resetFormControl(this.productService);
         this.resetFormControl(this.serviceMode);
         this.resetFormControl(this.shipmentMode);
-        this.resetFormControl(this.user);
         this.resetFormControl(this.serviceDate);
-        this.selectedPartner = { field: 'id', value: null };
+        this.resetFormControl(this.customerId);
+        this.resetFormControl(this.fieldOps);
+
     }
 
     expanded() {
@@ -215,13 +177,13 @@ export class JobManagementFormSearchComponent extends AppForm {
                 productService: this.productServices.find(p => p.id === this.dataSearch.productService) || null,
                 serviceMode: this.serviceModes.find(s => s.id === this.dataSearch.serviceMode) || null,
                 shipmentMode: this.shipmentModes.find(s => s.id === this.dataSearch.shipmentMode) || null,
-                user: this.users.find(u => u.id === this.dataSearch.fieldOps) || null,
                 serviceDate: !!this.dataSearch.serviceDateFrom && !!this.dataSearch.serviceDateTo ? {
                     startDate: new Date(this.dataSearch.serviceDateFrom),
                     endDate: new Date(this.dataSearch.serviceDateTo)
-                } : null
+                } : null,
+                customerId: this.dataSearch.customerId,
+                fieldOps: this.dataSearch.fieldOps
             };
-            this.selectedPartner = { field: 'id', value: this.dataSearch.customerId };
 
             this.formSearch.patchValue(advanceSearchForm);
         }
