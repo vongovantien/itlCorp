@@ -111,7 +111,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
                 }
 
-
+                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
             }
@@ -151,6 +151,51 @@ namespace eFMS.API.Catalogue.DL.Services
                 Get();
             }
             return hs;
+        }
+
+        private string GetContractServicesName(string ContractService)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export;";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import;";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export;";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export;";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import;";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic;";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking;";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export;Air Import;Sea FCL Export;Sea LCL Export;Sea LCL Import;Custom Logistic;Trucking ";
+                            break;
+                    }
+                }
+
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
+            }
+            return ContractServicesName;
         }
 
         public HandleState Update(CatContractModel model)

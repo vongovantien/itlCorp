@@ -82,6 +82,9 @@
                                 <a href="javascript:void(0)" (click)="showDetail(custom.id)">{{custom.clearanceNo}}</a>
                             </td>
                             <td>
+                                <span>{{custom.clearanceDate | date: 'dd/MM/yyyy'}}</span>
+                            </td>
+                            <td>
                                 <span>{{custom.type}}</span>
                             </td>
                             <td>
@@ -99,9 +102,7 @@
                             <td>
                                 <span>{{custom.jobNo}}</span>
                             </td>
-                            <td>
-                                <span>{{custom.clearanceDate | date: 'dd/MM/yyyy'}}</span>
-                            </td>
+
                             <td>
                                 <span class="text-success">{{custom.userCreatedName}}</span>
                             </td>

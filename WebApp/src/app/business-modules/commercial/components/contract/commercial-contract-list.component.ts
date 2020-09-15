@@ -188,7 +188,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.selectedContract = contract;
         this._router.navigate([`/home/commercial/customer/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
-
     getListContract(partneId: string) {
         this.isLoading = true;
         this._catalogueRepo.getListContract(partneId)
@@ -200,34 +199,48 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                     this.contracts = res || [];
                     console.log(this.contracts);
                     this.contracts.forEach(element => {
-                        if (element.saleService.includes(';')) {
-                            const arr = element.saleService.split(';');
-                            element.saleService = '';
-                            arr.forEach(item => {
-                                element.saleService += item + '; ';
-                            });
-                            if (element.saleService.charAt(element.saleService.length - 2) === ';') {
-                                element.saleService = element.saleService.substr(0, element.saleService.length - 2);
-                            }
-                        }
-                        if (!!element.officeId) {
-                            if (element.officeId.includes(';')) {
-                                const arrayOffice = element.officeId.split(';');
-                                element.officeNameEn = '';
-                                arrayOffice.forEach(itemOffice => {
-                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                        setTimeout(() => {
+                            if (element.saleService.includes(';')) {
+                                const arr = element.saleService.split(';');
+                                element.saleService = '';
+                                arr.forEach(item => {
+                                    element.saleService += item + '; ';
                                 });
-                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
-                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                element.saleServiceName = '';
+                                arr.forEach(item => {
+                                    element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
+                                });
+                                if (element.saleService.charAt(element.saleService.length - 2) === ';') {
+                                    element.saleService = element.saleService.substr(0, element.saleService.length - 2);
                                 }
-                            } else {
-                                element.officeId = element.officeId.toLowerCase();
-                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
-
-                                element.officeNameEn = !!obj ? obj.text : null;
+                                if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
+                                    element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
+                                }
                             }
-                        }
+                            else {
+                                element.saleServiceName = element.saleService.toLowerCase();
+                                const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
 
+                                element.saleServiceName = !!obj ? obj.text : null;
+                            }
+                            if (!!element.officeId) {
+                                if (element.officeId.includes(';')) {
+                                    const arrayOffice = element.officeId.split(';');
+                                    element.officeNameEn = '';
+                                    arrayOffice.forEach(itemOffice => {
+                                        element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                                    });
+                                    if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                                        element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                    }
+                                } else {
+                                    element.officeId = element.officeId.toLowerCase();
+                                    const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                    element.officeNameEn = !!obj ? obj.text : null;
+                                }
+                            }
+                        }, 300);
                     });
                 }
             );
