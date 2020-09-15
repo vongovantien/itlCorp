@@ -1141,7 +1141,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 CombinationSaleReportResult report = new CombinationSaleReportResult
                 {
-                    ShipmentSource = item.ShipmentType.ToUpper(),
+                    ShipmentSource = string.IsNullOrEmpty(item.ShipmentType) ? null : item.ShipmentType.ToUpper(),
                     Department = departmentRepository.Get(x => x.Id == item.DepartmentId).FirstOrDefault()?.DeptNameAbbr,
                     POD = catPlaceRepository.Get(x => x.Id == item.Pod)?.FirstOrDefault()?.Code,
                     POL = catPlaceRepository.Get(x => x.Id == item.Pol)?.FirstOrDefault()?.Code,
@@ -1259,7 +1259,7 @@ namespace eFMS.API.Documentation.DL.Services
                     CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
                     SharedProfit = 0,
                     OtherCharges = 0,
-                    ShipmentSource = item.ShipmentType.ToUpper(),
+                    ShipmentSource = string.IsNullOrEmpty(item.ShipmentType) ? null : item.ShipmentType.ToUpper(),
 
                     Lines = item.ColoaderId != null ? catPartnerRepository.Get(x => x.Id == item.ColoaderId).FirstOrDefault()?.PartnerNameEn : string.Empty,
                     Agent = item.AgentId != null ? catPartnerRepository.Get(x => x.Id == item.AgentId).FirstOrDefault()?.PartnerNameEn : string.Empty,
