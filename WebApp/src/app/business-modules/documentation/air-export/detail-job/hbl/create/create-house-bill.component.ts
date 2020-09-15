@@ -106,7 +106,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
             cbm: this.formCreateHBLComponent.totalCBM,
             hw: this.formCreateHBLComponent.totalHeightWeight,
-            attachList: this.attachListComponent.attachList,
+            attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]').replace(formatDate(form.etd.startDate, 'dd/MM/yyyy', 'en'), '[[Date]]'),
             dimensionDetails: form.dimensionDetails,
             hwConstant: this.formCreateHBLComponent.hwconstant,
             min: form.min,

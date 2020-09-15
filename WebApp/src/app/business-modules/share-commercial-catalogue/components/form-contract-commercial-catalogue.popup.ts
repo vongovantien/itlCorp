@@ -582,6 +582,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             }
         }
 
+        if (this.contractType.value[0].id === 'Official') {
+            this.trialEffectDate.setValue(null);
+            this.trialCreditDays.setValue(null);
+            this.trialExpiredDate.setValue(null);
+        }
+
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
@@ -634,16 +640,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this.statusContract = this.selectedContract.active;
                         let message = '';
                         if (!this.selectedContract.active) {
-                            message = 'Inactive success !!'
+                            message = 'Inactive success !!';
                         } else {
                             message = 'Active success !!';
+                            this.selectedContract.partnerStatus = true;
                         }
                         this._toastService.success(message);
-                        if (salesmanCreditRequest) {
-                            this.formGroup.controls['creditLimit'].setValue(this.selectedContract.creditLimit);
-                            this.formGroup.controls['creditLimitRate'].setValue(this.selectedContract.creditLimitRate);
-                        }
-                        this.selectedContract.partnerStatus = true;
                         this.onRequest.emit(this.selectedContract);
 
 

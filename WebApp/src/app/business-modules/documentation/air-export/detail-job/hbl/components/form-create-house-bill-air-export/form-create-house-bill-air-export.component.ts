@@ -11,8 +11,8 @@ import { CountryModel } from 'src/app/shared/models/catalogue/country.model';
 import { IShareBussinessState, getTransactionDetailCsTransactionState, getDetailHBlState, getDimensionVolumesState, InitShipmentOtherChargeAction } from 'src/app/business-modules/share-business/store';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap } from 'rxjs/operators';
-import { Observable, forkJoin } from 'rxjs';
+import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap, startWith } from 'rxjs/operators';
+import { Observable, forkJoin, BehaviorSubject } from 'rxjs';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
@@ -21,6 +21,8 @@ import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other
 import { formatCurrency } from '@angular/common';
 import { JobConstants } from '@constants';
 import { SelectItem } from 'ng2-select';
+import { DataService } from '@services';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'air-export-hbl-form-create',
@@ -123,12 +125,15 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     isUpdateOtherCharge: boolean = false;
     rateChargeIsNumber: boolean = false;
 
+    // $dataFormHBl: BehaviorSubject<{ hblNo: string, eta: string, etd: string }> = new BehaviorSubject({ hblNo: null, etd: null, eta: null });
+
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
         private _documentationRepo: DocumentationRepo,
-        private _store: Store<IShareBussinessState>
+        private _store: Store<IShareBussinessState>,
+        private _dataService: DataService,
     ) {
         super();
     }
@@ -395,6 +400,18 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.onChargeWeightChange();
         this.onSeaAirChange();
         this.onChangeAsArranged();
+
+        this.hwbno.valueChanges
+            .pipe(startWith(this.hwbno.value))
+            .subscribe((hwbno: string) => {
+                const etdDate = (this.etd !== null && this.etd.value !== null && this.etd.value.startDate !== null ? formatDate(this.etd.value.startDate, 'dd/MM/yyyy', 'en') : null);
+                this._dataService.setData('formHBLData', { hblNo: hwbno, etd: etdDate, eta: null });
+            });
+        this.etd.valueChanges.pipe(startWith(this.etd.value)).subscribe((d: any) => {
+            const etdDate = (d !== null && d.startDate !== null ? formatDate(d.startDate, 'dd/MM/yyyy', 'en') : null);
+            console.log(etdDate);
+            this._dataService.setData('formHBLData', { hblNo: this.hwbno.value, etd: etdDate, eta: null });
+        });
     }
 
     updateFormValue(data: HouseBill, isImport: boolean = false) {
