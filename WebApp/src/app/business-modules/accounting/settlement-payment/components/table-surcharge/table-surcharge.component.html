@@ -24,6 +24,9 @@
                         </div>
                     </td>
                     <td class="text-primary pointer text-underline" (click)="openSurchargeDetail(surcharge, i)">
+                        {{surcharge.chargeCode}}
+                    </td>
+                    <td class="text-primary pointer text-underline" (click)="openSurchargeDetail(surcharge, i)">
                         {{surcharge.chargeName}}
                     </td>
                     <td>{{surcharge.quantity}}</td>
