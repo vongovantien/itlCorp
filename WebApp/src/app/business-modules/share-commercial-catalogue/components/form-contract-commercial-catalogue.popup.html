@@ -267,13 +267,15 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" class="form-control" formControlName="paymentTerm">
+                                        <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                            autoFormatCurrency class="form-control" formControlName="paymentTerm">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Limit</label>
-                                        <input min="0" type="number" class="form-control" formControlName="creditLimit">
+                                        <input type="number" min="0" class="form-control" formControlName="creditLimit"
+                                            numeric [decimals]="digitDecimal" autoFormatCurrency>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -325,7 +327,8 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Rate</label>
-                                        <input min="0" type="number" class="form-control" formControlName="creditRate">
+                                        <input min="0" type="number" class="form-control" formControlName="creditRate"
+                                            numeric [decimals]="digitDecimal" autoFormatCurrency>
                                     </div>
                                 </div>
                             </ng-container>
