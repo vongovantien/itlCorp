@@ -499,6 +499,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 from cdNoGroup in cdNoGroups.DefaultIfEmpty()
                                 join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                 from settle in settle2.DefaultIfEmpty()
+                                join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                from advGrp in advGrps.DefaultIfEmpty()
                                 where sur.SettlementCode == settlementNo
                                 select new ShipmentSettlement
                                 {
@@ -508,9 +510,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     MBL = opst.Mblno,
                                     HblId = opst.Hblid,
                                     CurrencyShipment = settle.SettlementCurrency,
-                                    TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                    // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                     ShipmentId = opst.Id,
                                     Type = "OPS",
+                                    AdvanceNo = advGrp.AdvanceNo
                                 };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -519,6 +522,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
                                from settle in settle2.DefaultIfEmpty()
+                               join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                               from advGrp in advGrps.DefaultIfEmpty()
                                where sur.SettlementCode == settlementNo
                                select new ShipmentSettlement
                                {
@@ -527,15 +532,16 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = cstd.Hwbno,
                                    MBL = cst.Mawb,
                                    CurrencyShipment = settle.SettlementCurrency,
-                                   TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
+                                   // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                    HblId = cstd.Id,
                                    ShipmentId = cst.Id,
                                    Type = "DOC",
+                                   AdvanceNo = advGrp.AdvanceNo
                                };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId})
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo})
                 .Select(x => new ShipmentSettlement
             {
                 SettlementNo = x.Key.SettlementNo,
@@ -543,17 +549,18 @@ namespace eFMS.API.Accounting.DL.Services
                 HBL = x.Key.HBL,
                 MBL = x.Key.MBL,
                 CurrencyShipment = x.Key.CurrencyShipment,
-                TotalAmount = x.Sum(t => t.TotalAmount),
+                //TotalAmount = x.Sum(t => t.TotalAmount),
                 HblId = x.Key.HblId,
                 Type = x.Key.Type,
                 ShipmentId = x.Key.ShipmentId,
+                AdvanceNo = x.Key.AdvanceNo
             });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (ShipmentSettlement item in dataGroups)
             {
                 // Lấy thông tin advance theo group settlement.
-                AdvanceInfo advInfo = GetAdvanceInfo(item.SettlementNo, item.MBL, item.HBL, item.CurrencyShipment);
+                AdvanceInfo advInfo = GetAdvanceInfo(item.SettlementNo, item.MBL, item.HblId, item.CurrencyShipment, item.AdvanceNo, currencyExchange);
 
                 shipmentSettlement.Add(new ShipmentSettlement
                 {
@@ -561,16 +568,18 @@ namespace eFMS.API.Accounting.DL.Services
                     JobId = item.JobId,
                     MBL = item.MBL,
                     HBL = item.HBL,
-                    TotalAmount = item.TotalAmount,
+                    // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
                     ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
 
+                    TotalAmount = advInfo.TotalAmount ?? 0,
+
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = item.TotalAmount - advInfo.AdvanceAmount,
+                    Balance = advInfo.TotalAmount - advInfo.AdvanceAmount,
                     CustomNo = advInfo.CustomNo
                 });
             }
@@ -578,33 +587,45 @@ namespace eFMS.API.Accounting.DL.Services
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
         }
 
-        public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, string _hbl, string _SettleCurrency)
+        public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, Guid _hbl, string _settleCurrency, string _advanceNo, List<CatCurrencyExchange> currencyExchange)
         {
             AdvanceInfo result = new AdvanceInfo();
             string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
             var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
 
-            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblno == _hbl && x.Key.Mblno == _mbl);
+            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid == _hbl && x.Key.Mblno == _mbl);
             if(surchargeGrp != null && surchargeGrp.Count() > 0)
             {
-                 advNo = surchargeGrp?.FirstOrDefault().Key.AdvanceNo;
-                 customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
+                var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
+                advNo = advDataMatch?.FirstOrDefault().Key.AdvanceNo;
+                customNo = surchargeGrp?.FirstOrDefault().Key.ClearanceNo;
             }
-          
 
+            // Trường hợp settle cho 1 phiếu advance
             if (!string.IsNullOrEmpty(advNo))
             {
                 var advData = from advP in acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                               join advR in acctAdvanceRequestRepo.Get() on advP.AdvanceNo equals advR.AdvanceNo
-                              where advR.Mbl == _mbl && advR.Hbl == _hbl && advR.AdvanceNo == advNo
+                              where advR.Mbl == _mbl && advR.Hblid == _hbl && advR.AdvanceNo == advNo
                               select new
                               {
-                                  AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, _SettleCurrency), // tính theo tỷ giá ngày request adv và currency settlement
+                                  AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, _settleCurrency), // tính theo tỷ giá ngày request adv và currency settlement
                               };
                 result.AdvanceNo = advNo;
                 result.AdvanceAmount = advData.ToList().Sum(x => x.AdvAmount);
+
+
+                // Tính total amount của settlement theo adv đó.
+                IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.AdvanceNo == advNo && x.Mblno == _mbl && x.Hblid == _hbl);
+                result.TotalAmount = surChargeToCalculateAmount.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+
             }
+            else
+            {
+                result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+            }
+
 
             if (!string.IsNullOrEmpty(customNo))
             {
