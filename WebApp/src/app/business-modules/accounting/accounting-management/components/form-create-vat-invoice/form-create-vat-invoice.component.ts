@@ -182,6 +182,14 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                     }
                 );
         }
+
+        this.chartOfAccounts.subscribe(
+            (accounts: ChartOfAccounts[]) => {
+                const defaultAccountNo: ChartOfAccounts = (accounts || []).find((a: ChartOfAccounts) => a.accountCode === AccountingConstants.DEFAULT_ACCOUNT_NO_CODE);
+                this.accountNo.setValue(!!defaultAccountNo ? defaultAccountNo.accountCode : null);
+
+            }
+        );
     }
 
     onSelectDataFormInfo(data, type: string) {
