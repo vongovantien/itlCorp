@@ -92,14 +92,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
-        { id: "Air Import", text: "Air Import" },
-        { id: "Air Export", text: "Air Export" },
-        { id: "Sea FCL Export", text: "Sea FCL Export" },
-        { id: "Sea LCL Export", text: "Sea LCL Export" },
-        { id: "Sea FCL Import", text: "Sea FCL Import" },
-        { id: "Sea LCL Import", text: "Sea LCL Import" },
-        { id: "Custom Logistic", text: "Custom Logistic" },
-        { id: "Trucking", text: "Trucking" }
+        { id: "AI", text: "Air Import" },
+        { id: "AE", text: "Air Export" },
+        { id: "SFE", text: "Sea FCL Export" },
+        { id: "SLE", text: "Sea LCL Export" },
+        { id: "SFI", text: "Sea FCL Import" },
+        { id: "SLI", text: "Sea LCL Import" },
+        { id: "CL", text: "Custom Logistic" },
+        { id: "IT", text: "Trucking" }
     ];
 
 
