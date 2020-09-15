@@ -16,7 +16,8 @@ import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from './../../../share-business/store';
 
 import { Observable, of } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap, concatMap } from 'rxjs/operators';
+import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith } from 'rxjs/operators';
+import { DataService } from '@services';
 
 
 @Component({
@@ -96,6 +97,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         private _fb: FormBuilder,
         private _documentRepo: DocumentationRepo,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
+        private _dataService: DataService,
     ) {
         super();
     }
@@ -319,6 +321,11 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
         this.issueHbldate = this.formCreate.controls["issueHbldate"];
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
 
+        this.hwbno.valueChanges
+            .pipe(startWith(this.hwbno.value))
+            .subscribe((hwbno: string) => {
+                this._dataService.setData('formHBLData', { hblNo: hwbno, etd: '', eta: '' });
+            });
     }
 
     updateFormValue(data: CsTransactionDetail) {
