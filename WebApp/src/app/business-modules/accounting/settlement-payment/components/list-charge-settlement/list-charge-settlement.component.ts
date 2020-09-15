@@ -73,6 +73,7 @@ export class SettlementListChargeComponent extends AppList {
     ngOnInit() {
         this.headers = [
             { title: 'JobId - HBL - MBL', field: 'jobId', sortable: true, width: 200 },
+            { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'Qty', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitName', sortable: true },

@@ -144,6 +144,10 @@
                                     </td>
                                     <td class="text-primary pointer text-underline"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')">
+                                        {{surcharge.chargeCode}}
+                                    </td>
+                                    <td class="text-primary pointer text-underline"
+                                        (click)="openSurchargeDetail(surcharge, i, 'update')">
                                         {{surcharge.chargeName}}
                                     </td>
                                     <td>{{surcharge.quantity}}</td>
@@ -189,9 +193,5 @@
     (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
 
 <charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
-
-<!-- <ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container> -->
 
 <ng-template inject></ng-template>

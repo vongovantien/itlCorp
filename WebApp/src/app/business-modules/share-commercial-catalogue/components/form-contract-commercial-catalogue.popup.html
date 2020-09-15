@@ -207,7 +207,8 @@
                                     <div class="form-group">
                                         <label>Trial Credit Limit
                                         </label>
-                                        <input type="number" min="0"
+                                        <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                            autoFormatCurrency
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditLimit">
                                     </div>

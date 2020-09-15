@@ -202,7 +202,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.selectedContract = contract;
         this._router.navigate([`/home/commercial/customer/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
-
     getListContract(partneId: string) {
         this.isLoading = true;
         this._catalogueRepo.getListContract(partneId)
@@ -256,8 +255,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                                 }
                             }
                         }, 300);
-
-
                     });
                 }
             );

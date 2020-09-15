@@ -115,7 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 1);
                 }
 
-
+                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
                 saleman.Username = item.user.Username;
                 results.Add(saleman);
             }
@@ -196,9 +196,9 @@ namespace eFMS.API.Catalogue.DL.Services
                             break;
                     }
                 }
-          
+
             }
-            if(!string.IsNullOrEmpty(ContractServicesName))
+            if (!string.IsNullOrEmpty(ContractServicesName))
             {
                 ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 1);
             }

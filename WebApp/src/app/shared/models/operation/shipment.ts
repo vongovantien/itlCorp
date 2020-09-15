@@ -46,6 +46,8 @@ export class Shipment {
     customerName: string = '';
     isLocked: boolean = false;
 
+    userCreatedName: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

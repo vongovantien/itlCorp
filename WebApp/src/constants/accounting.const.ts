@@ -35,4 +35,6 @@ export class AccountingConstants {
         UNPAID: 'Unpaid'
     };
 
+    public static DEFAULT_ACCOUNT_NO_CODE: string = '13111';
+
 }
