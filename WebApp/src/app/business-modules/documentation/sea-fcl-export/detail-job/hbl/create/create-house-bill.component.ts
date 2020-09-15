@@ -183,7 +183,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             packageType: +this.goodSummaryComponent.selectedPackage,
             contSealNo: this.goodSummaryComponent.containerDescription,
             chargeWeight: this.goodSummaryComponent.totalChargeWeight,
-            attachList: this.attachListComponent.attachList,
+            attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]'),
         };
 
         return formData;

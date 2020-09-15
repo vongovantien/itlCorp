@@ -33,7 +33,10 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
-    defaultDataSearch = JobConstants.DEFAULT_RANGE_DATE_SEARCH;
+    defaultDataSearch = {
+        serviceDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
+        serviceDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
+    };
 
     constructor(
         private sortService: SortService,
@@ -213,6 +216,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                         this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
+                        this.totalItems = 0;
                     }
                 }
             );

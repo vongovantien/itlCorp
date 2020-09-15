@@ -111,15 +111,17 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 (charges: ChargeOfAccountingManagementModel[]) => {
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
                         this.charges = [...this.charges, ...charges];
-                        console.log(this.charges);
 
                         this.updateTotalAmount();
 
-                        this.charges.forEach(c => {
-                            if (!!c.invoiceDate) {
-                                c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
-                            }
-                        });
+                        if (this._type !== 'invoice') {
+                            this.charges.forEach(c => {
+                                if (!!c.invoiceDate) {
+                                    c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+                                }
+                            });
+                        }
+
                     } else {
                         this._toastService.warning("Charge has existed in list");
                         return;

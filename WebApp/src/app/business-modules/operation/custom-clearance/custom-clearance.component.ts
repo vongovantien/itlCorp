@@ -154,8 +154,6 @@ export class CustomClearanceComponent extends AppList {
                     }
                     this.getListCustomsDeclaration();
                 },
-                (errors: any) => { },
-                () => { }
             );
     }
 
