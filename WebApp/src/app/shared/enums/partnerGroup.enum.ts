@@ -10,5 +10,7 @@ export enum PartnerGroupEnum {
     SUPPLIER = 8,
     SUPPLIERMATERIAL = 9,
     CARRIER = 10,
-    AIRSHIPSUP = 11
+    AIRSHIPSUP = 11,
+    STAFF = 12,
+    PERSONAL = 13
 }
