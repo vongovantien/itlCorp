@@ -96,6 +96,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
         let sumNetWeight = 0;
         let sumGrossWeight = 0;
         let containerDescription = '';
+
         lstMasterContainers.forEach(x => {
             sumCbm = sumCbm + x.cbm;
             sumPackages = sumPackages + x.packageQuantity;
@@ -110,12 +111,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit 
                 quantity: _groupBy(lstMasterContainers, 'containerTypeName')[item].map(i => i.quantity).reduce((a: any, b: any) => a += b)
             });
         }
-        for (const item of contData) {
-            containerDescription = containerDescription + item.quantity + "x" + item.cont + "; ";
+
+        if (!!contData.length && contData.length < 2) {
+            containerDescription = `${contData[0].quantity}x${contData[0].cont}`;
+        } else {
+            for (const item of contData) {
+                containerDescription = containerDescription + item.quantity + "x" + item.cont + ";";
+            }
         }
-        if (containerDescription.length > 1) {
-            containerDescription = containerDescription.substring(0, containerDescription.length - 3);
-        }
+        containerDescription = containerDescription.replace(/;$/, "");
 
         this.editForm.formEdit.controls['sumCbm'].setValue(sumCbm);
         this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages);
