@@ -607,9 +607,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     activeInactiveContract(id: string) {
         if (this.contractType.value[0].id === 'Guaranteed'
-            && (this.formGroup.controls['creditLimit'].value <= 0
-                || !this.formGroup.controls['creditLimit'].value
-                && this.statusContract === false)) {
+            && ((this.formGroup.controls['creditLimit'].value <= 0
+                || !this.formGroup.controls['creditLimit'].value)
+                && this.selectedContract.active === false)) {
             this.salesmanCreditLimitPopup.show();
             return;
         }
@@ -623,7 +623,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.processActiveInActiveContract(this.selectedContract.id, true, data);
             this.selectedContract.creditLimit = data.creditLimit;
             this.selectedContract.creditLimitRate = data.creditRate;
-
+            this.formGroup.controls['creditLimit'].setValue(this.selectedContract.creditLimit);
+            this.formGroup.controls['creditLimitRate'].setValue(this.selectedContract.creditLimitRate);
         }
     }
 
