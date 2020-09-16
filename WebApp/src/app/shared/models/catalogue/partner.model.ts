@@ -72,7 +72,7 @@ export class Partner {
     partnerType: string = '';
     partnerMode: string = '';
     partnerLocation: string = '';
-
+    internalCode: string = '';
 
 
     permission: PermissionPartner = new PermissionPartner();

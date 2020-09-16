@@ -4,19 +4,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Partner } from 'src/app/shared/models/catalogue/partner.model';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
 import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize, map } from "rxjs/operators";
+import { catchError, finalize } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
-import { forkJoin, of, combineLatest } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
-import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { Company } from '@models';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
@@ -101,7 +99,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
-
         this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
@@ -114,39 +111,13 @@ export class PartnerDetailComponent extends AppList {
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
+
     ngAfterViewInit() {
         this.formPartnerComponent.isUpdate = true;
 
         this._cd.detectChanges();
     }
 
-
-    // getDetailCustomer(partnerId: string) {
-    //     this._catalogueRepo.getDetailPartner(partnerId)
-    //         .subscribe(
-    //             (res: Partner) => {
-    //                 this.partner = res;
-    //                 console.log("detail partner:", this.partner);
-    //                 //this.formPartnerComponent.formGroup.patchValue(res);
-    //                 this.formPartnerComponent.getShippingProvinces(res.countryShippingId);
-    //                 this.formPartnerComponent.getBillingProvinces(res.countryId);
-    //                 console.log("flag: ", this.formPartnerComponent.activePartner);
-
-    //             }
-    //         );
-    // }
-
-    RequireSaleman(partnerGroup: string): boolean {
-        if (partnerGroup != null) {
-            if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
     getParnerDetails() {
         this._progressRef.start();
         this._catalogueRepo.getDetailPartner(this.partner.id)
@@ -159,11 +130,13 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         this.partner = res;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         console.log("res: ", res);
-
                         this.formPartnerComponent.setFormData(this.partner);
-                        //
+                        console.log(this.partner.partnerMode);
+                        if (this.partner.partnerMode === 'External') {
+                            this.formPartnerComponent.isDisabledInternalCode = true;
+                        }
+
                         this.formPartnerComponent.activePartner = this.partner.active;
                     }
                 }
@@ -442,11 +415,17 @@ export class PartnerDetailComponent extends AppList {
         if (partnerGroup === PartnerGroupEnum.SUPPLIER) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
         }
+        if (partnerGroup === PartnerGroupEnum.STAFF) {
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "STAFF"));
+        }
+        if (partnerGroup === PartnerGroupEnum.PERSONAL) {
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "PERSONAL"));
+        }
         if (partnerGroup === PartnerGroupEnum.ALL) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -471,7 +450,7 @@ export class PartnerDetailComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {

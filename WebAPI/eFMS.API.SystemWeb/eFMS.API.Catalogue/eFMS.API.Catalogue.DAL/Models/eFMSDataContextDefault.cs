@@ -151,6 +151,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.ProductDept)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ServiceTypeId)
                     .HasColumnName("ServiceTypeID")
                     .HasMaxLength(250)
@@ -739,6 +743,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
 
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
@@ -2187,6 +2193,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);

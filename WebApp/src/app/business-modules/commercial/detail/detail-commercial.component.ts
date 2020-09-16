@@ -67,11 +67,44 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: Partner) => {
                     this.partner = res;
                     console.log("detail partner:", this.partner);
-                    this.formCreate.formGroup.patchValue(res);
+                    // this.formCreate.formGroup.patchValue(res);
+                    this.setDataForm(this.partner);
+                    // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
+
                     this.formCreate.getShippingProvinces(res.countryShippingId);
                     this.formCreate.getBillingProvinces(res.countryId);
                 }
             );
+    }
+
+    setDataForm(partner: Partner) {
+        this.formCreate.formGroup.patchValue({
+            accountNo: partner.accountNo,
+            partnerNameEn: partner.partnerNameEn,
+            partnerNameVn: partner.partnerNameVn,
+            shortName: partner.shortName,
+            taxCode: partner.taxCode,
+            internalReferenceNo: partner.internalReferenceNo,
+            addressShippingEn: partner.addressShippingEn,
+            addressShippingVn: partner.addressShippingVn,
+            addressVn: partner.addressVn,
+            addressEn: partner.addressEn,
+            zipCode: partner.zipCode,
+            zipCodeShipping: partner.zipCodeShipping,
+            contactPerson: partner.contactPerson,
+            tel: partner.tel,
+            fax: partner.fax,
+            workPhoneEx: partner.workPhoneEx,
+            email: partner.email,
+            billingEmail: partner.billingEmail,
+            billingPhone: partner.billingPhone,
+            countryId: partner.countryId,
+            countryShippingId: partner.countryShippingId,
+            provinceId: partner.provinceId,
+            provinceShippingId: partner.provinceShippingId,
+            partnerLocation: !!partner.partnerLocation ? [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }] : null,
+            parentId: partner.parentId
+        });
     }
 
     getListContract(partneId: string) {
@@ -129,7 +162,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.public = this.partner.public;
         modelAdd.workPlaceId = this.partner.workPlaceId;
         modelAdd.partnerMode = this.partner.partnerMode;
-        modelAdd.partnerLocation = this.partner.partnerLocation;
+        modelAdd.partnerLocation = this.formCreate.partnerLocation.value[0].id;
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);
