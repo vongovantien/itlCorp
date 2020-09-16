@@ -14,6 +14,8 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string CarrierPartner = "CARRIER";
         public static readonly string ConsigneePartner = "CONSIGNEE";
         public static readonly string ShipperPartner = "SHIPPER";
+        public static readonly string StaffPartner = "STAFF";
+        public static readonly string PersonalPartner = "PERSONAL";
         public static readonly string AllPartner = "ALL";
         public static readonly string PARTNER_GROUP = "AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER";
 
@@ -46,6 +48,8 @@ namespace eFMS.API.Catalogue.DL.Common
             new CatPartnerGroupModel { Id = ConsigneePartner, GroupNameVn = "Người nhận hàng", GroupNameEn = "Consignee" },
             new CatPartnerGroupModel { Id = CustomerPartner, GroupNameVn = "Khách hàng", GroupNameEn = "Customer" },
             new CatPartnerGroupModel { Id = ShipperPartner, GroupNameVn = "Người gửi", GroupNameEn = "Shipper" },
+            new CatPartnerGroupModel { Id = StaffPartner, GroupNameVn = "Nhân viên", GroupNameEn = "Staff" },
+            new CatPartnerGroupModel { Id = PersonalPartner, GroupNameVn = "Cá nhân", GroupNameEn = "Personal" },
             new CatPartnerGroupModel { Id = AllPartner, GroupNameVn = "All", GroupNameEn = "All" }
         };
         public static List<UnitType> UnitTypes = new List<UnitType>

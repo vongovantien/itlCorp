@@ -9,6 +9,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
+import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
