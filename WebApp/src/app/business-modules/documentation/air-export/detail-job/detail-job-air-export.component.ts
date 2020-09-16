@@ -118,6 +118,25 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             );
     }
 
+    previewShipmentCoverPage() {
+        this._documenRepo.previewShipmentCoverPage(this.jobId)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    this.dataReport = res;
+                    if (this.dataReport != null && res.dataSource.length > 0) {
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+
+
     onSaveJob() {
         this.formCreateComponent.isSubmitted = true;
         if (!this.checkValidateForm()) {

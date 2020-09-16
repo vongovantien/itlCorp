@@ -113,6 +113,12 @@
             </tab>
         </tabset>
     </div>
+
+    <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">
+        <li class="m-nav-sticky__item">
+            <a title="Preview Shipment Cover Page" style="cursor: pointer;" (click)="previewShipmentCoverPage()">CP</a>
+        </li>
+    </ul>
 </div>
 
 <ng-container *ngIf="dataReport">
