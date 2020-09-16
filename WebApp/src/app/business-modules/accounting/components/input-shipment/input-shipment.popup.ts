@@ -1,7 +1,7 @@
 import { PopupBase } from "src/app/popup.base";
-import { Component, Output, EventEmitter, Input } from "@angular/core";
+import { Component, Output, EventEmitter } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
-import { catchError } from "rxjs/operators";
+import { catchError, finalize } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 
 @Component({
@@ -9,27 +9,13 @@ import { ToastrService } from "ngx-toastr";
     templateUrl: './input-shipment.popup.html'
 })
 export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
-    @Input() set type(t: string) {
-        this._type = t;
-        console.log(this._type)
-        if (this._type !== 'soa') {
-            this.shipmentTypes = [
-                { text: 'JOB ID', id: 'JOBID' },
-                { text: 'MBL/MAWB', id: 'MBL' },
-                { text: 'HAWB/HBL', id: 'HBL' },
-                { text: 'Custom No', id: 'CustomNo' }
-            ];
-        }
-    }
 
     @Output() onInputShipment: EventEmitter<any> = new EventEmitter<any>();
-
-    private _type: string = 'soa';
-
     shipmentTypes = [
         { text: 'JOB ID', id: 'JOBID' },
         { text: 'MBL/MAWB', id: 'MBL' },
         { text: 'HAWB/HBL', id: 'HBL' },
+        { text: 'Custom No', id: 'CustomNo' }
     ];
     selectedShipmentType: string = '';
     shipmentSearch: string = '';
@@ -57,7 +43,10 @@ export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
             };
             const keywords: string[] = this.shipmentSearch.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
             this._documentRepo.GetShipmentNotExist(this.selectedShipmentType, keywords)
-                .pipe(catchError(this.catchError))
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.onInputShipment.emit(data);
+                    this.hide();
+                }))
                 .subscribe(
                     (res: any) => {
                         if (res.status) {
@@ -66,8 +55,6 @@ export class ShareAccountingInputShipmentPopupComponent extends PopupBase {
                     }
                 );
         }
-        this.onInputShipment.emit(data);
-        this.hide();
     }
 
     closePopup() {
