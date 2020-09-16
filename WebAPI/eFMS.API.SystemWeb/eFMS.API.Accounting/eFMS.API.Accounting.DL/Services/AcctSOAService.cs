@@ -1778,14 +1778,40 @@ namespace eFMS.API.Accounting.DL.Services
             var charge = GetChargeShipmentDocAndOperation(query, null);
             var chargeShipments = GetListChargeOfSoa(charge, soaNo, currencyLocal);
             var _groupShipments = new List<GroupShipmentModel>();
-            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL }).Select(s => new GroupShipmentModel
-            {
-                JobId = s.Key.JobId,
-                HBL = s.Key.HBL,
-                MBL = s.Key.MBL,
-                TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
-                TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
-                ChargeShipments = s.ToList()
+            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.ID }).Select(s => {
+                string _shipmentId = "";
+                string _pic = "";
+
+                if (s.Key.JobId.Contains("LOG")){
+                    OpsTransaction opsShipment = opsTransactionRepo.Get(x => x.JobNo == s.Key.JobId)?.FirstOrDefault();
+                    if(opsShipment != null)
+                    {
+                        _shipmentId = opsShipment.Id.ToString();
+                        SysUser sysUser = sysUserRepo.Get(x => x.Id == opsShipment.BillingOpsId)?.FirstOrDefault();
+                        _pic = sysUser?.Username;
+                    }
+                }
+                else
+                {
+                    CsTransaction docShipment = csTransactionRepo.Get(x => x.JobNo == s.Key.JobId)?.FirstOrDefault();
+                    if (docShipment != null)
+                    {
+                        _shipmentId = docShipment.Id.ToString();
+                        SysUser sysUser = sysUserRepo.Get(x => x.Id == docShipment.PersonIncharge)?.FirstOrDefault();
+                        _pic = sysUser?.Username;
+                    }
+                }
+                return new GroupShipmentModel
+                {
+                    ShipmentId = _shipmentId,
+                    PIC = _pic,
+                    JobId = s.Key.JobId,
+                    HBL = s.Key.HBL,
+                    MBL = s.Key.MBL,
+                    TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+                    TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+                    ChargeShipments = s.ToList()
+                };
             }).ToList();
             data = soaDetail;
             data.GroupShipments = _groupShipments;
