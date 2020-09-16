@@ -99,7 +99,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
-
         this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
@@ -112,39 +111,13 @@ export class PartnerDetailComponent extends AppList {
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
+
     ngAfterViewInit() {
         this.formPartnerComponent.isUpdate = true;
 
         this._cd.detectChanges();
     }
 
-
-    // getDetailCustomer(partnerId: string) {
-    //     this._catalogueRepo.getDetailPartner(partnerId)
-    //         .subscribe(
-    //             (res: Partner) => {
-    //                 this.partner = res;
-    //                 console.log("detail partner:", this.partner);
-    //                 //this.formPartnerComponent.formGroup.patchValue(res);
-    //                 this.formPartnerComponent.getShippingProvinces(res.countryShippingId);
-    //                 this.formPartnerComponent.getBillingProvinces(res.countryId);
-    //                 console.log("flag: ", this.formPartnerComponent.activePartner);
-
-    //             }
-    //         );
-    // }
-
-    RequireSaleman(partnerGroup: string): boolean {
-        if (partnerGroup != null) {
-            if (partnerGroup.includes('CUSTOMER') || partnerGroup.includes('ALL')) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
     getParnerDetails() {
         this._progressRef.start();
         this._catalogueRepo.getDetailPartner(this.partner.id)
@@ -157,7 +130,6 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         this.partner = res;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         console.log("res: ", res);
                         this.formPartnerComponent.setFormData(this.partner);
                         console.log(this.partner.partnerMode);
