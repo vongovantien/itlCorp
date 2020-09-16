@@ -113,7 +113,8 @@ export class SeaFclImportManifestComponent extends AppList {
     }
 
     refreshManifest() {
-        this.getManifest(this.jobId);
+        //this.getManifest(this.jobId);
+        this.formManifest.getShipmentDetail();
         this.getHblList(this.jobId);
     }
 
