@@ -2,7 +2,7 @@ import { Component, ViewChild, Output, EventEmitter, Input, ElementRef } from '@
 import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, shareReplay } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
 import { Partner, CountryModel, ProviceModel } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
@@ -52,6 +52,7 @@ export class FormAddPartnerComponent extends AppForm {
 
     partnerForm: FormGroup;
     isSubmitted: boolean = false;
+    isDisabledInternalCode: boolean = false;
     partnerAccountNo: AbstractControl;
     internalReferenceNo: AbstractControl;
     partnerNameEn: AbstractControl;
@@ -94,7 +95,7 @@ export class FormAddPartnerComponent extends AppForm {
     groups: string = '';
     partnerMode: AbstractControl;
     partnerLocation: AbstractControl;
-
+    internalCode: AbstractControl;
 
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
@@ -291,9 +292,7 @@ export class FormAddPartnerComponent extends AppForm {
             countryShippingId: [null, Validators.compose([
                 Validators.required
             ])],
-            provinceShippingId: [null, Validators.compose([
-                Validators.required
-            ])],
+            provinceShippingId: [null],
             zipCodeShipping: [null],
             addressShippingEn: [null, Validators.compose([
                 FormValidators.required
@@ -304,9 +303,7 @@ export class FormAddPartnerComponent extends AppForm {
             countryId: [null, Validators.compose([
                 Validators.required
             ])],
-            provinceId: [null, Validators.compose([
-                Validators.required
-            ])],
+            provinceId: [null],
             zipCode: [null],
             addressEn: [null, Validators.compose([
                 FormValidators.required
@@ -333,7 +330,8 @@ export class FormAddPartnerComponent extends AppForm {
             applyDim: [null],
             roundUpMethod: [null],
             partnerMode: [null],
-            partnerLocation: [null]
+            partnerLocation: [null, Validators.required],
+            internalCode: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -373,10 +371,12 @@ export class FormAddPartnerComponent extends AppForm {
         this.billingPhone = this.partnerForm.controls['billingPhone'];
         this.partnerMode = this.partnerForm.controls['partnerMode'];
         this.partnerLocation = this.partnerForm.controls['partnerLocation'];
+        this.internalCode = this.partnerForm.controls['internalCode'];
 
         if (!this.isUpdate) {
             this.partnerMode.setValue([<CommonInterface.INg2Select>{ id: this.partnerModes.find(x => x.text === 'External').id, text: 'External' }]);
             this.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partnerLocations.find(x => x.text === 'Domestic').id, text: 'Domestic' }]);
+            this.isDisabledInternalCode = true;
 
         }
 
@@ -429,7 +429,6 @@ export class FormAddPartnerComponent extends AppForm {
         const partnerGroupActives = !!partner.partnerGroup ? this.getPartnerGroupActives(partner.partnerGroup.split(';')) : null;
         let index = -1;
         let parentCustomerActive = [];
-        const workPlaceActive = [];
         let countryIdActive = [];
         let countryShippingIdActive = [];
         let billingProvinceActive = [];
@@ -497,9 +496,10 @@ export class FormAddPartnerComponent extends AppForm {
             roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
             applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }],
             partnerMode: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerMode }],
-            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerLocation }]
-
+            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerLocation }],
+            internalCode: partner.internalCode
         });
+
     }
 
     getPartnerGroupActives(arg0: string[]): any {
@@ -536,5 +536,15 @@ export class FormAddPartnerComponent extends AppForm {
 
     handleFocusInternalReference() {
         this.setFocusInput(this.internalReferenceRef);
+    }
+
+    selectedPartnerMode($event) {
+        console.log($event);
+        const partnerMode = $event;
+        if (partnerMode.id === 'Internal') {
+            this.isDisabledInternalCode = false;
+        } else {
+            this.isDisabledInternalCode = true;
+        }
     }
 }

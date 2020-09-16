@@ -24,6 +24,7 @@ export class SettlementTableSurchargeComponent extends AppList {
 
     ngOnInit() {
         this.headers = [
+            { title: 'Charge Code', field: 'chargeCode', sortable: true, width: 200 },
             { title: 'Charge Name', field: 'chargeName', sortable: true, width: 200 },
             { title: 'Qty', field: 'quantity', sortable: true },
             { title: 'Unit', field: 'unitName', sortable: true },

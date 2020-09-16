@@ -320,12 +320,17 @@ namespace eFMS.API.Documentation.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
-                var customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
-                var ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
+                IQueryable<CatPartner> customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
+                IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
+
                 data.ToList().ForEach(x => {
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
+
+                    IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
+
+                    x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
                 });
             }
             var results = new OpsTransactionResult

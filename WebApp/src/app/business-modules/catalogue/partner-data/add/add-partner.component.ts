@@ -331,11 +331,17 @@ export class AddPartnerDataComponent extends AppList {
         if (partnerGroup === PartnerGroupEnum.SUPPLIER) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "SUPPLIER"));
         }
+        if (partnerGroup === PartnerGroupEnum.STAFF) {
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "STAFF"));
+        }
+        if (partnerGroup === PartnerGroupEnum.PERSONAL) {
+            this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "PERSONAL"));
+        }
         if (partnerGroup === PartnerGroupEnum.ALL) {
             this.partnerGroupActives.push(this.formPartnerComponent.partnerGroups.find(x => x.id === "ALL"));
         }
         if (this.partnerGroupActives.find(x => x.id === "ALL")) {
-            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+            this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             this.isShowSaleMan = true;
         }
         this.formPartnerComponent.partnerForm.controls['partnerGroup'].setValue(this.partnerGroupActives);
@@ -352,7 +358,7 @@ export class AddPartnerDataComponent extends AppList {
         this.formPartnerComponent.applyDim.setErrors(null);
         this.formPartnerComponent.roundUpMethod.setErrors(null);
         this.formPartnerComponent.partnerMode.setErrors(null);
-        this.formPartnerComponent.partnerLocation.setErrors(null);
+        // this.formPartnerComponent.partnerLocation.setErrors(null);
 
 
 
@@ -410,11 +416,11 @@ export class AddPartnerDataComponent extends AppList {
         this.partner.partnerGroup = !!formBody.partnerGroup ? formBody.partnerGroup[0].id : null;
         if (formBody.partnerGroup != null) {
             if (formBody.partnerGroup.find(x => x.id === "ALL")) {
-                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER';
+                this.partner.partnerGroup = 'AGENT;CARRIER;CONSIGNEE;CUSTOMER;SHIPPER;SUPPLIER;STAFF;PERSONAL';
             } else {
                 let s = '';
                 for (const item of formBody.partnerGroup) {
-                    s = item['id'] + ';';
+                    s = s + item['id'] + ';';
                 }
                 this.partner.partnerGroup = s.substring(0, s.length - 1);
             }

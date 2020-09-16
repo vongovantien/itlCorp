@@ -4,18 +4,17 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
+import { DocumentationRepo } from '@repositories';
+import { SortService } from '@services';
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
-import { CsTransaction } from 'src/app/shared/models/document/csTransaction';
-import { CsTransactionDetail } from 'src/app/shared/models/document/csTransactionDetail';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { CsTransaction, CsTransactionDetail } from '@models';
+import { CommonEnum } from '@enums';
+import { JobConstants } from '@constants';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 import * as fromShare from './../../share-business/store';
-import { formatDate } from '@angular/common';
 import { getTransactionDataSearchState } from './../../share-business/store';
 
 @Component({
@@ -42,8 +41,7 @@ export class SeaConsolImportComponent extends AppList {
 
     defaultDataSearch = {
         transactionType: this.transactionService,
-        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+        ...JobConstants.DEFAULT_RANGE_DATE_SEARCH
     };
     jobIdSelected: string = null;
 

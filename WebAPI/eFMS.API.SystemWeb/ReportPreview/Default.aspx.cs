@@ -21,7 +21,13 @@ namespace ReportPerview
 {
     public partial class Default : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        void InitializeCompnent()
+        {
+            // Fix bug: crystal report viewer next page not working >> Move the contents of Page_Load to Page_Init()
+            this.Init += Page_Init; 
+        }
+        
+        private void Page_Init(object sender, EventArgs e)
         {
             if (!Page.IsPostBack)
             {
@@ -35,7 +41,7 @@ namespace ReportPerview
                     crystal = null;
                     Response.Redirect("~/NotFound.aspx");
                 }
-                if(crystal.DataSource.Columns.Count == 0)
+                if (crystal.DataSource.Columns.Count == 0)
                 {
                     crystal = null;
                     throw new Exception("Resource not found");
@@ -77,6 +83,64 @@ namespace ReportPerview
                 }
             }
         }
+
+        //protected void Page_Load(object sender, EventArgs e)
+        //{
+        //    if (!Page.IsPostBack)
+        //    {
+        //        Crystal crystal = new Crystal();
+        //        try
+        //        {
+        //            crystal = JsonConvert.DeserializeObject<Crystal>(Request.Form.GetValues(0)[0]);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            crystal = null;
+        //            Response.Redirect("~/NotFound.aspx");
+        //        }
+        //        if(crystal.DataSource.Columns.Count == 0)
+        //        {
+        //            crystal = null;
+        //            throw new Exception("Resource not found");
+        //        }
+        //        ReportDocument rpt = ShowReport(crystal);
+        //        if (rpt != null)
+        //        {
+        //            rptViewer.HasPrintButton = crystal.AllowPrint;
+        //            rptViewer.HasExportButton = crystal.AllowExport;
+        //            rptViewer.DisplayGroupTree = false;
+        //            Session["report"] = rpt;
+        //            Session["allowPrint"] = crystal.AllowPrint;
+        //            Session["allowExport"] = crystal.AllowExport;
+        //            rptViewer.ReportSource = rpt;
+        //            if (rpt.PrintOptions.PaperOrientation == CrystalDecisions.Shared.PaperOrientation.Landscape)
+        //            {
+        //                rptViewer.Width = 1320;
+        //            }
+        //            else
+        //            {
+        //                rptViewer.Width = 790;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("Resource not found");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        ReportDocument rpt = (ReportDocument)Session["report"];
+        //        bool allowPrint = (bool)Session["allowPrint"];
+        //        bool allowExport = (bool)Session["allowExport"];
+        //        if (rpt != null)
+        //        {
+        //            rptViewer.HasPrintButton = allowPrint;
+        //            rptViewer.HasExportButton = allowExport;
+        //            rptViewer.ReportSource = rpt;
+        //        }
+        //    }
+        //}
+
         /// <summary>
         /// Binding data string to report rpt and show on report viewer
         /// </summary>
