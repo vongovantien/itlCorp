@@ -570,13 +570,12 @@ namespace eFMS.API.Accounting.DL.Services
                     HBL = item.HBL,
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
-                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL),
+                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
 
                     TotalAmount = advInfo.TotalAmount ?? 0,
-
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = advInfo.TotalAmount - advInfo.AdvanceAmount,
@@ -643,7 +642,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL)
+        public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL, string AdvNo)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
@@ -670,6 +669,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.JobNo == JobId
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
+                                     && sur.AdvanceNo == AdvNo
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -701,7 +701,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = sur.AdvanceNo
+                                    AdvanceNo = AdvNo
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -721,6 +721,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cst.JobNo == JobId
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
+                                    && sur.AdvanceNo == AdvNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -752,7 +753,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = sur.AdvanceNo
+                                   AdvanceNo = AdvNo
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
