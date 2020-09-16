@@ -76,7 +76,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: Partner) => {
                     this.partner = res;
                     console.log("detail partner:", this.partner);
-                    this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerMode, text: this.partner.partnerLocation }]);
+                    this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
                     this.formCreate.formGroup.patchValue(res);
                     this.formCreate.getShippingProvinces(res.countryShippingId);
                     this.formCreate.getBillingProvinces(res.countryId);
