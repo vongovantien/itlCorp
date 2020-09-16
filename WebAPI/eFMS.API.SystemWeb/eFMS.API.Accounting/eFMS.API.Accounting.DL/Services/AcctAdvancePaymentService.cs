@@ -3002,7 +3002,7 @@ namespace eFMS.API.Accounting.DL.Services
             var mergeAdvRequest = queryOps.Union(queryDoc);
 
             //Get advance theo shipment và advance chưa làm settlement; order giảm dần theo ngày request date
-            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo));
+            var data = mergeAdvRequest.ToList().Where(x => !surcharge.Any(a => a.AdvanceNo == x.AdvanceNo && a.Hblid == x.Hblid));
             return data.ToList();
         }
 
@@ -3244,23 +3244,15 @@ namespace eFMS.API.Accounting.DL.Services
 
         public void UpdateStatusPaymentOfAdvanceRequest(string settlementCode)
         {
-            var hblIdList = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Select(s => s.Hblid).ToList();
-            var hblNoList = new List<string>();
-            //Find hblNo in operation
-            hblNoList = opsTransactionRepo.Get(x => hblIdList.Contains(x.Hblid)).Select(s => s.Hwbno).ToList();
-            if (hblNoList.Count == 0)
+            //Select list HBLID, AdvanceNo by SettlementCode
+            var hblIdAdvList = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode).Select(s => new { s.Hblid, s.AdvanceNo }).Distinct().ToList();
+            foreach(var hblIdAdv in hblIdAdvList)
             {
-                //Find hblNo documentation 
-                hblNoList = csTransactionDetailRepo.Get(x => hblIdList.Contains(x.Id)).Select(s => s.Hwbno).ToList();
-            }
-
-            foreach (var hblNo in hblNoList)
-            {
-                var avdReq = acctAdvanceRequestRepo.Get(x => x.Hbl == hblNo).FirstOrDefault();
-                if (avdReq != null)
+                var avdRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == hblIdAdv.Hblid && x.AdvanceNo == hblIdAdv.AdvanceNo);
+                foreach(var avdRequest in avdRequests)
                 {
-                    avdReq.StatusPayment = AccountingConstants.STATUS_PAYMENT_SETTLED;
-                    var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(avdReq, x => x.Id == avdReq.Id);
+                    avdRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_SETTLED;
+                    var hsUpdateAdvReq = acctAdvanceRequestRepo.Update(avdRequest, x => x.Id == avdRequest.Id);
                 }
             }
         }

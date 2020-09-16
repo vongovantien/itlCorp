@@ -107,6 +107,7 @@ export class PartnerDetailComponent extends AppList {
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
+
     ngAfterViewInit() {
         this.formPartnerComponent.isUpdate = true;
 
@@ -125,7 +126,6 @@ export class PartnerDetailComponent extends AppList {
                     if (!!res) {
                         this.partner = res;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        // this.isShowSaleMan = this.checkRequireSaleman(this.partner.partnerGroup);
                         console.log("res: ", res);
                         this.formPartnerComponent.setFormData(this.partner);
                         console.log(this.partner.partnerMode);
