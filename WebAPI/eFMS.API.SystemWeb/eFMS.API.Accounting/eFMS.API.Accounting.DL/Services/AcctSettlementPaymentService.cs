@@ -3504,9 +3504,7 @@ namespace eFMS.API.Accounting.DL.Services
             var csTransations = csTransactionRepo.Get();
             var csTranstionDetails = csTransactionDetailRepo.Get();  // HBL
             var custom = customsDeclarationRepo.Get();
-            var advRequest = acctAdvanceRequestRepo.Get();
-            var groupAdRequestByJobIdAndAccNo = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
-                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
+            
 
             try
             {
@@ -3584,38 +3582,21 @@ namespace eFMS.API.Accounting.DL.Services
                                           };
 
                         var data = dataOperation.Union(dataService).ToList();
-
-                        
-
-
-                        /*var test = from da in data
-                                   group da by new { da.SettleNo, da.AdvanceNo, da.JobID, da.HBL, da.MBL } into g
-                                   select new
-                                   {
-                                       SettleNo = g.Key.SettleNo,
-                                       AdvanceNo = g.Key.AdvanceNo,
-                                       JobId = g.Key.JobID,
-                                       HBLNo = g.Key.HBL,
-                                       MBLNo = g.Key.MBL
-                                   };
-                        var joinList = from te in test
-                                       join */
-
-                        var group = data.GroupBy(d => new {d.SettleNo, d.JobID, d.HBL, d.MBL})
+                      
+                        decimal? advTotalAmount;
+                        var group = data.GroupBy(d => new {d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo})
                             .Select(s => new SettlementExportGroupDefault
                         {
                             JobID = s.Key.JobID,
                             MBL = s.Key.MBL,
                             HBL = s.Key.HBL,
-                            // CustomNo = s.Key.CustomNo,
-                            
-                            AdvanceTotalAmount = s.Sum(su => su.AdvanceAmount),
-                            SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
-                            BalanceTotalAmount = s.Sum(d => d.SettlementAmount) - s.Sum(su => su.AdvanceAmount),
-                            //requestList = data.Where(w => w.JobID == s.Key.JobID && w.MBL == s.Key.MBL 
-                            //&& w.HBL == s.Key.HBL && w.CustomNo == s.Key.CustomNo).ToList()
-                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.HBL , s.Key.SettleNo)
-                        });
+                            CustomNo = s.Key.CustomNo,
+                       
+                            SettlementTotalAmount = s.Sum(d => d.SettlementAmount),                          
+                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL , s.Key.SettleNo, out advTotalAmount),
+                            AdvanceTotalAmount = advTotalAmount,
+                            BalanceTotalAmount = s.Sum(d => d.SettlementAmount) - advTotalAmount,
+                            });
 
                         // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
                         foreach (var item in group)
@@ -3638,14 +3619,28 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         private List<SettlementExportDefault> getRequestList(List<SettlementExportDefault> data, string JobID,
-            string HBL, string MBL, string SettleNo)
+            string HBL, string MBL, string SettleNo, out decimal? advTotalAmount)
         {
             var advRequest = acctAdvanceRequestRepo.Get();
+            var advPayment = acctAdvancePaymentRepo.Get();
+            //
             var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
                             .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
+            var groupAdvReqByStatus = from advReq in groupAdvReq
+                                      join advPay in advPayment on advReq.AdvanceNo equals advPay.AdvanceNo
+                                      where advPay.StatusApproval == "Done"
+                                      select new
+                                      {
+                                          advReq.AdvanceNo,
+                                          advReq.JobId,
+                                          advReq.Hbl,
+                                          advReq.Mbl,
+                                          advReq.AdvanceAmount
+                                      };
             //
-            var groupData = data.GroupBy(d => new { d.JobID, d.HBL, d.MBL, d.AdvanceNo, d.SettleNo, d.Currency,
-            d.ApproveDate, d.CustomNo, d.Description, d.RequestDate, d.Requester})
+            var groupData = data
+                .GroupBy(d => new { d.JobID, d.HBL, d.MBL, d.AdvanceNo, d.SettleNo, d.Currency,
+                d.ApproveDate, d.CustomNo, d.Description, d.RequestDate, d.Requester})
                 .Where(x => x.Key.JobID == JobID && x.Key.HBL == HBL && x.Key.MBL == MBL && x.Key.SettleNo == SettleNo)
                 .Select(y => new SettlementExportDefault{
                     JobID = y.Key.JobID,
@@ -3661,11 +3656,12 @@ namespace eFMS.API.Accounting.DL.Services
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
                 });
-
+            var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
+            groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
-                         join gar in groupAdvReq on new { gd.AdvanceNo, gd.JobID, gd.HBL, gd.MBL } equals
-                         new { gar.AdvanceNo, JobID = gar.JobId, HBL = gar.Hbl, MBL = gar.Mbl } into gar1
-                         from gar in gar1.DefaultIfEmpty()
+                         join gar in /*groupAdvReq*/ groupAdvReqByStatus on new { gd.AdvanceNo , gd.JobID, gd.HBL, gd.MBL } equals
+                         new { gar.AdvanceNo, JobID = gar.JobId, HBL = gar.Hbl, MBL = gar.Mbl } into res
+                         from gar in res.DefaultIfEmpty()
                          select new SettlementExportDefault {
                                 JobID = gd.JobID,
                                 HBL = gd.HBL,
@@ -3680,24 +3676,23 @@ namespace eFMS.API.Accounting.DL.Services
                                 Description = gd.Description,
                                 RequestDate = gd.RequestDate,
                                 Requester = gd.Requester,
-                                AdvanceAmount = gar.AdvanceAmount,
+                                AdvanceAmount = gar == null ? 0 : gar.AdvanceAmount,
                             };
-
-            var groupData1 = data
-                .Where(x => x.JobID == JobID && x.HBL == HBL && x.MBL == MBL && x.SettleNo == SettleNo).ToList();
-            return groupData1;
-            //groupData sẽ có 2 AdvanceNo
-
-            //var singleData = data.Where(x => x.JobID == JobID && x.HBL == HBL && x.MBL == MBL && x.SettleNo == SettleNo).FirstOrDefault();
-
-            //var addInfoGroupData = from gd in groupData
-            //                       join sd in singleData on gd.
-
-            //var joinGAdvReqGData = from gar in groupAdvReq
-            //                       join gd in groupData 
+            var output = result.ToList();
+            if(groupDataAdvanceNoIsNull.Count() > 0)
+            {
+                foreach(var item in groupDataAdvanceNoIsNull)
+                {
+                    item.AdvanceAmount = 0;
+                }
+                output.AddRange(groupDataAdvanceNoIsNull);
+            }
+           
+            advTotalAmount = result.Sum(z => z.AdvanceAmount).Value;
             
-
-            //return result;
+            //;
+            return output;
+            
         }
 
         #endregion --- EXPORT SETTLEMENT ---
