@@ -496,7 +496,7 @@ export class FormAddPartnerComponent extends AppForm {
             roundUpMethod: [<CommonInterface.INg2Select>{ id: partner.roundUpMethod, text: partner.roundUpMethod }],
             applyDim: [<CommonInterface.INg2Select>{ id: partner.applyDim, text: partner.applyDim }],
             partnerMode: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerMode }],
-            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerMode, text: partner.partnerLocation }],
+            partnerLocation: [<CommonInterface.INg2Select>{ id: partner.partnerLocation, text: partner.partnerLocation }],
             internalCode: partner.internalCode
         });
 
