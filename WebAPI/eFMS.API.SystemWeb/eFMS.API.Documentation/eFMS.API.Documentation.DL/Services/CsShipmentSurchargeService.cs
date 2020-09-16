@@ -408,7 +408,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if(item.Hblid != Guid.Empty)
                             {
                                 CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid)?.FirstOrDefault();
-                                item.OfficeId = hbl.OfficeId ?? null;
+                                item.OfficeId = hbl?.OfficeId ?? null;
                             }
                             var t = DataContext.Add(item, true);
                         }

@@ -13,7 +13,7 @@ import { IShareBussinessState, getTransationLoading, getTransactionListShipment,
 
 import { AppList } from 'src/app/app.list';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { formatDate } from '@angular/common';
+import { JobConstants } from '@constants';
 
 
 @Component({
@@ -40,8 +40,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
 
     defaultDataSearch = {
         transactionType: this.transactionService,
-        fromDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        toDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 2, new Date().getDate()), 'yyyy-MM-dd', 'en'),
+        ...JobConstants.DEFAULT_RANGE_DATE_SEARCH
     };
 
     constructor(
