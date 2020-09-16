@@ -368,7 +368,7 @@ namespace eFMS.API.Documentation.DL.Services
                         FirstDest = item.PODName,
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
-                        Notify = item.NotifyPartyDescription?.ToUpper(),
+                        Notify = transaction.TransactionType == "AE" ? item.Notify?.ToUpper() : item.NotifyPartyDescription?.ToUpper(),
                         AirFreight = item.FreightPayment
                     };
                     manifests.Add(manifest);
