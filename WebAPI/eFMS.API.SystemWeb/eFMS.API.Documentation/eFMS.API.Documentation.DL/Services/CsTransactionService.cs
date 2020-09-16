@@ -2296,7 +2296,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VNDExchange = charge.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
-                        charge.Docs = surcharge.InvoiceNo ?? ((surcharge.Soano ?? surcharge.PaySoano) ?? (surcharge.CreditNo ?? surcharge.DebitNo)); //Ưu tiên: InvoiceNo >> Soa No >> CD Note Code  of charge
+                        charge.Docs = surcharge.InvoiceNo ?? (surcharge.CreditNo ?? surcharge.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
