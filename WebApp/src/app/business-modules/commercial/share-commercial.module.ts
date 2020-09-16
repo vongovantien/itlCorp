@@ -9,6 +9,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommercialDetailComponent } from './detail/detail-commercial.component';
 import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/share-commercial-catalogue.module';
+import { SelectModule } from 'ng2-select';
 
 @NgModule({
     declarations: [
@@ -23,7 +24,8 @@ import { ShareCommercialCatalogueModule } from '../share-commercial-catalogue/sh
         DirectiveModule,
         ReactiveFormsModule,
         PipeModule,
-        ShareCommercialCatalogueModule
+        ShareCommercialCatalogueModule,
+        SelectModule,
     ],
     exports: [
         CommercialCreateComponent,
