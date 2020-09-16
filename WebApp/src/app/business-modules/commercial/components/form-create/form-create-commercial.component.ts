@@ -36,7 +36,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     addressShippingVn: AbstractControl;
     addressEn: AbstractControl;
     addressVn: AbstractControl;
-
+    partnerLocation: AbstractControl;
     countries: Observable<CountryModel[]>;
     cities: Observable<ProviceModel[]>;
     acRefCustomers: Observable<Partner[]>;
@@ -51,6 +51,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     displayFieldCountry: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_COUNTRY;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+
+    partnerLocations: CommonInterface.INg2Select[] = [
+        { id: 'Domestic', text: 'Domestic' },
+        { id: 'Oversea', text: 'Oversea' }
+    ];
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
@@ -128,6 +133,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             countryId: [null, Validators.required],
             provinceId: [],
             parentId: [],
+            partnerLocation: [null, Validators.required],
         });
 
         this.partnerNameEn = this.formGroup.controls["partnerNameEn"];
@@ -148,6 +154,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.addressShippingVn = this.formGroup.controls["addressShippingVn"];
         this.addressEn = this.formGroup.controls["addressEn"];
         this.addressVn = this.formGroup.controls["addressVn"];
+        this.partnerLocation = this.formGroup.controls["partnerLocation"];
     }
 
     onSelectDataFormInfo(data: any, type: string) {

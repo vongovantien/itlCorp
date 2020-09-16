@@ -30,19 +30,34 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
-                        <label required>Tax Code</label>
-                        <input type="text" class="form-control" formControlName="taxCode">
-                        <div class="form-control-feedback" *ngIf="isSubmitted && 
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
+                                <label required class="form-control-label"> Partner Location </label>
+                                <ng-select [items]="partnerLocations" name="partnerLocation"
+                                    formControlName="partnerLocation" placeholder="Select partner location">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
+                                <label required>Tax Code</label>
+                                <input type="text" class="form-control" formControlName="taxCode">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && 
                         ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
-                            Tax Code include 8 - 14 characters!
+                                    Tax Code include 8 - 14 characters!
+                                </div>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && taxCode.errors  | equalError:'pattern'">
+                                    Tax Code invalid
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-control-feedback"
-                            *ngIf="isSubmitted && taxCode.errors  | equalError:'pattern'">
-                            Tax Code invalid
-                        </div>
+
                     </div>
+
                 </div>
                 <div class="col-lg-8">
                     <div class="row">
