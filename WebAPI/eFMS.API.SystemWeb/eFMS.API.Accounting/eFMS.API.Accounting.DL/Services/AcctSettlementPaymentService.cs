@@ -1650,7 +1650,7 @@ namespace eFMS.API.Accounting.DL.Services
                            ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : string.Empty,
                            GW = (opst.SumGrossWeight ?? cstd.GrossWeight),
                            NW = (opst.SumNetWeight ?? cstd.NetWeight),
-                           CustomsId = (sur.ClearanceNo == null ? string.Empty : sur.ClearanceNo),
+                           CustomsId = sur.ClearanceNo,
                            PSC = (opst.SumPackages ?? cstd.PackageQty),
                            CBM = (opst.SumCbm ?? cstd.Cbm),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
@@ -1668,13 +1668,19 @@ namespace eFMS.API.Accounting.DL.Services
             result.ContainerQty = data.First().ContainerQty;
             result.GW = data.Sum(sum => sum.GW);
             result.NW = data.Sum(sum => sum.NW);
-            result.CustomsId = data.First().CustomsId;
+            result.CustomsId = !string.IsNullOrEmpty(data.First().CustomsId) ? data.First().CustomsId : GetCustomNoOldOfShipment(data.First().JobId);
             result.PSC = data.Sum(sum => sum.PSC);
             result.CBM = data.Sum(sum => sum.CBM);
             result.HBL = data.First().HBL;
             result.MBL = data.First().MBL;
             result.StlCSName = data.First().StlCSName;
             return result;
+        }
+
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
+            return customNos.FirstOrDefault() ?? string.Empty;
         }
 
         public IQueryable<AscSettlementPaymentRequestReport> GetChargeOfSettlement(string settlementNo, string currency)
