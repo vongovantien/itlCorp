@@ -13,8 +13,6 @@ import { SelectModule } from 'ng2-select';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
-
-import { SelectModule } from 'ng2-select';
 import { CustomerAgentImportComponent } from './components/customer-agent-import/customer-agent-import.component';
 import { ContractImportComponent } from './components/contract/import/contract-import.component';
 
