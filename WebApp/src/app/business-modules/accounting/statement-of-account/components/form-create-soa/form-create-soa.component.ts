@@ -376,6 +376,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 jobIds: this.mapShipment("JOBID"),
                 hbls: this.mapShipment("HBL"),
                 mbls: this.mapShipment("MBL"),
+                customNo: this.mapShipment("CustomNo")
             };
             this.dataSearch = new SOASearchCharge(body);
             this.onApply.emit(this.dataSearch);
@@ -445,7 +446,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
     }
 
     mapShipment(type: string) {
-        var _shipment = [];
+        let _shipment = [];
         if (this.shipmentInput) {
             if (this.shipmentInput.keyword.length > 0) {
                 const _keyword = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
