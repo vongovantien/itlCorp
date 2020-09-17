@@ -123,6 +123,12 @@ namespace eFMS.API.Documentation.DL.Services
                 case "AE":
                     manifestNo = "MAE" + shipment.JobNo.Substring(2);
                     break;
+                case "SCE":
+                    manifestNo = "MSCE" + shipment.JobNo.Substring(3);
+                    break;
+                case "SCI":
+                    manifestNo = "MSCI" + shipment.JobNo.Substring(3);
+                    break;
             }
             return manifestNo;
         }
