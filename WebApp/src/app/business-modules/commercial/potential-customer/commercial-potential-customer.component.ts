@@ -56,7 +56,7 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
             { title: 'Status', field: 'active', sortable: true },
         ];
         this.configSearch = {
-            settingFields: this.headers.filter(x => x.field !== 'margin' || 'quotation')
+            settingFields: this.headers
                 .map(x => ({ "fieldName": x.field === 'userCreatedName' ? 'creator' : x.field, "displayName": x.title })),
             typeSearch: TypeSearch.intab
         };
