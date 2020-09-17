@@ -4525,7 +4525,7 @@ namespace eFMS.API.Accounting.DL.Services
                             SettlementTotalAmount = s.Sum(d => d.SettlementAmount),                          
                             requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL , s.Key.SettleNo, out advTotalAmount),
                             AdvanceTotalAmount = advTotalAmount,
-                            BalanceTotalAmount = s.Sum(d => d.SettlementAmount) - advTotalAmount,
+                            BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount),
                             });
 
                         // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
