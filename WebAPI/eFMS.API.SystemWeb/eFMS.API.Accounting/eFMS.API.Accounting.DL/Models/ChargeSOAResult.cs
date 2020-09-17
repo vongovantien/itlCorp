@@ -65,6 +65,9 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? VATAmount { get; set; }
         public decimal? NetAmount { get; set; }
 
+        public string PIC { get; set; }
+
+
 
 
 
