@@ -34,5 +34,7 @@ namespace eFMS.API.Accounting.DL.Models
 
         public DateTime? DatetimeModifiedSurcharge { get; set; }
         public string CDNote { get; set; }
+        public string PIC { get; set; }
+
     }
 }

@@ -18,6 +18,8 @@ export class SOASearchCharge {
     jobIds: any[] = [];
     hbls: any[] = [];
     mbls: any[] = [];
+    customNo?: string[] = [];
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
