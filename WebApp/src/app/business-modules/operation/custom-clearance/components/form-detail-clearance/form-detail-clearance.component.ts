@@ -48,7 +48,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     countries: Observable<CountryModel[]>;
     serviceTypes: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     typeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
-    routeClearances: CommonInterface.INg2Select[] = [{ id: 'Red', text: 'Red' }, { id: 'Green', text: 'Green' }, { id: 'Blue', text: 'Blue' }];
+    routeClearances: CommonInterface.INg2Select[] = JobConstants.COMMON_DATA.ROUTES;
     cargoTypes: CommonInterface.INg2Select[] = [{ id: 'FCL', text: 'FCL' }, { id: 'LCL', text: 'LCL' }];
     commodities: Observable<Commodity[]>;
     units: Observable<Unit[]>;

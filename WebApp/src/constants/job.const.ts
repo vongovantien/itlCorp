@@ -156,6 +156,11 @@ export class JobConstants {
             { id: "BondedWarehouse", text: "Bonded Warehouse" },
             { id: "Other", text: "Other" },
         ],
+        ROUTES: <CommonInterface.INg2Select[]>[
+            { id: 'Red', text: 'Red' },
+            { id: 'Green', text: 'Green' },
+            { id: 'Yellow', text: 'Yellow' }
+        ]
     };
 
     public static readonly CONFIG = {

@@ -161,10 +161,13 @@
                                 <tr class="collapse-toggle-row tgroup">
                                     <td colspan="13">
                                         <div class='row'>
-                                            <div class='col-4'>Shipment: <span
-                                                    class='text-info'>[{{groupShipment.jobId}}] -
+                                            <div class='col-4'>Shipment:
+                                                <span class='text-info'>
+                                                    [{{groupShipment.jobId}}] -
                                                     [{{groupShipment.hbl}}] -
-                                                    [{{groupShipment.mbl}}]</span>
+                                                    [{{!!groupShipment.mbl ? groupShipment.mbl : '-'}}]
+                                                    [{{groupShipment.pic}}]
+                                                </span>
                                             </div>
                                             <div class='col-4'>Total Debit: <span
                                                     class='text-danger'>{{groupShipment.totalDebit}}</span>
@@ -184,7 +187,7 @@
                                         <span>{{charge.chargeName}}</span>
                                     </td>
                                     <td>
-                                        <span>{{charge.jobId}}</span>
+                                        <span class="text-primary">{{charge.jobId}}</span>
                                     </td>
                                     <td>
                                         <span>{{charge.hbl}}</span>
@@ -245,7 +248,7 @@
                                     <span>{{charge.chargeName}}</span>
                                 </td>
                                 <td>
-                                    <span>{{charge.jobId}}</span>
+                                    <span class="text-primary">{{charge.jobId}}</span>
                                 </td>
                                 <td>
                                     <span>{{charge.hbl}}</span>
