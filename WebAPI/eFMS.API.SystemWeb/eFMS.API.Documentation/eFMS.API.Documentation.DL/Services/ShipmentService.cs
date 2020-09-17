@@ -3006,24 +3006,22 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var it in item.SummaryOfCostsIncurredExportResults)
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, it.Currency, criteria.Currency);
-                    decimal? percent = 0;
                     decimal UnitPrice = it.UnitPrice ?? 0;
                     it.UnitPrice = Math.Round(UnitPrice, 3);
+                    it.NetAmount = it.UnitPrice * it.Quantity * _exchangeRate;
                     if (it.VATRate > 0)
                     {
-                        percent = (it.VATRate * 10) / 100;
-                        it.VATAmount = percent * (UnitPrice * it.Quantity) * _exchangeRate;
-                        if (it.Currency != "VND")
-                        {
-                            it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
-
-                        }
+                        it.VATAmount = (it.VATRate * it.NetAmount) / 100;
                     }
                     else
                     {
-                        it.VATAmount = it.VATRate;
+                        it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
+                        it.VATAmount = it.VATAmount * _exchangeRate;
                     }
-                    it.NetAmount = UnitPrice * it.Quantity * _exchangeRate;
+                    if (it.Currency != "VND")
+                    {
+                        it.VATAmount = Math.Round(it.VATAmount ?? 0, 3);
+                    }
 
                 }
             }
