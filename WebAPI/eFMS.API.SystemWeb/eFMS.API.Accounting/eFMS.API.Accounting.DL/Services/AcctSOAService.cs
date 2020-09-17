@@ -623,7 +623,7 @@ namespace eFMS.API.Accounting.DL.Services
             var creditNote = acctCdnoteRepo.Get();
             var debitNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
-
+            var customsDeclarations = customsDeclarationRepo.Get();
             //BUY & SELL
             var queryBuySellOperation = from sur in surcharge
                                         join ops in opst on sur.Hblid equals ops.Hblid
@@ -633,6 +633,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from debitN in debitN2.DefaultIfEmpty()
                                         join chg in charge on sur.ChargeId equals chg.Id into chg2
                                         from chg in chg2.DefaultIfEmpty()
+                                        join cd in customsDeclarations on ops.JobNo equals cd.JobNo into cdGrps
+                                        from cdGrp in cdGrps.DefaultIfEmpty()
                                         select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
@@ -669,7 +671,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
-                                            FinalExchangeRate = sur.FinalExchangeRate
+                                            FinalExchangeRate = sur.FinalExchangeRate,
+                                            CustomNo = cdGrp.ClearanceNo
                                         };
             queryBuySellOperation = queryBuySellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
 
@@ -745,7 +748,7 @@ namespace eFMS.API.Accounting.DL.Services
             var debitNote = acctCdnoteRepo.Get();
             var charge = catChargeRepo.Get();
             var partner = catPartnerRepo.Get();
-
+            var customDeclearation = customsDeclarationRepo.Get();
             //OBH Receiver (SELL - Credit)
             var queryObhSellOperation = from sur in surcharge
                                         join ops in opst on sur.Hblid equals ops.Hblid
@@ -755,6 +758,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         from chg in chg2.DefaultIfEmpty()
                                         join pat in partner on sur.PaymentObjectId equals pat.Id into pat2
                                         from pat in pat2.DefaultIfEmpty()
+                                        join cd in customDeclearation on ops.JobNo equals cd.JobNo into cdGrps
+                                        from cdGrp in cdGrps.DefaultIfEmpty()
                                         select new ChargeSOAResult
                                         {
                                             ID = sur.Id,
@@ -791,7 +796,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             TaxCodeOBH = pat.TaxCode,
                                             TypeCharge = chg.Type,
                                             ExchangeDate = sur.ExchangeDate,
-                                            FinalExchangeRate = sur.FinalExchangeRate
+                                            FinalExchangeRate = sur.FinalExchangeRate,
+                                            CustomNo = cdGrp.ClearanceNo
                                         };
             queryObhSellOperation = queryObhSellOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -876,6 +882,8 @@ namespace eFMS.API.Accounting.DL.Services
                                        from creditN in creditN2.DefaultIfEmpty()
                                        join chg in charge on sur.ChargeId equals chg.Id into chg2
                                        from chg in chg2.DefaultIfEmpty()
+                                       join cd in custom on ops.JobNo equals cd.JobNo into cdGrps
+                                       from cdGrp in cdGrps.DefaultIfEmpty()
                                        select new ChargeSOAResult
                                        {
                                            ID = sur.Id,
@@ -911,7 +919,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            CDNote = !string.IsNullOrEmpty(sur.CreditNo) ? sur.CreditNo : sur.DebitNo,
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
-                                           TypeCharge = chg.Type
+                                           TypeCharge = chg.Type,
+                                           CustomNo = cdGrp.ClearanceNo
                                        };
             queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
             if (isOBH != null)
@@ -1136,6 +1145,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
                 query = query.And(chg => criteria.Mbls.Contains(chg.MBL));
+            }
+
+            if (criteria.CustomNo != null && criteria.CustomNo.Count > 0)
+            {
+                query = query.And(chg => criteria.CustomNo.Contains(chg.CustomNo));
             }
 
             var charge = GetChargeShipmentDocAndOperation(query, criteria.IsOBH);
