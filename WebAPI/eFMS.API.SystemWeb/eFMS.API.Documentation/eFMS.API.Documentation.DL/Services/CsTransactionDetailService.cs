@@ -59,7 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> surchareRepo,
             IContextBase<CatCountry> countryRepo,
             IContextBase<CsTransactionDetail> csTransactiondetail,
-            ICsMawbcontainerService contService, 
+            ICsMawbcontainerService contService,
             ICurrentUser user,
             ICsDimensionDetailService dimensionService,
             IContextBase<SysAuthorization> authorizationRepo,
@@ -101,7 +101,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserCreated = _currentUser.UserID;
             model.UserModified = model.UserCreated = _currentUser.UserID;
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403,"");
+            if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
 
             if (model.CsMawbcontainers?.Count > 0)
             {
@@ -208,7 +208,7 @@ namespace eFMS.API.Documentation.DL.Services
                     ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
                     int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
-                    if (code == 403) return new HandleState(403,"");
+                    if (code == 403) return new HandleState(403, "");
                     model.DatetimeModified = DateTime.Now;
                     model.Active = true;
                     model.DatetimeCreated = hb.DatetimeCreated;
@@ -236,9 +236,9 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var hsDimensionDelete = dimensionDetailService.Delete(x => x.Hblid == model.Id);
                         }
-                        if(model.OtherCharges != null)
+                        if (model.OtherCharges != null)
                         {
-                            var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges,model.Id);
+                            var otherCharges = shipmentOtherChargeService.UpdateOtherChargeHouseBill(model.OtherCharges, model.Id);
                         }
                     }
                     trans.Commit();
@@ -387,7 +387,7 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var queryDetail = csTransactionDetailRepo.Get(x => x.Id == Id).FirstOrDefault();
-                
+
                 var detail = mapper.Map<CsTransactionDetailModel>(queryDetail);
                 if (detail != null)
                 {
@@ -734,8 +734,8 @@ namespace eFMS.API.Documentation.DL.Services
             results.ForEach(fe =>
             {
                 fe.Containers = fe.ContSealNo;
-                var containers = fe.ContSealNo != null? fe.ContSealNo.Split('\n').Where(x => x.Length > 0): null;
-                fe.ContSealNo = containers != null? string.Join(", ", containers): null;
+                var containers = fe.ContSealNo != null ? fe.ContSealNo.Split('\n').Where(x => x.Length > 0) : null;
+                fe.ContSealNo = containers != null ? string.Join(", ", containers) : null;
                 var packages = csMawbcontainerRepo.Get(x => x.Hblid == fe.Id && x.PackageTypeId != null).GroupBy(x => x.PackageTypeId).Select(x => x.Sum(c => c.PackageQuantity) + " " + GetUnitNameById(x.Key));
                 fe.Packages = string.Join(", ", packages);
             });
@@ -935,7 +935,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<CsTransactionDetailModel> Paging(CsTransactionDetailCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = Query(criteria);
-            if(data == null)
+            if (data == null)
             {
                 rowsCount = 0;
                 return null;
@@ -1084,7 +1084,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Delete);
 
                     int code = GetPermissionToDelete(new ModelUpdate { SaleManId = hbl.SaleManId, UserCreated = hbl.UserCreated, CompanyId = hbl.CompanyId, OfficeId = hbl.OfficeId, DepartmentId = hbl.DepartmentId, GroupId = hbl.GroupId }, permissionRange);
-                    if (code == 403) return new HandleState(403,"");
+                    if (code == 403) return new HandleState(403, "");
 
                     var charges = surchareRepository.Get(x => x.Hblid == hbl.Id).ToList();
                     var isSOA = false;
@@ -1361,21 +1361,21 @@ namespace eFMS.API.Documentation.DL.Services
                 string hbConstainers = string.Empty;
                 string markNo = string.Empty;
                 if (conts != null && conts.Count() > 0)
-                {                    
-                    var contLast = conts.Last();                   
+                {
+                    var contLast = conts.Last();
                     foreach (var cont in conts)
                     {
                         var contUnit = catUnitRepo.Get(x => x.Id == cont.ContainerTypeId).FirstOrDefault();
                         if (contUnit != null)
                         {
-                            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));                            
-                        }                       
+                            hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));
+                        }
                         markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
                         _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         var packageUnit = catUnitRepo.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();
                         _pkgsConts += cont.PackageQuantity + " " + packageUnit?.UnitNameEn?.ToUpper() + ((cont.PackageQuantity != null) ? "\r\n" : string.Empty);
-                    }         
+                    }
                 }
                 var _packageType = catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.Code;
                 housebill.NoPieces = string.Format("{0:n}", data.PackageQty) + " " + _packageType; // Package Qty & Package Type of HBL
@@ -1494,7 +1494,7 @@ namespace eFMS.API.Documentation.DL.Services
                     GrossWeight = _grossWeightConts, //list grossweight trong list container
                     Measurement = _cbmConts, //list cbm trong list container
                     TextInfo = "RECEIVED in apparent good order and condition except as otherwise noted the total number of Containers of other packages or units enumerated below for transportation from the place of receipt to the place of delivery subject to the terms detailed on the reverse side of this Bill of Lading. One of the signed bill of lading must be surrendered duly endorsed in exchange for the goods or delivery orther. On presentation of this document( duly endorsed) to the Carrier by or on behalf of the Holder the rights and liabilities arising in accordance with the terms here of shall( without prejudice to any rule of common law or statute rendering them biding on the Merchant) become binding hereby had been made between them.\r\nIN WITHNESS where of the stated number or original bills of lading all this tenor and date have been signed, one of which being accomplished, the other(s) to be void."
-                };                
+                };
                 result.SetParameter(parameter);
             }
 
@@ -1511,7 +1511,7 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
-            
+
             return result;
         }
 
@@ -1545,7 +1545,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ReferrenceNo = string.Empty; //NOT USE
                 housebill.OSI = string.Empty; //NOT USE
                 housebill.FirstDestination = data.FirstCarrierTo?.ToUpper();
-                housebill.FirstCarrier = !string.IsNullOrEmpty(data.FirstCarrierBy) ? data.FirstCarrierBy.Substring(0,2).ToUpper() : string.Empty; //2 ký tự đầu
+                housebill.FirstCarrier = !string.IsNullOrEmpty(data.FirstCarrierBy) ? data.FirstCarrierBy.Substring(0, 2).ToUpper() : string.Empty; //2 ký tự đầu
                 housebill.SecondDestination = data.TransitPlaceTo1?.ToUpper();
                 housebill.SecondCarrier = data.TransitPlaceBy1?.ToUpper();
                 housebill.ThirdDestination = data.TransitPlaceTo2?.ToUpper();
@@ -1580,7 +1580,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.ItemNo = data.ComItemNo?.ToUpper(); //ComItemNo - Commodity Item no
                 housebill.WChargeable = data.ChargeWeight ?? 0; //CW
                 housebill.ChWDecimal = 3; //NOT USE
-                housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : ( data.RateCharge?.ToString() ?? string.Empty); //RateCharge
+                housebill.Rchge = data.AsArranged == true ? "AS ARRANGED" : (data.RateCharge?.ToString() ?? string.Empty); //RateCharge
                 housebill.Ttal = data.Total?.ToString().ToUpper() ?? string.Empty;
                 housebill.Description = data.DesOfGoods?.ToUpper(); //Natural and Quality Goods
                 decimal _wtpp = 0;
@@ -1604,7 +1604,7 @@ namespace eFMS.API.Documentation.DL.Services
                 decimal _dueCarrierPp = 0;
                 housebill.TTCarrPP = (decimal.TryParse(data.DueCarrierPp, out _dueCarrierPp)) ? (_dueCarrierPp != 0 ? string.Format("{0:n}", _dueCarrierPp) : string.Empty) : data.DueCarrierPp?.ToUpper(); //Due to carrier (prepaid)
                 decimal _dueCarrierCll = 0;
-                housebill.TTCarrCC = (decimal.TryParse(data.DueCarrierCll, out _dueCarrierCll)) ? (_dueCarrierCll != 0 ? string.Format("{0:n}", _dueCarrierCll) : string.Empty): data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
+                housebill.TTCarrCC = (decimal.TryParse(data.DueCarrierCll, out _dueCarrierCll)) ? (_dueCarrierCll != 0 ? string.Format("{0:n}", _dueCarrierCll) : string.Empty) : data.DueCarrierCll?.ToUpper(); //Due to carrier (Collect)
                 decimal _totalPp = 0;
                 housebill.TtalPP = (decimal.TryParse(data.TotalPp, out _totalPp)) ? (_totalPp != 0 ? string.Format("{0:n}", _totalPp) : string.Empty) : data.TotalPp?.ToUpper(); //Total (prepaid)
                 decimal _totalCll = 0;
@@ -1654,7 +1654,7 @@ namespace eFMS.API.Documentation.DL.Services
                     _reportName = "HouseAirwayBillHAWB.rpt";
                     break;
                 case DocumentConstants.HOUSEAIRWAYBILLLASTEST_HAWB_FRAME:
-                    _reportName = "HouseAirwayBillHAWBFrame.rpt";                
+                    _reportName = "HouseAirwayBillHAWBFrame.rpt";
                     break;
             }
             result = new Crystal
@@ -1738,7 +1738,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PrintMonth = string.Empty,
                 PrintYear = string.Empty
             };
-            if(data.DeliveryOrderPrintedDate != null)
+            if (data.DeliveryOrderPrintedDate != null)
             {
                 parameter.PrintDay = data.DeliveryOrderPrintedDate.Value.Day.ToString();
                 parameter.PrintMonth = data.DeliveryOrderPrintedDate.Value.Month.ToString();
@@ -1810,13 +1810,13 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
-        
+
         public Crystal PreviewBookingNote(BookingNoteCriteria criteria)
         {
             Crystal result = null;
             var data = GetById(criteria.HblId);
             var bookingNotes = new List<BookingNoteReport>();
-            if(data != null)
+            if (data != null)
             {
                 var bookingNote = new BookingNoteReport();
                 bookingNote.FlexId = criteria.FlexId?.ToUpper();
@@ -1827,7 +1827,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _pol = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var _pod = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
                 var _airportOfDischarge = !string.IsNullOrEmpty(data.FirstCarrierTo) ? data.FirstCarrierTo : _pod?.Code;
-                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" +data.FlightNo + "/" + (data.Etd != null ? data.Etd.Value.ToString("dd MMM") : string.Empty);
+                var _flightNo = _pol?.Code + "-" + _airportOfDischarge + ":" + data.FlightNo + "/" + (data.Etd != null ? data.Etd.Value.ToString("dd MMM") : string.Empty);
                 bookingNote.FlightNo1 = _flightNo?.ToUpper();
                 bookingNote.FlightNo2 = criteria.FlightNo2?.ToUpper();
                 bookingNote.DepartureAirport = _pol?.Code?.ToUpper(); //Lấy Code
@@ -1904,7 +1904,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     _airFrieghtDa = "CLL IN " + pod?.Code;
                 }
-            }            
+            }
             result.AirFrieghtDa = _airFrieghtDa;
 
             result.DepartureAirport = pol?.NameEn;
@@ -1939,17 +1939,17 @@ namespace eFMS.API.Documentation.DL.Services
 
         public string GenerateHBLNoSeaExport(string podCode)
         {
-            if(string.IsNullOrEmpty(podCode) || podCode == "null")
+            if (string.IsNullOrEmpty(podCode) || podCode == "null")
             {
                 return null;
             }
-            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode)  + DateTime.Now.ToString("yyMM");
+            string keyword = ((string.IsNullOrEmpty(podCode) || podCode == "null") ? "" : podCode) + DateTime.Now.ToString("yyMM");
             string hbl = "ITL" + keyword;
 
             var codes = DataContext.Where(x => x.Hwbno.Contains(keyword)).Select(x => x.Hwbno);
             var oders = new List<int>();
 
-            if(codes != null & codes.Count() > 0)
+            if (codes != null & codes.Count() > 0)
             {
                 foreach (var code in codes)
                 {
@@ -1959,7 +1959,7 @@ namespace eFMS.API.Documentation.DL.Services
                         oders.Add(int.Parse(code.Substring(code.Length - 3)));
                     }
                 }
-                if(oders.Count() > 0)
+                if (oders.Count() > 0)
                 {
                     int maxCurrentOder = oders.Max();
 
@@ -1981,7 +1981,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private bool isNumeric(string n)
         {
-           return int.TryParse(n, out int _);
+            return int.TryParse(n, out int _);
         }
 
         public HandleState UpdateInputBKNote(BookingNoteCriteria criteria)
@@ -2016,6 +2016,51 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public List<HousebillDailyExportResult> GetHousebillsDailyExport(DateTime? issuedDate)
+        {
+            var housebillDaily = new List<HousebillDailyExportResult>();
+            var trans = csTransactionRepo.Get();
+            var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            var warehouses = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse");
+            var pics = sysUserRepo.Get();
+            var shippers = catPartnerRepo.Get();
+
+            IQueryable<Guid> jobIds = null;
+            if (issuedDate != null)
+            {
+                jobIds = DataContext.Get(x => x.IssueHbldate.HasValue ? x.IssueHbldate.Value.Date == issuedDate.Value.Date : false).Select(s => s.JobId);
+            }
+            if (jobIds == null) return null;
+
+            var transDetails = DataContext.Get(x => jobIds.Contains(x.JobId));
+            housebillDaily = (from transDetail in transDetails
+                              join tran in trans on transDetail.JobId equals tran.Id into transGrp
+                              from tran in transGrp.DefaultIfEmpty()
+                              join pod in pods on transDetail.Pod equals pod.Id into podGrp
+                              from pod in podGrp.DefaultIfEmpty()
+                              join warehouse in warehouses on transDetail.WarehouseId equals warehouse.Id into warehouseGrp
+                              from warehouse in warehouseGrp.DefaultIfEmpty()
+                              join shipper in shippers on transDetail.ShipperId equals shipper.Id into shipperGrp
+                              from shipper in shipperGrp.DefaultIfEmpty()
+                              join pic in pics on tran.PersonIncharge equals pic.Id into picGrp
+                              from pic in picGrp.DefaultIfEmpty()
+                              orderby tran.DatetimeModified descending
+                              select new HousebillDailyExportResult
+                              {
+                                  Mawb = transDetail.Mawb,
+                                  Hawb = transDetail.Hwbno,
+                                  FlightNo = transDetail.FlightNo,
+                                  PodCode = pod.Code,
+                                  ShipperName = shipper.ShortName, //ABBR Name
+                                  Pieces = transDetail.PackageQty,
+                                  Po = null,
+                                  Remark = null,
+                                  WarehouseName = warehouse.DisplayName, //ABBR Name
+                                  PicName = pic.Username
+                              }).ToList();
+            return housebillDaily;
         }
     }
 }

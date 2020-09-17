@@ -367,5 +367,31 @@ namespace eFMS.API.ReportData.Controllers
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Summary of Revenue incurred.xlsx");
             return fileContent;
         }
+
+        [Route("ExportHousebillDaily")]
+        [HttpGet]
+        public async Task<IActionResult> ExportHousebillDaily(DateTime? issuedDate)
+        {
+            if (issuedDate == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.GetDataHousebillDailyExportUrl + issuedDate.Value.ToString("yyyy-MM-dd"));
+
+            var dataObject = responseFromApi.Content.ReadAsAsync<List<HousebillDailyExportResult>>();
+            if (dataObject.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateHousebillDailyExportExcel(dataObject.Result, issuedDate);
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DAILY LIST "+ issuedDate.Value.ToString("dd MMM yyyy") + ".xlsx");
+
+            return fileContent;
+        }
     }
 }
