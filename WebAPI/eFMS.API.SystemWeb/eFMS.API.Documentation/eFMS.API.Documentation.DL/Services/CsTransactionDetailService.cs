@@ -727,7 +727,8 @@ namespace eFMS.API.Documentation.DL.Services
                           TransitPlaceTo1 = detail.TransitPlaceTo1,
                           TransitPlaceBy2 = detail.TransitPlaceBy2,
                           TransitPlaceTo2 = detail.TransitPlaceTo2,
-                          Total = detail.Total
+                          Total = detail.Total, 
+                          Notify = detail.Notify
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
