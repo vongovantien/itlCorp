@@ -352,6 +352,7 @@ namespace eFMS.API.Documentation.DL.Services
             var ports = placeRepository.Get(x => x.PlaceTypeId.Contains("Port")).ToList();
             model.PolName = model.Pol != null ? ports.Where(x => x.Id == model.Pol)?.FirstOrDefault()?.NameEn : null;
             model.PodName = model.Pol != null ? ports.Where(x => x.Id == model.Pod)?.FirstOrDefault()?.NameEn : null;
+            var places = placeRepository.Get();
             var manifests = new List<AirCargoManifestReport>();
             if (model.CsTransactionDetails.Count > 0)
             {
@@ -365,7 +366,7 @@ namespace eFMS.API.Documentation.DL.Services
                         ShipperName = item.ShipperDescription?.ToUpper(),
                         Consignees = item.ConsigneeDescription?.ToUpper(),
                         Description = item.DesOfGoods,
-                        FirstDest = item.PODName,
+                        FirstDest = places.Where(t=>t.Id == item.Pod).Select(t=>t.Code).FirstOrDefault(),
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
                         Notify = transaction.TransactionType == "AE" ? item.Notify?.ToUpper() : item.NotifyPartyDescription?.ToUpper(),
