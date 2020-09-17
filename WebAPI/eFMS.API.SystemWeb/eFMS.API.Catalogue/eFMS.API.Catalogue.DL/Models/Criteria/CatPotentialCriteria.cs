@@ -13,8 +13,10 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string Tel { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }
-        public bool? Active { get; set; }
+        public string Active { get; set; }
         public string Type { get; set; }
+        public string Margin { get; set; }
+        public string Quotation { get; set; }
         public string Creator { get; set; }
     }
 }

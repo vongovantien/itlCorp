@@ -43,8 +43,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 model.Potential.Active = true;
                 model.Potential.Id = Guid.NewGuid();
+
                 model.Potential.UserCreated = currentUser.UserID;
                 model.Potential.DatetimeCreated = DateTime.Now;
+                model.Potential.UserModified = currentUser.UserID;
+                model.Potential.DatetimeModified = DateTime.Now;
+
                 model.Potential.GroupId = currentUser.GroupId;
                 model.Potential.DepartmentId = currentUser.DepartmentId;
                 model.Potential.OfficeId = currentUser.OfficeID;
@@ -122,7 +126,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var data = GetQueryBy(criteria);
             //
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialIncoterm);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
             PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
 
             data = QueryByPermission(data, permissionRangeList, _user);
@@ -146,6 +150,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => x.NameEn.Contains(criteria.All) || x.NameLocal.Contains(criteria.All)
                 || x.Address.Contains(criteria.All) || x.Taxcode.Contains(criteria.Taxcode) || x.Tel.Contains(criteria.All)
                 || x.Email.Contains(criteria.All) || x.PotentialType.Contains(criteria.All)
+                || (x.Active.Value == true ? "Active" : "Inactive").Equals(criteria.All) || x.Margin.Value.ToString().Contains(criteria.All)
+                || x.Quotation.Value.ToString().Contains(criteria.All)
                 || listUserIdByUserName.Any(val => val == x.UserCreated));
                 
             }
@@ -173,9 +179,17 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = (x => x.Address.Contains(criteria.Address));
             }
-            if (criteria.Active.HasValue)
+            if (!string.IsNullOrEmpty(criteria.Active))
             {
-                query = (x => x.Active.Value == criteria.Active.Value);
+                query = (x => (x.Active.Value == true ? "Active" : "Inactive").Equals(criteria.Active));
+            }
+            if (!string.IsNullOrEmpty(criteria.Margin))
+            {
+                query = (x => x.Margin.Value.ToString().Contains(criteria.Margin));
+            }
+            if (!string.IsNullOrEmpty(criteria.Quotation))
+            {
+                query = (x => x.Quotation.Value.ToString().Contains(criteria.Quotation));
             }
             if (!string.IsNullOrEmpty(criteria.Type))
             {

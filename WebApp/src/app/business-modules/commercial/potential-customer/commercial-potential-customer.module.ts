@@ -7,7 +7,10 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SharedModule } from 'src/app/shared/shared.module';
 
 
-import { TabsModule, PaginationModule, ModalModule } from 'ngx-bootstrap';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+
 import { CommercialPotentialCustomerComponent } from './commercial-potential-customer.component';
 import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
 import { CommercialPotentialCustomerPopupComponent } from './components/popup/potential-customer-commercial.popup';

@@ -43,7 +43,7 @@
                                 <div class="table-actions" style="width: 70px">
                                     <app-permission-button type="detail" (click)="checkAllowDetail(item.id)">
                                     </app-permission-button>
-                                    <app-permission-button type="delete" *ngIf="item.active === true"
+                                    <app-permission-button type="delete" *ngIf="item.active === false"
                                         (click)="checkAllowDelete(item.id)">
                                     </app-permission-button>
                                 </div>
