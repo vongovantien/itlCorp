@@ -118,6 +118,14 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 model.CurrentStatus = TermData.Processing;
             }
+            
+            model.JobNo = CreateJobNoOps();
+            var entity = mapper.Map<OpsTransaction>(model);
+            return DataContext.Add(entity);
+        }
+
+        public string CreateJobNoOps()
+        {
             SysOffice office = null;
             string prefixJob = string.Empty;
             var currentUserOffice = currentUser?.OfficeID ?? null;
@@ -127,45 +135,52 @@ namespace eFMS.API.Documentation.DL.Services
                 prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
             }
             prefixJob += DocumentConstants.OPS_SHIPMENT;
-            int countNumberJob = GetNumberOpsToGenerateJobNo(office);
-            model.JobNo = GenerateID.GenerateOPSJobID(prefixJob, countNumberJob);
-            var entity = mapper.Map<OpsTransaction>(model);
-            return DataContext.Add(entity);
+            var currentShipment = GetOpsTransactionToGenerateJobNo(office);
+            int countNumberJob = 0;
+            if (currentShipment != null)
+            {
+                countNumberJob = Convert.ToInt32(currentShipment.JobNo.Substring(prefixJob.Length + 5, 5));
+            }
+            return GenerateID.GenerateJobID(prefixJob, countNumberJob);
         }
 
-        private int GetNumberOpsToGenerateJobNo(SysOffice office)
+        private OpsTransaction GetOpsTransactionToGenerateJobNo(SysOffice office)
         {
-            int countNumberJob = 0;
+            OpsTransaction currentShipment = null;
             if (office != null)
             {
                 if (office.Code == "ITLHAN")
                 {
-                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("HAN"));
+                                                         && x.JobNo.StartsWith("HAN"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("DAD"));
+                                                         && x.JobNo.StartsWith("DAD"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
                 }
                 else
                 {
-                    countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && !x.JobNo.StartsWith("DAD")
-                                                         && !x.JobNo.StartsWith("HAN"));
+                                                         && !x.JobNo.StartsWith("HAN"))
+                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
                 }
             }
             else
             {
-                countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("DAD")
-                                                     && !x.JobNo.StartsWith("HAN"));
+                                                     && !x.JobNo.StartsWith("HAN"))
+                                                     .OrderByDescending(x => x.JobNo).FirstOrDefault();
             }
-            return countNumberJob;
+            return currentShipment;
         }
 
         private string SetPrefixJobIdByOfficeCode(string officeCode)
@@ -551,19 +566,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 
                 var opsTransaction = GetNewShipmentToConvert(productService, model);
-                //int countNumberJob = DataContext.Count(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Year == DateTime.Now.Year);
-                //opsTransaction.JobNo = GenerateID.GenerateOPSJobID(DocumentConstants.OPS_SHIPMENT, countNumberJob);
-                SysOffice office = null;
-                string prefixJob = string.Empty;
-                var currentUserOffice = currentUser?.OfficeID ?? null;
-                if (currentUserOffice != null)
-                {
-                    office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
-                    prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
-                }
-                prefixJob += DocumentConstants.OPS_SHIPMENT;
-                int countNumberJob = GetNumberOpsToGenerateJobNo(office);
-                opsTransaction.JobNo = GenerateID.GenerateOPSJobID(prefixJob, countNumberJob);
+                opsTransaction.JobNo = CreateJobNoOps();
                 DataContext.Add(opsTransaction, false);
 
                 if (model.Id > 0)
@@ -940,7 +943,7 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.VNDExchange = surchargeRpt.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                     surchargeRpt.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                     surchargeRpt.DatePaid = DateTime.Now;
-                    surchargeRpt.Docs = item.InvoiceNo ?? ((item.Soano ?? item.PaySoano) ?? (item.CreditNo ?? item.DebitNo)); //Ưu tiên: InvoiceNo >> Soa No >> CD Note Code  of charge
+                    surchargeRpt.Docs = item.InvoiceNo ?? (item.CreditNo ?? item.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
                     surchargeRpt.Notes = item.Notes;
                     surchargeRpt.InputData = "InputData";
                     surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
