@@ -2883,5 +2883,108 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             #endregion
         }
+
+        public Stream GenerateHousebillDailyExportExcel(List<HousebillDailyExportResult> housebillDailyExport, DateTime? issuedDate, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add(issuedDate.Value.ToString("dd MMM").ToUpper());
+                    var workSheet = excelPackage.Workbook.Worksheets[1];
+                    BindingDataHousebillDailyExportExcel(workSheet, housebillDailyExport, issuedDate);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void SetWidthColumnExcelHousebillDailyExport(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 5; //Cột A
+            workSheet.Column(2).Width = 15; //Cột B
+            workSheet.Column(3).Width = 15; //Cột C
+            workSheet.Column(4).Width = 15; //Cột D
+            workSheet.Column(5).Width = 10; //Cột E
+            workSheet.Column(6).Width = 40; //Cột F
+            workSheet.Column(7).Width = 8; //Cột G
+            workSheet.Column(8).Width = 15; //Cột H
+            workSheet.Column(9).Width = 30; //Cột I
+            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(11).Width = 12; //Cột K
+        }
+
+        private void BindingDataHousebillDailyExportExcel(ExcelWorksheet workSheet, List<HousebillDailyExportResult> housebillDailyExport, DateTime? issuedDate)
+        {
+            List<string> headerTable = new List<string>()
+            {
+                "STT",
+                "MAWB",
+                "HAWB",
+                "FLIGHT",
+                "DEST",
+                "SHIPPER",
+                "CTNS",
+                "PO",
+                "REMARK",
+                "KHO",
+                "PIC"
+            };
+
+            SetWidthColumnExcelHousebillDailyExport(workSheet);
+            
+            workSheet.Cells["B2:G2"].Merge = true;
+            workSheet.Cells["B2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["B2"].Value = "DALY LIST " + issuedDate.Value.ToString("dd MMM yyyy");
+            workSheet.Cells["B2"].Style.Font.Bold = true;
+
+            for(var c = 1; c < 12; c++)
+            {
+                //Set header
+                workSheet.Cells[4, c].Value = headerTable[c - 1];
+                //Set Background for header
+                workSheet.Cells[4, c].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                workSheet.Cells[4, c].Style.Fill.BackgroundColor.SetColor(Color.LightBlue);
+                //Set border for row 2,3,4
+                BorderThinItem(workSheet, 2, c);
+                BorderThinItem(workSheet, 3, c);
+                BorderThinItem(workSheet, 4, c);
+            }
+
+            workSheet.Cells["A4:K4"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A4:K4"].Style.Font.Bold = true;
+                        
+            int no = 1;
+            int rowStart = 5;
+            foreach(var item in housebillDailyExport)
+            {
+                workSheet.Cells[rowStart, 1].Value = no;                
+                workSheet.Cells[rowStart, 2].Value = item.Mawb;
+                workSheet.Cells[rowStart, 3].Value = item.Hawb;
+                workSheet.Cells[rowStart, 4].Value = item.FlightNo;
+                workSheet.Cells[rowStart, 5].Value = item.PodCode;
+                workSheet.Cells[rowStart, 6].Value = item.ShipperName;
+                workSheet.Cells[rowStart, 7].Value = item.Pieces;
+                workSheet.Cells[rowStart, 8].Value = item.Po;
+                workSheet.Cells[rowStart, 9].Value = item.Remark;
+                workSheet.Cells[rowStart, 10].Value = item.WarehouseName;
+                workSheet.Cells[rowStart, 11].Value = item.PicName;
+                for (var i = 1; i < 12; i++)
+                {
+                    BorderThinItem(workSheet, rowStart, i);
+                }
+                rowStart += 1;
+                no += 1;
+            }
+
+            //In đậm & căn giữa value list 
+            workSheet.Cells["A5:K" + (5 + housebillDailyExport.Count)].Style.Font.Bold = true;
+            workSheet.Cells["A5:K" +  (5 + housebillDailyExport.Count)].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        }
     }
 }

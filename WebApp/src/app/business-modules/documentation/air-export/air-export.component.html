@@ -1,6 +1,7 @@
 <app-sub-header>
     <div class="c-button-actions">
         <app-permission-button title="create new job" (onClick)="gotoCreateJob()" type="add"></app-permission-button>
+        <app-permission-button type="export" title="Export" (onClick)="showPopupDailyExport()"></app-permission-button>
     </div>
 </app-sub-header>
 
@@ -111,3 +112,4 @@
 
 <info-popup [body]="'You are not allow to delete this job'" [title]="'Alert'"></info-popup>
 <permission-403-popup></permission-403-popup>
+<input-daily-export-popup></input-daily-export-popup>

@@ -38,6 +38,8 @@ export class csBookingNote {
     pickupAt: string = null;
     dropoffAt: string = null;
     note: string = null;
+    //
+    packageQty: number = null;
 
     bookingDate: string = null;
     userCreated: string = null;

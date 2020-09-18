@@ -441,5 +441,17 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get housebill daily export
+        /// </summary>
+        /// <param name="issuedDate">Issued Date of housebill</param>
+        /// <returns></returns>
+        [HttpGet("GetHousebillsDailyExport")]
+        public IActionResult GetHousebillsDailyExport(DateTime? issuedDate)
+        {
+            var data = csTransactionDetailService.GetHousebillsDailyExport(issuedDate);
+            return Ok(data);
+        }
     }
 }
