@@ -2773,12 +2773,12 @@ namespace eFMS.API.ReportData.FormatExcel
             };
 
             SetWidthColumnExcelHousebillDailyExport(workSheet);
-            workSheet.Cells["A1:K1000000"].Style.Font.Bold = true;
             
             workSheet.Cells["B2:G2"].Merge = true;
             workSheet.Cells["B2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["B2"].Value = "DALY LIST " + issuedDate.Value.ToString("dd MMM yyyy");
-            
+            workSheet.Cells["B2"].Style.Font.Bold = true;
+
             for(var c = 1; c < 12; c++)
             {
                 //Set header

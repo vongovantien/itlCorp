@@ -62,7 +62,7 @@
             public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
             public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
 
-            public const string GetDataHousebillDailyExportUrl = "/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
+            public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
         }
     }
 }

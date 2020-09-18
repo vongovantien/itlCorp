@@ -379,7 +379,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.HostStaging + Urls.Documentation.GetDataHousebillDailyExportUrl + issuedDate.Value.ToString("yyyy-MM-dd"));
 
             var dataObject = responseFromApi.Content.ReadAsAsync<List<HousebillDailyExportResult>>();
-            if (dataObject.Result == null)
+            if (dataObject.Result == null || dataObject.Result.Count == 0)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
@@ -389,7 +389,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DAILY LIST "+ issuedDate.Value.ToString("dd MMM yyyy") + ".xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "DAILY LIST "+ issuedDate.Value.ToString("dd MMM yyyy").ToUpper() + ".xlsx");
 
             return fileContent;
         }
