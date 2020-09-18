@@ -2631,7 +2631,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var buHeadLevel = BuHeadLevel(type, officeId, companyId);
-            if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL)
+            if (buHeadLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
             {
                 if (string.IsNullOrEmpty(buHeadLevel.UserId)) return new HandleState("Not found BOD");
                 if (string.IsNullOrEmpty(buHeadLevel.EmailUser)) return new HandleState("Not found email of BOD");
