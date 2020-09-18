@@ -302,7 +302,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             worksheet.Cells[addressStartContent, 8].Value = request.SettlementAmount;
                             worksheet.Cells[addressStartContent, 9].Value = request.AdvanceNo;
                             worksheet.Cells[addressStartContent, 10].Value = request.AdvanceAmount;
-                            worksheet.Cells[addressStartContent, 11].Value = request.SettlementAmount - request.AdvanceAmount;
+                            worksheet.Cells[addressStartContent, 11].Value = request.AdvanceAmount - request.SettlementAmount;
                             worksheet.Cells[addressStartContent, 12].Value = request.Currency;
                             worksheet.Cells[addressStartContent, 13].Value = request.ApproveDate;
                             worksheet.Cells[addressStartContent, 13].Style.Numberformat.Format = "dd/MM/yyyy  HH:mm:ss AM/PM";

@@ -2710,7 +2710,7 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.FreightTerm = item.FreightPayment;
                         objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
                         objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
-                        objInHbl.CW = item.Cbm == null ? 0 : item.Cbm;
+                        objInHbl.CW = item.ChargeWeight == null ? 0 : item.ChargeWeight;
                         objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
                         objInHbl.TransID = obj.TransID;
                         objInHbl.TransDate = obj.TransDate;
