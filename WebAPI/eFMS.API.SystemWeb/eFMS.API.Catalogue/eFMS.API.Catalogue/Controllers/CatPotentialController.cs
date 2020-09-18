@@ -167,6 +167,15 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
         //
+        [HttpPost]
+        [Route("QueryExport")]
+        [Authorize]
+        public IActionResult QueryPotentialExport(CatPotentialCriteria criteria)
+        {
+            var data = catPotentialService.QueryExport(criteria);
+            return Ok(data);
+        }
+        //
         [HttpGet("CheckAllowDetail/{id}")]
         [Authorize]
         public IActionResult CheckAllowDetail(Guid id)

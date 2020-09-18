@@ -345,5 +345,18 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return true;
         }
+
+        public IQueryable<CatPotentialModel> QueryExport(CatPotentialCriteria criteria)
+        {
+            var data = GetQueryBy(criteria);
+            //
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialPotential);
+            PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+
+            data = QueryByPermission(data, permissionRangeList, _user);
+            //format
+            var result = FormatPotential(data);
+            return result;
+        }
     }
 }

@@ -21,6 +21,7 @@
         public const string GroupName = "Group List.xlsx";
         public const string UserName = "User List.xlsx";
         public const string IncotermList = "Incoterm List.xlsx";
+        public const string PotentialList = "Potential Customer List.xlsx";
 
     }
 }

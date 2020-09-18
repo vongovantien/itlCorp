@@ -1188,4 +1188,12 @@ export class CatalogueRepo {
     getDetailPotential(id: string): any {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/GetById/${id}`);
     }
+    //
+    downloadPotentialCustomerListExcel(body: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportPotentialCustomerList`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+
+    }
 }

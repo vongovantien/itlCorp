@@ -283,6 +283,20 @@ namespace eFMS.API.ReportData.Controllers
             
         }
 
+        [Route("ExportPotentialCustomerList")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportPotentialCustomerList(CatPotentialCriteria catPotentialCriteria)
+        {
+            Helper helper = new Helper();
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(catPotentialCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatPotentialListUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatPotentialModel>>();
+            var stream = helper.GeneratePotentialListExcel(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.PotentialList);
+
+        }
+
         /// <summary>
         /// export Custom Clearance
         /// </summary>
