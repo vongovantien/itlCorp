@@ -105,8 +105,12 @@ export class LoginComponent {
                             this.router.navigateByUrl(this.currenURL);
                             this._spinner.hide();
 
-                            // save username & password into cookies.
+                            this.cookieService.delete("__p");
+                            this.cookieService.delete("__u");
+
+                            // * save username & password into cookies.
                             const userInfoEncrypted = this.encryptUserInfo(this.username, this.password);
+
                             this.cookieService.set("__u", userInfoEncrypted.username_encrypt, 1, "/", window.location.hostname); // * 1 days.
                             this.cookieService.set("__p", userInfoEncrypted.password_encrypt, 1, "/", location.hostname);
 
