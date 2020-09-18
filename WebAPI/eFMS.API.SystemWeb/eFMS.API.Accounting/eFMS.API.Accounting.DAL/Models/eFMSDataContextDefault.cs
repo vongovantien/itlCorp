@@ -1259,6 +1259,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
+
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1274,6 +1276,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PartnerGroup)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerLocation)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerMode)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PartnerNameEn)
@@ -1572,6 +1582,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AmountVnd)
+                    .HasColumnName("AmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Cdclosed)
                     .HasColumnName("CDClosed")
                     .HasDefaultValueSql("((0))");
@@ -1710,6 +1724,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VatAmountVnd)
+                    .HasColumnName("VatAmountVND")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
@@ -2552,6 +2570,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ShipmentMode)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);
