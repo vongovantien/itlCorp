@@ -78,8 +78,8 @@ export class MasterPageComponent implements OnInit {
     }
 
     logout() {
-        this.cookieService.delete("__p");
-        this.cookieService.delete("__u");
+        this.cookieService.delete("__p", "/", window.location.hostname);
+        this.cookieService.delete("__u", "/", window.location.hostname);
         this.oauthService.logoutUrl = window.location.origin + '/#/login';
         if (this.oauthService.hasValidAccessToken()) {
             this.http.get(`${environment.HOST.INDENTITY_SERVER_URL}/api/Account/Signout`).toPromise()
