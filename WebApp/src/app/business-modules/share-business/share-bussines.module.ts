@@ -68,7 +68,8 @@ import {
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
     ShareBussinessHBLFCLContainerPopupComponent,
     ShareGoodsImportComponent,
-    ShareBusinessAttachListHouseBillComponent
+    ShareBusinessAttachListHouseBillComponent,
+    ShareBussinessInputDailyExportPopupComponent
 
 } from './components';
 
@@ -132,7 +133,8 @@ const COMPONENTS = [
     ShareBusinessAddAttachmentPopupComponent,
     ShareBussinessBillInstructionSeaExportComponent,
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
-    ShareBusinessAttachListHouseBillComponent
+    ShareBusinessAttachListHouseBillComponent,
+    ShareBussinessInputDailyExportPopupComponent
 ];
 
 
