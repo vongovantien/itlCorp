@@ -2743,16 +2743,16 @@ namespace eFMS.API.ReportData.FormatExcel
         private void SetWidthColumnExcelHousebillDailyExport(ExcelWorksheet workSheet)
         {
             workSheet.Column(1).Width = 5; //Cột A
-            workSheet.Column(2).Width = 15; //Cột B
-            workSheet.Column(3).Width = 15; //Cột C
-            workSheet.Column(4).Width = 15; //Cột D
-            workSheet.Column(5).Width = 10; //Cột E
+            workSheet.Column(2).Width = 16; //Cột B
+            workSheet.Column(3).Width = 16; //Cột C
+            workSheet.Column(4).Width = 16; //Cột D
+            workSheet.Column(5).Width = 11; //Cột E
             workSheet.Column(6).Width = 40; //Cột F
-            workSheet.Column(7).Width = 8; //Cột G
+            workSheet.Column(7).Width = 9; //Cột G
             workSheet.Column(8).Width = 15; //Cột H
             workSheet.Column(9).Width = 30; //Cột I
             workSheet.Column(10).Width = 15; //Cột J
-            workSheet.Column(11).Width = 12; //Cột K
+            workSheet.Column(11).Width = 15; //Cột K
         }
 
         private void BindingDataHousebillDailyExportExcel(ExcelWorksheet workSheet, List<HousebillDailyExportResult> housebillDailyExport, DateTime? issuedDate)
