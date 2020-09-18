@@ -53,7 +53,8 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: "Credit Value", field: 'credit', sortable: true },
             { title: "Debit Value", field: 'debit', sortable: true },
-            { title: 'Note', field: 'notes', sortable: true }
+            { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Exc Rate', field: 'exchangeRate', sortable: true }
         ];
     }
 

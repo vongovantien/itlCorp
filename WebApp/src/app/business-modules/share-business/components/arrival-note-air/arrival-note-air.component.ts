@@ -12,7 +12,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { AppList } from 'src/app/app.list';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail, Container } from '@models';
+import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail, Container, CsTransaction } from '@models';
 
 import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../../store';
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
@@ -21,6 +21,7 @@ import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl'
 import { Observable } from 'rxjs';
 import { catchError, takeUntil, switchMap, finalize, tap, skip } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
+import * as fromShare from './../../store';
 
 @Component({
     selector: 'arrival-note-air',
@@ -107,6 +108,10 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                             this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : { startDate: new Date(), endDate: new Date() };
                             this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
                         }
+                        // res.arrivalNo === null
+                        else {
+                            this.setDefaultArrivalNote();
+                        }
                     }
                 }
             );
@@ -144,6 +149,21 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             { title: 'Unit', field: 'unitId' },
             { title: 'Code', field: 'code' },
         ];
+    }
+
+    setDefaultArrivalNote() {
+        //get JobNo and "Select Store chỗ nào thì takeUntil để tranh memoryLeak" a Thuong said:
+        this._store.select(fromShare.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: CsTransaction) => {
+                if (!!res) {
+                    this.hblArrivalNote.arrivalNo = res.jobNo + "-A01";
+                    this.hblArrivalNote.arrivalFirstNotice = { startDate: new Date(), endDate: new Date() };
+                }
+            });
+
+
+
     }
 
     addCharge() {
