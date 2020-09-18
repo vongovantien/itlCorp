@@ -160,12 +160,12 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         this.attachDocInfo = this.formGroup.controls['attachDocInfo'];
         this.paymentTerm = this.formGroup.controls['paymentTerm'];
 
-        this.chartOfAccounts.subscribe(
-            (accounts: ChartOfAccounts[]) => {
-                const defaultAccountNo: ChartOfAccounts = (accounts || []).find((a: ChartOfAccounts) => a.accountCode === AccountingConstants.DEFAULT_ACCOUNT_NO_CODE);
-                this.accountNo.setValue(!!defaultAccountNo ? defaultAccountNo.accountCode : null);
-            }
-        );
+        // this.chartOfAccounts.subscribe(
+        //     (accounts: ChartOfAccounts[]) => {
+        //         const defaultAccountNo: ChartOfAccounts = (accounts || []).find((a: ChartOfAccounts) => a.accountCode === AccountingConstants.DEFAULT_ACCOUNT_NO_CODE);
+        //         this.accountNo.setValue(!!defaultAccountNo ? defaultAccountNo.accountCode : null);
+        //     }
+        // );
     }
 
 

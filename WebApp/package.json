@@ -4,6 +4,8 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
+        "start-uat": "ng serve --ssl true --c=uat",
+        "start-prod": "ng serve --ssl true --c=prod",
         "build": "ng build",
         "build:test": "ng build --prod --c=test-vi && ng build --prod --c=test-en",
         "build:test:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --prod --c=test-vi",
