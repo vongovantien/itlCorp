@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { formatDate } from '@angular/common';
-import { Observable } from 'rxjs';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 
@@ -29,9 +28,6 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
 
-
-
-
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
 
@@ -45,16 +41,9 @@ export class AdvancePaymentComponent extends AppList {
 
     advancePaymentIds: string[] = [];
 
-    menuSpecialPermission: Observable<any[]>;
-
-
     checkAll = false;
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
-
-
-
-
 
     constructor(
         private _accoutingRepo: AccountingRepo,
