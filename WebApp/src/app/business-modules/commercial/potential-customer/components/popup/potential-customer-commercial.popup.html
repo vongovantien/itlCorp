@@ -87,9 +87,14 @@
                             <div class="form-group row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Email
                                 </label>
-                                <div class="col-lg-8">
+                                <div class="col-lg-8"
+                                    [ngClass]="{ 'm-form__group has-danger': isSubmitted && !email.valid}">
                                     <input type="text" class="form-control m-input m-input--square"
                                         formControlName="email" placeholder="Please enter Email">
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && email.errors  | equalError:'pattern'">
+                                        Email field invalid!
+                                    </div>
                                 </div>
                             </div>
                         </div>

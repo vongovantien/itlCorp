@@ -71,7 +71,9 @@ export class CommercialPotentialCustomerPopupComponent extends PopupBase impleme
             ],
             tel: [],
             address: [],
-            email: [],
+            email: [null, Validators.compose([
+                Validators.pattern(SystemConstants.CPATTERN.EMAIL),
+            ])],
             margin: [null, Validators.compose([
                 Validators.min(0),
                 Validators.max(100),
