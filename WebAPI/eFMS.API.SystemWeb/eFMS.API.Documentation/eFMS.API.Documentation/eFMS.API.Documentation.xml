@@ -666,6 +666,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.GetHousebillsDailyExport(System.Nullable{System.DateTime})">
+            <summary>
+            Get housebill daily export
+            </summary>
+            <param name="issuedDate">Issued Date of housebill</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CustomAuthcontroller">
             <summary>
             
