@@ -2060,7 +2060,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
 
                     var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
-                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL
+                    if ((leaderLevel.Role == AccountingConstants.ROLE_APPROVAL || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                         &&
                         (
                             (isLeader && currentUser.GroupId != AccountingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
@@ -2088,7 +2088,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
-                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !isDeptAccountant
+                    if ((managerLevel.Role == AccountingConstants.ROLE_APPROVAL || managerLevel.Role == AccountingConstants.ROLE_AUTO) && !isDeptAccountant
                         &&
                         (
                             (isManager && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
@@ -2115,7 +2115,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
-                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && isDeptAccountant
+                    if ((accountantLevel.Role == AccountingConstants.ROLE_APPROVAL || accountantLevel.Role == AccountingConstants.ROLE_AUTO) && isDeptAccountant
                         &&
                         (
                             (isAccountant && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
@@ -2142,7 +2142,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL || buHeadLevel.Role == AccountingConstants.ROLE_AUTO) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)

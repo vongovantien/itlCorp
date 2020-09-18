@@ -2598,7 +2598,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
 
                     var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
-                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL
+                    if ((leaderLevel.Role == AccountingConstants.ROLE_APPROVAL || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                         &&
                         (
                             (isLeader && currentUser.GroupId != AccountingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
@@ -2626,7 +2626,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
-                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !isDeptAccountant
+                    if ((managerLevel.Role == AccountingConstants.ROLE_APPROVAL || managerLevel.Role == AccountingConstants.ROLE_AUTO) && !isDeptAccountant
                         &&
                         (
                             (isManager && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
@@ -2653,7 +2653,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
-                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && isDeptAccountant
+                    if ((accountantLevel.Role == AccountingConstants.ROLE_APPROVAL || accountantLevel.Role == AccountingConstants.ROLE_AUTO) && isDeptAccountant
                         &&
                         (
                             (isAccountant && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
@@ -2680,7 +2680,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL || buHeadLevel.Role == AccountingConstants.ROLE_AUTO) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
@@ -3409,35 +3409,36 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="settlementNo"></param>
         /// <returns></returns>
-        private IQueryable<Shipments> GetShipmentBySettlementNo(string settlementNo)
-        {
-            var surcharge = csShipmentSurchargeRepo.Get();
-            var opst = opsTransactionRepo.Get();
-            var csTrans = csTransactionRepo.Get();
-            var csTransDe = csTransactionDetailRepo.Get();
-            var query = from sur in surcharge
-                        join ops in opst on sur.Hblid equals ops.Hblid into op
-                        from ops in op.DefaultIfEmpty()
-                        join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
-                        from cstd in csd.DefaultIfEmpty()
-                        join cst in csTrans on cstd.JobId equals cst.Id into cs
-                        from cst in cs.DefaultIfEmpty()
-                        where
-                            sur.SettlementCode == settlementNo
-                        && (ops.JobNo == null ? cst.JobNo : ops.JobNo) != null
-                        && (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno) != null
-                        && (ops.Mblno == null ? cst.Mawb : ops.Mblno) != null
-                        select new Shipments
-                        {
-                            JobId = (ops.JobNo == null ? cst.JobNo : ops.JobNo),
-                            HBL = (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno),
-                            MBL = (ops.Mblno == null ? cst.Mawb : ops.Mblno)
-                        };
-            var listShipment = query
-                            .GroupBy(x => new { x.JobId, x.MBL, x.HBL })
-                            .Select(s => new Shipments { JobId = s.Key.JobId, MBL = s.Key.MBL, HBL = s.Key.HBL });
-            return listShipment;
-        }
+        //private IQueryable<Shipments> GetShipmentBySettlementNo(string settlementNo)
+        //{
+        //    var surcharge = csShipmentSurchargeRepo.Get();
+        //    var opst = opsTransactionRepo.Get();
+        //    var csTrans = csTransactionRepo.Get();
+        //    var csTransDe = csTransactionDetailRepo.Get();
+        //    var query = from sur in surcharge
+        //                join ops in opst on sur.Hblid equals ops.Hblid into op
+        //                from ops in op.DefaultIfEmpty()
+        //                join cstd in csTransDe on sur.Hblid equals cstd.Id into csd
+        //                from cstd in csd.DefaultIfEmpty()
+        //                join cst in csTrans on cstd.JobId equals cst.Id into cs
+        //                from cst in cs.DefaultIfEmpty()
+        //                where
+        //                    sur.SettlementCode == settlementNo
+        //                && (ops.JobNo == null ? cst.JobNo : ops.JobNo) != null
+        //                && (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno) != null
+        //                && (ops.Mblno == null ? cst.Mawb : ops.Mblno) != null
+        //                select new Shipments
+        //                {
+        //                    JobId = (ops.JobNo == null ? cst.JobNo : ops.JobNo),
+        //                    HBL = (ops.Hwbno == null ? cstd.Hwbno : ops.Hwbno),
+        //                    MBL = (ops.Mblno == null ? cst.Mawb : ops.Mblno),
+        //                    HBLID = (ops.Hblid == null ? cstd.Id : ops.Hblid)
+        //                };
+        //    var listShipment = query
+        //                    .GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.HBLID })
+        //                    .Select(s => new Shipments { JobId = s.Key.JobId, MBL = s.Key.MBL, HBL = s.Key.HBL, HBLID = s.Key.HBLID });
+        //    return listShipment;
+        //}
 
         /// <summary>
         /// Lấy ra danh sách AdvanceNo(chỉ lấy ra các advance có status là done) dựa vào Shipment
@@ -3446,26 +3447,26 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="MBL"></param>
         /// <param name="HBL"></param>
         /// <returns></returns>
-        private IQueryable<string> GetAdvanceNoByShipment(string JobId, string MBL, string HBL)
-        {
-            //Chỉ lấy ra những Advance thuộc shipment có status là done
-            var request = acctAdvanceRequestRepo.Get();
-            var advance = acctAdvancePaymentRepo.Get();
-            var query = from req in request
-                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
-                        from ad in ad2.DefaultIfEmpty()
-                        where
-                               ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                            && req.JobId == JobId
-                            && req.Mbl == MBL
-                            && req.Hbl == HBL
-                        select new
-                        {
-                            AdvanceNo = req.AdvanceNo
-                        };
-            var listAdvanceNo = query.GroupBy(x => new { x.AdvanceNo }).Where(x => x.Key.AdvanceNo != null).Select(s => s.Key.AdvanceNo);
-            return listAdvanceNo;
-        }
+        //private IQueryable<string> GetAdvanceNoByShipment(string JobId, string MBL, string HBL)
+        //{
+        //    //Chỉ lấy ra những Advance thuộc shipment có status là done
+        //    var request = acctAdvanceRequestRepo.Get();
+        //    var advance = acctAdvancePaymentRepo.Get();
+        //    var query = from req in request
+        //                join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
+        //                from ad in ad2.DefaultIfEmpty()
+        //                where
+        //                       ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+        //                    && req.JobId == JobId
+        //                    && req.Mbl == MBL
+        //                    && req.Hbl == HBL
+        //                select new
+        //                {
+        //                    AdvanceNo = req.AdvanceNo
+        //                };
+        //    var listAdvanceNo = query.GroupBy(x => new { x.AdvanceNo }).Where(x => x.Key.AdvanceNo != null).Select(s => s.Key.AdvanceNo);
+        //    return listAdvanceNo;
+        //}
 
         //Check group trước đó đã được approve hay chưa? Nếu group trước đó đã approve thì group hiện tại mới được Approve
         //Nếu group hiện tại đã được approve thì không cho approve nữa
@@ -3728,23 +3729,26 @@ namespace eFMS.API.Accounting.DL.Services
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
             totalAmount = Math.Round(totalAmount, 2);
 
-            //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
-            var shipments = GetShipmentBySettlementNo(settlementNo);
+            //Lấy ra list shipment(JobId,MBL,HBL,HBLID) dựa vào SettlementNo
+            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
-            if (shipments != null && shipments.Count() > 0)
-            {
-                foreach (var shipment in shipments)
-                {
-                    var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-                    foreach (var advanceNo in listAdvanceNo)
-                    {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-                    }
-                }
-                advanceNos += ")";
-                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            }
+            //if (shipments != null && shipments.Count() > 0)
+            //{
+            //    foreach (var shipment in shipments)
+            //    {
+            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
+            //        foreach (var advanceNo in listAdvanceNo)
+            //        {
+            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
+            //        }
+            //    }
+            //    advanceNos += ")";
+            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
+            //}
+
+            var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
+            advanceNos = string.Join("; ", listAdvanceNo);
 
             var userReciverId = userBaseService.GetEmployeeIdOfUser(userReciver);
             var userReciverName = userBaseService.GetEmployeeByEmployeeId(userReciverId)?.EmployeeNameEn;
@@ -3835,22 +3839,25 @@ namespace eFMS.API.Accounting.DL.Services
             totalAmount = Math.Round(totalAmount, 2);
 
             //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
-            var shipments = GetShipmentBySettlementNo(settlementNo);
+            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
-            if (shipments != null && shipments.Count() > 0)
-            {
-                foreach (var shipment in shipments)
-                {
-                    var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-                    foreach (var advanceNo in listAdvanceNo)
-                    {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-                    }
-                }
-                advanceNos += ")";
-                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            }
+            //if (shipments != null && shipments.Count() > 0)
+            //{
+            //    foreach (var shipment in shipments)
+            //    {
+            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
+            //        foreach (var advanceNo in listAdvanceNo)
+            //        {
+            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
+            //        }
+            //    }
+            //    advanceNos += ")";
+            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
+            //}
+
+            var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
+            advanceNos = string.Join("; ", listAdvanceNo);
 
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is approved";
@@ -3916,22 +3923,25 @@ namespace eFMS.API.Accounting.DL.Services
             totalAmount = Math.Round(totalAmount, 2);
 
             //Lấy ra list shipment(JobId,MBL,HBL) dựa vào SettlementNo
-            var shipments = GetShipmentBySettlementNo(settlementNo);
+            //var shipments = GetShipmentBySettlementNo(settlementNo);
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
-            if (shipments != null && shipments.Count() > 0)
-            {
-                foreach (var shipment in shipments)
-                {
-                    var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
-                    foreach (var advanceNo in listAdvanceNo)
-                    {
-                        advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
-                    }
-                }
-                advanceNos += ")";
-                advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
-            }
+            //if (shipments != null && shipments.Count() > 0)
+            //{
+            //    foreach (var shipment in shipments)
+            //    {
+            //        var listAdvanceNo = GetAdvanceNoByShipment(shipment.JobId, shipment.MBL, shipment.HBL);
+            //        foreach (var advanceNo in listAdvanceNo)
+            //        {
+            //            advanceNos += !string.IsNullOrEmpty(advanceNo) ? advanceNo + "; " : string.Empty;
+            //        }
+            //    }
+            //    advanceNos += ")";
+            //    advanceNos = advanceNos != ")" ? advanceNos.Replace("; )", string.Empty) : string.Empty;
+            //}
+
+            var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
+            advanceNos = string.Join("; ", listAdvanceNo);
 
             //Mail Info
             string subject = "eFMS - Settlement Payment from [RequesterName] is denied";
