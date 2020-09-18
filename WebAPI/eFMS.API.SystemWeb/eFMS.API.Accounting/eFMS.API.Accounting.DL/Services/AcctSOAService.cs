@@ -1960,7 +1960,7 @@ namespace eFMS.API.Accounting.DL.Services
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
                     air.AOL = chargeData.MBL.Substring(0, 3) + port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 9);
+                    air.Mawb = chargeData.MBL.Substring(0, 3)  + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
