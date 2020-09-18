@@ -707,6 +707,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
+
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1394,6 +1396,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OtherTerms).HasMaxLength(250);
 
+                entity.Property(e => e.PackageQty).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PaymentTerm)
                     .HasMaxLength(20)
                     .IsUnicode(false);
@@ -1714,6 +1718,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                
+
                 entity.Property(e => e.PaySoano)
                     .HasColumnName("PaySOANo")
                     .HasMaxLength(50)
@@ -1763,6 +1769,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
+
+                
 
                 entity.Property(e => e.Type)
                     .IsRequired()

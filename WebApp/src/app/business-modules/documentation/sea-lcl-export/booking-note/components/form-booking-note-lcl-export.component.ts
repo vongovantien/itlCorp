@@ -35,6 +35,8 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
     contact: AbstractControl;
     bookingNo: AbstractControl;
     bookingDate: AbstractControl;
+    //
+    packageQty: AbstractControl;
 
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
@@ -112,6 +114,8 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
             etd: [null, Validators.required],
             eta: [],
             bookingDate: [{ startDate: new Date(), endDate: new Date() }],
+            //
+            packageQty: [],
 
 
             paymentTerm: [],
@@ -134,6 +138,8 @@ export class SeaLCLExportFormBookingNoteComponent extends AppForm implements OnI
         this.placeOfStuffing = this.formGroup.controls['placeOfStuffing'];
         this.bookingNo = this.formGroup.controls['bookingNo'];
         this.bookingDate = this.formGroup.controls['bookingDate'];
+        //
+        this.packageQty = this.formGroup.controls['packageQty'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
