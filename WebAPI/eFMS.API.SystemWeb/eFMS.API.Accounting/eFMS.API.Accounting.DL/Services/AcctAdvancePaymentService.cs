@@ -194,7 +194,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
                   || x.advancePaymentApr.LeaderApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                 )
                 && x.advancePayment.GroupId == currentUser.GroupId
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
@@ -207,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
                   || x.advancePaymentApr.ManagerApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                   )
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -220,7 +220,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
                   || x.advancePaymentApr.AccountantApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
@@ -233,7 +233,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
                   || x.advancePaymentApr.BuheadApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
