@@ -66,7 +66,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -1650,6 +1650,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AmountVnd)
+                    .HasColumnName("AmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Cdclosed)
                     .HasColumnName("CDClosed")
                     .HasDefaultValueSql("((0))");
@@ -1719,7 +1723,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-                
 
                 entity.Property(e => e.PaySoano)
                     .HasColumnName("PaySOANo")
@@ -1772,7 +1775,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.TransactionType).HasMaxLength(10);
-                
 
                 entity.Property(e => e.Type)
                     .IsRequired()
@@ -1794,6 +1796,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VatAmountVnd)
+                    .HasColumnName("VatAmountVND")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")

@@ -342,8 +342,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          ExchangeDate = sur.ExchangeDate,
                                          FinalExchangeRate = sur.FinalExchangeRate,
                                          ExchangeRate = 0, //Tính toán bên dưới
-                                         AmountVnd = 0, //Tính toán bên dưới
-                                         VatAmountVnd = 0, //Tính toán bên dưới
+                                         AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                         VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                          VatPartnerId = sur.PaymentObjectId,
                                          VatPartnerCode = pat.TaxCode, //Tax code
                                          VatPartnerName = pat.ShortName,
@@ -393,8 +393,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              ExchangeDate = sur.ExchangeDate,
                                              FinalExchangeRate = sur.FinalExchangeRate,
                                              ExchangeRate = 0, //Tính toán bên dưới
-                                             AmountVnd = 0, //Tính toán bên dưới
-                                             VatAmountVnd = 0, //Tính toán bên dưới
+                                             AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                             VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                              VatPartnerId = sur.PaymentObjectId,
                                              VatPartnerCode = pat.TaxCode, //Tax code
                                              VatPartnerName = pat.ShortName,
@@ -422,8 +422,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
                 fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
-                fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
-                fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
+                fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
+                fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
             });
             return dataSell;
         }
@@ -549,8 +549,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             ExchangeDate = sur.ExchangeDate,
                                             FinalExchangeRate = sur.FinalExchangeRate,
                                             ExchangeRate = 0, //Tính toán bên dưới
-                                            AmountVnd = 0, //Tính toán bên dưới
-                                            VatAmountVnd = 0, //Tính toán bên dưới
+                                            AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                            VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                             VatPartnerId = sur.PaymentObjectId,
                                             VatPartnerCode = pat.TaxCode, //Tax code
                                             VatPartnerName = pat.ShortName,
@@ -602,8 +602,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 ExchangeDate = sur.ExchangeDate,
                                                 FinalExchangeRate = sur.FinalExchangeRate,
                                                 ExchangeRate = 0, //Tính toán bên dưới
-                                                AmountVnd = 0, //Tính toán bên dưới
-                                                VatAmountVnd = 0, //Tính toán bên dưới
+                                                AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                                VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                                 VatPartnerId = sur.PaymentObjectId,
                                                 VatPartnerCode = pat.TaxCode, //Tax code
                                                 VatPartnerName = pat.ShortName,
@@ -631,8 +631,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
                 fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
-                fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
-                fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
+                fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
+                fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
             });
             return dataBuySell;
         }
@@ -682,8 +682,8 @@ namespace eFMS.API.Accounting.DL.Services
                                            ExchangeDate = sur.ExchangeDate,
                                            FinalExchangeRate = sur.FinalExchangeRate,
                                            ExchangeRate = 0, //Tính toán bên dưới
-                                           AmountVnd = 0, //Tính toán bên dưới
-                                           VatAmountVnd = 0, //Tính toán bên dưới
+                                           AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                           VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                            VatPartnerId = sur.PayerId,
                                            VatPartnerCode = pat.TaxCode, //Tax code
                                            VatPartnerName = pat.ShortName,
@@ -737,8 +737,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                ExchangeDate = sur.ExchangeDate,
                                                FinalExchangeRate = sur.FinalExchangeRate,
                                                ExchangeRate = 0, //Tính toán bên dưới
-                                               AmountVnd = 0, //Tính toán bên dưới
-                                               VatAmountVnd = 0, //Tính toán bên dưới
+                                               AmountVnd = sur.AmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
+                                               VatAmountVnd = sur.VatAmountVnd, // Không Tính toán bên dưới -> Lấy giá trị đã lưu do kế toán chỉnh sửa
                                                VatPartnerId = sur.PayerId,
                                                VatPartnerCode = pat.TaxCode, //Tax code
                                                VatPartnerName = pat.ShortName,
@@ -766,8 +766,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 fe.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, AccountingConstants.CURRENCY_LOCAL);
                 fe.OrgVatAmount = (fe.Vat != null) ? (fe.Vat < 101 & fe.Vat >= 0) ? ((fe.OrgAmount * fe.Vat) / 100) : Math.Abs(fe.Vat ?? 0) : 0;
-                fe.AmountVnd = fe.OrgAmount * fe.ExchangeRate;
-                fe.VatAmountVnd = fe.OrgVatAmount * fe.ExchangeRate;
+                fe.AmountVnd = fe.AmountVnd != null ? fe.AmountVnd : fe.OrgAmount * fe.ExchangeRate;
+                fe.VatAmountVnd = fe.VatAmountVnd != null ? fe.VatAmountVnd : fe.OrgVatAmount * fe.ExchangeRate;
             });
             return dataObhBuy;
         }
@@ -944,6 +944,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+
+                                // CR: 14405
+                                charge.VatAmountVnd = chargeOfAcct.VatAmountVnd;
+                                charge.AmountVnd = chargeOfAcct.AmountVnd;
+
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                                 {
                                     charge.VoucherId = accounting.VoucherId;
@@ -1075,6 +1080,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
                                 charge.AcctManagementId = accounting.Id;
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+
+                                // CR: 14405
+                                charge.AmountVnd = chargeOfAcct.AmountVnd;
+                                charge.VatAmountVnd = chargeOfAcct.VatAmountVnd;
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                                 {
                                     charge.VoucherId = accounting.VoucherId;
@@ -1771,6 +1780,27 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var surchargeIds = surchargeRepo.Get(x => x.AcctManagementId == acctMngt).Select(s => s.Id).ToList();
             return surchargeIds;
+        }
+
+        public ChargeAccountingMngtTotalViewModel CalculateListChargeAccountingMngt(List<ChargeOfAccountingManagementModel> charges)
+        {
+            ChargeAccountingMngtTotalViewModel result = new ChargeAccountingMngtTotalViewModel();
+            if(charges.Count() > 0)
+            {
+                foreach (ChargeOfAccountingManagementModel charge in charges)
+                {
+                    charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, AccountingConstants.CURRENCY_LOCAL);
+                    charge.OrgVatAmount = (charge.Vat != null) ? (charge.Vat < 101 & charge.Vat >= 0) ? ((charge.OrgAmount * charge.Vat) / 100) : Math.Abs(charge.Vat ?? 0) : 0;
+                    charge.AmountVnd = Math.Round((charge.OrgAmount ?? 0) * (charge.ExchangeRate ?? 0 ));
+                    charge.VatAmountVnd = Math.Round((charge.OrgVatAmount ?? 0 ) * (charge.ExchangeRate ?? 0));
+                }
+                result.Charges = charges;
+                result.TotalAmountVat = charges.Sum(x => x.VatAmountVnd);
+                result.TotalAmountVnd = charges.Sum(x => x.AmountVnd);
+                result.TotalAmount = result.TotalAmountVat + result.TotalAmountVnd;
+            }
+
+            return result;
         }
     }
 }

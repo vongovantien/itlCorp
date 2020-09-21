@@ -645,6 +645,10 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    calculateListChargeAccountingMngt(charges: any[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/CalculateListChargeAccountingMngt`, charges);
+    }
 }
 
 
