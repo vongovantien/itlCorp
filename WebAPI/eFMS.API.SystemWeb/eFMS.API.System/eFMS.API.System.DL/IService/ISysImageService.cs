@@ -14,5 +14,7 @@ namespace eFMS.API.System.DL.IService
         Task<ResultHandle> UploadImage(IFormFile file, string folderName);
         HandleState Delete(Guid id);
         IQueryable<SysImageModel> GetAll();
+        IQueryable<SysImageModel> GetImageCompany();
+
     }
 }

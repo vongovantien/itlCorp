@@ -10,8 +10,11 @@ import { ChargeOfAccountingManagementModel } from '@models';
 import { AppList } from 'src/app/app.list';
 import { IAccountingManagementState, getAccountingManagementPartnerChargeState } from '../../store';
 
-import { takeUntil } from 'rxjs/operators';
+import { map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
+import { AccountingRepo } from '@repositories';
+import { of } from 'rxjs';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'list-charge-accounting-management',
@@ -80,7 +83,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         { title: 'VAT Account', field: 'vatAccount', sortable: true },
         { title: 'Currency', field: 'currency', sortable: true },
         { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
-        { title: 'Amount(VND)', field: 'amountVnd', sortable: true },
+        { title: 'Amount(VND)', field: 'amountVnd', sortable: true, width: 150 },
         { title: 'VAT Amount(VND)', field: 'vatAmountVnd', sortable: true },
         { title: 'VAT Partner ID', field: 'vatPartnerCode', sortable: true },
         { title: 'VAT Partner', field: 'vatPartnerName', sortable: true },
@@ -99,18 +102,21 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         private _store: Store<IAccountingManagementState>,
         private _toastService: ToastrService,
         private _dataService: DataService,
+        private _accountingRepo: AccountingRepo
     ) {
         super();
         this.requestSort = this.sortCharges;
     }
 
     ngOnInit(): void {
+
         this._store.select(getAccountingManagementPartnerChargeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (charges: ChargeOfAccountingManagementModel[]) => {
+                    console.log(charges);
                     if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
-                        this.charges = [...this.charges, ...charges];
+                        this.charges = [...this.charges, ...cloneDeep(charges)]; // * CloneDeep to avoid shadow copy after call fn => refreshListCharge()
 
                         this.updateTotalAmount();
 
@@ -129,23 +135,37 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                 }
             );
 
-        this._dataService.currentMessage.pipe(
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (res: { [key: string]: any }) => {
-                if (res.generalExchangeRate) {
-                    if (!!this.charges.length) {
-                        this.charges.forEach(c => {
-                            if (c.currency !== 'VND') { // ! CURENCY LOCAL
-                                c.exchangeRate = res.generalExchangeRate; // * for Display
-                                c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
-                            }
-                        });
+        this._dataService.currentMessage
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                switchMap((res: { [key: string]: any }) => {
+                    console.log(res);
+                    if (res.generalExchangeRate) {
+                        if (!!this.charges.length) {
+                            this.charges.forEach(c => {
+                                if (c.currency !== 'VND') { // ! CURENCY LOCAL
+                                    c.exchangeRate = res.generalExchangeRate; // * for Display
+                                    c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
+                                }
+                            });
+                            return this._accountingRepo.calculateListChargeAccountingMngt(this.charges);
+                        }
+                        return of(false);
+                    }
+                    return of(false);
+                })
+            ).subscribe(
+                (data: IChargeAccountingMngtTotal) => {
+                    if (!!data) {
+                        this.charges = [...data.charges];
+                        this.totalAmountVnd = data.totalAmountVnd;
+                        this.totalAmountVat = data.totalAmountVat;
                         this._toastService.success("Exchange Rate synced successfully");
+
+                    } else {
                     }
                 }
-            }
-        );
+            );
     }
 
     sortCharges(sort: string) {
@@ -277,9 +297,40 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         }
         return cdNoteNo.join(",\n");
     }
+
+    refreshListCharge() {
+        this._store.select(getAccountingManagementPartnerChargeState)
+            .pipe(takeUntil(this.ngUnsubscribe),
+                switchMap(
+                    (listChargeInStore: ChargeOfAccountingManagementModel[]) => {
+                        console.log("list charge in store: ", listChargeInStore);
+                        if (!!listChargeInStore.length) {
+                            return this._accountingRepo.calculateListChargeAccountingMngt(listChargeInStore);
+                        }
+                        return of(false);
+                    }
+                )
+            ).subscribe(
+                (data: IChargeAccountingMngtTotal | any) => {
+                    if (!!data) {
+                        this.charges = cloneDeep([...(data.charges)]);
+                        console.log("list charge after calculate: ", this.charges);
+
+                        this.totalAmountVnd = data.totalAmountVnd;
+                        this.totalAmountVat = data.totalAmountVat;
+                    }
+                }
+            );
+    }
 }
 
 interface ITotalAmountVatVnd {
     totalAmountVnd: number;
     totalAmountVat: number;
 }
+
+interface IChargeAccountingMngtTotal extends ITotalAmountVatVnd {
+    charges: ChargeOfAccountingManagementModel[];
+    totalAmount: number;
+}
+

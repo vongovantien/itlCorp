@@ -747,8 +747,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<ChargeSOAResult> GetChargeOBHSell(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH)
         {
-            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
+            //Lấy cả phí chứng từ & phí hiện trường [Change request 14469 (21/09/2020)]
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();
@@ -881,8 +881,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<ChargeSOAResult> GetChargeOBHBuy(Expression<Func<ChargeSOAResult, bool>> query, bool? isOBH)
         {
-            //Chỉ lấy những phí từ shipment (IsFromShipment = true)
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
+            //Lấy cả phí chứng từ & phí hiện trường [Change request 14469 (21/09/2020)] 
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
             var opst = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != null && x.CurrentStatus != TermData.Canceled);
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var csTransDe = csTransactionDetailRepo.Get();

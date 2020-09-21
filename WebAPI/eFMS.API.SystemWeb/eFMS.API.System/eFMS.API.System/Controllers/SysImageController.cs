@@ -49,7 +49,7 @@ namespace eFMS.API.System.Controllers
         [Route("company")]
         public IActionResult GetImageCompany()
         {
-            var response = imageService.GetAll();
+            var response = imageService.GetImageCompany();
             return Ok(response);
 
         }

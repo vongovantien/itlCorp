@@ -221,6 +221,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
                   || x.advancePaymentApr.AccountantApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId)
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
@@ -270,7 +271,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (advanceRequests != null)
             {
-                advancePayments = advancePayments.Join(advanceRequests, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) => u);
+                advancePayments = advancePayments.Join(advanceRequests, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) => u).Distinct();
             }
 
             return advancePayments;

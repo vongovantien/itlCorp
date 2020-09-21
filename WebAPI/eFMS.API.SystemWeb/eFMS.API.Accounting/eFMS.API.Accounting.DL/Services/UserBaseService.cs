@@ -322,5 +322,18 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #endregion -- DEPUTY USER --
+        /// <summary>
+        /// Kiểm tra Department của user có phải là department Accountant hay không theo office ID & department ID
+        /// </summary>
+        /// <param name="officeId">Office ID của User</param>
+        /// <param name="deptId">Department ID của User</param>
+        /// <returns></returns>
+        public bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId)
+        {
+            var isDeptAccountant = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant 
+                                                           && x.Id == deptId 
+                                                           && x.BranchId == officeId).Any();
+            return isDeptAccountant;
+        }
     }
 }

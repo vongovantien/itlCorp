@@ -71,5 +71,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string PartnerType { get; set; }
         public string PartnerMode { get; set; }
         public string PartnerLocation { get; set; }
+        public string InternalCode { get; set; }
     }
 }

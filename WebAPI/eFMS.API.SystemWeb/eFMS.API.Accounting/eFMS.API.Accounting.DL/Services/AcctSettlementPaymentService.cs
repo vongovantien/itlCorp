@@ -219,6 +219,7 @@ namespace eFMS.API.Accounting.DL.Services
                 (x.settlementPaymentApr != null && (x.settlementPaymentApr.Accountant == currentUser.UserID
                   || x.settlementPaymentApr.AccountantApr == currentUser.UserID
                   || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.settlementPaymentApr.Accountant, null, null, x.settlementPayment.OfficeId, x.settlementPayment.CompanyId)
+                  || userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId)
                   )
                 && x.settlementPayment.OfficeId == currentUser.OfficeID
                 && x.settlementPayment.CompanyId == currentUser.CompanyID
@@ -1647,59 +1648,55 @@ namespace eFMS.API.Accounting.DL.Services
         public AscSettlementPaymentRequestReportParams GetFirstShipmentOfSettlement(string settlementNo)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
-            var charge = catChargeRepo.Get();
             var opsTrans = opsTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
 
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
-            var settlement = DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
-            var settleApprove = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
-
+            
             var customer = catPartnerRepo.Get();
             var consignee = catPartnerRepo.Get();
             var consigner = catPartnerRepo.Get();
 
-            var data = from sur in surcharge
-                       join cat in charge on sur.ChargeId equals cat.Id into cat2
-                       from cat in cat2.DefaultIfEmpty()
-                       join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
-                       from opst in opst2.DefaultIfEmpty()
-                       join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
-                       from cstd in cstd2.DefaultIfEmpty()
-                       join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                       from cst in cst2.DefaultIfEmpty()
-                       join request in advRequest on new { JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo), HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno), MBL = (opst.Mblno == null ? cst.Mawb : opst.Mblno) } equals new { JobId = request.JobId, HBL = request.Hbl, MBL = request.Mbl } into request1
-                       from request in request1.DefaultIfEmpty()
-                       join advance in advPayment on request.AdvanceNo equals advance.AdvanceNo into advance1
-                       from advance in advance1.DefaultIfEmpty()
-                       join cus in customer on (opst.CustomerId == null ? cstd.CustomerId : opst.CustomerId) equals cus.Id into cus1
-                       from cus in cus1.DefaultIfEmpty()
-                       join cnee in consignee on cstd.ConsigneeId equals cnee.Id into cnee1
-                       from cnee in cnee1.DefaultIfEmpty()
-                       join cner in consigner on cstd.ShipperId equals cner.Id into cner1
-                       from cner in cner1.DefaultIfEmpty()
-                       where
+            var query = from sur in surcharge
+                        join opst in opsTrans on sur.Hblid equals opst.Hblid into opst2
+                        from opst in opst2.DefaultIfEmpty()
+                        join cstd in csTransDe on sur.Hblid equals cstd.Id into cstd2
+                        from cstd in cstd2.DefaultIfEmpty()
+                        join cst in csTrans on cstd.JobId equals cst.Id into cst2
+                        from cst in cst2.DefaultIfEmpty()
+                        join request in advRequest on (opst.Hblid == null ? cstd.Id : opst.Hblid) equals request.Hblid into request1
+                        from request in request1.DefaultIfEmpty()
+                        join advance in advPayment on request.AdvanceNo equals advance.AdvanceNo into advance1
+                        from advance in advance1.DefaultIfEmpty()
+                        join cus in customer on (opst.CustomerId == null ? cstd.CustomerId : opst.CustomerId) equals cus.Id into cus1
+                        from cus in cus1.DefaultIfEmpty()
+                        join cnee in consignee on cstd.ConsigneeId equals cnee.Id into cnee1
+                        from cnee in cnee1.DefaultIfEmpty()
+                        join cner in consigner on cstd.ShipperId equals cner.Id into cner1
+                        from cner in cner1.DefaultIfEmpty()
+                        where
                             sur.SettlementCode == settlementNo
-                       select new AscSettlementPaymentRequestReportParams
-                       {
-                           JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
-                           AdvDate = (!string.IsNullOrEmpty(advance.StatusApproval) && advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE ? advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
-                           SettlementNo = settlementNo,
-                           Customer = cus.PartnerNameVn != null ? cus.PartnerNameVn.ToUpper() : string.Empty,
-                           Consignee = cnee.PartnerNameVn != null ? cnee.PartnerNameVn.ToUpper() : string.Empty,
-                           Consigner = cner.PartnerNameVn != null ? cner.PartnerNameVn.ToUpper() : string.Empty,
-                           ContainerQty = opst.SumContainers.HasValue ? opst.SumContainers.Value.ToString() + "/" : string.Empty,
-                           GW = (opst.SumGrossWeight ?? cstd.GrossWeight),
-                           NW = (opst.SumNetWeight ?? cstd.NetWeight),
-                           CustomsId = sur.ClearanceNo,
-                           PSC = (opst.SumPackages ?? cstd.PackageQty),
-                           CBM = (opst.SumCbm ?? cstd.Cbm),
-                           HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
-                           MBL = (opst.Mblno == null ? (cst.Mawb ?? string.Empty) : opst.Mblno),
-                           StlCSName = string.Empty
-                       };
+                        select new { sur, opst, cst, cstd, advance, cus, cnee, cner };
+            var data = query.Select(s => new AscSettlementPaymentRequestReportParams
+            {
+                JobId = (s.opst.JobNo == null ? s.cst.JobNo : s.opst.JobNo),
+                AdvDate = (!string.IsNullOrEmpty(s.advance.StatusApproval) && s.advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE ? s.advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
+                SettlementNo = settlementNo,
+                Customer = s.cus.PartnerNameVn != null ? s.cus.PartnerNameVn.ToUpper() : string.Empty,
+                Consignee = s.cnee.PartnerNameVn != null ? s.cnee.PartnerNameVn.ToUpper() : string.Empty,
+                Consigner = s.cner.PartnerNameVn != null ? s.cner.PartnerNameVn.ToUpper() : string.Empty,
+                ContainerQty = s.opst.SumContainers.HasValue ? s.opst.SumContainers.Value.ToString() + "/" : string.Empty,
+                //GW = (opst.SumGrossWeight ?? cstd.GrossWeight),
+                //NW = (opst.SumNetWeight ?? cstd.NetWeight),
+                CustomsId = s.sur.ClearanceNo,
+                //PSC = (opst.SumPackages ?? cstd.PackageQty),
+                //CBM = (opst.SumCbm ?? cstd.Cbm),
+                HBL = (s.opst.Hwbno == null ? s.cstd.Hwbno : s.opst.Hwbno),
+                MBL = (s.opst.Mblno == null ? (s.cst.Mawb ?? string.Empty) : s.opst.Mblno),
+                StlCSName = string.Empty
+            });
             data = data.OrderByDescending(x => x.JobId);
             var result = new AscSettlementPaymentRequestReportParams();
             result.JobId = data.First().JobId;
@@ -1709,11 +1706,24 @@ namespace eFMS.API.Accounting.DL.Services
             result.Consignee = data.First().Consignee;
             result.Consigner = data.First().Consigner;
             result.ContainerQty = data.First().ContainerQty;
-            result.GW = data.Sum(sum => sum.GW);
-            result.NW = data.Sum(sum => sum.NW);
+
+            var hblids = query.Select(s => s.opst.Hblid != null ? s.opst.Hblid : s.cstd.Id).Distinct().ToList();
+            decimal? _gw = 0;
+            decimal? _nw = 0;
+            int? _psc = 0;
+            decimal? _cbm = 0;
+            foreach(var hblid in hblids)
+            {
+                _gw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumGrossWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.GrossWeight);
+                _nw += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumNetWeight) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.NetWeight);
+                _psc += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumPackages) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.PackageQty);
+                _cbm += opsTrans.Where(x => x.Hblid == hblid).Sum(su => su.SumCbm) ?? csTransDe.Where(x => x.Id == hblid).Sum(su => su.Cbm);
+            }
+            result.GW = _gw;
+            result.NW = _nw;
             result.CustomsId = !string.IsNullOrEmpty(data.First().CustomsId) ? data.First().CustomsId : GetCustomNoOldOfShipment(data.First().JobId);
-            result.PSC = data.Sum(sum => sum.PSC);
-            result.CBM = data.Sum(sum => sum.CBM);
+            result.PSC = _psc;
+            result.CBM = _cbm;
             result.HBL = data.First().HBL;
             result.MBL = data.First().MBL;
             result.StlCSName = data.First().StlCSName;
