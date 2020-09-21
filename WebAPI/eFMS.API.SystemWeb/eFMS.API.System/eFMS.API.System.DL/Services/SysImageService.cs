@@ -104,6 +104,13 @@ namespace eFMS.API.System.DL.Services
             var sysImage = DataContext.Get();
             return sysImage.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
         }
+
+        public IQueryable<SysImageModel> GetImageCompany()
+        {
+            var result =  DataContext.Where(x => x.Folder == "Company");
+            return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
+
+        }
     }
 
 }
