@@ -444,5 +444,13 @@ namespace eFMS.API.Accounting.Controllers
                 accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
             }
         }
+        
+        [HttpPost]
+        [Route("CalculateListChargeAccountingMngt")]
+        public IActionResult CalculateListChargeAccountingMngt(List<ChargeOfAccountingManagementModel> charges)
+        {
+            ChargeAccountingMngtTotalViewModel result = accountingService.CalculateListChargeAccountingMngt(charges);
+            return Ok(result);
+        }
     }
 }

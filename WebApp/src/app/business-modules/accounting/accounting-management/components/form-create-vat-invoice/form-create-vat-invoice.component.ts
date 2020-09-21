@@ -104,13 +104,14 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
                             }
                         } else if (!!res.inputRefNo && !this.attachDocInfo.value.includes(res.inputRefNo)) {
                             this.attachDocInfo.setValue(this.updateAttachInfo(this.attachDocInfo.value, !!res.inputRefNo ? res.inputRefNo : ''));
-                            this.description.setValue(`Hóa Đơn Thu Ph : ${this.attachDocInfo.value}`);
+                            this.description.setValue(`Hóa Đơn Thu Phí : ${this.attachDocInfo.value}`);
 
                         }
                     }
                 }
             );
 
+        // * Listen Payment term change form input ref no
         this._store.select(getAccoutingManagementPaymentTermState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

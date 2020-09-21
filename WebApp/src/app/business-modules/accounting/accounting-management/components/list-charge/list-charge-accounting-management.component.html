@@ -8,9 +8,17 @@
                         <span>Remove</span>
                     </span>
                 </button>
+
+                <button class="btn btn-default m-btn--icon m-btn--uppercase" type="button"
+                    (click)="refreshListCharge()">
+                    <span>
+                        <i class="la la-refresh"></i>
+                        <span>Refresh</span>
+                    </span>
+                </button>
             </ng-container>
 
-            <div class="m-input-icon m-input-icon--right" style="width: 70%">
+            <div class="m-input-icon m-input-icon--right" style="width: 65%">
                 <input type="text" class="form-control m-input m-input--square" placeholder="Search"
                     [(ngModel)]="keyword" name="keyword">
                 <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -69,8 +77,14 @@
                                 <input type="text" class="form-control" [(ngModel)]="charge.exchangeRate"
                                     autoFormatCurrency numeric>
                             </td>
-                            <td>{{charge.amountVnd | number: '.0-3'}}</td>
-                            <td>{{charge.vatAmountVnd | number: '.0-3'}}</td>
+                            <td>
+                                <input type="text" class="form-control" [(ngModel)]="charge.amountVnd"
+                                    autoFormatCurrency numeric>
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" [(ngModel)]="charge.vatAmountVnd"
+                                    autoFormatCurrency>
+                            </td>
                             <ng-container *ngIf="type !== 'invoice'">
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo">
