@@ -163,19 +163,47 @@ namespace eFMS.API.Catalogue.Controllers
         private string CheckExistedContract(CatContractModel model)
         {
             string messageDuplicate = string.Empty;
-            bool existed = false;
+            var office = model.OfficeId.Split(";").ToArray();
             if (model.Id != Guid.Empty)
             {
-                if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && !string.IsNullOrEmpty(model.ContractNo)))
+                if(model.ContractType != "Official")
                 {
-                    existed = true;
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) &&  x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Duplicate service, office, salesman!";
+                    }
                 }
+                else
+                {
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.ContractNo  == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Contract no has been existed!";
+                    }
+                }
+                //if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && !string.IsNullOrEmpty(model.ContractNo)))
+                //{
+                //    existed = true;
+                //}
             }
             else
             {
-                existed = catContractService.Any(x => x.ContractNo == model.ContractNo && !string.IsNullOrEmpty( model.ContractNo));
+                //existed = catContractService.Any(x => x.ContractNo == model.ContractNo && !string.IsNullOrEmpty( model.ContractNo));
+                if (model.ContractType != "Official")
+                {
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Duplicate service, office, salesman!";
+                    }
+                }
+                else
+                {
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.ContractNo == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Contract no has been existed!";
+                    }
+                }
             }
-            messageDuplicate = existed == true ? "Contract no has been existed!" : string.Empty;
+
             return messageDuplicate;
         }
 

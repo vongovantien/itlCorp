@@ -47,5 +47,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? CreatedDate { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public decimal? PackageQty { get; set; }
     }
 }

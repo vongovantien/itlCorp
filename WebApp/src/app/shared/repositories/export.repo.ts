@@ -294,5 +294,12 @@ export class ExportRepo {
         );
     }
 
+    exportHousebillDaily(issuedDate: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportHousebillDaily?issuedDate=${issuedDate}`).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
 }
 

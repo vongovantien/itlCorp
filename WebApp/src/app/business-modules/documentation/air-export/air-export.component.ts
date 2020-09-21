@@ -15,6 +15,7 @@ import * as fromShare from './../../share-business/store';
 
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { JobConstants } from '@constants';
+import { ShareBussinessInputDailyExportPopupComponent } from '@share-bussiness';
 
 @Component({
     selector: 'app-air-export',
@@ -25,7 +26,7 @@ export class AirExportComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
-
+    @ViewChild(ShareBussinessInputDailyExportPopupComponent, { static: false }) dailyExportPopup: ShareBussinessInputDailyExportPopupComponent;
     headersHBL: CommonInterface.IHeaderTable[];
 
     shipments: CsTransaction[] = [];
@@ -229,5 +230,9 @@ export class AirExportComponent extends AppList {
                     this.permissionPopup.show();
                 }
             });
+    }
+
+    showPopupDailyExport() {
+        this.dailyExportPopup.show();
     }
 }
