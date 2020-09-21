@@ -14,6 +14,7 @@
             public const string CatchargeUrl = "/api/v1/en-US/CatCharge/QueryExport";
             public const string CatCurrencyUrl = "/api/v1/en-US/CatCurrency/getAllByQuery";
             public const string CatChartOfAccountsUrl = "/api/v1/en-US/CatChartOfAccounts/QueryExport";
+            public const string CatIncotermListUrl = "/api/v1/en-US/CatIncoterm/QueryExport";
 
         }
         public class CustomClearance
@@ -61,7 +62,7 @@
 
             public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
             public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
-
+            public const string GetDataJobProfitAnalysisUrl = "/Documentation/api/v1/en-US/Shipment/GetDataJobProfitAnalysis";
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
         }
     }

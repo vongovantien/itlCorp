@@ -6,8 +6,7 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params, Router } from '@angular/router';
+import { Params, Router, ActivatedRoute } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -58,7 +57,8 @@ export class SeaFclExportManifestComponent extends AppList {
         private _sortService: SortService,
         private _toastService: ToastrService,
         protected _router: Router,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _activedRoute: ActivatedRoute
 
     ) {
         super();
@@ -84,13 +84,13 @@ export class SeaFclExportManifestComponent extends AppList {
 
     }
     ngAfterViewInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
 
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getHblList(this.jobId);
@@ -111,7 +111,8 @@ export class SeaFclExportManifestComponent extends AppList {
     }
 
     refreshManifest() {
-        this.getManifest(this.jobId);
+        //this.getManifest(this.jobId);
+        this.formManifest.getShipmentDetail();
         this.getHblList(this.jobId);
     }
 
@@ -151,6 +152,9 @@ export class SeaFclExportManifestComponent extends AppList {
                     this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
+                }
+                else {
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );

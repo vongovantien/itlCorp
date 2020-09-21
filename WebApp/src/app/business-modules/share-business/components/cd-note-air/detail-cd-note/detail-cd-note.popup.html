@@ -233,7 +233,7 @@
                 <!--end::Form-->
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                <button class="btn btn-danger  m-btn--icon m-btn--uppercase"
                     (click)="checkDeleteCdNote(CdNoteDetail.cdNote.id)">
                     <span>
                         <i class="la la-trash"></i>
@@ -242,8 +242,8 @@
                         </span>
                     </span>
                 </button>
-                <button class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
-                    [disabled]="CdNoteDetail.isLoocked" (click)="openPopupEdit()">
+                <button class="btn btn-success  m-btn--icon m-btn--uppercase" [disabled]="CdNoteDetail.isLoocked"
+                    (click)="openPopupEdit()">
                     <span>
                         <i class="la la-edit"></i>
                         <span>
@@ -251,8 +251,8 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default m-btn--square m-btn--icon m-btn--uppercase"
-                    data-dismiss="modal" (click)="closePopup()">
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" data-dismiss="modal"
+                    (click)="closePopup()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -289,7 +289,7 @@
                     frameborder="0"></iframe>
             </div>
             <div class="modal-footer m--align-center" (click)="hidePreview()">
-                <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" data-dismiss="modal">
+                <button type="button" class="btn  m-btn--icon m-btn--uppercase" data-dismiss="modal">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

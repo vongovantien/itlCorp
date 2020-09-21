@@ -11,7 +11,7 @@ import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
 
 import * as fromShare from '../../store';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip } from 'rxjs/operators';
+import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
@@ -85,7 +85,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
 
         this.carries = this._store.select(getCatalogueCarrierState);
         this.agents = this._store.select(getCatalogueAgentState);
-        this.ports = this._store.select(getCataloguePortState);
+        this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
+
         this.listUsers = this._systemRepo.getListSystemUser();
 
         this.initForm();
@@ -131,6 +132,8 @@ export class ShareBussinessFormCreateSeaImportComponent extends AppForm implemen
                                 coloader: this.fclImportDetail.coloaderId,
                                 deliveryPlace: this.fclImportDetail.deliveryPlace
                             });
+
+                            this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
                         } catch (error) {
                             console.log(error);
 

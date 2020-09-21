@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using eFMS.API.ReportData.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using eFMS.API.ReportData.Models.Criteria;
 
 namespace eFMS.API.ReportData.Controllers
 {
@@ -268,7 +269,19 @@ namespace eFMS.API.ReportData.Controllers
             var stream = helper.CreateChartOfAccountExcelFile(dataObjects.Result);
             return new FileHelper().ExportExcel(stream, FilesNames.CurrencyName);
         }
-
+        [Route("ExportIncotermList")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportIncotermList(CatIncotermCriteria catIncotermCriteria)
+        {
+            Helper helper = new Helper();
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(catIncotermCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatIncotermListUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatIncotermModel>>();
+            var stream = helper.GenerateIncotermListExcel(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.IncotermList);
+            
+        }
 
         /// <summary>
         /// export Custom Clearance

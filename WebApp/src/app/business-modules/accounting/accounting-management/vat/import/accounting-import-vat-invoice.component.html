@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <div class="form-actions m--margin-top-5 m--align-right">
-                        <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                        <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase"
                             (click)="hideInvalid()">
                             <span>
                                 <span *ngIf="isShowInvalid">
@@ -52,7 +52,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
                             (click)="importVatInvoice()">
                             <span>
                                 <i class="la la-save"></i>
@@ -61,7 +61,7 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn m-btn--square m-btn--icon m-btn--uppercase" (click)="back()">
+                        <button type="button" class="btn  m-btn--icon m-btn--uppercase" (click)="back()">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>
@@ -98,6 +98,9 @@
                                     </td>
                                     <td>
                                         {{ item.serieNo }}
+                                    </td>
+                                    <td>
+                                        {{ item.paymentStatus }}
                                     </td>
                                 </tr>
                             </ng-container>

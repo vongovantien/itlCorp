@@ -5,7 +5,10 @@ import { StoreModule } from "@ngrx/store";
 import { EffectsModule } from "@ngrx/effects";
 
 import { SelectModule } from "ng2-select";
-import { CollapseModule, TabsModule } from "ngx-bootstrap";
+
+
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { CommonComponentModule } from "src/app/shared/common/common.module";
 import { DirectiveModule } from "src/app/shared/directives/directive.module";

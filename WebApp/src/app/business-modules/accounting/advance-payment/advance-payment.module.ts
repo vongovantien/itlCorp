@@ -5,7 +5,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { ModalModule, PaginationModule, } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AdvancePaymentAddNewComponent } from './add/add-new-advance-payment.component';
 import { AdvancePaymentFormCreateComponent } from './components/form-create-advance-payment/form-create-advance-payment.component';
@@ -19,6 +20,7 @@ import { NgxCurrencyModule } from "ngx-currency";
 import { ShareApprovePaymentModule } from '../approve-payment/components/share-approve-payment.module';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-advance-payment.component';
+import { SelectModule } from 'ng2-select';
 const routing: Routes = [
     {
         path: "",
@@ -83,7 +85,8 @@ const customCurrencyMaskConfig = {
         ReactiveFormsModule,
         NgProgressModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
-        ShareApprovePaymentModule
+        ShareApprovePaymentModule,
+        SelectModule,
     ],
     declarations: [
         AdvancePaymentComponent,

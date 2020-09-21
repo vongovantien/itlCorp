@@ -1,35 +1,45 @@
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
-import * as fromShareBussiness from './../../../../share-business/store';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
-import { ToastrService } from 'ngx-toastr';
-import * as fromShare from './../../../../share-business/store';
 import { ActivatedRoute } from '@angular/router';
-import { DataService } from 'src/app/shared/services';
-import { SystemConstants } from 'src/constants/system.const';
-import { CsTransaction } from 'src/app/shared/models';
-import { ReportPreviewComponent } from 'src/app/shared/common';
-import { getTransactionPermission, getTransactionLocked } from './../../../../share-business/store';
+import { Store } from '@ngrx/store';
+import { ToastrService } from 'ngx-toastr';
+
+
+import { DataService } from '@services';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction } from '@models';
+import { SystemConstants } from '@constants';
+import { ReportPreviewComponent } from '@common';
 import { ShareBussinessBillInstructionSeaExportComponent, ShareBussinessBillInstructionHousebillsSeaExportComponent } from '@share-bussiness';
+
+import { AppList } from 'src/app/app.list';
+import { CsShippingInstruction } from 'src/app/shared/models/document/shippingInstruction.model';
+import {
+    getTransactionPermission,
+    getTransactionLocked,
+    TransactionActions,
+    TransactionGetDetailAction,
+    getTransactionDetailCsTransactionState
+} from './../../../../share-business/store';
+
 import _groupBy from 'lodash/groupBy';
+import { catchError, finalize, takeUntil, take } from 'rxjs/operators';
+
 
 @Component({
     selector: 'app-sea-fcl-export-shipping-instruction',
     templateUrl: './sea-fcl-export-shipping-instruction.component.html'
 })
 export class SeaFclExportShippingInstructionComponent extends AppList {
+
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent, { static: false }) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild(ShareBussinessBillInstructionSeaExportComponent, { static: false }) billSIComponent: ShareBussinessBillInstructionSeaExportComponent;
-    jobId: string;
-    termTypes: CommonInterface.INg2Select[];
-    houseBills: any[] = [];
-    dataReport: any = null;
 
-    constructor(private _store: Store<fromShareBussiness.TransactionActions>,
+    jobId: string;
+    houseBills: any[] = [];
+    displayPreview: boolean = false;
+
+    constructor(private _store: Store<TransactionActions>,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
@@ -38,11 +48,10 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
     }
 
     ngOnInit() {
-        this.getTerms();
         this._activedRouter.params.subscribe((param: any) => {
             if (!!param && param.jobId) {
                 this.jobId = param.jobId;
-                this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                 this.getHouseBills();
             }
         });
@@ -58,7 +67,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             finalize(() => { this.isLoading = false; }),
         ).subscribe(
             (res: any) => {
-
                 this.houseBills = res;
                 this.billDetail.housebills = res;
 
@@ -66,17 +74,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             },
         );
     }
-    async getTerms() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA)) {
-            const commonData = this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
 
-        } else {
-            const commonData: { [key: string]: CommonInterface.IValueDisplay[] } = await this._documentRepo.getShipmentDataCommon().toPromise();
-            this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPMENT_COMMON_DATA, commonData);
-            this.termTypes = this.utility.prepareNg2SelectData(commonData.freightTerms, 'value', 'displayName');
-        }
-    }
     getBillingInstruction(jobId: string) {
         this._documentRepo.getShippingInstruction(jobId)
             .pipe(
@@ -85,12 +83,18 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             )
             .subscribe(
                 (res: any) => {
+                    if (!!res) {
+                        this.displayPreview = true;
+                    }
+                    else {
+                        this.displayPreview = false;
+                    }
                     this.setDataBillInstructionComponent(res);
                 },
             );
     }
     setDataBillInstructionComponent(data: any) {
-        this._store.select(fromShare.getTransactionDetailCsTransactionState)
+        this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), take(1))
             .subscribe(
                 (res) => {
@@ -106,7 +110,6 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
                         }
 
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
-                        this.billSIComponent.termTypes = this.termTypes;
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
                     }
                 }
@@ -266,6 +269,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        //
+                        this.displayPreview = true;
+                        //
                         this._toastService.success(res.message);
                         this.getBillingInstruction(this.jobId);
                     } else {
@@ -287,6 +293,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList {
         return valid;
     }
     refresh() {
+        this.displayPreview = false;
         this.setDataBillInstructionComponent(null);
     }
     previewSummaryReport() {

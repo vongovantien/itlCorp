@@ -18,7 +18,7 @@ import _includes from 'lodash/includes';
 import _cloneDeep from 'lodash/cloneDeep';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
-import { timeoutD } from '@decorators';
+import { delayTime } from '@decorators';
 import { DocumentationRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -285,7 +285,7 @@ export class SettlementListChargeComponent extends AppList {
         this.showPaymentManagementPopup();
     }
 
-    @timeoutD(500)
+    @delayTime(500)
     showPaymentManagementPopup() {
         this.paymentManagementPopup.show();
     }

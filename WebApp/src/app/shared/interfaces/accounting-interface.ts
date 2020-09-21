@@ -7,4 +7,16 @@ namespace AccountingInterface {
         mbls: string[];
         settlementCodes: string[];
     }
+
+    export interface IAccReceivableSearch {
+        arType: number;
+        acRefId: string;
+        overDueDay: number;
+        debitRateFrom?: number;
+        debitRateTo?: number;
+        agreementStatus: string;
+        agreementExpiredDay: string;
+        salesmanId: string;
+        officeId: string;
+    }
 }

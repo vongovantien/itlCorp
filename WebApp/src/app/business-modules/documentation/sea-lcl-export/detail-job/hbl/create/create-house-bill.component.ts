@@ -205,6 +205,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
             packageQty: this.goodSummaryComponent.packageQty,
             packageType: +this.goodSummaryComponent.selectedPackage,
             contSealNo: this.goodSummaryComponent.containerDescription,
+            chargeWeight: this.goodSummaryComponent.totalChargeWeight,
             attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]'),
         };
 

@@ -2,8 +2,8 @@ import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 
-export function timeoutD(milliseconds: number = 0) {
-    return function (target, key, descriptor) {
+export function delayTime(milliseconds: number = 0) {
+    return function (_target: any, _key: any, descriptor: any) {
         const originalMethod = descriptor.value;
         descriptor.value = function (...args) {
             setTimeout(() => {

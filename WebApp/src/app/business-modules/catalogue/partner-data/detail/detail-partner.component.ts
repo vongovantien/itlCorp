@@ -48,7 +48,6 @@ export class PartnerDetailComponent extends AppList {
     indexToRemove: number = 0;
     indexlstContract: number = null;
 
-    saleMans = [];
     activeNg: boolean = true;
     partner: Partner = new Partner();
     partnerGroupActives: any = [];
@@ -58,13 +57,11 @@ export class PartnerDetailComponent extends AppList {
     services: any[] = [];
     status: CommonInterface.ICommonTitleValue[] = [];
     offices: any[] = [];
-    salemanToAdd: SalemanAdd = new SalemanAdd();
     strOfficeCurrent: any = '';
     strSalemanCurrent: any = '';
     selectedStatus: any = {};
     selectedService: any = {};
     deleteMessage: string = '';
-    selectedSaleman: Saleman = null;
     saleMantoView: Saleman = new Saleman();
     dataSearchSaleman: any = {};
     isShowSaleMan: boolean = false;
@@ -99,7 +96,6 @@ export class PartnerDetailComponent extends AppList {
     }
 
     ngOnInit() {
-        this.getComboboxDataSaleman();
         this.initHeaderSalemanTable();
         this.route.params.subscribe((prams: any) => {
             if (!!prams.id) {
@@ -204,112 +200,7 @@ export class PartnerDetailComponent extends AppList {
             { title: 'Company', field: 'companyName', sortable: true },
         ];
     }
-    closePopupSaleman(param: SalemanAdd) {
-        this.salemanToAdd = param;
-        this.salemanToAdd.partnerId = this.partner.id;
-        this.poupSaleman.isDetail = false;
-        this.isDup = this.saleMandetail.some((saleMane: Saleman) => (saleMane.service === this.salemanToAdd.service && saleMane.office === this.salemanToAdd.office));
 
-        if (this.isDup) {
-            for (const it of this.saleMandetail) {
-                const index = this.services.findIndex(x => x.id === it.service);
-                if (index > -1) {
-                    it.serviceName = this.services[index].text;
-                }
-            }
-        }
-
-
-        if (this.salemanToAdd.service !== null && this.salemanToAdd.office !== null) {
-            this._catalogueRepo.checkExistedSaleman(this.salemanToAdd)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: any) => {
-                        if (!!res) {
-                            if (this.isDup) {
-                                console.log("dup");
-                                this.toastr.error('Duplicate service, office with sale man!');
-                            } else {
-                                // this.saleMandetail.push(this.salemanToAdd);
-                                this.saleMandetail = [...this.saleMandetail, this.salemanToAdd];
-                                this.poupSaleman.hide();
-                                for (const it of this.saleMandetail) {
-
-                                    this.services.forEach(item => {
-                                        if (it.service === item.id) {
-                                            it.serviceName = item.text;
-                                        }
-                                    });
-                                    this.offices.forEach(item => {
-                                        if (it.office === item.id) {
-                                            it.officeName = item.branchNameEn;
-                                        }
-                                        if (it.company === item.buid) {
-                                            const objCompany = this.company.find(x => x.id === item.buid);
-                                            it.companyName = objCompany.bunameAbbr;
-                                        }
-                                    });
-                                }
-
-
-                            }
-                        }
-
-                    },
-                );
-        }
-
-
-    }
-    closeppAndDeleteSaleman(index: any) {
-        this.index = index;
-        const id = this.saleMandetail[index].id;
-        this.deleteSaleman(this.index, id);
-    }
-
-    showPopupSaleman() {
-        this.poupSaleman.isSave = false;
-        this.poupSaleman.isDetail = false;
-        this.poupSaleman.resetForm();
-        this.poupSaleman.show();
-    }
-
-    onDeleteSaleman() {
-        if (this.saleMandetail.length === 1) {
-            this._toastService.error('Salesman must have one row!');
-            this.confirmDeleteSalemanPopup.hide();
-            return;
-        }
-        this.confirmDeleteSalemanPopup.hide();
-        if (!!this.salemansId) {
-            this._catalogueRepo.deleteContract(this.salemansId, this.partner.id)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success(res.message);
-                            this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
-                            this.confirmDeleteSalemanPopup.hide();
-                        } else {
-                            this._toastService.error(res.message);
-                        }
-                    }
-                );
-        } else {
-            if (this.saleMandetail.length > 0) {
-                this.saleMandetail = [...this.saleMandetail.slice(0, this.index), ...this.saleMandetail.slice(this.index + 1)];
-                if (!this.salemansId) {
-                    this._toastService.success('Data delete success!');
-                }
-            }
-        }
-    }
-    deleteSaleman(index: any, id: string) {
-        this.index = index;
-        this.salemansId = id;
-        this.deleteMessage = `Do you want to delete sale man  ${this.saleMandetail[index].username}?`;
-        this.confirmDeleteSalemanPopup.show();
-    }
     getDataCombobox() {
         forkJoin([
             this._catalogueRepo.getCountryByLanguage(),
@@ -342,12 +233,7 @@ export class PartnerDetailComponent extends AppList {
 
             );
     }
-    getComboboxDataSaleman(): any {
-        this.getService();
-        this.getOffice();
-        this.getCompany();
-        this.getStatus();
-    }
+
 
     getService() {
         this._catalogueRepo.getListService()
@@ -432,18 +318,13 @@ export class PartnerDetailComponent extends AppList {
     }
 
     onSubmit() {
-        // this.partner.saleMans = this.saleMandetail;
         this.formPartnerComponent.isSubmitted = true;
-
-        //const formBody = this.formPartnerComponent.partnerForm.getRawValue();
-        //console.log(formBody);
         if (!this.formPartnerComponent.partnerForm.valid) {
             return;
         }
         this.getFormPartnerData();
-        console.log("this.partner: ", this.partner);
-
     }
+
     getFormPartnerData() {
         const formBody = this.formPartnerComponent.partnerForm.getRawValue();
         this.trimInputForm(formBody);
@@ -558,30 +439,11 @@ export class PartnerDetailComponent extends AppList {
                 }
             );
     }
+
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {
             this.saleMandetail = this._sortService.sort(this.saleMandetail, sortData.sortField, sortData.order);
         }
-    }
-
-    showDetailSaleMan(saleman: Saleman, id: any) {
-        this.poupSaleman.isDetail = true;
-
-        //const obj = this.saleMandetail.find(x => x.id === id);
-        const saleMane: any = {
-            description: saleman.description,
-            office: saleman.office,
-            effectDate: saleman.effectDate,
-            status: saleman.status,
-            partnerId: null,
-            saleManId: saleman.saleManId,
-            service: saleman.service,
-            freightPayment: saleman.freightPayment,
-            serviceName: saleman.serviceName
-        };
-        this.poupSaleman.allowDelete = this.partner.permission.allowDelete;
-        this.poupSaleman.showSaleman(saleMane);
-        this.poupSaleman.show();
     }
 
     showConfirmDelete() {
@@ -615,8 +477,50 @@ export class PartnerDetailComponent extends AppList {
                 (res: any[]) => {
                     this.listContract.contracts = res || [];
                     this.listContract.isActiveNewContract = false;
-                    // this.contracts = res || [];
+                    console.log(this.listContract.contracts);
+                    this.listContract.contracts.forEach(element => {
 
+                        if (element.saleService.includes(';')) {
+                            const arr = element.saleService.split(';');
+                            element.saleService = '';
+                            arr.forEach(item => {
+                                element.saleService += item + '; ';
+                            });
+                            element.saleServiceName = '';
+                            arr.forEach(item => {
+                                element.saleServiceName += this.formContractPopup.serviceTypes.find(x => x.id === item).text + "; ";
+                            });
+                            if (element.saleService.charAt(element.saleService.length - 2) === ';') {
+                                element.saleService = element.saleService.substr(0, element.saleService.length - 2);
+                            }
+                            if (element.saleServiceName.charAt(element.saleServiceName.length - 2) === ';') {
+                                element.saleServiceName = element.saleServiceName.substr(0, element.saleServiceName.length - 2);
+                            }
+                        }
+                        else {
+                            element.saleServiceName = element.saleService.toLowerCase();
+                            const obj = this.formContractPopup.serviceTypes.find(x => x.id === element.saleService);
+
+                            element.saleServiceName = !!obj ? obj.text : null;
+                        }
+                        if (!!element.officeId) {
+                            if (element.officeId.includes(';')) {
+                                const arrayOffice = element.officeId.split(';');
+                                element.officeNameEn = '';
+                                arrayOffice.forEach(itemOffice => {
+                                    element.officeNameEn += this.formContractPopup.offices.find(x => x.id === itemOffice).text + "; ";
+                                });
+                                if (element.officeNameEn.charAt(element.officeNameEn.length - 2) === ';') {
+                                    element.officeNameEn = element.officeNameEn.substr(0, element.officeNameEn.length - 2);
+                                }
+                            } else {
+                                element.officeId = element.officeId.toLowerCase();
+                                const obj = this.formContractPopup.offices.find(x => x.id === element.officeId);
+
+                                element.officeNameEn = !!obj ? obj.text : null;
+                            }
+                        }
+                    });
                 }
             );
     }
@@ -643,66 +547,6 @@ export class PartnerDetailComponent extends AppList {
             }
         }
         this.formContractPopup.contracts = this.contracts;
-    }
-
-    getDetailContract(id: string, index: number) {
-        this.formContractPopup.isUpdate = true;
-        this.formContractPopup.partnerId = this.partner.id;
-        this.formContractPopup.selectedContract.id = id;
-        this.indexlstContract = index;
-        if (this.formContractPopup.selectedContract.id !== SystemConstants.EMPTY_GUID && this.formContractPopup.selectedContract.id !== "") {
-            this.formContractPopup.getFileContract();
-            this._catalogueRepo.getDetailContract(this.formContractPopup.selectedContract.id)
-                .subscribe(
-                    (res: Contract) => {
-                        this.selectedContract = res;
-                        this.formContractPopup.idContract = this.selectedContract.id;
-                        this.formContractPopup.selectedContract = res;
-                        this.formContractPopup.pachValueToFormContract();
-                        this.formContractPopup.show();
-                    }
-                );
-        } else {
-            if (this.contracts.length > 0) {
-                this.formContractPopup.selectedContract = this.contracts[this.indexlstContract];
-                this.formContractPopup.indexDetailContract = this.indexlstContract;
-                this.formContractPopup.fileList = this.formContractPopup.selectedContract.fileList;
-            }
-            this.formContractPopup.pachValueToFormContract();
-            this.formContractPopup.show();
-        }
-
-    }
-
-    showConfirmDeleteContract(contract: Contract, index: number) {
-        this.selectedContract = contract;
-        this.indexToRemove = index;
-        if (this.selectedContract.id === SystemConstants.EMPTY_GUID) {
-            this.contracts = [...this.contracts.slice(0, index), ...this.contracts.slice(index + 1)];
-        } else {
-            this.confirmDeleteContract.show();
-        }
-    }
-
-    onDeleteContract() {
-        if (this.contracts.length === 1) {
-            this._toastService.error('Contract must have one row!');
-            this.confirmDeleteContract.hide();
-            return;
-        }
-        this.confirmDeleteContract.hide();
-        this._catalogueRepo.deleteContract(this.selectedContract.id, this.partner.id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        this.contracts.splice(this.indexToRemove, 1);
-                    } else {
-                        this._toastService.error(res.message);
-                    }
-                }
-            );
     }
 
 

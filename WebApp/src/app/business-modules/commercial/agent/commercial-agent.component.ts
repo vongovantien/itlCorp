@@ -73,7 +73,6 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         };
         this.dataSearch = { All: '' };
         this.dataSearch.partnerType = 'Agent';
-
         this.getPartners();
 
     }

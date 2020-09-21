@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { SortService, DataService } from '@services';
 import { ConfirmPopupComponent } from '@common';
-import { timeoutD } from '@decorators';
+import { delayTime } from '@decorators';
 import { ChargeOfAccountingManagementModel } from '@models';
 
 import { AppList } from 'src/app/app.list';
@@ -239,7 +239,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
         });
     }
 
-    @timeoutD(500)
+    @delayTime(500)
     removeCharge() {
         const chargeToDelete: ChargeOfAccountingManagementModel[] = this.charges.filter(x => x.isSelected);
         if (!!chargeToDelete.length) {

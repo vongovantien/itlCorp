@@ -2348,5 +2348,11 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Preview --
 
+        public List<Guid> GetSurchargeIdBySoaId(int soaId)
+        {
+            var soaNo = Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
+            var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();
+            return surchargeIds;
+        }
     }
 }

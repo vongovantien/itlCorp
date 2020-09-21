@@ -25,7 +25,7 @@ import { AccountingManagementFormSearchVatVoucherComponent } from './components/
 
 import { reducers } from './store';
 import { AccountingManagementDetailVatInvoiceComponent } from './vat/detail/accounting-detail-vat-invoice.component';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { AccountingDetailCdNoteComponent } from './components/popup/detail-cd-note/detail-cd-note.component';
 import { AccountingManagementCreateVoucherComponent } from './voucher/create/accounting-create-voucher.component';
 import { AccountingManagementFormCreateVoucherComponent } from './components/form-create-voucher/form-create-voucher.component';

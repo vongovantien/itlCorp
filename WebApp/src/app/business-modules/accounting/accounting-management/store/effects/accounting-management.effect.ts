@@ -27,6 +27,7 @@ export class AccountingManagementEffects {
                 ({
                     partnerId: payload.partnerId,
                     service: (!!payload.service && payload.service.split(";").length > 1) ? payload.service.split(";")[0] : payload.service,
+                    // *lấy service của charge đầu tiên theo partner
                     office: this.getOfficeByCurrentUser()
                 })
             ),

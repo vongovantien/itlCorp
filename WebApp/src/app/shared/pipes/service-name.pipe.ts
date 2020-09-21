@@ -22,6 +22,9 @@ export class ServiceNamePipe implements PipeTransform {
             [ChargeConstants.SLI_CODE, [ChargeConstants.SLI_DES]],
             [ChargeConstants.CL_CODE, [ChargeConstants.CL_DES]],
             [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
+            [ChargeConstants.SCE_CODE, [ChargeConstants.SCE_DES]],
+            [ChargeConstants.SCI_CODE, [ChargeConstants.SCI_DES]],
+
         ]).get(type)[0];
     }
 }

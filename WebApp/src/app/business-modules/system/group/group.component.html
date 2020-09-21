@@ -4,7 +4,7 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                 [routerLink]="'/home/system/group/new'">
                 <span>
                     <i class="la la-plus"></i>
@@ -13,7 +13,7 @@
                     </span>
                 </span>
             </button>
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase">
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase">
                 <span>
                     <i class="la la-upload"></i>
                     <span>
@@ -44,12 +44,12 @@
                                     <td class="table-actions-col">
                                         <div class="table-actions" style="width: 70px">
                                             <button type="button"
-                                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
                                                 title="Edit unit" [routerLink]="group.id">
                                                 <i class="la la-edit"></i>
                                             </button>
                                             <button type="button"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                 [disabled]="group.active" title="Remove unit"
                                                 (click)="confirmDelete(group)">
                                                 <i class="la la-trash"></i>

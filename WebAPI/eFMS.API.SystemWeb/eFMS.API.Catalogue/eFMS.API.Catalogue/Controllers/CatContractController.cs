@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.Authorize;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
@@ -13,11 +15,15 @@ using eFMS.API.Catalogue.Models;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
+
 namespace eFMS.API.Catalogue.Controllers
 {
     [ApiController]
@@ -29,14 +35,16 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICatContractService catContractService;
         private readonly ICatPartnerService partnerService;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private readonly IMapper mapper;
-        public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper)
+        public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catContractService = service;
             mapper = iMapper;
             partnerService = partnerSv;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -358,9 +366,9 @@ namespace eFMS.API.Catalogue.Controllers
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid id,string partnerId)
+        public IActionResult ActiveInactiveContract(Guid id,string partnerId,[FromBody]SalesmanCreditModel credit)
         {
-            var hs = catContractService.ActiveInActiveContract(id, partnerId);
+            var hs = catContractService.ActiveInActiveContract(id, partnerId,credit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -369,5 +377,127 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
+
+
+        /// <summary>
+        /// download file excel from server
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = Templates.CatContract.ExelImportFileName + Templates.ExelImportEx;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+            }
+        }
+
+        /// <summary>
+        /// import list partner
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public IActionResult Import([FromBody] List<CatContractImportModel> data)
+        {
+            var hs = catContractService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// read data from file excel
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFile")]
+        public IActionResult UploadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                DateTime temp;
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+                List<CatContractImportModel> list = new List<CatContractImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    string dateEffect = worksheet.Cells[row, 7].Value?.ToString().Trim();
+                    DateTime? dateToPase = null;
+                    if (DateTime.TryParse(dateEffect, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPase = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        if(dateEffect != null) {
+                            dateToPase = DateTime.Parse(dateEffect, culture);
+                        }
+                    }
+
+                    string dateExpired = worksheet.Cells[row, 8].Value?.ToString().Trim();
+                    DateTime? dateToPaseExpired = null;
+                    if (DateTime.TryParse(dateExpired, out temp))
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        dateToPaseExpired = DateTime.Parse(temp.ToString("dd/MM/yyyy"), culture);
+                    }
+                    else
+                    {
+                        CultureInfo culture = new CultureInfo("es-ES");
+                        if(dateExpired != null)
+                        {
+                            dateToPaseExpired = DateTime.Parse(dateExpired, culture);
+                        }
+                    }
+
+
+                    var contract = new CatContractImportModel
+                    {
+                        IsValid = true,
+                        CustomerId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        ContractNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        ContractType = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        SaleService = worksheet.Cells[row, 4].Value?.ToString().Trim(), 
+                        Company = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        Office  = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
+                        ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
+                        PaymentMethod = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        Vas = worksheet.Cells[row, 10].Value?.ToString().Trim(), 
+                        Salesman = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        PaymentTermTrialDay = worksheet.Cells[row, 12].Value?.ToString().Trim(),
+                        CreditLimited =  worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        CreditLimitedRated = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 15].Value?.ToString().Trim()
+                    };
+                    list.Add(contract);
+                }
+                var data = catContractService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
     }
 }

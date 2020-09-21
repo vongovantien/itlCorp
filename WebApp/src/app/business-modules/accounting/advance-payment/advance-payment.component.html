@@ -18,26 +18,26 @@
                                 <div class="c-button-actions">
                                     <button (click)="showPopupUpdateVoucher()"
                                         *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase">
+                                        class="btn btn-success m-btn--icon m-btn--uppercase">
                                         <span>
                                             <i class="la la-plus"></i>
                                             <span>
-                                                Update Payment Voucher
+                                                Update Voucher
                                             </span>
                                         </span>
                                     </button>
                                     <button *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                        type="button" class="btn btn-danger m-btn--icon m-btn--uppercase"
                                         (click)="removeSelectedVoucher()">
                                         <span>
                                             <i class="la la-trash"></i>
                                             <span>
-                                                Remove
+                                                Remove Voucher
                                             </span>
                                         </span>
                                     </button>
                                     <button *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'"
-                                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+                                        class="btn btn-brand m-btn--icon m-btn--uppercase"
                                         routerLink="/home/accounting/advance-payment/import-voucher">
                                         <span>
                                             <i class="la la-upload"></i>
@@ -84,15 +84,14 @@
 
                                                     <button
                                                         (click)="getRequestAdvancePaymentGroup(advancePayment.advanceNo, i)"
-                                                        class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only collapsed"
+                                                        class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         [attr.data-target]="'#collapse' + i" data-toggle="collapse"
                                                         title="Collapse" type="button">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
                                                     <ng-container
                                                         *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                        <button
-                                                            class="btn btn-sm m-btn--square m-btn--icon m-btn--icon-only"
+                                                        <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
                                                             title="Delete advance payment"
                                                             (click)="prepareDeleteAdvance(advancePayment)">
                                                             <i class="la la-trash text-danger"></i>
@@ -106,7 +105,7 @@
                                             </td>
                                             <td>{{advancePayment.amount | number: '.0-3'}}</td>
                                             <td>{{advancePayment.advanceCurrency}}</td>
-                                            <td>{{advancePayment.requesterName}}</td>
+                                            <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
                                             <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
@@ -136,12 +135,17 @@
                                                 </ng-container>
                                                 <ng-template #empty>-</ng-template>
                                             </td>
-                                            <td>{{advancePayment.paymentMethodName}}</td>
+                                            <td [ngSwitch]="advancePayment.paymentMethod">
+                                                <div *ngSwitchCase="'Cash'" class="text-primary">
+                                                    {{advancePayment.paymentMethodName}}
+                                                </div>
+                                                <div *ngSwitchDefault class="text-info">
+                                                    {{advancePayment.paymentMethodName}}
+                                                </div>
+                                            </td>
                                             <td>{{advancePayment.advanceNote}}</td>
                                             <td>{{advancePayment.voucherNo}}</td>
                                             <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
-
-
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
                                             [parentId]="'#adv-payment-list-table'">

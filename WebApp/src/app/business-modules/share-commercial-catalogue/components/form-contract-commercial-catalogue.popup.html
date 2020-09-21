@@ -129,7 +129,7 @@
                         <div class="col-lg-4">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && contractType.invalid}">
-                                <label required>Contract Type</label>
+                                <label required>Agreement Type</label>
                                 <ng-select #ct [items]="contractTypes" [allowClear]="true"
                                     (opened)="closeOtherSelects(ct)" formControlName="contractType"
                                     placeholder="Please select">
@@ -142,8 +142,9 @@
                                 <label required>Sale Service</label>
                                 <div class="pos-rel">
                                     <ng-select #sv [items]="serviceTypes" (selected)="selectedService($event)"
-                                        [allowClear]="true" [active]="activeServices" (opened)="closeOtherSelects(sv)"
-                                        formControlName="saleService" [multiple]="true" placeholder="Please select">
+                                        [disabled]="type === 'Agent'" [allowClear]="true" [active]="activeServices"
+                                        (opened)="closeOtherSelects(sv)" formControlName="saleService" [multiple]="true"
+                                        placeholder="Please select">
                                     </ng-select>
                                     <combo-grid-icon
                                         *ngIf="!saleService.value || (!!saleService.value && !saleService.value.length)">
@@ -158,8 +159,8 @@
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <ng-select #pm [items]="paymentMethods" [allowClear]="true"
-                                    (opened)="closeOtherSelects(pm)" formControlName="paymentMethod"
-                                    placeholder="Please select">
+                                    [disabled]="type === 'Agent'" (opened)="closeOtherSelects(pm)"
+                                    formControlName="paymentMethod" placeholder="Please select">
                                 </ng-select>
                             </div>
                         </div>
@@ -176,7 +177,7 @@
                             <div class="form-group">
                                 <label>VAS</label>
                                 <div class="pos-rel">
-                                    <ng-select #vas [items]="vaslst" [allowClear]="true"
+                                    <ng-select #vas [items]="vaslst" [allowClear]="true" [disabled]="type === 'Agent'"
                                         (selected)="selectedVas($event)" (opened)="closeOtherSelects(vas)"
                                         [active]="activeVas" [multiple]="true" formControlName="vas"
                                         placeholder="Please select">
@@ -275,8 +276,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Credit Limit</label>
-                                        <input type="number" min="0" class="form-control" formControlName="creditLimit"
-                                            numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                        <input type="number" class="form-control" formControlName="creditLimit">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -291,7 +291,7 @@
                             <ng-container *ngIf="isUpdate">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <label>Credit Amount</label>
+                                        <label>Debit Amount</label>
                                         <input min="0" type="number" disabled class="form-control"
                                             formControlName="creditAmount">
                                     </div>
@@ -348,7 +348,7 @@
                                     <input style="display:none" type="file" #file (change)="handleFileInput($event)">
                                     <div class="form-group ">
                                         <button (click)="file.click()" type="button"
-                                            class=" btn btn-success m-btn--square m-btn--icon m-btn--uppercase margin-right-10">
+                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
                                             <span>
                                                 <i class="la la-plus"></i>
                                                 <span>
@@ -394,8 +394,7 @@
             </div>
             <div class="modal-footer m--align-center">
                 <ng-container *ngIf="openOnPartner === false">
-                    <button (click)="onSubmit()"
-                        class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                    <button (click)="onSubmit()" class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <i class="la la-save"></i>
                             <span> Save </span>
@@ -411,14 +410,14 @@
                     </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"
                         *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <span> Active </span>
                         </span>
                     </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"
                         *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                        class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
+                        class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>
                             <span> Inactive </span>
                         </span>
@@ -431,3 +430,6 @@
         </div>
     </div>
 </div>
+<popup-salesman-credit-limit (onRequest)="onSalesmanCreditRequest($event)">
+
+</popup-salesman-credit-limit>

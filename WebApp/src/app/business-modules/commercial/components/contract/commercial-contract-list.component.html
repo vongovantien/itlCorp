@@ -45,17 +45,16 @@
                     <tbody>
                         <ng-container *ngIf="!!contracts.length">
                             <tr *ngFor="let item of contracts | filter : keyword :['username', 'contractNo',
-                             'contractType', 'saleService', 'officeNameAbbr', 'companyNameAbbr'] ; let i = index;">
+                             'contractType', 'saleService', 'officeNameEn', 'companyNameAbbr'] ; let i = index;">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <button (click)="getDetailContract(item.id,i)"
-                                            class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only"
-                                            title="Edit">
+                                            class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                             <i class="la la-edit"></i>
                                         </button>
                                         <ng-container *ngIf="!item.active && isActiveNewContract">
                                             <button (click)="showConfirmDelete(item,i)"
-                                                class="btn btn-danger btn-sm m-btn--square m-btn--icon m-btn--icon-only">
+                                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </ng-container>

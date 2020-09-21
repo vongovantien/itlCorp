@@ -13,6 +13,8 @@ export class InfoPopupComponent extends PopupBase {
     @Input() body: string = 'Default Info Popup';
     @Input() isShowButton: boolean = true;
     @Input() label: string = 'Ok';
+    @Input() align: CommonType.DIRECTION = 'center';
+
     constructor() {
         super();
     }

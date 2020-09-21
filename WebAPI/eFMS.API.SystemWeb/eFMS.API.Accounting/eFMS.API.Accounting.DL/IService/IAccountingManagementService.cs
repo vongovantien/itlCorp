@@ -30,6 +30,6 @@ namespace eFMS.API.Accounting.DL.IService
         ResultHandle ImportVatInvoice(List<AcctMngtVatInvoiceImportModel> list);
         int CheckDetailPermission(Guid id);
         CatContractInvoiceModel GetContractForInvoice(AccMngtContractInvoiceCriteria model);
-
+        List<Guid> GetSurchargeIdByAcctMngtId(Guid? acctMngt);
     }
 }

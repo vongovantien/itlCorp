@@ -1718,6 +1718,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
                 
 
                 entity.Property(e => e.PaySoano)
@@ -1770,6 +1771,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Total).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.TransactionType).HasMaxLength(10);
                 
 
                 entity.Property(e => e.Type)

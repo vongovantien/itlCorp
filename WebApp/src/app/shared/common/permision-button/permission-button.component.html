@@ -1,6 +1,6 @@
 <ng-container [ngSwitch]="type">
     <ng-container *ngSwitchCase="'import'">
-        <button type="button" NoDbClick class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-brand  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.import === true" (click)="onClicked($event)">
             <span NoDbClick>
                 <i class="la la-upload"></i>
@@ -11,7 +11,7 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'export'">
-        <button type="button" NoDbClick class="btn btn-danger  m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-danger   m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.export === true" (click)="onClicked($event)">
             <span>
                 <i class="la la-download"></i>
@@ -22,7 +22,7 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'save'">
-        <button type="button" NoDbClick class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-brand  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.write !== 'None'" (click)="onClicked($event)">
             <span>
                 <i class="la la-save"></i>
@@ -33,7 +33,7 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'save-and-send'">
-        <button type="button" NoDbClick class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-success  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.write !== 'None'" (click)="onClicked($event)">
             <span>
                 <i class="la la-download"></i>
@@ -44,25 +44,25 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'detail'">
-        <button type="button" NoDbClick class="btn btn-success m-btn--square m-btn--icon m-btn--icon-only"
+        <button type="button" NoDbClick class="btn btn-success  m-btn--icon m-btn--icon-only"
             *ngIf="(menuPermission | async)?.detail !== 'None'" (click)="onClicked($event)">
             <i class="la la-edit"></i>
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'copy'">
-        <button type="button" NoDbClick class="btn btn-success m-btn--square m-btn--icon m-btn--icon-only"
+        <button type="button" NoDbClick class="btn btn-success  m-btn--icon m-btn--icon-only"
             *ngIf="(menuPermission | async)?.detail !== 'None'" (click)="onClicked($event)">
             <i class="la la-copy"></i>
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'delete'">
-        <button type="button" NoDbClick class="btn btn-danger m-btn--square m-btn--icon m-btn--icon-only"
+        <button type="button" NoDbClick class="btn btn-danger  m-btn--icon m-btn--icon-only"
             *ngIf="(menuPermission | async)?.delete !== 'None'" (click)="onClicked($event)">
             <i class="la la-trash"></i>
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'add'">
-        <button type="button" NoDbClick class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-success  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
             <span>
                 <i class="la la-plus"></i>
@@ -73,7 +73,7 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchDefault>
-        <button type="button" NoDbClick class="btn btn-{{class}} m-btn--square m-btn--icon m-btn--uppercase"
+        <button type="button" NoDbClick class="btn btn-{{class}}  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
             <span>
                 <i class="{{icon}}"></i>

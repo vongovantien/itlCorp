@@ -10,6 +10,7 @@ import { formatDate } from "@angular/common";
 import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
+import { ReportInterface } from "src/app/shared/interfaces/report-interface";
 
 @Component({
     selector: 'sale-report-form-search',

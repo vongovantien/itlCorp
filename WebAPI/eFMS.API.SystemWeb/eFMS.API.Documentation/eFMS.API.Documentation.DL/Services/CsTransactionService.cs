@@ -1230,7 +1230,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySEC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            return null;
+            //Sử dụng lại của service Sea FCL Export
+            var result = QuerySEF(criteria, listSearch);
+            return result;
         }
 
         /// <summary>
@@ -1241,7 +1243,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private IQueryable<CsTransactionModel> QuerySIC(CsTransactionCriteria criteria, IQueryable<CsTransactionModel> listSearch)
         {
-            return null;
+            //Sử dụng lại của service Sea FCL Import
+            var result = QuerySIF(criteria, listSearch);
+            return result;
         }
 
         /// <summary>
@@ -1815,7 +1819,7 @@ namespace eFMS.API.Documentation.DL.Services
         public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
         {
             IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId == null);
-            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE")
+            if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE" && model.TransactionType != "SCE")
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
 
             var transaction = GetDefaultJob(model);

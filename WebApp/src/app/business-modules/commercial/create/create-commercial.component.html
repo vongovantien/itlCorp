@@ -27,3 +27,5 @@
 
 
 <info-popup #taxCodeInfo [body]="invalidTaxCode"></info-popup>
+<confirm-popup #internalReferenceConfirmPopup (onSubmit)="onFocusInternalReference()" [body]="invalidTaxCode"
+    [labelConfirm]="'Ok'" [labelCancel]="'Cancel'" [align]="'left'"></confirm-popup>

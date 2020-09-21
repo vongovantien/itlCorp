@@ -35,8 +35,7 @@
                         <ng-container *ngIf="!!data && !data.isLocked">
                             <ng-container *ngIf="!!data && data.permission.allowAssignStage">
                                 <div class="col">
-                                    <button type="button"
-                                        class="btn btn-primary m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-primary  m-btn--icon m-btn--uppercase"
                                         (click)="openPopUpAssignStage()">
                                         <span>
                                             <i class="la la-plus"></i>
@@ -45,8 +44,7 @@
                                             </span>
                                         </span>
                                     </button>
-                                    <button type="button"
-                                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                    <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                                         (click)="openPopUpCreateStage()">
                                         <span>
                                             <i class="la la-plus"></i>
@@ -74,14 +72,14 @@
                         <!-- <td class="table-actions-col no-sorting">
                             <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                 [state]="!!data && data.isLocked"
-                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
                         </td> -->
                         <td class="table-actions-col no-sorting" style="min-width: 0">
                             <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                 [state]="!!data && data.isLocked"
-                                class="btn btn-success btn-sm m-btn--square m-btn--icon m-btn--icon-only" title="Edit">
+                                class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                 <i class="la la-edit"></i>
                             </button>
                         </td>

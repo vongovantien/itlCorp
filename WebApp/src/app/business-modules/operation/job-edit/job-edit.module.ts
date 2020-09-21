@@ -7,7 +7,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 import { NgxCurrencyModule } from 'ngx-currency';
-import { TabsModule, ModalModule, PaginationModule } from 'ngx-bootstrap';
+
+
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
@@ -17,10 +21,11 @@ import { JobEditShareModule } from './job-edit-share.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
-        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "", serviceId: ChargeConstants.CL_CODE }
+        path: ":id", component: OpsModuleBillingJobEditComponent, data: { name: "", serviceId: ChargeConstants.CL_CODE }, canDeactivate: [DeactivateGuardService]
     },
 
 ];

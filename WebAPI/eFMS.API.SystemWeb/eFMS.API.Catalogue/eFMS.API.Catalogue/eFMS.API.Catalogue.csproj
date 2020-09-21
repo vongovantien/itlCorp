@@ -68,6 +68,9 @@
     <Reference Include="eFMS.API.Infrastructure">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="eFMS.API.Provider">
+      <HintPath>..\..\..\eFMS.API.Common\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+    </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
     </Reference>
@@ -112,6 +115,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Files\CountryImportTemplate.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\CustomerContractImportTemplate.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\CommercialCustomerImportTemplate.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Files\DistrictImportTemplate.xlsx">

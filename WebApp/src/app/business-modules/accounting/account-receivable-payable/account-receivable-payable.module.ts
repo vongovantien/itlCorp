@@ -9,23 +9,30 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SelectModule } from 'ng2-select';
 
-import { AccountReceivePayableFormSearchComponent } from './components/form-search/form-search-account-receivable-payable.component';
+import { AccountPaymentFormSearchComponent } from './components/form-search/account-payment/form-search-account-payment.component';
 import { AccountReceivablePayableComponent } from './account-receivable-payable.component';
-import { AccountReceivablePayableListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-receivable-payable.component';
-import { AccountReceivablePayableListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-receivable-payable.component';
+
 import { SharedModule } from 'src/app/shared/shared.module';
-import { AccountReceivablePayableUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
+import { AccountPaymentUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
 import { PaymentImportComponent } from './components/payment-import/payment-import.component';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { AccountReceivablePayableImportOBHPaymentComponent } from './components/import-obh/import-obh-account-receivable-payable.component';
+
+
+import { AccountPaymentListInvoicePaymentComponent } from './components/list-invoice-payment/list-invoice-account-payment.component';
+import { AccountPaymentListOBHPaymentComponent } from './components/list-obh-payment/list-obh-account-payment.component';
+
+
+
 const routing: Routes = [
     {
         path: "",
         data: { name: "", title: 'eFMS Receivable Payable' },
         children: [
             {
-                path: '', component: AccountReceivablePayableComponent
+                path: '', component: AccountReceivablePayableComponent,
+                data: { name: 'Account Payment' }
             },
             {
                 path: 'payment-import', component: PaymentImportComponent, data: { name: "Import" }
@@ -33,20 +40,25 @@ const routing: Routes = [
             {
                 path: 'import-obh', component: AccountReceivablePayableImportOBHPaymentComponent, data: { name: "Import OBH" }
             },
+            {
+                path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
+                data: { name: 'A.R' }
+            }
         ]
-    }
+    },
 ];
 
 
 @NgModule({
     declarations: [
-        AccountReceivePayableFormSearchComponent,
+        AccountPaymentFormSearchComponent,
         AccountReceivablePayableComponent,
-        AccountReceivablePayableListInvoicePaymentComponent,
-        AccountReceivablePayableListOBHPaymentComponent,
-        AccountReceivablePayableUpdateExtendDayPopupComponent,
+        AccountPaymentListInvoicePaymentComponent,
+        AccountPaymentListOBHPaymentComponent,
+        AccountPaymentUpdateExtendDayPopupComponent,
         PaymentImportComponent,
-        AccountReceivablePayableImportOBHPaymentComponent
+        AccountReceivablePayableImportOBHPaymentComponent,
+
     ],
     imports: [
         CommonModule,
@@ -59,7 +71,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         NgxDaterangepickerMd,
         SelectModule,
-        PerfectScrollbarModule
+        PerfectScrollbarModule,
     ],
     exports: [],
     providers: [],

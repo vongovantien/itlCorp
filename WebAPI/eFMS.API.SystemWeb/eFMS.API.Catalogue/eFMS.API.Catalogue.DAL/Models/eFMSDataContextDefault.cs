@@ -19,6 +19,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatChargeDefaultAccount> CatChargeDefaultAccount { get; set; }
         public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
+        public virtual DbSet<CatChargeIncoterm> CatChargeIncoterm { get; set; }
         public virtual DbSet<CatChartOfAccounts> CatChartOfAccounts { get; set; }
         public virtual DbSet<CatCommodity> CatCommodity { get; set; }
         public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
@@ -28,6 +29,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatCurrency> CatCurrency { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
+        public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CatPartnerCharge> CatPartnerCharge { get; set; }
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
@@ -234,6 +236,39 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatChargeIncoterm>(entity =>
+            {
+                entity.ToTable("catChargeIncoterm");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.Currency).HasMaxLength(50);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.FeeType).HasMaxLength(50);
+
+                entity.Property(e => e.IncotermId).HasColumnName("IncotermID");
+
+                entity.Property(e => e.QuantityType).HasMaxLength(50);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
@@ -652,6 +687,51 @@ namespace eFMS.API.Catalogue.Service.Models
                     .WithMany(p => p.CatDepartment)
                     .HasForeignKey(d => d.BranchId)
                     .HasConstraintName("FK_catDepartment_sysBranch");
+            });
+
+            modelBuilder.Entity<CatIncoterm>(entity =>
+            {
+                entity.ToTable("catIncoterm");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Code).HasMaxLength(50);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DescriptionEn)
+                    .HasColumnName("DescriptionEN")
+                    .HasMaxLength(2000);
+
+                entity.Property(e => e.DescriptionLocal).HasMaxLength(2000);
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(150);
+
+                entity.Property(e => e.NameLocal).HasMaxLength(150);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Service).HasMaxLength(50);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatPartner>(entity =>

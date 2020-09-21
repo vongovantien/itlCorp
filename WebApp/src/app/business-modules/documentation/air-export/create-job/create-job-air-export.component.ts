@@ -6,10 +6,10 @@ import { Store } from '@ngrx/store';
 import { AbstractControl } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { CsTransaction } from 'src/app/shared/models';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { InfoPopupComponent } from '@common';
+import { DocumentationRepo } from '@repositories';
+import { CsTransaction } from '@models';
+import { CommonEnum } from '@enums';
 import {
     ShareBusinessImportJobDetailPopupComponent,
     ShareBusinessFormCreateAirComponent
@@ -31,7 +31,7 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
     @ViewChild(ShareBusinessImportJobDetailPopupComponent, { static: true }) formImportJobDetailPopup: ShareBusinessImportJobDetailPopupComponent;
 
     isImport: boolean = false;
-    selectedJob: any = {}; // TODO model.
+    selectedJob: CsTransaction;
 
     constructor(
         protected _toastService: ToastrService,

@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { TabsModule, CollapseModule, PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+
 import { SelectModule } from 'ng2-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -19,6 +22,7 @@ import { SeaFclExportShippingInstructionComponent } from './detail-job/shipping-
 import { SeaFclExportManifestComponent } from './detail-job/manifest/sea-fcl-export-manifest.component';
 import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 import { ChargeConstants } from 'src/constants/charge.const';
+import { DeactivateGuardService } from '@core';
 
 const routing: Routes = [
     {
@@ -35,7 +39,7 @@ const routing: Routes = [
         data: { transactionType: CommonEnum.TransactionTypeEnum.SeaFCLExport, name: "Job Detail" },
         children: [
             {
-                path: '', component: SeaFCLExportDetailJobComponent, data: { name: "" }
+                path: '', component: SeaFCLExportDetailJobComponent, data: { name: "" }, canDeactivate: [DeactivateGuardService]
             },
             {
                 path: 'hbl', loadChildren: () => import('./detail-job/hbl/sea-fcl-export-hbl.module').then(m => m.SeaFCLExportHBLModule),

@@ -38,7 +38,10 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccAccountingPaymentService accountingPaymentService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        
+        private readonly IAccountingManagementService accountingManagementService;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IAcctSOAService acctSOAService;
+
 
         /// <summary>
         /// constructor
@@ -46,14 +49,22 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="paymentService"></param>
         /// <param name="hostingEnvironment"></param>
+        /// <param name="acctManagementService"></param>
+        /// <param name="accountReceivableService"></param>
+        /// <param name="soaServiceService"></param>
         public AccountingPaymentController(IStringLocalizer<LanguageSub> localizer,
             IAccAccountingPaymentService paymentService,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IAccountingManagementService acctManagementService,
+            IAccAccountReceivableService accountReceivableService,
+            IAcctSOAService soaServiceService)
         {
             stringLocalizer = localizer;
             accountingPaymentService = paymentService;
             _hostingEnvironment = hostingEnvironment;
-            
+            accountingManagementService = acctManagementService;
+            accAccountReceivableService = accountReceivableService;
+            acctSOAService = soaServiceService;
         }
         
         /// <summary>
@@ -303,6 +314,20 @@ namespace eFMS.API.Accounting.Controllers
         {
             var hs = accountingPaymentService.ImportInvoicePayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+
+            if (hs.Success)
+            {
+                foreach (var item in list) {
+                    var paymentInvoiceIds = accountingPaymentService.Get(x => x.Type == "INVOICE" && x.RefId == item.RefId).Select(s => s.RefId);
+                    foreach (var acctMngtId in paymentInvoiceIds)
+                    {
+                        var surchargeIds = accountingManagementService.GetSurchargeIdByAcctMngtId(Guid.Parse(acctMngtId));
+                        // Tính công nợ
+                        CalculatorReceivableAcctPayment(surchargeIds);
+                    }
+                }
+            }
+
             if (!hs.Success)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
@@ -320,6 +345,21 @@ namespace eFMS.API.Accounting.Controllers
         {
             var hs = accountingPaymentService.ImportOBHPayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+
+            if (hs.Success)
+            {
+                foreach (var item in list)
+                {
+                    var paymentSoaIds = accountingPaymentService.Get(x => x.Type == "OBH" && x.RefId == item.RefId).Select(s => s.RefId);
+                    foreach (var soaId in paymentSoaIds)
+                    {
+                        var surchargeIds = acctSOAService.GetSurchargeIdBySoaId(Int32.Parse(soaId));
+                        // Tính công nợ
+                        CalculatorReceivableAcctPayment(surchargeIds);
+                    }
+                }
+            }
+
             if (!hs.Success)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Message.ToString() });
@@ -359,10 +399,34 @@ namespace eFMS.API.Accounting.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(Guid id)
         {
+            var acctPayments = accountingPaymentService.Get(x => x.Id == id);
+            var surchargeIds = new List<Guid>();
+            foreach (var acctPayment in acctPayments)
+            {
+                if (acctPayment != null && acctPayment.Type == "INVOICE")
+                {
+                    surchargeIds = accountingManagementService.GetSurchargeIdByAcctMngtId(Guid.Parse(acctPayment.RefId));
+                    
+                }
+                if (acctPayment != null && acctPayment.Type == "OBH")
+                {
+                    surchargeIds = acctSOAService.GetSurchargeIdBySoaId(Int32.Parse(acctPayment.RefId));                
+                }
+            }
+
             var hs = accountingPaymentService.Delete(id);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                if (surchargeIds.Count > 0)
+                {
+                    // Tính công nợ
+                    CalculatorReceivableAcctPayment(surchargeIds);
+                }
             }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -517,6 +581,23 @@ namespace eFMS.API.Accounting.Controllers
         {
             var data = accountingPaymentService.ExportAccountingPayment(criteria);
             return Ok(data);
+        }
+
+        private void CalculatorReceivableAcctPayment(List<Guid> surchargeIds)
+        {
+            if (surchargeIds != null && surchargeIds.Count > 0)
+            {
+                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
+                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
+                foreach (var surchargeId in surchargeIds)
+                {
+                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
+                    objectReceivable.SurchargeId = surchargeId;
+                    receivableModels.Add(objectReceivable);
+                }
+                calculatorReceivable.ObjectReceivable = receivableModels;
+                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
+            }
         }
     }
 }

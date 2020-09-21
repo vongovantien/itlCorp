@@ -6,8 +6,7 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params, Router } from '@angular/router';
+import { Params, Router, ActivatedRoute } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
 import { ReportPreviewComponent } from 'src/app/shared/common';
@@ -55,7 +54,9 @@ export class SeaLclExportManifestComponent extends AppList {
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private cdRef: ChangeDetectorRef,
-        protected _router: Router
+        protected _router: Router,
+        private _activedRoute: ActivatedRoute
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -80,13 +81,13 @@ export class SeaLclExportManifestComponent extends AppList {
 
     }
     ngAfterViewInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRoute.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId) {
                     this.jobId = param.jobId;
                     this.formManifest.jobId = this.jobId;
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
                     this.getHblList(this.jobId);
                     this.getManifest(this.jobId);
@@ -96,7 +97,8 @@ export class SeaLclExportManifestComponent extends AppList {
             });
     }
     refreshManifest() {
-        this.getManifest(this.jobId);
+        //this.getManifest(this.jobId);
+        this.formManifest.getShipmentDetail();
         this.getHblList(this.jobId);
     }
 
@@ -140,6 +142,10 @@ export class SeaLclExportManifestComponent extends AppList {
                     this.isShowUpdate = true;
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
+                }
+                else {
+                    this.isShowUpdate = false;
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );

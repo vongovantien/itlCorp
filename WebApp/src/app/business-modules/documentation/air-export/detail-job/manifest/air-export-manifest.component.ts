@@ -6,8 +6,7 @@ import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { getParamsRouterState } from 'src/app/store';
-import { Params, Router } from '@angular/router';
+import { Params, Router, ActivatedRoute } from '@angular/router';
 import { SortService } from 'src/app/shared/services';
 import { formatDate } from '@angular/common';
 import { Crystal } from 'src/app/shared/models/report/crystal.model';
@@ -57,7 +56,8 @@ export class AirExportManifestComponent extends AppList {
         private _sortService: SortService,
         private _toastService: ToastrService,
         protected _router: Router,
-        private cdRef: ChangeDetectorRef
+        private cdRef: ChangeDetectorRef,
+        private _activedRouter: ActivatedRoute
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -82,7 +82,7 @@ export class AirExportManifestComponent extends AppList {
     }
 
     ngAfterViewInit() {
-        this._store.select(getParamsRouterState)
+        this._activedRouter.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((param: Params) => {
                 if (param.jobId && isUUID(param.jobId)) {
@@ -112,7 +112,7 @@ export class AirExportManifestComponent extends AppList {
     refreshManifest() {
         //this.getManifest(this.jobId);
 
-        this.formManifest.getShipmentDetail(this.jobId);
+        this.formManifest.getShipmentDetail();
 
         this.getHblList(this.jobId);
     }
@@ -154,7 +154,8 @@ export class AirExportManifestComponent extends AppList {
                     this.manifest = res;
                     this.formManifest.updateDataToForm(this.manifest);
                 } else {
-                    this.formManifest.getShipmentDetail(this.formManifest.jobId);
+                    this.isShowUpdate = false;
+                    this.formManifest.getShipmentDetail();
                 }
             }
         );

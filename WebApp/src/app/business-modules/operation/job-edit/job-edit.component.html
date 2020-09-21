@@ -1,7 +1,7 @@
 <app-sub-header>
     <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
         <ng-container *ngIf="!!opsTransaction && opsTransaction.permission.allowLock">
-            <button type="button" class="btn btn-warning m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+            <button type="button" class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10"
                 (click)="lockShipment()">
                 <span>
                     <i class="la la-lock"></i>
@@ -17,7 +17,7 @@
         <i class="fa fa-lock text-danger fa-3x"></i>
     </span>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onOpePLPrint()">
             <span>
                 <i class="la la-print"></i>
@@ -29,7 +29,7 @@
     </div>
     <ng-container *ngIf="!!opsTransaction && opsTransaction.isLocked === false">
         <div class="c-button-actions">
-            <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+            <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
                 *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate" (click)="saveShipment()"
                 [disabled]="tab !== 'job-edit'">
                 <span>
@@ -41,7 +41,7 @@
             </button>
         </div>
         <div class="c-button-actions" *ngIf="!!opsTransaction && !opsTransaction.isLocked">
-            <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10"
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
                 (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete" title="Shipment was deleted">
                 <span>
                     <i class="la la-trash"></i>
@@ -54,7 +54,7 @@
     </ng-container>
 
 
-    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=confirmCancelJob()></app-default-button>
+    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)=handleCancelForm()></app-default-button>
 
 </app-sub-header>
 
@@ -129,7 +129,7 @@
 
 <pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
 
-<confirm-popup #confirmCancelUpdate (onSubmit)="onCancelUpdateJob()"
+<confirm-popup #confirmCancelUpdate (onSubmit)="confirmCancel()"
     [body]="'Unsaved data will be lost. Are you sure want to leave?'" [labelConfirm]="'Yes'"></confirm-popup>
 
 <confirm-popup *ngIf="!!opsTransaction" #confirmDelete (onSubmit)="onDeleteJob()" [body]="deleteMessage">
@@ -146,4 +146,5 @@
         <span class="no-data-text">No records found</span>
     </div>
 </ng-template>
+
 <info-popup #notAllowUpdate [body]="invalidFormText" [title]="'Cannot Create Job'"></info-popup>

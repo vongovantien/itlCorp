@@ -34,6 +34,8 @@
             this.serviceInstaller3 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstaller4 = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstallerAutoLockShipment = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstallerSendMailOverduePayment = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstallerSendMailExceededCreditLimit = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller1
             // 
@@ -76,6 +78,20 @@
             this.serviceInstallerAutoLockShipment.ServiceName = "AutoLockShipmentService";
             this.serviceInstallerAutoLockShipment.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
+            // serviceInstallerSendMailOverduePayment
+            // 
+            this.serviceInstallerSendMailOverduePayment.Description = "SendMailOverduePaymentService";
+            this.serviceInstallerSendMailOverduePayment.DisplayName = "eFMSWindowService.SendMailOverduePaymentService";
+            this.serviceInstallerSendMailOverduePayment.ServiceName = "SendMailOverduePaymentService";
+            this.serviceInstallerSendMailOverduePayment.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            // 
+            // serviceInstallerSendMailExceededCreditLimit
+            // 
+            this.serviceInstallerSendMailExceededCreditLimit.Description = "SendMailExceededCreditLimitService";
+            this.serviceInstallerSendMailExceededCreditLimit.DisplayName = "eFMSWindowService.SendMailExceededCreditLimitService";
+            this.serviceInstallerSendMailExceededCreditLimit.ServiceName = "SendMailExceededCreditLimitService";
+            this.serviceInstallerSendMailExceededCreditLimit.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
@@ -84,7 +100,9 @@
             this.serviceInstaller2,
             this.serviceInstaller3,
             this.serviceInstaller4,
-            this.serviceInstallerAutoLockShipment});
+            this.serviceInstallerAutoLockShipment,
+            this.serviceInstallerSendMailOverduePayment,
+            this.serviceInstallerSendMailExceededCreditLimit});
 
         }
 
@@ -96,5 +114,7 @@
         private System.ServiceProcess.ServiceInstaller serviceInstaller3;
         private System.ServiceProcess.ServiceInstaller serviceInstaller4;
         private System.ServiceProcess.ServiceInstaller serviceInstallerAutoLockShipment;
+        private System.ServiceProcess.ServiceInstaller serviceInstallerSendMailOverduePayment;
+        private System.ServiceProcess.ServiceInstaller serviceInstallerSendMailExceededCreditLimit;
     }
 }

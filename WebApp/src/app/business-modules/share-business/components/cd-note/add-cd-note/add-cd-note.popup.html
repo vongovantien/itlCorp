@@ -5,7 +5,8 @@
                 <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Create Credit/Debit Note</h5>
                 <ng-template #updateTitle class="modal-title">
                     <h5 class="modal-title">Edit
-                        <b><span class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                        <b><span
+                                class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
                         No: <b class="text-warning">{{CDNote.code}}</b></h5>
                 </ng-template>
 
@@ -27,7 +28,8 @@
                                         (itemSelected)="onSelectDataFormInfo($event)"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200" [placeholder]="'Select subject to partner'">
+                                        [displayFields]="configPartner.displayFields" [height]="200"
+                                        [placeholder]="'Select subject to partner'">
                                     </app-combo-grid-virtual-scroll>
 
                                 </div>
@@ -80,7 +82,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
-                                <button type="button" class="btn btn-danger m-btn--square m-btn--icon m-btn--uppercase"
+                                <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase"
                                     (click)="removeCharge()">
                                     <span>
                                         <i class="la la-trash"></i>
@@ -89,7 +91,7 @@
                                         </span>
                                     </span>
                                 </button>
-                                <button type="button" class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase"
+                                <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                                     data-toggle="modal" [disabled]="(selectedPartner | json) === '{}'"
                                     (click)="openPopupAddCharge()">
                                     <span>
@@ -124,7 +126,7 @@
                                                     <input type="checkbox" (change)="onChangeCheckBoxGrpCharge(charges)"
                                                         value="{{charges}}" [(ngModel)]="charges.isSelected"
                                                         name="{{charges.hwbno}}">
-                                                        HBL No: {{charges.hwbno}}
+                                                    HBL No: {{charges.hwbno}}
                                                     <span></span>
                                                 </label>
                                             </td>
@@ -210,7 +212,7 @@
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase" (click)="saveCDNote()"
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="saveCDNote()"
                     [disabled]="listCharges.length === 0">
                     <span>
                         <i class="la la-save"></i>
@@ -219,8 +221,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-cancel m-btn--square m-btn--icon m-btn--uppercase"
-                    (click)="cancel()">
+                <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="cancel()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>
@@ -246,6 +247,5 @@
 <add-remaining-charge-popup (onAddCharge)="onAddMoreCharge($event)"></add-remaining-charge-popup>
 
 <confirm-popup #confirmCloseAddPopup (onSubmit)="onSubmitConfirmCloseAdd()" [title]="'Alert'"
-    (onCancel)="onCancelConfirmCloseAdd()"
-    [body]="'Do you want to exit without saving?'" [labelCancel]="'No'">
+    (onCancel)="onCancelConfirmCloseAdd()" [body]="'Do you want to exit without saving?'" [labelCancel]="'No'">
 </confirm-popup>

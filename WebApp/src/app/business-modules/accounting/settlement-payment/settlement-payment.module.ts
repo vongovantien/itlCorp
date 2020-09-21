@@ -4,7 +4,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { PaginationModule, AccordionModule, ModalModule, BsDropdownModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { AccordionModule, } from 'ngx-bootstrap/accordion';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';
@@ -28,6 +31,7 @@ import { SettlementTableListChargePopupComponent } from './components/popup/tabl
 import { ShareAccountingModule } from '../share-accouting.module';
 import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { ReportPreviewComponent } from '@common';
+import { SelectModule } from 'ng2-select';
 
 const routing: Routes = [
     {
@@ -96,8 +100,8 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
         BsDropdownModule.forRoot(),
-        ShareAccountingModule
-
+        ShareAccountingModule,
+        SelectModule,
 
     ],
     exports: [],

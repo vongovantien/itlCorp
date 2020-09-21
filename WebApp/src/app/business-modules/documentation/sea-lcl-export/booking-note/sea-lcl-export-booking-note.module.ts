@@ -11,7 +11,7 @@ import { NgxDaterangepickerMd, LocaleConfig } from 'ngx-daterangepicker-material
 import { FroalaEditorModule } from 'angular-froala-wysiwyg';
 import { SelectModule } from 'ng2-select';
 import { SeaLCLExportBookingNoteFormSearchComponent } from './components/form-search-booking-note/form-search-booking-note.component';
-import { PaginationModule } from 'ngx-bootstrap';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 const routing: Routes = [
     {

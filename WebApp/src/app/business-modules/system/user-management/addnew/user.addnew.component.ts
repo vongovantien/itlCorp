@@ -46,7 +46,11 @@ export class UserAddNewComponent extends AppPage {
                 workingStatus: this.formAdd.workingg.value.value,
                 isLdap: this.formAdd.ldap.value,
                 active: this.formAdd.active.value.value,
-                description: this.formAdd.description.value
+                description: this.formAdd.description.value,
+                //
+                creditLimit: this.formAdd.creditLimit.value,
+                creditRate: this.formAdd.creditRate.value,
+
             };
 
             this._systemRepo.addNewUser(body)
@@ -77,4 +81,7 @@ export interface IAddUser {
     isLdap: boolean;
     active: boolean;
     description: string;
+    //
+    creditLimit: number;
+    creditRate: number;
 }

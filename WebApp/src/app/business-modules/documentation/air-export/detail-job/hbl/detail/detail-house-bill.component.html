@@ -4,7 +4,7 @@
             <div class="dropdown m-dropdown m-dropdown--inline">
                 <ng-container *ngIf="(isLocked | async) === false">
                     <button *ngIf="(permissionHblDetail | async)?.allowUpdate"
-                        class="btn btn-success m-btn--square m-btn--icon m-btn--uppercase" (click)="gotoSeparate()">
+                        class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="gotoSeparate()">
                         <span>
                             <i class="la la-plus"></i>
                             <span>

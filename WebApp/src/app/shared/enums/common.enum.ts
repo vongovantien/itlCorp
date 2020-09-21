@@ -127,6 +127,10 @@ export namespace CommonEnum {
 
     }
 
+    export enum JOB_PROFIT_ANALYSIS_TYPE {
+        JOB_PROFIT_ANALYSIS = 'JOB_PROFIT_ANALYSIS'
+    }
+
     export enum ROUND_DIM {
         HALF = '0.5',
         ONE = '1.0',
@@ -149,6 +153,22 @@ export namespace CommonEnum {
         ADVANCE = 2,
         SETTEMENT = 3,
         CHANGESERVICEDATE = 4,
+    }
+
+    export enum FEE_TYPE {
+        HANDLING = "Handling",
+        FREIGHT = "Freight",
+        OTHER = "Other",
+        LOCALCHARGE = "LocalCharge",
+        LOGISTICS = "Logistics",
+        FUEL = "Fuel",
+        TRUCKING = "Trucking",
+    }
+
+    export enum TabTypeAccountReceivableEnum {
+        TrialOrOffical = 1,
+        Guarantee = 2,
+        Other = 3,
     }
 }
 

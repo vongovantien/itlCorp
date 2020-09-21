@@ -3,8 +3,15 @@
         <ng-container *ngFor="let item of breadcrumbs;let i = index">
             <li class="m-nav__item">
                 <a class="m-nav__link pointer" [routerLink]="item.path">
-                    <span class="m-nav__link-text"
-                        [ngClass]="{ 'active-route': i === breadcrumbs.length-1}">{{item.name}}</span>
+                    <ng-container *ngIf="i === 0; else link">
+                        <span class="m-nav__link-text">
+                            <i class="la la-home" style="font-size:17px"></i>
+                        </span>
+                    </ng-container>
+                    <ng-template #link>
+                        <span class="m-nav__link-text"
+                            [ngClass]="{ 'active-route': i === breadcrumbs.length-1}">{{item.name}}</span>
+                    </ng-template>
                 </a>
             </li>
             <li class="m-nav__separator" *ngIf="i !== breadcrumbs.length-1"

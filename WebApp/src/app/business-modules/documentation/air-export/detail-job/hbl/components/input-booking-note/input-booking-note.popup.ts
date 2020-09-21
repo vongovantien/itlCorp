@@ -7,7 +7,7 @@ import { Crystal, CsTransactionDetail } from "@models";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
 import { DomSanitizer } from "@angular/platform-browser";
-import { ModalDirective } from "ngx-bootstrap";
+import { ModalDirective } from "ngx-bootstrap/modal";
 import { environment } from "src/environments/environment";
 
 @Component({
@@ -37,7 +37,7 @@ export class InputBookingNotePopupComponent extends PopupBase {
         private _toastService: ToastrService,
         private _fb: FormBuilder,
         private _progressService: NgProgress,
-        private sanitizer: DomSanitizer, ) {
+        private sanitizer: DomSanitizer,) {
         super();
         this._progressRef = this._progressService.ref();
     }

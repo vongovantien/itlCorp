@@ -32,6 +32,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AcctApproveSettlementModel, AcctApproveSettlement>();
             CreateMap<AcctSettlementPaymentModel, AcctSettlementPayment>();
             CreateMap<AccAccountingManagementModel, AccAccountingManagement>();
+            CreateMap<AccAccountReceivableModel, AccAccountReceivable>();
         }
     }
 }

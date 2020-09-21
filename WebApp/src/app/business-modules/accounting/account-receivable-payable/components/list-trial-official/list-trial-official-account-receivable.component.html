@@ -1,0 +1,92 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div class="m-form">
+
+            <div class="row">
+                <div class="col-lg-12 m--margin-top-20">
+                    <div class="table-wrapper table-scrollable" id="payment-table">
+                        <table class="table table-hover table-brand dataTable table-hover">
+                            <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
+                                <th class="m--w-50 first table-actions-col">
+                                    Action
+                                </th>
+                            </thead>
+                            <tbody>
+                                <ng-container>
+                                    <ng-container
+                                        *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
+                                        <tr class="">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions" style="width: 70px">
+                                                    <app-permission-button type="detail"
+                                                        (click)="viewDetail(item.agreementId)">
+                                                    </app-permission-button>
+                                                </div>
+                                            </td>
+                                            <td><a class="pointer"
+                                                    (click)="viewDetail(item.agreementId)">{{ item.partnerCode }}</a>
+                                            </td>
+                                            <td>{{ item.partnerNameAbbr }} </td>
+                                            <td>{{ item.creditLimited  | number: '.0-3' }}</td>
+                                            <td>{{ item.debitAmount | number: '.0-3' }}</td>
+                                            <td>
+                                                <span
+                                                    [ngClass]="item.debitRate < 70 ? 'text-success' : item.debitRate < 100 ? 'text-warning':'text-danger'">
+                                                    {{ item.debitRate | number: '.0-3'}}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.billingAmount | number: '.0-3' }}
+                                            </td>
+                                            <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
+                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
+                                            <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.over1To15Day | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.over16To30Day | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.over30Day | number: '.0-3' }}
+                                                </span>
+                                            </td>
+                                            <td>{{ item.agreementNo}}</td>
+                                            <td><span [ngClass]="item.agreementType === 'Trial' ? 'text-warning': 
+                                                'text-info'">{{ item.agreementType}}</span></td>
+                                            <td>{{ item.expriedDate | date: 'dd/MM/yyyy'}}</td>
+                                            <td>
+                                                <span [ngClass]="'text-danger'">
+                                                    {{ item.expriedDay }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    [ngClass]="item.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
+                                                    {{ item.agreementStatus }}
+                                                </span>
+                                            </td>
+
+
+                                        </tr>
+
+                                    </ng-container>
+                                </ng-container>
+                                <tr app-table-none-record *ngIf="!trialOfficialList.length">
+                                </tr>
+                                <tr app-table-row-loading *ngIf="isLoading === true"></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                        (onChange)="updatePagingData($event)"></app-pagination>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

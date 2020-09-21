@@ -1,21 +1,21 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-export.component';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
+import { CsTransaction } from '@models';
+import { DocumentationRepo } from '@repositories';
+import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 
-import { combineLatest, of } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize } from 'rxjs/operators';
+import { combineLatest, of, Observable } from 'rxjs';
+import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
-import { CsTransaction } from '@models';
+import { ICanComponentDeactivate } from '@core';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -24,12 +24,14 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
     templateUrl: './detail-job-fcl-export.component.html'
 })
 
-export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit {
+export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate {
 
     @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
     @ViewChild('confirmDeleteJob', { static: false }) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild("duplicateconfirmTemplate", { static: false }) confirmDuplicatePopup: ConfirmPopupComponent;
     @ViewChild("confirmLockShipment", { static: false }) confirmLockPopup: ConfirmPopupComponent;
+    @ViewChild("confirmCancelPopup", { static: false }) confirmCancelPopup: ConfirmPopupComponent;
+
     @ViewChild(SubHeaderComponent, { static: false }) headerComponent: SubHeaderComponent;
     @ViewChild('notAllowDelete', { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent, { static: false }) permissionPopup: Permission403PopupComponent;
@@ -40,8 +42,10 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
     shipmentDetail: CsTransaction;
-    dataReport: any = null;
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, ETA, MBL, Vessel, Voy, POL, POD, Booking No to House Bill?<span>`;
+
+    nextState: RouterStateSnapshot;
+    isCancelFormPopupSuccess: boolean = false;
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
@@ -157,12 +161,15 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                         // * get detail & container list.
                         this._router.navigate([`home/documentation/sea-fcl-export/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                         this.ACTION = 'SHIPMENT';
+
+                        this.isDuplicate = true;
                     } else {
                         this._toastService.error(res.message);
                     }
                 }
             );
     }
+
     saveJob(body: any) {
         this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
@@ -267,30 +274,32 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
-            .subscribe((value: boolean) => {
-                if (value) {
-                    this.deleteJob();
-                } else {
+            .pipe(
+                concatMap((isAllowDelete: boolean) => {
+                    if (isAllowDelete) {
+                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                    }
+                    return of(403);
+                }),
+                concatMap((isValid) => {
+                    if (isValid) {
+                        return of(200);
+                    }
+                    return of(201);
+                })
+            )
+            .subscribe((value: number) => {
+                if (value === 403) {
                     this.permissionPopup.show();
+                    return;
+                }
+                if (value === 200) {
+                    this.confirmDeleteJobPopup.show();
+                    return;
+                } else {
+                    this.canNotDeleteJobPopup.show();
                 }
             });
-    }
-
-    deleteJob() {
-        this._progressRef.start();
-        this._documenRepo.checkMasterBillAllowToDelete(this.jobId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            ).subscribe(
-                (res: any) => {
-                    if (res) {
-                        this.confirmDeleteJobPopup.show();
-                    } else {
-                        this.canNotDeleteJobPopup.show();
-                    }
-                },
-            );
     }
 
     onDeleteJob() {
@@ -388,5 +397,41 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
                     }
                 },
             );
+    }
+
+    handleCancelForm() {
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+        if (isEdited) {
+            this.confirmCancelPopup.show();
+        } else {
+            this.isCancelFormPopupSuccess = true;
+            this.gotoList();
+        }
+    }
+
+    confirmCancel() {
+        this.confirmCancelPopup.hide();
+        this.isCancelFormPopupSuccess = true;
+
+        if (this.nextState) {
+            this._router.navigate([this.nextState.url.toString()]);
+        } else {
+            this.gotoList();
+        }
+    }
+
+    canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
+        this.nextState = nextState; // * Save nextState for Deactivate service.
+
+        if (this.isCancelFormPopupSuccess || this.isDuplicate) {
+            return of(true);
+        }
+        const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
+
+        if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
+            this.confirmCancelPopup.show();
+            return;
+        }
+        return of(!isEdited);
     }
 }
