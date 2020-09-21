@@ -87,8 +87,8 @@ export class CompanyInformationFormAddComponent extends AppForm {
                     Module: 'Company',
                     // Path: `dayladuongdanhinh`
                 },
-                imageUploadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
-                imageManagerLoadURL: `http://${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
+                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
 
             }).on('froalaEditor.contentChanged', (e: any) => {
                 this.photoUrl = e.target.src;
