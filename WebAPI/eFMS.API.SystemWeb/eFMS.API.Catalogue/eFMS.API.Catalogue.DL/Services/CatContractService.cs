@@ -517,7 +517,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.ApiUrl.Value.Url + "/Catalogue";
+            string path = this.webUrl.Value.Url ;
             try
             {
                 var list = new List<SysImage>();

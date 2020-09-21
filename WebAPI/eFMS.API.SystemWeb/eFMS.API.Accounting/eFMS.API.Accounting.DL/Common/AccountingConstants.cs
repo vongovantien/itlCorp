@@ -69,12 +69,29 @@
         public static readonly string PositionManager = "Manager-Leader";
         public static readonly string DeptTypeAccountant = "ACCOUNTANT";
         #region -- CHARGE
+        public static readonly string CHARGE_AIR_FREIGHT_CODE = "SA_A_F_Air";
         public static readonly string CHARGE_AIR_FREIGHT = "Air freight";
+
+        public static readonly string CHARGE_FUEL_SURCHARGE_CODE = "SA_FSC_Air";
         public static readonly string CHARGE_FUEL_SURCHARGE = "Fuel Surcharge";
+
+        public static readonly string CHARGE_WAR_RISK_SURCHARGE_CODE = "SA_WRS_Air";
         public static readonly string CHARGE_WAR_RISK_SURCHARGE = "War risk Surcharge";
+
+        public static readonly string CHARGE_SCREENING_CODE = "SA_SCR_Air";
         public static readonly string CHARGE_SCREENING_FEE = "Screening fee";
 
         public static readonly string CHARGE_AWB_FEE = "Air Waybill fee";
+        public static readonly string CHARGE_AWB_FEE_CODE = "SA_AWB_AIR";
+
+        public static readonly string CHARGE_SA_DAN_AIR_CODE = "SA_DAN_AIR";
+        public static readonly string CHARGE_SA_DAN_AIR_FEE = "Dangerous Fee";
+
+        public static readonly string CHARGE_AMS_FEE = "Automated Manifest System";
+        public static readonly string CHARGE_AMS_FEE_CODE = "SA_AMS_AIR";
+
+        public static readonly string CHARGE_SA_OTH_AIR_CODE = "SA_OTH_AIR";
+        public static readonly string CHARGE_SA_OTH_FEE = "Other Charges";
 
         public static readonly string CHARGE_HANDLING_FEE = "Handling fee";
         #region -- TYPE SOA--
