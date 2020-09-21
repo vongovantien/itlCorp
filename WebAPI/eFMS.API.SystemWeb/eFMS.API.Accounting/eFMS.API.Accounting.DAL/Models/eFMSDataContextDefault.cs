@@ -86,7 +86,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
-                entity.Property(e => e.ContractCurrency).HasMaxLength(10);
+                entity.Property(e => e.ContractCurrency).HasMaxLength(50);
 
                 entity.Property(e => e.ContractId).HasColumnName("ContractID");
 
@@ -1741,6 +1741,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.ObjectBePaid)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaySoano)
                     .HasColumnName("PaySOANo")
