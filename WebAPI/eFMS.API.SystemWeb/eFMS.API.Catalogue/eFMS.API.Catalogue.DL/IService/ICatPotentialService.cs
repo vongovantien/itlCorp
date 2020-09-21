@@ -19,5 +19,7 @@ namespace eFMS.API.Catalogue.DL.IService
         HandleState AddNew(CatPotentialEditModel model);
         HandleState Delete(Guid Id);
         CatPotentialEditModel GetDetail(Guid id);
+
+        IQueryable<CatPotentialModel> QueryExport(CatPotentialCriteria criteria);
     }
 }

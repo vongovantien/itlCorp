@@ -13,6 +13,7 @@ import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Permission403PopupComponent, ConfirmPopupComponent } from '@common';
 import { CommercialFormSearchPotentialCustomerComponent } from './components/form-search/form-search-potential-customer.component';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'app-commercial-potential-customer',
@@ -177,6 +178,15 @@ export class CommercialPotentialCustomerComponent extends AppList implements OnI
     handleChangePotentialPopup(event: any) {
         this.dataSearch = {};
         this.getPotentialCustomerListPaging();
+    }
+    //
+    exportExcel() {
+        this._catalogueRepo.downloadPotentialCustomerListExcel(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'potential-customer-list.xlsx');
+                }
+            );
     }
 
 }
