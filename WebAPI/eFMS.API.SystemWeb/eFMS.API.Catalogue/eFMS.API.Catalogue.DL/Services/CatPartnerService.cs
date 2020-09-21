@@ -1594,7 +1594,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
-                                //&& (x.Active == criteria.Active || criteria.Active == null)
+                                && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel
