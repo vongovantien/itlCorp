@@ -208,7 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                              ExtendDays = x.Key.ExtendDays,
                              ExtendNote = x.Key.ExtendNote,
                              PaidAmount = x.Sum(c => c.PaymentAmount),
-                             UnpaidAmount = x.Sum(c => c.Balance)
+                             UnpaidAmount = x.Sum(c => c.PaymentAmount).Value != 0 ? x.Sum(c => c.Balance) : x.Key.Amount,
                          }).AsQueryable();
             return results;
         }
@@ -378,7 +378,9 @@ namespace eFMS.API.Accounting.DL.Services
                 OverdueDays = (DateTime.Today > x.PaymentDueDate.Value.Date)? (DateTime.Today - x.PaymentDueDate.Value.Date).Days: 0,
                 Status = x.PaymentStatus ?? "Unpaid",
                 ExtendDays = x.PaymentExtendDays,
-                ExtendNote = x.PaymentNote
+                ExtendNote = x.PaymentNote,
+                PaidAmount = x.PaidAmount,
+                UnpaidAmount = x.UnpaidAmount,
             });
             if (results == null) return null;
             switch (criteria.OverDueDays)
