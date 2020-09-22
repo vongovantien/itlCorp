@@ -5,7 +5,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Reference No</label>
-                        <textarea name="" id="" cols="30" rows="6" class="form-control" formControlName="referenceNo"
+                        <textarea name="" id="" cols="30" rows="10" class="form-control" formControlName="referenceNo"
                             placeholder="Reference No"
                             onkeypress="return event.charCode === 13 || event.charCode == 32 || event.charCode == 95 || (event.charCode > 96 && event.charCode < 123) || (event.charCode > 64 && event.charCode < 91) || (event.charCode > 44 && event.charCode < 58)">
                         </textarea>
@@ -29,6 +29,17 @@
                                     <option [ngValue]="null">All</option>
                                     <option *ngFor="let status of statusApprovals; let i = index" [ngValue]="status">
                                         {{status.title}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="">Currency</label>
+                                <select class="form-control" formControlName="currencyId">
+                                    <option [ngValue]="null">All</option>
+                                    <option *ngFor="let currency of (currencies | async)" [ngValue]="currency">
+                                        {{currency.id}}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -62,17 +73,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-4"></div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label for="">Currency</label>
-                        <select class="form-control" formControlName="currencyId">
-                            <option [ngValue]="null">All</option>
-                            <option *ngFor="let currency of (currencies | async)" [ngValue]="currency">{{currency.id}}
-                            </option>
-                        </select>
                     </div>
                 </div>
             </form>

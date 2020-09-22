@@ -12,7 +12,6 @@ import { Router } from '@angular/router';
 import { SystemConstants } from 'src/constants/system.const';
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { formatDate } from '@angular/common';
-import { Observable } from 'rxjs';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
 
@@ -39,8 +38,6 @@ export class AdvancePaymentComponent extends AppList {
     userLogged: User;
 
     advancePaymentIds: string[] = [];
-
-    menuSpecialPermission: Observable<any[]>;
 
     checkAll = false;
     paymentHasStatusDone = false;

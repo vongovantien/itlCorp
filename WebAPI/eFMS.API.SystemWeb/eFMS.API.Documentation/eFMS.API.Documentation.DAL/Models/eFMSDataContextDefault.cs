@@ -66,7 +66,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -706,6 +706,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InternalCode).HasMaxLength(250);
 
                 entity.Property(e => e.InternalReferenceNo)
                     .HasMaxLength(50)
@@ -1394,6 +1396,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OtherTerms).HasMaxLength(250);
 
+                entity.Property(e => e.PackageQty).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PaymentTerm)
                     .HasMaxLength(20)
                     .IsUnicode(false);
@@ -1646,6 +1650,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AmountVnd)
+                    .HasColumnName("AmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Cdclosed)
                     .HasColumnName("CDClosed")
                     .HasDefaultValueSql("((0))");
@@ -1788,6 +1796,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VatAmountVnd)
+                    .HasColumnName("VatAmountVND")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")

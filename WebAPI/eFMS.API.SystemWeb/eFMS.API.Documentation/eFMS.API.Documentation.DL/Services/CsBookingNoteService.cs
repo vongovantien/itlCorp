@@ -347,7 +347,7 @@ namespace eFMS.API.Documentation.DL.Services
             bookingNote.SpecialRequest = data.SpecialRequest;
             bookingNote.CloseTime20 = data.OtherTerms; //Other terms & conditions
             bookingNote.CloseTime40 = data.PlaceOfDelivery; //Place Of Delivery
-            bookingNote.CloseTimeLCL = data.ClosingTime?.ToString("HH tt, dd MMM yyyy");
+            bookingNote.CloseTimeLCL = data.ClosingTime?.ToString("HH:mm, dd MMM yyyy");
             bookingNote.PickupAt = data.PickupAt; //Pick-up at
             bookingNote.DropoffAt = data.DropoffAt; //Drop-off at
             bookingNote.ContainerNo = string.Empty; //NOT USE

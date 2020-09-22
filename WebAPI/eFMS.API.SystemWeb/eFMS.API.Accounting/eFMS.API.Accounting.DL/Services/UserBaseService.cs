@@ -290,8 +290,8 @@ namespace eFMS.API.Accounting.DL.Services
             var userAuthorizedApprovals = GetAuthorizedApprovalByTypeAndAuthorizer(type, userId);
             foreach (var userAuth in userAuthorizedApprovals)
             {
-                var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
-                if (isSame)
+                //var isSame = CheckUserSameLevel(userAuth, groupId, departmentId, officeId, companyId);
+                //if (isSame)
                 {
                     userDeputies.Add(userAuth);
                 }
@@ -315,12 +315,25 @@ namespace eFMS.API.Accounting.DL.Services
             return emailUserDeputies;
         }
 
-        public bool CheckIsUserDeputy(string type, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
+        public bool CheckIsUserDeputy(string type, string commissioner, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId)
         {
-            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId);
+            var deputies = GetUsersDeputyByCondition(type, userId, groupId, departmentId, officeId, companyId).Where(x => x == commissioner);
             return deputies.Any();
         }
 
         #endregion -- DEPUTY USER --
+        /// <summary>
+        /// Kiểm tra Department của user có phải là department Accountant hay không theo office ID & department ID
+        /// </summary>
+        /// <param name="officeId">Office ID của User</param>
+        /// <param name="deptId">Department ID của User</param>
+        /// <returns></returns>
+        public bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId)
+        {
+            var isDeptAccountant = catDepartmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant 
+                                                           && x.Id == deptId 
+                                                           && x.BranchId == officeId).Any();
+            return isDeptAccountant;
+        }
     }
 }

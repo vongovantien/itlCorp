@@ -194,7 +194,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Leader == currentUser.UserID
                   || x.advancePaymentApr.LeaderApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Leader, x.advancePayment.GroupId, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                 )
                 && x.advancePayment.GroupId == currentUser.GroupId
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
@@ -207,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Manager == currentUser.UserID
                   || x.advancePaymentApr.ManagerApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Manager, null, x.advancePayment.DepartmentId, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                   )
                 && x.advancePayment.DepartmentId == currentUser.DepartmentId
                 && x.advancePayment.OfficeId == currentUser.OfficeID
@@ -220,7 +220,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Accountant == currentUser.UserID
                   || x.advancePaymentApr.AccountantApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Accountant, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId)
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
@@ -233,7 +234,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ||
                 (x.advancePaymentApr != null && (x.advancePaymentApr.Buhead == currentUser.UserID
                   || x.advancePaymentApr.BuheadApr == currentUser.UserID
-                  || userBaseService.CheckIsUserDeputy(typeApproval, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
+                  || userBaseService.CheckIsUserDeputy(typeApproval, currentUser.UserID, x.advancePaymentApr.Buhead ?? null, null, null, x.advancePayment.OfficeId, x.advancePayment.CompanyId)
                   )
                 && x.advancePayment.OfficeId == currentUser.OfficeID
                 && x.advancePayment.CompanyId == currentUser.CompanyID
@@ -270,7 +271,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (advanceRequests != null)
             {
-                advancePayments = advancePayments.Join(advanceRequests, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) => u);
+                advancePayments = advancePayments.Join(advanceRequests, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) => u).Distinct();
             }
 
             return advancePayments;
@@ -2060,7 +2061,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var isDeptAccountant = userBaseService.CheckIsAccountantDept(currentUser.DepartmentId);
 
                     var isLeader = userBaseService.GetLeaderGroup(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId, currentUser.GroupId).FirstOrDefault() == currentUser.UserID;
-                    if (leaderLevel.Role == AccountingConstants.ROLE_APPROVAL
+                    if ((leaderLevel.Role == AccountingConstants.ROLE_APPROVAL || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                         &&
                         (
                             (isLeader && currentUser.GroupId != AccountingConstants.SpecialGroup && userCurrent == leaderLevel.UserId)
@@ -2088,7 +2089,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isManager = userBaseService.GetDeptManager(currentUser.CompanyID, currentUser.OfficeID, currentUser.DepartmentId).FirstOrDefault() == currentUser.UserID;
-                    if (managerLevel.Role == AccountingConstants.ROLE_APPROVAL && !isDeptAccountant
+                    if ((managerLevel.Role == AccountingConstants.ROLE_APPROVAL || managerLevel.Role == AccountingConstants.ROLE_AUTO) && !isDeptAccountant
                         &&
                         (
                             (isManager && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == managerLevel.UserId)
@@ -2115,7 +2116,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var isAccountant = userBaseService.GetAccoutantManager(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
-                    if (accountantLevel.Role == AccountingConstants.ROLE_APPROVAL && isDeptAccountant
+                    if ((accountantLevel.Role == AccountingConstants.ROLE_APPROVAL || accountantLevel.Role == AccountingConstants.ROLE_AUTO) && isDeptAccountant
                         &&
                         (
                             (isAccountant && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == accountantLevel.UserId)
@@ -2142,7 +2143,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL) && isBod
+                    if ((buHeadLevel.Role == AccountingConstants.ROLE_APPROVAL || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL || buHeadLevel.Role == AccountingConstants.ROLE_AUTO) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == AccountingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)

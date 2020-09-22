@@ -72,7 +72,6 @@ export class SeaLCLExportBookingNoteCreateComponent extends AppForm implements O
 
         };
         const bookingNote: csBookingNote = new csBookingNote(Object.assign(_merge(form, formData)));
-
         return bookingNote;
 
     }
