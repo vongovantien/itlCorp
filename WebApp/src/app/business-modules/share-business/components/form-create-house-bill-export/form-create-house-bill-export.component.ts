@@ -496,6 +496,9 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                     }
                 }
                 break;
+            case 'sale':
+                this.saleMan.setValue(data.id);
+                break;
             default:
                 break;
         }
