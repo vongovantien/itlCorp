@@ -14,6 +14,7 @@ namespace eFMS.API.Accounting.DL.Models
 
         public string OfficeEn { get; set; }
         public string BankAccountVND { get; set; }
+        public string BankAccountUSD { get; set; }
         public string BankNameEn { get; set; }
         public string AddressEn { get; set; }
         public string SwiftCode { get; set; }

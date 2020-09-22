@@ -406,6 +406,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("PreviewAdvancePaymentRequestByAdvanceId")]
+        [Authorize]
         public IActionResult PreviewAdvancePaymentRequest(Guid advanceId)
         {
             var result = acctAdvancePaymentService.Preview(advanceId);
