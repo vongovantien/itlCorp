@@ -8,7 +8,7 @@ import { AppForm } from 'src/app/app.form';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { distinctUntilChanged, takeUntil, tap } from 'rxjs/operators';
 
 import * as fromShare from './../../store';
@@ -59,9 +59,7 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     shipperDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
     alsonotifyPartyDescription: AbstractControl;
-    term$ = new BehaviorSubject<string>('');
-    isShowSaleMan: boolean = false;
-    isShowConsignee: boolean = false;
+
     oceanVoyNo: AbstractControl;
     configCustomer: CommonInterface.IComboGirdConfig | any = {};
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
@@ -434,7 +432,6 @@ export class ShareBusinessFormCreateHouseBillImportComponent extends AppForm {
     onSelectDataFormInfo(data: any, key: string) {
         switch (key) {
             case 'saleman':
-                this.isShowSaleMan = false;
                 this.saleMan.setValue(data.id);
                 break;
             case 'Customer':
