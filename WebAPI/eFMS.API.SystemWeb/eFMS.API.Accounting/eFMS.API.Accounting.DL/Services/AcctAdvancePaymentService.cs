@@ -1045,10 +1045,10 @@ namespace eFMS.API.Accounting.DL.Services
                 .GroupBy(g => new { g.Hbl })
                 .Select(s => new AcctAdvanceRequestModel
                 {
-                    JobId = s.First().JobId,
+                    JobId = s.First() != null ? s.First().JobId : null,
                     Hbl = s.Key.Hbl,
-                    Mbl = s.First().Mbl,
-                    CustomNo = s.First().CustomNo
+                    Mbl = s.First() != null ? s.First().Mbl : null,
+                    CustomNo = s.First() != null ? s.First().CustomNo : null
                 });
 
                 foreach (var request in groupJobByHbl)
@@ -1068,10 +1068,13 @@ namespace eFMS.API.Accounting.DL.Services
                     else
                     {
                         var job = csTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
-                        nw += job.NetWeight ?? 0;
-                        psc += job.PackageQty ?? 0;
-                        cbm += job.Cbm ?? 0;
-                        gw += job.GrossWeight ?? 0;
+                        if (job != null)
+                        {
+                            nw += job.NetWeight ?? 0;
+                            psc += job.PackageQty ?? 0;
+                            cbm += job.Cbm ?? 0;
+                            gw += job.GrossWeight ?? 0;
+                        }
 
                         var house = csTransactionDetailRepo.Get(x => x.Hwbno == request.Hbl).FirstOrDefault();
                         string customerNameAbbr = catPartnerRepo.Get(x => x.Id == house.CustomerId).FirstOrDefault()?.ShortName;
@@ -1113,7 +1116,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 AdvID = advance.AdvanceNo,
                 RefNo = "N/A",
-                AdvDate = advance.RequestDate.Value.Date,
+                AdvDate = advance.RequestDate.HasValue ? (DateTime?)advance.RequestDate.Value.Date : null,
                 AdvTo = "N/A",
                 AdvContactID = "N/A",
                 AdvContact = requesterName,//cần lấy ra username
@@ -1158,7 +1161,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Currency = "N/A",
                 ExchangeRate = 0,
                 TotalAmount = 0,
-                PaymentDate = advance.DeadlinePayment.Value.Date,
+                PaymentDate = advance.DeadlinePayment.HasValue ? (DateTime?)advance.DeadlinePayment.Value.Date : null,
                 InvoiceNo = "N/A",
                 CustomID = strCustomNo,
                 HBLNO = "N/A",

@@ -67,8 +67,14 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
 
-            var exchargeDateSurcharge = exchangeDate == null ? DateTime.Now.Date : exchangeDate.Value.Date;
+            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
             List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
+
             decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
             decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
 
@@ -81,7 +87,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else if (currencyFrom == AccountingConstants.CURRENCY_LOCAL && currencyTo != AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _exchangeRate = (finalExchangeRate.Value != 0) ? (1 / finalExchangeRate.Value) : 0;
+                    _exchangeRate = (_exchangeRateCurrencyTo != 0) ? (1 / _exchangeRateCurrencyTo) : 0;
                 }
                 else if (currencyFrom != AccountingConstants.CURRENCY_LOCAL && currencyTo == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -112,6 +118,57 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return _exchangeRate;
+        }
+
+        /// <summary>
+        /// Tính giá trị Amount dựa vào Final Exchange  Rate, Exchange Date, Currency From, Currency To => có làm tròn giá trị
+        /// </summary>
+        /// <param name="amount">Amount</param>
+        /// <param name="finalExchangeRate">Final Exchange Rate</param>
+        /// <param name="exchangeDate">Exchange Date</param>
+        /// <param name="currencyFrom">Currency From</param>
+        /// <param name="currencyTo">Currency To</param>
+        /// <param name="roundCurr">Default: làm tròn 2 chữ số thập phân (lấy 2 chữ số thập phân)</param>
+        /// <returns></returns>
+        public decimal CalculatorAmount(decimal? amount, decimal? finalExchangeRate, DateTime? exchangeDate, string currencyFrom, string currencyTo, int? roundCurr)
+        {
+            roundCurr = roundCurr == null ? 2 : roundCurr;
+            decimal amountResult = 0;
+            if (string.IsNullOrEmpty(currencyFrom) || string.IsNullOrEmpty(currencyTo)) return 0;
+            int roundLocal = 0;
+            if (currencyTo == AccountingConstants.CURRENCY_LOCAL)
+            {
+                roundCurr = 0;
+            }
+            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+            var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated : exchangeDate.Value.Date;
+            List<CatCurrencyExchange> currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == exchargeDateSurcharge).ToList();
+            if (currencyExchange.Count == 0)
+            {
+                currencyExchange = DataContext.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            }
+
+            decimal _exchangeRateCurrencyFrom = GetRateCurrencyExchange(currencyExchange, currencyFrom, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
+            decimal _exchangeRateCurrencyTo = GetRateCurrencyExchange(currencyExchange, currencyTo, AccountingConstants.CURRENCY_LOCAL); //Lấy currency Local làm gốc để quy đỗi
+
+            //Tránh case chia 0
+            _exchangeRateCurrencyTo = _exchangeRateCurrencyTo == 0 ? 1 : _exchangeRateCurrencyTo;
+
+            decimal roundCurrAmount = Math.Round(amount.Value, roundCurr.Value);
+            if (finalExchangeRate != null)
+            {
+                //RoundCurr (RoundLocal(RoundCurr(Amount) x  FinalExc)/ExcByDate (Currency 2) ) 
+                decimal roundCurrAmountFinal = Math.Round(roundCurrAmount * finalExchangeRate.Value, roundLocal);
+                amountResult = Math.Round(roundCurrAmountFinal / _exchangeRateCurrencyTo, roundCurr.Value);
+            }
+            else
+            {
+                //RoundCurr (RoundLocal(RoundCurr(Amount) x  ExcByDate (Currency 1) )/ExcByDate (Currency 2) )  
+                decimal roundCurrAmountExcDate = Math.Round(roundCurrAmount * _exchangeRateCurrencyFrom, roundLocal);
+                amountResult = Math.Round(roundCurrAmountExcDate / _exchangeRateCurrencyTo, roundCurr.Value);
+            }
+
+            return amountResult;
         }
     }
 }

@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { AccountingRepo, CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { SOA, SOASearchCharge, Charge } from 'src/app/shared/models';
+import { SOA, SOASearchCharge, Charge, Surcharge } from 'src/app/shared/models';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
@@ -288,5 +288,12 @@ export class StatementOfAccountEditComponent extends AppList {
     calculatorReceivable(surcharges: any[]) {
         const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
         this._accoutingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+    }
+
+    selectJobId(charge) {
+        console.log(charge);
+        charge.isSelected = !charge.isSelected;
+        this.isCheckAllCharge = this.soa.chargeShipments.every((item: any) => item.isSelected);
+
     }
 }
