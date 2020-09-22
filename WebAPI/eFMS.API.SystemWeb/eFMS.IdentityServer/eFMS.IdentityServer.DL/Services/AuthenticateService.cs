@@ -320,5 +320,26 @@ namespace eFMS.IdentityServer.DL.Services
             }
             return true;
         }
+
+        public int ValidateAuthPartner(string username, string password, out LoginReturnModel modelReturn)
+        {
+            int result = -2;
+            LoginReturnModel _modelReturn = new LoginReturnModel();
+            SysUser sysUser = DataContext.Get(x => x.Username == username).FirstOrDefault();
+
+            if (sysUser == null)
+            {
+                result = - 2;
+            }
+
+            // Check password
+            if(BCrypt.Net.BCrypt.Verify(password, sysUser.Password))
+            {
+                result = 1;
+                _modelReturn.idUser = sysUser.Id;
+            }
+            modelReturn = _modelReturn;
+            return result;
+        }
     }
 }
