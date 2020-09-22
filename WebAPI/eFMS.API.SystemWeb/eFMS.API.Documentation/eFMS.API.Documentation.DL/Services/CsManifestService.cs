@@ -303,13 +303,13 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new ManifestFCLImportReportParameter
             {
                 SumCarton = string.Empty,
-                MBL = transaction.Mawb,
+                MBL = !string.IsNullOrEmpty( transaction.Mawb) ? transaction.Mawb : string.Empty,
                 LCL = "FCL",
                 CompanyName = DocumentConstants.COMPANY_NAME,
                 CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
                 CompanyAddress2 = DocumentConstants.COMPANY_ADDRESS2,
                 Website = DocumentConstants.COMPANY_WEBSITE,
-                Contact = currentUser.UserName,
+                Contact = currentUser.UserName
             };
             result = new Crystal
             {

@@ -1827,26 +1827,30 @@ namespace eFMS.API.ReportData.FormatExcel
 
             List<string> headerTable = new List<string>()
             {
-                "No", //3
-               "Job No", //4
-               "Flight No", //5
-               "Shippment Date", //6
-               "MAWB#", //7
-               "Dest", //8
-               "Service", //9
-               "Air PCS", //10
-               "Gross Weight(KG)", //11
-               "Chargeable Weight(KG)", //12
-               "Rate(USD)", //13
-               "AirFreight(USD)", //14
-               "Fuel Surcharge(USD)", //15
-               "Warisk Surcharge(USD)", //16
-               "Screening Surcharge(USD)", //17
-               "AWB(USD)", //18
-               "Handling fee(USD)", //19
-               "Net Amount(USD)", //20
-               "Exchange Rate(VND/USD)", //21
-               "Total Amount(VND)", //21
+                "No", //1
+               "Job No", //2
+               "Flight No", //3
+               "ETD", //4
+               "MAWB", //5
+               "Origin(AOL)", //6
+               "Dest(AOD)", //7
+               //"Service", //8
+               "Air PCS", //9
+               "Gross Weight(KG)", //10
+               "Chargeable Weight(KG)", //11
+               "Rate(USD)", //12
+               "AirFreight(USD)", //13
+               "Fuel Surcharge(USD)", //14
+               "Warisk Surcharge(USD)", //15
+               "Screening Surcharge(USD)", //16
+               "AWB(USD)", //17
+               "AMS(USD)", //18
+               "Dangerous fee(USD)", //18
+               "Other fee(USD)", //19
+               "Handling fee(USD)", //20
+               "Net Amount(USD)", //21
+               "Exchange Rate(VND/USD)", //22
+               "Total Amount(VND)", //23
             };
 
             workSheet.Cells["H1:U1"].Merge = true;
@@ -1874,21 +1878,21 @@ namespace eFMS.API.ReportData.FormatExcel
             // Tạo header
             for (int i = 0; i < headerTable.Count; i++)
             {
-                if (i == 5)
-                {
-                    workSheet.Cells[8, i + 2].Value = headerTable[i];
-                }
-                if (i < 5)
-                {
-                    workSheet.Cells[8, i + 1].Value = headerTable[i];
-                }
-                if (i > 5)
-                {
-                    workSheet.Cells[8, i + 2].Value = headerTable[i];
-                    workSheet.Cells[8, i + 2].Style.Font.Bold = true;
+                //if (i == 5)
+                //{
+                //    workSheet.Cells[8, i + 2].Value = headerTable[i];
+                //}
+                //if (i < 5)
+                //{
+                //    workSheet.Cells[8, i + 1].Value = headerTable[i];
+                //}
+                //if (i > 5)
+                //{
+                //    workSheet.Cells[8, i + 2].Value = headerTable[i];
+                //    workSheet.Cells[8, i + 2].Style.Font.Bold = true;
 
-                }
-
+                //}
+                workSheet.Cells[8, i + 1].Value = headerTable[i];
                 workSheet.Cells[8, i + 1].Style.Font.Bold = true;
                 workSheet.Cells[8, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[8, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -1904,6 +1908,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["C8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["C8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["D8:D9"].Merge = true;
+            workSheet.Cells["E8:E9"].Merge = true;
+            workSheet.Cells["F8:F9"].Merge = true;
             workSheet.Cells["D8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["D8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             //workSheet.Cells["E8:E9"].Merge = true;
@@ -1980,7 +1986,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["U8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["U8:U9"].Style.WrapText = true;
 
-            workSheet.Cells["E8:F9"].Merge = true;
+            //workSheet.Cells["E8:F9"].Merge = true;
 
 
             string textHead = string.Empty;
@@ -2012,6 +2018,9 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             workSheet.Cells["A7"].Value = textSOA;
 
+            workSheet.Cells["W8:W9"].Merge = true;
+            workSheet.Cells["V8:V9"].Merge = true;
+
             int addressStartContent = 10;
             int row = addressStartContent - 1;
             int row1 = addressStartContent - 1;
@@ -2025,53 +2034,63 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i + addressStartContent, 4].Value = item.ShippmentDate;
                 workSheet.Cells[i + addressStartContent, 4].Style.Numberformat.Format = "dd/MM/yyyy";
 
-                workSheet.Cells[i + addressStartContent, 5].Value = item.AOL;
-                workSheet.Cells[i + addressStartContent, 6].Value = item.Mawb;
+                workSheet.Cells[i + addressStartContent, 5].Value = item.Mawb;
+                workSheet.Cells[i + addressStartContent, 6].Value = item.AOL;
                 workSheet.Cells[i + addressStartContent, 7].Value = item.AOD;
-                workSheet.Cells[i + addressStartContent, 8].Value = item.Service;
-                workSheet.Cells[i + addressStartContent, 9].Value = item.Pcs;
+                //workSheet.Cells[i + addressStartContent, 8].Value = item.Service;
+                workSheet.Cells[i + addressStartContent, 8].Value = item.Pcs;
+                workSheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[i + addressStartContent, 9].Value = item.GW;
                 workSheet.Cells[i + addressStartContent, 9].Style.Numberformat.Format = numberFormat;
-                workSheet.Cells[i + addressStartContent, 10].Value = item.GW;
+                workSheet.Cells[i + addressStartContent, 10].Value = item.CW;
                 workSheet.Cells[i + addressStartContent, 10].Style.Numberformat.Format = numberFormat;
-                workSheet.Cells[i + addressStartContent, 11].Value = item.CW;
+                workSheet.Cells[i + addressStartContent, 11].Value = item.Rate;
                 workSheet.Cells[i + addressStartContent, 11].Style.Numberformat.Format = numberFormat;
-                workSheet.Cells[i + addressStartContent, 12].Value = item.Rate;
+
+                workSheet.Cells[i + addressStartContent, 12].Value = item.AirFreight;
                 workSheet.Cells[i + addressStartContent, 12].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 13].Value = item.AirFreight;
+                workSheet.Cells[i + addressStartContent, 13].Value = item.FuelSurcharge;
                 workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 14].Value = item.FuelSurcharge;
+                workSheet.Cells[i + addressStartContent, 14].Value = item.WarriskSurcharge;
                 workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 15].Value = item.WarriskSurcharge;
+                workSheet.Cells[i + addressStartContent, 15].Value = item.ScreeningFee;
                 workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 16].Value = item.ScreeningFee;
+                workSheet.Cells[i + addressStartContent, 16].Value = item.AWB;
                 workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 17].Value = item.AWB;
+                workSheet.Cells[i + addressStartContent, 17].Value = item.AMS;
                 workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 18].Value = item.HandlingFee;
+                workSheet.Cells[i + addressStartContent, 18].Value = item.DAN;
                 workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 19].Value = item.NetAmount;
+                workSheet.Cells[i + addressStartContent, 19].Value = item.OTH;
                 workSheet.Cells[i + addressStartContent, 19].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 20].Value = item.ExchangeRate;
+
+                workSheet.Cells[i + addressStartContent, 20].Value = item.HandlingFee;
                 workSheet.Cells[i + addressStartContent, 20].Style.Numberformat.Format = numberFormat;
 
-                workSheet.Cells[i + addressStartContent, 21].Value = item.TotalAmount;
+                workSheet.Cells[i + addressStartContent, 21].Value = item.NetAmount;
                 workSheet.Cells[i + addressStartContent, 21].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 22].Value = item.ExchangeRate;
+                workSheet.Cells[i + addressStartContent, 22].Style.Numberformat.Format = numberFormat;
+
+                workSheet.Cells[i + addressStartContent, 23].Value = item.TotalAmount;
+                workSheet.Cells[i + addressStartContent, 23].Style.Numberformat.Format = numberFormat;
 
 
                 row1++;
 
             }
-            workSheet.Cells[8, 1, row1 + 1, 21].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[8, 1, row1, 21].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[8, 1, row1, 21].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, row1 + 1, 23].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, row1, 23].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[8, 1, row1, 23].Style.Border.Top.Style = ExcelBorderStyle.Thin;
             addressStartContent = addressStartContent + airfreightObj.HawbAirFrieghts.Count;
 
             workSheet.Cells[addressStartContent, 1].Value = headers[3]; //Total
@@ -2169,7 +2188,7 @@ namespace eFMS.API.ReportData.FormatExcel
              .Address;
 
             string idToborder1 = workSheet
-            .Cells[addressStartContent, 21]
+            .Cells[addressStartContent, 23]
             .Start
             .Address;
             string addressBorderRight = idToBoder + ":" + idToborder1;
@@ -2223,9 +2242,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 textBottom = textBottom + "\n" + airfreightObj.OfficeEn;
             }
 
+
             if (!string.IsNullOrEmpty(airfreightObj.BankAccountVND))
             {
-                textBottom = textBottom + "\n" + "A/C: " + airfreightObj.BankAccountVND;
+                textBottom = textBottom + "\n" + "A/C: " + (!string.IsNullOrEmpty (airfreightObj.BankAccountUsd) ? (airfreightObj.BankAccountUsd +  " - ") : string.Empty)  + airfreightObj.BankAccountVND;
             }
 
             if (!string.IsNullOrEmpty(airfreightObj.BankNameEn))

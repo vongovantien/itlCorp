@@ -615,11 +615,16 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_DUPLICATE], item.ContractNo);
                         item.IsValid = false;
                     }
-                    if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
-                    {
-                        item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
-                        item.IsValid = false;
-                    }
+
+                    // start tạm thời comment, chưa rõ yêu cầu
+
+                    //if (item.ContractNo.Length < 3 || item.ContractNo.Length > 50)
+                    //{
+                    //    item.ContractNoError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACTNO_LENGTH]);
+                    //    item.IsValid = false;
+                    //}
+
+                    // end 
                 }
 
                 if (string.IsNullOrEmpty(item.SaleService))
@@ -864,7 +869,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.ApiUrl.Value.Url + "/Catalogue";
+            string path = this.webUrl.Value.Url ;
             try
             {
                 var list = new List<SysImage>();

@@ -1959,8 +1959,8 @@ namespace eFMS.API.Accounting.DL.Services
                     air.JobNo = chargeData.JobId;
                     air.FlightNo = chargeData.FlightNo;
                     air.ShippmentDate = chargeData.ShippmentDate;
-                    air.AOL = chargeData.MBL.Substring(0, 3) + port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
-                    air.Mawb = chargeData.MBL.Substring(chargeData.MBL.Length - 9);
+                    air.AOL = port.Where(x => x.Id == chargeData.AOL).Select(t => t.Code).FirstOrDefault();
+                    air.Mawb = chargeData.MBL.Substring(0, 3)  + "-" + chargeData.MBL.Substring(chargeData.MBL.Length - 9);
                     air.AOD = port.Where(x => x.Id == chargeData.AOD).Select(t => t.Code).FirstOrDefault();
                     air.Service = "Normal"; // tạm thời hardcode;
                     air.Pcs = chargeData.PackageQty;
@@ -1968,20 +1968,83 @@ namespace eFMS.API.Accounting.DL.Services
                     air.GW = chargeData.GrossWeight;
                     air.Rate = chargeData.ChargeName == AccountingConstants.CHARGE_AIR_FREIGHT ? chargeData.UnitPrice : null;
 
-                    var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+
+                    var lstAirfrieght = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AIR_FREIGHT_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstAirfrieght.Count() == 0)
+                    {
+                        lstAirfrieght = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
                     air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Debit).Sum() : null;
 
-                    var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstFuelSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstFuelSurcharge.Count() == 0)
+                    {
+                        lstFuelSurcharge = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
                     air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Debit).Sum() : null;
 
-                    var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+
+                    var lstWariskSurcharge = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstWariskSurcharge.Count() == 0)
+                    {
+                        lstWariskSurcharge = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
                     air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Debit).Sum() : null;
 
-                    var lstScreeningFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    var lstScreeningFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SCREENING_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstScreeningFee.Count() == 0)
+                    {
+                        lstScreeningFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == "x-ray charge") && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
                     air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Debit).Sum() : null;
-
-                    var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
+                    
+                    var lstAWBFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AWB_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstAWBFee.Count() == 0)
+                    {
+                        lstAWBFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == "air waybill") && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
                     air.AWB = lstAWBFee.Count() > 0 ? lstAWBFee.Select(t => t.Debit).Sum() : null;
+
+
+                    var lstAMSFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_AMS_FEE_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstAMSFee.Count() == 0)
+                    {
+                        lstAMSFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
+                    air.AMS = lstAMSFee.Count() > 0 ? lstAMSFee.Select(t => t.Debit).Sum() : null;
+
+                    var lstDANFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_DAN_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstDANFee.Count() == 0)
+                    {
+                        lstDANFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
+                    air.DAN = lstDANFee.Count() > 0 ? lstDANFee.Select(t => t.Debit).Sum() : null;
+
+                    var lstOTHFee = charge.Where(x => x.HBL == item && x.ChargeCode == AccountingConstants.CHARGE_SA_OTH_AIR_CODE && x.Currency == AccountingConstants.CURRENCY_USD);
+                    if (lstOTHFee.Count() == 0)
+                    {
+                        lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower()) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
+                    if(lstOTHFee.Count() == 0)
+                    {
+                        lstOTHFee = charge.Where(x => x.HBL == item && (x.ChargeCode != AccountingConstants.CHARGE_AIR_FREIGHT_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_FUEL_SURCHARGE_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SCREENING_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SCREENING_FEE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_AWB_FEE_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AWB_FEE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_AMS_FEE_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_AMS_FEE.ToLower()
+                                                                    && x.ChargeCode != AccountingConstants.CHARGE_SA_DAN_AIR_CODE
+                                                                    && x.ChargeName.ToLower() != AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower()
+                        ) && x.Currency == AccountingConstants.CURRENCY_USD);
+                    }
+
+                    air.OTH = lstOTHFee.Count() > 0 ? lstOTHFee.Select(t => t.Debit).Sum() : null;
 
                     var lstHandlingFee = charge.Where(x => x.HBL == item && x.ChargeName.ToLower() == AccountingConstants.CHARGE_HANDLING_FEE.ToLower() && x.Currency == AccountingConstants.CURRENCY_USD);
                     air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Debit).Sum() : null;
@@ -2032,6 +2095,7 @@ namespace eFMS.API.Accounting.DL.Services
             var officeData = officeRepo.Get(x => x.Id == new Guid(officeId)).FirstOrDefault();
             result.OfficeEn = officeData.BranchNameEn;
             result.BankAccountVND = officeData.BankAccountVnd;
+            result.BankAccountUSD = officeData.BankAccountUsd;
             result.BankNameEn = officeData.BankNameEn;
             result.AddressEn = officeData.AddressEn;
             result.SwiftCode = officeData.SwiftCode;
