@@ -238,7 +238,7 @@
                             </td>
                             <td>
                                 <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null}">
                                     <ng-container *ngIf="!!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -251,8 +251,7 @@
                                     </ng-container>
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
-                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
-                                            autoFormatCurrency numeric [decimals]="digitDecimal">
+                                            (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price">
                                     </ng-template>
                                 </div>
                             </td>
