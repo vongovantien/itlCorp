@@ -276,15 +276,15 @@ namespace eFMS.API.Accounting.DL.Services
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                               (
                                   (
-                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo) : true)
+                                      (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
                                   )
                               )
                               :
@@ -4541,7 +4541,7 @@ namespace eFMS.API.Accounting.DL.Services
                             MBL = s.Key.MBL,
                             HBL = s.Key.HBL,
                             CustomNo = s.Key.CustomNo,
-                       
+                            
                             SettlementTotalAmount = s.Sum(d => d.SettlementAmount),                          
                             requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL , s.Key.SettleNo, out advTotalAmount),
                             AdvanceTotalAmount = advTotalAmount,
@@ -4573,6 +4573,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
+            var settleDesc = DataContext.Get().Where(x => x.SettlementNo == SettleNo).FirstOrDefault().Note;
             //
             var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
                             .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
@@ -4590,7 +4591,7 @@ namespace eFMS.API.Accounting.DL.Services
             //
             var groupData = data
                 .GroupBy(d => new { d.JobID, d.HBL, d.MBL, d.AdvanceNo, d.SettleNo, d.Currency,
-                d.ApproveDate, d.CustomNo, d.Description, d.RequestDate, d.Requester})
+                d.ApproveDate, d.CustomNo, d.RequestDate, d.Requester})
                 .Where(x => x.Key.JobID == JobID && x.Key.HBL == HBL && x.Key.MBL == MBL && x.Key.SettleNo == SettleNo)
                 .Select(y => new SettlementExportDefault{
                     JobID = y.Key.JobID,
@@ -4602,7 +4603,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ApproveDate = y.Key.ApproveDate,
                     Currency = y.Key.Currency,
                     CustomNo = y.Key.CustomNo,
-                    Description = y.Key.Description,
+                    Description = settleDesc,
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
                 });
