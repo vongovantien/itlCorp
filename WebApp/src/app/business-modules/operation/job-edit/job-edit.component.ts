@@ -408,6 +408,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     canDeactivate(currenctRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Observable<boolean> {
         this.nextState = nextState; // * Save nextState for Deactivate service.
 
+        if (this.tab !== 'job-edit') {
+            return of(true);
+        }
         const isEdited = JSON.stringify(this.editForm.currentFormValue) !== JSON.stringify(this.editForm.formEdit.getRawValue());
         if (this.isCancelFormPopupSuccess) {
             return of(true);

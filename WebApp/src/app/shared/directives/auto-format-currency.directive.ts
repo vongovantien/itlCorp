@@ -58,7 +58,7 @@ export class AutoFormatCurrencyDirective {
 
     @HostListener("focus", ["$event.target.value"])
     onFocus(value) {
-        this.el.value = value.replace(/[^0-9.]+/g, '');
+        this.el.value = value.replace(/[^0-9.-]+/g, '');
         // this.el.select();
     }
 
