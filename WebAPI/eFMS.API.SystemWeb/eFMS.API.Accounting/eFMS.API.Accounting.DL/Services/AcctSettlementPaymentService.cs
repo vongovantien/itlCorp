@@ -276,15 +276,15 @@ namespace eFMS.API.Accounting.DL.Services
                               criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                               (
                                   (
-                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo) : true)
+                                      (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(ops.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cstd.Hwbno, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.Mawb, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cst.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(req.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
                                   )
                               )
                               :
