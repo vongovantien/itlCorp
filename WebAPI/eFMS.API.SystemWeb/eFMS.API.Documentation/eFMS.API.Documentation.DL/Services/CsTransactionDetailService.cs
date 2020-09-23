@@ -2022,7 +2022,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<HousebillDailyExportResult> GetHousebillsDailyExport(DateTime? issuedDate)
         {
             var housebillDaily = new List<HousebillDailyExportResult>();
-            var trans = csTransactionRepo.Get();
+            var trans = csTransactionRepo.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.TransactionType == "AE");
             var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
             var warehouses = catPlaceRepo.Get(x => x.PlaceTypeId == "Warehouse");
             var pics = sysUserRepo.Get();
@@ -2037,8 +2037,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             var transDetails = DataContext.Get(x => jobIds.Contains(x.JobId));
             housebillDaily = (from transDetail in transDetails
-                              join tran in trans on transDetail.JobId equals tran.Id into transGrp
-                              from tran in transGrp.DefaultIfEmpty()
+                              join tran in trans on transDetail.JobId equals tran.Id //into transGrp
+                              //from tran in transGrp.DefaultIfEmpty()
                               join pod in pods on transDetail.Pod equals pod.Id into podGrp
                               from pod in podGrp.DefaultIfEmpty()
                               join warehouse in warehouses on transDetail.WarehouseId equals warehouse.Id into warehouseGrp
