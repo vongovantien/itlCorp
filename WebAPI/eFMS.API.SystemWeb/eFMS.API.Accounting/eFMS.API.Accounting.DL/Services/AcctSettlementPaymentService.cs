@@ -341,6 +341,10 @@ namespace eFMS.API.Accounting.DL.Services
                            DatetimeModified = settlePayment.DatetimeModified,
                            StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == settlePayment.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
                            PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == settlePayment.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+
+                           // CR 14484
+                           VoucherDate = settlePayment.VoucherDate,
+                           VoucherNo = settlePayment.VoucherNo
                        };
 
             //Sort Array sẽ nhanh hơn

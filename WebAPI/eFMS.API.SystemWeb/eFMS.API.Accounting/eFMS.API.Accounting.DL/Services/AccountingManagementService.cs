@@ -117,6 +117,9 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 item.VoucherId = null;
                                 item.VoucherIddate = null;
+                                item.InvoiceNo = null;
+                                item.InvoiceDate = null;
+                                item.SeriesNo = null;
                             }
                             if (data.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                             {
@@ -129,6 +132,23 @@ namespace eFMS.API.Accounting.DL.Services
                             surchargeRepo.Update(item, x => x.Id == item.Id, false);
 
                             UpdateStatusSoaAfterDeleteAcctMngt(data.Type, item);
+                        }
+
+                        // Remove VoucherDate, VoucherNo trong settlement.
+                        if (data.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                        {
+
+                            List<string> listSettlementCode = charges.Select(x => x.SettlementCode).Distinct().ToList();
+
+                            if (listSettlementCode.Count() > 0)
+                            {
+                                foreach (string code in listSettlementCode)
+                                {
+                                    updateVoucherSettlement(code, null, null);
+                                }
+
+                                settlementPaymentRepo.SubmitChanges();
+                            }
                         }
 
                         soaRepo.SubmitChanges();
@@ -954,6 +974,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     charge.VoucherId = accounting.VoucherId;
                                     charge.VoucherIddate = accounting.Date;
+
+                                    // CR: 14344
+                                    charge.InvoiceNo = chargeOfAcct.InvoiceNo;
+                                    charge.InvoiceDate = chargeOfAcct.InvoiceDate;
+                                    charge.SeriesNo = chargeOfAcct.Serie;
+
+                                   
                                 }
                                 if (accounting.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                                 {
@@ -962,6 +989,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     charge.SeriesNo = accounting.Serie; //Cập nhật lại Serie No cho charge
                                     charge.VoucherIddate = accounting.Date; //Cập nhật VoucherDate
                                     charge.VoucherId = accounting.VoucherId; //Cập nhật VoucherId
+
                                 }
                                 charge.DatetimeModified = DateTime.Now;
                                 charge.UserModified = currentUser.UserID;
@@ -974,7 +1002,25 @@ namespace eFMS.API.Accounting.DL.Services
                                     //Cập nhật status cho SOA: Issued Invoice, Issued Voucher
                                     UpdateStatusSOA(soa, accounting.Type);
                                 }
+
+                               
                             }
+                            // Cập nhật Settlement: VoucherNo, VoucherDate
+                            if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE) {
+
+                                List<string> listSettlementCode = chargesOfAcct.Select(x => x.SettlementCode).Distinct().ToList();
+
+                                if (listSettlementCode.Count() > 0)
+                                {
+                                    foreach (string code in listSettlementCode)
+                                    {
+                                        updateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
+                                    }
+
+                                    settlementPaymentRepo.SubmitChanges();
+                                }
+                            }
+
                             surchargeRepo.SubmitChanges();
                             soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
@@ -1115,6 +1161,24 @@ namespace eFMS.API.Accounting.DL.Services
                                     UpdateStatusSOA(soa, accounting.Type);
                                 }
                             }
+
+                            // Cập nhật Settlement: VoucherNo, VoucherDate
+                            if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
+                            {
+
+                                List<string> listSettlementCode = chargesOfAcctUpdate.Select(x => x.SettlementCode).Distinct().ToList();
+
+                                if (listSettlementCode.Count() > 0)
+                                {
+                                    foreach (string code in listSettlementCode)
+                                    {
+                                        updateVoucherSettlement(code, accounting.VoucherId, accounting.Date);
+                                    }
+
+                                    settlementPaymentRepo.SubmitChanges();
+                                }
+                            }
+
                             surchargeRepo.SubmitChanges();
                             soaRepo.SubmitChanges();
                             DataContext.SubmitChanges();
@@ -1803,6 +1867,20 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return result;
+        }
+
+        public void updateVoucherSettlement(string _settleCode, string _voucherNo, DateTime? _voucherDate)
+        {
+            AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == _settleCode).FirstOrDefault();
+            if(settlement != null)
+            {
+                settlement.VoucherDate = _voucherDate;
+                settlement.VoucherNo = _voucherNo;
+                settlement.UserModified = currentUser.UserID;
+                settlement.DatetimeModified = DateTime.Now;
+            }
+
+            settlementPaymentRepo.Update(settlement, x => x.Id == settlement.Id,false);
         }
     }
 }

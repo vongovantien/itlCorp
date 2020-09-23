@@ -45,7 +45,7 @@
 
                                                 <div class="m-checkbox-list d-flex align-items-center">
                                                     <label class="m-checkbox"
-                                                        *ngIf="settlePayment.statusApproval === 'Done'">
+                                                        *ngIf="settlePayment.statusApproval === 'Done' && !settlePayment.voucherNo">
                                                         <input type="checkbox" [(ngModel)]="settlePayment.isSelected"
                                                             (change)="onChangeSelectedSettlement(settlePayment);">
                                                         <span></span>
@@ -93,6 +93,10 @@
                                                 </div>
                                             </td>
                                             <td>{{settlePayment.paymentMethodName}}</td>
+                                            <td class="text-primary">
+                                                {{settlePayment.voucherNo}}
+                                            </td>
+                                            <td>{{settlePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>{{settlePayment.note}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
