@@ -224,8 +224,10 @@ namespace eFMS.API.Catalogue.Controllers
                 model.Contracts.ForEach(x => x.Id = Guid.NewGuid());
                 idsContract = model.Contracts.Select(t => t.Id.ToString()).ToList();
                 model.idsContract = idsContract;
+                
             }
             var partner = mapper.Map<CatPartnerModel>(model);
+            partner.idsContract = model.idsContract;
             foreach(var item in partner.Contracts)
             {
                foreach(var it in model.Contracts)
@@ -236,13 +238,9 @@ namespace eFMS.API.Catalogue.Controllers
                     }
                }
             }
-            var hs = catPartnerService.Add(partner);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
+            
+            var result = catPartnerService.Add(partner);
+            
             return Ok(result);
         }
 
