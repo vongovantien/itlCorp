@@ -9,6 +9,8 @@ import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { AssignStagePopupComponent } from "./assign-stage/assign-stage.popup";
 import { AppList } from "src/app/app.list";
+import { ConfirmPopupComponent } from "@common";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
     selector: "app-ops-module-stage-management",
@@ -20,6 +22,7 @@ export class OpsModuleStageManagementComponent extends AppList {
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent, { static: false }) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
     @ViewChild(OpsModuleStageManagementDetailComponent, { static: false }) popupDetail: OpsModuleStageManagementDetailComponent;
     @ViewChild(AssignStagePopupComponent, { static: false }) assignStagePopup: AssignStagePopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmDeletePopup: ConfirmPopupComponent;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
@@ -37,6 +40,7 @@ export class OpsModuleStageManagementComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -178,5 +182,34 @@ export class OpsModuleStageManagementComponent extends AppList {
 
     sortStage() {
         this.stages = this._sortService.sort(this.stages, this.sort, this.order);
+    }
+
+    showDeletePopup(data: any) {
+        this.confirmDeletePopup.show();
+        this.selectedStage = data;
+    }
+
+    onDeleteStage() {
+        this.confirmDeletePopup.hide();
+        this.deleteStageAssigned(this.selectedStage.id);
+    }
+
+    deleteStageAssigned(id: string) {
+        this.isLoading = true;
+        this._progressRef.start();
+        this._operation.deleteStageAssigned(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message, '');
+                        this.getListStageJob(this.jobId);
+                    } else {
+                        this._toastService.error(res.message || 'Có lỗi xảy ra', '');
+                    }
+                },
+            );
     }
 }

@@ -1023,6 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Tính toán total amount theo currency
                 accounting.TotalAmount = CaculatorTotalAmount(model);
+                accounting.UnpaidAmount = accounting.TotalAmount;
                 accounting.UserModified = currentUser.UserID;
                 accounting.DatetimeModified = DateTime.Now;
 

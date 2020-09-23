@@ -138,9 +138,9 @@ namespace eFMS.API.Catalogue.DL.Services
             contract.UserCreated = contract.UserModified = currentUser.UserID;
             contract.Active = false;
             var hs = DataContext.Add(contract, false);
+            DataContext.SubmitChanges();
             if (hs.Success)
             {
-                DataContext.SubmitChanges();
                 if (entity.IsRequestApproval == true)
                 {
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();

@@ -141,7 +141,7 @@ const COMPONENTS = [
 
 const customCurrencyMaskConfig = {
     align: "right",
-    allowNegative: false,
+    allowNegative: true,
     allowZero: true,
     decimal: ".",
     precision: 3,

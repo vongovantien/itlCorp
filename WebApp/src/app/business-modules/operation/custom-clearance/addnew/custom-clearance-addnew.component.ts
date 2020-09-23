@@ -37,7 +37,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         if (this.detailComponent.isDisableCargo) {
             this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
         }
-        if (this.detailComponent.formGroup.invalid) {
+        if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
         }
         this.detailComponent.getClearance();
@@ -64,10 +64,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         if (this.detailComponent.isDisableCargo) {
             this.detailComponent.formGroup.controls['cargoType'].setErrors(null);
         }
-        if (this.detailComponent.formGroup.invalid) {
-            return;
-        }
-        if (this.detailComponent.formGroup.invalid) {
+        if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
         } else {
             if (this.detailComponent.mblid.value == null || this.detailComponent.mblid.value === '') {

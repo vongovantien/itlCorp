@@ -73,6 +73,7 @@
                                 (click)="showDeletePopup(stage)">
                                 <i class="la la-trash"></i>
                             </button>
+
                         </td>
 
                         <td class="sorting">
@@ -114,6 +115,7 @@
                             <span>{{stage.doneDate | date: 'dd/mm/yyyy'}}</span>
                         </td>
                     </tr>
+                    <tr app-table-none-record *ngIf="!stages.length"></tr>
                 </tbody>
             </table>
         </div>

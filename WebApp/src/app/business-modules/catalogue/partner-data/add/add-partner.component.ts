@@ -76,7 +76,8 @@ export class AddPartnerDataComponent extends AppList {
         private toastr: ToastrService,
         private _systemRepo: SystemRepo,
         private _cd: ChangeDetectorRef,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        protected _router: Router,
     ) {
         super();
         this.requestSort = this.sortLocal;
@@ -554,10 +555,11 @@ export class AddPartnerDataComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    if (res.status) {
-                        this.toastr.success(res.message);
-                        this.router.navigate(["/home/catalogue/partner-data"]);
-
+                    if (res.result.success) {
+                        this._toastService.success("New data added");
+                        this._router.navigate([`home/catalogue/partner-data/detail/${res.model.id}`]);
+                    } else {
+                        this._toastService.error("Opps", "Something getting error!");
                     }
 
                 }, err => {
