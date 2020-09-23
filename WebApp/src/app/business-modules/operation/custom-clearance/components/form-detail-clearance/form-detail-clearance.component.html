@@ -56,9 +56,10 @@
                                 </span>
                             </div>
                             <div class="form-control-feedback"
-                                *ngIf="(clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !clearanceDate.value.startDate)">
+                                *ngIf="(clearanceDate.dirty && !clearanceDate.value) || (isSubmitted && !clearanceDate.value) || (isSubmitted && !!clearanceDate.value && !clearanceDate.value.startDate)">
                                 Clearance Date is required!
                             </div>
+
                         </div>
                     </div>
                 </div>

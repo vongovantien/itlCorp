@@ -20,6 +20,9 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? WarriskSurcharge { get; set; }
         public decimal? ScreeningFee { get; set; }
         public decimal? AWB { get; set; }
+        public decimal? DAN { get; set; }
+        public decimal? AMS { get; set; }
+        public decimal? OTH { get; set; }
         public decimal? HandlingFee { get; set; }
         public decimal? NetAmount { get; set; }
         public decimal? ExchangeRate { get; set; }

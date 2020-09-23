@@ -15,6 +15,7 @@ namespace eFMS.API.ReportData.Models
 
         public string OfficeEn { get; set; }
         public string BankAccountVND { get; set; }
+        public string BankAccountUsd { get; set; }
         public string BankNameEn { get; set; }
         public string AddressEn { get; set; }
         public string SwiftCode { get; set; }
@@ -25,5 +26,6 @@ namespace eFMS.API.ReportData.Models
         public string IssuedBy { get; set; }
         public string ApprovedBy { get; set; }
         public string Account { get; set; }
+ 
     }
 }

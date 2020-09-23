@@ -241,7 +241,31 @@ namespace eFMS.API.System.Controllers
         [Route("{id}")]
         public IActionResult GetBy(string id)
         {
-            var result = sysUserService.Get(x => x.Id == id).FirstOrDefault();
+            var result = sysUserService.Get(x => x.Id == id).Select(y => new SysUserModel
+            {
+                Active = y.Active,
+                CreditLimit = y.CreditLimit,
+                CreditRate = y.CreditRate,
+                DatetimeCreated = y.DatetimeCreated,
+                DatetimeModified = y.DatetimeModified,
+                Description = y.Description,
+                EmployeeId = y.EmployeeId,
+                EmployeeNameVn = y.EmployeeNameVn,
+                Id = y.Id,
+                InactiveOn = y.InactiveOn,
+                IsLdap = y.IsLdap,
+                LdapObjectGuid = y.LdapObjectGuid,
+                RefuseEmail = y.RefuseEmail,
+                SysEmployeeModel = y.SysEmployeeModel,
+                UserCreated = y.UserCreated,
+                UserCreatedName = y.UserCreatedName,
+                UserModified = y.UserModified,
+                UserModifiedName = y.UserModifiedName,
+                Username = y.Username,
+                UserType = y.UserType,
+                WorkingStatus = y.WorkingStatus,
+                WorkPlaceId = y.WorkPlaceId,
+            }).FirstOrDefault();
             var userCreate = sysUserService.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = sysUserService.Get(x => x.Id == result.UserModified).FirstOrDefault();
             result.UserCreated = userCreate?.Username;
