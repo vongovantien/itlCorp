@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string DeliveryPlace { get; set; }
         public DateTime? NgayDK { get; set; }
         public DateTime? CustomDate { get; set; }
+        public string JobNo { get; set; }
     }
 
 
