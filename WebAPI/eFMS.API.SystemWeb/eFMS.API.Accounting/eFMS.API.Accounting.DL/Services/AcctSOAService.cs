@@ -2294,6 +2294,7 @@ namespace eFMS.API.Accounting.DL.Services
                 string _mawb = string.Empty;
                 string _hwbNo = string.Empty;
                 string _customNo = string.Empty;
+                string _jobNo = string.Empty;
                 #region -- Info MBL, HBL --
                 var ops = opsTransactionRepo.Get(x => x.Hblid == charge.Hblid).FirstOrDefault();
                 if (ops != null)
@@ -2301,6 +2302,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _mawb = ops.Mblno;
                     _hwbNo = ops.Hwbno;
                     _customNo = GetTopClearanceNoByJobNo(ops.JobNo);
+                    _jobNo = ops.JobNo;
                 }
                 else
                 {
@@ -2313,6 +2315,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             _mawb = masterBillDoc.Mawb;
                             _customNo = GetTopClearanceNoByJobNo(masterBillDoc.JobNo);
+                            _jobNo = masterBillDoc.JobNo;
                         }
                     }
                 }
@@ -2367,6 +2370,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.ROBH = (charge.Type == AccountingConstants.TYPE_CHARGE_OBH) ? _amount : 0;
                 soaCharge.ROBH = soaCharge.ROBH + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.CustomNo = _customNo;
+                soaCharge.JobNo = _jobNo;
 
                 soaCharges.Add(soaCharge);
             }

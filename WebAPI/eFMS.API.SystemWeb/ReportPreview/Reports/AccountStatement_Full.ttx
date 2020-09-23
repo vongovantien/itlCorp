@@ -8,7 +8,7 @@ Fax	String	255
 Taxcode	String	50	
 TransID	String	50	
 MAWB	String	50	
-HWBNO	Memo	50	
+HWBNO	String	50	
 DateofInv	String	50	
 Order	String	255	
 InvID	String	50	
@@ -38,3 +38,4 @@ Volumne	String	255
 POBH	Number	
 ROBH	Number	
 CustomNo	String	255	
+JobNo	String	50	

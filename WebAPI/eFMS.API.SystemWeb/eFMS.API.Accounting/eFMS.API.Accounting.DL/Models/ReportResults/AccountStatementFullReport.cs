@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public decimal? POBH { get; set; }
         public decimal? ROBH { get; set; }
         public string CustomNo { get; set; }
+        public string JobNo { get; set; }
 
     }
 
