@@ -843,6 +843,18 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         subject = "ON BEHALF";
                     }
+
+                    decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                    decimal? _vatAmount = 0;                 
+                    if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && item.CurrencyId != DocumentConstants.CURRENCY_USD)
+                    {
+                        //Quy đổi về USD đối với các currency khác
+                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
+                    }
+                    else
+                    {
+                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
+                    }
                     var acctCDNo = new AcctSOAReport
                     {
                         SortIndex = null,
@@ -870,7 +882,7 @@ namespace eFMS.API.Documentation.DL.Services
                         Quantity = item.Quantity,
                         QUnit = "N/A",
                         UnitPrice = item.UnitPrice,
-                        VAT = null,
+                        VAT = _vatAmount,
                         Debit = model.TotalDebit,
                         Credit = model.TotalCredit,
                         Notes = item.Notes,
@@ -898,7 +910,8 @@ namespace eFMS.API.Documentation.DL.Services
                         TransDate = null,
                         Unit = item.CurrencyId,
                         UnitPieaces = "N/A",
-                        CustomDate = _clearance?.ClearanceDate
+                        CustomDate = _clearance?.ClearanceDate,
+                        JobNo = model.JobNo
                     };
                     listSOA.Add(acctCDNo);
                 }
