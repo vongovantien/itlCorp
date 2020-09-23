@@ -52,4 +52,5 @@ NgayDK	Date
 CuaKhau	String	255	
 DeliveryPlace	String	255	
 CustomDate	Date	
+JobNo	String	50	
 
