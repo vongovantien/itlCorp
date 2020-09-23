@@ -910,6 +910,7 @@ namespace eFMS.API.Accounting.DL.Services
                 model.Status = "New";
                 //Tính toán total amount theo currency
                 model.TotalAmount = CaculatorTotalAmount(model);
+                model.UnpaidAmount = model.TotalAmount;
                 model.UserCreated = model.UserModified = currentUser.UserID;
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.GroupId = currentUser.GroupId;
