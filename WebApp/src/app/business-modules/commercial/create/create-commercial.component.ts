@@ -112,34 +112,48 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                     // * Ngược lại không trùng TaxCode thì đi tạo Partner.
                     return this._catalogueRepo.createPartner(body).pipe(
                         catchError((err, caught) => this.catchError),
-                        concatMap((res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                if (res.data) {
-                                    this._toastService.success(res.message);
-                                    this.contractList.contracts.forEach(element => {
-                                        if (!!element.fileList) {
-                                            this.fileList.push(element.fileList[0]);
-                                        }
-                                    });
+                        concatMap((res: any) => {
+                            if (res.result.success) {
+                                this._toastService.success("New data added");
+                                this.contractList.contracts.forEach(element => {
+                                    if (!!element.fileList) {
+                                        this.fileList.push(element.fileList[0]);
+                                    }
+                                });
 
-                                    let i = 0;
-                                    for (const obj of this.contractList.contracts) {
-                                        obj.id = res.data.idsContract[i];
-                                        i++;
-                                    }
-                                    const idsContract: any = [];
-                                    this.contractList.contracts.forEach(element => {
-                                        if (!!element.fileList) {
-                                            idsContract.push(element.id);
-                                        }
-                                    });
-                                    // Nếu không có file thì return luôn.
-                                    if (this.fileList.length === 0) {
-                                        return of(true);
-                                    }
-                                    return this._catalogueRepo.uploadFileMoreContract(idsContract, res.data.id, this.fileList);
+                                let i = 0;
+                                for (const obj of this.contractList.contracts) {
+                                    obj.id = res.model.idsContract[i];
+                                    i++;
                                 }
+                                const idsContract: any = [];
+                                this.contractList.contracts.forEach(element => {
+                                    if (!!element.fileList) {
+                                        idsContract.push(element.id);
+                                    }
+                                });
+                                // Nếu không có file thì return luôn.
+                                if (this.fileList.length === 0) {
+                                    return of({ status: true, id: res.model.id });
+                                }
+                                return this._catalogueRepo.uploadFileMoreContract(idsContract, res.model.id, this.fileList).pipe(
+                                    catchError((err, caught) => this.catchError),
+                                    concatMap((rs: any) => {
+                                        if (!!rs) {
+                                            this._toastService.success("Upload file successfully!");
+                                            return of(res.model.id);
+                                        }
+                                    })
+                                );
+                            } else {
+                                this._toastService.error("Opps", "Something getting error!");
                             }
+                            // if (res.status) {
+                            //     if (res.data) {
+                            //         this._toastService.success(res.message);
+
+                            //     }
+                            // }
                         })
                     );
                 })
@@ -150,14 +164,19 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                     this.formCreate.isExistedTaxcode = true;
                     return;
                 }
-                if (res || res.status) {
+                if (res.status === true) {
                     if (this.type === 'Customer') {
-                        this._router.navigate(["/home/commercial/customer"]);
+                        this._router.navigate([`home/commercial/customer/${res.id}`]);
                     } else {
-                        this._router.navigate(["/home/commercial/agent"]);
+                        this._router.navigate([`home/commercial/agent/${res.id}`]);
+                    }
+                } else if (!!res) {
+                    if (this.type === 'Customer') {
+                        this._router.navigate([`home/commercial/customer/${res}`]);
+                    } else {
+                        this._router.navigate([`home/commercial/agent/${res}`]);
                     }
                 }
-                console.log(res);
             },
             (err) => {
                 console.log(err);

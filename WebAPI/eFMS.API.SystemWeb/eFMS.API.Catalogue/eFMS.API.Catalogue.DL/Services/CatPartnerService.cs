@@ -93,55 +93,72 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
         #region CRUD
-        public HandleState Add(CatPartnerModel entity)
+        public object Add(CatPartnerModel entity)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRangeWrite == PermissionRange.None) return new HandleState(403, "");
-            CatPartner partner = GetModelToAdd(entity);
-            var hs = new HandleState();
-
-            if (entity.Contracts.Count > 0)
+            CatPartnerModel partner = GetModelToAdd(entity);
+            using (var trans = DataContext.DC.Database.BeginTransaction())
             {
-                var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
-                contracts.ForEach(x =>
+                try
                 {
-                    x.PartnerId = partner.Id;
-                    x.DatetimeCreated = DateTime.Now;
-                    x.UserCreated = x.UserModified = currentUser.UserID;
-                });
-                partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
-                contractRepository.Add(contracts, false);
-            
-            }
-            DataContext.Add(partner, false);
-
-            DataContext.SubmitChanges();
-            contractRepository.SubmitChanges();
-            if(entity.Contracts.Count > 0)
-            {
-                foreach (var item in entity.Contracts)
-                {
-                    if (item.IsRequestApproval == true)
+                    var hsTransPartner = DataContext.Add(partner);
+                    if (hsTransPartner.Success)
                     {
-                        entity.ContractService = item.SaleService;
-                        entity.ContractType = item.ContractType;
-                        entity.SalesmanId = item.SaleManId;
-                        entity.UserCreated = partner.UserCreated;
-                        SendMailRequestApproval(entity);
+                        if (entity.Contracts.Count > 0)
+                        {
+                            var contracts = mapper.Map<List<CatContract>>(entity.Contracts);
+                            contracts.ForEach(x =>
+                            {
+                                x.PartnerId = partner.Id;
+                                x.DatetimeCreated = DateTime.Now;
+                                x.UserCreated = x.UserModified = currentUser.UserID;
+                            });
+                            partner.SalePersonId = contracts.FirstOrDefault().SaleManId.ToString();
+
+                            var hsContract = contractRepository.Add(contracts);
+
+                            if (hsContract.Success)
+                            {
+                                foreach (var item in entity.Contracts)
+                                {
+                                    if (item.IsRequestApproval == true)
+                                    {
+                                        entity.ContractService = item.SaleService;
+                                        entity.ContractType = item.ContractType;
+                                        entity.SalesmanId = item.SaleManId;
+                                        entity.UserCreated = partner.UserCreated;
+                                        SendMailRequestApproval(entity);
+                                    }
+                                }
+                            }
+
+                        }
+                        SendMailCreatedSuccess(partner);
                     }
+                    ClearCache();
+                    Get();
+                    var result = hsTransPartner;
+                    trans.Commit();
+                    return new { model = partner, result };
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    var result = new HandleState(ex.Message);
+                    return new { model = new object { }, result };
+                }
+                finally
+                {
+                    trans.Dispose();
                 }
             }
-            ClearCache();
-            Get();
-            SendMailCreatedSuccess(partner);
-
-            return hs;
         }
 
-        private CatPartner GetModelToAdd(CatPartnerModel entity)
+        private CatPartnerModel GetModelToAdd(CatPartnerModel entity)
         {
-            var partner = mapper.Map<CatPartner>(entity);
+            var partner = entity;
             if (!string.IsNullOrEmpty(entity.ParentId))
             {
                 partner.ParentId = entity.ParentId;
@@ -289,7 +306,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "eFMS System </div>");
 
-            if(partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+            if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
             {
                 if (lstToAccountant.Any())
                 {
@@ -297,7 +314,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
 
-            if(partner.PartnerType == "Customer"  || partner.PartnerType == "Agent")
+            if (partner.PartnerType == "Customer" || partner.PartnerType == "Agent")
             {
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
@@ -945,7 +962,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DatetimeCreated = DateTime.Now;
                     partner.Id = Guid.NewGuid().ToString();
                     partner.AccountNo = partner.TaxCode;
-                    if(!string.IsNullOrEmpty(item.AcReference))
+                    if (!string.IsNullOrEmpty(item.AcReference))
                     {
                         partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
                     }
@@ -1047,7 +1064,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     partner.DepartmentId = currentUser.DepartmentId;
                     partner.PartnerGroup = type == "Customer" ? "CUSTOMER" : "CUSTOMER;AGENT";
                     partner.PartnerType = type == "Customer" ? "Customer" : "Agent";
-                    if(!string.IsNullOrEmpty(item.AcReference))
+                    if (!string.IsNullOrEmpty(item.AcReference))
                     {
                         partner.ParentId = DataContext.Get(x => x.AccountNo == item.AcReference).Select(x => x.Id)?.FirstOrDefault();
                     }
@@ -1320,7 +1337,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
                         item.IsValid = false;
                     }
-                    else if (list.Count(x => x.TaxCode == taxCode) > 1 && list.Count(x=>x.InternalReferenceNo == internalReferenceNo) > 1 )
+                    else if (list.Count(x => x.TaxCode == taxCode) > 1 && list.Count(x => x.InternalReferenceNo == internalReferenceNo) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
