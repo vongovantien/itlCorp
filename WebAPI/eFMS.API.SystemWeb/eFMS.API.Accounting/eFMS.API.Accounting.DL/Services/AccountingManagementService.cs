@@ -437,33 +437,33 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
             {
                 
-                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w)).Select(y => y.ToUpper())
-                .Contains(x.CdNoteNo.ToUpper()));
+                query = query.And(x => criteria.CdNotes.Where(w => !string.IsNullOrEmpty(w))
+                .Contains(x.CdNoteNo, StringComparer.OrdinalIgnoreCase));
 
             }
 
             if (criteria.SoaNos != null && criteria.SoaNos.Count > 0)
             {
-                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w)).Select(y => y.ToUpper())
-                .Contains(x.SoaNo.ToUpper()));
+                query = query.And(x => criteria.SoaNos.Where(w => !string.IsNullOrEmpty(w))
+                .Contains(x.SoaNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.JobNos != null && criteria.JobNos.Count > 0)
             {
-                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w)).Select(y => y.ToUpper())
-                .Contains(x.JobNo.ToUpper()));
+                query = query.And(x => criteria.JobNos.Where(w => !string.IsNullOrEmpty(w))
+                .Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Hbls != null && criteria.Hbls.Count > 0)
             {
-                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w)).Select(y => y.ToUpper())
-                .Contains(x.Hbl.ToUpper()));
+                query = query.And(x => criteria.Hbls.Where(w => !string.IsNullOrEmpty(w))
+                .Contains(x.Hbl, StringComparer.OrdinalIgnoreCase));
             }
 
             if (criteria.Mbls != null && criteria.Mbls.Count > 0)
             {
-                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Select(y => y.ToUpper())
-                .Contains(x.Mbl.ToUpper()));
+                query = query.And(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w))
+                .Contains(x.Mbl, StringComparer.OrdinalIgnoreCase));
             }
 
             //SELLING (DEBIT)
