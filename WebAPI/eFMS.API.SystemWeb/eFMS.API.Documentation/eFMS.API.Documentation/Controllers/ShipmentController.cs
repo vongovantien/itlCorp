@@ -245,7 +245,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("GetDataJobProfitAnalysis")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetDataJobProfitAnalysis(GeneralReportCriteria criteria)
         {
             var data = shipmentService.GetDataJobProfitAnalysis(criteria);
