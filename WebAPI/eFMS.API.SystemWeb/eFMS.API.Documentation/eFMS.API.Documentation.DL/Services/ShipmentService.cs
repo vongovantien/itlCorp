@@ -2185,39 +2185,42 @@ namespace eFMS.API.Documentation.DL.Services
                     data.Eta = item.ServiceDate;
                     data.Etd = item.ServiceDate;
                     data.Quantity = item.SumContainers;
-                    var DetailContainer = item.ContainerDescription.Split(";").ToArray();
+                    var DetailContainer = !string.IsNullOrEmpty(item.ContainerDescription) ?  item.ContainerDescription.Split(";").ToArray() : null;
                     int? Cont20 = 0;
                     int? Cont40 = 0;
                     int? Cont40HC = 0;
                     int? Cont45 = 0;
                     int? Cont = 0;
-                    foreach(var it in DetailContainer)
+                    if(DetailContainer != null)
                     {
-                        if (Regex.Matches(it.Trim(), "20").Count > 0)
+                        foreach (var it in DetailContainer)
                         {
-                            Cont20 = Convert.ToInt16(it.Trim().Substring(0, 1));
-                        }
+                            if (Regex.Matches(it.Trim(), "20").Count > 0)
+                            {
+                                Cont20 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            }
 
-                        if (Regex.Matches(it.Trim(), "40").Count > 0)
-                        {
-                            Cont40 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            if (Regex.Matches(it.Trim(), "40").Count > 0)
+                            {
+                                Cont40 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            }
+
+                            if (Regex.Matches(it.Trim(), "40´HC").Count > 0)
+                            {
+                                Cont40HC = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            }
+
+                            if (Regex.Matches(it.Trim(), "45").Count > 0)
+                            {
+                                Cont45 = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            }
+
+                            if (Regex.Matches(it.Trim(), "Cont").Count > 0)
+                            {
+                                Cont = Convert.ToInt16(it.Trim().Substring(0, 1));
+                            }
+
                         }
-   
-                        if (Regex.Matches(it.Trim(), "40´HC").Count > 0 )
-                        {
-                            Cont40HC = Convert.ToInt16(it.Trim().Substring(0, 1));
-                        }
-       
-                        if (Regex.Matches(it.Trim(), "45").Count > 0)
-                        {
-                            Cont45 = Convert.ToInt16(it.Trim().Substring(0, 1));
-                        }
-         
-                        if (Regex.Matches(it.Trim(), "Cont").Count > 0)
-                        {
-                            Cont = Convert.ToInt16(it.Trim().Substring(0, 1));
-                        }
-          
                     }
                     data.Cont20 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont20 : 0;
                     data.Cont40 = !string.IsNullOrEmpty(item.ContainerDescription) ? Cont40 : 0;
