@@ -18,7 +18,7 @@ import { SeaConsolImportDetailHBLComponent } from './detail/detail-hbl-consol-im
 const routing: Routes = [
     {
         path: '', component: SeaConsolImportHBLComponent,
-        data: <CommonInterface.IDataParam>{ name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.SFI_CODE }
+        data: <CommonInterface.IDataParam>{ name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.SCI_CODE }
     },
     {
         path: 'new', component: SeaConsolImportCreateHBLComponent,
