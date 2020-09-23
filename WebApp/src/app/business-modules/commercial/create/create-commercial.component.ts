@@ -134,9 +134,17 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                                 });
                                 // Nếu không có file thì return luôn.
                                 if (this.fileList.length === 0) {
-                                    return of({ status: true, model: res.model.id });
+                                    return of({ status: true, id: res.model.id });
                                 }
-                                return this._catalogueRepo.uploadFileMoreContract(idsContract, res.model.id, this.fileList);
+                                return this._catalogueRepo.uploadFileMoreContract(idsContract, res.model.id, this.fileList).pipe(
+                                    catchError((err, caught) => this.catchError),
+                                    concatMap((rs: any) => {
+                                        if (!!rs) {
+                                            this._toastService.success("Upload file successfully!");
+                                            return of(res.model.id);
+                                        }
+                                    })
+                                );
                             } else {
                                 this._toastService.error("Opps", "Something getting error!");
                             }
@@ -156,17 +164,19 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
                     this.formCreate.isExistedTaxcode = true;
                     return;
                 }
-                // else {
-                //     console.log(res);
-                // }
                 if (res.status === true) {
                     if (this.type === 'Customer') {
-                        this._router.navigate([`home/commercial/customer/${res.model}`]);
+                        this._router.navigate([`home/commercial/customer/${res.id}`]);
                     } else {
-                        this._router.navigate([`home/commercial/agent/${res.model}`]);
+                        this._router.navigate([`home/commercial/agent/${res.id}`]);
+                    }
+                } else if (!!res) {
+                    if (this.type === 'Customer') {
+                        this._router.navigate([`home/commercial/customer/${res}`]);
+                    } else {
+                        this._router.navigate([`home/commercial/agent/${res}`]);
                     }
                 }
-                console.log(res);
             },
             (err) => {
                 console.log(err);
