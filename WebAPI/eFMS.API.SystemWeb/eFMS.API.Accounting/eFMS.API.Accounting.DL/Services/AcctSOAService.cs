@@ -2102,6 +2102,185 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        // Export SOA Credit Cost 
+        public ExportSOAAirfreightModel GetSoaSupplierAirFreightBySoaNo(string soaNo, string officeId)
+        {
+            var soa = DataContext.Get(x => x.Soano == soaNo);
+            var partner = catPartnerRepo.Get();
+            var port = catPlaceRepo.Get();
+            var resultData = from s in soa
+                             join pat in partner on s.Customer equals pat.Id into pat2
+                             from pat in pat2.DefaultIfEmpty()
+                             select new ExportSOAAirfreightModel
+                             {
+                                 PartnerNameEn = pat.PartnerNameEn,
+                                 PartnerBillingAddress = pat.AddressEn,
+                                 PartnerTaxCode = pat.TaxCode,
+                                 SoaNo = s.Soano,
+                                 DateSOA = s.DatetimeCreated,
+                                 IssuedBy = s.UserCreated,
+                             };
+            // Partner information
+            var result = resultData.FirstOrDefault();
+            if (result != null)
+            {
+                result.IssuedBy = sysUserRepo.Get(x => x.Id == result.IssuedBy).FirstOrDefault()?.Username;
+            }
+
+            Expression<Func<ChargeSOAResult, bool>> query = chg => chg.SOANo == soaNo;
+            var charge = GetChargeShipmentDocAndOperation(query, null).Where(x => x.TransactionType == "AI" || x.TransactionType == "AE");
+            var results = charge.GroupBy(x => x.JobId).AsQueryable();
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
+            var csTransDe = csTransactionDetailRepo.Get();
+
+            if (results.Select(x => x.Key).Count() > 0)
+            {
+                result.HawbAirFrieghts = new List<HawbAirFrieghtModel>();
+                foreach (var item in results.Select(x => x.Key))
+                {
+                    var chargeData = charge.Where(x => x.JobId == item).FirstOrDefault();
+                    HawbAirFrieghtModel air = new HawbAirFrieghtModel();
+                    var cstrans = csTrans.Where(k => k.JobNo == chargeData.JobId).FirstOrDefault();
+                    var transDetail = csTransDe.Where(x => x.JobId == cstrans.Id).FirstOrDefault();
+                    air.JobNo = chargeData.JobId;
+                    air.FlightNo = cstrans.FlightVesselName ?? transDetail.FlightNo;
+                    air.ShippmentDate = chargeData.ShippmentDate;
+                    air.AOL = port.Where(x => x.Id == cstrans.Pol).Select(t => t.Code).FirstOrDefault();
+                    air.Mawb = chargeData.MBL;
+                    air.AOD = port.Where(x => x.Id == cstrans.Pod).Select(t => t.Code).FirstOrDefault();
+                    air.Pcs = chargeData.PackageQty;
+                    air.CW = cstrans.ChargeWeight ?? transDetail.ChargeWeight;
+                    air.GW = cstrans.GrossWeight ?? transDetail.GrossWeight;
+
+                    // Rate
+                    air.Rate = chargeData.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE || (chargeData.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
+                                                                    chargeData.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())) ? chargeData.UnitPrice : null;
+
+                    // Air Freight
+                    var lstAirfrieght = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE ||
+                                        (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()))));
+                    air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Credit).Sum() : null;
+
+                    // Fuel Surcharge
+                    var lstFuelSurcharge = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_FUEL_SURCHARGE_CODE ||
+                                            (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_FUEL_SURCHARGE.ToLower())));
+                    air.FuelSurcharge = lstFuelSurcharge.Count() > 0 ? lstFuelSurcharge.Select(t => t.Credit).Sum() : null;
+
+                    // War risk Surcharge
+                    var lstWariskSurcharge = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_WAR_RISK_SURCHARGE_CODE ||
+                                            (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_WAR_RISK_SURCHARGE.ToLower())));
+                    air.WarriskSurcharge = lstWariskSurcharge.Count() > 0 ? lstWariskSurcharge.Select(t => t.Credit).Sum() : null;
+
+                    // Screening Fee
+                    var lstScreeningFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_SCREENING_CODE ||
+                                        (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
+                                        (x.ChargeName.ToLower() == AccountingConstants.CHARGE_SCREENING_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_X_RAY.ToLower()))));
+                    air.ScreeningFee = lstScreeningFee.Count() > 0 ? lstScreeningFee.Select(t => t.Credit).Sum() : null;
+
+                    // AWB
+                    var lstAWBFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AWB_FEE_CODE ||
+                                    (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
+                                    (x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB_FEE.ToLower() || x.ChargeName.ToLower() == AccountingConstants.CHARGE_AWB.ToLower()))));
+                    air.AWB = lstAWBFee.Count() > 0 ? lstAWBFee.Select(t => t.Credit).Sum() : null;
+
+                    // AMS
+                    var lstAMS = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AMS_FEE_CODE ||
+                                (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AMS_FEE.ToLower())));
+                    air.AMS = lstAMS.Count() > 0 ? lstAMS.Select(t => t.Credit).Sum() : null;
+
+                    // Dangerous Fee
+                    var lstDangerousFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_DAN_AIR_CODE ||
+                                            (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_DAN_AIR_FEE.ToLower())));
+                    air.DAN = lstDangerousFee.Count() > 0 ? lstDangerousFee.Select(t => t.Credit).Sum() : null;
+
+                    // Handling fee
+                    var lstHandlingFee = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_DHL_AIR_CODE || x.ChargeName.ToLower() == AccountingConstants.CHARGE_HANDLING_FEE.ToLower()));
+                    air.HandlingFee = lstHandlingFee.Count() > 0 ? lstHandlingFee.Select(t => t.Credit).Sum() : null;
+
+                    // Other Charges
+                    var lstOtherChrg = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_OTH_AIR_CODE ||
+                                        (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_SA_OTH_FEE.ToLower())));
+                    if (lstOtherChrg.Count() == 0)
+                    {
+                        lstOtherChrg = charge.Where(x => x.JobId == item && x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower()).Except(lstAirfrieght);
+                        lstOtherChrg = lstOtherChrg.Except(lstFuelSurcharge);
+                        lstOtherChrg = lstOtherChrg.Except(lstWariskSurcharge);
+                        lstOtherChrg = lstOtherChrg.Except(lstScreeningFee);
+                        lstOtherChrg = lstOtherChrg.Except(lstAWBFee);
+                        lstOtherChrg = lstOtherChrg.Except(lstAMS);
+                        lstOtherChrg = lstOtherChrg.Except(lstDangerousFee);
+                        lstOtherChrg = lstOtherChrg.Except(lstHandlingFee);
+                    }
+                    air.OTH = lstOtherChrg.Count() > 0 ? lstOtherChrg.Select(t => t.Credit).Sum() : null;
+
+                    // Net Amount
+                    air.NetAmount = 0;
+                    if (air.AirFreight.HasValue)
+                    {
+                        air.NetAmount += air.AirFreight;
+                    }
+                    if (air.FuelSurcharge.HasValue)
+                    {
+                        air.NetAmount += air.FuelSurcharge;
+                    }
+                    if (air.WarriskSurcharge.HasValue)
+                    {
+                        air.NetAmount += air.WarriskSurcharge;
+                    }
+                    if (air.ScreeningFee.HasValue)
+                    {
+                        air.NetAmount += air.ScreeningFee;
+                    }
+                    if (air.AWB.HasValue)
+                    {
+                        air.NetAmount += air.AWB;
+                    }
+                    if (air.AMS.HasValue)
+                    {
+                        air.NetAmount += air.AMS;
+                    }
+                    if (air.DAN.HasValue)
+                    {
+                        air.NetAmount += air.DAN;
+                    }
+                    if (air.OTH.HasValue)
+                    {
+                        air.NetAmount += air.OTH;
+                    }
+                    if (air.HandlingFee.HasValue)
+                    {
+                        air.NetAmount += air.HandlingFee;
+                    }
+
+                    var _exchangeRateUSD = 0m;
+                    if (chargeData.Currency != AccountingConstants.CURRENCY_USD)
+                    {
+                        _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(chargeData.FinalExchangeRate, chargeData.ExchangeDate, chargeData.Currency, AccountingConstants.CURRENCY_USD);
+                        air.ExchangeRate = _exchangeRateUSD;
+                        air.AirFreight = air.AirFreight * _exchangeRateUSD;
+                        air.FuelSurcharge = air.FuelSurcharge * _exchangeRateUSD;
+                        air.WarriskSurcharge = air.WarriskSurcharge * _exchangeRateUSD;
+                        air.ScreeningFee = air.ScreeningFee * _exchangeRateUSD;
+                        air.AWB = air.AWB * _exchangeRateUSD;
+                        air.AMS = air.AMS * _exchangeRateUSD;
+                        air.DAN = air.DAN * _exchangeRateUSD;
+                        air.OTH = air.OTH * _exchangeRateUSD;
+                        air.HandlingFee = air.HandlingFee * _exchangeRateUSD;
+                        air.NetAmount = air.NetAmount * _exchangeRateUSD;
+                    }
+                    result.HawbAirFrieghts.Add(air);
+                }
+            }
+            var officeData = officeRepo.Get(x => x.Id == new Guid(officeId)).FirstOrDefault();
+            result.OfficeEn = officeData.BranchNameEn;
+            result.BankAccountUSD = officeData.BankAccountUsd;
+            result.BankAccountVND = officeData.BankAccountVnd;
+            result.BankNameEn = officeData.BankNameEn;
+            result.AddressEn = officeData.AddressEn;
+            result.SwiftCode = officeData.SwiftCode;
+            return result;
+        }
+
         public SOAOPSModel GetSOAOPS(string soaNo)
         {
             SOAOPSModel opssoa = new SOAOPSModel();

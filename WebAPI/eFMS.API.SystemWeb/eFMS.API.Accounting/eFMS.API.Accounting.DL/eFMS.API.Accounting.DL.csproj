@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <Reference Include="eFMS.API.Accounting.Service">
-      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Accounting.Service.dll</HintPath>
+      <HintPath>obj\Debug\netcoreapp2.2\eFMS.API.Accounting.Service.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
