@@ -30,5 +30,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string SalesmanId { get; set; }
         public string Service { get; set; }
         public string ServiceName { get; set; }
+        public decimal? ChargeWeight { get; set; }
     }
 }
