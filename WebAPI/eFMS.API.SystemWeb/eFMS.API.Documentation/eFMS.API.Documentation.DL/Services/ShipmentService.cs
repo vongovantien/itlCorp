@@ -1158,6 +1158,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
                                         QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        
 
 
                                     };
