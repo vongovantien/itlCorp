@@ -94,15 +94,14 @@
                                 <span>{{custom.customerName}}</span>
                             </td>
                             <td>
-                                <span>{{custom.importCountryName}}</span>
+                                <span>{{custom.pcs | number :'.0-3'}}</span>
                             </td>
                             <td>
-                                <span>{{custom.exportCountryName}}</span>
+                                <span>{{custom.grossWeight | number :'.0-3'}}</span>
                             </td>
                             <td>
                                 <span>{{custom.jobNo}}</span>
                             </td>
-
                             <td>
                                 <span class="text-success">{{custom.userCreatedName}}</span>
                             </td>
@@ -111,6 +110,12 @@
                                 <ng-template #nojobno>
                                     <span class="m--font-danger">Not Imported</span>
                                 </ng-template>
+                            </td>
+                            <td>
+                                <span>{{custom.importCountryName}}</span>
+                            </td>
+                            <td>
+                                <span>{{custom.exportCountryName}}</span>
                             </td>
                         </tr>
                         <tr class="loading-wrapper" *ngIf="isLoading">
