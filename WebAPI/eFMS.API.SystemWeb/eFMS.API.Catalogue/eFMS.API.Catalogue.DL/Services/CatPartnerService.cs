@@ -81,6 +81,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "AgentId");
             SetChildren<CatPartnerCharge>("Id", "PartnerId");
             SetChildren<CsManifest>("Id", "Supplier");
+            SetChildren<CsShipmentSurcharge>("Id", "PayerID");
+            SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
