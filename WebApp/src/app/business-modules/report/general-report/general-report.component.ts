@@ -42,6 +42,7 @@ export class GeneralReportComponent extends AppList {
             { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Route', field: 'route', sortable: true },
             { title: 'Qty', field: 'qty', sortable: true },
+            { title: 'CW', field: 'chargeWeight', sortable: true },
             { title: 'Revenue', field: 'revenue', sortable: true },
             { title: 'Cost', field: 'cost', sortable: true },
             { title: 'Profit', field: 'profit', sortable: true },

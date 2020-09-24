@@ -2132,7 +2132,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(14).Width = 14; //Cột N
             workSheet.Column(15).Width = 20; //Cột O
             workSheet.Column(16).Width = 20; //Cột P
-            workSheet.Column(17).Width = 15.5; //Cột Q            
+            workSheet.Column(17).Width = 20; //Cột Q 
+            workSheet.Column(18).Width = 18; //Cột R
         }
 
         private void BinddingDataStandardGeneralReport(ExcelWorksheet workSheet, List<GeneralReportResult> listData, GeneralReportCriteria criteria)
@@ -2150,16 +2151,17 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Service Date", //7
                 "Route", //8
                 "Qty", //9
-                "Revenue", //10
-                "Cost", //11
-                "Profit", //12
-                "OBH", //13
-                "P.I.C", //14
-                "Salesman", //15
-                "Service" //16
+                "CW", //10
+                "Revenue", //11
+                "Cost", //12
+                "Profit", //13
+                "OBH", //14
+                "P.I.C", //15
+                "Salesman", //16
+                "Service" //17
             };
-            workSheet.Cells["A1:Q1"].Style.Font.Bold = true;
-            for (int c = 1; c < 18; c++)
+            workSheet.Cells["A1:R1"].Style.Font.Bold = true;
+            for (int c = 1; c < 19; c++)
             {
                 workSheet.Cells[1, c].Value = headers[c - 1];
             }
@@ -2172,44 +2174,49 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[startRow, 3].Value = item.Mawb;
                 workSheet.Cells[startRow, 4].Value = item.Hawb;
                 workSheet.Cells[startRow, 5].Value = item.CustomerName;
+                workSheet.Cells[startRow, 5].Style.WrapText = true;
                 workSheet.Cells[startRow, 6].Value = item.CarrierName;
+                workSheet.Cells[startRow, 6].Style.WrapText = true;
                 workSheet.Cells[startRow, 7].Value = item.AgentName;
+                workSheet.Cells[startRow, 7].Style.WrapText = true;
                 workSheet.Cells[startRow, 8].Value = item.ServiceDate;
                 workSheet.Cells[startRow, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[startRow, 9].Value = item.Route;
 
                 workSheet.Cells[startRow, 10].Value = item.Qty;
-                workSheet.Cells[startRow, 11].Value = item.Revenue;
-                workSheet.Cells[startRow, 12].Value = item.Cost;
-                workSheet.Cells[startRow, 13].Value = item.Profit;
-                workSheet.Cells[startRow, 14].Value = item.Obh;
+                workSheet.Cells[startRow, 11].Value = item.ChargeWeight;
+                workSheet.Cells[startRow, 12].Value = item.Revenue;
+                workSheet.Cells[startRow, 13].Value = item.Cost;
+                workSheet.Cells[startRow, 14].Value = item.Profit;
+                workSheet.Cells[startRow, 15].Value = item.Obh;
 
                 workSheet.Cells[startRow, 10].Style.Numberformat.Format = numberFormatVND;
 
                 if (criteria.Currency != "VND")
                 {
-                    for (int i = 11; i < 15; i++)
+                    for (int i = 11; i < 16; i++)
                     {
                         workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormatVND;
                     }
                 }
                 else
                 {
-                    for (int i = 11; i < 15; i++)
+                    for (int i = 11; i < 16; i++)
                     {
                         workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormats;
                     }
                 }
 
-                workSheet.Cells[startRow, 15].Value = item.PersonInCharge;
-                workSheet.Cells[startRow, 16].Value = item.Salesman;
-                workSheet.Cells[startRow, 17].Value = item.ServiceName;
+                workSheet.Cells[startRow, 16].Value = item.PersonInCharge;
+                workSheet.Cells[startRow, 17].Value = item.Salesman;
+                workSheet.Cells[startRow, 18].Value = item.ServiceName;
 
                 startRow += 1;
             }
-
-            workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow - 1, 17].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
         #region Summary Cost
         public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, GeneralReportCriteria criteria, Stream stream = null)
