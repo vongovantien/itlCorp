@@ -39,3 +39,5 @@ POBH	Number
 ROBH	Number	
 CustomNo	String	255	
 JobNo	String	50	
+CdCode	String	50	
+Docs	Memo	

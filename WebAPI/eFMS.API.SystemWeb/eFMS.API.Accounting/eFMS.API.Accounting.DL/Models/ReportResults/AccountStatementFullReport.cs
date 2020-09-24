@@ -45,7 +45,8 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public decimal? ROBH { get; set; }
         public string CustomNo { get; set; }
         public string JobNo { get; set; }
-
+        public string CdCode { get; set; }
+        public string Docs { get; set; }
     }
 
     public class AccountStatementFullReportParams
