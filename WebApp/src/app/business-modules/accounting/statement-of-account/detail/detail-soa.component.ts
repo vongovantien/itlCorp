@@ -126,6 +126,24 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
+    exportSOASupplierAF() {
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._exportRepo.exportSOASupplierAirFreight(this.soaNO, userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'AIR -SOA COST.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
     async getDetailSOAExport(soaNO: string) {
         this._progressRef.start();
         try {

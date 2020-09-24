@@ -324,6 +324,19 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Export SOA detail by SOANo
+        /// </summary>
+        /// <param name="soaNo">soaNo that want to retrieve SOA</param>
+        /// <param name="officeId">soaNo that want to retrieve officeId</param>
+        /// <returns></returns>
+        [HttpGet("GetDataExportSOASupplierAirFrieghtBySOANo")]
+        public IActionResult GetDataExportSOASupplierAirFrieghtBySOANo(string soaNo, string officeId)
+        {
+            var data = acctSOAService.GetSoaSupplierAirFreightBySoaNo(soaNo, officeId);
+            return Ok(data);
+        }
+
+        /// <summary>
         /// Export SOA OPS by SOANo
         /// </summary>
         /// <param name="soaNo">soaNo that want to retrieve SOA</param>

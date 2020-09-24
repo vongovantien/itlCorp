@@ -744,6 +744,14 @@
             <param name="officeId">soaNo that want to retrieve officeId</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOASupplierAirFrieghtBySOANo(System.String,System.String)">
+            <summary>
+            Export SOA detail by SOANo
+            </summary>
+            <param name="soaNo">soaNo that want to retrieve SOA</param>
+            <param name="officeId">soaNo that want to retrieve officeId</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.GetDataExportSOAOPSBySOANo(System.String)">
             <summary>
             Export SOA OPS by SOANo
