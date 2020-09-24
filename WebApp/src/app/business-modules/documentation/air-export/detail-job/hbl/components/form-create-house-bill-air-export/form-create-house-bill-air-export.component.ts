@@ -224,8 +224,19 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                     warehouseId: shipment.warehouseId,
                                     firstCarrierBy: shipment.flightVesselName,
                                     freightPayment: !!shipment.paymentTerm ? [(this.termTypes).find(type => type.id === shipment.paymentTerm)] : null,
-
                                 });
+
+                                // *  CR 14501
+                                if (shipment.isHawb) {
+                                    const valueDefaultFromShipment = {
+                                        grossWeight: shipment.grossWeight,
+                                        chargeWeight: shipment.chargeWeight,
+                                        hw: shipment.hw,
+                                        packageQty: shipment.packageQty,
+                                    };
+                                    this.totalHeightWeight = valueDefaultFromShipment.hw;
+                                    this.formCreate.patchValue(valueDefaultFromShipment);
+                                }
                             }
                         }
                     ),
@@ -393,7 +404,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                     }
                 }
             }
-        )
+        );
         this.onWTVALChange();
         this.otherPaymentChange();
         this.onRateChargeChange();
@@ -409,13 +420,11 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             });
         this.etd.valueChanges.pipe(startWith(this.etd.value)).subscribe((d: any) => {
             const etdDate = (d !== null && d.startDate !== null ? formatDate(d.startDate, 'dd/MM/yyyy', 'en') : null);
-            console.log(etdDate);
             this._dataService.setData('formHBLData', { hblNo: this.hwbno.value, etd: etdDate, eta: null });
         });
     }
 
     updateFormValue(data: HouseBill, isImport: boolean = false) {
-
         const formValue = {
             issueHbldate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
@@ -437,6 +446,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             formValue.issueHbldate = { startDate: new Date(), endDate: new Date() };
         }
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
+
+        this.totalHeightWeight = data.hw;
     }
 
     setDimensionDetails(dims: DIM[]): FormArray {
@@ -548,7 +559,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                 dimItem.hw = this.utility.calculateHeightWeight(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
                 dimItem.cbm = this.utility.calculateCBM(dimItem.width || 0, dimItem.height || 0, dimItem.length || 0, dimItem.package || 0, this.hwconstant || 6000);
             });
-            this.totalHeightWeight = this.updateTotalHeightWeight(dims);
+            // this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
         }
     }
