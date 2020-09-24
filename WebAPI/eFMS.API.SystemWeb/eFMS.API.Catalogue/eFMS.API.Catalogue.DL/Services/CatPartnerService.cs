@@ -1127,6 +1127,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
+            ClearCache();
             var partners = Get().ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = countryService.Get().ToList();
