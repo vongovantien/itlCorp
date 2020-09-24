@@ -307,6 +307,33 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export detail SOA Supplier
+        /// </summary>
+        /// <param name="soaNo">SoaNo of SOA</param>
+        /// <param name="officeId">OfficeId of User</param>
+        /// <returns></returns>
+        [Route("ExportSOASupplierAirfreight")]
+        [HttpGet]
+        public async Task<IActionResult> ExportSOASupplierAirfreight(string soaNo, string officeId)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOASupplierAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
+            if (dataObjects.Result.HawbAirFrieghts == null)
+            {
+                return Ok();
+            }
+            var stream = new AccountingHelper().GenerateSOASupplierAirfreightExcel(dataObjects.Result);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Export SOA Supplier Air Freight " + soaNo + ".xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export accounting management
         /// </summary>
         /// <param name="criteria">List Voucher or Invoices</param>
