@@ -20,7 +20,7 @@ import { SeaConsolExportDetailHBLComponent } from './detail/detail-hbl-consol-ex
 const routing: Routes = [
     {
         path: '', component: SeaConsolExportHBLComponent,
-        data: { name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.SFE_CODE }
+        data: { name: '', path: 'hbl', level: 4, serviceId: ChargeConstants.SCE_CODE }
     },
     {
         path: 'new', component: SeaConsolExportCreateHBLComponent,
