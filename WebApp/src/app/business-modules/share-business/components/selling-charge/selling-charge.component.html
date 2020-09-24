@@ -385,7 +385,12 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group table-date">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" disabled placeholder="DD/MM/YYYY"
+                                        [value]="!!charge.invoiceDate && charge.invoiceDate.startDate ? (charge.invoiceDate.startDate | date: 'dd/MM/yyyy') : null ">
+                                </div>
+
+                                <!-- <div class="form-group table-date">
                                     <ng-container *ngIf="!!charge.debitNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -412,7 +417,7 @@
                                             </span>
                                         </div>
                                     </ng-template>
-                                </div>
+                                </div> -->
                             </td>
                             <td class="disabled">
                                 <div class="form-group ">

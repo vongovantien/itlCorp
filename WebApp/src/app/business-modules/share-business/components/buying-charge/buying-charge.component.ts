@@ -66,8 +66,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     TYPE: CommonEnum.SurchargeTypeEnum.BUYING_RATE = CommonEnum.SurchargeTypeEnum.BUYING_RATE;
 
     isSubmitted: boolean = false;
-    // isDuplicateChargeCode: boolean = false;
-    // isDuplicateInvoice: boolean = false;
 
     selectedSurcharge: CsShipmentSurcharge;
 
@@ -668,7 +666,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     checkSpecialCaseCharge(charge: CsShipmentSurcharge) {
-        console.log(this.TYPE)
         return !!charge.soano
             || !!charge.creditNo
             || !!charge.debitNo
@@ -702,14 +699,19 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     checkDuplicate() {
         let valid: boolean = true;
-        if (this.utility.checkDuplicateInObject("chargeId", this.charges) && this.utility.checkDuplicateInObject("invoiceNo", this.charges)) {
+
+        const chargeToCheckDuplicate = [...this.charges].filter(x => !this.checkSpecialCaseCharge(x)) || [];
+        if (!chargeToCheckDuplicate.length) {
+            return true;
+        }
+        if (this.utility.checkDuplicateInObject("chargeId", chargeToCheckDuplicate) && this.utility.checkDuplicateInObject("invoiceNo", chargeToCheckDuplicate)) {
 
             const testObjectCharge = {};
             const testObjectInvoice = {};
             const idsCharge: string[] = [];
             const invoices: string[] = [];
 
-            this.charges.forEach(c => {
+            chargeToCheckDuplicate.forEach(c => {
                 const itemPropertyNameCharge = c['chargeId'];
                 const itemPropertyNameInvoice = c['invoiceNo'];
 
@@ -726,28 +728,24 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             });
 
             if (!!idsCharge.length) {
-                this.charges.forEach(c => {
+                chargeToCheckDuplicate.forEach(c => {
                     if (idsCharge.includes(c.chargeId)) {
                         c.duplicateCharge = true;
                     }
                 });
             }
             if (!!invoices.length) {
-                this.charges.forEach(c => {
+                chargeToCheckDuplicate.forEach(c => {
                     if (invoices.includes(c.invoiceNo)) {
                         c.duplicateInvoice = true;
                     }
                 });
             }
-            // this.isDuplicateChargeCode = true;
-            // this.isDuplicateInvoice = true;
             valid = false;
             this._toastService.warning("The Charge code and InvoiceNo is duplicated");
             return;
         } else {
             valid = true;
-            // this.isDuplicateChargeCode = false;
-            // this.isDuplicateInvoice = false;
         }
         return valid;
     }
@@ -889,6 +887,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (c.chargeCode === ChargeConstants.DEFAULT_AIR[2]) {
                         c = this.updateUnitSurcharge(c, 'SET');
                         c.quantity = 1;
+                    }
+                    if (c.chargeCode === ChargeConstants.DEFAULT_AIR[3]) {
+                        c = this.updateUnitSurcharge(c, 'HAWB');
+                        c.quantity = 1;
+                        c.vatrate = 10;
+                        c.currencyId = "VND";
+                        c.unitPrice = 250000;
                     }
                 });
                 break;

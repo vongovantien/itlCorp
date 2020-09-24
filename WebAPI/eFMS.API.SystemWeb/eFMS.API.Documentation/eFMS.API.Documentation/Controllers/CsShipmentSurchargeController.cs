@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var query = list.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
+            var query = list.Where(x => !isSurchargeSpecialCase(x)).GroupBy(x => new { x.InvoiceNo, x.ChargeId })
                                       .Where(g => g.Count() > 1)
                                       .Select(y => y.Key);
             if (query.Any())
@@ -309,6 +309,16 @@ namespace eFMS.API.Documentation.Controllers
             }
             var results = csShipmentSurchargeService.GetRecentlyCharges(criteria);
             return Ok(results);
+        }
+
+        private bool isSurchargeSpecialCase(CsShipmentSurcharge charge)
+        {
+            return !string.IsNullOrEmpty(charge.Soano)
+            || !string.IsNullOrEmpty(charge.CreditNo)
+            || !string.IsNullOrEmpty(charge.DebitNo)
+            || !string.IsNullOrEmpty(charge.SettlementCode)
+            || !string.IsNullOrEmpty(charge.VoucherId)
+            ;
         }
     }
 }
