@@ -1827,8 +1827,8 @@ namespace eFMS.API.Accounting.DL.Services
                     ChargeShipments = s.ToList()
             }).ToList();
             data = soaDetail;
-            data.GroupShipments = _groupShipments;
-            data.ChargeShipments = chargeShipments;
+            data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
+            data.ChargeShipments = chargeShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.AmountDebitLocal = Math.Round(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
             data.AmountCreditLocal = Math.Round(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
             data.AmountDebitUSD = Math.Round(chargeShipments.Sum(x => x.AmountDebitUSD), 3);
@@ -2287,6 +2287,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (soa == null) return null;
             var chargesOfSOA = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
             var partner = catPartnerRepo.Get(x => x.Id == soa.Customer).FirstOrDefault();
+            var grpInvCdNoteByHbl = chargesOfSOA.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
 
             var soaCharges = new List<AccountStatementFullReport>();
             foreach (var charge in chargesOfSOA)
@@ -2342,10 +2343,10 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.HWBNO = _hwbNo; //HBLNo
                 soaCharge.DateofInv = cdNote?.DatetimeCreated?.ToString("MMM dd, yy") ?? string.Empty; //Created Datetime CD Note
                 soaCharge.Order = string.Empty; //NOT USE
-                soaCharge.InvID = cdNote?.Code; //CD Note Code
+                soaCharge.InvID =  charge.InvoiceNo;
                 soaCharge.Amount = _amount + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.Curr = soa.Currency?.Trim(); //Currency SOA
-                soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;//!string.IsNullOrEmpty(soa.Soano) ? true : false; //Is Debit charge?
+                soaCharge.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
                 soaCharge.Vessel = string.Empty; //NOT USE
                 soaCharge.Routine = string.Empty; //NOT USE
                 soaCharge.LoadingDate = null; //NOT USE
@@ -2371,9 +2372,14 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCharge.ROBH = soaCharge.ROBH + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 soaCharge.CustomNo = _customNo;
                 soaCharge.JobNo = _jobNo;
+                soaCharge.CdCode = cdNote?.Code;
+                soaCharge.Docs = string.Join("\r\n", grpInvCdNoteByHbl.Where(w => w.Hblid == charge.Hblid).Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
 
                 soaCharges.Add(soaCharge);
             }
+
+            //Sắp xếp giảm dần theo số Job
+            soaCharges = soaCharges.ToArray().OrderByDescending(o => o.JobNo).ToList();
 
             //Info Company, Office of User Created SOA
             //var company = sysCompanyRepo.Get(x => x.Id == soa.CompanyId).FirstOrDefault();
