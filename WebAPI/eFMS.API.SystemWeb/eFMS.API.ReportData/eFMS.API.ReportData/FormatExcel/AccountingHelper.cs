@@ -2366,18 +2366,18 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(7).Width = 10; //Cột G
             workSheet.Column(8).Width = 15; //Cột H            
             workSheet.Column(9).Width = 17; //Cột I
-            workSheet.Column(10).Width = 6; //Cột J
+            workSheet.Column(10).Width = 8; //Cột J
             workSheet.Column(10).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Column(11).Width = 10; //Cột K
+            workSheet.Column(11).Width = 12; //Cột K
             workSheet.Column(12).Width = 10; //Cột L
             workSheet.Column(13).Width = 10; //Cột M
             workSheet.Column(14).Width = 10; //Cột N
-            workSheet.Column(15).Width = 8; //Cột O
-            workSheet.Column(16).Width = 8; //Cột P
+            workSheet.Column(15).Width = 12; //Cột O
+            workSheet.Column(16).Width = 12; //Cột P
             workSheet.Column(17).Width = 12; //Cột Q
-            workSheet.Column(18).Width = 12; //Cột R
-            workSheet.Column(19).Width = 12;  //Cột S
-            workSheet.Column(20).Width = 17; //Cột T
+            workSheet.Column(18).Width = 18; //Cột R
+            workSheet.Column(19).Width = 12; //Cột S
+            workSheet.Column(20).Width = 18; //Cột T
 
             // Header0
             workSheet.Cells["O1:T1"].Merge = true;
@@ -2486,10 +2486,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[i + addressStartContent, 16].Value = item.AMS;
                 workSheet.Cells[i + addressStartContent, 16].Style.Numberformat.Format = numberFormat;
                 // Dangerous Fee
-                workSheet.Cells[i + addressStartContent, 17].Value = item.DangerousFee;
+                workSheet.Cells[i + addressStartContent, 17].Value = item.DAN;
                 workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat;
                 // Other Fee
-                workSheet.Cells[i + addressStartContent, 18].Value = item.OtherCharges;
+                workSheet.Cells[i + addressStartContent, 18].Value = item.OTH;
                 workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat;
                 // Handling Fee
                 workSheet.Cells[i + addressStartContent, 19].Value = item.HandlingFee;
@@ -2545,41 +2545,36 @@ namespace eFMS.API.ReportData.FormatExcel
 
             // Account info
             string textBottom = "Kindly arrange the payment to: ";
-            var rowNum = 1;
             if (!string.IsNullOrEmpty(airfreightObj.OfficeEn))
             {
                 textBottom += "\n" + airfreightObj.OfficeEn;
-                rowNum++;
             }
-            if (!string.IsNullOrEmpty(airfreightObj.BankAccountUSD) || !string.IsNullOrEmpty(airfreightObj.BankAccountVND))
+            if (!string.IsNullOrEmpty(airfreightObj.BankAccountUsd) || !string.IsNullOrEmpty(airfreightObj.BankAccountVND))
             {
                 textBottom += "\nA/C: ";
-                textBottom += (!string.IsNullOrEmpty(airfreightObj.BankAccountUSD) ? "USD " : "") + airfreightObj.BankAccountUSD;
-                textBottom += (!string.IsNullOrEmpty(airfreightObj.BankAccountVND) ? (!string.IsNullOrEmpty(airfreightObj.BankAccountUSD) ? " - " : "") + "VND " : "") + airfreightObj.BankAccountVND;
+                textBottom += (!string.IsNullOrEmpty(airfreightObj.BankAccountUsd) ? "USD " : "") + airfreightObj.BankAccountUsd;
+                textBottom += (!string.IsNullOrEmpty(airfreightObj.BankAccountVND) ? (!string.IsNullOrEmpty(airfreightObj.BankAccountUsd) ? " - " : "") + "VND " : "") + airfreightObj.BankAccountVND;
                 textBottom = textBottom.Replace("(USD)", "");
                 textBottom = textBottom.Replace("(VND)", "");
-                rowNum++;
             }
             if (!string.IsNullOrEmpty(airfreightObj.BankNameEn))
             {
                 textBottom += "\nVia: " + airfreightObj.BankNameEn;
-                rowNum++;
             }
             if (!string.IsNullOrEmpty(airfreightObj.AddressEn))
             {
                 textBottom += "\n" + airfreightObj.AddressEn;
-                rowNum++;
             }
             if (!string.IsNullOrEmpty(airfreightObj.SwiftCode))
             {
                 textBottom += "\nSWIFT Code: " + airfreightObj.SwiftCode;
-                rowNum++;
             }
             textBottom += "\nThanks for your kind co-operation.";
+            var rowNum = textBottom.Split('\n').Length - 1;
             workSheet.Cells[row1 + 3, 3].Value = textBottom;
-            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum + 1, 10].Merge = true;
-            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum + 1, 10].Style.WrapText = true;
-            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum + 1, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum, 10].Merge = true;
+            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum, 10].Style.WrapText = true;
+            workSheet.Cells[row1 + 3, 3, row1 + 3 + rowNum, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
         #endregion
 
