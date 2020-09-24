@@ -356,10 +356,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 )
                 .subscribe((value: { startDate: any, endDate: any }) => {
                     if (!!value.startDate) {
-                        // * serviceDate hadn't value
-                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
-                            this.formGroup.controls["serviceDate"].setValue(value);
-                        }
+                        this.formGroup.controls["serviceDate"].setValue(value);
                         this.formGroup.controls["flightDate"].setValue(value);
                     }
                 });
@@ -371,10 +368,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 )
                 .subscribe((value: { startDate: any, endDate: any }) => {
                     if (!!value.startDate) {
-                        // * serviceDate hadn't value
-                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
-                            this.formGroup.controls["serviceDate"].setValue(value);
-                        }
+                        this.formGroup.controls["serviceDate"].setValue(value);
                     }
                 });
         }
