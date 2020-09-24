@@ -41,10 +41,16 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
     personalIncharge: AbstractControl;
+
     coloaderId: AbstractControl; // * Airline/Coloader
+    supplierName: string = null;
+
     pol: AbstractControl;
     pod: AbstractControl;
+
     agentId: AbstractControl;
+    agentName: string = null;
+
     warehouseId: AbstractControl;
     paymentTerm: AbstractControl; // * Payment Method
     serviceDate: AbstractControl;
@@ -188,6 +194,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                             }
                         });
                         try {
+                            this.supplierName = res.supplierName;
+                            this.agentName = res.agentName;
                             const formData: any = {
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
