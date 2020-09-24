@@ -49,7 +49,7 @@ export class CustomClearanceComponent extends AppList {
         this.dataSearch = {
             fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
             toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            imPorted: false,
+            imPorted: null,
             personHandle: JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id
         };
     }
@@ -70,12 +70,13 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Clearance Location', field: 'gatewayName', sortable: true },
             { title: 'Partner Name', field: 'customerName', sortable: true },
-            { title: 'Import Country', field: 'importCountryName', sortable: true },
-            { title: 'Export Country', field: 'exportCountryName', sortable: true },
+            { title: 'Package Qty', field: 'pcs', sortable: true },
+            { title: 'GW', field: 'grossWeight', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
-
             { title: 'creator', field: 'userCreatedName', sortable: true },
             { title: 'Status', field: 'jobNo', sortable: true },
+            { title: 'Import Country', field: 'importCountryName', sortable: true },
+            { title: 'Export Country', field: 'exportCountryName', sortable: true },
         ];
         this.getListCustomsDeclaration();
         this.getListPort();
