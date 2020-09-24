@@ -2154,11 +2154,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                     // Rate
                     air.Rate = chargeData.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE || (chargeData.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
-                                                                    chargeData.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())) ? chargeData.UnitPrice : null;
+                                                                    chargeData.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) ? chargeData.UnitPrice : null;
 
                     // Air Freight
                     var lstAirfrieght = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE ||
-                                        (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower().Contains(AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()))));
+                                        (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())));
                     air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Credit).Sum() : null;
 
                     // Fuel Surcharge
