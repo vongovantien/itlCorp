@@ -213,11 +213,15 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (details != null)
             {
-                var agent = partnerRepository.Get(x => x.Id == details.AgentId).FirstOrDefault();
+                CatPartner agent = partnerRepository.Get(x => x.Id == details.AgentId).FirstOrDefault();
                 details.AgentName = agent?.PartnerNameEn;
 
-                var supplier = partnerRepository.Get(x => x.Id == details.SupplierId).FirstOrDefault();
+                CatPartner supplier = partnerRepository.Get(x => x.Id == details.SupplierId).FirstOrDefault();
                 details.SupplierName = supplier?.PartnerNameEn;
+
+                CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
+                details.CustomerName = customer?.ShortName;
+
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
             }

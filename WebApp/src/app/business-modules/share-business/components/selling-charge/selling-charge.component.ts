@@ -200,6 +200,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     }
 
                     const buyingCharges: CsShipmentSurcharge[] = cloneDeep(buyings);
+
                     // * update debit charge to chargeId
                     buyingCharges.forEach(c => {
                         c.chargeId = c.debitCharge;
@@ -214,6 +215,13 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.voucherIdre = null;
                         c.voucherIdredate = null;
                         c.isFromShipment = true;
+                        c.invoiceNo = null;
+                        c.invoiceDate = null;
+                        // Mặc định lấy customer name của HBL
+                        c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
+                        c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;
+                        c.partnerShortName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;
+                        c.exchangeDate = { startDate: new Date(), endDate: new Date() };
                         this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                     });
 
