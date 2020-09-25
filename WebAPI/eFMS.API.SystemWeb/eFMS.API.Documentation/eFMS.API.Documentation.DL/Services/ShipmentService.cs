@@ -827,7 +827,7 @@ namespace eFMS.API.Documentation.DL.Services
                 #endregion -- Phí OBH sau thuế --
                 data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
                 data.CustomerId = item.CustomerId;
-                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                data.CustomerName = item.CustomerName;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
                 data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
@@ -1157,7 +1157,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
+                                        CustomerName = partner.ShortName
                                         
 
 
@@ -1207,7 +1208,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
+                                        CustomerName = partner.ShortName
                                     };
 
                 return queryShipment;
@@ -1856,14 +1858,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                     data.ServiceDate = item.ServiceDate;
                     data.JobId = item.JobNo;
-                    var _partnerId = (charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
                     data.PartnerCode = _partner?.AccountNo;
                     data.PartnerName = _partner?.PartnerNameEn;
                     data.PartnerTaxCode = _partner?.TaxCode;
                     data.Mbl = item.Mblno;
                     data.Hbl = item.Hwbno;
-                    data.CustomNo = charge.ClearanceNo;
+                    data.CustomNo = !string.IsNullOrEmpty(charge.ClearanceNo) ? charge.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo); //Ưu tiên: ClearanceNo of charge >> ClearanceNo of Job có ngày ClearanceDate cũ nhất
                     data.PaymentMethodTerm = string.Empty;
                     var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     data.ChargeCode = _charge?.Code;
@@ -2441,14 +2443,14 @@ namespace eFMS.API.Documentation.DL.Services
 
                     data.ServiceDate = item.ServiceDate;
                     data.JobId = item.JobId;
-                    var _partnerId = (charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
+                    var _partnerId = !string.IsNullOrEmpty(criteria.CustomerId) ? criteria.CustomerId : charge.PaymentObjectId; //(charge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? charge.PayerId : charge.PaymentObjectId;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
                     data.PartnerCode = _partner?.AccountNo;
                     data.PartnerName = _partner?.PartnerNameEn;
                     data.PartnerTaxCode = _partner?.TaxCode;
                     data.Mbl = item.Mbl;
                     data.Hbl = item.Hbl;
-                    data.CustomNo = charge.ClearanceNo;
+                    data.CustomNo = string.Empty; //Service Documentation Không có CustomNo
                     data.PaymentMethodTerm = item.PaymentMethodTerm;
                     var _charge = catChargeRepo.Get(x => x.Id == charge.ChargeId).FirstOrDefault();
                     data.ChargeCode = _charge?.Code;
