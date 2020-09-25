@@ -2365,19 +2365,19 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 10; //Cột G
             workSheet.Column(8).Width = 15; //Cột H            
-            workSheet.Column(9).Width = 17; //Cột I
-            workSheet.Column(10).Width = 8; //Cột J
+            workSheet.Column(9).Width = 20; //Cột I
+            workSheet.Column(10).Width = 12; //Cột J
             workSheet.Column(10).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Column(11).Width = 12; //Cột K
-            workSheet.Column(12).Width = 10; //Cột L
-            workSheet.Column(13).Width = 10; //Cột M
-            workSheet.Column(14).Width = 10; //Cột N
-            workSheet.Column(15).Width = 12; //Cột O
-            workSheet.Column(16).Width = 12; //Cột P
-            workSheet.Column(17).Width = 12; //Cột Q
-            workSheet.Column(18).Width = 18; //Cột R
-            workSheet.Column(19).Width = 12; //Cột S
-            workSheet.Column(20).Width = 18; //Cột T
+            workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
+            workSheet.Column(13).Width = 20; //Cột M
+            workSheet.Column(14).Width = 20; //Cột N
+            workSheet.Column(15).Width = 20; //Cột O
+            workSheet.Column(16).Width = 20; //Cột P
+            workSheet.Column(17).Width = 20; //Cột Q
+            workSheet.Column(18).Width = 20; //Cột R
+            workSheet.Column(19).Width = 20; //Cột S
+            workSheet.Column(20).Width = 20; //Cột T
 
             // Header0
             workSheet.Cells["O1:T1"].Merge = true;
