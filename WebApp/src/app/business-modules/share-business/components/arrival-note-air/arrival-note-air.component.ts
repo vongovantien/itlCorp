@@ -98,7 +98,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.hbl = res;
                     this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
                 }),
-                switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.SeaFCLImport)) // * Get arrival info.
+                switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.AirImport)) // * Get arrival info.
             )
             .subscribe(
                 (res: HBLArrivalNote) => {
@@ -335,7 +335,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     setDefaultFreightCharge() {
         const body: IArrivalFreightChargeDefault = {
             userDefault: this.userLogged.id,
-            transactionType: CommonEnum.TransactionTypeEnum.SeaFCLImport,
+            transactionType: CommonEnum.TransactionTypeEnum.AirImport,
             csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges,
             type: CommonEnum.TransactionTypeEnum.AirImport,
         };
