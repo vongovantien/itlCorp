@@ -327,6 +327,16 @@
                                     <input type="text" class="form-control" formControlName="route">
                                 </div>
                             </div>
+                            <div class="col-md-12" *ngIf="type === 'export'">
+                                <div class="form-group">
+                                    <label>No HAWB</label>
+                                    <div>
+                                        <app-switch size="md" [toggle]="formGroup.controls['isHawb'].value"
+                                            (toggleChange)="formGroup.controls['isHawb'].setValue($event)"></app-switch>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">

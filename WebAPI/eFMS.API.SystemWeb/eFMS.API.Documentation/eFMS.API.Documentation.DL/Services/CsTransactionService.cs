@@ -2510,6 +2510,13 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.Mawb = model.MblNo;
                             string agentDescription = catPartnerRepo.Get(c => c.Id == model.AgentId).Select(s => s.PartnerNameEn + "\r\n" + s.AddressEn + "\r\nTel No: " + s.Tel + "\r\nFax No: " + s.Fax).FirstOrDefault();
                             hbl.ForwardingAgentDescription = agentDescription;
+                            
+
+                            // CR 14501
+                            hbl.PackageQty = model.PackageQty;
+                            hbl.GrossWeight = model.GrossWeight;
+                            hbl.Hw = model.Hw;
+                            hbl.ChargeWeight = model.ChargeWeight;
 
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
