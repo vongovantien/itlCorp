@@ -41,5 +41,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? PaidAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? PaymentTerm { get; set; }
+        public string SourceCreated { get; set; }
+        public string SourceModified { get; set; }
     }
 }
