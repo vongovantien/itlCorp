@@ -74,7 +74,7 @@
                             [ngClass]="{'m-form__group has-danger':  isSubmitted && !coloader.value}">
                             <label required>Shipping Line/Co-Loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloader.value}"
+                                [currentActiveItemId]="{ field: 'id', value: coloader.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(coloader)">
                             </app-combo-grid-virtual-scroll>
@@ -106,7 +106,7 @@
                         <div class="form-group">
                             <label>Agent</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agent.value}"
+                                [currentActiveItemId]="{ field: 'id', value: agent.value, hardValue: agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" (remove)="resetFormControl(agent)">
                             </app-combo-grid-virtual-scroll>

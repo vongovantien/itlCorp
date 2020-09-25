@@ -54,7 +54,7 @@
                                 <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
-                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: coloaderId.value, hardValue: supplierName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select airline"
                                 [loading]="isLoadingAirline | async" (remove)="resetFormControl(coloaderId)">
@@ -69,7 +69,7 @@
                                 <span class="text-danger" *ngIf="type === 'import'">(*)</span>
                             </label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agent')"
-                                [currentActiveItemId]="{ field: 'id', value: agentId.value}"
+                                [currentActiveItemId]="{ field: 'id', value: agentId.value, hardValue: agentName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                                 [displayFields]="displayFieldsSupplier" placeholder="Select agent"
                                 (remove)="resetFormControl(agentId)" [loading]="isLoadingAgent | async">
