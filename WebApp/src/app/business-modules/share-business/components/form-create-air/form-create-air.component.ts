@@ -15,12 +15,14 @@ import { ShareBusinessDIMVolumePopupComponent } from '../dim-volume/dim-volume.p
 
 import * as fromStore from './../../store/index';
 import { distinctUntilChanged, takeUntil, skip, shareReplay } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SystemConstants } from 'src/constants/system.const';
 import { SystemRepo, CatalogueRepo } from '@repositories';
-import cloneDeep from 'lodash/cloneDeep';
 import { JobConstants } from '@constants';
 import { GetDimensionAction } from './../../store/index';
+
+import cloneDeep from 'lodash/cloneDeep';
+import _merge from 'lodash/merge';
 
 
 @Component({
@@ -67,7 +69,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
     commodities: CommonInterface.INg2Select[];
     listUsers: Observable<User[]>;
     warehouses: Warehouse[];
-    initWarehouses: Warehouse[];
+    // ? initWarehouses: Warehouse[];
     initCarriers: Customer[];
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -125,7 +127,6 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
 
 
     ngOnInit() {
-        // this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new GetCatalogueCarrierAction());
         this._store.dispatch(new GetCatalogueAgentAction({ active: true }));
 
@@ -153,14 +154,14 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             (res: Warehouse[]) => {
                 if (!!res) {
                     this.warehouses = (res || []).map(w => new Warehouse(w));
-                    this.initWarehouses = cloneDeep(this.warehouses);
+
+                    // ? this.initWarehouses = cloneDeep(this.warehouses);
                 }
             }
         );
 
         this.initForm();
         this.getUserLogged();
-        // this.getCarriers();
         this.getAgents();
         this.getUnits();
         this.getCommodities();
@@ -198,54 +199,35 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                                 paymentTerm: !!res.paymentTerm ? [this.termTypes.find(type => type.id === res.paymentTerm)] : null,
                                 shipmentType: !!res.shipmentType ? [this.shipmentTypes.find(type => type.id === res.shipmentType)] : null,
 
-                                pol: res.pol,
-                                pod: res.pod,
-                                agentId: res.agentId,
-                                coloaderId: res.coloaderId,
-                                warehouseId: res.warehouseId,
-
-                                mawb: res.mawb,
-                                jobNo: res.jobNo,
-                                flightVesselName: res.flightVesselName,
-                                notes: res.notes,
-                                hw: res.hw,
-                                cbm: res.cbm,
-                                grossWeight: res.grossWeight,
-                                chargeWeight: res.chargeWeight,
-                                packageQty: res.packageQty,
-                                issuedBy: res.issuedBy,
-                                route: res.route,
-                                personIncharge: res.personIncharge
-
-                                // commodity: 
                             };
-                            this.formGroup.patchValue(formData);
+                            const dataSelectValue: Partial<{ packageType: CommonInterface.INg2Select[], commodity: CommonInterface.INg2Select[] }> = {};
 
-
+                            // * Unit
                             if (!!res.packageType) {
-                                this.formGroup.patchValue({ packageType: [this.units.find(u => u.id === +res.packageType)] });
+                                dataSelectValue.packageType = [this.units.find(u => u.id === +res.packageType)];
                             }
-                            // if (!!this.formGroup.value.etd) {
-                            //     this.minDateETA = this.createMoment(new Date(res.etd));
-                            // }
 
-                            // * Update commodity
-                            const commodities: CommonInterface.INg2Select[] =
-                                (res.commodity || '').split(',').map((i: string) => <CommonInterface.INg2Select>({
-                                    id: i,
-                                    text: i,
-                                }));
+                            // * commodity
+                            if (!!res.commodity) {
+                                const commodities: CommonInterface.INg2Select[] = (res.commodity || '').split(',').map((i: string) => <CommonInterface.INg2Select>({ id: i, text: i }));
 
-                            const commoditiesTemp = [];
-                            commodities.forEach((commodity: CommonInterface.INg2Select) => {
-                                const dataTempInPackages = (this.commodities || []).find((t: CommonInterface.INg2Select) => t.id === commodity.id);
-                                if (!!dataTempInPackages) {
-                                    commoditiesTemp.push(dataTempInPackages);
+                                const commodity: CommonInterface.INg2Select[] = [];
+                                commodities.forEach((c: CommonInterface.INg2Select) => {
+                                    const dataTempInPackages = (this.commodities || []).find((t: CommonInterface.INg2Select) => t.id === c.id);
+                                    if (!!dataTempInPackages) {
+                                        commodity.push(dataTempInPackages);
+                                    }
+                                });
+                                if (commodity.length) {
+                                    dataSelectValue.commodity = commodity;
                                 }
-                            });
-                            // * Update Form
-                            this.formGroup.patchValue({ commodity: commoditiesTemp });
 
+                            }
+
+                            // * Update Form
+                            this.formGroup.patchValue(Object.assign(_merge(res, formData, dataSelectValue)));
+
+                            // * Assign for detect form change (Deactivate).
                             this.currentFormValue = this.formGroup.getRawValue();
 
                         } catch (error) {
@@ -325,6 +307,8 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             coloaderId: [null, this.type !== 'import' ? Validators.required : null],
             warehouseId: [],
 
+            isHawb: [false]
+
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
 
         this.mawb = this.formGroup.controls["mawb"];
@@ -356,10 +340,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 )
                 .subscribe((value: { startDate: any, endDate: any }) => {
                     if (!!value.startDate) {
-                        // * serviceDate hadn't value
-                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
-                            this.formGroup.controls["serviceDate"].setValue(value);
-                        }
+                        this.formGroup.controls["serviceDate"].setValue(value);
                         this.formGroup.controls["flightDate"].setValue(value);
                     }
                 });
@@ -371,10 +352,7 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
                 )
                 .subscribe((value: { startDate: any, endDate: any }) => {
                     if (!!value.startDate) {
-                        // * serviceDate hadn't value
-                        if (!this.formGroup.controls["serviceDate"].value || !this.formGroup.controls["serviceDate"].value.startDate) {
-                            this.formGroup.controls["serviceDate"].setValue(value);
-                        }
+                        this.formGroup.controls["serviceDate"].setValue(value);
                     }
                 });
         }
@@ -520,9 +498,11 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             this.formGroup.patchValue({ hw: null });
         }
     }
+
     inputChanged() {
         this.setDefaultChargeWeight();
     }
+
     setDefaultChargeWeight() {
         if (this.type !== 'import') {
             let grossWeight = this.formGroup.controls['grossWeight'].value;

@@ -18,6 +18,11 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string BookingNo;
         public string MblNo;
         public string VoyNo;
+        public int? PackageQty;
+        public decimal? ChargeWeight;
+        public decimal? GrossWeight;
+        public decimal? Hw;
+
 
     }
 }

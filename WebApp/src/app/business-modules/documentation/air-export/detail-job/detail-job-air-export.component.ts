@@ -47,7 +47,10 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     isCancelFormPopupSuccess: boolean = false;
 
     nextState: RouterStateSnapshot;
-
+    confirmSyncHBLText: string = `
+    Do you want to sync
+    <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL, GW, CW, VW, Qty to HAWB ?<span>
+    `;
     constructor(
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _toastService: ToastrService,
@@ -371,7 +374,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             issuedBy: modelAdd.issuedBy,
             warehouseId: modelAdd.warehouseId,
             route: modelAdd.route,
-            mblNo: modelAdd.mawb
+            mblNo: modelAdd.mawb,
+
+            // * CR 14501
+            packageQty: modelAdd.packageQty,
+            grossWeight: modelAdd.grossWeight,
+            hw: modelAdd.hw,
+            chargeWeight: modelAdd.chargeWeight,
         };
 
         this._progressRef.start();
