@@ -827,7 +827,7 @@ namespace eFMS.API.Documentation.DL.Services
                 #endregion -- Phí OBH sau thuế --
                 data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
                 data.CustomerId = item.CustomerId;
-                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                data.CustomerName = item.CustomerName;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
                 data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
@@ -1157,7 +1157,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
+                                        CustomerName = partner.ShortName
                                         
 
 
@@ -1207,7 +1208,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
+                                        CustomerName = partner.ShortName
                                     };
 
                 return queryShipment;
