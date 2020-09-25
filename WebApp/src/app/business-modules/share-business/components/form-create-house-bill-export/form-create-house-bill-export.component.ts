@@ -161,6 +161,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.shipmmentDetail = new CsTransaction(shipment);
+
                         this.formCreate.patchValue({
                             bookingNo: this.shipmmentDetail.bookingNo,
                             mawb: this.shipmmentDetail.mawb,
@@ -181,15 +182,21 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
                         });
 
                         if (!!this.shipmmentDetail.bookingNo) {
-                            if (!!this.csBookingNotes.length) {
-                                const currentBookingNo: csBookingNote = this.csBookingNotes.find(b => b.bookingNo === this.shipmmentDetail.bookingNo);
-                                if (currentBookingNo) {
-                                    this.shipper.setValue(currentBookingNo.shipperId);
-                                    this.shipperDescription.setValue(currentBookingNo.shipperDescription);
-                                    this.consignee.setValue(currentBookingNo.consigneeId);
-                                    this.consigneeDescription.setValue(currentBookingNo.consigneeDescription);
+                            this._documentRepo.getBookingNoteSeaLCLExport().subscribe(
+                                (res: csBookingNote[]) => {
+                                    this.csBookingNotes = res;
+                                    if (!!this.csBookingNotes.length) {
+                                        const currentBookingNo: csBookingNote = this.csBookingNotes.find(b => b.bookingNo === this.shipmmentDetail.bookingNo);
+                                        if (currentBookingNo) {
+                                            this.shipper.setValue(currentBookingNo.shipperId);
+                                            this.shipperDescription.setValue(currentBookingNo.shipperDescription);
+                                            this.consignee.setValue(currentBookingNo.consigneeId);
+                                            this.consigneeDescription.setValue(currentBookingNo.consigneeDescription);
+                                        }
+                                    }
                                 }
-                            }
+                            );
+
                         }
                     }
                 }),
@@ -520,6 +527,7 @@ export class ShareBusinessFormCreateHouseBillExportComponent extends AppForm imp
 
     showBookingNote() {
         this.componentRef = this.renderDynamicComponent(AppComboGridComponent, this.bookingNoteContainerRef.viewContainerRef);
+
 
         if (!!this.componentRef) {
             this.componentRef.instance.headers = <CommonInterface.IHeaderTable[]>[{ title: 'Booking Note', field: 'bookingNo' }];

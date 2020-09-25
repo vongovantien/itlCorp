@@ -710,6 +710,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<AcctSoa>(entity =>

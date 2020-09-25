@@ -47,6 +47,7 @@
             public const string DetailSettlementPaymentExportUrl = "/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string DetailSOAExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
             public const string GetDataSOAAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
+            public const string GetDataSOASupplierAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOASupplierAirFrieghtBySOANo?soaNo=";
             public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
             public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
             public const string AccountingManagementExportUrl = "/api/v1/en-US/AccountingManagement/GetDataAcctMngtExport";

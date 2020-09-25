@@ -66,7 +66,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -1995,6 +1995,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.IsHawb).HasColumnName("IsHAWB");
 
                 entity.Property(e => e.IsLocked).HasDefaultValueSql("((0))");
 

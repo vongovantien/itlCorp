@@ -65,6 +65,14 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
 
         modelAdd.charges = [...this.listChargeComponent.charges];
 
+        // * Format lại invoice date trước khi gửi lên do Ngx-Mask đổi format.
+        modelAdd.charges.forEach(c => {
+            if (!!c.invoiceDate) {
+                const [day, month, year]: string[] = c.invoiceDate.split("/");
+                c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+            }
+        });
+
         this.saveVoucher(modelAdd);
     }
 

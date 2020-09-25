@@ -74,7 +74,8 @@ export class CustomClearanceFormSearchComponent extends AppForm {
             { title: 'Imported', value: true },
             { title: 'Not imported', value: false },
         ];
-        this.importStatus.setValue(this.status[1]);
+        // this.importStatus.setValue(this.status[1]);
+        this.importStatus.setValue(null);
 
         this.types = [
             { title: 'Import', value: 'Import' },
@@ -128,7 +129,8 @@ export class CustomClearanceFormSearchComponent extends AppForm {
         });
         this.importDate.setValue(null);
         this.type.setValue(null);
-        this.importStatus.setValue(this.status[1]);
+        // this.importStatus.setValue(this.status[1]);
+        this.importStatus.setValue(null);
         this.searchCustomClearance();
     }
 }

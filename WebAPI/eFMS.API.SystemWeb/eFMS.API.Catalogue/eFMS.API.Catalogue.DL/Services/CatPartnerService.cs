@@ -81,6 +81,8 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<OpsTransaction>("Id", "AgentId");
             SetChildren<CatPartnerCharge>("Id", "PartnerId");
             SetChildren<CsManifest>("Id", "Supplier");
+            SetChildren<CsShipmentSurcharge>("Id", "PayerID");
+            SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -245,15 +247,14 @@ namespace eFMS.API.Catalogue.DL.Services
               "<i> Thanks and Regards </i>" + "</br> </br>" +
               "eFMS System </div>");
 
-            List<string> lstCc = new List<string>
-            {
-            };
+            List<string> lstCc = ListMailCC();
 
             lstCc.Add(objInfoSalesman?.Email);
             SendMail.Send(subject, body, lstTo, null, lstCc);
 
         }
 
+   
         private void SendMailCreatedSuccess(CatPartner partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == currentUser.UserID).Select(t => t.EmployeeId).FirstOrDefault();
@@ -261,7 +262,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string url = string.Empty;
             List<string> lstToAR = new List<string>();
             List<string> lstToAccountant = new List<string>();
-
+            List<string> lstCc = ListMailCC();
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
@@ -306,11 +307,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 "<i> Thanks and Regards </i>" + "</br> </br>" +
                 "eFMS System </div>");
 
-            if (partner.PartnerType != "Customer" && partner.PartnerType != "Agent")
+            if ( (partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
-                if (lstToAccountant.Any())
+                if (lstToAccountant.Any() || lstCc.Any())
                 {
-                    SendMail.Send(subject, body, lstToAccountant, null, null);
+                    if(lstToAccountant.Count() == 0)
+                    {
+                        lstToAccountant = lstCc;
+                    }
+                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
                 }
             }
 
@@ -319,11 +324,26 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
                 {
-                    SendMail.Send(subject, body, lstToAccountant, null, null);
+                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
                 }
             }
 
         }
+
+        private List<string> ListMailCC()
+        {
+            List<string> lstCc = new List<string>
+            {
+                "alex.phuong@itlvn.com",
+                "luis.quang@itlvn.com",
+                "andy.hoa@itlvn.com",
+                "cara.oanh@itlvn.com",
+                "lynne.loc@itlvn.com",
+                "samuel.an@logtechub.com"
+            };
+            return lstCc;
+        }
+
         private async void UploadFileContract(ContractFileUploadModel model)
         {
             string fileName = "";
@@ -1107,6 +1127,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list)
         {
+            ClearCache();
             var partners = Get().ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = countryService.Get().ToList();

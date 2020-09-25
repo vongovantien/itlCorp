@@ -1158,6 +1158,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
                                         QTy = house.PackageQty.ToString() + " " + unit.Code
+                                        
 
 
                                     };
@@ -1401,6 +1402,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Route = _polCode + "/" + _podCode;
 
                 data.Qty = item.SumPackages ?? 0;
+                data.ChargeWeight = item.SumChargeWeight ?? 0;
 
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;
@@ -1652,6 +1654,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //Qty lấy theo Housebill
                 var houseBill = detailRepository.Get(x => x.Id == item.HblId).FirstOrDefault();
                 data.Qty = houseBill?.PackageQty ?? 0;
+                data.ChargeWeight = houseBill?.ChargeWeight ?? 0;
 
                 #region -- Phí Selling trước thuế --
                 decimal _revenue = 0;

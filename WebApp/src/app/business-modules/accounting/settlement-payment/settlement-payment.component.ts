@@ -61,6 +61,8 @@ export class SettlementPaymentComponent extends AppList {
             { title: 'Request Date', field: 'requestDate', sortable: true },
             { title: 'Status Approval', field: 'statusApproval', sortable: true },
             { title: 'Payment method', field: 'paymentMethod', sortable: true },
+            { title: 'Voucher No', field: 'voucherNo', sortable: true },
+            { title: 'Voucher Date', field: 'voucherDate', sortable: true },
             { title: 'Description', field: 'note', sortable: true },
         ];
 
@@ -283,6 +285,6 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     onChangeSelectedSettlement() {
-        this.isCheckAll = this.settlements.filter(x => x.statusApproval === 'Done').every(x => x.isSelected === true);
+        this.isCheckAll = this.settlements.filter(x => x.statusApproval === 'Done' && !x.voucherNo).every(x => x.isSelected === true);
     }
 }

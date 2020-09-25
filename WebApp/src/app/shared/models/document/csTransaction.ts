@@ -98,6 +98,7 @@ export class CsTransaction extends BaseModel {
     creatorOffice: OfficeData = null;
     groupEmail: string = null;
 
+    isHawb: boolean = false;
 
     constructor(object?: any) {
         super();

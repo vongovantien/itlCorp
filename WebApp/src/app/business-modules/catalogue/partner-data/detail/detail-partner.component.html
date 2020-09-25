@@ -7,7 +7,7 @@
                 <app-breadcrumb></app-breadcrumb>
             </div>
             <div class="c-button-actions">
-                <button *ngIf="partner.permission.allowDelete" type="button"
+                <button *ngIf="partner.permission.allowDelete && !partner.active" type="button"
                     class="btn btn-danger   m-btn--icon  m-btn--uppercase" (click)="showConfirmDelete()">
                     <span>
                         <i class="la la-trash"></i>
