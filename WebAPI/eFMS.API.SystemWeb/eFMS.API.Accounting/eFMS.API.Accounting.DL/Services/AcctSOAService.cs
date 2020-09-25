@@ -2102,7 +2102,7 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        // Export SOA Credit Cost 
+        // Export SOA Supplier Cost 
         public ExportSOAAirfreightModel GetSoaSupplierAirFreightBySoaNo(string soaNo, string officeId)
         {
             var soa = DataContext.Get(x => x.Soano == soaNo);
@@ -2152,13 +2152,11 @@ namespace eFMS.API.Accounting.DL.Services
                     air.CW = cstrans.ChargeWeight ?? transDetail.ChargeWeight;
                     air.GW = cstrans.GrossWeight ?? transDetail.GrossWeight;
 
-                    // Rate
-                    air.Rate = chargeData.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE || (chargeData.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() &&
-                                                                    chargeData.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower()) ? chargeData.UnitPrice : null;
-
-                    // Air Freight
                     var lstAirfrieght = charge.Where(x => x.JobId == item && (x.ChargeCode == AccountingConstants.CHARGE_BA_AIR_FREIGHT_CODE ||
                                         (x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_CREDIT.ToLower() && x.ChargeName.ToLower() == AccountingConstants.CHARGE_AIR_FREIGHT.ToLower())));
+                    // Rate
+                    air.Rate = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.UnitPrice).FirstOrDefault() : null;
+                    // Air Freight
                     air.AirFreight = lstAirfrieght.Count() > 0 ? lstAirfrieght.Select(t => t.Credit).Sum() : null;
 
                     // Fuel Surcharge
