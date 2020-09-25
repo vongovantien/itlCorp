@@ -252,6 +252,12 @@ export class ShareBusinessFormCreateAirComponent extends AppForm implements OnIn
             .subscribe(
                 (commodities: Commodity[]) => {
                     this.commodities = this.utility.prepareNg2SelectData(commodities, 'code', 'commodityNameEn');
+                    if (!!this.commodities.length && this.type === 'import') {
+                        const asPerBill = this.commodities.filter(e => e.id === 'CM04');
+                        if (!!asPerBill) {
+                            this.commodity.setValue(asPerBill);
+                        }
+                    }
                 },
             );
     }

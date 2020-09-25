@@ -86,6 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<MonthlySaleReportResult> GetOpsSaleReport(SaleReportCriteria criteria)
         {
+            double _decimalNumber = 0.000000001;
             List<MonthlySaleReportResult> results = null;
             IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
             if (data == null) return null;
@@ -109,15 +110,15 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.SumGrossWeight == null ? 0 : (decimal)item.SumGrossWeight,
-                    CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
+                    KGS = (item.SumGrossWeight ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
+                    CBM = (item.SumCbm ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
                     TpyeofService = "CL",
-                    Shipper = item.Shipper,
-                    Consignee = item.Consignee,
+                    Shipper = item.Shipper ?? string.Empty,
+                    Consignee = item.Consignee ?? string.Empty,
                     LoadingDate = item.ServiceDate
                 };
                 string employeeId = userRepository.Get(x => x.Id == item.SalemanId).FirstOrDefault()?.EmployeeId;
@@ -126,17 +127,17 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 //Tổng amount trước thuế selling của HBL
-                report.SellingRate = GetSellingRate(item.Hblid, criteria.Currency);
+                report.SellingRate = GetSellingRate(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
-                report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency);
+                report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount Trước thuế của phí tick chon Kick Back
-                report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency);
+                report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.Hblid);
                 if(contInfo != null)
                 {
-                    report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                    report.Qty20 = (decimal)contInfo?.Qty20;
-                    report.Qty40 = (decimal)contInfo?.Qty40;
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC + (decimal)_decimalNumber;
+                    report.Qty20 = (decimal)contInfo?.Qty20 + (decimal)_decimalNumber;
+                    report.Qty40 = (decimal)contInfo?.Qty40 + (decimal)_decimalNumber;
                 }
                 results.Add(report);
             }
@@ -172,6 +173,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private IQueryable<MonthlySaleReportResult> GetCSSaleReport(SaleReportCriteria criteria)
         {
+            double _decimalNumber = 0.000000001;
             IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
             if (shipments == null) return null;
             IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
@@ -193,13 +195,16 @@ namespace eFMS.API.Documentation.DL.Services
                             HBLID = housebill.Id,
                             housebill.Hwbno,
                             housebill.GrossWeight,
+                            housebill.ChargeWeight,
                             housebill.Cbm,
                             housebill.ShipperDescription,
                             housebill.ConsigneeDescription,
                             housebill.SaleManId,
                             shipment.Eta,
                             shipment.Etd,
-                            shipment.TypeOfService
+                            shipment.TypeOfService,
+                            housebill.ShipperId,
+                            housebill.ConsigneeId,
                         });
             if (data == null) return null;
             var results = new List<MonthlySaleReportResult>();
@@ -222,15 +227,18 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = item.ShipmentType == "Nominated",
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = item.GrossWeight == null ? 0 : (decimal)item.GrossWeight,
-                    CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
+                    //KGS = item.GrossWeight == null ? 0 : (decimal)item.GrossWeight,
+                    KGS = (item.TransactionType.Contains("A") ? (item.ChargeWeight ?? 0) : (item.GrossWeight ?? 0)) + (decimal)_decimalNumber, //CR: CW đối với hàng Air, GW các hàng còn lại [25-09-2020]
+                    CBM = (item.Cbm ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
                     Bonus = 0,
                     TpyeofService = item.TypeOfService != null? (item.TypeOfService.Contains("LCL")?"LCL": string.Empty): string.Empty,//item.ShipmentType.Contains("I") ? "IMP" : "EXP",
-                    Shipper = item.ShipperDescription,
-                    Consignee = item.ConsigneeDescription,
+                    //Shipper = item.ShipperDescription,
+                    Shipper = catPartnerRepository.Get(x => x.Id == item.ShipperId).FirstOrDefault()?.PartnerNameEn, //CR: Get Shipper Name En [25-09-2020]
+                    //Consignee = item.ConsigneeDescription,
+                    Consignee = catPartnerRepository.Get(x => x.Id == item.ConsigneeId).FirstOrDefault()?.PartnerNameEn, //CR: Get Consignee Name En [25-09-2020]
                     LoadingDate = item.TransactionType.Contains("I") ? item.Eta : item.Etd
                 };
                 string employeeId = userRepository.Get(x => x.Id == item.SaleManId).FirstOrDefault()?.EmployeeId;
@@ -239,17 +247,17 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 //Tổng amount trước thuế selling của HBL
-                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency);
+                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
-                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency);
+                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
-                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
+                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.HBLID);
                 if(contInfo != null)
                 {
-                    report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                    report.Qty20 = (decimal)contInfo?.Qty20;
-                    report.Qty40 = (decimal)contInfo?.Qty40;
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC + (decimal)_decimalNumber;
+                    report.Qty20 = (decimal)contInfo?.Qty20 + (decimal)_decimalNumber;
+                    report.Qty40 = (decimal)contInfo?.Qty40 + (decimal)_decimalNumber;
                 }
                 results.Add(report);
             }
