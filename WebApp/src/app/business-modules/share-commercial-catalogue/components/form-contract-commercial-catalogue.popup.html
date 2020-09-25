@@ -415,6 +415,16 @@
                             <span> Active </span>
                         </span>
                     </button>
+                    <button
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                        type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
+                        (click)="showRejectCommentPopup()">
+                        <span>
+                            <span>
+                                Reject
+                            </span>
+                        </span>
+                    </button>
                     <button (click)="activeInactiveContract(selectedContract.id)"
                         *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
                         class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -433,3 +443,4 @@
 <popup-salesman-credit-limit (onRequest)="onSalesmanCreditRequest($event)">
 
 </popup-salesman-credit-limit>
+<partner-reject-popup (onSave)="onSaveReject($event)"></partner-reject-popup>

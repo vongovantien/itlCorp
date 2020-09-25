@@ -378,6 +378,21 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// reject partner comment
+        /// </summary>
+        /// <param name="contractId">id of data that need to retrieve</param>
+        /// <param name="partnerType">id of data that need to retrieve</param>
+        /// <param name="partnerId">id of data that need to retrieve</param>
+        /// <param name="comment">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet("RejectComment")]
+        [Authorize]
+        public IActionResult RejectComment(string partnerId,string contractId, string comment, string partnerType)
+        {
+            bool result = catContractService.SendMailRejectComment(partnerId,contractId, comment,partnerType);
+            return Ok(result);
+        }
 
         /// <summary>
         /// download file excel from server

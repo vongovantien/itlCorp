@@ -14,6 +14,7 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/popup/salesman-credit-limit.popup';
+import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -27,6 +28,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SalesmanCreditLimitPopupComponent, { static: false }) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
+    @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -715,6 +717,30 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const serv = this.vaslst.filter(vas => vas.id !== 'All');
         vasId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         return vasId;
+    }
+
+    onSaveReject($event: string) {
+        const comment = $event;
+        console.log(comment);
+        this._progressRef.start();
+        this._catalogueRepo.rejectCommentCommercial(this.partnerId, this.selectedContract.id, comment, this.type)
+            .pipe(
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this._toastService.success('Sent Successfully!');
+                    } else {
+                        this._toastService.error('something went wrong!');
+                    }
+                }
+            );
+    }
+
+    showRejectCommentPopup() {
+        this.popupRejectPartner.comment = '';
+        this.popupRejectPartner.show();
     }
 
     close() {
