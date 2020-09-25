@@ -19,6 +19,7 @@ import { CommonEnum } from '@enums';
 import { getTransactionLocked, getTransactionPermission, TransactionGetDetailAction } from '@share-bussiness';
 
 import isUUID from 'validator/lib/isUUID';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-air-export-manifest',
@@ -127,7 +128,7 @@ export class AirExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/air-export/${this.jobId}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`]);
     }
 
     getTotalWeight() {

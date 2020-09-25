@@ -23,6 +23,7 @@ import _merge from 'lodash/merge';
 
 import isUUID from 'validator/lib/isUUID';
 import { forkJoin } from 'rxjs';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -221,10 +222,10 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.gotoList();
                         } else {
                             if (!!hbId) {
-                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${hbId}/separate`]);
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}${this.jobId}/hbl/${hbId}/separate`]);
                             }
                             else {
-                                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${res.data}`]);
+                                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                             }
                         }
                     }
@@ -280,6 +281,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     gotoList() {
-        this._router.navigate([`home/documentation/air-export/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
     }
 }

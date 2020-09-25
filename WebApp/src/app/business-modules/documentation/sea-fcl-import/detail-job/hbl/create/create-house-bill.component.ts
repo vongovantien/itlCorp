@@ -22,6 +22,7 @@ import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
 import { ShareBusinessArrivalNoteComponent, ShareBusinessDeliveryOrderComponent, ShareBusinessFormCreateHouseBillImportComponent, ShareBusinessImportHouseBillDetailComponent, ShareBussinessHBLGoodSummaryFCLComponent, getTransactionPermission, getTransactionDetailCsTransactionState } from '@share-bussiness';
 import { DataService } from '@services';
+import { RoutingConstants } from '@constants';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
@@ -183,7 +184,7 @@ export class CreateHouseBillComponent extends AppForm {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}/hbl`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl`]);
     }
 
     createHbl(body: any) {
@@ -204,7 +205,7 @@ export class CreateHouseBillComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
-                        this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}/hbl/${res.data}`]);
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
 
                         return forkJoin([arrival, delivery]);
                     }),

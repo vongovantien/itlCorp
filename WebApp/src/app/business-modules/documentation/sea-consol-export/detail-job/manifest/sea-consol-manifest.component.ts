@@ -17,6 +17,7 @@ import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/sha
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 
@@ -120,7 +121,7 @@ export class SeaConsolExportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-consol-export/${this.jobId}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`]);
     }
 
     getTotalWeight() {

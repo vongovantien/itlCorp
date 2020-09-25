@@ -17,6 +17,7 @@ import { SettlementFormCreateComponent } from '../../settlement-payment/componen
 import { finalize, catchError, takeUntil } from 'rxjs/operators';
 import { switchMap, tap } from 'rxjs/operators';
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -83,7 +84,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 finalize(() => this._progressRef.complete()),
                 tap((res: any) => {
                     if (!res.settlement) {
-                        this._router.navigate(['home/accounting/settlement-payment']);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
                         this._toastService.warning("Settlement not found");
                         return;
                     }
@@ -270,7 +271,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     back() {
         if (!this.approveInfo.requesterAprDate) {
-            this._router.navigate([`home/accounting/settlement-payment/${this.settlementId}`]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${this.settlementId}`]);
         } else {
             window.history.back();
         }

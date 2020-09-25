@@ -15,7 +15,7 @@ import { Crystal } from '@models';
 import { ReportPreviewComponent, ExportCrystalComponent } from '@common';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import * as fromShareBussiness from '@share-bussiness';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -751,16 +751,16 @@ export class ShareBusinessReAlertComponent extends AppList {
     cancelPreAlert() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-                this._router.navigate([`/home/documentation/air-import/${this.jobId}/hbl/${this.hblId}`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 break;
             case ChargeConstants.AE_CODE: // Air Export
-                this._router.navigate([`/home/documentation/air-export/${this.jobId}/hbl/${this.hblId}`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
-                this._router.navigate([`/home/documentation/sea-fcl-export/${this.jobId}/si`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/si`]);
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
-                this._router.navigate([`/home/documentation/sea-lcl-export/${this.jobId}/si`]);
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}/si`]);
                 break;
             default:
                 break;

@@ -17,6 +17,7 @@ import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/sha
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 import { CommonEnum } from '@enums';
 import { getTransactionLocked, getTransactionPermission, TransactionGetDetailAction } from '@share-bussiness';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-sea-fcl-import-manifest',
@@ -129,7 +130,7 @@ export class SeaFclImportManifestComponent extends AppList {
     }
 
     combackToHBLList() {
-        this._router.navigate([`/home/documentation/sea-fcl-import/${this.jobId}`]);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
     }
 
 

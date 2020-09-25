@@ -9,6 +9,7 @@ import _merge from 'lodash/merge';
 import { NgProgress } from '@ngx-progressbar/core';
 import { takeUntil, switchMap } from 'rxjs/operators';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'detail-account-receivable',
@@ -104,7 +105,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
         //window.history.back();
 
-        this._router.navigate(['/home/accounting/account-receivable-payable/receivable'],
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`],
             { queryParams: { subTab: this.subTab } });
     }
 }

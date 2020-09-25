@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { ShareAirExportOtherChargePopupComponent, IDataOtherCharge } from '../../share/other-charge/air-export-other-charge.popup';
-import { JobConstants, SystemConstants } from '@constants';
+import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -224,7 +224,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit {
                     this.handleObserver();
                 },
                 (err) => {
-                    this._router.navigate([`home/documentation/air-export`]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}`]);
                 });
     }
 

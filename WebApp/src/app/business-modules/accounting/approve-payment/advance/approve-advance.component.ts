@@ -12,6 +12,7 @@ import { ReportPreviewComponent } from 'src/app/shared/common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-approve-advance',
@@ -181,7 +182,7 @@ export class ApproveAdvancePaymentComponent extends AppPage {
 
     back() {
         if (!this.approveInfo.requesterAprDate) {
-            this._router.navigate([`home/accounting/advance-payment/${this.idAdvPayment}`]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${this.idAdvPayment}`]);
         } else {
             window.history.back();
         }

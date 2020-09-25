@@ -11,7 +11,7 @@ import { CommonEnum } from '@enums';
 import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
-import { JobConstants } from '@constants';
+import { JobConstants, RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-air-import',
@@ -208,7 +208,7 @@ export class AirImportComponent extends AppList {
     }
 
     gotoCreateJob() {
-        this._router.navigate(['home/documentation/air-import/new']);
+        this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/new`]);
     }
 
     loadListHouseBillExpanding() {
@@ -222,7 +222,7 @@ export class AirImportComponent extends AppList {
         this._documentRepo.checkDetailShippmentPermission(id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate(["/home/documentation/air-import", id]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}`, id]);
                 } else {
                     this.permissionPopup.show();
                 }

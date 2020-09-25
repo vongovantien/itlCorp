@@ -12,6 +12,7 @@ import { AccountReceivableListOtherComponent } from './components/list-other/lis
 import { AccountReceivableFormSearchComponent } from './components/form-search/account-receivable/form-search-account-receivable.component';
 import { CommonEnum } from '@enums';
 import { Router, ActivatedRoute } from '@angular/router';
+import { RoutingConstants } from '@constants';
 type TAB = 'INVOICE' | 'OBH';
 
 
@@ -71,11 +72,11 @@ export class AccountReceivablePayableComponent extends AppList implements OnInit
         this.selectedTabAR = tab;
 
         if (tab === 'payment') {
-            this._router.navigate(['/home/accounting/account-receivable-payable']);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
             this.selectedTab = 'INVOICE';
             this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
         } else {
-            this._router.navigate(['/home/accounting/account-receivable-payable/receivable']);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
 
         }
     }
