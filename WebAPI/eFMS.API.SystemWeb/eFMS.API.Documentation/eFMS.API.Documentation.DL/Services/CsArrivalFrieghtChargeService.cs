@@ -122,7 +122,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Id = Guid.Empty,
                     Hblid = hblid,
-                    Description = null,
+                    Description = x.Description,
                     ChargeId = x.ChargeId,
                     Quantity = x.Quantity,
                     UnitId = x.UnitId,
@@ -134,7 +134,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Notes = x.Notes,
                     IsShow = x.IsShow,
                     IsFull = x.IsFull,
-                    IsTick = x.IsTick
+                    IsTick = x.IsTick,
                 });
             if (defaultFreightCharges.Count() > 0)
             {

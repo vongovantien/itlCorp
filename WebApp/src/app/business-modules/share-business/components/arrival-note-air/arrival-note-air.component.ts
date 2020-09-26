@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { CommonEnum } from '@enums';
 import { ConfirmPopupComponent, AppComboGridComponent } from '@common';
 import { CatalogueRepo, DocumentationRepo } from '@repositories';
-import { SortService, DataService } from '@services';
+import { SortService } from '@services';
 
 import { ChargeConstants } from 'src/constants/charge.const';
 import { AppList } from 'src/app/app.list';
@@ -14,14 +14,15 @@ import { SystemConstants } from 'src/constants/system.const';
 
 import { ArrivalFreightCharge, User, Charge, Unit, Currency, CsTransactionDetail, Container, CsTransaction } from '@models';
 
-import { getDetailHBlState, getTransactionLocked, GetDetailHBLAction } from '../../store';
+import { getTransactionLocked, GetDetailHBLAction, getTransactionDetailCsTransactionState } from '../../store';
 import { IArrivalFreightChargeDefault, IArrivalDefault } from '../hbl/arrival-note/arrival-note.component';
 import { HBLArrivalNote } from 'src/app/shared/models/document/arrival-note-hbl';
 
-import { Observable } from 'rxjs';
-import { catchError, takeUntil, switchMap, finalize, tap, skip } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, takeUntil, switchMap, finalize, tap, skip, concatMap, map } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
 import * as fromShare from './../../store';
+import { ActivatedRoute, Params } from '@angular/router';
 
 @Component({
     selector: 'arrival-note-air',
@@ -54,6 +55,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     isSubmitted: boolean = false;
 
     selectedFreightCharge: ArrivalFreightCharge;
+    hblid: string;
 
 
     constructor(
@@ -63,7 +65,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
         private _sortService: SortService,
         private _ngProgress: NgProgress,
         private _toastService: ToastrService,
-        private _dataService: DataService
+        private _activedRoute: ActivatedRoute
     ) {
         super();
 
@@ -90,31 +92,58 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             }
         );
 
-        this._store.select(getDetailHBlState)
+        this._activedRoute.params
             .pipe(
-                catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
-                tap((res: CsTransactionDetail) => {
-                    this.hbl = res;
-                    this.hblArrivalNote.hblid = res.id || SystemConstants.EMPTY_GUID;
-                }),
-                switchMap(() => this._documentRepo.getArrivalInfo(this.hblArrivalNote.hblid, CommonEnum.TransactionTypeEnum.AirImport)) // * Get arrival info.
-            )
-            .subscribe(
-                (res: HBLArrivalNote) => {
-                    if (!!res) {
-                        if (!!res.hblid && res.arrivalNo !== null) {
-                            this.hblArrivalNote = res;
-                            this.hblArrivalNote.arrivalFirstNotice = !!res.arrivalFirstNotice ? { startDate: new Date(res.arrivalFirstNotice), endDate: new Date(res.arrivalSecondNotice) } : { startDate: new Date(), endDate: new Date() };
-                            this.hblArrivalNote.arrivalSecondNotice = !!res.arrivalSecondNotice ? { startDate: new Date(res.arrivalSecondNotice), endDate: new Date(res.arrivalSecondNotice) } : null;
-                        }
-                        // res.arrivalNo === null
-                        else {
-                            this.setDefaultArrivalNote();
-                        }
+                map((p: Params) => {
+                    if (p.hblId) {
+                        this.hblid = p.hblId;
+                    } else {
+                        this.hblid = SystemConstants.EMPTY_GUID;
                     }
-                }
-            );
+                    return of(this.hblid);
+                }),
+                switchMap(() => this._documentRepo.getArrivalInfo(this.hblid, CommonEnum.TransactionTypeEnum.AirImport)), // * Stream 1: Get arrival info.
+                concatMap((data: HBLArrivalNote) => {
+                    // * Update HBL ArrivalNote model from dataDefault.
+                    this.hblArrivalNote.arrivalHeader = data.arrivalHeader;
+                    this.hblArrivalNote.arrivalFooter = data.arrivalFooter;
+                    this.hblArrivalNote.csArrivalFrieghtCharges = data.csArrivalFrieghtCharges || [];
+
+
+                    if (!data.arrivalNo) {
+                        return this._store.select(getTransactionDetailCsTransactionState);  // * Stream 2: get shipment detail
+                    } else {
+                        this.hblArrivalNote.arrivalNo = data.arrivalNo;
+                        this.hblArrivalNote.arrivalFirstNotice = !!data.arrivalFirstNotice ? {
+                            startDate: new Date(data.arrivalFirstNotice),
+                            endDate: new Date(data.arrivalFirstNotice),
+                        } : null;
+                        this.hblArrivalNote.arrivalSecondNotice = !!data.arrivalSecondNotice ? {
+                            startDate: new Date(data.arrivalSecondNotice),
+                            endDate: new Date(data.arrivalSecondNotice),
+                        } : null;
+
+                        return of(this.hblArrivalNote);
+                    }
+                }),
+                map((res: CsTransaction | HBLArrivalNote | any) => {
+                    // * If res are DeliveryOrder object
+                    if (res.hasOwnProperty("arrivalHeader")) {
+                        return res;
+                    }
+
+                    // * Update field from shipment
+                    this.hblArrivalNote.arrivalNo = res.jobNo + "-" + "A01";
+                    this.hblArrivalNote.arrivalFirstNotice = {
+                        startDate: new Date(),
+                        endDate: new Date()
+                    };
+
+                    return new HBLArrivalNote(this.hblArrivalNote);
+                })
+            )
+            .subscribe((res) => { console.log("subscribe", res); });
 
         this.isLocked = this._store.select(getTransactionLocked);
     }
@@ -152,7 +181,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     }
 
     setDefaultArrivalNote() {
-        //get JobNo and "Select Store chỗ nào thì takeUntil để tranh memoryLeak" a Thuong said:
+        // get JobNo and "Select Store chỗ nào thì takeUntil để tranh memoryLeak" a Thuong said:
         this._store.select(fromShare.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res: CsTransaction) => {
