@@ -64,7 +64,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpGet("GetDeliveryOrder")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetDeliveryOrder(Guid hblid, TransactionTypeEnum type)
         {
             string transactionType = DataTypeEx.GetType(type);
