@@ -41,7 +41,9 @@ namespace eFMS.API.Accounting.DL.IService
         Crystal Preview(Guid advanceId);
 
         Crystal Preview(AcctAdvancePaymentModel advance);
-        
+
+        Crystal PreviewMultipleAdvance(List<Guid> advanceIds);
+
         HandleState InsertOrUpdateApprovalAdvance(AcctApproveAdvanceModel approve);
 
         HandleState UpdateApproval(Guid advanceId);

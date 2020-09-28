@@ -1415,6 +1415,27 @@ namespace eFMS.API.Accounting.DL.Services
             result.SetParameter(parameter);
             return result;
         }
+        
+        public Crystal PreviewMultipleAdvance(List<Guid> advanceIds)
+        {
+            Crystal result = null;
+            List<Crystal> subReports = new List<Crystal>();
+            for(var i = 0; i < advanceIds.Count; i++)
+            {
+                var _preview = Preview(advanceIds[i]);
+                subReports.Add(_preview);
+            }
+            result = new Crystal
+            {
+                ReportName = "AdvancePaymentRequestMulti.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddSubReport("AdvancePaymentRequest-Copy.rpt", subReports);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            return result;
+        }
+        
         #endregion PREVIEW ADVANCE PAYMENT
 
         #region APPROVAL ADVANCE PAYMENT        

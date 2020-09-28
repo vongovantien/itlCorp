@@ -649,6 +649,12 @@ export class AccountingRepo {
     calculateListChargeAccountingMngt(charges: any[]) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/vi/AccountingManagement/CalculateListChargeAccountingMngt`, charges);
     }
+
+    previewAdvancePaymentMultiple(advanceIds: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewMultipleAdvancePaymentByAdvanceIds`, advanceIds).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

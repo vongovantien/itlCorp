@@ -871,5 +871,13 @@ namespace eFMS.API.Accounting.Controllers
                 accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
             }
         }
+
+        [Authorize]
+        [HttpPost("PreviewMultipleAdvancePaymentByAdvanceIds")]
+        public IActionResult PreviewMultipleAdvancePaymentByAdvanceIds(List<Guid> advanceIds)
+        {
+            var result = acctAdvancePaymentService.PreviewMultipleAdvance(advanceIds);
+            return Ok(result);
+        }
     }
 }
