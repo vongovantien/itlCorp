@@ -54,6 +54,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
+    selectedTabSurcharge: string = 'BUY';
 
     constructor(
         private _spinner: NgxSpinnerService,
@@ -340,6 +341,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     getSurCharges(type: 'BUY' | 'SELL' | 'OBH') {
+        this.selectedTabSurcharge = type;
         if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
             this._store.dispatch(new fromShareBussiness.GetBuyingSurchargeAction({ type: CommonEnum.SurchargeTypeEnum.BUYING_RATE, hblId: this.opsTransaction.hblid }));
         }
