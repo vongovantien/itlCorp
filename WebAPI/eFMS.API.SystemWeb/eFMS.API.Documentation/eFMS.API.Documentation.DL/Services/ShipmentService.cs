@@ -826,8 +826,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.AmountOBH = _obh;
                 #endregion -- Phí OBH sau thuế --
                 data.Destination = catPlaceRepo.Get(x => x.Id == item.Pod).Select(t => t.NameVn).FirstOrDefault();
-                data.CustomerId = item.CustomerId;
-                data.CustomerName = item.CustomerName;
                 data.RalatedHblHawb = string.Empty;// tạm thời để trống
                 data.RalatedJobNo = string.Empty;// tạm thời để trống
                 data.HandleOffice = sysOfficeRepo.Get(x => x.Id == item.OfficeId).Select(t => t.Code).FirstOrDefault();
@@ -841,6 +839,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PMTerm = item.PMTerm;
                 data.ShipmentNotes = item.ShipmentNotes;
                 data.Created = item.Created;
+                data.CustomerId = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.AccountNo).FirstOrDefault();
+                data.CustomerName = catPartnerRepo.Get(x => x.Id == item.CustomerId).Select(t => t.ShortName).FirstOrDefault();
+                string Code = catUnitRepo.Get(x => x.Id == item.PackageQty).Select(t => t.Code).FirstOrDefault();
+                data.QTy = !string.IsNullOrEmpty(Code) ? item.QTy + " " + Code : string.Empty;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -984,7 +986,10 @@ namespace eFMS.API.Documentation.DL.Services
                 data.BKRefNo = item.JobNo;
                 data.ServiceMode = item.ServiceMode;//chua co thong tin
                 data.ProductService = item.ProductService;
+                data.etd = item.ServiceDate;
+                data.Creator = sysUserRepo.Get(x => x.Id == item.UserCreated).Select(t => t.Username).FirstOrDefault();
                 data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
+                data.Created = item.DatetimeCreated;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -1119,10 +1124,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId into housebill
                                     from house in housebill.DefaultIfEmpty()
-                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
-                                    from unit in units.DefaultIfEmpty()
-                                    join partner in dataPartner on house.CustomerId equals partner.Id into Partner
-                                    from partner in Partner.DefaultIfEmpty()
+                                    //join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    //from unit in units.DefaultIfEmpty()
+                                    //join partner in dataPartner on house.CustomerId equals partner.Id into Partner
+                                    //from partner in Partner.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1149,7 +1154,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
-                                        CustomerId = partner.AccountNo,
+                                        CustomerId = house.CustomerId,
                                         OfficeId = master.OfficeId,
                                         Creator = master.UserCreated,
                                         POINV = master.Pono,
@@ -1157,9 +1162,9 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
-                                        CustomerName = partner.ShortName
-                                        
+                                        QTy = house.PackageQty.ToString(), //+ " " + unit.Code,
+                                        //CustomerName = partner.ShortName
+                                        PackageQty = house.PackageType
 
 
                                     };
@@ -1170,10 +1175,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseBills = detailRepository.Get().Where(queryTranDetail);
                 var queryShipment = from master in masterBills
                                     join house in houseBills on master.Id equals house.JobId
-                                    join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
-                                    from unit in units.DefaultIfEmpty()
-                                    join partner in dataPartner on house.CustomerId equals partner.Id into Partner
-                                    from partner in Partner.DefaultIfEmpty()
+                                    //join unit in catUnitRepo.Get() on house.PackageType equals unit.Id into units
+                                    //from unit in units.DefaultIfEmpty()
+                                    //join partner in dataPartner on house.CustomerId equals partner.Id into Partner
+                                    //from partner in Partner.DefaultIfEmpty()
                                     select new GeneralExportShipmentOverviewResult
                                     {
                                         ServiceName = master.TransactionType,
@@ -1193,14 +1198,14 @@ namespace eFMS.API.Documentation.DL.Services
                                         Consignee = house.ConsigneeId,
                                         PackageType = house.PackageType,
                                         Cont20 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "20").Count : 0,
-                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40").Count : 0,
+                                        Cont40 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count > 0 ? Regex.Matches(house.PackageContainer, "40´HC").Count : Regex.Matches(house.PackageContainer, "40").Count : 0,
                                         Cont40HC = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "40´HC").Count : 0,
                                         Cont45 = !string.IsNullOrEmpty(house.PackageContainer) ? Regex.Matches(house.PackageContainer, "45").Count : 0,
                                         GW = master.GrossWeight,
                                         CW = master.ChargeWeight,
                                         CBM = house.Cbm.HasValue ? house.Cbm : master.Cbm,
                                         HblId = house.Id,
-                                        CustomerId = partner.AccountNo,
+                                        CustomerId = house.CustomerId,
                                         OfficeId = master.OfficeId,
                                         Creator = master.UserCreated,
                                         POINV = master.Pono,
@@ -1208,8 +1213,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         PMTerm = master.PaymentTerm,
                                         ShipmentNotes = master.Notes,
                                         Created = master.DatetimeCreated,
-                                        QTy = house.PackageQty.ToString() + " " + unit.Code,
-                                        CustomerName = partner.ShortName
+                                        QTy = house.PackageQty.ToString(), //+ " " + unit.Code,        //CustomerName = partner.ShortName
+                                        PackageQty = house.PackageType
                                     };
 
                 return queryShipment;
