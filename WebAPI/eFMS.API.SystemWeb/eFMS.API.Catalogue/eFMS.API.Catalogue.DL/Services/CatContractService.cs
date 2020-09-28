@@ -774,7 +774,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, emailCreator, null, lstCc);
+                SendMail.Send(subject, body, lstTo, null, null, lstCc);
             }
             else
             {
@@ -805,7 +805,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 };
 
                 lstCc.Add(objInfoSalesman?.Email);
-                SendMail.Send(subject, body, lstTo ,null , lstCc);
+                SendMail.Send(subject, body, lstTo, null, null, lstCc);
 
             }
 
