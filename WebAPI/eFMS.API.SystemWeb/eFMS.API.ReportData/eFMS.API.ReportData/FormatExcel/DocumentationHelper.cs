@@ -2186,7 +2186,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(7).Width = 34; //Cột G
             workSheet.Column(8).Width = 12.5; //Cột H
             workSheet.Column(9).Width = 13; //Cột I
-            workSheet.Column(10).Width = 9; //Cột J
+            workSheet.Column(10).Width = 14; //Cột J
             workSheet.Column(11).Width = 14; //Cột K
             workSheet.Column(12).Width = 14; //Cột L
             workSheet.Column(13).Width = 14; //Cột M
@@ -2274,10 +2274,38 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 startRow += 1;
             }
-            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow - 1, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            //Row total
+            workSheet.Cells[startRow, 1].Value = "Total";
+            workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Row(startRow).Style.Font.Bold = true;
+            workSheet.Cells["A" + startRow + ":I" + startRow].Merge = true;
+            workSheet.Cells[startRow, 10].Value = listData.Sum(su => su.Qty); //Total Qty
+            workSheet.Cells[startRow, 10].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[startRow, 11].Value = listData.Sum(su => su.ChargeWeight); //Total Charge Weight
+            workSheet.Cells[startRow, 12].Value = listData.Sum(su => su.Revenue); //Total Revenue
+            workSheet.Cells[startRow, 13].Value = listData.Sum(su => su.Cost); //Total Cost
+            workSheet.Cells[startRow, 14].Value = listData.Sum(su => su.Profit); //Total Profit
+            workSheet.Cells[startRow, 15].Value = listData.Sum(su => su.Obh); //Total OBH
+            if (criteria.Currency != "VND")
+            {
+                for (int i = 11; i < 16; i++)
+                {
+                    workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormatVND;
+                }
+            }
+            else
+            {
+                for (int i = 11; i < 16; i++)
+                {
+                    workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormats;
+                }
+            }
+
+            workSheet.Cells[1, 1, startRow, 18].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 18].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
         #region Summary Cost
         public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, GeneralReportCriteria criteria, Stream stream = null)
