@@ -91,7 +91,7 @@
                                         || !!charge.paySoano
                                         || !charge.isFromShipment 
                                         || (isLocked | async) === true ;else partnerTemplate">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName"
                                             [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
                                     </ng-container>
