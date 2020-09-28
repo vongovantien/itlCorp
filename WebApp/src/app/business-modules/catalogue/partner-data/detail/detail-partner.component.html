@@ -16,6 +16,16 @@
                         </span>
                     </span>
                 </button>
+                <button
+                    *ngIf="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true && !partner.active"
+                    type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
+                    (click)="showRejectCommentPopup()">
+                    <span>
+                        <span>
+                            Reject
+                        </span>
+                    </span>
+                </button>
                 <button *ngIf="partner.permission.allowUpdate" type=""
                     class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onSubmit()">
                     <span>
@@ -55,3 +65,4 @@
 <confirm-popup #internalReferenceConfirmPopup (onSubmit)="onFocusInternalReference()" [body]="deleteMessage"
     [labelConfirm]="'Ok'" [labelCancel]="'Cancel'" [align]="'left'"></confirm-popup>
 <info-popup #duplicatePartnerPopup [body]="deleteMessage"></info-popup>
+<partner-reject-popup (onSave)="onSaveReject($event)"></partner-reject-popup>

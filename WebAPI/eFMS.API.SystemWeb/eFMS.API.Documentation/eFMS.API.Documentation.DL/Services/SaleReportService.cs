@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysOffice> officeRepository;
         readonly IContextBase<SysUserLevel> userLevelRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         public SaleReportService(IContextBase<OpsTransaction> opsRepo,
             IContextBase<CsTransaction> csRepo,
@@ -85,8 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
 
 
         private IQueryable<MonthlySaleReportResult> GetOpsSaleReport(SaleReportCriteria criteria)
-        {
-            double _decimalNumber = 0.000000001;
+        {            
             List<MonthlySaleReportResult> results = null;
             IQueryable<OpsTransaction> data = QueryOpsSaleReport(criteria);
             if (data == null) return null;
@@ -110,8 +110,8 @@ namespace eFMS.API.Documentation.DL.Services
                     assigned = false,
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
-                    KGS = (item.SumGrossWeight ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
-                    CBM = (item.SumCbm ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
+                    KGS = (item.SumGrossWeight ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
+                    CBM = (item.SumCbm ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
@@ -127,17 +127,17 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 //Tổng amount trước thuế selling của HBL
-                report.SellingRate = GetSellingRate(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.SellingRate = GetSellingRate(item.Hblid, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
-                report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.BuyingRate = GetBuyingRate(item.Hblid, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount Trước thuế của phí tick chon Kick Back
-                report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.SharedProfit = GetShareProfit(item.Hblid, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.Hblid);
                 if(contInfo != null)
                 {
-                    report.Cont40HC = (decimal)contInfo?.Cont40HC + (decimal)_decimalNumber;
-                    report.Qty20 = (decimal)contInfo?.Qty20 + (decimal)_decimalNumber;
-                    report.Qty40 = (decimal)contInfo?.Qty40 + (decimal)_decimalNumber;
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
+                    report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
+                    report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
                 }
                 results.Add(report);
             }
@@ -173,7 +173,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
         private IQueryable<MonthlySaleReportResult> GetCSSaleReport(SaleReportCriteria criteria)
         {
-            double _decimalNumber = 0.000000001;
             IQueryable<CsTransaction> shipments = QueryCsTransaction(criteria);
             if (shipments == null) return null;
             IQueryable<CsTransactionDetail> housebills = QueryHouseBills(criteria);
@@ -228,8 +227,8 @@ namespace eFMS.API.Documentation.DL.Services
                     TransID = item.JobNo,
                     HWBNO = item.Hwbno,
                     //KGS = item.GrossWeight == null ? 0 : (decimal)item.GrossWeight,
-                    KGS = (item.TransactionType.Contains("A") ? (item.ChargeWeight ?? 0) : (item.GrossWeight ?? 0)) + (decimal)_decimalNumber, //CR: CW đối với hàng Air, GW các hàng còn lại [25-09-2020]
-                    CBM = (item.Cbm ?? 0) + (decimal)_decimalNumber, //Cộng thêm phần thập phân
+                    KGS = (item.TransactionType.Contains("A") ? (item.ChargeWeight ?? 0) : (item.GrossWeight ?? 0)) + _decimalNumber, //CR: CW đối với hàng Air, GW các hàng còn lại [25-09-2020]
+                    CBM = (item.Cbm ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                     SharedProfit = 0,
                     OtherCharges = 0,
                     SalesTarget = 0,
@@ -247,17 +246,17 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 //Tổng amount trước thuế selling của HBL
-                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.SellingRate = GetSellingRate(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng amount trước thuế Buying của HBL (ko lấy phí có tick KB)
-                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.BuyingRate = GetBuyingRate(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 //Tổng Amount Trước thuế của phí tick chon Kick Back
-                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + (decimal)_decimalNumber; //Cộng thêm phần thập phân
+                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
                 var contInfo = GetContainer(containerData, null, item.HBLID);
                 if(contInfo != null)
                 {
-                    report.Cont40HC = (decimal)contInfo?.Cont40HC + (decimal)_decimalNumber;
-                    report.Qty20 = (decimal)contInfo?.Qty20 + (decimal)_decimalNumber;
-                    report.Qty40 = (decimal)contInfo?.Qty40 + (decimal)_decimalNumber;
+                    report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
+                    report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
+                    report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
                 }
                 results.Add(report);
             }
@@ -619,9 +618,9 @@ namespace eFMS.API.Documentation.DL.Services
                     Cont40HC = 0,
                     KGS = 0,
                     CBM = 0,
-                    SellingRate = _sellingRate, // Total Amount Selling
-                    SharedProfit = _sharedProfit, // Total Amount Buying có Check Kick Back
-                    BuyingRate = _buyingRate, // Total Amount Buying ko có Check Kick Back
+                    SellingRate = _sellingRate + _decimalNumber, // Total Amount Selling
+                    SharedProfit = _sharedProfit + _decimalNumber, // Total Amount Buying có Check Kick Back
+                    BuyingRate = _buyingRate + _decimalNumber, // Total Amount Buying ko có Check Kick Back
                     OtherCharges = 0, // Default bằng 0
                     SalesTarget = 0, // Default bằng 0
                     Bonus = 0, // Default bằng 0
@@ -750,9 +749,9 @@ namespace eFMS.API.Documentation.DL.Services
                     Cont40HC = 0,
                     KGS = 0,
                     CBM = 0,
-                    SellingRate = _sellingRate, // Total Amount Selling
-                    SharedProfit = _sharedProfit, // Total Amount Buying có Check Kick Back
-                    BuyingRate = _buyingRate, // Total Amount Buying ko có Check Kick Back
+                    SellingRate = _sellingRate + _decimalNumber, // Total Amount Selling
+                    SharedProfit = _sharedProfit + _decimalNumber, // Total Amount Buying có Check Kick Back
+                    BuyingRate = _buyingRate + _decimalNumber, // Total Amount Buying ko có Check Kick Back
                     OtherCharges = 0, // Default bằng 0
                     SalesTarget = 0, // Default bằng 0
                     Bonus = 0, // Default bằng 0
@@ -980,8 +979,8 @@ namespace eFMS.API.Documentation.DL.Services
                     Description = GetShipmentTypeForPreviewPL(item.TransactionType),
                     Assigned = item.ShipmentType == "Nominated" ? true : false,
                     TransID = item.JobNo,
-                    KGS = item.NetWeight == null ? 0 : (decimal)item.NetWeight,
-                    CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
+                    KGS = (item.NetWeight ?? 0) + _decimalNumber,
+                    CBM = (item.Cbm ?? 0) + _decimalNumber,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     TpyeofService = item.TypeOfService
@@ -992,19 +991,19 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 // Selling
-                report.SellingRate = GetChargeFee(item.HBLID, criteria.Currency, "SELL");
+                report.SellingRate = GetChargeFee(item.HBLID, criteria.Currency, "SELL") + _decimalNumber; //Cộng thêm phần thập phân
                 //Buying without kickBack.
-                report.BuyingRate = GetChargeFee(item.HBLID, criteria.Currency, "BUY");
+                report.BuyingRate = GetChargeFee(item.HBLID, criteria.Currency, "BUY") + _decimalNumber; //Cộng thêm phần thập phân
                 //KickBack
-                report.SharedProfit = GetChargeFee(item.HBLID, criteria.Currency, "SHARE");
-                // Share-Profit
-                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
+                report.SharedProfit = GetChargeFee(item.HBLID, criteria.Currency, "SHARE") + _decimalNumber; //Cộng thêm phần thập phân
+                // Share-Profit (Sử dụng hàm trên 28092020)
+                // report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency) + _decimalNumber; //Cộng thêm phần thập phân
 
                 var contInfo = GetContainer(containerData,null,item.HBLID);
 
-                report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                report.Qty20 = (decimal)contInfo?.Qty20;
-                report.Qty40 = (decimal)contInfo?.Qty40;
+                report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
+                report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
+                report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
                 results.Add(report);
             }
             return results.AsQueryable();
@@ -1025,8 +1024,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     Description = "Logistics",
                     TransID = item.JobNo,
-                    KGS = item.SumNetWeight == null ? 0 : (decimal)item.SumNetWeight,
-                    CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
+                    KGS = (item.SumNetWeight ?? 0) + _decimalNumber,
+                    CBM = (item.SumCbm ?? 0) + _decimalNumber,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     TpyeofService = API.Common.Globals.CustomData.Services.FirstOrDefault(c => c.Value == DocumentConstants.LG_SHIPMENT)?.Value,
@@ -1039,11 +1038,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 // Selling
-                report.SellingRate = GetChargeFee(item.Hblid, criteria.Currency, "SELL");
+                report.SellingRate = GetChargeFee(item.Hblid, criteria.Currency, "SELL") + _decimalNumber; //Cộng thêm phần thập phân
                 //Buying without kickBack.
-                report.BuyingRate = GetChargeFee(item.Hblid, criteria.Currency, "BUY");
+                report.BuyingRate = GetChargeFee(item.Hblid, criteria.Currency, "BUY") + _decimalNumber; //Cộng thêm phần thập phân
                 //KickBack
-                report.SharedProfit = GetChargeFee(item.Hblid, criteria.Currency, "SHARE");
+                report.SharedProfit = GetChargeFee(item.Hblid, criteria.Currency, "SHARE") + _decimalNumber; //Cộng thêm phần thập phân
                 // Container
                 IQueryable<CsMawbcontainer> containers = null;
                 if (item != null)
@@ -1059,9 +1058,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var conts = containers.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
 
-                    report.Cont40HC = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40HC".ToLower()).Sum(x => x.x.Quantity);
-                    report.Qty20 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont20DC".ToLower()).Sum(x => x.x.Quantity);
-                    report.Qty40 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40DC".ToLower()).Sum(x => x.x.Quantity);
+                    report.Cont40HC = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40HC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
+                    report.Qty20 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont20DC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
+                    report.Qty40 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40DC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
                 }
 
                 results.Add(report);
@@ -1155,8 +1154,8 @@ namespace eFMS.API.Documentation.DL.Services
                     POL = catPlaceRepository.Get(x => x.Id == item.Pol)?.FirstOrDefault()?.Code,
                     Description = "Logistics",
                     TransID = item?.JobNo,
-                    KGS = item.SumNetWeight == null ? 0 : (decimal)item.SumNetWeight,
-                    CBM = item.SumCbm == null ? 0 : (decimal)item.SumCbm,
+                    KGS = (item.SumNetWeight ?? 0) + _decimalNumber,
+                    CBM = (item.SumCbm ?? 0) + _decimalNumber,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     NominationParty = string.Empty,
@@ -1178,11 +1177,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 // Selling
-                report.SellingRate = GetChargeFee(item.Hblid, criteria.Currency, "SELL");
+                report.SellingRate = GetChargeFee(item.Hblid, criteria.Currency, "SELL") + _decimalNumber; //Cộng thêm phần thập phân
                 //Buying without kickBack.
-                report.BuyingRate = GetChargeFee(item.Hblid, criteria.Currency, "BUY");
+                report.BuyingRate = GetChargeFee(item.Hblid, criteria.Currency, "BUY") + _decimalNumber; //Cộng thêm phần thập phân
                 //KickBack
-                report.SharedProfit = GetChargeFee(item.Hblid, criteria.Currency, "SHARE");
+                report.SharedProfit = GetChargeFee(item.Hblid, criteria.Currency, "SHARE") + _decimalNumber; //Cộng thêm phần thập phân
                 // Container
                 IQueryable<CsMawbcontainer> containers = null;
                 if (item != null)
@@ -1198,9 +1197,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var conts = containers.Join(containerData, x => x.ContainerTypeId, y => y.Id, (x, y) => new { x, y.Code });
 
-                    report.Cont40HC = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40HC".ToLower()).Sum(x => x.x.Quantity);
-                    report.Qty20 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont20DC".ToLower()).Sum(x => x.x.Quantity);
-                    report.Qty40 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40DC".ToLower()).Sum(x => x.x.Quantity);
+                    report.Cont40HC = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40HC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
+                    report.Qty20 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont20DC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
+                    report.Qty40 = (decimal)conts.Where(x => x.Code.ToLower() == "Cont40DC".ToLower()).Sum(x => x.x.Quantity) + _decimalNumber;
                 }
 
                 results.Add(report);
@@ -1243,9 +1242,6 @@ namespace eFMS.API.Documentation.DL.Services
                             housebill.ConsigneeDescription,
                             shipment.Eta,
                             shipment.Etd,
-
-
-
                         });
             if (data == null) return null;
 
@@ -1263,8 +1259,8 @@ namespace eFMS.API.Documentation.DL.Services
                     Description = GetShipmentTypeForPreviewPL(item.TransactionType),
                     Assigned = item.ShipmentType == "Nominated" ? true : false,
                     TransID = item.JobNo,
-                    KGS = item.NetWeight == null ? 0 : (decimal)item.NetWeight,
-                    CBM = item.Cbm == null ? 0 : (decimal)item.Cbm,
+                    KGS = (item.NetWeight ?? 0) + _decimalNumber,
+                    CBM = (item.Cbm ?? 0) + _decimalNumber,
                     SharedProfit = 0,
                     OtherCharges = 0,
                     ShipmentSource = string.IsNullOrEmpty(item.ShipmentType) ? null : item.ShipmentType.ToUpper(),
@@ -1286,19 +1282,19 @@ namespace eFMS.API.Documentation.DL.Services
                     report.ContactName = employeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameVn;
                 }
                 // Selling
-                report.SellingRate = GetChargeFee(item.HBLID, criteria.Currency, "SELL");
+                report.SellingRate = GetChargeFee(item.HBLID, criteria.Currency, "SELL") + _decimalNumber;
                 //Buying without kickBack.
-                report.BuyingRate = GetChargeFee(item.HBLID, criteria.Currency, "BUY");
+                report.BuyingRate = GetChargeFee(item.HBLID, criteria.Currency, "BUY") + _decimalNumber;
                 //KickBack
-                report.SharedProfit = GetChargeFee(item.HBLID, criteria.Currency, "SHARE");
-                // Share-Profit
-                report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
+                report.SharedProfit = GetChargeFee(item.HBLID, criteria.Currency, "SHARE") + _decimalNumber;
+                // Share-Profit (Sử dụng hàm trên)
+                // report.SharedProfit = GetShareProfit(item.HBLID, criteria.Currency);
 
                 var contInfo = GetContainer(containerData, null, item.HBLID);
 
-                report.Cont40HC = (decimal)contInfo?.Cont40HC;
-                report.Qty20 = (decimal)contInfo?.Qty20;
-                report.Qty40 = (decimal)contInfo?.Qty40;
+                report.Cont40HC = (decimal)contInfo?.Cont40HC + _decimalNumber;
+                report.Qty20 = (decimal)contInfo?.Qty20 + _decimalNumber;
+                report.Qty40 = (decimal)contInfo?.Qty40 + _decimalNumber;
                 results.Add(report);
             }
             return results.AsQueryable();
