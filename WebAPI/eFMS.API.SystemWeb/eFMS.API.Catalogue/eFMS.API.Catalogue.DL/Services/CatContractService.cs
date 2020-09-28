@@ -812,6 +812,68 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
+        public bool SendMailRejectComment(string partnerId, string contractId, string comment, string partnerType)
+        {
+            var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
+            var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
+            string employeeId = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
+            var salesmanObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            contract.SaleService  = GetContractServicesName(contract.SaleService);
+
+            string subject = string.Empty;
+            string linkVn = string.Empty;
+            string linkEn = string.Empty;
+            string customerName = string.Empty;
+            string url = string.Empty;
+            string body = string.Empty;
+            if(partnerType == "Customer")
+            {
+                url = "home/commercial/customer/";
+                subject = "Reject Agreement Customer - " + partner.PartnerNameVn;
+                customerName = "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            }
+            else
+            {
+                url = "home/commercial/agent/";
+                subject = "Reject Agreement Agent - " + partner.PartnerNameVn;
+                customerName = "\t  Agent Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>";
+            }
+            string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
+            linkEn = "View more detail, please you <a href='" + address + "'> click here </a>" + "to view detail.";
+            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt'> Dear " + salesmanObj.EmployeeNameVn + "," + " </br> </br>" +
+                        "<i> Your Agreement of " + partner.PartnerNameVn + " is rejected by AR/Accountant as info bellow </i> </br>" +
+                        "<i> Khách hàng or thỏa thuận " + partner.PartnerNameVn + " đã bị từ chối với lý do sau: </i> </br></br>" + customerName + 
+                        "\t  Taxcode  / <i> Mã số thuế: </i> " + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+                        "\t  Số hợp đồng  / <i> Contract No: </i> " + "<b>" + contract.ContractNo + "</b>" + "</br>" +
+                        "\t  Service  / <i> Dịch vụ: </i> " + "<b>" + contract.SaleService + "</b>" + "</br>" +
+                        "\t  Agreement type  / <i> Loại thỏa thuận: </i> " + "<b>" + contract.ContractType + "</b>" + "</br>" +
+                        "\t  Reason  / <i> Lý do: </i> " + "<b>" + comment + "</b>" + "</br></br>"
+                         +linkEn + "</br>" + linkVn + "</br> </br>" +
+                        "<i> Thanks and Regards </i>" + "</br> </br>" +
+                       "eFMS System </div>" );
+            List<string> lstCc = ListMailCC();
+            List<string> lstTo = new List<string>();
+
+            lstTo.Add(salesmanObj?.Email);
+
+            return SendMail.Send(subject, body, lstTo, null, lstCc);
+        }
+
+        private List<string> ListMailCC()
+        {
+            List<string> lstCc = new List<string>
+            {
+                "alex.phuong@itlvn.com",
+                "luis.quang@itlvn.com",
+                "andy.hoa@itlvn.com",
+                "cara.oanh@itlvn.com",
+                "lynne.loc@itlvn.com",
+                "samuel.an@logtechub.com"
+            };
+            return lstCc;
+        }
+
         public SysImage GetFileContract(string partnerId, string contractId)
         {
             var result = sysImageRepository.Get(x => x.ObjectId == partnerId && x.ChildId == contractId).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();

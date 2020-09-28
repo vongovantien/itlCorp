@@ -49,6 +49,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CsAirWayBill> airwaybillRepository;
         readonly IContextBase<SysGroup> groupRepository;
         readonly IContextBase<CatCommodity> commodityRepository;
+        private decimal _decimalNumber = Constants.DecimalNumber;
+
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -2145,7 +2147,6 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency)
         {
-            double _doubleNumber = 0.000000001;
             Crystal result = null;
             var _currentUser = currentUser.UserName;
             var shipment = DataContext.First(x => x.Id == jobId);
@@ -2292,22 +2293,22 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
                         charge.VAT = 0; //NOT USE
                         charge.VATAmount = 0; //NOT USE
-                        charge.Cost = cost + (decimal)_doubleNumber; //Phí chi của charge
-                        charge.Revenue = revenue + (decimal)_doubleNumber; //Phí thu của charge
+                        charge.Cost = cost + _decimalNumber; //Phí chi của charge
+                        charge.Revenue = revenue + _decimalNumber; //Phí thu của charge
                         charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
-                        charge.Exchange = charge.Exchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                        charge.Exchange = charge.Exchange + _decimalNumber; //Cộng thêm phần thập phân
                         charge.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : _exchangeRateUSD;
-                        charge.VNDExchange = charge.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                        charge.VNDExchange = charge.VNDExchange + _decimalNumber; //Cộng thêm phần thập phân
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.DatePaid = DateTime.Now; //NOT USE
                         charge.Docs = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? surcharge.InvoiceNo : (surcharge.CreditNo ?? surcharge.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
                         charge.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
-                        charge.SalesProfit = charge.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                        charge.SalesProfit = charge.SalesProfit + _decimalNumber; //Cộng thêm phần thập phân
                         charge.Quantity = surcharge.Quantity;
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0);
-                        charge.UnitPrice = charge.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                        charge.UnitPrice = charge.UnitPrice + _decimalNumber; //Cộng thêm phần thập phân
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
@@ -2720,8 +2721,8 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.Consignee = consignee?.ToUpper();
                         objInHbl.FreightTerm = item.FreightPayment;
                         objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
-                        objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
-                        objInHbl.CW = item.ChargeWeight == null ? 0 : item.ChargeWeight;
+                        objInHbl.GW = (item.GrossWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        objInHbl.CW = (item.ChargeWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                         objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
                         objInHbl.TransID = obj.TransID;
                         objInHbl.TransDate = obj.TransDate;

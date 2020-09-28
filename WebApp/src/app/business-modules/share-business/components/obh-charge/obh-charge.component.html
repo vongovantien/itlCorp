@@ -83,7 +83,7 @@
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !charge.isFromShipment || (isLocked | async) === true;else  payerCharge">
-                                        <input type="text" class="dropdown-toggle form-control" readonly
+                                        <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.payerShortName" placeholder="Please Select">
                                     </ng-container>
                                     <ng-template #payerCharge>

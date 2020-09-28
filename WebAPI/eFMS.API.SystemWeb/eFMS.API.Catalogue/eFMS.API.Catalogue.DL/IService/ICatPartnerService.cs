@@ -32,7 +32,7 @@ namespace eFMS.API.Catalogue.DL.IService
         int CheckDetailPermission(string id);
         CatPartnerModel GetDetail(string id);
         int CheckDeletePermission(string id);
-
+        bool SendMailRejectComment(string partnerId, string comment);
 
 
     }
