@@ -224,7 +224,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             lstTo.Add(creatorObj?.Email);
 
-            return SendMail.Send(subject, body, lstTo, null, lstCc);
+            return SendMail.Send(subject, body, lstTo, null, null, lstCc);
         }
 
         private void SendMailRequestApproval(CatPartnerModel partner)
@@ -285,7 +285,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCc = ListMailCC();
 
             lstCc.Add(objInfoSalesman?.Email);
-            SendMail.Send(subject, body, lstTo, null, lstCc);
+            SendMail.Send(subject, body, lstTo, null, null, lstCc);
 
         }
 
@@ -301,7 +301,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             // info send to and cc
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
+            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" /*&& x.BranchId == currentUser.OfficeID*/)?.Select(t => t.Email).FirstOrDefault();
 
             if (listEmailAR != null && listEmailAR.Any())
             {
@@ -350,7 +350,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
+                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -359,7 +359,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant.AddRange(lstToAR);
                 if (lstToAccountant.Any())
                 {
-                    SendMail.Send(subject, body, lstToAccountant, null, lstCc);
+                    SendMail.Send(subject, body, lstToAccountant, null, null, lstCc);
                 }
             }
 
@@ -374,7 +374,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
                 "lynne.loc@itlvn.com",
-                "samuel.an@logtechub.com"
+                "samuel.an@logtechub.com",
+                "kenny.thuong@itlvn.com"
             };
             return lstCc;
         }
