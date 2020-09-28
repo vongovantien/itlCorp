@@ -47,6 +47,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
         private string typeApproval = "Settlement";
+        private decimal _decimalNumber = Constants.DecimalNumber;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -1786,8 +1787,8 @@ namespace eFMS.API.Accounting.DL.Services
                            JobID = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            Description = cat.ChargeNameEn,
-                           InvoiceNo = sur.InvoiceNo == null ? string.Empty : sur.InvoiceNo,
-                           Amount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency),
+                           InvoiceNo = string.IsNullOrEmpty(sur.InvoiceNo) ? string.Empty : sur.InvoiceNo,
+                           Amount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, currency) + _decimalNumber,
                            Debt = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false,
                            Currency = string.Empty,
                            Note = sur.Notes,
