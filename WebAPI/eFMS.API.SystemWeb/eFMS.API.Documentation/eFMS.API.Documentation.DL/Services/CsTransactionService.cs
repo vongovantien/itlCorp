@@ -2721,8 +2721,8 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.Consignee = consignee?.ToUpper();
                         objInHbl.FreightTerm = item.FreightPayment;
                         objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
-                        objInHbl.GW = item.GrossWeight == null ? 0 : item.GrossWeight;
-                        objInHbl.CW = item.ChargeWeight == null ? 0 : item.ChargeWeight;
+                        objInHbl.GW = (item.GrossWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        objInHbl.CW = (item.ChargeWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
                         objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
                         objInHbl.TransID = obj.TransID;
                         objInHbl.TransDate = obj.TransDate;
