@@ -1,14 +1,20 @@
 import { createAction, props } from '@ngrx/store';
-import { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel } from '@models';
+import { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagementCriteria } from '@models';
 
 export enum AccountingManagementActionTypes {
-    SELECT_PARTNER = '[Accounting Management] Select Partner',
+
     INIT_PARTNER = '[Accounting Management] Init Partner',
+    SELECT_PARTNER = '[Accounting Management] Select Partner',
     SELECT_REQUESTER = '[Accounting Management] Select Requester',
+
     UPDATE_CHARGE_LIST = '[Accounting Management] Update Charge List',
     UPDATE_EXCHANGE_RATE = '[Accounting Management] Update Exchange Rate',
     GET_AGREEMENT_INVOICE = '[Accounting Management] Get Agreement Invoice',
 
+    SEARCH_LIST = '[Accounting Management] Search List',
+    LOAD_LIST = '[Accounting Management] Load List',
+    LOAD_LIST_SUCCESS = '[Accounting Management] Load Success',
+    LOAD_LIST_FAIL = '[Accounting Management] Load Fail',
 }
 
 export interface ISyncExchangeRate {
@@ -35,3 +41,4 @@ export const UpdateChargeList = createAction(AccountingManagementActionTypes.UPD
 export const UpdateExchangeRate = createAction(AccountingManagementActionTypes.UPDATE_EXCHANGE_RATE, props<ISyncExchangeRate>());
 export const GetAgreementForInvoice = createAction(AccountingManagementActionTypes.GET_AGREEMENT_INVOICE, props<IAgreementInvoice>());
 
+export const SearchListAccountingMngt = createAction(AccountingManagementActionTypes.SEARCH_LIST, props<AccAccountingManagementCriteria>());

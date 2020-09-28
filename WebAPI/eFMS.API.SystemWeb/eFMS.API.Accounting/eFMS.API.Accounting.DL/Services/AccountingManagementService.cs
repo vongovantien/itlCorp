@@ -1874,7 +1874,7 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (ChargeOfAccountingManagementModel charge in charges)
                 {
                     charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, AccountingConstants.CURRENCY_LOCAL);
-                    charge.OrgVatAmount = (charge.Vat != null) ? (charge.Vat < 101 & charge.Vat >= 0) ? ((charge.OrgAmount * charge.Vat) / 100) : Math.Abs(charge.Vat ?? 0) : 0;
+                    charge.OrgVatAmount = (charge.Vat != null) ? (charge.Vat < 101 & charge.Vat >= 0) ? Math.Round(((charge.OrgAmount * charge.Vat) / 100 ?? 0),3) : Math.Abs(charge.Vat ?? 0) : 0;
                     charge.AmountVnd = Math.Round((charge.OrgAmount ?? 0) * (charge.ExchangeRate ?? 0 ));
                     charge.VatAmountVnd = Math.Round((charge.OrgVatAmount ?? 0 ) * (charge.ExchangeRate ?? 0));
                 }
