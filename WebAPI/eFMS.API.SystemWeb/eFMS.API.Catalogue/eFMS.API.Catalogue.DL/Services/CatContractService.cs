@@ -857,7 +857,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             lstTo.Add(salesmanObj?.Email);
 
-            return SendMail.Send(subject, body, lstTo, null, lstCc);
+            return SendMail.Send(subject, body, lstTo, null, null, lstCc);
         }
 
         private List<string> ListMailCC()
