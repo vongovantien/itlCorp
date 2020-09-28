@@ -4,18 +4,19 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
 import { ShareBussinessBuyingChargeComponent } from '../buying-charge/buying-charge.component';
-import { CatalogueRepo, DocumentationRepo, AccountingRepo } from 'src/app/shared/repositories';
-import { SortService, DataService } from 'src/app/shared/services';
-import { CsShipmentSurcharge, Charge } from 'src/app/shared/models';
-import { SystemConstants } from 'src/constants/system.const';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
+import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories';
+import { SortService } from '@services';
+import { CsShipmentSurcharge, Charge, Unit } from '@models';
+import { SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
 
-import { takeUntil, catchError, finalize, skip } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
+import { getCatalogueCurrencyState, getCatalogueUnitState } from '@store';
 
 
 @Component({
@@ -40,43 +41,44 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         protected _sortService: SortService,
         protected _ngProgressService: NgProgress,
         protected _spinner: NgxSpinnerService,
-        protected _dataService: DataService,
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute
     ) {
-        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _dataService, _accountingRepo, _activedRoute);
+        super(_catalogueRepo, _store, _documentRepo, _toastService, _sortService, _ngProgressService, _spinner, _accountingRepo, _activedRoute);
         this._progressRef = this._ngProgressService.ref();
 
     }
 
     getPartner() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listPartner = data[SystemConstants.CSTORAGE.PARTNER] || [];
-            });
+        this.isShowLoadingPartner = true;
+        this._spinner.show(this.spinnerpartner);
+
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .pipe(
+                catchError(this.catchError), finalize(() => {
+                    this._spinner.hide(this.spinnerpartner);
+                    this.isShowLoadingPartner = false;
+                }))
+            .subscribe(
+                (partners: any[]) => {
+                    this.listPartner = partners;
+                }
+            );
+
     }
 
     getCurrency() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listCurrency = data[SystemConstants.CSTORAGE.CURRENCY] || [];
-            });
+        this.listCurrency = this._store.select(getCatalogueCurrencyState);
     }
 
     getUnits() {
-        this._dataService.currentMessage.pipe(
-            skip(1),
-            takeUntil(this.ngUnsubscribe)
-        ).subscribe(
-            (data: any = []) => {
-                this.listUnits = data[SystemConstants.CSTORAGE.UNIT] || [];
-            });
+        this._store.select(getCatalogueUnitState)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (units: Unit[]) => {
+                    this.listUnits = units;
+                }
+            );
     }
 
     getSurcharge() {

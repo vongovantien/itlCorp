@@ -82,7 +82,8 @@
                                         <tab heading="Buying" (selectTab)="getSurCharges('BUY')">
                                             <ng-container
                                                 *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <buying-charge [showGetCharge]="false" service="logistic">
+                                                <buying-charge [showGetCharge]="false" service="logistic"
+                                                    *ngIf="selectedTabSurcharge === 'BUY'">
                                                 </buying-charge>
                                             </ng-container>
                                         </tab>
@@ -90,14 +91,15 @@
                                             <ng-container
                                                 *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                                 <selling-charge service="logistic" [showSyncFreight]="false"
-                                                    [showGetCharge]="false">
+                                                    [showGetCharge]="false" *ngIf="selectedTabSurcharge === 'SELL'">
                                                 </selling-charge>
                                             </ng-container>
                                         </tab>
                                         <tab heading="OBH" (selectTab)="getSurCharges('OBH')">
                                             <ng-container
                                                 *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                                <obh-charge service="logistic"></obh-charge>
+                                                <obh-charge service="logistic" *ngIf="selectedTabSurcharge === 'OBH'">
+                                                </obh-charge>
                                             </ng-container>
                                         </tab>
                                     </tabset>
