@@ -1111,7 +1111,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);//Lấy ra cả Job bị LOCK
             var dataPartner = catPartnerRepo.Get();
             if (queryTranDetail == null)
             {
@@ -1284,7 +1284,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<OpsTransaction> QueryDataOperation(GeneralReportCriteria criteria)
         {
-            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var shipments = opsRepository.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);//Lấy luôn cả job bị LOCK
             Expression<Func<OpsTransaction, bool>> query = q => true;
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
@@ -1581,7 +1581,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryTrans = queryTrans.And(q => q.Pod == criteria.Pod);
             }
 
-            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false).Where(queryTrans);
+            var masterBills = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED).Where(queryTrans);//Lấy hết các lô hàng bao gồm các lô bị Lock
             if (queryTranDetail == null)
             {
                 var houseBills = detailRepository.Get();
