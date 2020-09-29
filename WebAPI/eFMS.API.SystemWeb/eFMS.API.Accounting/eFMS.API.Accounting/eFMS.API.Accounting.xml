@@ -338,13 +338,6 @@
             <param name="advanceId">advanceId that want to retrieve preview advance payment request</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.PreviewAdvancePaymentRequest(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
-            <summary>
-            Preview Advance Payment Request
-            </summary>
-            <param name="advance"></param>
-            <returns></returns>
-        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.SaveAndSendRequest(eFMS.API.Accounting.DL.Models.AcctAdvancePaymentModel)">
             <summary>
             Save and Send Request

@@ -412,20 +412,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.Preview(advanceId);
             return Ok(result);
         }
-
-        /// <summary>
-        /// Preview Advance Payment Request
-        /// </summary>
-        /// <param name="advance"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("PreviewAdvancePaymentRequest")]
-        public IActionResult PreviewAdvancePaymentRequest(AcctAdvancePaymentModel advance)
-        {
-            var result = acctAdvancePaymentService.Preview(advance);
-            return Ok(result);
-        }
-
+        
         /// <summary>
         /// Save and Send Request
         /// </summary>
@@ -872,8 +859,8 @@ namespace eFMS.API.Accounting.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost("PreviewMultipleAdvancePaymentByAdvanceIds")]
+        [Authorize]
         public IActionResult PreviewMultipleAdvancePaymentByAdvanceIds(List<Guid> advanceIds)
         {
             var result = acctAdvancePaymentService.PreviewMultipleAdvance(advanceIds);

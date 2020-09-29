@@ -183,10 +183,6 @@ export class AccountingRepo {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewAdvancePaymentRequestByAdvanceId`, null, { advanceId: param }).pipe(
                 map((data: any) => data)
             );
-        } else {
-            return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewAdvancePaymentRequest`, param).pipe(
-                map((data: any) => data)
-            );
         }
     }
 
@@ -652,6 +648,12 @@ export class AccountingRepo {
 
     previewAdvancePaymentMultiple(advanceIds: string[]) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/PreviewMultipleAdvancePaymentByAdvanceIds`, advanceIds).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewSettlementPaymentMultiple(settlementNos: string[]) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/PreviewMultipleSettlementBySettlementNos`, settlementNos).pipe(
             map((data: any) => data)
         );
     }

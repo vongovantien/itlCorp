@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models.ReportResults
 {
@@ -81,15 +79,10 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public decimal? TotalNorm { get; set; }
         public decimal? TotalInvoice { get; set; }
         public decimal? TotalOrther { get; set; }
-    }
-
-    public class AdvancePaymentRequestReportParams
-    {
+        public string Inword { get; set; }
         public string CompanyName { get; set; }
-        public string CompanyAddress1 { get; set; }
-        public string CompanyAddress2 { get; set; }
+        public string CompanyAddress { get; set; }
         public string Website { get; set; }
         public string Contact { get; set; }
-        public string Inword { get; set; }
     }
 }

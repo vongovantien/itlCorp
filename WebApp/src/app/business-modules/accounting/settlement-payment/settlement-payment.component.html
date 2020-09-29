@@ -20,6 +20,14 @@
                                     *ngIf="menuSpecialPermission | async | specialPermission:'IssueVoucher'">
                                     <i class="la la-download"></i>Issue Voucher<span class="caret"></span>
                                 </button>
+                                <button class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="printMultiple()">
+                                    <span>
+                                        <i class="la la-print"></i>
+                                        <span>
+                                            Print-Multiple
+                                        </span>
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </div>
