@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagementCriteria } from '@models';
+import { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagementCriteria, AccAccountingManagement } from '@models';
 
 export enum AccountingManagementActionTypes {
 
@@ -41,4 +41,6 @@ export const UpdateChargeList = createAction(AccountingManagementActionTypes.UPD
 export const UpdateExchangeRate = createAction(AccountingManagementActionTypes.UPDATE_EXCHANGE_RATE, props<ISyncExchangeRate>());
 export const GetAgreementForInvoice = createAction(AccountingManagementActionTypes.GET_AGREEMENT_INVOICE, props<IAgreementInvoice>());
 
-export const SearchListAccountingMngt = createAction(AccountingManagementActionTypes.SEARCH_LIST, props<AccAccountingManagementCriteria>());
+export const SearchListAccountingMngt = createAction(AccountingManagementActionTypes.SEARCH_LIST, props<Partial<AccAccountingManagementCriteria>>());
+export const LoadListAccountingMngt = createAction(AccountingManagementActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
+export const LoadListAccountingMngtSuccess = createAction(AccountingManagementActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());

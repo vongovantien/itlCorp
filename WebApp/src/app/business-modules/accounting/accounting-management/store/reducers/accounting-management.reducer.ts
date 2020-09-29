@@ -1,23 +1,19 @@
-import { AccAccountingManagement, AccAccountingManagementCriteria } from "@models";
+import { AccAccountingManagementCriteria } from "@models";
 import { Action, createReducer, on } from "@ngrx/store";
 import * as accountingManagementActions from '../actions/accounting-management.action';
 
 export interface IAccountingManagementListState {
-    vatInvoices: AccAccountingManagement[];
-    vouchers: AccAccountingManagement[];
+    accMngts: CommonInterface.IResponsePaging;
     isLoading: boolean;
     isLoaded: boolean;
-    dataSearchInvoice: AccAccountingManagementCriteria;
-    dataSearchVoucher: AccAccountingManagementCriteria;
+    dataSearch: Partial<AccAccountingManagementCriteria>;
 }
 
 export const initialState: IAccountingManagementListState = {
-    vatInvoices: [],
-    vouchers: [],
+    accMngts: { data: [], totalItems: 0, page: 1, size: 15 },
     isLoading: false,
     isLoaded: false,
-    dataSearchInvoice: null,
-    dataSearchVoucher: null
+    dataSearch: null
 
 };
 
@@ -25,13 +21,23 @@ export const initialState: IAccountingManagementListState = {
 export const accountingManagementListReducer = createReducer(
     initialState,
     on(
-        accountingManagementActions.SearchListAccountingMngt, (state: IAccountingManagementListState, payload: AccAccountingManagementCriteria) => (
-            { ...initialState }
-        )
+        accountingManagementActions.SearchListAccountingMngt, (state: IAccountingManagementListState, payload: Partial<AccAccountingManagementCriteria>) => {
+            return { ...state, dataSearch: payload, isLoading: true };
+        }
     ),
+    on(
+        accountingManagementActions.LoadListAccountingMngt, (state: IAccountingManagementListState, payload: CommonInterface.IParamPaging) => {
+            return { ...state, isLoading: true };
+        }
+    ),
+    on(
+        accountingManagementActions.LoadListAccountingMngtSuccess, (state: IAccountingManagementListState, payload: CommonInterface.IResponsePaging) => {
+            return { ...state, accMngts: payload, isLoading: false, isLoaded: true };
+        }
+    )
 );
 
-export function accountingListReducer(state: any | undefined, action: Action) {
+export function accountingListReducer(state: IAccountingManagementListState | undefined, action: Action) {
     return accountingManagementListReducer(state, action);
 }
 

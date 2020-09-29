@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, EMPTY } from 'rxjs';
+import { Observable, EMPTY } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType, createEffect } from '@ngrx/effects';
 import { AccountingRepo } from '@repositories';
 import { catchError, mergeMap, map } from 'rxjs/operators';
-import { AccountingManagementActionTypes, GetAgreementForInvoice, IAccMngtContractInvoiceCriteria, IAgreementInvoice } from '../actions';
+import { AccountingManagementActionTypes, GetAgreementForInvoice, IAccMngtContractInvoiceCriteria, IAgreementInvoice, LoadListAccountingMngtSuccess } from '../actions';
 import { PartnerOfAcctManagementResult } from '@models';
 import { SystemConstants } from '@constants';
 
 @Injectable()
 export class AccountingManagementEffects {
 
-    @Effect() effectOldSyntax$: Observable<Action> = this.actions$.pipe(ofType('ACTIONTYPE')); // ! cú pháp cũ
-
-    effectNewSystax$: Observable<Action> = createEffect(() => this.actions$.pipe(ofType('ACTIONTYPE'))); // ? Cú pháp mới
-
     constructor(
         private actions$: Actions,
         private _accountingRepo: AccountingRepo,
     ) { }
+
+    @Effect() effectOldSyntax$: Observable<Action> = this.actions$.pipe(ofType('ACTIONTYPE')); // ! cú pháp cũ
+
+    effectNewSystax$: Observable<Action> = createEffect(() => this.actions$.pipe(ofType('ACTIONTYPE'))); // ? Cú pháp mới
 
     getAgreementBy$: Observable<Action> = createEffect(() => this.actions$
         .pipe(
@@ -34,7 +34,19 @@ export class AccountingManagementEffects {
             mergeMap(
                 (data: IAccMngtContractInvoiceCriteria) => this._accountingRepo.getAgreementForInvoice(data)
                     .pipe(
-                        map((data: IAgreementInvoice) => GetAgreementForInvoice(data)),
+                        map((d: IAgreementInvoice) => GetAgreementForInvoice(d)),
+                        catchError(() => EMPTY)
+                    )
+            )
+        ));
+
+    getListAccMngt$: Observable<Action> = createEffect(() => this.actions$
+        .pipe(
+            ofType(AccountingManagementActionTypes.LOAD_LIST),
+            mergeMap(
+                (param: CommonInterface.IParamPaging) => this._accountingRepo.getListAcctMngt(param.page, param.size, param.dataSearch)
+                    .pipe(
+                        map((data: CommonInterface.IResponsePaging) => LoadListAccountingMngtSuccess(data)),
                         catchError(() => EMPTY)
                     )
             )
