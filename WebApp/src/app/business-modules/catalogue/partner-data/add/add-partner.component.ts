@@ -17,7 +17,7 @@ import { formatDate } from '@angular/common';
 import { Company } from '@models';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import _merge from 'lodash/merge';
 
@@ -557,7 +557,7 @@ export class AddPartnerDataComponent extends AppList {
                 (res: any) => {
                     if (res.result.success) {
                         this._toastService.success("New data added");
-                        this._router.navigate([`home/catalogue/partner-data/detail/${res.model.id}`]);
+                        this._router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/detail/${res.model.id}`]);
                     } else {
                         this._toastService.error("Opps", "Something getting error!");
                     }

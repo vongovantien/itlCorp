@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from '@common';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { NgProgress } from '@ngx-progressbar/core';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { SortService } from '@services';
 
 @Component({
@@ -200,7 +200,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     showDetail(contract: Contract) {
         this.selectedContract = contract;
-        this._router.navigate([`/home/commercial/customer/${this.partnerId}/contract/${this.selectedContract.id}`]);
+        this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
     getListContract(partneId: string) {
         this.isLoading = true;

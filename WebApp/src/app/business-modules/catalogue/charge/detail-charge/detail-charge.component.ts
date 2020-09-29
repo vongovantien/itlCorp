@@ -7,6 +7,7 @@ import { AddChargeComponent } from '../add-charge/add-charge.component';
 import { CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 @Component({
     selector: 'detail-charge',
     templateUrl: './detail-charge.component.html',
@@ -121,7 +122,7 @@ export class DetailChargeComponent extends AddChargeComponent {
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
                                 this._toastService.success(res.message, '');
-                                this.router.navigate(["/home/catalogue/charge"]);
+                                this.router.navigate([`${RoutingConstants.CATALOGUE.CHARGE}`]);
                             } else {
                                 this._toastService.error(res.message, '');
                             }

@@ -8,6 +8,7 @@ import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { RoutingConstants } from '@constants';
 @Component({
     selector: 'add-role-user',
     templateUrl: 'add-role-user.component.html'
@@ -378,7 +379,7 @@ export class AddRoleUserComponent extends AppList {
 
     gotoUserPermission(id: string) {
         const type = 'user';
-        this._router.navigate([`home/system/user-management/${this.id}/permission/${id}/${type}`]);
+        this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}/${this.id}/permission/${id}/${type}`]);
     }
 
 }

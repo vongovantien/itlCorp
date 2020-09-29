@@ -8,6 +8,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shar
 import { ToastrService } from 'ngx-toastr';
 import { Tariff } from 'src/app/shared/models';
 import { Router } from '@angular/router';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'app-tariff',
@@ -119,7 +120,7 @@ export class TariffComponent extends AppList {
                     if (!res) {
                         this.permission403Popup.show();
                     } else {
-                        this._router.navigate(["home/tool/tariff", tariff.id], {
+                        this._router.navigate([`${RoutingConstants.TOOL.TARIFF}`, tariff.id], {
                             queryParams: {
                                 action: 'copy'
                             }
@@ -136,7 +137,7 @@ export class TariffComponent extends AppList {
                     if (!res) {
                         this.permission403Popup.show();
                     } else {
-                        this._router.navigate(["home/tool/tariff", tariff.id]);
+                        this._router.navigate([`${RoutingConstants.TOOL.TARIFF}`, tariff.id]);
                     }
                 }
             );

@@ -7,7 +7,7 @@ import { SortService } from "@services";
 import { SettingRepo } from "@repositories";
 import { UnlockRequestResult, User } from "@models";
 import { catchError, finalize, map } from "rxjs/operators";
-import { SystemConstants } from "@constants";
+import { RoutingConstants, SystemConstants } from "@constants";
 
 @Component({
     selector: 'app-unlock-request',
@@ -82,7 +82,7 @@ export class UnlockRequestComponent extends AppList {
     }
 
     viewDetail(data: UnlockRequestResult): void {
-        this._router.navigate([`home/tool/unlock-request/${data.id}`]);
+        this._router.navigate([`${RoutingConstants.TOOL.UNLOCK_REQUEST}/${data.id}`]);
     }
 
     deleteUnlockRequest(id: string) {

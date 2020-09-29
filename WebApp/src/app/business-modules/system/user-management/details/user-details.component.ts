@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { IAddUser } from '../addnew/user.addnew.component';
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -64,7 +65,7 @@ export class UserDetailsComponent extends AppPage {
                 this.getDetailUser(this.userId);
                 this.getListUserLevelByUserId();
             } else {
-                this._router.navigate(["home/system/user-management"]);
+                this._router.navigate([`${RoutingConstants.SYSTEM.USER_MANAGEMENT}`]);
             }
         });
     }
