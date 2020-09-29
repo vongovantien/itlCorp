@@ -183,7 +183,7 @@ namespace eFMS.API.Catalogue.Controllers
                 }
                 else
                 {
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.ContractNo  == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && ( x.OfficeId != null && office.Contains(x.OfficeId.ToLower())) && x.ContractNo  == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.Id != model.Id && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Contract no has been existed!";
                     }
