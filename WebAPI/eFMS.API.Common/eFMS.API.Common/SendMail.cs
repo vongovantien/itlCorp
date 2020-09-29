@@ -11,11 +11,13 @@ namespace eFMS.API.Common
 {
     public class SendMail
     {
-        public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments, List<string> emailCCs)
+        public static bool Send(string subject, string body, List<string> toEmails, List<string> attachments, List<string> emailCCs, List<string> emailBCC = null)
         {
             //string SentUser = "";
             string receivers = "";
             string CCs = "";
+            string BCCs = "";
+
             string description = "";
             bool result = true;
 
@@ -45,6 +47,17 @@ namespace eFMS.API.Common
                     MailAddress CC = new MailAddress(EmailCC);
                     CCs += EmailCC + ", ";
                     message.CC.Add(CC);
+                }
+            }
+
+            // Add a carbon copy recipient.
+            if (emailBCC != null)
+            {
+                foreach (string EmailBCC in emailBCC)
+                {
+                    MailAddress BCC = new MailAddress(EmailBCC);
+                    BCCs += emailBCC + ", ";
+                    message.Bcc.Add(BCC);
                 }
             }
 
@@ -89,11 +102,12 @@ namespace eFMS.API.Common
             }
             return result;
         }
-        public static bool Send(string Subject, string Body, string ToEmail, List<string> Attachments, List<string> EmailCCs)
+        public static bool Send(string Subject, string Body, string ToEmail, List<string> Attachments, List<string> EmailCCs, List<string> emailBCC = null)
         {
             List<string> ToEmails = new List<string>() { ToEmail };
-            return Send(Subject, Body, ToEmails, Attachments, EmailCCs);
+            return Send(Subject, Body, ToEmails, Attachments, EmailCCs, emailBCC);
         }
+       
         private static DateTime GetDateTime()
         {
 
