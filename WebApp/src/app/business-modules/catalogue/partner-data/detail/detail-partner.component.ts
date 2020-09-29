@@ -12,7 +12,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SystemConstants } from 'src/constants/system.const';
@@ -21,6 +21,9 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/form-contract-commercial-catalogue.popup';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import _merge from 'lodash/merge';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
+import { PartnerRejectPopupComponent } from 'src/app/business-modules/share-commercial-catalogue/components/partner-reject/partner-reject.popup';
 
 
 @Component({
@@ -39,6 +42,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(SalemanPopupComponent, { static: false }) poupSaleman: SalemanPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent, { static: false }) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(CommercialContractListComponent, { static: false }) listContract: CommercialContractListComponent;
 
     contracts: Contract[] = [];
@@ -75,6 +79,8 @@ export class PartnerDetailComponent extends AppList {
 
     isDup: boolean = false;
 
+    menuSpecialPermission: Observable<any[]>;
+
     constructor(private route: ActivatedRoute,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,
@@ -85,6 +91,7 @@ export class PartnerDetailComponent extends AppList {
         private _toastService: ToastrService,
         private _cd: ChangeDetectorRef,
         private _activedRoute: ActivatedRoute,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -104,6 +111,7 @@ export class PartnerDetailComponent extends AppList {
             }
         });
         this.getDataCombobox();
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         const claim = localStorage.getItem(SystemConstants.USER_CLAIMS);
         this.currenctUser = JSON.parse(claim)["id"];
     }
@@ -547,6 +555,32 @@ export class PartnerDetailComponent extends AppList {
             }
         }
         this.formContractPopup.contracts = this.contracts;
+    }
+
+    showRejectCommentPopup() {
+        this.popupRejectPartner.comment = '';
+        this.popupRejectPartner.show();
+    }
+
+    onSaveReject($event: string) {
+        const comment = $event;
+        console.log(comment);
+        this._progressRef.start();
+        this._catalogueRepo.rejectComment(this.partner.id, comment)
+            .pipe(
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this._toastService.success('Sent Successfully!');
+                    } else {
+                        this._toastService.error('something went wrong!');
+                    }
+                }
+            );
+
+
     }
 
 

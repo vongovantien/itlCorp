@@ -25,6 +25,7 @@ export abstract class AppShareHBLBase extends AppList {
     totalCBM: number;
     totalGW: number;
     totalCW: number;
+    totalQty: number;
 
     selectedHbl: CsTransactionDetail;
     selectedTabSurcharge: string = 'BUY';
@@ -114,6 +115,7 @@ export abstract class AppShareHBLBase extends AppList {
                         this.totalGW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.gw, 0);
                         this.totalCBM = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cbm, 0);
                         this.totalCW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cw, 0);
+                        this.totalQty = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.packageQty, 0);
 
                         this.selectHBL(this.houseBills[0]);
                     } else {

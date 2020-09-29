@@ -191,6 +191,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
+        /// <summary>
+        /// reject partner comment
+        /// </summary>
+        /// <param name="partnerId">id of data that need to retrieve</param>
+        /// <param name="comment">id of data that need to retrieve</param>
+        /// <returns></returns>
+        [HttpGet("RejectComment")]
+        [Authorize]
+        public IActionResult RejectComment(string partnerId, string comment)
+        {
+            bool result = catPartnerService.SendMailRejectComment(partnerId, comment);
+            return Ok(result);
+        }
 
         /// <summary>
         /// add new partner

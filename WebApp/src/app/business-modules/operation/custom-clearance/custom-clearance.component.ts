@@ -73,7 +73,7 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Package Qty', field: 'pcs', sortable: true },
             { title: 'GW', field: 'grossWeight', sortable: true },
             { title: 'Job ID', field: 'jobNo', sortable: true },
-            { title: 'creator', field: 'userCreatedName', sortable: true },
+            { title: 'Creator', field: 'userCreatedName', sortable: true },
             { title: 'Status', field: 'jobNo', sortable: true },
             { title: 'Import Country', field: 'importCountryName', sortable: true },
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
