@@ -32,7 +32,8 @@
             "@store": ["src/app/store"],
             "@system-constants": ["src/constants"],
             "@decorators": ["src/app/shared/decorators"],
-            "@core": ["src/app/core"]
+            "@core": ["src/app/core"],
+            "@app": ["src/app"]
         }
     }
 }
