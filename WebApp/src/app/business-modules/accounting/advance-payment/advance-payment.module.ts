@@ -21,6 +21,8 @@ import { ShareApprovePaymentModule } from '../approve-payment/components/share-a
 import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { ImportVoucherAdvancePaymentComponent } from './import/import-voucher-advance-payment.component';
 import { SelectModule } from 'ng2-select';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store';
 const routing: Routes = [
     {
         path: "",
@@ -86,6 +88,7 @@ const customCurrencyMaskConfig = {
         NgProgressModule,
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
+        StoreModule.forFeature('advance-payment', reducers),
         SelectModule,
     ],
     declarations: [

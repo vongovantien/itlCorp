@@ -6,7 +6,11 @@ import { User, Currency } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { getAdvancePaymentSearchParamsState, IAdvancePaymentState, reducer } from '../../store/reducers';
+import { SearchList } from '../../store/actions';
+
 
 @Component({
     selector: 'adv-payment-form-search',
@@ -39,6 +43,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
+        private _store: Store<IAdvancePaymentState>,
     ) {
         super();
     }
@@ -46,6 +51,7 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
     ngOnInit() {
         this.initForm();
         this.initDataInform();
+
     }
 
     initForm() {
@@ -84,6 +90,21 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.getUsers();
     }
 
+    setDataSearchFromRedux(data: any) {
+        console.log("data: ", data);
+        this.formSearch.patchValue({
+            referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
+            requester: !!data.requester ? this.requesters.filter(e => e.id === data.requester) : [],
+            requestDate: !!data.requestDateFrom && !!data.requestDateTo ? { startDate: new Date(data.requestDateFrom), endDate: new Date(data.requestDateTo) } : null,
+            modifiedDate: !!data.advanceModifiedDateFrom && !!data.advanceModifiedDateTo ? { startDate: new Date(data.advanceModifiedDateFrom), endDate: new Date(data.advanceModifiedDateTo) } : null,
+            // statusApproval: data.statusApproval === "All" || null ? null : data.statusApproval,
+            // statusPayment: data.statusPayment === "All" || null ? null : data.statusPayment,
+            // paymentMethod: data.paymentMethod === "All" || null ? null : data.paymentMethod,
+            //currencyId: !!data.currencyId ? this.currencies.filter(e => e.id === data.currencyId) : [],
+        });
+
+    }
+
     onSubmit() {
         const body: ISearchAdvancePayment = {
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
@@ -98,6 +119,12 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
             requester: this.requester.value.length > 0 ? this.requester.value[0].id : this.userLogged.id
         };
         this.onSearch.emit(body);
+
+        this._store.dispatch(SearchList({ payload: body }));
+    }
+
+    bindValueFormSearch(data: any) {
+
     }
 
     getUserLogged() {
@@ -154,6 +181,9 @@ export class AdvancePaymentFormsearchComponent extends AppForm {
         this.resetFormControl(this.statusPayment);
         this.resetFormControl(this.currencyId);
 
+        this._store.dispatch(SearchList({
+            payload: { requester: this.userLogged.id }
+        }));
         this.onSearch.emit(<any>{ requester: this.userLogged.id });
     }
 

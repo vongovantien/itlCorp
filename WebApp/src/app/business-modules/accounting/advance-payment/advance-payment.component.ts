@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
@@ -14,6 +14,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { formatDate } from '@angular/common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { getAdvancePaymentSearchParamsState } from './store';
 
 @Component({
     selector: 'app-advance-payment',
@@ -59,6 +60,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     ngOnInit() {
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.headers = [
             { title: 'Advance No', field: 'advanceNo', sortable: true },
@@ -86,7 +88,28 @@ export class AdvancePaymentComponent extends AppList {
         ];
 
         this.getUserLogged();
-        this.getListAdvancePayment();
+        //this.getListAdvancePayment();
+        // * Update form search from store
+        this._store.select(getAdvancePaymentSearchParamsState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (Object.keys(data.searchParams).length === 0 && data.searchParams.constructor === Object) {
+
+                    } else {
+                        console.log("else: ", data)
+                        this.dataSearch = data.searchParams;
+                        this.setDataForFormSearch();
+                    }
+                    this.getListAdvancePayment();
+                }
+            );
+    }
+
+    setDataForFormSearch() {
+        this.formSearch.setDataSearchFromRedux(this.dataSearch);
     }
 
     onSearchAdvPayment(data: any) {
@@ -98,6 +121,7 @@ export class AdvancePaymentComponent extends AppList {
     getListAdvancePayment() {
         this.isLoading = true;
         this._progressRef.start();
+        console.log("dataSearch before call api: ", this.dataSearch);
         this._accoutingRepo.getListAdvancePayment(this.page, this.pageSize, this.dataSearch)
             .pipe(
                 catchError(this.catchError),
