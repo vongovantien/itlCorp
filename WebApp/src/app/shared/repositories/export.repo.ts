@@ -315,5 +315,11 @@ export class ExportRepo {
         );
     }
 
+    exportCDNote(jobId: string, cdNo: String, officeId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNote`, null, { jobId: jobId, cdNo: cdNo, officeId: officeId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

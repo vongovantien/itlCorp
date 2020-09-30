@@ -1,4 +1,4 @@
-﻿using eFMS.API.Accounting.DL.Common;
+﻿using eFMS.API.ForPartner.DL.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;

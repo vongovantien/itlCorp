@@ -301,6 +301,12 @@
             <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportOpsCdNote(System.Guid,System.String,System.Guid)">
+            <summary>
+            Export Ops Debit Note
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
