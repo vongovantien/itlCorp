@@ -1,13 +1,17 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { formatDate } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AccountingConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Partner, User } from '@models';
-import { AbstractControl, FormGroup, FormBuilder } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { JobConstants, AccountingConstants } from '@constants';
+import { takeUntil } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
+
 import { AccAccountingManagementCriteria } from 'src/app/shared/models/accouting/accounting-management';
-import { formatDate } from '@angular/common';
+import { accountingManagementDataSearchState, IAccountingManagementState, SearchListAccountingMngt } from '../../../store';
 
 @Component({
     selector: 'form-search-vat-voucher',
@@ -43,16 +47,13 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
     ];
 
     voucherTypeList: CommonInterface.INg2Select[] = AccountingConstants.VOUCHER_TYPE;
-
-    // tslint:disable-next-line: no-any
-    invoiceStatusActive: any[] = [];
-    // tslint:disable-next-line: no-any
-    voucherTypeActive: any[] = [];
+    dataSearch: AccAccountingManagementCriteria;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
+        private _store: Store<IAccountingManagementState>
     ) {
         super();
     }
@@ -61,6 +62,41 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         this.initFormSearch();
         this.loadPartnerList();
         this.loadUserList();
+
+        // * Update form search from store
+        this._store.select(accountingManagementDataSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (dataSearch: AccAccountingManagementCriteria) => {
+                    console.log(dataSearch);
+                    if (!!dataSearch && dataSearch.typeOfAcctManagement && dataSearch.typeOfAcctManagement === this.accountType) {
+                        this.dataSearch = dataSearch;
+
+                        let formData: any = {
+                            partner: this.dataSearch.partnerId,
+                            issueDate: !!this.dataSearch.fromIssuedDate && !!this.dataSearch.toIssuedDate ? {
+                                startDate: new Date(this.dataSearch.fromIssuedDate), endDate: new Date(this.dataSearch.toIssuedDate)
+                            } : null,
+                            creator: this.dataSearch.creatorId,
+                        };
+                        if (this.dataSearch.referenceNos) {
+                            formData = { ...formData, referenceNo: this.dataSearch.referenceNos.toString().replace(/[,]/g, "\n") || "" };
+                        }
+
+                        if (this.dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.VOUCHER && this.dataSearch.voucherType) {
+                            formData = { ...formData, voucherType: [AccountingConstants.VOUCHER_TYPE.find(x => x.id === this.dataSearch.voucherType)] };
+                        }
+                        if (this.dataSearch.typeOfAcctManagement === AccountingConstants.ISSUE_TYPE.INVOICE && this.dataSearch.invoiceStatus) {
+                            formData = { ...formData, invoiceStatus: [this.invoiceStatusList.find(x => x.id === this.dataSearch.invoiceStatus)] };
+                        }
+
+                        // * Update form search.
+                        this.formSearch.patchValue(formData);
+                    }
+                }
+            );
     }
 
     initFormSearch() {
@@ -88,8 +124,7 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
         this.creators = this._systemRepo.getSystemUsers({});
     }
 
-    // tslint:disable-next-line: no-any
-    onSelectDataFormInfo(data: any, type: string) {
+    onSelectDataFormInfo(data: { id: any; }, type: string) {
         switch (type) {
             case 'partner':
                 this.formSearch.controls['partner'].setValue(data.id);
@@ -104,7 +139,6 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
 
     onSubmit() {
         const criteria: AccAccountingManagementCriteria = {
-            // tslint:disable-next-line: no-any
             referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: this.partner.value,
             fromIssuedDate: this.issueDate.value ? (this.issueDate.value.startDate !== null ? formatDate(this.issueDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
@@ -115,6 +149,9 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
             typeOfAcctManagement: this.accountType,
         };
         this.onSearch.emit(criteria);
+
+        // * Dispatch an action.
+        this._store.dispatch(SearchListAccountingMngt(criteria));
     }
 
     search() {
@@ -124,10 +161,9 @@ export class AccountingManagementFormSearchVatVoucherComponent extends AppForm i
     reset() {
         this.formSearch.reset();
         this.issueDate.setValue({ startDate: new Date(), endDate: new Date() });
-        this.onSearch.emit(<any>{
-            typeOfAcctManagement: this.accountType,
-            fromIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            toIssuedDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-        });
+
+        // * Dispatch an action.
+        this._store.dispatch(SearchListAccountingMngt({}));
+
     }
 }

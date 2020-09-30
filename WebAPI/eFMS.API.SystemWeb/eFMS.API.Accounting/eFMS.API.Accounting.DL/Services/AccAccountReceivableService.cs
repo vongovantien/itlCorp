@@ -339,8 +339,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (model.Service == "CL")
             {
                 var operations = opsRepo.Get(x => x.OfficeId == model.Office); // && x.BillingOpsId == model.SaleMan
-                accountants = from surcharge in surcharges
-                              join acctMngt in accountingManagements on surcharge.AcctManagementId equals acctMngt.Id
+                accountants = from acctMngt in accountingManagements
+                              join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
                               join operation in operations on surcharge.Hblid equals operation.Hblid
                               select acctMngt;
             }
@@ -348,13 +348,13 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var transDetails = transactionDetailRepo.Get(x => x.OfficeId == model.Office); // && x.SaleManId == model.SaleMan
                 var transactions = transactionRepo.Get(x => x.TransactionType == model.Service);
-                accountants = from surcharge in surcharges
-                              join acctMngt in accountingManagements on surcharge.AcctManagementId equals acctMngt.Id
+                accountants = from acctMngt in accountingManagements 
+                              join surcharge in surcharges on  acctMngt.Id equals surcharge.AcctManagementId
                               join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
                               join trans in transactions on transDetail.JobId equals trans.Id
                               select acctMngt;
             }
-
+            accountants = accountants.Distinct();
             foreach (var acct in accountants)
             {
                 var qtyService = !string.IsNullOrEmpty(acct.ServiceType) ? acct.ServiceType.Split(';').Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
@@ -668,7 +668,7 @@ namespace eFMS.API.Accounting.DL.Services
                     model.UserModified = contractPartner.UserCreated;
                     model.GroupId = null;
                     model.DepartmentId = null;
-                    model.OfficeId = Guid.Parse(contractPartner.OfficeId);
+                    model.OfficeId = model.OfficeId;//Guid.Parse(contractPartner.OfficeId);
                     model.CompanyId = contractPartner.CompanyId;
                 }
                 model.DatetimeModified = DateTime.Now;

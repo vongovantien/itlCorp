@@ -2804,7 +2804,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                     workSheet.Cells[i + addressStartContent, 22].Value = item.SummaryOfCostsIncurredExportResults.Select(t => t.SoaNo).FirstOrDefault();
                     workSheet.Cells[i + addressStartContent, 23].Value = item.SummaryOfCostsIncurredExportResults.Select(t => t.InvoiceNo).FirstOrDefault();
-                    workSheet.Cells[i + addressStartContent, 24].Value = item.SummaryOfCostsIncurredExportResults.Select(t => t.InvoiceDate).FirstOrDefault();
+                    //workSheet.Cells[i + addressStartContent, 24].Value = item.SummaryOfCostsIncurredExportResults.Select(t => t.InvoiceDate).FirstOrDefault();
+                    workSheet.Cells[i + addressStartContent, 24].Value = item.SummaryOfCostsIncurredExportResults.Select(t => t.InvoiceDate).FirstOrDefault().HasValue ? item.SummaryOfCostsIncurredExportResults.Select(t => t.InvoiceDate).FirstOrDefault().Value.ToString("dd/MM/yyyy") : "";
 
                     decimal? TotalNormalCharge1 = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
                     decimal? TotalOBHCharge1 = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 20].Value);
@@ -2872,6 +2873,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 22].Value = itemCharge.SoaNo;
                         workSheet.Cells[i + addressStartContent, 23].Value = itemCharge.InvoiceNo;
                         workSheet.Cells[i + addressStartContent, 24].Value = itemCharge.InvoiceDate;
+                        workSheet.Cells[i + addressStartContent, 24].Value = itemCharge.InvoiceDate.HasValue ? itemCharge.InvoiceDate.Value.ToString("dd/MM/yyyy") : "";
 
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 17].Value);
                         decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 20].Value);
