@@ -19,4 +19,10 @@ namespace AccountingInterface {
         salesmanId: string;
         officeId: string;
     }
+
+    export interface IDefaultSearchAcctMngt {
+        typeOfAcctManagement: string;
+        fromIssuedDate: string;
+        toIssuedDate: string;
+    }
 }
