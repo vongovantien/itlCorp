@@ -14,6 +14,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { formatDate } from '@angular/common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { ReportPreviewComponent } from '@common';
 
 @Component({
     selector: 'app-advance-payment',
@@ -27,6 +28,7 @@ export class AdvancePaymentComponent extends AppList {
     @ViewChild(InfoPopupComponent, { static: false }) infoPopup: InfoPopupComponent;
     @ViewChild('confirmExistedVoucher', { static: false }) confirmExistedVoucher: ConfirmPopupComponent;
     @ViewChild('confirmRemoveSelectedVoucher', { static: false }) confirmRemoveSelectedVoucher: ConfirmPopupComponent;
+    @ViewChild(ReportPreviewComponent, { static: false }) previewPopup: ReportPreviewComponent;
 
     headers: CommonInterface.IHeaderTable[];
     headerGroupRequest: CommonInterface.IHeaderTable[];
@@ -42,6 +44,7 @@ export class AdvancePaymentComponent extends AppList {
     checkAll = false;
     paymentHasStatusDone = false;
     messageVoucherExisted: string = '';
+    dataReport: any = null;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -334,6 +337,48 @@ export class AdvancePaymentComponent extends AppList {
                         this._toastService.error(res.message, '');
                     }
                 }
+            );
+    }
+
+    printMultiple() {
+        const objChecked = this.advancePayments.find(x => x.isChecked);
+        const advanceIds = [];
+        if (!objChecked) {
+            this.infoPopup.title = 'Cannot Print Multiple Advance!';
+            this.infoPopup.body = 'Opps, Please check advance to print';
+            this.infoPopup.show();
+            return;
+        } else {
+            this.advancePayments.forEach(item => {
+                if (item.isChecked) {
+                    advanceIds.push(item.id);
+                }
+            });
+
+            this.previewMultiple(advanceIds);
+        }
+        console.log(this.advancePaymentIds);
+    }
+
+    previewMultiple(advancePaymentIds: string[]) {
+        this._progressRef.start();
+        this._accoutingRepo.previewAdvancePaymentMultiple(advancePaymentIds)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res != null) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
             );
     }
 

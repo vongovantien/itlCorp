@@ -3249,7 +3249,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 2].Value = item.VoucherId; //Số chứng từ 
                 workSheet.Cells[rowStart, 3].Value = (typeOfAcctMngt == "Invoice") ? "HD" : item.VoucherId?.Substring(0, 2); //2 ký tự đầu của số chứng từ
                 workSheet.Cells[rowStart, 4].Value = item.ChargeName;
-                workSheet.Cells[rowStart, 5].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
+                // workSheet.Cells[rowStart, 5].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
+                workSheet.Cells[rowStart, 5].Value = item.PartnerId; // Partner ID của đối tượng voucher
                 workSheet.Cells[rowStart, 6].Value = item.AccountNo;
                 workSheet.Cells[rowStart, 7].Value = item.ContraAccount;
                 workSheet.Cells[rowStart, 8].Value = item.ChargeCode;

@@ -1,66 +1,38 @@
 AdvID	String	50	
-AdvDate	Date		
-AdvContact	String	50	
-AdvAddress	String	50	
-StlDescription	String	255	
-AdvanceNo	String	255	
-AdvValue	Number		
-AdvCurrency	String	255	
-Remains	Number		
-AdvanceDate	Date		
-No	Number		
-CustomsID	String	50	
-JobID	String	50	
-HBL	String	50	
 Description	String	255	
 InvoiceNo	String	50	
 Amount	Number		
-Debt	BLOB		
+Debt	Boolean	
 Currency	String	50	
 Note	String	255	
-AdvDpManagerID	String	50	
-AdvDpManagerStickDeny	BLOB		
-AdvDpManagerStickApp	BLOB		
-AdvDpManagerName	String	50	
-AdvDpSignDate	Date		
-AdvAcsDpManagerID	String	50	
-AdvAcsDpManagerStickDeny	BLOB		
-AdvAcsDpManagerStickApp	BLOB		
-AdvAcsDpManagerName	String	50	
-AdvAcsSignDate	Date		
-AdvBODID	String	50	
-AdvBODStickDeny	BLOB		
-AdvBODStickApp	BLOB		
-AdvBODName	String	50	
-AdvBODSignDate	Date		
-SltAcsCashierName	String	50	
-SltCashierDate	Date		
-ClearStatus	BLOB		
-Status	String	255	
-AcsApproval	BLOB		
-SltDpComment	String	255	
-Shipper	String	255	
-ShipmentInfo	String	255	
-MBLNO	String	255	
-VAT	Number		
-BFVATAmount	Number		
+CompanyName	String	255	
+CompanyAddress	String	255	
+Website	String	50	
+Tel	String	100	
+Contact	String	100	
+Inword	Memo	
+JobId	String	50	
+JobIdFirst	String	50	
+SettleRequester	String	100	
+SettleRequestDate	String	50	
+AdvValue	String	50	
+AdvCurrency	String	10	
+AdvDate	String	50	
+SettlementNo	String	50	
+Customer	String	255	
+Consignee	String	255	
+Consigner	String	255	
 ContainerQty	String	255	
-Noofpieces	Number		
-UnitPieaces	String	255	
-GrossWeight	Number		
-NW	Number		
-CBM	Number		
-ShipperHBL	String	255	
-ConsigneeHBL	String	255	
-ModeSettle	String	255	
-STT	Number		
-Series	String	255	
-InvoiceDate	Date		
-Inword	String	255	
-InvoiceID	String	255	
-Commodity	String	255	
-ServiceType	String	255	
-SltCSName	String	255	
-SltCSStickDeny	BLOB		
-SltCSStickApp	BLOB		
-SltCSSignDate	Date		
+GW	Number	
+NW	Number	
+CustomsId	String	255	
+PSC	Number	
+CBM	Number	
+HBL	String	255	
+MBL	String	255	
+StlCSName	String	100	
+StlDpManagerName	String	100	
+StlDpManagerSignDate	String	50	
+StlAscDpManagerName	String	100	
+StlAscDpManagerSignDate	String	50	
+StlBODSignDate	String	50	
