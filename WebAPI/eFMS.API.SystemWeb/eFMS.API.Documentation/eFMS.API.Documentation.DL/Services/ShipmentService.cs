@@ -987,7 +987,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ServiceMode = item.ServiceMode;//chua co thong tin
                 data.ProductService = item.ProductService;
                 data.etd = item.ServiceDate;
-                data.Creator = sysUserRepo.Get(x => x.Id == item.UserCreated).Select(t => t.Username).FirstOrDefault();
+                data.Creator = sysUserRepo.Get(x => x.Id == item.BillingOpsId).Select(t => t.Username).FirstOrDefault();
                 data.CustomNo = GetCustomNoOldOfShipment(item.JobNo);
                 data.Created = item.DatetimeCreated;
                 lstShipment.Add(data);
