@@ -70,6 +70,8 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
             if (!!c.invoiceDate) {
                 const [day, month, year]: string[] = c.invoiceDate.split("/");
                 c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+            } else {
+                c.invoiceDate = null;
             }
         });
 

@@ -45,6 +45,7 @@ export class Contract {
     currencyId: string = null;
     isRequestApproval: boolean = false;
     partnerStatus: boolean = false;
+    isChangeAgrmentType: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

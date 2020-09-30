@@ -124,12 +124,12 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatContractModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            model.Id = Guid.NewGuid();
             string messageExisted = CheckExistedContract(model);
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
             }
+            model.Id = Guid.NewGuid();
             var hs = catContractService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
@@ -149,7 +149,7 @@ namespace eFMS.API.Catalogue.Controllers
         //[Route("CheckExisted")]
         //public IActionResult CheckExisted(CatContractModel model)
         //{
-      
+
         //    string messageDuplicate = string.Empty;
         //    bool existed = false;
         //    if(model.Id != Guid.Empty)
@@ -174,19 +174,35 @@ namespace eFMS.API.Catalogue.Controllers
             var office = model.OfficeId.Split(";").ToArray();
             if (model.Id != Guid.Empty)
             {
-                if(model.ContractType != "Official")
+                if (model.ContractType != "Official")
                 {
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) &&  x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                        {
+                            messageDuplicate = "Contract no has been existed!";
+                        }
+                    }
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.OfficeId != null && office.Any(y=> x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId && x.Id != model.Id))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
+
                 }
                 else
                 {
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.ContractNo  == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    if (!string.IsNullOrEmpty(model.ContractNo))
                     {
-                        messageDuplicate = "Contract no has been existed!";
+                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = "Contract no has been existed!";
+                        }
                     }
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Any(y => x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.Id != model.Id && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Duplicate service, office, salesman!";
+                    }
+
                 }
                 //if(catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && !string.IsNullOrEmpty(model.ContractNo)))
                 //{
@@ -198,17 +214,36 @@ namespace eFMS.API.Catalogue.Controllers
                 //existed = catContractService.Any(x => x.ContractNo == model.ContractNo && !string.IsNullOrEmpty( model.ContractNo));
                 if (model.ContractType != "Official")
                 {
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.PartnerId == model.PartnerId))
+                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    {
+                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = "Contract no has been existed!";
+                        }
+                    }
+
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.OfficeId != null && office.Any(y => x.OfficeId.Contains(y)) && x.SaleManId == model.SaleManId && x.PartnerId == model.PartnerId))
                     {
                         messageDuplicate = "Duplicate service, office, salesman!";
                     }
+
+
                 }
                 else
                 {
-                    if (catContractService.Any(x => x.SaleService == model.SaleService && office.Contains(x.OfficeId.ToLower()) && x.ContractNo == model.ContractNo && !string.IsNullOrEmpty(model.ContractNo) && x.PartnerId == model.PartnerId))
+                    if (!string.IsNullOrEmpty(model.ContractNo))
                     {
-                        messageDuplicate = "Contract no has been existed!";
+                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = "Contract no has been existed!";
+                        }
                     }
+
+                    if (catContractService.Any(x => x.SaleService == model.SaleService && x.SaleManId == model.SaleManId && office.Any(y => x.OfficeId.Contains(y)) && x.PartnerId == model.PartnerId))
+                    {
+                        messageDuplicate = "Duplicate service, office, salesman!";
+                    }
+
                 }
             }
 
@@ -231,6 +266,10 @@ namespace eFMS.API.Catalogue.Controllers
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
+            }
+            if (model.isChangeAgrmentType == true)
+            {
+                model.Active = false;
             }
             var hs = catContractService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -258,8 +297,8 @@ namespace eFMS.API.Catalogue.Controllers
             if (hs.Success)
             {
                 var objPartner = partnerService.Get(x => x.Id == partnerId).FirstOrDefault();
-                objPartner.SalePersonId = catContractService.Get(x=>x.PartnerId == partnerId)?.OrderBy(x=>x.DatetimeCreated).FirstOrDefault()?.SaleManId.ToString();
-                var hsPartner = partnerService.Update(objPartner, x=>x.Id == partnerId);
+                objPartner.SalePersonId = catContractService.Get(x => x.PartnerId == partnerId)?.OrderBy(x => x.DatetimeCreated).FirstOrDefault()?.SaleManId.ToString();
+                var hsPartner = partnerService.Update(objPartner, x => x.Id == partnerId);
                 if (!hsPartner.Success)
                 {
                     return BadRequest();
@@ -307,7 +346,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("UploadFileMoreContract/{PartnerId}/{contractIds}")]
         [Authorize]
-        public async Task<IActionResult> UploadFileMoreContract(List<IFormFile> files,string contractIds,string partnerId)
+        public async Task<IActionResult> UploadFileMoreContract(List<IFormFile> files, string contractIds, string partnerId)
         {
             string folderName = Request.Headers["Module"];
             ResultHandle result = new ResultHandle();
@@ -366,9 +405,9 @@ namespace eFMS.API.Catalogue.Controllers
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid id,string partnerId,[FromBody]SalesmanCreditModel credit)
+        public IActionResult ActiveInactiveContract(Guid id, string partnerId, [FromBody]SalesmanCreditModel credit)
         {
-            var hs = catContractService.ActiveInActiveContract(id, partnerId,credit);
+            var hs = catContractService.ActiveInActiveContract(id, partnerId, credit);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -388,9 +427,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet("RejectComment")]
         [Authorize]
-        public IActionResult RejectComment(string partnerId,string contractId, string comment, string partnerType)
+        public IActionResult RejectComment(string partnerId, string contractId, string comment, string partnerType)
         {
-            bool result = catContractService.SendMailRejectComment(partnerId,contractId, comment,partnerType);
+            bool result = catContractService.SendMailRejectComment(partnerId, contractId, comment, partnerType);
             return Ok(result);
         }
 
@@ -463,7 +502,8 @@ namespace eFMS.API.Catalogue.Controllers
                     else
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        if(dateEffect != null) {
+                        if (dateEffect != null)
+                        {
                             dateToPase = DateTime.Parse(dateEffect, culture);
                         }
                     }
@@ -478,7 +518,7 @@ namespace eFMS.API.Catalogue.Controllers
                     else
                     {
                         CultureInfo culture = new CultureInfo("es-ES");
-                        if(dateExpired != null)
+                        if (dateExpired != null)
                         {
                             dateToPaseExpired = DateTime.Parse(dateExpired, culture);
                         }
@@ -491,16 +531,16 @@ namespace eFMS.API.Catalogue.Controllers
                         CustomerId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         ContractNo = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         ContractType = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                        SaleService = worksheet.Cells[row, 4].Value?.ToString().Trim(), 
+                        SaleService = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         Company = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        Office  = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        Office = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                         EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
                         ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
                         PaymentMethod = worksheet.Cells[row, 9].Value?.ToString().Trim(),
-                        Vas = worksheet.Cells[row, 10].Value?.ToString().Trim(), 
+                        Vas = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         Salesman = worksheet.Cells[row, 11].Value?.ToString().Trim(),
                         PaymentTermTrialDay = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                        CreditLimited =  worksheet.Cells[row, 13].Value?.ToString().Trim(),
+                        CreditLimited = worksheet.Cells[row, 13].Value?.ToString().Trim(),
                         CreditLimitedRated = worksheet.Cells[row, 14].Value?.ToString().Trim(),
                         Status = worksheet.Cells[row, 15].Value?.ToString().Trim()
                     };

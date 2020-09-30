@@ -26,7 +26,14 @@ export * from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
 export * from './accouting/settlement-payment';
 export * from './accouting/advance-payment';
-export { PartnerOfAcctManagementResult, ChargeOfAccountingManagementModel, AccAccountingManagement, AccAccountingManagementModel, AccAccountingManagementResult } from './accouting/accounting-management';
+export {
+    PartnerOfAcctManagementResult,
+    ChargeOfAccountingManagementModel,
+    AccAccountingManagement,
+    AccAccountingManagementModel,
+    AccAccountingManagementResult,
+    AccAccountingManagementCriteria
+} from './accouting/accounting-management';
 export * from './accouting/cdnoteview.model';
 export * from './accouting/payment.model';
 export * from './accouting/accounting-payment.model';

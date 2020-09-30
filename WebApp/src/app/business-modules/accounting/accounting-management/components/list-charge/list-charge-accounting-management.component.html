@@ -87,14 +87,17 @@
                             </td>
                             <ng-container *ngIf="type !== 'invoice'">
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
+                                        (ngModelChange)="onChangeInvoiceNo(charge.invoiceNo)">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="charge.serie">
+                                    <input type="text" class="form-control" [(ngModel)]="charge.serie"
+                                        (ngModelChange)="onChangeSerieNo(charge.serie)">
                                 </td>
                                 <td>
                                     <input type="text" mask="d0/M0/0000" class="form-control"
-                                        [(ngModel)]="charge.invoiceDate" />
+                                        [(ngModel)]="charge.invoiceDate"
+                                        (ngModelChange)="onChangeInvoiceDate(charge.invoiceDate)" />
                                     <!-- [value]="charge.invoiceDate | mask:'00/00/0000'" -->
                                 </td>
                                 <td>{{charge.obhPartner}}</td>
