@@ -73,3 +73,8 @@ AdvCSStickDeny	Boolean
 TotalNorm	Number	
 TotalInvoice	Number	
 TotalOrther	Number	
+Inword	Memo	
+CompanyName	String	255	
+CompanyAddress	String	255	
+Website	String	100	
+Contact	String	255	

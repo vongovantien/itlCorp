@@ -1630,7 +1630,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- INSERT & UPDATE SETTLEMENT PAYMENT --
 
         #region --- PREVIEW SETTLEMENT PAYMENT ---
-        public decimal GetAdvanceAmountByShipmentAndCurrency(string JobId, string MBL, string HBL, string Currency)
+        public decimal GetAdvanceAmountByShipmentAndCurrency(string advanceNo, Guid hblId, string Currency)
         {
             //Chỉ lấy ra các charge có status advance là done
             //Quy đổi tỉ giá theo ngày hiện tại
@@ -1640,13 +1640,18 @@ namespace eFMS.API.Accounting.DL.Services
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
-            var advance = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
-            var request = acctAdvanceRequestRepo.Get(x => x.JobId == JobId && x.Mbl == MBL && x.Hbl == HBL);
-            var query = from adv in advance
-                        join req in request on adv.AdvanceNo equals req.AdvanceNo into req1
-                        from req in req1.DefaultIfEmpty()
-                        select req;
-            var advanceAmount = query.Sum(x => x.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.RequestCurrency, Currency));
+            var advanceNoDone = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == advanceNo && x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE).Select(s => s.AdvanceNo).FirstOrDefault();
+            var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advanceNo 
+            && x.AdvanceNo == advanceNoDone 
+            //&& x.JobId == jobNo 
+            //&& x.Mbl == mbl
+            //&& x.Hbl == hbl
+            && x.Hblid == hblId);
+            //var query = from adv in advance
+                        //join req in request on adv.AdvanceNo equals req.AdvanceNo //into req1
+                        //from req in req1.DefaultIfEmpty()
+                        //select req;
+            var advanceAmount = request.Sum(x => x.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.RequestCurrency, Currency));
             return advanceAmount.Value;
         }
 
@@ -1688,7 +1693,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 JobId = (s.opst.JobNo == null ? s.cst.JobNo : s.opst.JobNo),
                 AdvDate = (!string.IsNullOrEmpty(s.advance.StatusApproval) && s.advance.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE ? s.advance.DatetimeModified.Value.ToString("dd/MM/yyyy") : string.Empty),
-                SettlementNo = settlementNo,
                 Customer = s.cus.PartnerNameVn != null ? s.cus.PartnerNameVn.ToUpper() : string.Empty,
                 Consignee = s.cnee.PartnerNameVn != null ? s.cnee.PartnerNameVn.ToUpper() : string.Empty,
                 Consigner = s.cner.PartnerNameVn != null ? s.cner.PartnerNameVn.ToUpper() : string.Empty,
@@ -1706,7 +1710,6 @@ namespace eFMS.API.Accounting.DL.Services
             var result = new AscSettlementPaymentRequestReportParams();
             result.JobId = data.First().JobId;
             result.AdvDate = data.First().AdvDate;
-            result.SettlementNo = data.First().SettlementNo;
             result.Customer = data.First().Customer;
             result.Consignee = data.First().Consignee;
             result.Consigner = data.First().Consigner;
@@ -1741,6 +1744,74 @@ namespace eFMS.API.Accounting.DL.Services
             return customNos.FirstOrDefault() ?? string.Empty;
         }
 
+        public List<AscSettlementPaymentRequestReport> GetSettlementPaymentRequestReportBySettlementNo(string settlementNo)
+        {
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            var listSettlementPayment = new List<AscSettlementPaymentRequestReport>();
+
+            listSettlementPayment = GetChargeOfSettlement(settlementNo, settlement.SettlementCurrency).ToList();
+            if (listSettlementPayment.Count == 0)
+            {
+                return null;
+            }
+            // First shipment of Settlement
+            var firstShipment = GetFirstShipmentOfSettlement(settlementNo);
+            //Lấy thông tin các User Approve Settlement
+            var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
+            listSettlementPayment.ForEach(fe =>
+            {
+                fe.JobIdFirst = firstShipment.JobId;
+                fe.AdvDate = firstShipment.AdvDate;
+                fe.SettlementNo = settlementNo;
+                fe.Customer = firstShipment.Customer;
+                fe.Consignee = firstShipment.Consignee;
+                fe.Consigner = firstShipment.Consigner;
+                fe.ContainerQty = firstShipment.ContainerQty;
+                fe.GW = firstShipment.GW;
+                fe.NW = firstShipment.NW;
+                fe.CustomsId = firstShipment.CustomsId;
+                fe.PSC = firstShipment.PSC;
+                fe.CBM = firstShipment.CBM;
+                fe.HBL = firstShipment.HBL;
+                fe.MBL = firstShipment.MBL;
+                fe.StlCSName = firstShipment.StlCSName;
+
+                fe.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? userBaseService.GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
+                fe.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                fe.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : string.Empty;
+                fe.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                fe.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
+                fe.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                fe.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+
+                //Lấy ra tổng Advance Amount của các charge thuộc Settlement
+                decimal advanceAmount = 0;
+
+                var chargeOfSettlements = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Where(w => !string.IsNullOrEmpty(w.AdvanceNo)).Select(s => new { s.Hblid, s.AdvanceNo }).Distinct().ToList();
+                foreach (var charge in chargeOfSettlements)
+                {
+                    advanceAmount += GetAdvanceAmountByShipmentAndCurrency(charge.AdvanceNo, charge.Hblid, settlement.SettlementCurrency);
+                }
+                fe.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : string.Empty;
+                fe.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : string.Empty;
+
+                //Chuyển tiền Amount thành chữ
+                decimal _amount = advanceAmount > 0 ? advanceAmount : 0;
+                var _inword = string.Empty;
+                if (_amount > 0)
+                {
+                    var _currency = settlement.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ?
+                               (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
+                            :
+                            settlement.SettlementCurrency;
+
+                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                }
+                fe.Inword = _inword;
+            });
+            return listSettlementPayment;
+        }
+
         public IQueryable<AscSettlementPaymentRequestReport> GetChargeOfSettlement(string settlementNo, string currency)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
@@ -1748,9 +1819,7 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransDe = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
-
             var settle = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-
             //Quy đổi tỉ giá theo ngày Request Date, nếu không có thì lấy exchange rate mới nhất
             var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
@@ -1773,18 +1842,7 @@ namespace eFMS.API.Accounting.DL.Services
                        select new AscSettlementPaymentRequestReport
                        {
                            AdvID = settlementNo,
-                           AdvDate = DateTime.Now,
-                           AdvContact = string.Empty,
-                           AdvAddress = string.Empty,
-                           StlDescription = string.Empty,
-                           AdvanceNo = string.Empty,
-                           AdvValue = 0,
-                           AdvCurrency = string.Empty,
-                           Remains = 0,
-                           AdvanceDate = DateTime.Now,
-                           No = 0,
-                           CustomsID = string.Empty,
-                           JobID = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
+                           JobId = (opst.JobNo == null ? cst.JobNo : opst.JobNo),
                            HBL = (opst.Hwbno == null ? cstd.Hwbno : opst.Hwbno),
                            Description = cat.ChargeNameEn,
                            InvoiceNo = string.IsNullOrEmpty(sur.InvoiceNo) ? string.Empty : sur.InvoiceNo,
@@ -1792,128 +1850,57 @@ namespace eFMS.API.Accounting.DL.Services
                            Debt = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false,
                            Currency = string.Empty,
                            Note = sur.Notes,
-                           AdvDpManagerID = string.Empty,
-                           AdvDpManagerStickDeny = true,
-                           AdvDpManagerStickApp = true,
-                           AdvDpManagerName = string.Empty,
-                           AdvDpSignDate = DateTime.Now,
-                           AdvAcsDpManagerID = string.Empty,
-                           AdvAcsDpManagerStickDeny = true,
-                           AdvAcsDpManagerStickApp = true,
-                           AdvAcsDpManagerName = string.Empty,
-                           AdvAcsSignDate = DateTime.Now,
-                           AdvBODID = string.Empty,
-                           AdvBODStickDeny = true,
-                           AdvBODStickApp = true,
-                           AdvBODName = string.Empty,
-                           AdvBODSignDate = DateTime.Now,
-                           SltAcsCashierName = string.Empty,
-                           SltCashierDate = DateTime.Now,
-                           Saved = true,
-                           ClearStatus = true,
-                           Status = string.Empty,
-                           AcsApproval = true,
-                           SltDpComment = string.Empty,
-                           Shipper = string.Empty,
-                           ShipmentInfo = string.Empty,
-                           MBLNO = (opst.Mblno == null ? (cst.Mawb ?? string.Empty) : opst.Mblno),
-                           VAT = 0,
-                           BFVATAmount = 0,
-                           ContainerQty = string.Empty,
-                           Noofpieces = 0,
-                           UnitPieaces = string.Empty,
-                           GrossWeight = 0,
-                           NW = 0,
-                           CBM = 0,
-                           ShipperHBL = string.Empty,
-                           ConsigneeHBL = string.Empty,
-                           ModeSettle = string.Empty,
-                           STT = 0,
-                           Series = string.Empty,
-                           InvoiceDate = DateTime.Now,
-                           Inword = string.Empty,
-                           InvoiceID = string.Empty,
-                           Commodity = string.Empty,
-                           ServiceType = string.Empty,
-                           SltCSName = string.Empty,
-                           SltCSStickDeny = true,
-                           SltCSStickApp = true,
-                           SltCSSignDate = DateTime.Now,
+                           CompanyName = AccountingConstants.COMPANY_NAME,
+                           CompanyAddress = AccountingConstants.COMPANY_ADDRESS1,
+                           Website = AccountingConstants.COMPANY_WEBSITE,
+                           Tel = AccountingConstants.COMPANY_CONTACT,
+                           Contact = currentUser.UserName
                        };
 
-            return data.OrderByDescending(x => x.JobID);
+            return data.OrderByDescending(x => x.JobId);
         }
 
         public Crystal Preview(string settlementNo)
         {
             Crystal result = null;
-
-            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
-
-            var listSettlementPayment = new List<AscSettlementPaymentRequestReport>();
-
-            listSettlementPayment = GetChargeOfSettlement(settlementNo, settlement.SettlementCurrency).ToList();
-            if (listSettlementPayment.Count == 0)
-            {
-                return null;
-            }
-
-            var parameter = new AscSettlementPaymentRequestReportParams();
-            parameter = GetFirstShipmentOfSettlement(settlementNo);
-            if (parameter != null)
-            {
-                parameter.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? userBaseService.GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
-
-                parameter.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-
-                //Lấy thông tin các User Approve Settlement
-                var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
-                parameter.StlDpManagerName = infoSettleAprove != null ? infoSettleAprove.ManagerName : string.Empty;
-                parameter.StlDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.ManagerAprDate.HasValue ? infoSettleAprove.ManagerAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-                parameter.StlAscDpManagerName = infoSettleAprove != null ? infoSettleAprove.AccountantName : string.Empty;
-                parameter.StlAscDpManagerSignDate = infoSettleAprove != null && infoSettleAprove.AccountantAprDate.HasValue ? infoSettleAprove.AccountantAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-                parameter.StlBODSignDate = infoSettleAprove != null && infoSettleAprove.BuheadAprDate.HasValue ? infoSettleAprove.BuheadAprDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-
-                parameter.CompanyName = AccountingConstants.COMPANY_NAME;
-                parameter.CompanyAddress1 = AccountingConstants.COMPANY_ADDRESS1;
-                parameter.CompanyAddress2 = AccountingConstants.COMPANY_CONTACT;
-                parameter.Website = AccountingConstants.COMPANY_WEBSITE;
-                parameter.Contact = currentUser.UserName;//Get user login
-
-                //Lấy ra tổng Advance Amount của các charge thuộc Settlement
-                decimal advanceAmount = 0;
-                var shipments = listSettlementPayment.GroupBy(x => new { x.JobID, x.MBLNO, x.HBL }).Select(x => new { JobID = x.Key.JobID, MBLNO = x.Key.MBLNO, HBL = x.Key.HBL });
-                foreach (var item in shipments)
-                {
-                    advanceAmount += GetAdvanceAmountByShipmentAndCurrency(item.JobID, item.MBLNO, item.HBL, settlement.SettlementCurrency);
-                }
-                parameter.AdvValue = advanceAmount > 0 ? String.Format("{0:n}", advanceAmount) : string.Empty;
-                parameter.AdvCurrency = advanceAmount > 0 ? settlement.SettlementCurrency : string.Empty;
-
-                //Chuyển tiền Amount thành chữ
-                decimal _amount = advanceAmount > 0 ? advanceAmount : 0;
-                var _inword = string.Empty;
-                if (_amount > 0)
-                {
-                    var _currency = settlement.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ?
-                               (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
-                            :
-                            settlement.SettlementCurrency;
-
-                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
-                }
-                parameter.Inword = _inword;
-            }
-
+            var listSettlementPayment = GetSettlementPaymentRequestReportBySettlementNo(settlementNo);
             result = new Crystal
             {
-                ReportName = "AcsSettlementPaymentRequest.rpt",
+                ReportName = "AcsSettlementPaymentRequestSingle.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
             result.AddDataSource(listSettlementPayment);
             result.FormatType = ExportFormatType.PortableDocFormat;
-            result.SetParameter(parameter);
+            return result;
+        }
+
+        public Crystal PreviewMultipleSettlement(List<string> settlementNos)
+        {
+            Crystal result = null;
+            List<SettlementPaymentMulti> _settlementNos = new List<SettlementPaymentMulti>();
+            var listSettlement = new List<AscSettlementPaymentRequestReport>();
+            for (var i = 0; i < settlementNos.Count; i++)
+            {
+                var settlements = GetSettlementPaymentRequestReportBySettlementNo(settlementNos[i]);
+                foreach (var settlement in settlements)
+                {
+                    listSettlement.Add(settlement);
+                }
+
+                var _settlementNo = new SettlementPaymentMulti();
+                _settlementNo.SettlementNo = settlementNos[i];
+                _settlementNos.Add(_settlementNo);
+            }
+            result = new Crystal
+            {
+                ReportName = "AcsSettlementPaymentRequestMulti.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+            result.AddDataSource(_settlementNos);
+            result.AddSubReport("AcsSettlementPaymentRequestSingle.rpt", listSettlement);
+            result.FormatType = ExportFormatType.PortableDocFormat;
             return result;
         }
         #endregion --- PREVIEW SETTLEMENT PAYMENT ---
