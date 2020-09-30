@@ -2580,7 +2580,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                     SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
-                    var _partnerId = charge.CustomerID;
+                    var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
                     data.SupplierCode = _partner?.AccountNo;
                     data.SuplierName = _partner?.PartnerNameVn;
@@ -2657,7 +2657,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.Currency, criteria.Currency);
                     SummaryOfCostsIncurredExportResult data = new SummaryOfCostsIncurredExportResult();
-                    var _partnerId = charge.CustomerID;
+                    var _partnerId = charge.TypeCharge == "OBH" ? charge.PayerId : charge.CustomerID;
                     var _partner = catPartnerRepo.Get(x => x.Id == _partnerId).FirstOrDefault();
                     data.SupplierCode = _partner?.AccountNo;
                     data.SuplierName = _partner?.PartnerNameVn;
@@ -3194,6 +3194,10 @@ namespace eFMS.API.Documentation.DL.Services
                                            Unit = uni.UnitNameEn,
                                            InvoiceDate = sur.InvoiceDate
                                        };
+            if (query != null)
+            {
+                queryObhBuyOperation = queryObhBuyOperation.Where(x => !string.IsNullOrEmpty(x.Service)).Where(query);
+            }
             return queryObhBuyOperation;
         }
 
