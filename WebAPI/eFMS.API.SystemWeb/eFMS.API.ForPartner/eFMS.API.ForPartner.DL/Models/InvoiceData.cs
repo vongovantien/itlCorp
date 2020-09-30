@@ -9,7 +9,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public string ReferenceNo { get; set; }
         public string PartnerCode { get; set; }
         public string SerieNo { get; set; }
-        List<ChargeInvoice> Charges { get; set; }
+        public List<ChargeInvoice> Charges { get; set; }
 
     }
 }

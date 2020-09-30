@@ -11,7 +11,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public string NewInvoice { get; set; }
         public string SerieNo { get; set; }
         public DateTime InvoiceDate { get; set; }
-        List<ChargeInvoice> Charges { get; set; }
+        public List<ChargeInvoice> Charges { get; set; }
 
     }
 }
