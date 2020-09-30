@@ -14,11 +14,7 @@ import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-pa
 import { formatDate } from '@angular/common';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
-<<<<<<< HEAD
-import { getAdvancePaymentSearchParamsState } from './store';
-=======
 import { ReportPreviewComponent } from '@common';
->>>>>>> uat/21-09-2020-sprint19
 
 @Component({
     selector: 'app-advance-payment',
