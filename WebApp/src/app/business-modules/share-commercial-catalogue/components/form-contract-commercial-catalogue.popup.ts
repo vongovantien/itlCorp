@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { SalesmanCreditLimitPopupComponent } from '../../commercial/components/popup/salesman-credit-limit.popup';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
+import { ConfirmPopupComponent } from '@common';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -29,6 +30,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SalesmanCreditLimitPopupComponent, { static: false }) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent, { static: false }) popupRejectPartner: PartnerRejectPopupComponent;
+    @ViewChild(ConfirmPopupComponent, { static: false }) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -73,6 +75,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     idContract: string = SystemConstants.EMPTY_GUID;
     type: string = '';
+    contractTypeDetail: string = '';
+    isChangeAgrmentType: boolean = false;
 
     indexDetailContract: number = null;
 
@@ -347,6 +351,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.paymentMethod);
         this.setError(this.currencyId);
         this.isSubmitted = true;
+        let status = false;
         this.selectedContract.index = this.indexDetailContract;
         if (!this.effectiveDate.value.startDate) {
             return;
@@ -388,7 +393,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         }
                     );
             } else if (this.isUpdate && !this.isCreateNewCommercial) {
-                this._catalogueRepo.updateContract(this.selectedContract)
+                const body = new Contract(this.selectedContract);
+                if (this.contractTypeDetail !== this.contractType.value[0].id && this.selectedContract.active === true && this.isChangeAgrmentType === false) {
+                    status = this.statusContract;
+                    this.confirmChangeAgreementTypePopup.show();
+                    this.isChangeAgrmentType = true;
+                    return;
+                } else if (this.isChangeAgrmentType === true) {
+                    this.isChangeAgrmentType = true;
+                } else {
+                    this.isChangeAgrmentType = false;
+                }
+                if (this.selectedContract.active === false) {
+                    this.isChangeAgrmentType = null;
+                }
+                body.isChangeAgrmentType = this.isChangeAgrmentType;
+                this.confirmChangeAgreementTypePopup.hide();
+                this._catalogueRepo.updateContract(body)
                     .pipe(catchError(this.catchError))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
@@ -403,6 +424,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }
                         }
                     );
+
             } else {
                 this.selectedContract.username = this.users.find(x => x.id === this.selectedContract.saleManId).username;
                 if (this.selectedContract.officeId.includes(';')) {
@@ -430,8 +452,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     if (this.selectedContract.saleServiceName.charAt(this.selectedContract.saleServiceName.length - 2) === ';') {
                         this.selectedContract.saleServiceName = this.selectedContract.saleServiceName.substr(0, this.selectedContract.saleServiceName.length - 2);
                     }
-                }
-                else {
+                } else {
                     this.selectedContract.saleServiceName = this.selectedContract.saleService.toLowerCase();
                     const obj = this.serviceTypes.find(x => x.id === this.selectedContract.saleService);
 
@@ -529,6 +550,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             paymentMethod: !!this.selectedContract.paymentMethod ? [this.paymentMethods.find(type => type.id === this.selectedContract.paymentMethod)] : null,
             currencyId: !!this.selectedContract.currencyId ? [{ id: this.selectedContract.currencyId, text: this.selectedContract.currencyId }] : null
         });
+        this.contractTypeDetail = this.selectedContract.contractType;
     }
 
 
