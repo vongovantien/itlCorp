@@ -361,6 +361,7 @@ export class AdvancePaymentComponent extends AppList {
     }
 
     previewMultiple(advancePaymentIds: string[]) {
+        this._progressRef.start();
         this._accoutingRepo.previewAdvancePaymentMultiple(advancePaymentIds)
             .pipe(
                 catchError(this.catchError),

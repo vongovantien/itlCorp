@@ -16,18 +16,23 @@
                     <div class="m-form m--margin-bottom-10">
                         <div class="row">
                             <div class="col-lg-12">
-                                <button type="button" class="btn btn-success" (click)="issueVoucher()"
-                                    *ngIf="menuSpecialPermission | async | specialPermission:'IssueVoucher'">
-                                    <i class="la la-download"></i>Issue Voucher<span class="caret"></span>
-                                </button>
-                                <button class="btn btn-cancel  m-btn--icon m-btn--uppercase" (click)="printMultiple()">
-                                    <span>
-                                        <i class="la la-print"></i>
-                                        <span>
-                                            Print-Multiple
-                                        </span>
-                                    </span>
-                                </button>
+                                <div class="form-group">
+                                    <div class="c-button-actions">
+                                        <button type="button" class="btn btn-success" (click)="issueVoucher()"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'IssueVoucher'">
+                                            <i class="la la-download"></i>Issue Voucher<span class="caret"></span>
+                                        </button>
+                                        <button class="btn btn-cancel  m-btn--icon m-btn--uppercase"
+                                            (click)="printMultiple()">
+                                            <span>
+                                                <i class="la la-print"></i>
+                                                <span>
+                                                    Print-Multiple
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
