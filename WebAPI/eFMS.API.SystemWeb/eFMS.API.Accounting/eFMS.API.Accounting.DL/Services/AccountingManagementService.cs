@@ -1281,8 +1281,16 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 model.Charges.ForEach(fe =>
                 {
-                    var exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
-                    total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
+                    decimal exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(fe.FinalExchangeRate, fe.ExchangeDate, fe.Currency, model.Currency);
+                    if(exchangeRate == 1)
+                    {
+                        total += (exchangeRate * (fe.OrgVatAmount + fe.OrgAmount)) ?? 0;
+                    }
+                    else
+                    {
+                        decimal currentTotal = Math.Round(fe.AmountVnd + fe.VatAmountVnd ?? 0);
+                        total += currentTotal;
+                    }
                 });
                 if(model.Currency == "VND")
                 {
