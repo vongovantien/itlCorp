@@ -310,6 +310,7 @@ export class SettlementPaymentComponent extends AppList {
     }
 
     previewMultiple(settlementNos: string[]) {
+        this._progressRef.start();
         this._accoutingRepo.previewSettlementPaymentMultiple(settlementNos)
             .pipe(
                 catchError(this.catchError),

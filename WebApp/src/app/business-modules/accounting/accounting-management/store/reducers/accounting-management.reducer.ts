@@ -35,7 +35,7 @@ export const accountingManagementListReducer = createReducer(
     )
 );
 
-export function reducer(state: IAccountingManagementListState | undefined, action: Action) {
+export function acctMngtListReducer(state: IAccountingManagementListState | undefined, action: Action) {
     return accountingManagementListReducer(state, action);
 }
 
